@@ -29,7 +29,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     return <MetaLine style={{ bottom: 0 }}>
         <MetaLineHeader>
-            <MetaLineHeaderLine title={nls.localize('vuengine/musicEditor/effects', 'Effects')}>
+            <MetaLineHeaderLine title={nls.localize('vuengine/editors/music/effects', 'Effects')}>
                 <MagicWand size={16} />
             </MetaLineHeaderLine>
         </MetaLineHeader>

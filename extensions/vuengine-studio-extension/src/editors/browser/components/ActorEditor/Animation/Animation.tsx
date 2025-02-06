@@ -95,9 +95,9 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             <HContainer alignItems='start' gap={15} wrap='wrap'>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/default', 'Default')}
+                        label={nls.localize('vuengine/editors/actor/default', 'Default')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/defaultAnimationDescription',
+                            'vuengine/editors/actor/defaultAnimationDescription',
                             'Play this animation as the default when the actor is created.'
                         )}
                     />
@@ -111,9 +111,9 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 </VContainer>
                 <VContainer grow={1}>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/cycles', 'Cycles')}
+                        label={nls.localize('vuengine/editors/actor/cycles', 'Cycles')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/animationCyclesDescription',
+                            'vuengine/editors/actor/animationCyclesDescription',
                             'Each frame of this animation Number is display the fiven amount of CPU cycles.'
                         )}
                     />
@@ -130,9 +130,9 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 </VContainer>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/loop', 'Loop')}
+                        label={nls.localize('vuengine/editors/actor/loop', 'Loop')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/animationLoopDescription',
+                            'vuengine/editors/actor/animationLoopDescription',
                             'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
                         )}
                     />
@@ -147,9 +147,9 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 {!animation.loop &&
                     <VContainer grow={1}>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/callback', 'Callback')}
+                            label={nls.localize('vuengine/editors/actor/callback', 'Callback')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/animationCallbackDescription',
+                                'vuengine/editors/actor/animationCallbackDescription',
                                 'Provide the name of the method to call on animation completion.'
                             )}
                         />
@@ -163,7 +163,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             </HContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
+                    {nls.localize('vuengine/editors/actor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
                 </label>
                 <HContainer alignItems='start' wrap='wrap'>
                     {animation.frames.map((f, i) =>
@@ -183,7 +183,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                             <button
                                 className="theia-button secondary"
                                 onClick={() => removeFrame(i)}
-                                title={nls.localize('vuengine/actorEditor/removeFrame', 'Remove Frame')}
+                                title={nls.localizeByDefault('Remove')}
                             >
                                 <i className='codicon codicon-x' />
                             </button>
@@ -193,12 +193,12 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         ? <button
                             className='theia-button add-button'
                             onClick={addFrame}
-                            title={nls.localize('vuengine/actorEditor/addFrame', 'Add Frame')}
+                            title={nls.localizeByDefault('Add')}
                         >
                             <i className='codicon codicon-plus' />
                         </button>
                         : <div>
-                            {nls.localize('vuengine/actorEditor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
+                            {nls.localize('vuengine/editors/actor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
                         </div>
                     }
                 </HContainer>

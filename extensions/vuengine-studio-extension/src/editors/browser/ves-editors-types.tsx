@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { CommandService, MessageService, QuickPickService, URI } from '@theia/core';
+import { CommandService, MessageService, nls, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
     LocalStorageService,
@@ -61,3 +61,28 @@ export interface EditorCommand {
 export interface EditorCommands {
     [id: string]: EditorCommand
 }
+
+export const TYPE_LABELS: { [typeId: string]: string } = {
+    'Actor': nls.localize('vuengine/editors/general/typeLabels/actor', 'Actor'),
+    'Audio': nls.localize('vuengine/editors/general/typeLabels/audio', 'Audio'),
+    'BrightnessRepeat': nls.localize('vuengine/editors/general/typeLabels/brightnessRepeat', 'Brightness Repeat'),
+    'ColliderLayers': nls.localize('vuengine/editors/general/typeLabels/colliderLayers', 'Collider Layers'),
+    'ColumnTable': nls.localize('vuengine/editors/general/typeLabels/columnTable', 'Column Table'),
+    'CompilerConfig': nls.localize('vuengine/editors/general/typeLabels/compilerConfig', 'Compiler Config'),
+    'EngineConfig': nls.localize('vuengine/editors/general/typeLabels/engineConfig', 'Engine Config'),
+    'Events': nls.localize('vuengine/editors/general/typeLabels/events', 'Events'),
+    'Font': nls.localize('vuengine/editors/general/typeLabels/font', 'Font'),
+    'GameConfig': nls.localize('vuengine/editors/general/typeLabels/gameConfig', 'Game Config'),
+    'InGameTypes': nls.localize('vuengine/editors/general/typeLabels/inGameTypes', 'In-Game Types'),
+    'Image': nls.localize('vuengine/editors/general/typeLabels/image', 'Image'),
+    'Logic': nls.localize('vuengine/editors/general/typeLabels/logic', 'Logic'),
+    'Messages': nls.localize('vuengine/editors/general/typeLabels/messages', 'Messages'),
+    'Pcm': nls.localize('vuengine/editors/general/typeLabels/pcm', 'PCM'),
+    'PluginFile': nls.localize('vuengine/editors/general/typeLabels/pluginFile', 'Plugin File'),
+    'RumbleEffect': nls.localize('vuengine/editors/general/typeLabels/rumbleEffect', 'Rumble Effect'),
+    'RomInfo': nls.localize('vuengine/editors/general/typeLabels/romInfo', 'ROM Info'),
+    'Sprite': nls.localize('vuengine/editors/general/typeLabels/sprite', 'Sprite'),
+    'Stage': nls.localize('vuengine/editors/general/typeLabels/stage', 'Stage'),
+    'VsuSandbox': nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),
+    'WaveForm': nls.localize('vuengine/editors/general/typeLabels/waveForm', 'Wave Form'),
+};

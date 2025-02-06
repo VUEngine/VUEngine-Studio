@@ -55,62 +55,62 @@ export default function ComponentTree(): React.JSX.Element {
         {
             key: 'sprites',
             componentKey: 'sprites',
-            labelSingular: nls.localize('vuengine/actorEditor/sprite', 'Sprite'),
-            labelPlural: nls.localize('vuengine/actorEditor/sprites', 'Sprites'),
+            labelSingular: nls.localize('vuengine/editors/actor/sprite', 'Sprite'),
+            labelPlural: nls.localize('vuengine/editors/actor/sprites', 'Sprites'),
             hasContent: data.components?.sprites?.length > 0,
         },
         {
             key: 'animations',
             componentKey: 'animations',
-            labelSingular: nls.localize('vuengine/actorEditor/animation', 'Animation'),
-            labelPlural: nls.localize('vuengine/actorEditor/animations', 'Animations'),
+            labelSingular: nls.localize('vuengine/editors/actor/animation', 'Animation'),
+            labelPlural: nls.localize('vuengine/editors/actor/animations', 'Animations'),
             hasContent: data.components?.animations?.length > 0,
         },
         {
             key: 'colliders',
             componentKey: 'colliders',
-            labelSingular: nls.localize('vuengine/actorEditor/collider', 'Collider'),
-            labelPlural: nls.localize('vuengine/actorEditor/colliders', 'Colliders'),
+            labelSingular: nls.localize('vuengine/editors/actor/collider', 'Collider'),
+            labelPlural: nls.localize('vuengine/editors/actor/colliders', 'Colliders'),
             hasContent: data.components?.colliders?.length > 0,
         },
         {
             key: 'wireframes',
             componentKey: 'wireframes',
-            labelSingular: nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'),
-            labelPlural: nls.localize('vuengine/actorEditor/wireframes', 'Wireframes'),
+            labelSingular: nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'),
+            labelPlural: nls.localize('vuengine/editors/actor/wireframes', 'Wireframes'),
             hasContent: data.components?.wireframes?.length > 0,
         },
         {
             key: 'mutators',
             componentKey: 'mutators',
-            labelSingular: nls.localize('vuengine/actorEditor/mutator', 'Mutator'),
-            labelPlural: nls.localize('vuengine/actorEditor/mutators', 'Mutators'),
+            labelSingular: nls.localize('vuengine/editors/actor/mutator', 'Mutator'),
+            labelPlural: nls.localize('vuengine/editors/actor/mutators', 'Mutators'),
             hasContent: data.components?.mutators?.length > 0,
         },
         {
             key: 'children',
             componentKey: 'children',
-            labelSingular: nls.localize('vuengine/actorEditor/child', 'Child'),
-            labelPlural: nls.localize('vuengine/actorEditor/children', 'Children'),
+            labelSingular: nls.localize('vuengine/editors/actor/child', 'Child'),
+            labelPlural: nls.localize('vuengine/editors/actor/children', 'Children'),
             hasContent: data.components?.children?.length > 0,
         },
         {
             key: 'body',
-            labelSingular: nls.localize('vuengine/actorEditor/body', 'Body'),
-            labelPlural: nls.localize('vuengine/actorEditor/body', 'Body'),
-            // labelPlural: nls.localize('vuengine/actorEditor/bodies', 'Bodies'),
+            labelSingular: nls.localize('vuengine/editors/actor/body', 'Body'),
+            labelPlural: nls.localize('vuengine/editors/actor/body', 'Body'),
+            // labelPlural: nls.localize('vuengine/editors/actor/bodies', 'Bodies'),
             hasContent: data.body.enabled,
         },
         {
             key: 'extraProperties',
-            labelSingular: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
-            labelPlural: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
+            labelSingular: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
+            labelPlural: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
             hasContent: data.extraProperties.enabled,
         },
         {
             key: 'logic',
-            labelSingular: nls.localize('vuengine/actorEditor/logic', 'Logic'),
-            labelPlural: nls.localize('vuengine/actorEditor/logic', 'Logic'),
+            labelSingular: nls.localize('vuengine/editors/actor/logic', 'Logic'),
+            labelPlural: nls.localize('vuengine/editors/actor/logic', 'Logic'),
             hasContent: data.logic.enabled,
         },
     ];
@@ -151,7 +151,7 @@ export default function ComponentTree(): React.JSX.Element {
 
     treeData.push({
         id: 'addComponent',
-        name: nls.localize('vuengine/editors/addComponent', 'Add Component'),
+        name: nls.localize('vuengine/editors/general/addComponent', 'Add Component'),
     });
 
     return (
@@ -164,7 +164,7 @@ export default function ComponentTree(): React.JSX.Element {
             <label style={{
                 padding: 'var(--padding) var(--padding) 0',
             }}>
-                {nls.localize('vuengine/actorEditor/components', 'Components')}
+                {nls.localize('vuengine/editors/actor/components', 'Components')}
             </label>
             <div className='ves-tree' style={{
                 overflow: 'auto',

@@ -45,9 +45,9 @@ export default function EngineConfigAffine(props: EngineConfigAffineProps): Reac
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/affine/maxRowsPerCall', 'Maximum Rows Per Call')}
+                    label={nls.localize('vuengine/editors/engineConfig/affine/maxRowsPerCall', 'Maximum Rows Per Call')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/affine/maxRowsPerCallDescription',
+                        'vuengine/editors/engineConfig/affine/maxRowsPerCallDescription',
                         'The maximum number of rows to write on each call to affine calculation functions.'
                     )}
                 />
@@ -63,9 +63,9 @@ export default function EngineConfigAffine(props: EngineConfigAffineProps): Reac
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/affine/maxScale', 'Maximum Scale')}
+                    label={nls.localize('vuengine/editors/engineConfig/affine/maxScale', 'Maximum Scale')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/affine/maxScaleDescription',
+                        'vuengine/editors/engineConfig/affine/maxScaleDescription',
                         'The maximum possible scale. Affects param table allocation space.'
                     )}
                 />

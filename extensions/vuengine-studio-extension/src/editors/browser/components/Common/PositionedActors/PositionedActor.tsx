@@ -75,7 +75,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                 <HContainer alignItems='end' grow={1}>
                     <VContainer grow={1}>
                         <label>
-                            {nls.localize('vuengine/actorEditor/actor', 'Actor')}
+                            {nls.localize('vuengine/editors/actor/actor', 'Actor')}
                         </label>
                         <input
                             className='theia-input'
@@ -87,7 +87,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                     <button
                         className='theia-button secondary'
                         onClick={openEditor}
-                        title={nls.localize('vuengine/actorEditor/editActor', 'Edit Actor')}
+                        title={nls.localize('vuengine/editors/actor/editActor', 'Edit Actor')}
                     >
                         <i className='codicon codicon-edit' />
                     </button>
@@ -124,7 +124,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                 />
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/scale', 'Scale (x, y, z)')}
+                        {nls.localize('vuengine/editors/actor/scale', 'Scale (x, y, z)')}
                     </label>
                     <HContainer>
                         <input
@@ -185,7 +185,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                     </VContainer>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/editors/loadRegardlessOfPosition', 'Always load')}
+                            {nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
                         </label>
                         <input
                             type="checkbox"
@@ -196,7 +196,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                 </HContainer>
             </>
                 : <VContainer className='error'>
-                    {nls.localize('vuengine/editors/actorNotFound', 'Actor could not be found')}
+                    {nls.localize('vuengine/editors/general/actorNotFound', 'Actor could not be found')}
                 </VContainer>}
         </VContainer>
     );

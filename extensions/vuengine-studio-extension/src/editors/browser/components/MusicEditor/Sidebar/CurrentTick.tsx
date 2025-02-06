@@ -42,7 +42,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
 
     if (currentNote === -1) {
         return <VContainer gap={15} className="lightLabel">
-            {nls.localize('vuengine/musicEditor/selectNoteToEditProperties', 'Select a note to edit its properties')}
+            {nls.localize('vuengine/editors/music/selectNoteToEditProperties', 'Select a note to edit its properties')}
         </VContainer>;
     }
 
@@ -77,8 +77,8 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
 
     const showNewEventSelection = (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/musicEditor/addEffect', 'Add Effect'),
-            placeholder: nls.localize('vuengine/musicEditor/selectEffectToAdd', 'Select an effect to add...'),
+            title: nls.localize('vuengine/editors/music/addEffect', 'Add Effect'),
+            placeholder: nls.localize('vuengine/editors/music/selectEffectToAdd', 'Select an effect to add...'),
         };
         let previousCategory = '';
         const items: (QuickPickItem | QuickPickSeparator)[] = [];
@@ -116,7 +116,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/currentTick', 'Current Tick')}
+                    {nls.localize('vuengine/editors/music/currentTick', 'Current Tick')}
                 </label>
                 <input
                     className='theia-input'
@@ -135,14 +135,14 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/note', 'Note')}
+                    {nls.localize('vuengine/editors/music/note', 'Note')}
                 </label>
                 <InputWithAction>
                     <BasicSelect
                         options={[
                             {
                                 value: undefined,
-                                label: nls.localize('vuengine/musicEditor/none', 'None'),
+                                label: nls.localize('vuengine/editors/music/none', 'None'),
                             },
                             ...Object.keys(NOTES).map((n, i) => ({
                                 label: n,
@@ -168,7 +168,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     /> */}
                     <InputWithActionButton
                         className={`theia-button ${testing ? 'primary' : 'secondary'}`}
-                        title={nls.localize('vuengine/musicEditor/try', 'Try')}
+                        title={nls.localize('vuengine/editors/music/try', 'Try')}
                         onClick={() => testing ? stopTesting() : startTesting(note)}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -184,7 +184,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/effects', 'Effects')}
+                    {nls.localize('vuengine/editors/music/effects', 'Effects')}
                     {eventsWithoutNoteKeys.length > 0 &&
                         <>
                             {' '}<span className='count'>{eventsWithoutNoteKeys.length}</span>
@@ -205,7 +205,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     <button
                         className="theia-button add-button full-width"
                         onClick={addEvent}
-                        title={nls.localize('vuengine/musicEditor/addEffect', 'Add Effect')}
+                        title={nls.localize('vuengine/editors/music/addEffect', 'Add Effect')}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >

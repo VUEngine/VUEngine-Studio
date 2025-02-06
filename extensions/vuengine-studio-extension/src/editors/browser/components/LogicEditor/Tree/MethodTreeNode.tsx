@@ -29,7 +29,7 @@ export default function MethodTreeNode(props: NodeRendererProps<any>): React.JSX
             return;
         }
 
-        newMethodData.name = nls.localize('vuengine/logicEditor/method', 'Method');
+        newMethodData.name = nls.localize('vuengine/editors/logic/method', 'Method');
 
         updateData({
             ...data,
@@ -44,8 +44,8 @@ export default function MethodTreeNode(props: NodeRendererProps<any>): React.JSX
 
     const removeMethod = async (i: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/logicEditor/removeMethod', 'Remove Method'),
-            msg: nls.localize('vuengine/logicEditor/areYouSureYouWantToRemoveMethod', 'Are you sure you want to remove this method?'),
+            title: nls.localize('vuengine/editors/logic/removeMethod', 'Remove Method'),
+            msg: nls.localize('vuengine/editors/logic/areYouSureYouWantToRemoveMethod', 'Are you sure you want to remove this method?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -156,21 +156,21 @@ export default function MethodTreeNode(props: NodeRendererProps<any>): React.JSX
                     <i
                         className='codicon codicon-plus'
                         onClick={addMethod}
-                        title={nls.localize('vuengine/logicEditor/addMethod', 'Add Method')}
+                        title={nls.localizeByDefault('Add')}
                     />
                 }
                 {node.isLeaf && !node.parent?.isRoot &&
                     <i
                         className='codicon codicon-edit'
                         onClick={() => node.edit()}
-                        title={nls.localize('vuengine/logicEditor/editName', 'Edit Name')}
+                        title={nls.localize('vuengine/editors/logic/editName', 'Edit Name')}
                     />
                 }
                 {node.isLeaf && node.id !== 'addMethod' &&
                     <i
                         className='codicon codicon-trash'
                         onClick={() => removeMethod(index)}
-                        title={nls.localize('vuengine/logicEditor/removeMethod', 'Remove Method')}
+                        title={nls.localizeByDefault('Remove')}
                     />
                 }
             </div>

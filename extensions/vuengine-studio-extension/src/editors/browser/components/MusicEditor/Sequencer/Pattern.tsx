@@ -158,7 +158,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             />
             {patternId + 1}
             <StyledPatternRemove
-                title={nls.localize('vuengine/musicEditor/removePattern', 'Remove Pattern')}
+                title={nls.localizeByDefault('Remove')}
                 onClick={e => {
                     removeFromSequence(channel, index);
                     e.stopPropagation();

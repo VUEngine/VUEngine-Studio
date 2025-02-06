@@ -25,11 +25,11 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
             case 1:
             case 2:
             case 3:
-                return `${nls.localize('vuengine/musicEditor/waveShort', 'W')}${i + 1}`;
+                return `${nls.localize('vuengine/editors/music/waveShort', 'W')}${i + 1}`;
             case 4:
-                return nls.localize('vuengine/musicEditor/sweepModulationShort', 'SM');
+                return nls.localize('vuengine/editors/music/sweepModulationShort', 'SM');
             case 5:
-                return nls.localize('vuengine/musicEditor/noiseShort', 'N');
+                return nls.localize('vuengine/editors/music/noiseShort', 'N');
         }
         return '';
     };

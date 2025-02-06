@@ -29,7 +29,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                 setPattern={setPattern}
             />
             : <div className="lightLabel">
-                {nls.localize('vuengine/musicEditor/selectPatternToEditProperties', 'Select a pattern to edit its properties')}
+                {nls.localize('vuengine/editors/music/selectPatternToEditProperties', 'Select a pattern to edit its properties')}
             </div>
         }
     </>;

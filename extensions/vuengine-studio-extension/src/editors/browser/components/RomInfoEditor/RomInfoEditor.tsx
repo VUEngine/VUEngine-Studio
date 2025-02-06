@@ -61,9 +61,9 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
     return <VContainer gap={15}>
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/romInfoEditor/gameTitle', 'Game Title')}
+                label={nls.localize('vuengine/editors/romInfo/gameTitle', 'Game Title')}
                 tooltip={nls.localize(
-                    'vuengine/romInfoEditor/gameTitleDescription',
+                    'vuengine/editors/romInfo/gameTitleDescription',
                     "The game's title. Up to {0} characters.",
                     GAME_TITLE_MAX_LENGTH
                 )}
@@ -77,14 +77,14 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
         </VContainer>
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/romInfoEditor/gameCode', 'Game Code')}
+                label={nls.localize('vuengine/editors/romInfo/gameCode', 'Game Code')}
             />
             <HContainer gap={15}>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/romInfoEditor/system', 'System')}
+                        label={nls.localize('vuengine/editors/romInfo/system', 'System')}
                         tooltip={nls.localize(
-                            'vuengine/romInfoEditor/systemDescription',
+                            'vuengine/editors/romInfo/systemDescription',
                             '{0} character system code. Always "V" for "VUE".',
                             GAME_CODE_SYSTEM_MAX_LENGTH
                         )}
@@ -98,9 +98,9 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                 </VContainer>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/romInfoEditor/id', 'ID')}
+                        label={nls.localize('vuengine/editors/romInfo/id', 'ID')}
                         tooltip={nls.localize(
-                            'vuengine/romInfoEditor/idDescription',
+                            'vuengine/editors/romInfo/idDescription',
                             'Unique game identifier. {0} characters.',
                             GAME_CODE_ID_MAX_LENGTH
                         )}
@@ -114,9 +114,9 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                 </VContainer>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/romInfoEditor/language', 'Language')}
+                        label={nls.localize('vuengine/editors/romInfo/language', 'Language')}
                         tooltip={nls.localize(
-                            'vuengine/romInfoEditor/languageDescription',
+                            'vuengine/editors/romInfo/languageDescription',
                             'In-game language. {0} character. Usually "E" for "English", "J" for "Japanese" or "M" for multiple languages.',
                             GAME_CODE_LANGUAGE_MAX_LENGTH
                         )}
@@ -132,9 +132,9 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
         </VContainer>
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/romInfoEditor/makerCode', 'Maker Code')}
+                label={nls.localize('vuengine/editors/romInfo/makerCode', 'Maker Code')}
                 tooltip={nls.localize(
-                    'vuengine/romInfoEditor/makerCodeDescription',
+                    'vuengine/editors/romInfo/makerCodeDescription',
                     "Unique {0} character identifier of the game's developer.",
                     MAKER_CODE_MAX_LENGTH
                 )}
@@ -148,9 +148,9 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
         </VContainer>
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/romInfoEditor/revision', 'Revision')}
+                label={nls.localize('vuengine/editors/romInfo/revision', 'Revision')}
                 tooltip={nls.localize(
-                    'vuengine/romInfoEditor/revisionDescription',
+                    'vuengine/editors/romInfo/revisionDescription',
                     'Version of the game, should be counted up with every release.',
                 )}
             />

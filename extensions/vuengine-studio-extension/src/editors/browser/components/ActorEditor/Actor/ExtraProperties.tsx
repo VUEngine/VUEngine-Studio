@@ -34,19 +34,19 @@ export default function ExtraProperties(): React.JSX.Element {
     return (
         <VContainer gap={15}>
             <Input
-                label={nls.localize('vuengine/actorEditor/extraInfo', 'Extra Info')}
+                label={nls.localize('vuengine/editors/actor/extraInfo', 'Extra Info')}
                 value={data.extraProperties.extraInfo}
                 setValue={v => setExtraInfo(v as string)}
                 commands={INPUT_BLOCKING_COMMANDS}
             />
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/actorSize', 'Size (x, y, z)')}
+                    label={nls.localize('vuengine/editors/actor/actorSize', 'Size (x, y, z)')}
                     tooltip={
                         nls.localize(
-                            'vuengine/actorEditor/actorSizeDescription',
-                            'Size of the actor in pixels. Used by streaming to test if out of screen bounds. ' +
-                            'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
+                            'vuengine/editors/actor/actorSizeDescription',
+                            "Size of the actor in pixels. Used by streaming to test if out of screen bounds. \
+If 0, width and height will be inferred from the first sprite's texture size."
                         )}
                 />
                 <HContainer>

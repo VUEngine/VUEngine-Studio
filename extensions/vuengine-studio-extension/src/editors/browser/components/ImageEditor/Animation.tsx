@@ -36,7 +36,7 @@ export default function Animation(): React.JSX.Element {
     return <VContainer gap={10}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/imageEditor/animation', 'Animation')}
+                {nls.localize('vuengine/editors/image/animation', 'Animation')}
             </label>
             <label>
                 <input
@@ -44,7 +44,7 @@ export default function Animation(): React.JSX.Element {
                     checked={imageData.animation.isAnimation}
                     onChange={toggleIsAnimation}
                 />
-                {nls.localize('vuengine/imageEditor/isAnimation', 'Is animation')}
+                {nls.localize('vuengine/editors/image/isAnimation', 'Is animation')}
             </label>
             {imageData.animation.isAnimation && <label>
                 <input
@@ -52,11 +52,11 @@ export default function Animation(): React.JSX.Element {
                     checked={imageData.animation.individualFiles}
                     onChange={toggleIndividualFiles}
                 />
-                {nls.localize('vuengine/imageEditor/individualFiles', 'Frames are separate image files')}
+                {nls.localize('vuengine/editors/image/individualFiles', 'Frames are separate image files')}
             </label>}
         </VContainer>
         {imageData.animation.isAnimation && !imageData.animation.individualFiles && <VContainer>
-            <label>{nls.localize('vuengine/imageEditor/frames', 'Frames')}</label>
+            <label>{nls.localize('vuengine/editors/image/frames', 'Frames')}</label>
             <input
                 className='theia-input'
                 type='number'

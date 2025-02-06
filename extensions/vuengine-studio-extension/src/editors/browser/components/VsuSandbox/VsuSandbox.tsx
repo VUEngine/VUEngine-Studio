@@ -92,15 +92,15 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
         <Tabs>
             <TabList>
                 <Tab key="tab-channels">
-                    {nls.localize('vuengine/vsuSandbox/channels', 'Channels')}
+                    {nls.localize('vuengine/editors/vsuSandbox/channels', 'Channels')}
                 </Tab>
                 {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                     <Tab key={`tab-waveform-${x}`}>
-                        {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')} {x + 1}
+                        {nls.localize('vuengine/editors/vsuSandbox/waveForm', 'WaveForm')} {x + 1}
                     </Tab>
                 ))}
                 <Tab key="tab-mod-data">
-                    {nls.localize('vuengine/vsuSandbox/modulationData', 'Modulation Data')}
+                    {nls.localize('vuengine/editors/vsuSandbox/modulationData', 'Modulation Data')}
                 </Tab>
             </TabList>
             <TabPanel key="tabpanel-channels">

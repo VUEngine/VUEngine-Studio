@@ -401,9 +401,9 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     </HContainer>
                     <VContainer grow={1} overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
+                            {nls.localize('vuengine/editors/font/alphabet', 'Alphabet')}{' '}
                             <span className="secondaryText">
-                                ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Arrow Keys To Navigate')})
+                                ({nls.localize('vuengine/editors/font/alphabetNavigationDescription', 'Arrow Keys To Navigate')})
                             </span>
                         </label>
                         <Alphabet
@@ -432,20 +432,21 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 <HContainer gap={15} justifyContent="space-between">
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/compression', 'Compression')}
+                            label={nls.localize('vuengine/editors/actor/compression', 'Compression')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/compressionDescription',
-                                // eslint-disable-next-line max-len
-                                'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                                'vuengine/editors/actor/compressionDescription',
+                                'Image data can be stored in a compressed format to save ROM space. \
+Comes at the cost of a slightly higher CPU load when loading data into memory. \
+Will be skipped if compressed data is not smaller than source data.'
                             )}
                             tooltipPosition='bottom'
                         />
                         <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/actorEditor/none', 'None'),
+                                label: nls.localize('vuengine/editors/actor/compressionType/none', 'None'),
                                 value: ImageCompressionType.NONE,
                             }, {
-                                label: nls.localize('vuengine/actorEditor/rle', 'RLE'),
+                                label: 'RLE',
                                 value: ImageCompressionType.RLE,
                             }]}
                             defaultValue={data.compression}

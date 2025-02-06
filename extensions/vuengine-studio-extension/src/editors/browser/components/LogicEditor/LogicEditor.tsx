@@ -64,7 +64,7 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
             >
               <HideTreeButton
                 className="theia-button secondary"
-                title={nls.localize('vuengine/logicEditor/showMethodsTree', 'Show Methods Tree')}
+                title={nls.localize('vuengine/editors/logic/showMethodsTree', 'Show Methods Tree')}
                 onClick={() => setLeftSidebarOpen(false)}
               >
                 <i className="codicon codicon-chevron-left" />
@@ -77,7 +77,7 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
                   opacity: leftSidebarOpen ? 0 : 1,
                 }}
                 className="theia-button secondary"
-                title={nls.localize('vuengine/logicEditor/showMethodsTree', 'Show Methods Tree')}
+                title={nls.localize('vuengine/editors/logic/showMethodsTree', 'Show Methods Tree')}
                 onClick={() => setLeftSidebarOpen(true)}
               >
                 <i className="codicon codicon-list-tree" />

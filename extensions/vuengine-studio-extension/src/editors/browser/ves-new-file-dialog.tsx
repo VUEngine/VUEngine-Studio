@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify';
 import * as React from 'react';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectContributor, ProjectDataTypesWithContributor } from '../../project/browser/ves-project-types';
+import { TYPE_LABELS } from './ves-editors-types';
 
 @injectable()
 export class VesNewFileDialogProps extends DialogProps {
@@ -60,14 +61,14 @@ export class VesNewFileDialog extends ReactDialog<string> {
             </div>
             <div style={{ alignItems: 'end', display: 'flex', gap: 'calc(var(--theia-ui-padding) * 2)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--theia-ui-padding)', flexGrow: 1 }}>
-                    <label style={{ marginTop: 'var(--theia-ui-padding)' }}>{nls.localize('vuengine/editors/newFileDialog/fileName', 'File Name')}</label>
+                    <label style={{ marginTop: 'var(--theia-ui-padding)' }}>{nls.localize('vuengine/editors/general/newFileDialog/fileName', 'File Name')}</label>
                     <div style={{ display: 'flex', alignItems: 'end', gap: 'var(--theia-ui-padding)' }}>
                         <input
                             type="text"
                             className="theia-input"
                             style={{ flexGrow: 2, width: 0 }}
                             spellCheck="false"
-                            placeholder={nls.localize('vuengine/editors/newFileDialog/fileName', 'File Name')}
+                            placeholder={nls.localize('vuengine/editors/general/newFileDialog/fileName', 'File Name')}
                             value={this.name}
                             tabIndex={0}
                             onChange={e => {
@@ -83,7 +84,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             className="theia-input"
                             style={{ flexGrow: 1, width: 0 }}
                             spellCheck="false"
-                            placeholder={nls.localize('vuengine/editors/newFileDialog/extension', 'extension')}
+                            placeholder={nls.localize('vuengine/editors/general/newFileDialog/extension', 'extension')}
                             value={this.ext}
                             onChange={e => {
                                 this.ext = e.currentTarget.value;
@@ -114,16 +115,16 @@ export class VesNewFileDialog extends ReactDialog<string> {
                     >
                         <optgroup>
                             <option value="">
-                                {nls.localize('vuengine/editors/newFileDialog/types/None', 'None')}
+                                {nls.localize('vuengine/editors/general/newFileDialog/types/None', 'None')}
                             </option>
                             <option value=".c / .h">
-                                {nls.localize('vuengine/editors/newFileDialog/types/SourceAndHeader', 'Source & Header')}
+                                {nls.localize('vuengine/editors/general/newFileDialog/types/SourceAndHeader', 'Source & Header')}
                             </option>
                             <option value=".c">
-                                {nls.localize('vuengine/editors/newFileDialog/types/Source', 'Source Code')}
+                                {nls.localize('vuengine/editors/general/newFileDialog/types/Source', 'Source Code')}
                             </option>
                             <option value=".h">
-                                {nls.localize('vuengine/editors/newFileDialog/types/Header', 'Header')}
+                                {nls.localize('vuengine/editors/general/newFileDialog/types/Header', 'Header')}
                             </option>
                         </optgroup>
 
@@ -134,7 +135,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                     const ext = this.props.types[typeId].file;
                                     return (
                                         <option value={ext} key={ext}>
-                                            {nls.localize(`vuengine/projects/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                            {TYPE_LABELS[typeId] ?? this.props.types[typeId].schema.title}
                                         </option>
                                     );
                                 })}

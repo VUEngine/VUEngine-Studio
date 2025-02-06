@@ -164,10 +164,10 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       {animate &&
         <div className='current-frame'>
           <div>
-            {nls.localize('vuengine/actorEditor/step', 'Step')} {currentAnimationStep + 1}
+            {nls.localize('vuengine/editors/actor/step', 'Step')} {currentAnimationStep + 1}
           </div>
           <div>
-            {nls.localize('vuengine/actorEditor/frame', 'Frame')} {actualCurrentFrame + 1}
+            {nls.localize('vuengine/editors/actor/frame', 'Frame')} {actualCurrentFrame + 1}
           </div>
         </div>
       }
@@ -242,14 +242,14 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             >
               {
                 nls.localize(
-                  'vuengine/actorEditor/actorIsEmpty',
+                  'vuengine/editors/actor/actorIsEmpty',
                   'This Actor is empty',
                 )
               }
             </div>
             <div>
               {nls.localize(
-                'vuengine/actorEditor/clickBelowToAddFirstComponent',
+                'vuengine/editors/actor/clickBelowToAddFirstComponent',
                 'Click below to add the first component',
               )}
             </div>
@@ -260,7 +260,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
                 marginTop: 20
               }}
             >
-              <i className='codicon codicon-add' /> {nls.localize('vuengine/editors/addComponent', 'Add Component')}
+              <i className='codicon codicon-add' /> {nls.localize('vuengine/editors/general/addComponent', 'Add Component')}
             </button>
           </>
           : <>
@@ -271,13 +271,13 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
               }}
             >
               {nls.localize(
-                'vuengine/actorEditor/noPreviewableComponents',
+                'vuengine/editors/actor/noPreviewableComponents',
                 'This actor does not yet have any previewable components',
               )}
             </div>
             <div>
               {nls.localize(
-                'vuengine/actorEditor/previewableComponentsList',
+                'vuengine/editors/actor/previewableComponentsList',
                 'Add either a child, collider, sprite or wireframe',
               )}
             </div>

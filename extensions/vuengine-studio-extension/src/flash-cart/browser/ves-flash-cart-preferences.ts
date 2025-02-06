@@ -61,11 +61,11 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
           args: {
             type: 'string',
             description:
-              'Arguments to pass to flasher software. You can use the following placeholders: ' +
-              "%NAME%: project's name " +
-              "%NAME_NO_SPACE%: project's name with spaces removed " +
-              "%ROM%: project's output ROM image path " +
-              '%PORT%: port the flash cart is connected to ',
+              "Arguments to pass to flasher software. You can use the following placeholders: \
+%NAME%: project's name \
+%NAME_NO_SPACE%: project's name with spaces removed \
+%ROM%: project's output ROM image path \
+%PORT%: port the flash cart is connected to ",
           },
           padRom: {
             type: 'boolean',

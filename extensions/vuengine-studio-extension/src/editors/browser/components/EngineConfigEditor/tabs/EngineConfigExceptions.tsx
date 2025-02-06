@@ -62,9 +62,9 @@ export default function EngineConfigExceptions(props: EngineConfigExceptionsProp
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/exceptions/position', 'Position (x, y)')}
+                    label={nls.localize('vuengine/editors/engineConfig/exceptions/position', 'Position (x, y)')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/exceptions/positionDescription',
+                        'vuengine/editors/engineConfig/exceptions/positionDescription',
                         'The camera coordinates for the output of exceptions.'
                     )}
                 />

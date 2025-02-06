@@ -42,7 +42,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
     return (
         <VContainer>
             <label>
-                {nls.localize('vuengine/editors/rotation', 'Rotation (x, y, z)')}
+                {nls.localize('vuengine/editors/general/rotation', 'Rotation (x, y, z)')}
             </label>
             <HContainer wrap='wrap'>
                 <VContainer>

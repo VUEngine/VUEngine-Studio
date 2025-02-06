@@ -149,9 +149,9 @@ export default function EngineConfigTexture(props: EngineConfigTextureProps): Re
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/printing/bgmapsPerSegments', 'BGMaps Per Segments')}
+                    label={nls.localize('vuengine/editors/engineConfig/printing/bgmapsPerSegments', 'BGMaps Per Segments')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/printing/bgmapsPerSegmentsDescription',
+                        'vuengine/editors/engineConfig/printing/bgmapsPerSegmentsDescription',
                         'Number of BGMap specs in each BGMap segment.',
                     )}
                 />
@@ -167,9 +167,9 @@ export default function EngineConfigTexture(props: EngineConfigTextureProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/printing/paramTableSegments', 'Param Table Segments')}
+                    label={nls.localize('vuengine/editors/engineConfig/printing/paramTableSegments', 'Param Table Segments')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/printing/paramTableSegmentsDescription',
+                        'vuengine/editors/engineConfig/printing/paramTableSegmentsDescription',
                         'Number of segments for param tables.',
                     )}
                 />
@@ -185,7 +185,7 @@ export default function EngineConfigTexture(props: EngineConfigTextureProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/printing/printingAreaOffset', 'Printing Area Offset (x, y, parallax)')}
+                    label={nls.localize('vuengine/editors/engineConfig/printing/printingAreaOffset', 'Printing Area Offset (x, y, parallax)')}
                 />
                 <HContainer>
                     <input
@@ -219,7 +219,7 @@ export default function EngineConfigTexture(props: EngineConfigTextureProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/printing/printableArea', 'Printable Area')}
+                    label={nls.localize('vuengine/editors/engineConfig/printing/printableArea', 'Printable Area')}
                 />
                 <input
                     className="theia-input"

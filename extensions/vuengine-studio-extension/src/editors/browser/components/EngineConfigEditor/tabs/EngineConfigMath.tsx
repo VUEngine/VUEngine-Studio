@@ -55,7 +55,7 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/math/fixedPointPrecision', 'Fixed Point Precision')}
+                    {nls.localize('vuengine/editors/engineConfig/math/fixedPointPrecision', 'Fixed Point Precision')}
                 </label>
                 <input
                     className="theia-input"
@@ -69,7 +69,7 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/math/addUserInputAndTimeToRandomSeed', 'Add User Input and Time To Random Seed')}
+                    {nls.localize('vuengine/editors/engineConfig/math/addUserInputAndTimeToRandomSeed', 'Add User Input and Time To Random Seed')}
                 </label>
                 <input
                     type="checkbox"
@@ -79,7 +79,7 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/math/randomSeedCycles', 'Random Seed Cycles')}
+                    {nls.localize('vuengine/editors/engineConfig/math/randomSeedCycles', 'Random Seed Cycles')}
                 </label>
                 <input
                     className="theia-input"

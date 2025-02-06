@@ -7,7 +7,7 @@ export namespace VesRumblePackCommands {
       label: 'Detect Connected Rumble Pack',
       category: 'Rumble Pack',
     },
-    'vuengine/rumblePack/commands/detectConnected',
-    'vuengine/rumblePack/commands/category'
+    'vuengine/editors/rumbleEffect/commands/detectConnected',
+    'vuengine/editors/rumbleEffect/commands/category'
   );
 };

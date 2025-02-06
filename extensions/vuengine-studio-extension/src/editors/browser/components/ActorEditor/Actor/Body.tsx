@@ -79,7 +79,7 @@ export default function Body(): React.JSX.Element {
     return (
         <HContainer gap={15} wrap='wrap'>
             <Input
-                label={nls.localize('vuengine/actorEditor/mass', 'Mass')}
+                label={nls.localize('vuengine/editors/actor/mass', 'Mass')}
                 value={data.body.mass}
                 setValue={v => setMass(v as number)}
                 type='number'
@@ -90,7 +90,7 @@ export default function Body(): React.JSX.Element {
                 commands={INPUT_BLOCKING_COMMANDS}
             />
             <Input
-                label={nls.localize('vuengine/actorEditor/friction', 'Friction')}
+                label={nls.localize('vuengine/editors/actor/friction', 'Friction')}
                 value={data.body.friction}
                 setValue={v => setFriction(v as number)}
                 type='number'
@@ -101,7 +101,7 @@ export default function Body(): React.JSX.Element {
                 commands={INPUT_BLOCKING_COMMANDS}
             />
             <Input
-                label={nls.localize('vuengine/actorEditor/bounciness', 'Bounciness')}
+                label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
                 value={data.body.bounciness}
                 setValue={v => setBounciness(v as number)}
                 type='number'
@@ -113,7 +113,7 @@ export default function Body(): React.JSX.Element {
             />
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/maximumVelocity', 'Maximum Velocity (x, y, z)')}
+                    {nls.localize('vuengine/editors/actor/maximumVelocity', 'Maximum Velocity (x, y, z)')}
                 </label>
                 <HContainer>
                     <Input
@@ -146,7 +146,7 @@ export default function Body(): React.JSX.Element {
                 </HContainer>
             </VContainer>
             <Input
-                label={nls.localize('vuengine/actorEditor/maximumSpeed', 'Maximum Speed')}
+                label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
                 value={data.body.maximumSpeed}
                 setValue={v => setMaximumSpeed(v as number)}
                 type='number'
@@ -157,9 +157,9 @@ export default function Body(): React.JSX.Element {
             />
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/gravityAxes', 'Gravity Axes')}
+                    label={nls.localize('vuengine/editors/actor/gravityAxes', 'Gravity Axes')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/gravityAxesDescription',
+                        'vuengine/editors/actor/gravityAxesDescription',
                         'Select the axes on which the actor should be subject to gravity.'
                     )}
                 />
@@ -184,12 +184,12 @@ export default function Body(): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/rotationAxes', 'Rotation Axes')}
+                    label={nls.localize('vuengine/editors/actor/rotationAxes', 'Rotation Axes')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/rotationAxesDescription',
-                        'Select the axes around which the actor\'s spatial rotation syncs with its body\'s direction, ' +
-                        'which propagates to its sprites, colliders and wireframes. ' +
-                        'Note that sprites need to use AFFINE mode to be able to be rotated.',
+                        'vuengine/editors/actor/rotationAxesDescription',
+                        'Select the axes around which the actor\'s spatial rotation syncs with its body\'s direction, \
+which propagates to its sprites, colliders and wireframes. \
+Note that sprites need to use AFFINE mode to be able to be rotated.',
                     )}
                 />
                 <RadioSelect

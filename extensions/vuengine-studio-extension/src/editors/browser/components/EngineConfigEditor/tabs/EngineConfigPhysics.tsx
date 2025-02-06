@@ -193,13 +193,13 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/physics/angleToPreventColliderDisplacement',
+                        'vuengine/editors/engineConfig/physics/angleToPreventColliderDisplacement',
                         'Angle To Prevent Collider Displacement'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/physics/angleToPreventColliderDisplacementDescription',
-                        'Minimum angle to allow movement when colliding against another object. ' +
-                        'Smaller values allow movement to start when colliding against a collider and trying to move towards it.'
+                        'vuengine/editors/engineConfig/physics/angleToPreventColliderDisplacementDescription',
+                        'Minimum angle to allow movement when colliding against another object. \
+Smaller values allow movement to start when colliding against a collider and trying to move towards it.'
                     )}
                 />
                 <input
@@ -215,7 +215,7 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/physics/frictionForceFactorPower',
+                        'vuengine/editors/engineConfig/physics/frictionForceFactorPower',
                         'Friction Force Factor Power'
                     )}
                 />
@@ -231,7 +231,7 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/gravity', 'Gravity')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/gravity', 'Gravity')}
                 />
                 <input
                     className="theia-input"
@@ -245,9 +245,9 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/highPrecision', 'High Precision')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/highPrecision', 'High Precision')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/physics/highPrecisionDescription',
+                        'vuengine/editors/engineConfig/physics/highPrecisionDescription',
                         'Use higher precision data type (fix7.9) to perform physics simulations.',
                     )}
                 />
@@ -259,7 +259,7 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/maximumBouncinessCoefficient', 'Maximum Bounciness Coefficient')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/maximumBouncinessCoefficient', 'Maximum Bounciness Coefficient')}
                 />
                 <input
                     className="theia-input"
@@ -273,7 +273,7 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/maximumFrictionCoefficient', 'Maximum Friction Coefficient')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/maximumFrictionCoefficient', 'Maximum Friction Coefficient')}
                 />
                 <input
                     className="theia-input"
@@ -287,7 +287,7 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/stopBouncingVelocityThreshold', 'Stop Bouncing Velocity Threshold')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/stopBouncingVelocityThreshold', 'Stop Bouncing Velocity Threshold')}
                 />
                 <input
                     className="theia-input"
@@ -301,9 +301,9 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/stopVelocityThreshold', 'Stop Velocity Threshold')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/stopVelocityThreshold', 'Stop Velocity Threshold')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/physics/stopVelocityThresholdDescription',
+                        'vuengine/editors/engineConfig/physics/stopVelocityThresholdDescription',
                         'Threshold to stop bodies.'
                     )}
                 />
@@ -319,9 +319,9 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/timeElapsedDivisor', 'Time Elapsed Divisor')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/timeElapsedDivisor', 'Time Elapsed Divisor')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/physics/timeElapsedDivisorDescription',
+                        'vuengine/editors/engineConfig/physics/timeElapsedDivisorDescription',
                         'Divisor to speed up physics simulations. Bigger number equals faster computations.'
                     )}
                 />
@@ -337,9 +337,9 @@ export default function EngineConfigPhysics(props: EngineConfigPhysicsProps): Re
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/physics/collidersMaximumSize', 'Colliders Maximum Size')}
+                    label={nls.localize('vuengine/editors/engineConfig/physics/collidersMaximumSize', 'Colliders Maximum Size')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/physics/collidersMaximumSizeDescription',
+                        'vuengine/editors/engineConfig/physics/collidersMaximumSizeDescription',
                         'Maximum size of colliders allowed to avoid checks against far away colliders.'
                     )}
                 />

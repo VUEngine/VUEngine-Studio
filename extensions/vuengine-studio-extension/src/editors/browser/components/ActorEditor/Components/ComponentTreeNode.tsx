@@ -268,35 +268,35 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     <i
                         className={showPreview === false ? 'fa fa-eye-slash' : 'fa fa-eye'}
                         onClick={toggleComponentVisibility}
-                        title={nls.localize('vuengine/actorEditor/toggleComponentVisibility', 'Toggle Component Visibility')}
+                        title={nls.localize('vuengine/editors/actor/toggleComponentVisibility', 'Toggle Component Visibility')}
                     />
                 }
                 {!node.isLeaf && node.parent?.isRoot && ADDABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-plus'
                         onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
-                        title={nls.localize('vuengine/actorEditor/addComponent', 'Add Component')}
+                        title={nls.localizeByDefault('Add')}
                     />
                 }
                 {node.isLeaf && !node.parent?.isRoot && type !== 'children' &&
                     <i
                         className='codicon codicon-edit'
                         onClick={() => node.edit()}
-                        title={nls.localize('vuengine/actorEditor/editName', 'Edit Name')}
+                        title={nls.localize('vuengine/editors/actor/editName', 'Edit Name')}
                     />
                 }
                 {node.isLeaf && CLONABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-copy'
                         onClick={cloneComponent}
-                        title={nls.localize('vuengine/actorEditor/cloneComponent', 'Clone Component')}
+                        title={nls.localize('vuengine/editors/actor/clone', 'Clone')}
                     />
                 }
                 {node.isLeaf && node.id !== 'addComponent' &&
                     <i
                         className='codicon codicon-trash'
                         onClick={() => removeComponent(type, index)}
-                        title={nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component')}
+                        title={nls.localizeByDefault('Remove')}
                     />
                 }
             </div>

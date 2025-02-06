@@ -9,10 +9,10 @@ interface PaletteProps {
 }
 
 const paletteValues: SelectOption[] = [
-    { value: '11', label: '11', description: nls.localize('vuengine/editors/palette/brightRed', 'Bright Red') },
-    { value: '10', label: '10', description: nls.localize('vuengine/editors/palette/mediumRed', 'Medium Red') },
-    { value: '01', label: '01', description: nls.localize('vuengine/editors/palette/darkRed', 'Dark Red') },
-    { value: '00', label: '00', description: nls.localize('vuengine/editors/palette/black', 'Black') },
+    { value: '11', label: '11', description: nls.localize('vuengine/editors/general/palette/brightRed', 'Bright Red') },
+    { value: '10', label: '10', description: nls.localize('vuengine/editors/general/palette/mediumRed', 'Medium Red') },
+    { value: '01', label: '01', description: nls.localize('vuengine/editors/general/palette/darkRed', 'Dark Red') },
+    { value: '00', label: '00', description: nls.localize('vuengine/editors/general/palette/black', 'Black') },
 ];
 
 export default function Palette(props: PaletteProps): React.JSX.Element {

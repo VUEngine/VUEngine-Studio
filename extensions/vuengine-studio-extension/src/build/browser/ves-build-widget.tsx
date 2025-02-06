@@ -277,7 +277,7 @@ export class VesBuildWidget extends ReactWidget {
                 <div>
                   <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
                     'Please consider installing WSL to massively improve build times.')} (
-                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/documentation/documentation',
+                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/general/documentation',
                     'Documentation')}</a>
                   )
                 </div>

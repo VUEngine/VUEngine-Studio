@@ -70,8 +70,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
 
     const removeCurrentInstrument = async () => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/musicEditor/deleteInstrumentQuestion', 'Delete Instrument?'),
-            msg: nls.localize('vuengine/musicEditor/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', instrument.name),
+            title: nls.localize('vuengine/editors/music/deleteInstrumentQuestion', 'Delete Instrument?'),
+            msg: nls.localize('vuengine/editors/music/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', instrument.name),
         });
         const remove = await dialog.open();
         if (remove) {
@@ -87,7 +87,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
 
     return <VContainer gap={15}>
         <VContainer>
-            {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+            {nls.localize('vuengine/editors/music/instruments', 'Instruments')}
             <InputWithAction>
                 <select
                     className='theia-select'
@@ -100,7 +100,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </select>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/musicEditor/deleteInstrument', 'Delete Instrument')}
+                    title={nls.localize('vuengine/editors/music/deleteInstrument', 'Delete Instrument')}
                     onClick={removeCurrentInstrument}
                     disabled={songData.instruments.length <= 1}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -110,7 +110,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </InputWithActionButton>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/musicEditor/addInstrument', 'Add Instrument')}
+                    title={nls.localizeByDefault('Add')}
                     onClick={addInstrument}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}

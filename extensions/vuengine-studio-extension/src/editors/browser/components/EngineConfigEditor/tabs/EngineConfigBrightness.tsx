@@ -109,7 +109,7 @@ export default function EngineConfigBrightness(props: EngineConfigBrightnessProp
     let brightnessWarning;
     if (data.brightness?.brightRed <= (data.brightness?.mediumRed + data.brightness?.darkRed)) {
         brightnessWarning = nls.localize(
-            'vuengine/engineConfigEditor/brightness/brightnessWarning',
+            'vuengine/editors/engineConfig/brightness/brightnessWarning',
             'Bright Red must be larger than Medium Red + Dark Red.'
         );
     }
@@ -118,11 +118,11 @@ export default function EngineConfigBrightness(props: EngineConfigBrightnessProp
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/brightness/brightness', 'Brightness (Bright, Medium, Dark)')}
+                    label={nls.localize('vuengine/editors/engineConfig/brightness/brightness', 'Brightness (Bright, Medium, Dark)')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/brightness/brightnessDescription',
-                        'The default brightness settings, actual values are set in stage specs. ' +
-                        'For a nice progression, each shade should be about twice as big as the previous one.'
+                        'vuengine/editors/engineConfig/brightness/brightnessDescription',
+                        'The default brightness settings, actual values are set in stage specs. \
+For a nice progression, each shade should be about twice as big as the previous one.'
                     )}
                 />
                 <HContainer>
@@ -162,9 +162,9 @@ export default function EngineConfigBrightness(props: EngineConfigBrightnessProp
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/brightness/fadeDelay', 'Fade Delay (ms)')}
+                    label={nls.localize('vuengine/editors/engineConfig/brightness/fadeDelay', 'Fade Delay (ms)')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/brightness/fadeDelayDescription',
+                        'vuengine/editors/engineConfig/brightness/fadeDelayDescription',
                         'The default delay between steps in synchronous fade effects in milliseconds.'
                     )}
                 />
@@ -180,9 +180,9 @@ export default function EngineConfigBrightness(props: EngineConfigBrightnessProp
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/brightness/fadeIncrement', 'Fade Increment')}
+                    label={nls.localize('vuengine/editors/engineConfig/brightness/fadeIncrement', 'Fade Increment')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/brightness/fadeIncrementDescription',
+                        'vuengine/editors/engineConfig/brightness/fadeIncrementDescription',
                         'The defaul step increment in asynchronous fade transitions.'
                     )}
                 />

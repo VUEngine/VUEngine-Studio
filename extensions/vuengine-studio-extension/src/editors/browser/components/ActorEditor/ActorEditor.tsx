@@ -294,45 +294,45 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const showComponentSelection = async (): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: nls.localize('vuengine/editors/addComponent', 'Add Component'),
-      placeholder: nls.localize('vuengine/editors/selectComponentTypeToAdd', 'Select a component type to add...'),
+      title: nls.localize('vuengine/editors/general/addComponent', 'Add Component'),
+      placeholder: nls.localize('vuengine/editors/general/selectComponentTypeToAdd', 'Select a component type to add...'),
     };
     const items: (QuickPickItem | QuickPickSeparator)[] = [];
     [{
       key: 'sprites',
-      label: nls.localize('vuengine/actorEditor/sprite', 'Sprite'),
+      label: nls.localize('vuengine/editors/actor/sprite', 'Sprite'),
       allowAdd: true,
     }, {
       key: 'animations',
-      label: nls.localize('vuengine/actorEditor/animation', 'Animation'),
+      label: nls.localize('vuengine/editors/actor/animation', 'Animation'),
       allowAdd: true,
     }, {
       key: 'colliders',
-      label: nls.localize('vuengine/actorEditor/collider', 'Collider'),
+      label: nls.localize('vuengine/editors/actor/collider', 'Collider'),
       allowAdd: true,
     }, {
       key: 'wireframes',
-      label: nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'),
+      label: nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'),
       allowAdd: true,
     }, {
       key: 'mutators',
-      label: nls.localize('vuengine/actorEditor/mutator', 'Mutator'),
+      label: nls.localize('vuengine/editors/actor/mutator', 'Mutator'),
       allowAdd: data.components.mutators.length === 0,
     }, {
       key: 'children',
-      label: nls.localize('vuengine/actorEditor/child', 'Child'),
+      label: nls.localize('vuengine/editors/actor/child', 'Child'),
       allowAdd: true,
     }, {
       key: 'body',
-      label: nls.localize('vuengine/actorEditor/body', 'Body'),
+      label: nls.localize('vuengine/editors/actor/body', 'Body'),
       allowAdd: !data.body.enabled,
     }, {
       key: 'extraProperties',
-      label: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
+      label: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
       allowAdd: !data.extraProperties.enabled,
     }, {
       key: 'logic',
-      label: nls.localize('vuengine/actorEditor/logic', 'Logic'),
+      label: nls.localize('vuengine/editors/actor/logic', 'Logic'),
       allowAdd: !data.logic.enabled,
     }]
       .sort((a, b) => a.label.localeCompare(b.label))
@@ -361,13 +361,13 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
   const doAddComponent = async (t: string): Promise<void> => {
     switch (t) {
       case 'animations':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/animation', 'Animation'));
+        return addComponentByType(t, nls.localize('vuengine/editors/actor/animation', 'Animation'));
       case 'mutators':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/mutation', 'Mutation'));
+        return addComponentByType(t, nls.localize('vuengine/editors/actor/mutation', 'Mutation'));
       case 'children':
         return addPositionedActor();
       case 'colliders':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/collider', 'Collider'));
+        return addComponentByType(t, nls.localize('vuengine/editors/actor/collider', 'Collider'));
       case 'extraProperties':
         return enableExtraProperties();
       case 'logic':
@@ -375,9 +375,9 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       case 'body':
         return enableBody();
       case 'sprites':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/sprite', 'Sprite'));
+        return addComponentByType(t, nls.localize('vuengine/editors/actor/sprite', 'Sprite'));
       case 'wireframes':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'));
+        return addComponentByType(t, nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'));
     }
   };
 
@@ -484,8 +484,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const removeComponent = async (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => {
     const dialog = new ConfirmDialog({
-      title: nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component'),
-      msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
+      title: nls.localize('vuengine/editors/actor/removeComponent', 'Remove Component'),
+      msg: nls.localize('vuengine/editors/actor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
     });
     const confirmed = await dialog.open();
     if (confirmed) {
@@ -723,7 +723,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
               >
                 <HideTreeButton
                   className="theia-button secondary"
-                  title={nls.localize('vuengine/actorEditor/showComponentsTree', 'Show Components Tree')}
+                  title={nls.localize('vuengine/editors/actor/showComponentsTree', 'Show Components Tree')}
                   onClick={() => setLeftSidebarOpen(false)}
                 >
                   <i className="codicon codicon-chevron-left" />
@@ -737,7 +737,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                     opacity: leftSidebarOpen ? 0 : 1,
                   }}
                   className="theia-button secondary"
-                  title={nls.localize('vuengine/actorEditor/showComponentsTree', 'Show Components Tree')}
+                  title={nls.localize('vuengine/editors/actor/showComponentsTree', 'Show Components Tree')}
                   onClick={() => setLeftSidebarOpen(true)}
                 >
                   <i className="codicon codicon-list-tree" />

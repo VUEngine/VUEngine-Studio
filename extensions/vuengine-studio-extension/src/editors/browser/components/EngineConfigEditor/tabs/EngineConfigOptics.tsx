@@ -213,11 +213,11 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/baseFactor',
+                        'vuengine/editors/engineConfig/optics/baseFactor',
                         'Base Factor'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/optics/baseFactorDescription',
+                        'vuengine/editors/engineConfig/optics/baseFactorDescription',
                         'The distance between eyes.'
                     )}
                 />
@@ -234,11 +234,11 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/cameraNearPlane',
+                        'vuengine/editors/engineConfig/optics/cameraNearPlane',
                         'Camera Near Plane'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/optics/cameraNearPlaneDescription',
+                        'vuengine/editors/engineConfig/optics/cameraNearPlaneDescription',
                         "The distance of the player's eyes to the virtual screen."
                     )}
                 />
@@ -255,7 +255,7 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/maximumViewDistance',
+                        'vuengine/editors/engineConfig/optics/maximumViewDistance',
                         'Maximum View Distance (power of two) (x, y)'
                     )}
                 />
@@ -283,11 +283,11 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/scalingModifierFactor',
+                        'vuengine/editors/engineConfig/optics/scalingModifierFactor',
                         'Scaling Modifier Factor'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/optics/scalingModifierFactorDescription',
+                        'vuengine/editors/engineConfig/optics/scalingModifierFactorDescription',
                         'The scaling modifier factor, affects the strength of sprite scaling.'
                     )}
                 />
@@ -304,7 +304,7 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/screenSizeInPixels',
+                        'vuengine/editors/engineConfig/optics/screenSizeInPixels',
                         'Screen Size (in pixels) (x, y, z)'
                     )}
                 />
@@ -341,11 +341,11 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/viewPointCenter',
+                        'vuengine/editors/engineConfig/optics/viewPointCenter',
                         'View Point Center (x, y)'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/optics/viewPointCenterDescription',
+                        'vuengine/editors/engineConfig/optics/viewPointCenterDescription',
                         "The horizontal and vertical positions of the player's eyes."
                     )}
                 />
@@ -373,11 +373,11 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/optics/useLegacyCoordinateProjection',
+                        'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjection',
                         'Use Legacy Coordinate Projection'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/optics/useLegacyCoordinateProjectionDescription',
+                        'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjectionDescription',
                         'Use the legacy coordinate system where (0, 0, 0) is at the top left corner of the screen, instead of in the middle of it.'
                     )}
                 />

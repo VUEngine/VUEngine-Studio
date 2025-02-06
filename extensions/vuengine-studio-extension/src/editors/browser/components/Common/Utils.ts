@@ -12,8 +12,8 @@ export const showActorSelection = async (
     ignoreIds?: string[]
 ): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-        title: nls.localize('vuengine/editors/selectActor', 'Select Actor'),
-        placeholder: nls.localize('vuengine/editors/selectActorToAdd', 'Select an Actor to add...'),
+        title: nls.localize('vuengine/editors/general/selectActor', 'Select Actor'),
+        placeholder: nls.localize('vuengine/editors/general/selectActorToAdd', 'Select an Actor to add...'),
     };
     const items: QuickPickItem[] = [];
     const actors = vesProjectService.getProjectDataItemsForType('Actor');

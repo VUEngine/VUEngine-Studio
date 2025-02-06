@@ -18,23 +18,23 @@ export default function SectionSelect(props: SectionSelectProps): React.JSX.Elem
     return (
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/editors/dataSection', 'Data Section')}
+                label={nls.localize('vuengine/editors/general/dataSection', 'Data Section')}
                 tooltip={nls.localize(
-                    'vuengine/editors/sectionDescription',
-                    'Defines whether data should be stored in ROM space, Data space or Expansion space. ' +
-                    'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                    'vuengine/editors/general/sectionDescription',
+                    'Defines whether data should be stored in ROM space, Data space or Expansion space. \
+You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
                 )}
             />
             <RadioSelect
                 defaultValue={value}
                 options={[{
-                    label: nls.localize('vuengine/editors/space/rom', 'ROM'),
+                    label: nls.localize('vuengine/editors/general/space/rom', 'ROM'),
                     value: DataSection.ROM,
                 }, {
-                    label: nls.localize('vuengine/editors/space/data', 'Data'),
+                    label: nls.localize('vuengine/editors/general/space/data', 'Data'),
                     value: DataSection.DATA,
                 }, {
-                    label: nls.localize('vuengine/editors/space/expansion', 'Expansion'),
+                    label: nls.localize('vuengine/editors/general/space/expansion', 'Expansion'),
                     value: DataSection.EXP,
                 }]}
                 onChange={options => setValue(options[0].value as DataSection)}

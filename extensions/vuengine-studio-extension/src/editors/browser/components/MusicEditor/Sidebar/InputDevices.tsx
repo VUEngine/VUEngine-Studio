@@ -10,7 +10,7 @@ export default function InputDevices(props: InputDevicesProps): React.JSX.Elemen
 
     return <VContainer gap={15}>
         <label>
-            {nls.localize('vuengine/musicEditor/inputDevices', 'Input Devices')}
+            {nls.localize('vuengine/editors/music/inputDevices', 'Input Devices')}
         </label>
         <i>Not yet implemented</i>
     </VContainer>;

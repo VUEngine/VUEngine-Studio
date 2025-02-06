@@ -49,25 +49,25 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
                     flexDirection: 'column',
                 }}
             >
-                <Tab>{nls.localize('vuengine/engineConfigEditor/affine', 'Affine')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/animation', 'Animation')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/brightness', 'Brightness')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/communications', 'Communications')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/debug', 'Debug')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/exceptions', 'Exceptions')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/frameRate', 'Frame Rate')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/macros', 'Macros')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/math', 'Math')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/memoryPools', 'Memory Pools')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/optics', 'Optics')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/palettes', 'Palettes')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/physics', 'Physics')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/sound', 'Sound')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/sprite', 'Sprite')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/sram', 'SRAM')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/texture', 'Texture')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/tiles', 'Tiles')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/wireframe', 'Wireframe')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/affine', 'Affine')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/animation', 'Animation')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/brightness', 'Brightness')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/communications', 'Communications')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/debug', 'Debug')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/exceptions', 'Exceptions')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/frameRate', 'Frame Rate')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/macros', 'Macros')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/math', 'Math')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/memoryPools', 'Memory Pools')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/optics', 'Optics')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/palettes', 'Palettes')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/physics', 'Physics')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/sound', 'Sound')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/sprite', 'Sprite')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/sram', 'SRAM')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/texture', 'Texture')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/tiles', 'Tiles')}</Tab>
+                <Tab>{nls.localize('vuengine/editors/engineConfig/wireframe', 'Wireframe')}</Tab>
             </TabList>
             <div
                 style={{

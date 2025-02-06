@@ -256,10 +256,10 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             <div className="gs-action-container">
                 {nls.localize(
                     'vuengine/gettingStarted/learnIntroduction',
-                    'New to VUEngine? Check out our step-by-step tutorial (link on the left) that implements a simple game with VUEngine Studio. ' +
-                    "To dive deeper, check out the documentation's user guide, " +
-                    "create a new project based on VUEngine Showcase and dig into the sources to learn about the engine's concepts and capabilities. " +
-                    'Various sample states expose you to key aspects of the engine step by step through cleanly written and properly commented code.'
+                    "New to VUEngine? Check out our step-by-step tutorial (link on the left) that implements a simple game with VUEngine Studio. \
+To dive deeper, check out the documentation's user guide, \
+create a new project based on VUEngine Showcase and dig into the sources to learn about the engine's concepts and capabilities. \
+Various sample states expose you to key aspects of the engine step by step through cleanly written and properly commented code."
                 )}
             </div>
             <div className="gs-action-container">

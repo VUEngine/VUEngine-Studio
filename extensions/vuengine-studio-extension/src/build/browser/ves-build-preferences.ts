@@ -1,7 +1,6 @@
 import { isWindows, nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema, PreferenceSchemaProperties } from '@theia/core/lib/common/preferences/preference-schema';
-import { VesCodeGenCommands } from '../../codegen/browser/ves-codegen-commands';
 import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
 export namespace VesBuildPreferenceIds {
@@ -56,9 +55,9 @@ const properties: PreferenceSchemaProperties = {
         type: 'string',
         description: nls.localize(
             'vuengine/build/preferences/engineCorePathDescription',
-            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". ' +
-            'Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated ' +
-            'occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'
+            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". \
+Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated \
+occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'
         ),
         default: '',
         additionalProperties: {
@@ -112,10 +111,10 @@ const properties: PreferenceSchemaProperties = {
         default: [{
             'type': 'command',
             'name': 'core.saveAll',
-        }, {
+        }, /* {
             'type': 'command',
             'name': VesCodeGenCommands.GENERATE_ALL_CHANGED.id,
-        }],
+        } */],
         scope: PreferenceScope.Folder,
         overridable: true,
     },

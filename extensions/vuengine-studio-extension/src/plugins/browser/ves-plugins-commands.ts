@@ -85,11 +85,11 @@ export namespace VesPluginsCommands {
     export const WIDGET_HELP: Command = Command.toLocalizedCommand(
         {
             id: 'plugins.showHelp',
-            label: 'Show Handbook Page',
+            label: 'Show Documentation',
             iconClass: 'codicon codicon-book',
             category: 'Plugins',
         },
-        'vuengine/plugins/commands/showHelp',
+        'vuengine/plugins/commands/showDocumentation',
         'vuengine/plugins/commands/category'
     );
 

@@ -134,12 +134,12 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                 <>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/editors/type', 'Type')}
+                            {nls.localizeByDefault('Type')}
                         </label>
                         <RadioSelect
                             options={[
-                                { value: ScriptType.Custom, label: nls.localize('vuengine/logicEditor/scriptTypeCustom', 'Custom') },
-                                { value: ScriptType.Inherited, label: nls.localize('vuengine/logicEditor/scriptTypeInherited', 'Inherited') },
+                                { value: ScriptType.Custom, label: nls.localize('vuengine/editors/logic/scriptTypeCustom', 'Custom') },
+                                { value: ScriptType.Inherited, label: nls.localize('vuengine/editors/logic/scriptTypeInherited', 'Inherited') },
                             ]}
                             canSelectMany={false}
                             allowBlank={false}
@@ -150,7 +150,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                     {scriptConfig.type === ScriptType.Custom &&
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/editors/name', 'Name')}
+                                {nls.localizeByDefault('Name')}
                             </label>
                             <input
                                 className='theia-input'
@@ -163,7 +163,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                     {scriptConfig.type === ScriptType.Inherited &&
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/logicEditor/inheritedFunction', 'Inherited Function')}
+                                {nls.localize('vuengine/editors/logic/inheritedFunction', 'Inherited Function')}
                             </label>
                             <SelectComponent
                                 options={Object.values(LOGIC_FUNCTIONS)
@@ -198,7 +198,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                         </VContainer>
                     )}
                     {!currentAction?.arguments &&
-                        nls.localize('vuengine/logicEditor/noActionConfiguration', 'This action does not need any configuration.')
+                        nls.localize('vuengine/editors/logic/noActionConfiguration', 'This action does not need any configuration.')
                     }
                 </>
             }

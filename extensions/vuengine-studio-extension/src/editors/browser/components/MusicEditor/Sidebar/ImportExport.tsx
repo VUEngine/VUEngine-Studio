@@ -8,7 +8,7 @@ export default function ImportExport(): React.JSX.Element {
 
     const selectFiles = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/musicEditor/selectFiles', 'Select file to import'),
+            title: nls.localize('vuengine/editors/music/selectFiles', 'Select file to import'),
             canSelectFolders: false,
             canSelectFiles: true,
             canSelectMany: false,
@@ -26,13 +26,13 @@ export default function ImportExport(): React.JSX.Element {
 
     return <VContainer gap={15}>
         <label>
-            {nls.localize('vuengine/musicEditor/ImportExport', 'Import/Export')}
+            {nls.localize('vuengine/editors/music/ImportExport', 'Import/Export')}
         </label>
         <i>Not yet implemented</i>
         { /* }
         <button
             className='theia-button secondary'
-            title={nls.localize('vuengine/musicEditor/importMidi', 'Import MIDI')}
+            title={nls.localize('vuengine/editors/music/importMidi', 'Import MIDI')}
             onClick={selectFiles}
         >
             Import MIDI

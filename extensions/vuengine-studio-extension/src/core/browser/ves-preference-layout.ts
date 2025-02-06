@@ -18,12 +18,12 @@ export class VesPreferenceLayoutProvider extends PreferenceLayoutProvider {
             ...featuresNode.children!.filter(c => c.id !== 'features.debug'),
             {
                 id: `features.${VesProjectPreferenceIds.CATEGORY}`,
-                label: nls.localize('vuengine/preferences/project', 'Project'),
+                label: nls.localize('vuengine/projects/project', 'Project'),
                 settings: [`${VesProjectPreferenceIds.CATEGORY}.*`]
             },
             {
                 id: `features.${VesUpdaterPreferenceIds.CATEGORY}`,
-                label: nls.localize('vuengine/preferences/updates', 'Updates'),
+                label: nls.localize('vuengine/updater/updates', 'Updates'),
                 settings: [`${VesUpdaterPreferenceIds.CATEGORY}.*`]
             },
         ];
@@ -31,7 +31,7 @@ export class VesPreferenceLayoutProvider extends PreferenceLayoutProvider {
         return [
             {
                 id: VesEditorsPreferenceIds.CATEGORY,
-                label: nls.localize('vuengine/preferences/editors', 'Editors'),
+                label: nls.localize('vuengine/editors/editors', 'Editors'),
                 settings: [`${VesEditorsPreferenceIds.CATEGORY}.*`],
                 children: [
                     {
@@ -41,24 +41,24 @@ export class VesPreferenceLayoutProvider extends PreferenceLayoutProvider {
                     {
 
                         id: `${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_VSU_SANDBOX}`,
-                        label: nls.localize('vuengine/preferences/editors/vsuSandbox', 'VSU Sandbox'),
+                        label: nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),
                         settings: [`${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_VSU_SANDBOX}.*`],
                     },
                 ]
             },
             {
                 id: VesBuildPreferenceIds.CATEGORY,
-                label: nls.localize('vuengine/preferences/build', 'Build'),
+                label: nls.localize('vuengine/build/build', 'Build'),
                 settings: [`${VesBuildPreferenceIds.CATEGORY}.*`, `${VesPluginsPreferenceIds.CATEGORY}.*`],
             },
             {
                 id: VesEmulatorPreferenceIds.CATEGORY,
-                label: nls.localize('vuengine/preferences/emulator', 'Emulator'),
+                label: nls.localize('vuengine/emulator/emulator', 'Emulator'),
                 settings: [`${VesEmulatorPreferenceIds.CATEGORY}.*`],
             },
             {
                 id: VesFlashCartPreferenceIds.CATEGORY,
-                label: nls.localize('vuengine/preferences/flashCarts', 'Flash Carts'),
+                label: nls.localize('vuengine/flashCarts/flashCarts', 'Flash Carts'),
                 settings: [`${VesFlashCartPreferenceIds.CATEGORY}.*`],
             },
             ...DEFAULT_LAYOUT.slice(1, 3),

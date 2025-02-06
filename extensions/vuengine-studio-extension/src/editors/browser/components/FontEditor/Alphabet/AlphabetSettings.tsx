@@ -32,7 +32,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
         <HContainer gap={10}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/count', 'Count')}
+                    {nls.localize('vuengine/editors/font/count', 'Count')}
                 </label>
                 <input
                     type="number"
@@ -51,7 +51,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/offset', 'Offset')}
+                    {nls.localize('vuengine/editors/font/offset', 'Offset')}
                 </label>
                 <input
                     type="number"
@@ -70,11 +70,11 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/fontEditor/pageSize', 'Page Size')}
+                    label={nls.localize('vuengine/editors/font/pageSize', 'Page Size')}
                     tooltip={nls.localize(
-                        'vuengine/fontEditor/pageSizeDescription',
-                        'Tiles for this amount of characters will be loaded to memory at once. ' +
-                        'For all regular use cases, this should be the total amount of characters in the font.'
+                        'vuengine/editors/font/pageSizeDescription',
+                        'Tiles for this amount of characters will be loaded to memory at once. \
+For all regular use cases, this should be the total amount of characters in the font.'
                     )}
                 />
                 <input
@@ -95,7 +95,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
         </HContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/fontEditor/tiles', 'Tiles')}
+                {nls.localize('vuengine/editors/font/tiles', 'Tiles')}
             </label>
             <FontTileInfo
                 charCount={pageSize}

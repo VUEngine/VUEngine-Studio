@@ -65,7 +65,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         <button
           className='theia-button secondary controls-button'
           onClick={e => { e.stopPropagation(); center(); }}
-          title={nls.localize('vuengine/editors/centerView', 'Center View')}
+          title={nls.localize('vuengine/editors/general/centerView', 'Center View')}
         >
           <CornersOut size={20} />
         </button>
@@ -78,9 +78,9 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
             paddingLeft: 4,
             paddingRight: 4,
           }}
-          title={`${nls.localize('vuengine/editors/anaglyph', 'Anaglyph')}: ${previewAnaglyph
-            ? nls.localize('vuengine/editors/enabled', 'Enabled')
-            : nls.localize('vuengine/editors/disabled', 'Disabled')}`}
+          title={`${nls.localize('vuengine/editors/general/anaglyph', 'Anaglyph')}: ${previewAnaglyph
+            ? nls.localize('vuengine/editors/general/enabled', 'Enabled')
+            : nls.localize('vuengine/editors/general/disabled', 'Disabled')}`}
         >
           {previewAnaglyph
             ? <>
@@ -107,7 +107,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         {/*
         <VContainer>
           <label>
-            {nls.localize('vuengine/actorEditor/palettes', 'Palettes')}
+            {nls.localize('vuengine/editors/actor/palettes', 'Palettes')}
           </label>
           {[...Array(4)].map((h, i) => (
             <HContainer key={`preview-palette-${i}`}>

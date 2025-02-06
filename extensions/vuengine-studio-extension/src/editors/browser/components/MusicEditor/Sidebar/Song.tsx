@@ -56,7 +56,7 @@ export default function Song(props: SongProps): React.JSX.Element {
     return <VContainer gap={15}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/songName', 'Song Name')}
+                {nls.localize('vuengine/editors/music/songName', 'Song Name')}
             </label>
             <input
                 className='theia-input'
@@ -69,7 +69,7 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/tickDurationMs', 'Tick duration (in milliseconds)')}
+                {nls.localize('vuengine/editors/music/tickDurationMs', 'Tick duration (in milliseconds)')}
             </label>
             <Range
                 value={songData.speed}
@@ -89,14 +89,14 @@ export default function Song(props: SongProps): React.JSX.Element {
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
-                {nls.localize('vuengine/musicEditor/loop', 'Loop')}
+                {nls.localize('vuengine/editors/music/loop', 'Loop')}
             </label>
         </VContainer>
 
         <HContainer gap={15}>
             <VContainer grow={1}>
                 <label>
-                    {nls.localize('vuengine/musicEditor/defaultBar', 'Default Bar')}
+                    {nls.localize('vuengine/editors/music/defaultBar', 'Default Bar')}
                 </label>
                 <BasicSelect
                     options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
@@ -108,13 +108,13 @@ export default function Song(props: SongProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/musicEditor/noteResolution', 'Note Resolution')}
+                    label={nls.localize('vuengine/editors/music/noteResolution', 'Note Resolution')}
                     tooltip={nls.localize(
-                        'vuengine/musicEditor/noteResolutionDescription',
-                        'This defines the length of every single note in this song, ' +
-                        'or, in other words, the amount of notes per whole tone segment. ' +
-                        'The higher the value, the more detailed sound you can create, ' +
-                        'but also the higher the required storage space. '
+                        'vuengine/editors/music/noteResolutionDescription',
+                        'This defines the length of every single note in this song, \
+or, in other words, the amount of notes per whole tone segment. \
+The higher the value, the more detailed sound you can create, \
+but also the higher the required storage space. '
                     )}
                 />
                 <RadioSelect

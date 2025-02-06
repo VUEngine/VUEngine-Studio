@@ -235,21 +235,21 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 <HContainer alignItems='end' gap={15} wrap='wrap'>
                     <VContainer grow={1}>
                         <label>
-                            {nls.localize('vuengine/actorEditor/type', 'Type')}
+                            {nls.localizeByDefault('Type')}
                         </label>
                         <SelectComponent
                             options={[{
                                 value: ColliderType.Ball,
-                                label: nls.localize('vuengine/actorEditor/colliderTypeBall', 'Ball'),
+                                label: nls.localize('vuengine/editors/actor/colliderTypeBall', 'Ball'),
                             }, {
                                 value: ColliderType.Box,
-                                label: nls.localize('vuengine/actorEditor/colliderTypeBox', 'Box'),
+                                label: nls.localize('vuengine/editors/actor/colliderTypeBox', 'Box'),
                             }, {
                                 value: ColliderType.InverseBox,
-                                label: nls.localize('vuengine/actorEditor/colliderTypeInverseBox', 'InverseBox'),
+                                label: nls.localize('vuengine/editors/actor/colliderTypeInverseBox', 'InverseBox'),
                             }, {
                                 value: ColliderType.LineField,
-                                label: nls.localize('vuengine/actorEditor/colliderTypeLineField', 'LineField'),
+                                label: nls.localize('vuengine/editors/actor/colliderTypeLineField', 'LineField'),
                             }]}
                             defaultValue={collider.type}
                             onChange={option => setType(option.value as ColliderType)}
@@ -261,13 +261,13 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='text'
                             value={`${heaviness} / 5`}
                             disabled
-                            title={nls.localize('vuengine/actorEditor/heaviness', 'Heaviness')}
+                            title={nls.localize('vuengine/editors/actor/heaviness', 'Heaviness')}
                         />
                     </VContainer>
                 </HContainer>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/actorEditor/colliderLayers', 'Collider Layers')}
+                        {nls.localize('vuengine/editors/actor/colliderLayers', 'Collider Layers')}
                         {collider.layers.length > 0 &&
                             <>
                                 {' '}<span className='count'>{collider.layers.length}</span>
@@ -286,7 +286,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         <button
                             className='theia-button secondary'
                             onClick={openEditor}
-                            title={nls.localize('vuengine/actorEditor/manageColliderLayers', 'Manage Collider Layers')}
+                            title={nls.localize('vuengine/editors/actor/manageColliderLayers', 'Manage Collider Layers')}
                         >
                             <i className='codicon codicon-settings-gear' />
                         </button>
@@ -295,7 +295,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 {(collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/actorEditor/colliderSize', 'Size (x, y, z)')}
+                            {nls.localize('vuengine/editors/actor/colliderSize', 'Size (x, y, z)')}
                         </label>
                         <HContainer>
                             <Input
@@ -330,7 +330,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 }
                 {collider.type === ColliderType.Ball &&
                     <Input
-                        label={nls.localize('vuengine/actorEditor/diameter', 'Diameter')}
+                        label={nls.localize('vuengine/editors/actor/diameter', 'Diameter')}
                         value={collider.pixelSize.x}
                         setValue={v => setDiameter(v as number)}
                         type='number'
@@ -343,7 +343,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 {collider.type === ColliderType.LineField &&
                     <HContainer gap={15} wrap='wrap'>
                         <Input
-                            label={nls.localize('vuengine/actorEditor/length', 'Length')}
+                            label={nls.localize('vuengine/editors/actor/length', 'Length')}
                             value={length}
                             setValue={v => updateLineField(axis, v as number, thickness)}
                             type='number'
@@ -354,7 +354,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         />
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/actorEditor/colliderAxis', 'Axis')}
+                                {nls.localize('vuengine/editors/actor/colliderAxis', 'Axis')}
                             </label>
                             <RadioSelect
                                 options={[{
@@ -375,7 +375,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             />
                         </VContainer>
                         <Input
-                            label={nls.localize('vuengine/actorEditor/thickness', 'Thickness')}
+                            label={nls.localize('vuengine/editors/actor/thickness', 'Thickness')}
                             value={thickness}
                             setValue={v => updateLineField(axis, length, v as number)}
                             type='number'
@@ -388,7 +388,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 }
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
+                        {nls.localize('vuengine/editors/actor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
                     </label>
                     <HContainer>
                         <Input
@@ -437,7 +437,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     (collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/actorEditor/scale', 'Scale (x, y, z)')}
+                            {nls.localize('vuengine/editors/actor/scale', 'Scale (x, y, z)')}
                         </label>
                         <HContainer>
                             <Input
@@ -476,7 +476,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 {
                     collider.type === ColliderType.Ball &&
                     <Input
-                        label={nls.localize('vuengine/actorEditor/scale', 'Scale')}
+                        label={nls.localize('vuengine/editors/actor/scale', 'Scale')}
                         value={collider.scale.x}
                         setValue={v => setBallScale(v as number)}
                         type='number'
@@ -489,7 +489,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 }
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/checkForCollisions', 'Check For Collisions')}
+                        {nls.localize('vuengine/editors/actor/checkForCollisions', 'Check For Collisions')}
                     </label>
                     <input
                         type="checkbox"
@@ -503,7 +503,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     collider.checkForCollisions &&
                     <VContainer grow={1}>
                         <label>
-                            {nls.localize('vuengine/actorEditor/colliderLayersToCheckAgainst', 'Collider Layers to check against')}
+                            {nls.localize('vuengine/editors/actor/colliderLayersToCheckAgainst', 'Collider Layers to check against')}
                             {collider.layersToCheck.length > 0 &&
                                 <>
                                     {' '}<span className='count'>{collider.layersToCheck.length}</span>
@@ -523,7 +523,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             <button
                                 className='theia-button secondary'
                                 onClick={openEditor}
-                                title={nls.localize('vuengine/actorEditor/manageColliderLayers', 'Manage Collider Layers')}
+                                title={nls.localize('vuengine/editors/actor/manageColliderLayers', 'Manage Collider Layers')}
                             >
                                 <i className='codicon codicon-settings-gear' />
                             </button>

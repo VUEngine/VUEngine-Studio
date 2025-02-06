@@ -445,7 +445,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             }
             {!this.isLoading && !this.data &&
                 <div className='error'>
-                    {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
+                    {nls.localize('vuengine/editors/general/errorCouldNotLoadItem', 'Error: could not load item.')}
                 </div>
             }
         </div>;

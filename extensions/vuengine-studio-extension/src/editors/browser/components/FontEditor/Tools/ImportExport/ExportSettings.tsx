@@ -86,7 +86,7 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/fileName', 'File Name')}
+                    {nls.localize('vuengine/editors/font/fileName', 'File Name')}
                 </label>
                 <HContainer alignItems='center'>
                     <input
@@ -100,7 +100,7 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/charactersPerLine', 'Characters Per Line')}
+                    {nls.localize('vuengine/editors/font/charactersPerLine', 'Characters Per Line')}
                 </label>
                 <input
                     type="number"
@@ -118,7 +118,7 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         </VContainer>
         <VContainer grow={1} overflow='hidden'>
             <label>
-                {nls.localize('vuengine/fontEditor/result', 'Result')}
+                {nls.localize('vuengine/editors/font/result', 'Result')}
             </label>
             {exportPngData &&
                 <VContainer

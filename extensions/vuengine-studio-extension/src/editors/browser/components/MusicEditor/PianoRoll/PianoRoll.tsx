@@ -52,7 +52,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     if (currentPatternId === -1) {
         return <>
-            {/* nls.localize('vuengine/musicEditor/selectPatternToEdit', 'Select a pattern to edit') */}
+            {/* nls.localize('vuengine/editors/music/selectPatternToEdit', 'Select a pattern to edit') */}
         </>;
     }
 

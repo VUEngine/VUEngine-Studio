@@ -113,7 +113,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
     return (
         <VContainer>
             <label>
-                {nls.localize('vuengine/spriteEditor/palette', 'Palette')}
+                {nls.localize('vuengine/editors/sprite/palette', 'Palette')}
             </label>
             <HContainer gap={2} wrap='wrap'>
                 {colorMode !== undefined && setColorMode !== undefined &&
@@ -123,7 +123,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                     >
                         {colorMode === ColorMode.FrameBlend
                             ? ' HiColor'
-                            : nls.localize('vuengine/spriteEditor/4colors', '4 Colors')}
+                            : nls.localize('vuengine/editors/sprite/4colors', '4 Colors')}
                     </SpriteEditorTool>
                 }
                 {[...Array(paletteColors.length)].map((p, paletteIndex) => {
@@ -147,7 +147,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                             color: '#fff',
                         }}
                         title={
-                            nls.localize('vuengine/spriteEditor/paletteIndex', 'Palette Index') + ' ' + (paletteIndex + 1) +
+                            nls.localize('vuengine/editors/sprite/paletteIndex', 'Palette Index') + ' ' + (paletteIndex + 1) +
                             services.vesCommonService.getKeybindingLabel(commandId(), true)
                         }
                         onClick={() => setPrimaryColorIndex(paletteIndex)}

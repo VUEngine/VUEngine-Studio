@@ -43,7 +43,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         <button
           className='theia-button secondary controls-button'
           onClick={e => { e.stopPropagation(); center(); }}
-          title={nls.localize('vuengine/editors/centerView', 'Center View')}
+          title={nls.localize('vuengine/editors/general/centerView', 'Center View')}
         >
           <CornersOut size={20} />
         </button>

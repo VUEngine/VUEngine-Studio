@@ -38,7 +38,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 setSidebarTab={setSidebarTab}
             />
             : <div className="lightLabel">
-                {nls.localize('vuengine/musicEditor/selectChannelToEditProperties', 'Select a channel to edit its properties')}
+                {nls.localize('vuengine/editors/music/selectChannelToEditProperties', 'Select a channel to edit its properties')}
             </div>}
     </>;
 }

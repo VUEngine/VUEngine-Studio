@@ -297,7 +297,7 @@ export class VesProjectService {
       return;
     }
 
-    const defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+    const defaultName = nls.localize('vuengine/editors/general/newFileDialog/untitled', 'Untitled');
     const filename = await this.quickInputService.input({
       value: defaultName,
       title: nls.localize('vuengine/projects/newFileName', 'New File Name'),
@@ -1082,7 +1082,7 @@ export class VesProjectService {
       await Promise.all(template.labels['authors']?.map(async (value: string) => {
         await this.replaceInProject(projectsBaseUri, value, author);
       }));
-      await this.replaceInProject(projectsBaseUri, template.labels['description'], 'Description');
+      await this.replaceInProject(projectsBaseUri, template.labels['description'], nls.localizeByDefault('Description'));
     } catch (e) {
       return e;
     }

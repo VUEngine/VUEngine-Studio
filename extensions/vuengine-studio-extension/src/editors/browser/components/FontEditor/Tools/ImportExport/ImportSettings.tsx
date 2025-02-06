@@ -132,7 +132,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
 
     const selectImageFileToImport = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/fontEditor/selectImageToImport', 'Select image file to import'),
+            title: nls.localize('vuengine/editors/font/selectImageToImport', 'Select image file to import'),
             canSelectFolders: false,
             canSelectFiles: true,
             filters: { 'PNG': ['png'] }
@@ -169,7 +169,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             setImportedCharacters(imageDataToCharacters(imgData));
         } else {
             services.messageService.error(
-                nls.localize('vuengine/fontEditor/errorImporting', 'There was an error importing the PNG file.')
+                nls.localize('vuengine/editors/font/errorImporting', 'There was an error importing the PNG file.')
             );
         }
     };
@@ -199,7 +199,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <HContainer justifyContent='space-between'>
                             <label>
-                                {nls.localize('vuengine/editors/source', 'Source')}
+                                {nls.localize('vuengine/editors/general/source', 'Source')}
                             </label>
                             <VContainer style={{ opacity: .6 }}>
                                 {sourceImageHeight
@@ -224,7 +224,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         <label style={{ width: 34 }}>&nbsp;</label>
                         <ReconvertButton
                             className="theia-button"
-                            title={nls.localize('vuengine/editors/reconvertImage', 'Reconvert Image')}
+                            title={nls.localize('vuengine/editors/general/reconvertImage', 'Reconvert Image')}
                             onClick={sourceImageToCharacters}
                         >
                             <i className="codicon codicon-arrow-right"></i>
@@ -232,7 +232,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     </VContainer>
                     <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/editors/result', 'Result')}
+                            {nls.localize('vuengine/editors/general/result', 'Result')}
                         </label>
                         <VContainer
                             alignItems='center'
@@ -268,7 +268,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             <HContainer gap={20}>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                        {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
                     </label>
                     <HContainer alignItems='center'>
                         <input
@@ -308,7 +308,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/fontEditor/offset', 'Offset')}
+                        {nls.localize('vuengine/editors/font/offset', 'Offset')}
                     </label>
                     <input
                         type="number"
@@ -326,7 +326,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/fontEditor/invertColors', 'Invert Colors')}
+                        {nls.localize('vuengine/editors/font/invertColors', 'Invert Colors')}
                     </label>
                     <input
                         type="checkbox"

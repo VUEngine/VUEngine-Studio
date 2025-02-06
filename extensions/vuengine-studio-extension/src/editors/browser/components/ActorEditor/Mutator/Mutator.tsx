@@ -23,7 +23,7 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
     return (
         <VContainer gap={15}>
             <Input
-                label={nls.localize('vuengine/actorEditor/mutationClass', 'Mutation Class')}
+                label={nls.localize('vuengine/editors/actor/mutationClass', 'Mutation Class')}
                 value={mutator.mutationClass}
                 setValue={setClass}
                 commands={INPUT_BLOCKING_COMMANDS}

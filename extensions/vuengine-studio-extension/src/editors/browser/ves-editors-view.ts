@@ -1,4 +1,4 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry, UntitledResourceResolver, URI } from '@theia/core';
+import { CommandRegistry, CommandService, MenuModelRegistry, nls, UntitledResourceResolver, URI } from '@theia/core';
 import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
@@ -16,6 +16,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
+import { TYPE_LABELS } from './ves-editors-types';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
@@ -146,15 +147,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             // See also: line 256
             /*
             if (type.file?.startsWith('.')) {
-                commandRegistry.registerCommand(Command.toLocalizedCommand(
-                    {
-                        id: `editors.new-untitled.${typeId}`,
-                        label: `New ${type.schema.title || typeId} File`,
-                        category: CommonCommands.FILE_CATEGORY,
-                        iconClass: type.icon,
-                    },
-                    `vuengine/editors/newUntitled/${typeId}`
-                ), {
+                commandRegistry.registerCommand({
+                    id: `editors.new-untitled.${typeId}`,
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    category: CommonCommands.FILE_CATEGORY,
+                    iconClass: type.icon,
+                }, {
                     isEnabled: () => true,
                     isVisible: () => false,
                     execute: async () => {
@@ -167,15 +165,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             */
 
             if (type.forFiles?.length) {
-                commandRegistry.registerCommand(Command.toLocalizedCommand(
-                    {
-                        id: `editors.new-file.${typeId}`,
-                        label: `New ${type.schema.title || typeId} File...`,
-                        category: CommonCommands.FILE_CATEGORY,
-                    },
-                    `vuengine/editors/newFile/${typeId}`
-                ), {
-                    // hide "new xyz conversion file" commands from command palette
+                commandRegistry.registerCommand({
+                    id: `editors.new-file.${typeId}`,
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    category: CommonCommands.FILE_CATEGORY,
+                }, {
+                    // Show "new xyz conversion file" commands only in explorer, but hide from command palette
                     isVisible: widget => this.shell.currentWidget?.id === 'files',
                     execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
                 });
@@ -259,7 +254,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             // See also: line 144
             /*
             if (type.file?.startsWith('.')) {
-                const id = `editors.new-untitled.${typeId}`;
+                const id = `editors.new - untitled.${ typeId }`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
                     id,
                     sortString: typeId,
@@ -270,7 +265,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
-                    commandId: `editors.new-file.${typeId}`,
+                    commandId: `editors.new - file.${typeId}`,
                     order: '-500',
                     when: type.forFiles.map(f => `explorerResourceExt == ${f}`).join(' || '),
                 });

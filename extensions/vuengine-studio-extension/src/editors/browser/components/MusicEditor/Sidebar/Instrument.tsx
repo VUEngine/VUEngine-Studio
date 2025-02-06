@@ -332,7 +332,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <HContainer gap={15}>
             <VContainer grow={1}>
                 <label>
-                    {nls.localize('vuengine/musicEditor/name', 'Name')}
+                    {nls.localizeByDefault('Name')}
                 </label>
                 <input
                     className='theia-input'
@@ -344,18 +344,18 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/type', 'Type')}
+                    {nls.localizeByDefault('Type')}
                 </label>
                 <BasicSelect
                     options={[{
-                        label: nls.localize('vuengine/musicEditor/wave', 'Wave'),
+                        label: nls.localize('vuengine/editors/music/wave', 'Wave'),
                         value: MusicEditorChannelType.WAVE,
                     }, {
 
-                        label: nls.localize('vuengine/musicEditor/sweepMod', 'Sweep / Mod.'),
+                        label: nls.localize('vuengine/editors/music/sweepMod', 'Sweep / Mod.'),
                         value: MusicEditorChannelType.SWEEPMOD,
                     }, {
-                        label: nls.localize('vuengine/musicEditor/noise', 'Noise'),
+                        label: nls.localize('vuengine/editors/music/noise', 'Noise'),
                         value: MusicEditorChannelType.NOISE,
                     }]}
                     value={instrument.type}
@@ -368,7 +368,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <HContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/volume', 'Volume')}
+                    {nls.localize('vuengine/editors/music/volume', 'Volume')}
                 </label>
                 <HContainer alignItems="center">
                     <div style={{ minWidth: 10, width: 10 }}>
@@ -401,7 +401,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 instrument.type !== MusicEditorChannelType.NOISE &&
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/musicEditor/waveform', 'Waveform')}
+                        {nls.localize('vuengine/editors/music/waveform', 'Waveform')}
                     </label>
                     <VContainer>
                         <NumberArrayPreview
@@ -414,7 +414,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         />
                         {!waveform &&
                             <div className='lightLabel' style={{ margin: '-42px auto 0' }}>
-                                {nls.localize('vuengine/musicEditor/none', 'None')}
+                                {nls.localize('vuengine/editors/music/none', 'None')}
                             </div>
                         }
                     </VContainer>
@@ -423,9 +423,9 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         </HContainer>
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/musicEditor/noteDuration', 'Note Duration')}
+                label={nls.localize('vuengine/editors/music/noteDuration', 'Note Duration')}
                 tooltip={
-                    nls.localize('vuengine/musicEditor/noteDurationDescription',
+                    nls.localize('vuengine/editors/music/noteDurationDescription',
                         'Specifies how long the current note should play before automatically being shut off.'
                     )}
             />
@@ -451,17 +451,17 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             instrument.type === MusicEditorChannelType.NOISE &&
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/musicEditor/tap', 'Tap')}
+                    label={nls.localize('vuengine/editors/music/tap', 'Tap')}
                     tooltip={nls.localize(
-                        'vuengine/musicEditor/tapDescription',
-                        'Specifies the bit within the shift register to use as the feedback source in noise generation. ' +
-                        'Different bits will produce pseudorandom bit sequences of different lengths before the sequences repeat.'
+                        'vuengine/editors/music/tapDescription',
+                        'Specifies the bit within the shift register to use as the feedback source in noise generation. \
+Different bits will produce pseudorandom bit sequences of different lengths before the sequences repeat.'
                     )}
                 />
                 <BasicSelect
                     options={Object.keys(VSU_NOISE_TAP).map((tl, i) => ({
-                        label: `${nls.localize('vuengine/musicEditor/bit', 'Bit')} ${VSU_NOISE_TAP[i][0]}, ` +
-                            `${nls.localize('vuengine/musicEditor/sequenceLength', 'Sequence Length')}: ${VSU_NOISE_TAP[i][1]}`,
+                        label: `${nls.localize('vuengine/editors/music/bit', 'Bit')} ${VSU_NOISE_TAP[i][0]}, ` +
+                            `${nls.localize('vuengine/editors/music/sequenceLength', 'Sequence Length')}: ${VSU_NOISE_TAP[i][1]}`,
                         value: i,
                     }))}
                     value={instrument.tap}
@@ -475,23 +475,23 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/musicEditor/envelope', 'Envelope')}
+                    label={nls.localize('vuengine/editors/music/envelope', 'Envelope')}
                     tooltip={
-                        nls.localize('vuengine/musicEditor/envelopeDescription',
-                            'The envelope acts like a master volume setting independent from the stereo levels. ' +
-                            'It can be configured to grow or decay automatically over time, and optionally reload ' +
-                            'a pre-configured value and repeat the grow/decay process. '
+                        nls.localize('vuengine/editors/music/envelopeDescription',
+                            'The envelope acts like a master volume setting independent from the stereo levels. \
+It can be configured to grow or decay automatically over time, and optionally reload \
+a pre-configured value and repeat the grow/decay process. '
                         )}
                 />
                 <RadioSelect
                     options={[{
-                        label: nls.localize('vuengine/musicEditor/off', 'Off'),
+                        label: nls.localize('vuengine/editors/music/off', 'Off'),
                         value: -1,
                     }, {
-                        label: nls.localize('vuengine/musicEditor/envelopeGrow', 'Grow'),
+                        label: nls.localize('vuengine/editors/music/envelopeGrow', 'Grow'),
                         value: VsuEnvelopeDirection.Grow,
                     }, {
-                        label: nls.localize('vuengine/musicEditor/envelopeDecay', 'Decay'),
+                        label: nls.localize('vuengine/editors/music/envelopeDecay', 'Decay'),
                         value: VsuEnvelopeDirection.Decay,
                     }]}
                     defaultValue={instrument.envelope.enabled ? instrument.envelope.direction : -1}
@@ -504,7 +504,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     <HContainer gap={15}>
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                                {nls.localize('vuengine/editors/music/interval', 'Interval')}
                             </label>
                             <Range
                                 value={instrument.envelope.stepTime}
@@ -533,7 +533,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 }
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
+                        {nls.localize('vuengine/editors/music/initialVolume', 'Initial Volume')}
                     </label>
                     <Range
                         value={instrument.envelope.initialValue}
@@ -546,8 +546,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 {instrument.envelope.enabled &&
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/musicEditor/preview', 'Preview')}
-                        // subLabel={nls.localize('vuengine/musicEditor/volumeOverTime', 'Volume over time')}
+                            label={nls.localizeByDefault('Preview')}
+                        // subLabel={nls.localize('vuengine/editors/music/volumeOverTime', 'Volume over time')}
                         />
                         <NumberArrayPreview
                             active={true}
@@ -566,42 +566,42 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 <hr />
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/musicEditor/sweepModulation', 'Sweep / Modulation')}
+                        label={nls.localize('vuengine/editors/music/sweepModulation', 'Sweep / Modulation')}
                         tooltip={<>
-                            {nls.localize('vuengine/musicEditor/sweepModDescription',
-                                'The VSU\'s channel 5 has, in addition to all of the features of channels 1-4, ' +
-                                'support for frequency sweep and modulation functions, which will modify the current frequency value over time.'
+                            {nls.localize('vuengine/editors/music/sweepModDescription',
+                                "The VSU's channel 5 has, in addition to all of the features of channels 1-4, \
+support for frequency sweep and modulation functions, which will modify the current frequency value over time."
                             )}
                             <br /><br />
-                            <b>{nls.localize('vuengine/musicEditor/sweep', 'Sweep')}</b>{': '}
+                            <b>{nls.localize('vuengine/editors/music/sweep', 'Sweep')}</b>{': '}
                             {nls.localize(
-                                'vuengine/musicEditor/sweepDescription',
-                                'The sweep function produces a new frequency value relative to the current frequency value. ' +
-                                'The new frequency value is calculated by shifting the current frequency value right by a ' +
-                                'specified number of bits, then adding or subtracting the result to or from the current frequency ' +
-                                'value. This results in a sliding pitch on the logarithmic scale, as though along octaves. '
+                                'vuengine/editors/music/sweepDescription',
+                                'The sweep function produces a new frequency value relative to the current frequency value. \
+The new frequency value is calculated by shifting the current frequency value right by a \
+specified number of bits, then adding or subtracting the result to or from the current frequency \
+value. This results in a sliding pitch on the logarithmic scale, as though along octaves. '
                             )}
                             <br /><br />
-                            <b>{nls.localize('vuengine/musicEditor/modulation', 'Modulation')}</b>{': '}
+                            <b>{nls.localize('vuengine/editors/music/modulation', 'Modulation')}</b>{': '}
                             {nls.localize(
-                                'vuengine/musicEditor/modulationDescription',
-                                'The modulation function produces a new frequency value by reading modulation values from VSU memory. ' +
-                                'Each frequency modification frame, a new frequency value is calculated by reading a modulation value ' +
-                                'and adding it to the most recent frequency value written to the frequency registers. ' +
-                                'After processing all 32 modulation values, frequency modification processing can either stop or continue ' +
-                                'from the first modulation value. '
+                                'vuengine/editors/music/modulationDescription',
+                                'The modulation function produces a new frequency value by reading modulation values from VSU memory. \
+Each frequency modification frame, a new frequency value is calculated by reading a modulation value \
+and adding it to the most recent frequency value written to the frequency registers. \
+After processing all 32 modulation values, frequency modification processing can either stop or continue \
+from the first modulation value. '
                             )}
                         </>}
                     />
                     <RadioSelect
                         options={[{
-                            label: nls.localize('vuengine/musicEditor/off', 'Off'),
+                            label: nls.localize('vuengine/editors/music/off', 'Off'),
                             value: -1,
                         }, {
-                            label: nls.localize('vuengine/musicEditor/sweep', 'Sweep'),
+                            label: nls.localize('vuengine/editors/music/sweep', 'Sweep'),
                             value: VsuSweepModulationFunction.Sweep,
                         }, {
-                            label: nls.localize('vuengine/musicEditor/modulation', 'Modulation'),
+                            label: nls.localize('vuengine/editors/music/modulation', 'Modulation'),
                             value: VsuSweepModulationFunction.Modulation,
                         }]}
                         defaultValue={instrument.sweepMod.enabled ? instrument.sweepMod.function : -1}
@@ -614,7 +614,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <HContainer gap={15}>
                             <VContainer>
                                 <label>
-                                    {nls.localize('vuengine/musicEditor/clockFrequency', 'Clock Frequency')}
+                                    {nls.localize('vuengine/editors/music/clockFrequency', 'Clock Frequency')}
                                 </label>
                                 <RadioSelect
                                     options={VSU_SWEEP_MODULATION_FREQUENCY_VALUES.map((v, i) => ({
@@ -628,7 +628,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             </VContainer>
                             <VContainer>
                                 <label>
-                                    {nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                                    {nls.localize('vuengine/editors/music/interval', 'Interval')}
                                 </label>
                                 <input
                                     className='theia-input'
@@ -661,7 +661,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             <HContainer gap={15}>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/musicEditor/direction', 'Direction')}
+                                        {nls.localize('vuengine/editors/music/direction', 'Direction')}
                                     </label>
                                     <RadioSelect
                                         options={[{
@@ -678,7 +678,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/musicEditor/shiftAmount', 'Shift Amount')}
+                                        {nls.localize('vuengine/editors/music/shiftAmount', 'Shift Amount')}
                                     </label>
                                     <Range
                                         min={VSU_SWEEP_MODULATION_SHIFT_MIN}
@@ -693,7 +693,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         {instrument.sweepMod.function === VsuSweepModulationFunction.Modulation &&
                             <VContainer>
                                 <label>
-                                    {nls.localize('vuengine/musicEditor/modulationData', 'Modulation Data')}
+                                    {nls.localize('vuengine/editors/music/modulationData', 'Modulation Data')}
                                 </label>
                                 <NumberArrayPreview
                                     active={true}
@@ -712,7 +712,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <hr />
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/try', 'Try')}
+                {nls.localize('vuengine/editors/music/try', 'Try')}
             </label>
             <InputWithAction>
                 <BasicSelect
@@ -731,7 +731,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 />
                 <InputWithActionButton
                     className={`theia-button ${testing ? 'primary' : 'secondary'}`}
-                    title={nls.localize('vuengine/musicEditor/try', 'Try')}
+                    title={nls.localize('vuengine/editors/music/try', 'Try')}
                     onClick={() => testing ? stopTesting() : startTesting()}
                     disabled={playing}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}

@@ -95,9 +95,9 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/wireframes/sort', 'Sort')}
+                    label={nls.localize('vuengine/editors/engineConfig/wireframes/sort', 'Sort')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/wireframes/sortDescription',
+                        'vuengine/editors/engineConfig/wireframes/sortDescription',
                         'Sort the wireframes based on their distance to the camera to cull off those that are far off if necessary.'
                     )}
                 />
@@ -109,9 +109,9 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/affine/interlacedThreshold', 'Interlaced Threshold')}
+                    label={nls.localize('vuengine/editors/engineConfig/affine/interlacedThreshold', 'Interlaced Threshold')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/affine/interlacedThresholdDescription',
+                        'vuengine/editors/engineConfig/affine/interlacedThresholdDescription',
                         'The distance to start interlacing wireframe graphics.'
                     )}
                 />
@@ -127,9 +127,9 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/affine/lineShrinkingPadding', 'Line Shrinking Padding')}
+                    label={nls.localize('vuengine/editors/engineConfig/affine/lineShrinkingPadding', 'Line Shrinking Padding')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/affine/lineShrinkingPaddingDescription',
+                        'vuengine/editors/engineConfig/affine/lineShrinkingPaddingDescription',
                         'Threshold before shrinking lines.'
                     )}
                 />
@@ -145,9 +145,9 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/affine/frustumExtensionPower', 'Frustum Extension Power')}
+                    label={nls.localize('vuengine/editors/engineConfig/affine/frustumExtensionPower', 'Frustum Extension Power')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/affine/frustumExtensionPowerDescription',
+                        'vuengine/editors/engineConfig/affine/frustumExtensionPowerDescription',
                         'Frustum extension power for line shrinking checks.'
                     )}
                 />
@@ -163,9 +163,9 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/wireframes/verticalLineOptimization', 'Vertical Line Optimization')}
+                    label={nls.localize('vuengine/editors/engineConfig/wireframes/verticalLineOptimization', 'Vertical Line Optimization')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/wireframes/verticalLineOptimizationDescription',
+                        'vuengine/editors/engineConfig/wireframes/verticalLineOptimizationDescription',
                         'Optimize drawing of vertical lines.'
                     )}
                 />

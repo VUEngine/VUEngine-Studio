@@ -45,7 +45,7 @@ export default function ActorMeta(): React.JSX.Element {
             >
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/tiles', 'Tiles')}
+                        {nls.localize('vuengine/editors/actor/tiles', 'Tiles')}
                     </label>
                     <div>
                         <input

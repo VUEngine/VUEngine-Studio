@@ -41,7 +41,7 @@ export default function Map(): React.JSX.Element {
 
     return <VContainer>
         <label>
-            {nls.localize('vuengine/imageEditor/map', 'Map')}
+            {nls.localize('vuengine/editors/image/map', 'Map')}
         </label>
         <label>
             <input
@@ -49,7 +49,7 @@ export default function Map(): React.JSX.Element {
                 checked={imageData.map.generate}
                 onChange={toggleGenerateMap}
             />
-            {nls.localize('vuengine/imageEditor/generateMap', 'Generate map data')}
+            {nls.localize('vuengine/editors/image/generateMap', 'Generate map data')}
         </label>
         {
             imageData.map.generate && <>
@@ -59,7 +59,7 @@ export default function Map(): React.JSX.Element {
                         checked={imageData.map.reduce.flipped}
                         onChange={toggleReduceFlipped}
                     />
-                    {nls.localize('vuengine/imageEditor/optimizeFlippedTiles', 'Optimize flipped tiles')}
+                    {nls.localize('vuengine/editors/image/optimizeFlippedTiles', 'Optimize flipped tiles')}
                 </label>
                 <label>
                     <input
@@ -67,7 +67,7 @@ export default function Map(): React.JSX.Element {
                         checked={imageData.map.reduce.unique}
                         onChange={toggleReduceUnique}
                     />
-                    {nls.localize('vuengine/imageEditor/optimizeUniqueTiles', 'Optimize unique tiles')}
+                    {nls.localize('vuengine/editors/image/optimizeUniqueTiles', 'Optimize unique tiles')}
                 </label>
             </>
         }

@@ -115,8 +115,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
 
     const removeSegment = async (segmentIndex: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/actorEditor/removeSegment', 'Remove Segment'),
-            msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveSegment', 'Are you sure you want to remove this segment?'),
+            title: nls.localize('vuengine/editors/actor/removeSegment', 'Remove Segment'),
+            msg: nls.localize('vuengine/editors/actor/areYouSureYouWantToRemoveSegment', 'Are you sure you want to remove this segment?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -134,18 +134,18 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
             <HContainer alignItems='start' gap={15} wrap='wrap'>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/actorEditor/type', 'Type')}
+                        {nls.localizeByDefault('Type')}
                     </label>
                     <SelectComponent
                         options={[{
                             value: WireframeType.Sphere,
-                            label: nls.localize('vuengine/actorEditor/wireframeTypeAffine', 'Sphere'),
+                            label: nls.localize('vuengine/editors/actor/wireframeTypeAffine', 'Sphere'),
                         }, {
                             value: WireframeType.Mesh,
-                            label: nls.localize('vuengine/actorEditor/wireframeTypeMesh', 'Mesh'),
+                            label: nls.localize('vuengine/editors/actor/wireframeTypeMesh', 'Mesh'),
                         }, {
                             value: WireframeType.Asterisk,
-                            label: nls.localize('vuengine/actorEditor/wireframeTypeAsterisk', 'Asterisk'),
+                            label: nls.localize('vuengine/editors/actor/wireframeTypeAsterisk', 'Asterisk'),
                         }]}
                         defaultValue={wireframe.type}
                         onChange={option => setType(option.value as WireframeType)}
@@ -154,7 +154,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                 </VContainer>
                 <VContainer>
-                    {nls.localize('vuengine/actorEditor/color', 'Color')}
+                    {nls.localize('vuengine/editors/actor/color', 'Color')}
                     <ColorSelector
                         color={wireframe.color}
                         updateColor={setColor}
@@ -172,7 +172,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 />
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/interlaced', 'Interlaced')}
+                        {nls.localize('vuengine/editors/actor/interlaced', 'Interlaced')}
                     </label>
                     <input
                         type="checkbox"
@@ -226,7 +226,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
             {wireframe.type === WireframeType.Mesh &&
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/segments', 'Segments')}
+                        {nls.localize('vuengine/editors/actor/segments', 'Segments')}
                         {wireframe.segments.length > 0 &&
                             <>
                                 {' '}<span className='count'>{wireframe.segments.length}</span>
@@ -244,7 +244,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <button
                         className='theia-button add-button full-width'
                         onClick={addSegment}
-                        title={nls.localize('vuengine/actorEditor/addSegment', 'Add Segment')}
+                        title={nls.localizeByDefault('Add')}
                     >
                         <i className='codicon codicon-plus' />
                     </button>
@@ -254,7 +254,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 <HContainer gap={15}>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/actorEditor/radius', 'Radius')}
+                            {nls.localize('vuengine/editors/actor/radius', 'Radius')}
                         </label>
                         <input
                             className='theia-input'
@@ -271,7 +271,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </VContainer>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/actorEditor/drawCenter', 'Draw Center')}
+                            {nls.localize('vuengine/editors/actor/drawCenter', 'Draw Center')}
                         </label>
                         <input
                             type="checkbox"
@@ -286,7 +286,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
             {wireframe.type === WireframeType.Asterisk &&
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/length', 'Length')}
+                        {nls.localize('vuengine/editors/actor/length', 'Length')}
                     </label>
                     <input
                         className='theia-input'

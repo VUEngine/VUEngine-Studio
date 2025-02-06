@@ -74,7 +74,7 @@ export class VesAboutDialog extends AboutDialog {
             <div className="ves-about-paragraph">
                 © 2022-2025 <a href={'mailto:c.radke@posteo.de'}>
                     Christian Radke
-                </a> {nls.localize('vuengine/about/and', 'and')} <a href={'mailto:jorgech3@gmail.com'}>
+                </a> & <a href={'mailto:jorgech3@gmail.com'}>
                     Jorge Andres Eremiev
                 </a>
             </div>
@@ -85,8 +85,8 @@ export class VesAboutDialog extends AboutDialog {
                     </a>
                 </div>
                 <div>
-                    <i className="fa fa-github" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine/VUEngine-Studio')}>
-                        {'https://github.com/VUEngine/VUEngine-Studio'}
+                    <i className="fa fa-github" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine')}>
+                        {'https://github.com/VUEngine'}
                     </a>
                 </div>
             </div>

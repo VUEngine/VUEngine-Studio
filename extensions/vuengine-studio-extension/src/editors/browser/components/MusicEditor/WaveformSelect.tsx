@@ -24,7 +24,7 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
         const newFileUri = await services.vesProjectService.createNewFileForType('WaveForm');
         if (newFileUri === undefined) {
             return services.messageService.error(
-                nls.localize('vuengine/musicEditor/couldNotCreateWaveFormFile', 'Could not create WaveForm file')
+                nls.localize('vuengine/editors/music/couldNotCreateWaveFormFile', 'Could not create WaveForm file')
             );
         }
 
@@ -52,7 +52,7 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
             />
             <InputWithActionButton
                 className='theia-button secondary'
-                title={nls.localize('vuengine/musicEditor/editWaveforms', 'Edit Waveforms')}
+                title={nls.localize('vuengine/editors/music/editWaveforms', 'Edit Waveforms')}
                 onClick={async () => (await services.openerService.getOpener(waveform._fileUri)).open(waveform._fileUri)}
                 style={{
                     position: 'absolute',
@@ -73,8 +73,8 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
             ? (
                 <VContainer gap={10}>
                     {templates
-                        ? nls.localize('vuengine/musicEditor/templates', 'Templates')
-                        : nls.localize('vuengine/musicEditor/custom', 'Custom')
+                        ? nls.localize('vuengine/editors/music/templates', 'Templates')
+                        : nls.localize('vuengine/editors/music/custom', 'Custom')
                     }
                     <HContainer gap={10} wrap='wrap'>
                         {(Object.values(filteredWaveforms).map((w, i) => waveformDisplay(w)))}

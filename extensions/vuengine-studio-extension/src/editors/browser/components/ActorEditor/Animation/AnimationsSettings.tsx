@@ -51,12 +51,12 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
 
     return <VContainer gap={10}>
         <label>
-            {nls.localize('vuengine/actorEditor/generalAnimationsSettings', 'General Animations Settings')}
+            {nls.localize('vuengine/editors/actor/generalAnimationsSettings', 'General Animations Settings')}
         </label>
         <HContainer gap={15} wrap='wrap'>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/totalFrames', ' Total Frames')}
+                    {nls.localize('vuengine/editors/actor/totalFrames', ' Total Frames')}
                 </label>
                 <input
                     className='theia-input'
@@ -72,11 +72,11 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
             </VContainer>
             {!isMultiFileAnimation && <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/multiframe', 'Multiframe')}
+                    label={nls.localize('vuengine/editors/actor/multiframe', 'Multiframe')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/multiframeDescription',
-                        'With this enabled, tiles for all animation frames are loaded into video memory at the same time. ' +
-                        'This allows multiple sprites to use the same texture, but show a different frame for each.'
+                        'vuengine/editors/actor/multiframeDescription',
+                        'With this enabled, tiles for all animation frames are loaded into video memory at the same time. \
+This allows multiple sprites to use the same texture, but show a different frame for each.'
                     )}
                 />
                 <input

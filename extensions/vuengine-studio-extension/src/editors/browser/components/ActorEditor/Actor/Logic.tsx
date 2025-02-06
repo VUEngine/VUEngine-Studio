@@ -33,11 +33,10 @@ export default function Logic(): React.JSX.Element {
         <VContainer gap={15}>
             <VContainer grow={1}>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/customAllocator', 'Custom Allocator')}
+                    label={nls.localize('vuengine/editors/actor/customAllocator', 'Custom Allocator')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/customAllocatorDescription',
-                        'Define which class to use to attach custom logic to this actor. ' +
-                        'If left blank, it will be Actor.',
+                        'vuengine/editors/actor/customAllocatorDescription',
+                        'Define which class to use to attach custom logic to this actor. If left blank, it will be Actor.',
                     )}
                 />
                 <input
@@ -50,9 +49,9 @@ export default function Logic(): React.JSX.Element {
             </VContainer>
             <VContainer grow={1}>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/configurationValues', 'Configuration Values')}
+                    label={nls.localize('vuengine/editors/actor/configurationValues', 'Configuration Values')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/configurationValuesDescription',
+                        'vuengine/editors/actor/configurationValuesDescription',
                         "The values of the custom allocator's additional spec properties."
                     )}
                 />

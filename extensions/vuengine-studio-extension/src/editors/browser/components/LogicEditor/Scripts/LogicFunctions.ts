@@ -44,9 +44,9 @@ export const LOGIC_FUNCTIONS: ActionFunctions = {
     'handleMessage': {
         name: 'handleMessage',
         label: 'Handle Message',
-        description: 'Called when the actor receives a message. ' +
-            'Messaging serves the purpose of communicating classes decoupling their interfaces ' +
-            '(ie; not having to implement specific methods). These messages can be delayed too..',
+        description: 'Called when the actor receives a message. \
+Messaging serves the purpose of communicating classes decoupling their interfaces \
+(ie; not having to implement specific methods). These messages can be delayed too.',
         arguments: [{
             name: 'telegram',
             label: 'Telegram',

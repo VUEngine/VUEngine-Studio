@@ -28,10 +28,10 @@ export namespace VesEmulatorSidebarCommands {
     export const WIDGET_HELP: Command = Command.toLocalizedCommand(
         {
             id: 'emulatorSidebar.showHelp',
-            label: 'Show Handbook Page',
+            label: 'Show Documentation',
             iconClass: 'codicon codicon-book',
         },
-        'vuengine/emulator/sidebar/commands/showHelp',
+        'vuengine/emulator/sidebar/commands/showDocumentation',
         'vuengine/emulator/sidebar/commands/category'
     );
 };

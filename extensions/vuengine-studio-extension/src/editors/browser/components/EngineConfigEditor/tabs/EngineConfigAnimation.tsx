@@ -56,11 +56,11 @@ export default function EngineConfigAnimation(props: EngineConfigAnimationProps)
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/animation/maxAnimationFunctionNameLength',
+                        'vuengine/editors/engineConfig/animation/maxAnimationFunctionNameLength',
                         'Maximum Animation Function Name Length'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/animation/maxAnimationFunctionNameLengthDescription',
+                        'vuengine/editors/engineConfig/animation/maxAnimationFunctionNameLengthDescription',
                         'The maximum length of an animation function name.'
                     )}
                 />
@@ -77,11 +77,11 @@ export default function EngineConfigAnimation(props: EngineConfigAnimationProps)
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/animation/maxFramesPerAnimationFunction',
+                        'vuengine/editors/engineConfig/animation/maxFramesPerAnimationFunction',
                         'Maximum Number of Frames per Animation Function'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/animation/maxFramesPerAnimationFunctionDescription',
+                        'vuengine/editors/engineConfig/animation/maxFramesPerAnimationFunctionDescription',
                         'The maximum number of frames that any animation function can consist of.'
                     )}
                 />

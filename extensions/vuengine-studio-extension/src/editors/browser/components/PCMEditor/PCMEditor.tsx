@@ -66,7 +66,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
 
         const selectSourceFile = async (): Promise<void> => {
             const openFileDialogProps: OpenFileDialogProps = {
-                title: nls.localize('vuengine/pcmEditor/selectSourceFile', 'Select source file'),
+                title: nls.localize('vuengine/editors/pcm/selectSourceFile', 'Select source file'),
                 canSelectFolders: false,
                 canSelectFiles: true,
                 filters: { 'WAV': ['wav'] }
@@ -79,7 +79,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     const relativeUri = configFileParentUri.relative(uri);
                     if (!relativeUri) {
                         services.messageService.error(
-                            nls.localize('vuengine/pcmEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
+                            nls.localize('vuengine/editors/pcm/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
                         );
                     } else {
                         this.setSourceFile(relativeUri.fsPath());
@@ -91,7 +91,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
         return <VContainer gap={15} className='pcmEditor'>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/emulator/path', 'Path')}
+                    {nls.localizeByDefault('Path')}
                 </label>
                 <HContainer>
                     <input
@@ -116,11 +116,11 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             <HContainer gap={15}>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/pcmEditor/volumeResolution', 'Volume Resolution')}
+                        label={nls.localize('vuengine/editors/pcm/volumeResolution', 'Volume Resolution')}
                         tooltip={nls.localize(
-                            'vuengine/pcmEditor/volumeResolutionDescription',
-                            'VUEngine can dynamically allocate up to 5 channels for playback to increase volume amplitude resolution. ' +
-                            'Thus, a higher value can deliver finer nuances in volume changes at a small performance cost.'
+                            'vuengine/editors/pcm/volumeResolutionDescription',
+                            'VUEngine can dynamically allocate up to 5 channels for playback to increase volume amplitude resolution. \
+Thus, a higher value can deliver finer nuances in volume changes at a small performance cost.'
                         )}
                     />
                     <RadioSelect
@@ -131,7 +131,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 </VContainer>
                 <VContainer>
                     <label className='setting'>
-                        {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
+                        {nls.localize('vuengine/editors/pcm/loop', 'Loop')}
                     </label>
                     <input
                         type="checkbox"

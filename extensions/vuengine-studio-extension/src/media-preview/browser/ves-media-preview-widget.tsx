@@ -30,7 +30,7 @@ export class VesMediaPreviewWidget extends ReactWidget implements NavigatableWid
   protected readonly options: VesMediaPreviewWidgetOptions;
 
   static readonly ID = 'vesMediaPreviewWidget';
-  static readonly LABEL = nls.localize('vuengine/mediaPreview/preview', 'Preview');
+  static readonly LABEL = nls.localizeByDefault('Preview');
 
   protected uri: URI;
   protected type: string;

@@ -49,8 +49,8 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
 
     const removeMacro = async (index: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/macrosList/removeMacro', 'Remove Macro'),
-            msg: nls.localize('vuengine/macrosList/areYouSureYouWantToRemoveMacro', 'Are you sure you want to remove this macro?'),
+            title: nls.localize('vuengine/editors/macrosList/removeMacro', 'Remove Macro'),
+            msg: nls.localize('vuengine/editors/macrosList/areYouSureYouWantToRemoveMacro', 'Are you sure you want to remove this macro?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -76,16 +76,16 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                     <thead>
                         <tr>
                             <th align="left">
-                                {nls.localize('vuengine/macrosList/enabled', 'Enabled')}
+                                {nls.localizeByDefault('Enabled')}
                             </th>
                             <th align="left" style={{ width: '30%' }}>
-                                {nls.localize('vuengine/macrosList/name', 'Name')}
+                                {nls.localizeByDefault('Name')}
                             </th>
                             <th align="left">
-                                {nls.localize('vuengine/macrosList/type', 'Type')}
+                                {nls.localizeByDefault('Type')}
                             </th>
                             <th align="left" style={{ width: '70%' }}>
-                                {nls.localize('vuengine/macrosList/value', 'Value')}
+                                {nls.localizeByDefault('Value')}
                             </th>
                             <th align="left">
                             </th>
@@ -121,22 +121,22 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                                             <SelectComponent
                                                 options={[{
                                                     value: MacroType.Boolean,
-                                                    label: nls.localize('vuengine/macrosList/type/boolean', 'Boolean'),
+                                                    label: nls.localize('vuengine/editors/macrosList/type/boolean', 'Boolean'),
                                                 }, {
                                                     value: MacroType.Define,
                                                     label: '#define',
                                                 }, {
                                                     value: MacroType.Macro,
-                                                    label: nls.localize('vuengine/macrosList/type/macro', 'Macro'),
+                                                    label: nls.localize('vuengine/editors/macrosList/type/macro', 'Macro'),
                                                 }, {
                                                     value: MacroType.Number,
-                                                    label: nls.localize('vuengine/macrosList/type/number', 'Number'),
+                                                    label: nls.localize('vuengine/editors/macrosList/type/number', 'Number'),
                                                 }, {
                                                     value: MacroType.Symbol,
-                                                    label: nls.localize('vuengine/macrosList/type/symbol', 'Symbol'),
+                                                    label: nls.localize('vuengine/editors/macrosList/type/symbol', 'Symbol'),
                                                 }, {
                                                     value: MacroType.Text,
-                                                    label: nls.localize('vuengine/macrosList/type/text', 'Text'),
+                                                    label: nls.localize('vuengine/editors/macrosList/type/text', 'Text'),
                                                 }, {
                                                     value: MacroType.Undefine,
                                                     label: '#undef',
@@ -193,20 +193,20 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                                                 <button
                                                     className='theia-button secondary'
                                                     onClick={() => removeMacro(index)}
-                                                    title={nls.localize('vuengine/macrosList/removeMacro', 'Remove Macro')}
+                                                    title={nls.localizeByDefault('Remove')}
                                                 >
                                                     <i className='codicon codicon-x' />
                                                 </button>
                                                 {macro.name === '' &&
                                                     <i
                                                         className="error codicon codicon-warning"
-                                                        title={nls.localize('vuengine/macrosList/emptyMacroName', 'Empty Macro Name')}
+                                                        title={nls.localize('vuengine/editors/macrosList/emptyMacroName', 'Empty Macro Name')}
                                                     />
                                                 }
                                                 {data?.filter(p => '__' + toUpperSnakeCase(p.name) === '__' + toUpperSnakeCase(macro.name)).length > 1 &&
                                                     <i
                                                         className="error codicon codicon-warning"
-                                                        title={nls.localize('vuengine/macrosList/duplicateMacroName', 'Duplicate Macro Name')}
+                                                        title={nls.localize('vuengine/editors/macrosList/duplicateMacroName', 'Duplicate Macro Name')}
                                                     />
                                                 }
                                             </HContainer>
@@ -217,12 +217,12 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                     </tbody>
                 </table>
                 : <div className="secondaryText">
-                    {nls.localize('vuengine/macrosList/noMacrosDefined', 'No macros defined.')}
+                    {nls.localize('vuengine/editors/macrosList/noMacrosDefined', 'No macros defined.')}
                 </div>}
             <button
                 className='theia-button add-button'
                 onClick={addMacro}
-                title={nls.localize('vuengine/macrosList/addMacro', 'Add Macro')}
+                title={nls.localize('vuengine/editors/macrosList/addMacro', 'Add Macro')}
             >
                 <i className='codicon codicon-plus' />
             </button>

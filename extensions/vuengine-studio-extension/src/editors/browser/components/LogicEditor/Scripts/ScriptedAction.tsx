@@ -30,8 +30,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
 
     const showActionSelection = (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/addAction', 'Add Action'),
-            placeholder: nls.localize('vuengine/editors/selectActionToAdd', 'Select an action to add...'),
+            title: nls.localize('vuengine/editors/general/addAction', 'Add Action'),
+            placeholder: nls.localize('vuengine/editors/general/selectActionToAdd', 'Select an action to add...'),
         };
         let previousCategory = '';
         const items: (QuickPickItem | QuickPickSeparator)[] = [];
@@ -81,8 +81,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
 
     const removeAction = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/logicEditor/removeAction', 'Remove Action'),
-            msg: nls.localize('vuengine/logicEditor/areYouSureYouWantToRemoveAction', 'Are you sure you want to remove this action?'),
+            title: nls.localize('vuengine/editors/logic/removeAction', 'Remove Action'),
+            msg: nls.localize('vuengine/editors/logic/areYouSureYouWantToRemoveAction', 'Are you sure you want to remove this action?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -169,7 +169,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                 <button
                     className="remove-button"
                     onClick={removeAction}
-                    title={nls.localize('vuengine/logicEditor/removeAction', 'Remove Action')}
+                    title={nls.localizeByDefault('Remove')}
                 >
                     <i className='codicon codicon-x' />
                 </button>
@@ -235,7 +235,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             !isEnd && <button
                 className='theia-button add-button full-width'
                 onClick={addAction}
-                title={nls.localize('vuengine/editors/addAction', 'Add Action')}
+                title={nls.localizeByDefault('Add')}
             >
                 <i className='codicon codicon-plus' />
             </button>

@@ -69,7 +69,7 @@ export default function EngineConfigFrameRate(props: EngineConfigFrameRateProps)
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/framerate/targetFps', 'Target FPS')}
+                    label={nls.localize('vuengine/editors/engineConfig/framerate/targetFps', 'Target FPS')}
                 />
                 <RadioSelect
                     options={TARGET_FPS_OPTIONS.map((fps, index) => ({
@@ -82,7 +82,7 @@ export default function EngineConfigFrameRate(props: EngineConfigFrameRateProps)
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/framerate/timerResolution', 'Timer Resolution')}
+                    label={nls.localize('vuengine/editors/engineConfig/framerate/timerResolution', 'Timer Resolution')}
                 />
                 <input
                     className="theia-input"
@@ -97,11 +97,11 @@ export default function EngineConfigFrameRate(props: EngineConfigFrameRateProps)
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/framerate/runDelayedMessagesAtHalfFrameRate',
+                        'vuengine/editors/engineConfig/framerate/runDelayedMessagesAtHalfFrameRate',
                         'Run Delayed Messages At Half Frame Rate'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/framerate/runDelayedMessagesAtHalfFrameRateDescription',
+                        'vuengine/editors/engineConfig/framerate/runDelayedMessagesAtHalfFrameRateDescription',
                         'Dispatch delayed messages every other game frame cycle only.',
                     )}
                 />

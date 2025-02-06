@@ -118,7 +118,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                         data.dimensions?.x || DEFAULT_SPRITE_SIZE,
                         data.dimensions?.y || DEFAULT_SPRITE_SIZE,
                     ),
-                    name: nls.localize('vuengine/spriteEditor/layer', 'Layer') + ' 1',
+                    name: nls.localize('vuengine/editors/sprite/layer', 'Layer') + ' 1',
                     parallax: 0,
                     displayMode: Displays.Both,
                 }
@@ -144,7 +144,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 data.dimensions?.x || DEFAULT_SPRITE_SIZE,
                 data.dimensions?.y || DEFAULT_SPRITE_SIZE,
             ),
-            name: `${nls.localize('vuengine/spriteEditor/layer', 'Layer')} ${layers.length + 1}`,
+            name: `${nls.localize('vuengine/editors/sprite/layer', 'Layer')} ${layers.length + 1}`,
             parallax: 0,
             displayMode: Displays.Both,
         };
@@ -360,7 +360,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     {/*
                     <VContainer style={{ zIndex: 100 }}>
                         <label>
-                            {nls.localize('vuengine/spriteEditor/navigator', 'Navigator')}
+                            {nls.localize('vuengine/editors/sprite/navigator', 'Navigator')}
                         </label>
                         <VContainer>
                             <Dotting
@@ -409,7 +409,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                                             e.stopPropagation();
                                             removeLayer(layer.id);
                                         }}
-                                        title={nls.localize('vuengine/spriteEditor/removeLayer', 'Remove Layer')}
+                                        title={nls.localize('vuengine/editors/sprite/removeLayer', 'Remove Layer')}
                                     >
                                         <i className='codicon codicon-x' />
                                     </button>
@@ -459,7 +459,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                         <button
                             className='theia-button add-button'
                             onClick={addDataLayer}
-                            title={nls.localize('vuengine/spriteEditor/addLayer', 'Add Layer')}
+                            title={nls.localizeByDefault('Add')}
                         >
                             <i className='codicon codicon-plus' />
                         </button>
@@ -476,7 +476,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     <button
                         className='theia-button add-button'
                         onClick={() => { }}
-                        title={nls.localize('vuengine/spriteEditor/addFrame', 'Add Frame')}
+                        title={nls.localizeByDefault('Add')}
                         style={{ zIndex: 100 }}
                     >
                         <i className='codicon codicon-plus' />

@@ -23,7 +23,7 @@ export class VesProjectStatusBarContribution implements FrontendApplicationContr
         if (!this.vesProjectService.isUpdatingFiles) {
             this.statusBar.removeElement('ves-project-updating-files');
         } else {
-            const label = nls.localize('vuengine/project/updatingFiles', 'Updating Files...');
+            const label = nls.localize('vuengine/projects/updatingFiles', 'Updating Files...');
             this.statusBar.setElement('ves-project-updating-files', {
                 alignment: StatusBarAlignment.LEFT,
                 priority: 1,

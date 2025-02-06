@@ -37,9 +37,9 @@ export default function EngineConfigSram(props: EngineConfigSramProps): React.JS
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/sram/totalSram', 'Total SRAM')}
+                    label={nls.localize('vuengine/editors/engineConfig/sram/totalSram', 'Total SRAM')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/sram/totalSramDescription',
+                        'vuengine/editors/engineConfig/sram/totalSramDescription',
                         'The amount of available SRAM space, in bytes. The Virtual Boy allows up to 16 MB, but most cartridges support only 8 kb (8192 b) of SRAM.',
                     )}
                 />

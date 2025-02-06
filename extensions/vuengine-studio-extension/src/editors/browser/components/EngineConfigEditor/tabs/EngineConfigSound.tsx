@@ -58,7 +58,7 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/animation/earDisplacement', 'Ear Displacement')}
+                    label={nls.localize('vuengine/editors/engineConfig/animation/earDisplacement', 'Ear Displacement')}
                 />
                 <input
                     className="theia-input"
@@ -73,13 +73,13 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/animation/stereoAttenuationDistance',
+                        'vuengine/editors/engineConfig/animation/stereoAttenuationDistance',
                         'Stereo Attenuation Distance'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/animation/stereoAttenuationDistanceDescription',
-                        "affects the amount of attenuation caused by the distance between the x coordinate and each ear's " +
-                        'position defined by "Ear Displacement".'
+                        'vuengine/editors/engineConfig/animation/stereoAttenuationDistanceDescription',
+                        "affects the amount of attenuation caused by the distance between the x coordinate and each ear's \
+position defined by \"Ear Displacement\"."
                     )}
                 />
                 <input

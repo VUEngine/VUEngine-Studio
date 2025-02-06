@@ -144,12 +144,12 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.alertVipOvertime ?? ALERT_VIP_OVERTIME_DEFAULT_VALUE}
                         onChange={() => toggleAlertVipOvertime()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/alertVipOvertime', 'Alert VIP Overtime')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/alertVipOvertime', 'Alert VIP Overtime')}
                 </label>
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/debug/profiler', 'Profiler')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/profiler', 'Profiler')}
                 </label>
                 <label>
                     <input
@@ -157,7 +157,7 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.enableProfiler ?? ENABLE_PROFILER_DEFAULT_VALUE}
                         onChange={() => toggleEnableProfiler()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/enableProfiler', 'Enable Profiler')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/enableProfiler', 'Enable Profiler')}
                 </label>
                 <label>
                     <input
@@ -166,9 +166,9 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         onChange={() => toggleDimmForProfiling()}
                     />
                     <InfoLabel
-                        label={nls.localize('vuengine/engineConfigEditor/debug/dimmForProfiling', 'Dimm For Profiling')}
+                        label={nls.localize('vuengine/editors/engineConfig/debug/dimmForProfiling', 'Dimm For Profiling')}
                         tooltip={nls.localize(
-                            'vuengine/engineConfigEditor/debug/dimmForProfilingDescription',
+                            'vuengine/editors/engineConfig/debug/dimmForProfilingDescription',
                             'Dimm the screen to make it easier to read the profiling output.'
                         )}
                     />
@@ -181,9 +181,9 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                     />
 
                     <InfoLabel
-                        label={nls.localize('vuengine/engineConfigEditor/debug/profileStreaming', 'Profile Streaming')}
+                        label={nls.localize('vuengine/editors/engineConfig/debug/profileStreaming', 'Profile Streaming')}
                         tooltip={nls.localize(
-                            'vuengine/engineConfigEditor/debug/profileStreamingDescription',
+                            'vuengine/editors/engineConfig/debug/profileStreamingDescription',
                             "Enable streaming's profiling."
                         )}
                     />
@@ -195,9 +195,9 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         onChange={() => toggleShowStreamingProfiling()}
                     />
                     <InfoLabel
-                        label={nls.localize('vuengine/engineConfigEditor/debug/showStreamingProfiling', 'Show Streaming Profiling')}
+                        label={nls.localize('vuengine/editors/engineConfig/debug/showStreamingProfiling', 'Show Streaming Profiling')}
                         tooltip={nls.localize(
-                            'vuengine/engineConfigEditor/debug/showStreamingProfilingDescription',
+                            'vuengine/editors/engineConfig/debug/showStreamingProfilingDescription',
                             "Show streaming's profiling during the game."
                         )}
                     />
@@ -205,7 +205,7 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/debug/framerate', 'Framerate')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/framerate', 'Framerate')}
                 </label>
                 <label>
                     <input
@@ -213,12 +213,12 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.printFramerate ?? PRINT_FRAMERATE_DEFAULT_VALUE}
                         onChange={() => togglePrintFramerate()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/printFramerate', 'Print Framerate')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/printFramerate', 'Print Framerate')}
                 </label>
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/debug/memoryPools', 'Memory Pools')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/memoryPools', 'Memory Pools')}
                 </label>
                 <label>
                     <input
@@ -226,7 +226,7 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.showMemoryPoolStatus ?? SHOW_MEMORY_POOL_STATUS_DEFAULT_VALUE}
                         onChange={() => toggleShowMemoryPoolStatus()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/showMemoryPoolStatus', 'Show Memory Pool Status')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/showMemoryPoolStatus', 'Show Memory Pool Status')}
                 </label>
                 <label>
                     <input
@@ -234,12 +234,12 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.showDetailedMemoryPoolStatus ?? SHOW_DETAILED_MEMORY_POOL_STATUS_DEFAULT_VALUE}
                         onChange={() => toggleShowDetailedMemoryPoolStatus()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/showDetailedMemoryPoolStatus', 'Show Detailed Memory Pool Status')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/showDetailedMemoryPoolStatus', 'Show Detailed Memory Pool Status')}
                 </label>
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/engineConfigEditor/debug/stack', 'Stack')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/stack', 'Stack')}
                 </label>
                 <label>
                     <input
@@ -247,11 +247,11 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         checked={data.debug?.showStackOverflowAlert ?? SHOW_STACK_OVERFLOW_ALERT_DEFAULT_VALUE}
                         onChange={() => toggleShowStackOverflowAlert()}
                     />
-                    {nls.localize('vuengine/engineConfigEditor/debug/showStackOverflowAlert', 'Show Stack Overflow Alert')}
+                    {nls.localize('vuengine/editors/engineConfig/debug/showStackOverflowAlert', 'Show Stack Overflow Alert')}
                 </label>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/engineConfigEditor/debug/headroom', 'Headroom')}
+                        {nls.localize('vuengine/editors/engineConfig/debug/headroom', 'Headroom')}
                     </label>
                     <input
                         className="theia-input"

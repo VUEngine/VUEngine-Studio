@@ -906,8 +906,8 @@ export class VesBuildService {
     container.appendChild(assetsCheckboxExplanationElement);
     assetsCheckboxExplanationElement.textContent = nls.localize(
       'vuengine/build/clean/fullCleanExplanation',
-      // eslint-disable-next-line max-len
-      'Checking this will delete the entire build folder, including object files for all build modes and assets. Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
+      'Checking this will delete the entire build folder, including object files for all build modes and assets. \
+Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
     );
 
     const onKeyDown = (e: KeyboardEvent) => {

@@ -55,17 +55,17 @@ export default function EngineConfigPalettes(props: EngineConfigPalettesProps): 
                     <label style={{ width: 64 }}>
                     </label>
                     <InfoLabel
-                        label={nls.localize('vuengine/engineConfigEditor/palettes/palette', 'Palette')}
+                        label={nls.localize('vuengine/editors/engineConfig/palettes/palette', 'Palette')}
                         tooltip={nls.localize(
-                            'vuengine/engineConfigEditor/palettes/paletteDescription',
+                            'vuengine/editors/engineConfig/palettes/paletteDescription',
                             'The default palette values, actual values are set in stage specs.'
                         )}
                         style={{ width: 232 }}
                     />
                     <InfoLabel
-                        label={nls.localize('vuengine/engineConfigEditor/palettes/printing', 'Printing')}
+                        label={nls.localize('vuengine/editors/engineConfig/palettes/printing', 'Printing')}
                         tooltip={nls.localize(
-                            'vuengine/engineConfigEditor/palettes/printingDescription',
+                            'vuengine/editors/engineConfig/palettes/printingDescription',
                             'The BGMap palette that shall be used for text on the printing layer.'
                         )}
                     />

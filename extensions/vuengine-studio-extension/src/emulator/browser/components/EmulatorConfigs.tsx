@@ -147,7 +147,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
             <div className='emulatorConfig'>
                 <div>
                     <label>
-                        {nls.localize('vuengine/emulator/name', 'Name')}
+                        {nls.localizeByDefault('Name')}
                         <input type="text" className="theia-input" readOnly disabled value={nls.localize('vuengine/emulator/builtIn', 'Built-In')} />
                     </label>
                     <div>
@@ -173,7 +173,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
             <div className='emulatorConfig'>
                 <div>
                     <label>
-                        {nls.localize('vuengine/emulator/name', 'Name')}
+                        {nls.localizeByDefault('Name')}
                         <input type="text" className="theia-input" readOnly disabled value="Red Viper" />
                     </label>
                     <div>
@@ -210,7 +210,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
             {emulatorConfigs && emulatorConfigs.map((config, index) => <div className='emulatorConfig' key={`emulatorConfig-${index}`}>
                 <div>
                     <label>
-                        {nls.localize('vuengine/emulator/name', 'Name')}
+                        {nls.localizeByDefault('Name')}
                         <input
                             type="text"
                             className="theia-input"
@@ -223,7 +223,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                         <button
                             className='theia-button secondary'
                             onClick={() => removeEmulatorConfig(index)}
-                            title={nls.localize('vuengine/emulator/removeEmulatorConfig', 'Remove Emulator Config')}
+                            title={nls.localizeByDefault('Remove')}
                         >
                             <i className='codicon codicon-x' />
                         </button>
@@ -231,7 +231,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                 </div>
                 <div>
                     <label>
-                        {nls.localize('vuengine/emulator/path', 'Path')}
+                        {nls.localizeByDefault('Path')}
                         <input
                             type="text"
                             className="theia-input"

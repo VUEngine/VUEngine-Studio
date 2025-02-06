@@ -50,8 +50,8 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
 
     const removeMemoryPool = async (index: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/engineConfigEditor/memoryPools/removeMemoryPool', 'Remove Memory Pool'),
-            msg: nls.localize('vuengine/engineConfigEditor/memoryPools/areYouSureYouWantToRemoveMemoryPool', 'Are you sure you want to remove this memory pool?'),
+            title: nls.localize('vuengine/editors/engineConfig/memoryPools/removeMemoryPool', 'Remove Memory Pool'),
+            msg: nls.localize('vuengine/editors/engineConfig/memoryPools/areYouSureYouWantToRemoveMemoryPool', 'Are you sure you want to remove this memory pool?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -122,9 +122,9 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/memoryPools/memoryPools', 'Memory Pools')}
+                    label={nls.localize('vuengine/editors/engineConfig/memoryPools/memoryPools', 'Memory Pools')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/memoryPools/memoryPoolsDescription',
+                        'vuengine/editors/engineConfig/memoryPools/memoryPoolsDescription',
                         '',
                     )}
                 />
@@ -132,10 +132,10 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                     ? <>
                         <HContainer>
                             <div style={{ width: 110 }}>
-                                {nls.localize('vuengine/engineConfigEditor/memoryPools/sizeInBytes', 'Size (Bytes)')}
+                                {nls.localize('vuengine/editors/engineConfig/memoryPools/sizeInBytes', 'Size (Bytes)')}
                             </div>
                             <div style={{ width: 110 }}>
-                                {nls.localize('vuengine/engineConfigEditor/memoryPools/blocks', 'Blocks')}
+                                {nls.localize('vuengine/editors/engineConfig/memoryPools/blocks', 'Blocks')}
                             </div>
                         </HContainer>
                         <VContainer>
@@ -192,14 +192,14 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                                             className='theia-button secondary'
                                             tabIndex={1000000 - pool.size + 2}
                                             onClick={() => removeMemoryPool(index)}
-                                            title={nls.localize('vuengine/engineConfigEditor/memoryPools/removeMemoryPool', 'Remove Memory Pool')}
+                                            title={nls.localizeByDefault('Remove')}
                                         >
                                             <i className='codicon codicon-x' />
                                         </button>
                                         {data.memoryPools?.pools?.filter(p => p.size === pool.size).length > 1 &&
                                             <i
                                                 className="error codicon codicon-warning"
-                                                title={nls.localize('vuengine/engineConfigEditor/memoryPools/duplicatePoolSize', 'Duplicate Pool Size')}
+                                                title={nls.localize('vuengine/editors/engineConfig/memoryPools/duplicatePoolSize', 'Duplicate Pool Size')}
                                             />
                                         }
                                     </HContainer>
@@ -208,21 +208,21 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                         </VContainer>
                     </>
                     : <div className="secondaryText">
-                        {nls.localize('vuengine/engineConfigEditor/memoryPools/noMemoryPoolsDefined', 'No memory pools defined.')}
+                        {nls.localize('vuengine/editors/engineConfig/memoryPools/noMemoryPoolsDefined', 'No memory pools defined.')}
                     </div>}
                 <button
                     className='theia-button add-button'
                     style={{ width: 262 }}
                     tabIndex={0}
                     onClick={addMemoryPool}
-                    title={nls.localize('vuengine/engineConfigEditor/memoryPools/addMemoryPool', 'Add Memory Pool')}
+                    title={nls.localizeByDefault('Add')}
                 >
                     <i className='codicon codicon-plus' />
                 </button>
 
                 <HContainer>
                     <div>
-                        {nls.localize('vuengine/engineConfigEditor/memoryPools/totalSize', 'Total Size')}:
+                        {nls.localize('vuengine/editors/engineConfig/memoryPools/totalSize', 'Total Size')}:
                     </div>
                     <div>
                         <span className={sizeLevel}>
@@ -238,9 +238,9 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/memoryPools/warningThreshold', 'Warning Threshold')}
+                    label={nls.localize('vuengine/editors/engineConfig/memoryPools/warningThreshold', 'Warning Threshold')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/memoryPools/warningThresholdDescription',
+                        'vuengine/editors/engineConfig/memoryPools/warningThresholdDescription',
                         'Percentage above which the memory pool status shows the pool usage.',
                     )}
                 />
@@ -259,11 +259,11 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/memoryPools/cleanUp', 'Clean Up')}
+                    label={nls.localize('vuengine/editors/engineConfig/memoryPools/cleanUp', 'Clean Up')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/memoryPools/cleanUpDescription',
-                        'Enabling clean-up will reset each byte of each free block to 0 on resetting the game. Use only for debugging! ' +
-                        'Proper object initialization must make this macro unnecessary.',
+                        'vuengine/editors/engineConfig/memoryPools/cleanUpDescription',
+                        'Enabling clean-up will reset each byte of each free block to 0 on resetting the game. Use only for debugging! \
+Proper object initialization must make this macro unnecessary.',
                     )}
                 />
                 <input

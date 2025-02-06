@@ -23,7 +23,7 @@ export default function WaveformWithPresets(props: WaveformWithPresetsProps): Re
         <VContainer gap={15} grow={1}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/vsuSandbox/presetsClickToApply', 'Presets (Click to apply)')}
+                    {nls.localize('vuengine/editors/vsuSandbox/presetsClickToApply', 'Presets (Click to apply)')}
                 </label>
                 <HContainer overflow='scroll'>
                     {(Object.values(waveForms).map((w, i) =>

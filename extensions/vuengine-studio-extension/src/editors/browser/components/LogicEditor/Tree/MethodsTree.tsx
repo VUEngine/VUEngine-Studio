@@ -47,7 +47,7 @@ export default function MethodsTree(): React.JSX.Element {
 
     treeData.push({
         id: 'addMethod',
-        name: nls.localize('vuengine/logicEditor/addMethod', 'Add Method'),
+        name: nls.localize('vuengine/editors/logic/addMethod', 'Add Method'),
     });
 
     return (
@@ -60,7 +60,7 @@ export default function MethodsTree(): React.JSX.Element {
             <label style={{
                 padding: 'var(--padding) var(--padding) 0',
             }}>
-                {nls.localize('vuengine/logicEditor/methods', 'Methods')}
+                {nls.localize('vuengine/editors/logic/methods', 'Methods')}
             </label>
             <div className='ves-tree' style={{
                 overflow: 'auto',

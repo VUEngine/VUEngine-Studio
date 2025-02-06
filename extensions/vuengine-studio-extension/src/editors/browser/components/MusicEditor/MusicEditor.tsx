@@ -378,25 +378,25 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 >
                     <TabList style={{ display: 'flex', padding: 'var(--padding) var(--padding) 0 var(--padding)' }}>
                         <Tab
-                            title={nls.localize('vuengine/musicEditor/selected', 'Selected')}
+                            title={nls.localize('vuengine/editors/music/selected', 'Selected')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <FadersHorizontal size={20} />
                         </Tab>
                         <Tab
-                            title={nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+                            title={nls.localize('vuengine/editors/music/instruments', 'Instruments')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <Guitar size={20} />
                         </Tab>
                         <Tab
-                            title={nls.localize('vuengine/musicEditor/inputDevices', 'Input Devices')}
+                            title={nls.localize('vuengine/editors/music/inputDevices', 'Input Devices')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <Keyboard size={20} />
                         </Tab>
                         <Tab
-                            title={nls.localize('vuengine/musicEditor/settings', 'Settings')}
+                            title={nls.localize('vuengine/editors/music/settings', 'Settings')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <GearSix size={20} />
@@ -481,7 +481,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 open={waveformDialogOpen > -1}
                 onClose={() => setWaveformDialogOpen(-1)}
                 onOk={() => setWaveformDialogOpen(-1)}
-                title={nls.localize('vuengine/musicEditor/selectWaveform', 'Select Waveform')
+                title={nls.localize('vuengine/editors/music/selectWaveform', 'Select Waveform')
                 }
                 height='100%'
                 width='100%'
@@ -501,7 +501,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 open={modulationDataDialogOpen > -1}
                 onClose={() => setModulationDataDialogOpen(-1)}
                 onOk={() => setModulationDataDialogOpen(-1)}
-                title={nls.localize('vuengine/musicEditor/editModulationData', 'Edit Modulation Data')}
+                title={nls.localize('vuengine/editors/music/editModulationData', 'Edit Modulation Data')}
                 height='100%'
                 width='100%'
             >

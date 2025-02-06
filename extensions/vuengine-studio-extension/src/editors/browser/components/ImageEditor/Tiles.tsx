@@ -18,7 +18,7 @@ export default function Tiles(): React.JSX.Element {
     return <VContainer gap={15}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/imageEditor/tiles', 'Tiles')}
+                {nls.localize('vuengine/editors/image/tiles', 'Tiles')}
             </label>
             <label>
                 <input
@@ -26,7 +26,7 @@ export default function Tiles(): React.JSX.Element {
                     checked={imageData.tileset.shared}
                     onChange={toggleShareTiles}
                 />
-                {nls.localize('vuengine/imageEditor/shareTiles', 'Maps should share a tileset')}
+                {nls.localize('vuengine/editors/image/shareTiles', 'Maps should share a tileset')}
             </label>
         </VContainer>
     </VContainer>;

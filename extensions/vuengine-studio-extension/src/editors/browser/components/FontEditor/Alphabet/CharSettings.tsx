@@ -97,18 +97,18 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         {/* }
         <VContainer>
             <label>
-                {nls.localize('vuengine/fontEditor/size', 'Size')}
+                {nls.localize('vuengine/editors/font/size', 'Size')}
             </label>
             <RadioSelect
                 options={[{
-                    label: nls.localize('vuengine/fontEditor/fixed', 'Fixed'),
+                    label: nls.localize('vuengine/editors/font/fixed', 'Fixed'),
                     value: '0',
-                    // description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
+                    // description: nls.localize('vuengine/editors/font/fixedSizeDescription', 'All characters have the same dimensions'),
                 }, {
-                    label: nls.localize('vuengine/fontEditor/variable', 'Variable'),
+                    label: nls.localize('vuengine/editors/font/variable', 'Variable'),
                     value: '1',
                     // description: nls.localize(
-                    //     'vuengine/fontEditor/variableSizeDescription',
+                    //     'vuengine/editors/font/variableSizeDescription',
                     //     'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'
                     // ),
                 }]}
@@ -125,7 +125,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         {variableSize.enabled &&
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                    {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
                 </label>
                 <HContainer alignItems='center'>
                     <input
@@ -155,17 +155,17 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
             {/* }
             {!variableSize.enabled &&
                 <label>
-                    {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                    {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
                 </label>
             }
             {variableSize.enabled &&
                 <label>
-                    {nls.localize('vuengine/fontEditor/maximum', 'Maximum')}
+                    {nls.localize('vuengine/editors/font/maximum', 'Maximum')}
                 </label>
             }
             {*/}
             <label>
-                {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
             </label>
             <HContainer alignItems='center'>
                 <input

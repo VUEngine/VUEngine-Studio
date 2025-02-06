@@ -42,7 +42,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             <i className='codicon codicon-plus' />
             <StyledAddPatternPatternSelect>
                 <StyledAddPatternNewPatternButton
-                    title={nls.localize('vuengine/musicEditor/addNewPattern', 'Add New Pattern')}
+                    title={nls.localizeByDefault('Add')}
                     onClick={() => addToSequence(channel.id, channel.patterns.length)}
                 >
                     <i className='codicon codicon-plus' />
@@ -51,7 +51,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                     {channel.patterns.map((pattern, patternId) => (
                         <StyledAddPatternButton
                             key={patternId}
-                            title={nls.localize('vuengine/musicEditor/addPatternX', 'Add Pattern {0}', patternId)}
+                            title={nls.localize('vuengine/editors/music/addPatternX', 'Add Pattern {0}', patternId)}
                             onClick={() => addToSequence(channel.id, patternId)}
                         >
                             {patternId + 1}

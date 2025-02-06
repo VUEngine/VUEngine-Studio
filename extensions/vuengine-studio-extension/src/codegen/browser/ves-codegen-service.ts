@@ -13,6 +13,7 @@ import { VesAudioConverterService } from '../../audio-converter/browser/ves-audi
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
+import { TYPE_LABELS } from '../../editors/browser/ves-editors-types';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { AnimationConfig, ImageCompressionType, ImageConfigWithName, TilesCompressionResult } from '../../images/browser/ves-images-types';
@@ -111,7 +112,7 @@ export class VesCodeGenService {
       this.handleFileUpdate(fileUri);
     });
     this.vesProjectService.onDidUpdateProjectItem(fileUri => {
-      // ignore files changes by git, etc
+      // ignore file changes by git, etc
       if (fileUri.scheme === 'file') {
         this.handleFileUpdate(fileUri);
       }
@@ -187,7 +188,7 @@ export class VesCodeGenService {
       if (templateTargets?.length) {
         items.push({
           id: typeId,
-          label: nls.localize(`vuengine/projects/types/${typeId}`, type.schema.title || typeId),
+          label: TYPE_LABELS[typeId] ?? type.schema.title,
           iconClasses,
           description: (numberOfItems === 1)
             ? `(${nls.localize('vuengine/codegen/oneTypeFile', '1 file')})`

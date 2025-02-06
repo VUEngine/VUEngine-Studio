@@ -68,7 +68,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 }
 
                 let meta = nls.localize(
-                    'vuengine/imageEditor/fileNotFound',
+                    'vuengine/editors/image/fileNotFound',
                     'File not found'
                 );
                 const resolvedUri = fileUri.parent.resolve(p);
@@ -95,11 +95,11 @@ export default function Images(props: ImagesProps): React.JSX.Element {
 
     const confirmSaveCopy = async (sourceUri: URI, targetUri: URI): Promise<boolean> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/imageEditor/saveCopy', 'Save Copy'),
+            title: nls.localize('vuengine/editors/image/saveCopy', 'Save Copy'),
             msg: nls.localize(
-                'vuengine/imageEditor/areYouSureYouWantToSaveACopy',
-                "Only files below the current file's folder can be used. " +
-                'Do you want to save a copy of "{0}" to be able to use this file?',
+                'vuengine/editors/image/areYouSureYouWantToSaveACopy',
+                "Only files below the current file's folder can be used. \
+'Do you want to save a copy of \"{0}\" to be able to use this file?",
                 targetUri.path.base
             ),
             maxWidth: 400,
@@ -109,7 +109,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             // TODO: the save dialog must not allow to navigate out of the workspace
             /*
             const saveFilterDialogProps: SaveFileDialogProps = {
-                title: nls.localize('vuengine/imageEditor/saveCopy', 'Save Copy'),
+                title: nls.localize('vuengine/editors/image/saveCopy', 'Save Copy'),
                 inputValue: filename,
                 filters: { 'PNG': ['png'] }
             };
@@ -132,7 +132,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
 
     const selectFiles = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/imageEditor/selectFiles', 'Select files'),
+            title: nls.localize('vuengine/editors/image/selectFiles', 'Select files'),
             canSelectFolders: false,
             canSelectFiles: true,
             canSelectMany,

@@ -78,8 +78,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 <StyledMusicEditorToolbarWideButton
                     className='theia-button secondary'
                     title={(editorMode === MusicEditorMode.PIANOROLL
-                        ? nls.localize('vuengine/musicEditor/switchToTrackerMode', 'Switch To Tracker Mode')
-                        : nls.localize('vuengine/musicEditor/switchToPianoRollMode', 'Switch To Piano Roll Mode'))
+                        ? nls.localize('vuengine/editors/music/switchToTrackerMode', 'Switch To Tracker Mode')
+                        : nls.localize('vuengine/editors/music/switchToPianoRollMode', 'Switch To Piano Roll Mode'))
                     }
                     onClick={toggleEditorMode}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -95,8 +95,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 <StyledMusicEditorToolbarWideButton
                     className={`theia-button ${playing ? 'primary' : 'secondary'}`}
                     title={(playing
-                        ? nls.localize('vuengine/musicEditor/pause', 'Pause')
-                        : nls.localize('vuengine/musicEditor/play', 'Play')) +
+                        ? nls.localize('vuengine/editors/music/pause', 'Pause')
+                        : nls.localize('vuengine/editors/music/play', 'Play')) +
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.PLAY_PAUSE.id, true)
                     }
                     onClick={togglePlaying}
@@ -108,7 +108,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 </StyledMusicEditorToolbarWideButton>
                 <StyledMusicEditorToolbarButton
                     className='theia-button secondary'
-                    title={(nls.localize('vuengine/musicEditor/stop', 'Stop')) +
+                    title={(nls.localize('vuengine/editors/music/stop', 'Stop')) +
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.STOP.id, true)
                     }
                     onClick={stopPlaying}
@@ -141,7 +141,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
             <StyledMusicEditorToolbarGroup>
                 <StyledMusicEditorToolbarButton
                     className='theia-button secondary'
-                    title={(nls.localize('vuengine/musicEditor/toolPencil', 'Pencil')) +
+                    title={(nls.localize('vuengine/editors/music/toolPencil', 'Pencil')) +
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.TOOL_PENCIL.id, true)
                     }
                     onClick={() => setTool(MusicEditorTool.DEFAULT)}
@@ -153,7 +153,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 </StyledMusicEditorToolbarButton>
                 <StyledMusicEditorToolbarButton
                     className='theia-button secondary'
-                    title={(nls.localize('vuengine/musicEditor/toolEraser', 'Eraser')) +
+                    title={(nls.localize('vuengine/editors/music/toolEraser', 'Eraser')) +
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.TOOL_ERASER.id, true)
                     }
                     onClick={() => setTool(MusicEditorTool.ERASER)}
@@ -165,7 +165,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 </StyledMusicEditorToolbarButton>
                 <StyledMusicEditorToolbarButton
                     className='theia-button secondary'
-                    title={(nls.localize('vuengine/musicEditor/toolMarquee', 'Marquee')) +
+                    title={(nls.localize('vuengine/editors/music/toolMarquee', 'Marquee')) +
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.TOOL_MARQUEE.id, true)
                     }
                     onClick={() => setTool(MusicEditorTool.MARQUEE)}

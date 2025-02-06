@@ -16,7 +16,7 @@ export const VesEditorsPreferenceSchema: PreferenceSchema = {
       type: 'boolean',
       label: 'Auto Start',
       description: nls.localize(
-        'vuengine/editors/preferences/vsuSandboxAutoStart',
+        'vuengine/editors/vsuSandbox/preferences/vsuSandboxAutoStart',
         'Automatically start VSU emulation.'
       ),
       default: false,

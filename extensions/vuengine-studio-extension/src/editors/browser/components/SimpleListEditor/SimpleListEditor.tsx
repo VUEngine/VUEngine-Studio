@@ -24,8 +24,8 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
 
     const removeItem = async (key: string): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/simpleListEditor/removeItem', 'Remove Item'),
-            msg: nls.localize('vuengine/simpleListEditor/areYouSureYouWantToRemoveItem', 'Are you sure you want to remove this item?'),
+            title: nls.localize('vuengine/editors/simpleList/removeItem', 'Remove Item'),
+            msg: nls.localize('vuengine/editors/simpleList/areYouSureYouWantToRemoveItem', 'Are you sure you want to remove this item?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -65,7 +65,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
                     <button
                         className='theia-button secondary'
                         onClick={() => removeItem(key)}
-                        title={nls.localize('vuengine/simpleListEditor/removeItem', 'Remove Item')}
+                        title={nls.localizeByDefault('Remove')}
                     >
                         <i className='codicon codicon-x' />
                     </button>
@@ -74,7 +74,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
         <button
             className='theia-button add-button full-width'
             onClick={addItem}
-            title={nls.localize('vuengine/simpleListEditor/addItem', 'Add Item')}
+            title={nls.localizeByDefault('Add')}
         >
             <i className='codicon codicon-plus' />
         </button>

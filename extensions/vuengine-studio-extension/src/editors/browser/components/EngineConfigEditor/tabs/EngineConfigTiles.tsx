@@ -33,11 +33,11 @@ export default function EngineConfigTiles(props: EngineConfigTilesProps): React.
             <VContainer>
                 <InfoLabel
                     label={nls.localize(
-                        'vuengine/engineConfigEditor/animation/availableChars',
+                        'vuengine/editors/engineConfig/animation/availableChars',
                         'Available Tiles'
                     )}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/animation/availableCharsDescription',
+                        'vuengine/editors/engineConfig/animation/availableCharsDescription',
                         'The total number of available chars in char memory.',
                     )}
                 />

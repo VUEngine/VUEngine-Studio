@@ -68,8 +68,10 @@ export class VesMigrateService {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: nls.localize('vuengine/migrate/migrateProjectMigration', 'Migrate Project: Migration'),
       placeholder: nls.localize('vuengine/migrate/chooseMigration', 'Choose migration to apply'),
-      // eslint-disable-next-line max-len
-      description: nls.localize('vuengine/migrate/chooseMigrationWarning', 'Warning! Migrations will modify project files. It is strongly recommended to utilize source control to be able to roll back should something fail.'),
+      description: nls.localize(
+        'vuengine/migrate/chooseMigrationWarning',
+        'Warning! Migrations will modify project files. It is strongly recommended to utilize source control to be able to roll back should something fail.'
+      ),
       step: 3,
       totalSteps: 3,
     };

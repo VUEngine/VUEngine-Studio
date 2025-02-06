@@ -254,7 +254,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                                     {' '}<span className='count'>{dependencies?.length || 0}</span>
                                 </Tab>
                                 <Tab>
-                                    {nls.localize('vuengine/plugins/configuration', 'Configuration')}
+                                    {nls.localize('vuengine/general/configuration', 'Configuration')}
                                     {' '}<span className='count'>{configuration?.length || 0}</span>
                                 </Tab>
                             </TabList>

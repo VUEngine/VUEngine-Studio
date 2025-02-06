@@ -86,7 +86,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                 default:
                     return <div className="lightLabel">
                         {nls.localize(
-                            'vuengine/actorEditor/noComponentSelected',
+                            'vuengine/editors/actor/noComponentSelected',
                             'No component selected. Select any component to edit its properties.',
                         )}
                     </div>;

@@ -47,8 +47,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
 
     const removeCurrentPattern = async () => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/musicEditor/deletePatternQuestion', 'Delete Pattern?'),
-            msg: nls.localize('vuengine/musicEditor/areYouSureYouWantToDeletePattern', 'Are you sure you want to completely delete this pattern?'),
+            title: nls.localize('vuengine/editors/music/deletePatternQuestion', 'Delete Pattern?'),
+            msg: nls.localize('vuengine/editors/music/areYouSureYouWantToDeletePattern', 'Are you sure you want to completely delete this pattern?'),
         });
         const remove = await dialog.open();
         if (remove) {
@@ -59,7 +59,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
     return <VContainer gap={15}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/currentPattern', 'Current Pattern')}
+                {nls.localize('vuengine/editors/music/currentPattern', 'Current Pattern')}
             </label>
             <InputWithAction>
                 <select
@@ -75,7 +75,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </select>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/musicEditor/deletePattern', 'Delete Pattern')}
+                    title={nls.localize('vuengine/editors/music/deletePattern', 'Delete Pattern')}
                     onClick={removeCurrentPattern}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -84,7 +84,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </InputWithActionButton>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/musicEditor/addPattern', 'Add Pattern')}
+                    title={nls.localize('vuengine/editors/music/addPattern', 'Add Pattern')}
                     onClick={addPattern}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -96,7 +96,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         <HContainer gap={15}>
             <VContainer grow={1}>
                 <label>
-                    {nls.localize('vuengine/musicEditor/name', 'Name')}
+                    {nls.localizeByDefault('Name')}
                 </label>
                 <input
                     className='theia-input'
@@ -108,7 +108,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/bar', 'Bar')}
+                    {nls.localize('vuengine/editors/music/bar', 'Bar')}
                 </label>
                 <BasicSelect
                     options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}

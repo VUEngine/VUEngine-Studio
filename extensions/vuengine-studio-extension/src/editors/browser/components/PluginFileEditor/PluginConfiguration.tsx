@@ -79,127 +79,129 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
         initTypes();
     }, []);
 
-    return <VContainer gap={15} className='pluginFileEditor'>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/pluginFileEditor/configuration/name', 'Name')}
-            </label>
-            <input
-                className='theia-input'
-                value={data.name}
-                onChange={e => setName(e.target.value)}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/pluginFileEditor/configuration/label', 'Label')}
-            </label>
-            <TranslatedValue
-                data={data.label}
-                setData={setLabel}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/pluginFileEditor/configuration/description', 'Description')}
-            </label>
-            <TranslatedValue
-                data={data.description}
-                setData={setDescription}
-            />
-        </VContainer>
-        <HContainer>
-            <VContainer style={{ flexGrow: 1 }}>
+    return (
+        <VContainer gap={15} className='pluginFileEditor'>
+            <VContainer>
                 <label>
-                    {nls.localize('vuengine/pluginFileEditor/configuration/dataType', 'Data Type')}
+                    {nls.localizeByDefault('Name')}
                 </label>
-                <select
-                    value={data.dataType}
-                    className='theia-select'
-                    onChange={e => setDataType(e.target.value as PluginConfigurationDataType)}
-                >
-                    {Object.values(PluginConfigurationDataType).map(d =>
-                        <option
-                            key={d}
-                            value={d}
-                        >
-                            {d.charAt(0).toUpperCase() + d.slice(1)}
-                        </option>
-                    )}
-                </select>
+                <input
+                    className='theia-input'
+                    value={data.name}
+                    onChange={e => setName(e.target.value)}
+                />
             </VContainer>
-            {data.dataType === PluginConfigurationDataType.type &&
-                <VContainer>
+            <VContainer>
+                <label>
+                    {nls.localizeByDefault('Label')}
+                </label>
+                <TranslatedValue
+                    data={data.label}
+                    setData={setLabel}
+                />
+            </VContainer>
+            <VContainer>
+                <label>
+                    {nls.localizeByDefault('Description')}
+                </label>
+                <TranslatedValue
+                    data={data.description}
+                    setData={setDescription}
+                />
+            </VContainer>
+            <HContainer>
+                <VContainer style={{ flexGrow: 1 }}>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/configuration/type', 'Type')}
+                        {nls.localize('vuengine/editors/pluginFile/configuration/dataType', 'Data Type')}
                     </label>
                     <select
-                        value={data.type}
+                        value={data.dataType}
                         className='theia-select'
-                        onChange={e => setType(e.target.value)}
+                        onChange={e => setDataType(e.target.value as PluginConfigurationDataType)}
                     >
-                        {Object.keys(types).map(typeId =>
+                        {Object.values(PluginConfigurationDataType).map(d =>
                             <option
-                                key={typeId}
-                                value={typeId}
+                                key={d}
+                                value={d}
                             >
-                                {types[typeId].schema.title}
+                                {d.charAt(0).toUpperCase() + d.slice(1)}
                             </option>
                         )}
                     </select>
                 </VContainer>
-            }
-            {data.dataType === PluginConfigurationDataType.integer && <>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/pluginFileEditor/configuration/min', 'Min')}
-                    </label>
-                    <input
-                        type='number'
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        value={data.min}
-                        onChange={e => setMin(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    />
-                </VContainer>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/pluginFileEditor/configuration/max', 'Max')}
-                    </label>
-                    <input
-                        type='number'
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        value={data.max}
-                        onChange={e => setMax(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    />
-                </VContainer>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/pluginFileEditor/configuration/step', 'Step')}
-                    </label>
-                    <input
-                        type='number'
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        value={data.step}
-                        onChange={e => setStep(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    />
-                </VContainer>
-            </>}
-        </HContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/pluginFileEditor/configuration/default', 'Default')}
-            </label>
-            <PluginDefaultInput
-                config={data as unknown as PluginConfiguration}
-                value={data.default}
-                setValue={(value: any, persist?: boolean) => setDefault(value)}
-                disabled={false}
-                vesCommonService={context.services.vesCommonService!}
-                vesProjectService={context.services.vesProjectService!}
-            />
+                {data.dataType === PluginConfigurationDataType.type &&
+                    <VContainer>
+                        <label>
+                            {nls.localizeByDefault('Type')}
+                        </label>
+                        <select
+                            value={data.type}
+                            className='theia-select'
+                            onChange={e => setType(e.target.value)}
+                        >
+                            {Object.keys(types).map(typeId =>
+                                <option
+                                    key={typeId}
+                                    value={typeId}
+                                >
+                                    {types[typeId].schema.title}
+                                </option>
+                            )}
+                        </select>
+                    </VContainer>
+                }
+                {data.dataType === PluginConfigurationDataType.integer && <>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/pluginFile/configuration/min', 'Min')}
+                        </label>
+                        <input
+                            type='number'
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            value={data.min}
+                            onChange={e => setMin(e.target.value === '' ? 0 : parseInt(e.target.value))}
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/pluginFile/configuration/max', 'Max')}
+                        </label>
+                        <input
+                            type='number'
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            value={data.max}
+                            onChange={e => setMax(e.target.value === '' ? 0 : parseInt(e.target.value))}
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/pluginFile/configuration/step', 'Step')}
+                        </label>
+                        <input
+                            type='number'
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            value={data.step}
+                            onChange={e => setStep(e.target.value === '' ? 0 : parseInt(e.target.value))}
+                        />
+                    </VContainer>
+                </>}
+            </HContainer>
+            <VContainer>
+                <label>
+                    {nls.localizeByDefault('Default')}
+                </label>
+                <PluginDefaultInput
+                    config={data as unknown as PluginConfiguration}
+                    value={data.default}
+                    setValue={(value: any, persist?: boolean) => setDefault(value)}
+                    disabled={false}
+                    vesCommonService={context.services.vesCommonService!}
+                    vesProjectService={context.services.vesProjectService!}
+                />
+            </VContainer>
         </VContainer>
-    </VContainer>;
+    );
 }

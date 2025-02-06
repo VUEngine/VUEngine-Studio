@@ -256,9 +256,9 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
 
     return <VContainer gap={15}>
         <label>
-            {nls.localize('vuengine/vsuSandbox/channel', 'Channel')} {index}
+            {nls.localize('vuengine/editors/vsuSandbox/channel', 'Channel')} {index}
             {isNoiseChannel &&
-                ` (${nls.localize('vuengine/vsuSandbox/noise', 'Noise')})`
+                ` (${nls.localize('vuengine/editors/vsuSandbox/noise', 'Noise')})`
             }
         </label>
         <label>
@@ -273,7 +273,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             <HContainer gap={25} wrap='wrap'>
                 {!isNoiseChannel && <>
                     <VContainer>
-                        {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')}
+                        {nls.localize('vuengine/editors/vsuSandbox/waveForm', 'WaveForm')}
                         <WaveformSelect
                             value={channel?.waveform}
                             setValue={setWaveform}
@@ -284,7 +284,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {isNoiseChannel &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/vsuSandbox/tap', 'Tap')}
+                            {nls.localize('vuengine/editors/vsuSandbox/tap', 'Tap')}
                         </label>
                         <select
                             className="theia-select"
@@ -299,7 +299,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 }
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/vsuSandbox/stereoLevels', 'Stereo Levels')}
+                        {nls.localize('vuengine/editors/vsuSandbox/stereoLevels', 'Stereo Levels')}
                     </label>
                     <HContainer alignItems='center'>
                         <div style={{ minWidth: 10, width: 10 }}>
@@ -326,7 +326,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/vsuSandbox/frequency', 'Frequency')}
+                        {nls.localize('vuengine/editors/vsuSandbox/frequency', 'Frequency')}
                     </label>
                     <input
                         className='theia-input'
@@ -356,7 +356,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/vsuSandbox/interval', 'Interval')}
+                        {nls.localize('vuengine/editors/vsuSandbox/interval', 'Interval')}
                     </label>
                     <HContainer gap={15} wrap='wrap'>
                         <label>
@@ -370,7 +370,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         {channel?.interval?.enabled &&
                             <VContainer>
                                 <label>
-                                    {nls.localize('vuengine/vsuSandbox/length', 'Length')}
+                                    {nls.localize('vuengine/editors/vsuSandbox/length', 'Length')}
                                 </label>
                                 <select
                                     className="theia-select"
@@ -387,7 +387,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/vsuSandbox/envelope', 'Envelope')}
+                        {nls.localize('vuengine/editors/vsuSandbox/envelope', 'Envelope')}
                     </label>
                     <HContainer gap={15} wrap='wrap'>
                         <VContainer>
@@ -414,7 +414,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                             <>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/vsuSandbox/type', 'Type')}
+                                        {nls.localizeByDefault('Type')}
                                     </label>
                                     <RadioSelect
                                         options={[{
@@ -431,7 +431,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/vsuSandbox/stepTime', 'Step Time')}
+                                        {nls.localize('vuengine/editors/vsuSandbox/stepTime', 'Step Time')}
                                     </label>
                                     <select
                                         className="theia-select"
@@ -445,7 +445,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/vsuSandbox/initialValue', 'Initial Value')}
+                                        {nls.localize('vuengine/editors/vsuSandbox/initialValue', 'Initial Value')}
                                     </label>
                                     <input
                                         className='theia-input'
@@ -464,7 +464,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {supportSweepAndModulation &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/vsuSandbox/sweepModulation', ' Sweep / Modulation')}
+                            {nls.localize('vuengine/editors/vsuSandbox/sweepModulation', ' Sweep / Modulation')}
                         </label>
                         <HContainer gap={15} wrap='wrap'>
                             <VContainer>
@@ -491,7 +491,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 <>
                                     <VContainer>
                                         <label>
-                                            {nls.localize('vuengine/vsuSandbox/type', 'Type')}
+                                            {nls.localizeByDefault('Type')}
                                         </label>
                                         <RadioSelect
                                             options={[{
@@ -508,7 +508,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     </VContainer>
                                     <VContainer>
                                         <label>
-                                            {nls.localize('vuengine/vsuSandbox/clockFrequency', 'Clock Frequency')}
+                                            {nls.localize('vuengine/editors/vsuSandbox/clockFrequency', 'Clock Frequency')}
                                         </label>
                                         <select
                                             className="theia-select"
@@ -521,7 +521,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     </VContainer>
                                     <VContainer>
                                         <label>
-                                            {nls.localize('vuengine/vsuSandbox/interval', 'Interval')}
+                                            {nls.localize('vuengine/editors/vsuSandbox/interval', 'Interval')}
                                         </label>
                                         <input
                                             className='theia-input'
@@ -537,7 +537,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         <>
                                             <VContainer>
                                                 <label>
-                                                    {nls.localize('vuengine/vsuSandbox/sweep', 'Sweep')}
+                                                    {nls.localize('vuengine/editors/vsuSandbox/sweep', 'Sweep')}
                                                 </label>
                                                 <RadioSelect
                                                     options={[{
@@ -554,7 +554,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             </VContainer>
                                             <VContainer>
                                                 <label>
-                                                    {nls.localize('vuengine/vsuSandbox/shiftAmount', 'Shift Amount')}
+                                                    {nls.localize('vuengine/editors/vsuSandbox/shiftAmount', 'Shift Amount')}
                                                 </label>
                                                 <input
                                                     className='theia-input'

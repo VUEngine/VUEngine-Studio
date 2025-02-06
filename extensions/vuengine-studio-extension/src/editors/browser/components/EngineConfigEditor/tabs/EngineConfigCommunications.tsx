@@ -26,9 +26,9 @@ export default function EngineConfigCommunications(props: EngineConfigCommunicat
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/communications/enabled', 'Enabled')}
+                    label={nls.localize('vuengine/editors/engineConfig/communications/enabled', 'Enabled')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/communications/enabledDescription',
+                        'vuengine/editors/engineConfig/communications/enabledDescription',
                         'Enable communications at the start of the game, e.g. for link play.',
                     )}
                 />

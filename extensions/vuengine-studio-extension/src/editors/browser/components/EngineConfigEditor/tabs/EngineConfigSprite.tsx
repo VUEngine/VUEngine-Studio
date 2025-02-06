@@ -77,9 +77,9 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
         <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/sprite/totalLayers', 'Total Layers')}
+                    label={nls.localize('vuengine/editors/engineConfig/sprite/totalLayers', 'Total Layers')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/sprite/totalLayersDescription',
+                        'vuengine/editors/engineConfig/sprite/totalLayersDescription',
                         'Total number of available WORLDS.'
                     )}
                 />
@@ -95,9 +95,9 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/sprite/totalObjects', 'Total Objects')}
+                    label={nls.localize('vuengine/editors/engineConfig/sprite/totalObjects', 'Total Objects')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/sprite/totalObjectsDescription',
+                        'vuengine/editors/engineConfig/sprite/totalObjectsDescription',
                         'Total number of available OBJECTS.'
                     )}
                 />
@@ -113,7 +113,7 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/sprite/spritesRotateIn3D', 'Sprites Rotate In 3-D')}
+                    label={nls.localize('vuengine/editors/engineConfig/sprite/spritesRotateIn3D', 'Sprites Rotate In 3-D')}
                 />
                 <input
                     type="checkbox"
@@ -123,9 +123,9 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/engineConfigEditor/sprite/hackBgmapSpriteHeight', 'Hack: BGMap Sprite Height')}
+                    label={nls.localize('vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeight', 'Hack: BGMap Sprite Height')}
                     tooltip={nls.localize(
-                        'vuengine/engineConfigEditor/sprite/hackBgmapSpriteHeightDescription',
+                        'vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeightDescription',
                         "Account for VIP's design to draw 8 pixel when BGMAP WORLD's height is less than 8."
                     )}
                 />

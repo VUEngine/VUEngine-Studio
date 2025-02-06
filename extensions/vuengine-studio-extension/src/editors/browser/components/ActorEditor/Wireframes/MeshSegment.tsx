@@ -42,7 +42,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
             <button
                 className="remove-button"
                 onClick={removeSegment}
-                title={nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component')}
+                title={nls.localize('vuengine/editors/actor/removeComponent', 'Remove Component')}
             >
                 <i className='codicon codicon-x' />
             </button>

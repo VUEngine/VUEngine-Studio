@@ -55,26 +55,26 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/currentChannel', 'Current Channel')}
+                    {nls.localize('vuengine/editors/music/currentChannel', 'Current Channel')}
                 </label>
                 <BasicSelect
                     options={[{
-                        label: `1: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 1`,
+                        label: `1: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 1`,
                         value: 0,
                     }, {
-                        label: `2: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 2`,
+                        label: `2: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 2`,
                         value: 1,
                     }, {
-                        label: `3: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 3`,
+                        label: `3: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 3`,
                         value: 2,
                     }, {
-                        label: `4: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 4`,
+                        label: `4: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 4`,
                         value: 3,
                     }, {
-                        label: `5: ${nls.localize('vuengine/musicEditor/sweepModulation', 'Sweep / Modulation')}`,
+                        label: `5: ${nls.localize('vuengine/editors/music/sweepModulation', 'Sweep / Modulation')}`,
                         value: 4,
                     }, {
-                        label: `6: ${nls.localize('vuengine/musicEditor/noise', 'Noise')}`,
+                        label: `6: ${nls.localize('vuengine/editors/music/noise', 'Noise')}`,
                         value: 5,
                     }]}
                     value={channel.id}
@@ -87,7 +87,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
             <HContainer alignItems='end' gap={20}>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/musicEditor/instrument', 'Instrument')}
+                        {nls.localize('vuengine/editors/music/instrument', 'Instrument')}
                     </label>
                     <InputWithAction>
                         <select
@@ -103,7 +103,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         </select>
                         <InputWithActionButton
                             className='theia-button secondary'
-                            title={nls.localize('vuengine/musicEditor/editInstrument', 'Edit Instrument')}
+                            title={nls.localize('vuengine/editors/music/editInstrument', 'Edit Instrument')}
                             onClick={editInstrument}
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -123,10 +123,10 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
-                        {nls.localize('vuengine/musicEditor/skip', 'Skip')}
+                        {nls.localize('vuengine/editors/music/skip', 'Skip')}
                         <HoverInfo
                             value={nls.localize(
-                                'vuengine/musicEditor/allowSkipDescription',
+                                'vuengine/editors/music/allowSkipDescription',
                                 'Allow to skip notes during play back if no sound source is available when requested.'
                             )}
                         />
@@ -142,7 +142,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                 onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                 onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
-                            {nls.localize('vuengine/musicEditor/muted', 'Muted')}
+                            {nls.localize('vuengine/editors/music/muted', 'Muted')}
                         </label>
                     </VContainer>
                     <VContainer>
@@ -154,7 +154,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                 onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                 onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
-                            {nls.localize('vuengine/musicEditor/solo', 'Solo')}
+                            {nls.localize('vuengine/editors/music/solo', 'Solo')}
                         </label>
                     </VContainer>
                 </HContainer>
