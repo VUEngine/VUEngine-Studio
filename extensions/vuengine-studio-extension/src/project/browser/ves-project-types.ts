@@ -615,6 +615,7 @@ export const defaultProjectData: ProjectData = {
       icon: 'codicon codicon-circuit-board'
     },
     VsuSandbox: {
+      enabled: false,
       file: '.vsu',
       schema: {
         title: 'VSU Sandbox',
