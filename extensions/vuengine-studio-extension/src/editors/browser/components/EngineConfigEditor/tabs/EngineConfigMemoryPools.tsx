@@ -5,7 +5,6 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { clamp } from '../../Common/Utils';
 import {
     EngineConfigData,
     EngineConfigDataMemoryPool,
@@ -87,12 +86,7 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
             ...data,
             memoryPools: {
                 ...(data.memoryPools ?? {}),
-                warningThreshold: clamp(
-                    warningThreshold,
-                    MEMORY_POOLS_WARNING_THRESHOLD_MIN_VALUE,
-                    MEMORY_POOLS_WARNING_THRESHOLD_MAX_VALUE,
-                    MEMORY_POOLS_WARNING_THRESHOLD_DEFAULT_VALUE
-                ),
+                warningThreshold,
             }
         });
     };
@@ -227,14 +221,14 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                     )}
                 />
                 <HContainer alignItems="center">
-                    <input
-                        className="theia-input"
-                        style={{ width: 48 }}
+                    <Input
                         type="number"
                         value={data.memoryPools?.warningThreshold ?? MEMORY_POOLS_WARNING_THRESHOLD_DEFAULT_VALUE}
+                        setValue={setWarningThreshold}
                         min={MEMORY_POOLS_WARNING_THRESHOLD_MIN_VALUE}
                         max={MEMORY_POOLS_WARNING_THRESHOLD_MAX_VALUE}
-                        onChange={e => setWarningThreshold(e.target.value === '' ? MEMORY_POOLS_WARNING_THRESHOLD_MIN_VALUE : parseInt(e.target.value))}
+                        defaultValue={MEMORY_POOLS_WARNING_THRESHOLD_DEFAULT_VALUE}
+                        width={48}
                     />
                     %
                 </HContainer>

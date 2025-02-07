@@ -4,6 +4,7 @@ import HContainer from '../Common/Base/HContainer';
 import { CompilerConfigData, MemorySectionsDataKeys } from './CompilerConfigEditorTypes';
 import VContainer from '../Common/Base/VContainer';
 import InfoLabel from '../Common/InfoLabel';
+import Input from '../Common/Base/Input';
 
 interface MemorySectionsProps {
     data: CompilerConfigData
@@ -69,24 +70,22 @@ The reserved space will be unavailable for BGMAP data.'
                     </td>
                     <td>
                         <HContainer alignItems='center'>
-                            <input
+                            <Input
                                 type="number"
-                                className="theia-input"
-                                style={{ width: 36 }}
-                                onChange={e => setLength(section, parseInt(e.target.value))}
                                 value={data.memorySections[section].length}
-                                min="0"
-                                max="114"
+                                setValue={v => setLength(section, v as number)}
+                                min={0}
+                                max={114}
+                                width={36}
                             />
                             KB
                         </HContainer>
                     </td>
                     <td>
-                        <input
-                            className="theia-input"
-                            style={{ width: 100 }}
-                            onChange={e => setOrigin(section, e.target.value)}
+                        <Input
+                            width={100}
                             value={data.memorySections[section].origin}
+                            setValue={v => setOrigin(section, v as string)}
                         />
                     </td>
                 </tr>
@@ -111,23 +110,21 @@ The reserved space will be unavailable for BGMAP data.'
                     </td>
                     <td>
                         <HContainer alignItems='center'>
-                            <input
+                            <Input
                                 type="number"
-                                className="theia-input"
-                                style={{ width: 36 }}
-                                onChange={e => setLength(section, parseInt(e.target.value))}
                                 value={data.memorySections[section].length}
-                                min="0"
+                                setValue={v => setLength(section, v as number)}
+                                min={0}
+                                width={36}
                             />
                             {section === 'wram' ? 'KB' : 'MB'}
                         </HContainer>
                     </td>
                     <td>
-                        <input
-                            className="theia-input"
-                            style={{ width: 100 }}
-                            onChange={e => setOrigin(section, e.target.value)}
+                        <Input
+                            width={100}
                             value={data.memorySections[section].origin}
+                            setValue={v => setOrigin(section, v as string)}
                         />
                     </td>
                 </tr>

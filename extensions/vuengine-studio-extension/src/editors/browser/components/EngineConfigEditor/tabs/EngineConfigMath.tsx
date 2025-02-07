@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { clamp } from '../../Common/Utils';
 import {
     EngineConfigData,
     FIXED_POINT_PRECISION_DEFAULT_VALUE,
@@ -26,7 +26,7 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
             ...data,
             math: {
                 ...(data.math ?? {}),
-                fixedPointPrecision: clamp(fixedPointPrecision, FIXED_POINT_PRECISION_MIN_VALUE, FIXED_POINT_PRECISION_MAX_VALUE, FIXED_POINT_PRECISION_DEFAULT_VALUE),
+                fixedPointPrecision,
             }
         });
     };
@@ -46,27 +46,23 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
             ...data,
             random: {
                 ...(data.random ?? {}),
-                seedCycles: clamp(seedCycles, SEED_CYCLES_MIN_VALUE, SEED_CYCLES_MAX_VALUE, SEED_CYCLES_DEFAULT_VALUE),
+                seedCycles,
             }
         });
     };
 
     return (
         <VContainer gap={15}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/engineConfig/math/fixedPointPrecision', 'Fixed Point Precision')}
-                </label>
-                <input
-                    className="theia-input"
-                    style={{ width: 66 }}
-                    type="number"
-                    value={data.math?.fixedPointPrecision ?? FIXED_POINT_PRECISION_DEFAULT_VALUE}
-                    min={FIXED_POINT_PRECISION_MIN_VALUE}
-                    max={FIXED_POINT_PRECISION_MAX_VALUE}
-                    onChange={e => setFixedPointPrecision(e.target.value === '' ? FIXED_POINT_PRECISION_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/math/fixedPointPrecision', 'Fixed Point Precision')}
+                type="number"
+                value={data.math?.fixedPointPrecision ?? FIXED_POINT_PRECISION_DEFAULT_VALUE}
+                setValue={setFixedPointPrecision}
+                min={FIXED_POINT_PRECISION_MIN_VALUE}
+                max={FIXED_POINT_PRECISION_MAX_VALUE}
+                defaultValue={FIXED_POINT_PRECISION_DEFAULT_VALUE}
+                width={66}
+            />
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/engineConfig/math/addUserInputAndTimeToRandomSeed', 'Add User Input and Time To Random Seed')}
@@ -77,20 +73,16 @@ export default function EngineConfigMath(props: EngineConfigMathProps): React.JS
                     onChange={() => toggleAddUserInput()}
                 />
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/engineConfig/math/randomSeedCycles', 'Random Seed Cycles')}
-                </label>
-                <input
-                    className="theia-input"
-                    style={{ width: 66 }}
-                    type="number"
-                    value={data.random?.seedCycles ?? SEED_CYCLES_DEFAULT_VALUE}
-                    min={SEED_CYCLES_MIN_VALUE}
-                    max={SEED_CYCLES_MAX_VALUE}
-                    onChange={e => setSeedCycles(e.target.value === '' ? SEED_CYCLES_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/math/randomSeedCycles', 'Random Seed Cycles')}
+                type="number"
+                value={data.random?.seedCycles ?? SEED_CYCLES_DEFAULT_VALUE}
+                setValue={setSeedCycles}
+                min={SEED_CYCLES_MIN_VALUE}
+                max={SEED_CYCLES_MAX_VALUE}
+                defaultValue={SEED_CYCLES_DEFAULT_VALUE}
+                width={66}
+            />
         </VContainer>
     );
 }

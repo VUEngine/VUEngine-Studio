@@ -11,8 +11,9 @@ import {
 } from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
+import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { clamp, roundToNextMultipleOf8 } from '../../../Common/Utils';
+import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
 import { INPUT_BLOCKING_COMMANDS } from '../../FontEditor';
@@ -271,59 +272,39 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
                     </label>
                     <HContainer alignItems='center'>
-                        <input
+                        <Input
                             type="number"
-                            className="theia-input"
-                            style={{ width: 48 }}
+                            value={importedCharWidth}
+                            setValue={v => setImportedCharWidth(roundToNextMultipleOf8(v as number))}
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            value={importedCharWidth}
-                            onChange={e => setImportedCharWidth(clamp(
-                                roundToNextMultipleOf8(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : CHAR_PIXEL_SIZE),
-                                MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
-                                MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
-                            ))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={48}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
-                        <input
+                        <Input
                             type="number"
-                            className="theia-input"
-                            style={{ width: 48 }}
+                            value={importedCharHeight}
+                            setValue={v => setImportedCharHeight(roundToNextMultipleOf8(v as number))}
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            value={importedCharHeight}
-                            onChange={e => setImportedCharHeight(clamp(
-                                roundToNextMultipleOf8(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : CHAR_PIXEL_SIZE),
-                                MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
-                                MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
-                            ))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={48}
                         />
                     </HContainer>
                 </VContainer>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/font/offset', 'Offset')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        style={{ width: 48 }}
-                        min={MIN_OFFSET}
-                        max={MAX_OFFSET}
-                        value={importOffset}
-                        onChange={e => setImportOffset(
-                            clamp(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0, MIN_OFFSET, MAX_OFFSET)
-                        )}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                </VContainer>
+                <Input
+                    label={nls.localize('vuengine/editors/font/offset', 'Offset')}
+                    type="number"
+                    value={importOffset}
+                    setValue={v => setImportOffset(v as number)}
+                    min={MIN_OFFSET}
+                    max={MAX_OFFSET}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    width={48}
+                />
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/editors/font/invertColors', 'Invert Colors')}

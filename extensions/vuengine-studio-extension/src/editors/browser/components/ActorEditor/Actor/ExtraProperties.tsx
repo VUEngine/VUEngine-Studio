@@ -42,12 +42,11 @@ export default function ExtraProperties(): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/actor/actorSize', 'Size (x, y, z)')}
-                    tooltip={
-                        nls.localize(
-                            'vuengine/editors/actor/actorSizeDescription',
-                            "Size of the actor in pixels. Used by streaming to test if out of screen bounds. \
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/actorSizeDescription',
+                        "Size of the actor in pixels. Used by streaming to test if out of screen bounds. \
 If 0, width and height will be inferred from the first sprite's texture size."
-                        )}
+                    )}
                 />
                 <HContainer>
                     <Input

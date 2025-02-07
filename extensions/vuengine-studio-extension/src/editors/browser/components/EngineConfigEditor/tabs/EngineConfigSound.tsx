@@ -1,16 +1,12 @@
 import { nls } from '@theia/core';
 import { default as React } from 'react';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import InfoLabel from '../../Common/InfoLabel';
-import { clamp } from '../../Common/Utils';
 import {
     EAR_DISPLACEMENT_DEFAULT_VALUE,
     EAR_DISPLACEMENT_MAX_VALUE,
     EAR_DISPLACEMENT_MIN_VALUE,
     EngineConfigData,
-    MAX_ANIMATION_FUNCTION_NAME_LENGTH_DEFAULT_VALUE,
-    MAX_ANIMATION_FUNCTION_NAME_LENGTH_MAX_VALUE,
-    MAX_ANIMATION_FUNCTION_NAME_LENGTH_MIN_VALUE,
     STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE,
     STEREO_ATTENUATION_DISTANCE_MAX_VALUE,
     STEREO_ATTENUATION_DISTANCE_MIN_VALUE
@@ -29,12 +25,7 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
             ...data,
             sound: {
                 ...(data.sound ?? {}),
-                earDisplacement: clamp(
-                    earDisplacement,
-                    MAX_ANIMATION_FUNCTION_NAME_LENGTH_MIN_VALUE,
-                    MAX_ANIMATION_FUNCTION_NAME_LENGTH_MAX_VALUE,
-                    MAX_ANIMATION_FUNCTION_NAME_LENGTH_DEFAULT_VALUE
-                ),
+                earDisplacement,
             }
         });
     };
@@ -44,54 +35,41 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
             ...data,
             sound: {
                 ...(data.sound ?? {}),
-                stereoAttenuationDistance: clamp(
-                    stereoAttenuationDistance,
-                    STEREO_ATTENUATION_DISTANCE_MIN_VALUE,
-                    STEREO_ATTENUATION_DISTANCE_MAX_VALUE,
-                    STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE
-                ),
+                stereoAttenuationDistance,
             }
         });
     };
 
     return (
         <VContainer gap={15}>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/animation/earDisplacement', 'Ear Displacement')}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.sound?.earDisplacement ?? EAR_DISPLACEMENT_DEFAULT_VALUE}
-                    min={EAR_DISPLACEMENT_MIN_VALUE}
-                    max={EAR_DISPLACEMENT_MAX_VALUE}
-                    onChange={e => setEarDisplacement(e.target.value === '' ? EAR_DISPLACEMENT_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize(
-                        'vuengine/editors/engineConfig/animation/stereoAttenuationDistance',
-                        'Stereo Attenuation Distance'
-                    )}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/animation/stereoAttenuationDistanceDescription',
-                        "affects the amount of attenuation caused by the distance between the x coordinate and each ear's \
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/animation/earDisplacement', 'Ear Displacement')}
+                type="number"
+                value={data.sound?.earDisplacement ?? EAR_DISPLACEMENT_DEFAULT_VALUE}
+                setValue={setEarDisplacement}
+                min={EAR_DISPLACEMENT_MIN_VALUE}
+                max={EAR_DISPLACEMENT_MAX_VALUE}
+                defaultValue={EAR_DISPLACEMENT_DEFAULT_VALUE}
+                width={64}
+            />
+            <Input
+                label={nls.localize(
+                    'vuengine/editors/engineConfig/animation/stereoAttenuationDistance',
+                    'Stereo Attenuation Distance'
+                )}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/animation/stereoAttenuationDistanceDescription',
+                    "affects the amount of attenuation caused by the distance between the x coordinate and each ear's \
 position defined by \"Ear Displacement\"."
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.sound?.stereoAttenuationDistance ?? STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE}
-                    min={STEREO_ATTENUATION_DISTANCE_MIN_VALUE}
-                    max={STEREO_ATTENUATION_DISTANCE_MAX_VALUE}
-                    onChange={e => setStereoAttenuationDistance(e.target.value === '' ? STEREO_ATTENUATION_DISTANCE_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
+                )}
+                type="number"
+                value={data.sound?.stereoAttenuationDistance ?? STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE}
+                setValue={setStereoAttenuationDistance}
+                min={STEREO_ATTENUATION_DISTANCE_MIN_VALUE}
+                max={STEREO_ATTENUATION_DISTANCE_MAX_VALUE}
+                defaultValue={STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE}
+                width={64}
+            />
         </VContainer>
     );
 }

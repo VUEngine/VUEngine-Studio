@@ -1,5 +1,8 @@
+import { nls } from '@theia/core';
 import React from 'react';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import {
     EngineConfigData,
     WIREFRAMES_FRUSTUM_EXTENSION_POWER_DEFAULT_VALUE,
@@ -14,9 +17,6 @@ import {
     WIREFRAMES_SORT_DEFAULT_VALUE,
     WIREFRAMES_VERTICAL_LINE_OPTIMIZATION_DEFAULT_VALUE
 } from '../EngineConfigEditorTypes';
-import InfoLabel from '../../Common/InfoLabel';
-import { nls } from '@theia/core';
-import { clamp } from '../../Common/Utils';
 
 interface EngineConfigWireframeProps {
     data: EngineConfigData
@@ -41,12 +41,7 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             ...data,
             wireframes: {
                 ...(data.wireframes ?? {}),
-                interlacedThreshold: clamp(
-                    interlacedThreshold,
-                    WIREFRAMES_INTERLACED_THRESHOLD_MIN_VALUE,
-                    WIREFRAMES_INTERLACED_THRESHOLD_MAX_VALUE,
-                    WIREFRAMES_INTERLACED_THRESHOLD_DEFAULT_VALUE
-                ),
+                interlacedThreshold,
             }
         });
     };
@@ -56,12 +51,7 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             ...data,
             wireframes: {
                 ...(data.wireframes ?? {}),
-                lineShrinkingPadding: clamp(
-                    lineShrinkingPadding,
-                    WIREFRAMES_LINE_SHRINKING_PADDING_MIN_VALUE,
-                    WIREFRAMES_LINE_SHRINKING_PADDING_MAX_VALUE,
-                    WIREFRAMES_LINE_SHRINKING_PADDING_DEFAULT_VALUE
-                ),
+                lineShrinkingPadding,
             }
         });
     };
@@ -71,12 +61,7 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
             ...data,
             wireframes: {
                 ...(data.wireframes ?? {}),
-                frustumExtensionPower: clamp(
-                    frustumExtensionPower,
-                    WIREFRAMES_FRUSTUM_EXTENSION_POWER_MIN_VALUE,
-                    WIREFRAMES_FRUSTUM_EXTENSION_POWER_MAX_VALUE,
-                    WIREFRAMES_FRUSTUM_EXTENSION_POWER_DEFAULT_VALUE
-                ),
+                frustumExtensionPower,
             }
         });
     };
@@ -107,60 +92,48 @@ export default function EngineConfigWireframe(props: EngineConfigWireframeProps)
                     onChange={() => toggleSort()}
                 />
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/affine/interlacedThreshold', 'Interlaced Threshold')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/affine/interlacedThresholdDescription',
-                        'The distance to start interlacing wireframe graphics.'
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.wireframes?.interlacedThreshold ?? WIREFRAMES_INTERLACED_THRESHOLD_DEFAULT_VALUE}
-                    min={WIREFRAMES_INTERLACED_THRESHOLD_MIN_VALUE}
-                    max={WIREFRAMES_INTERLACED_THRESHOLD_MAX_VALUE}
-                    onChange={e => setInterlacedThreshold(e.target.value === '' ? WIREFRAMES_INTERLACED_THRESHOLD_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/affine/lineShrinkingPadding', 'Line Shrinking Padding')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/affine/lineShrinkingPaddingDescription',
-                        'Threshold before shrinking lines.'
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.wireframes?.lineShrinkingPadding ?? WIREFRAMES_LINE_SHRINKING_PADDING_DEFAULT_VALUE}
-                    min={WIREFRAMES_LINE_SHRINKING_PADDING_MIN_VALUE}
-                    max={WIREFRAMES_LINE_SHRINKING_PADDING_MAX_VALUE}
-                    onChange={e => setLineShrinkingPadding(e.target.value === '' ? WIREFRAMES_LINE_SHRINKING_PADDING_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/affine/frustumExtensionPower', 'Frustum Extension Power')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/affine/frustumExtensionPowerDescription',
-                        'Frustum extension power for line shrinking checks.'
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.wireframes?.frustumExtensionPower ?? WIREFRAMES_FRUSTUM_EXTENSION_POWER_DEFAULT_VALUE}
-                    min={WIREFRAMES_FRUSTUM_EXTENSION_POWER_MIN_VALUE}
-                    max={WIREFRAMES_FRUSTUM_EXTENSION_POWER_MAX_VALUE}
-                    onChange={e => setFrustumExtensionPower(e.target.value === '' ? WIREFRAMES_FRUSTUM_EXTENSION_POWER_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/affine/interlacedThreshold', 'Interlaced Threshold')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/affine/interlacedThresholdDescription',
+                    'The distance to start interlacing wireframe graphics.'
+                )}
+                type="number"
+                value={data.wireframes?.interlacedThreshold ?? WIREFRAMES_INTERLACED_THRESHOLD_DEFAULT_VALUE}
+                setValue={setInterlacedThreshold}
+                min={WIREFRAMES_INTERLACED_THRESHOLD_MIN_VALUE}
+                max={WIREFRAMES_INTERLACED_THRESHOLD_MAX_VALUE}
+                defaultValue={WIREFRAMES_INTERLACED_THRESHOLD_DEFAULT_VALUE}
+                width={64}
+            />
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/affine/lineShrinkingPadding', 'Line Shrinking Padding')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/affine/lineShrinkingPaddingDescription',
+                    'Threshold before shrinking lines.'
+                )}
+                type="number"
+                value={data.wireframes?.lineShrinkingPadding ?? WIREFRAMES_LINE_SHRINKING_PADDING_DEFAULT_VALUE}
+                setValue={setLineShrinkingPadding}
+                min={WIREFRAMES_LINE_SHRINKING_PADDING_MIN_VALUE}
+                max={WIREFRAMES_LINE_SHRINKING_PADDING_MAX_VALUE}
+                defaultValue={WIREFRAMES_LINE_SHRINKING_PADDING_DEFAULT_VALUE}
+                width={64}
+            />
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/affine/frustumExtensionPower', 'Frustum Extension Power')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/affine/frustumExtensionPowerDescription',
+                    'Frustum extension power for line shrinking checks.'
+                )}
+                type="number"
+                value={data.wireframes?.frustumExtensionPower ?? WIREFRAMES_FRUSTUM_EXTENSION_POWER_DEFAULT_VALUE}
+                setValue={setFrustumExtensionPower}
+                min={WIREFRAMES_FRUSTUM_EXTENSION_POWER_MIN_VALUE}
+                max={WIREFRAMES_FRUSTUM_EXTENSION_POWER_MAX_VALUE}
+                defaultValue={WIREFRAMES_FRUSTUM_EXTENSION_POWER_DEFAULT_VALUE}
+                width={64}
+            />
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/engineConfig/wireframes/verticalLineOptimization', 'Vertical Line Optimization')}

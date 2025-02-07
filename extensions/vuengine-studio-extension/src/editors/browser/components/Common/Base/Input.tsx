@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import { debounce, isInteger } from 'lodash';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { FocusEventHandler, MouseEventHandler, useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
@@ -17,11 +17,14 @@ interface InputProps {
     max?: number
     defaultValue?: string | number
     step?: number
+    disabled?: boolean
     commands?: string[]
     style?: object
     tabIndex?: number
     autoFocus?: boolean
     width?: number
+    onClick?: MouseEventHandler<HTMLInputElement>
+    onBlur?: FocusEventHandler<HTMLInputElement>
 }
 
 const ClearableContainer = styled.div`
@@ -54,7 +57,17 @@ const ClearableContainer = styled.div`
 `;
 
 export default function Input(props: InputProps): React.JSX.Element {
-    const { value, setValue, type, label, tooltip, min, max, defaultValue, step, commands, style, tabIndex, autoFocus, width } = props;
+    const {
+        type,
+        value, setValue, defaultValue,
+        label, tooltip,
+        min, max, step,
+        disabled,
+        style, width,
+        tabIndex, autoFocus,
+        commands,
+        onClick, onBlur,
+    } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [internalValue, setInternalValue] = useState<string | number>(value ?? defaultValue);
     const [invalid, setInvalid] = useState<boolean>(false);
@@ -135,7 +148,14 @@ export default function Input(props: InputProps): React.JSX.Element {
                         value={internalValue}
                         onChange={e => updateInternalValue(e.target.value)}
                         onFocus={handleOnFocus}
-                        onBlur={handleOnBlur}
+                        onBlur={e => {
+                            handleOnBlur();
+                            if (onBlur) {
+                                onBlur(e);
+                            }
+                        }}
+                        onClick={onClick}
+                        disabled={disabled}
                         style={{
                             width,
                             ...(style ?? {})
@@ -143,7 +163,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                         tabIndex={tabIndex}
                         autoFocus={autoFocus}
                     />
-                    {type !== 'number' && internalValue !== '' && (
+                    {type !== 'number' && internalValue !== '' && !disabled && (
                         <i
                             className="codicon codicon-x"
                             onClick={() => updateInternalValue(defaultValue as string ?? '')}

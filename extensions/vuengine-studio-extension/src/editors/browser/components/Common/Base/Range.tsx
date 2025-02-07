@@ -3,6 +3,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { clamp } from '../Utils';
 import BasicSelect, { BasicSelectOption } from './BasicSelect';
 import HContainer from './HContainer';
+import Input from './Input';
 
 interface RangeProps {
     min: number
@@ -59,17 +60,15 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
                     onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
                     onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
                 />
-                : <input
+                : <Input
                     type="number"
-                    className="theia-input"
                     style={{ minWidth: inputWidth, width: inputWidth }}
+                    value={value ?? max}
+                    setValue={setValue}
                     min={min}
                     max={max}
                     step={step}
-                    value={value ?? max}
-                    onChange={onChange}
-                    onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
-                    onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
+                    commands={commandsToDisable}
                 />
         }
     </HContainer>;

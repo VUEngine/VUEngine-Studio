@@ -1,5 +1,8 @@
+import { nls } from '@theia/core';
 import React from 'react';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import {
     EngineConfigData,
     HACK_BGMAP_SPRITE_HEIGHT_DEFAULT_VALUE,
@@ -11,9 +14,6 @@ import {
     TOTAL_OBJECTS_MAX_VALUE,
     TOTAL_OBJECTS_MIN_VALUE
 } from '../EngineConfigEditorTypes';
-import InfoLabel from '../../Common/InfoLabel';
-import { nls } from '@theia/core';
-import { clamp } from '../../Common/Utils';
 
 interface EngineConfigSpriteProps {
     data: EngineConfigData
@@ -28,12 +28,7 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
             ...data,
             sprite: {
                 ...(data.sprite ?? {}),
-                totalLayers: clamp(
-                    totalLayers,
-                    TOTAL_LAYERS_MIN_VALUE,
-                    TOTAL_LAYERS_MAX_VALUE,
-                    TOTAL_LAYERS_DEFAULT_VALUE
-                ),
+                totalLayers,
             }
         });
     };
@@ -43,12 +38,7 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
             ...data,
             sprite: {
                 ...(data.sprite ?? {}),
-                totalObjects: clamp(
-                    totalObjects,
-                    TOTAL_OBJECTS_MIN_VALUE,
-                    TOTAL_OBJECTS_MAX_VALUE,
-                    TOTAL_OBJECTS_DEFAULT_VALUE
-                ),
+                totalObjects,
             }
         });
     };
@@ -75,42 +65,34 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
 
     return (
         <VContainer gap={15}>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/sprite/totalLayers', 'Total Layers')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/sprite/totalLayersDescription',
-                        'Total number of available WORLDS.'
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.sprite?.totalLayers ?? TOTAL_LAYERS_DEFAULT_VALUE}
-                    min={TOTAL_LAYERS_MIN_VALUE}
-                    max={TOTAL_LAYERS_MAX_VALUE}
-                    onChange={e => setTotalLayers(e.target.value === '' ? TOTAL_LAYERS_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/sprite/totalObjects', 'Total Objects')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/sprite/totalObjectsDescription',
-                        'Total number of available OBJECTS.'
-                    )}
-                />
-                <input
-                    className="theia-input"
-                    style={{ width: 64 }}
-                    type="number"
-                    value={data.sprite?.totalObjects ?? TOTAL_OBJECTS_DEFAULT_VALUE}
-                    min={TOTAL_OBJECTS_MIN_VALUE}
-                    max={TOTAL_OBJECTS_MAX_VALUE}
-                    onChange={e => setTotalObjects(e.target.value === '' ? TOTAL_OBJECTS_MIN_VALUE : parseInt(e.target.value))}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/sprite/totalLayers', 'Total Layers')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/sprite/totalLayersDescription',
+                    'Total number of available WORLDS.'
+                )}
+                type="number"
+                value={data.sprite?.totalLayers ?? TOTAL_LAYERS_DEFAULT_VALUE}
+                setValue={setTotalLayers}
+                min={TOTAL_LAYERS_MIN_VALUE}
+                max={TOTAL_LAYERS_MAX_VALUE}
+                defaultValue={TOTAL_LAYERS_DEFAULT_VALUE}
+                width={64}
+            />
+            <Input
+                label={nls.localize('vuengine/editors/engineConfig/sprite/totalObjects', 'Total Objects')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/sprite/totalObjectsDescription',
+                    'Total number of available OBJECTS.'
+                )}
+                type="number"
+                value={data.sprite?.totalObjects ?? TOTAL_OBJECTS_DEFAULT_VALUE}
+                setValue={setTotalObjects}
+                min={TOTAL_OBJECTS_MIN_VALUE}
+                max={TOTAL_OBJECTS_MAX_VALUE}
+                defaultValue={TOTAL_OBJECTS_DEFAULT_VALUE}
+                width={64}
+            />
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/engineConfig/sprite/spritesRotateIn3D', 'Sprites Rotate In 3-D')}

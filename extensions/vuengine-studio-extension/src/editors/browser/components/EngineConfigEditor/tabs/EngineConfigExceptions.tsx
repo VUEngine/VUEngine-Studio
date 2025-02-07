@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { clamp } from '../../Common/Utils';
 import {
     EngineConfigData,
     EXCEPTION_POSITION_X_DEFAULT_VALUE,
@@ -22,37 +22,14 @@ interface EngineConfigExceptionsProps {
 export default function EngineConfigExceptions(props: EngineConfigExceptionsProps): React.JSX.Element {
     const { data, updateData } = props;
 
-    const setPositionX = (position: number): void => {
+    const setPosition = (axis: 'x' | 'y', position: number): void => {
         updateData({
             ...data,
             exceptions: {
                 ...(data.exceptions ?? {}),
                 position: {
                     ...(data.exceptions?.position ?? {}),
-                    x: clamp(
-                        position,
-                        EXCEPTION_POSITION_X_MIN_VALUE,
-                        EXCEPTION_POSITION_X_MAX_VALUE,
-                        EXCEPTION_POSITION_X_DEFAULT_VALUE
-                    )
-                },
-            }
-        });
-    };
-
-    const setPositionY = (position: number): void => {
-        updateData({
-            ...data,
-            exceptions: {
-                ...(data.exceptions ?? {}),
-                position: {
-                    ...(data.exceptions?.position ?? {}),
-                    y: clamp(
-                        position,
-                        EXCEPTION_POSITION_Y_MIN_VALUE,
-                        EXCEPTION_POSITION_Y_MAX_VALUE,
-                        EXCEPTION_POSITION_Y_DEFAULT_VALUE
-                    )
+                    [axis]: position,
                 },
             }
         });
@@ -69,23 +46,23 @@ export default function EngineConfigExceptions(props: EngineConfigExceptionsProp
                     )}
                 />
                 <HContainer>
-                    <input
-                        className="theia-input"
-                        style={{ width: 64 }}
+                    <Input
                         type="number"
                         value={data.exceptions?.position?.x ?? EXCEPTION_POSITION_X_DEFAULT_VALUE}
+                        setValue={position => setPosition('x', position as number)}
                         min={EXCEPTION_POSITION_X_MIN_VALUE}
                         max={EXCEPTION_POSITION_X_MAX_VALUE}
-                        onChange={e => setPositionX(e.target.value === '' ? EXCEPTION_POSITION_X_MIN_VALUE : parseInt(e.target.value))}
+                        defaultValue={EXCEPTION_POSITION_X_DEFAULT_VALUE}
+                        width={64}
                     />
-                    <input
-                        className="theia-input"
-                        style={{ width: 64 }}
+                    <Input
                         type="number"
                         value={data.exceptions?.position?.y ?? EXCEPTION_POSITION_Y_DEFAULT_VALUE}
+                        setValue={position => setPosition('y', position as number)}
                         min={EXCEPTION_POSITION_Y_MIN_VALUE}
                         max={EXCEPTION_POSITION_Y_MAX_VALUE}
-                        onChange={e => setPositionY(e.target.value === '' ? EXCEPTION_POSITION_Y_MIN_VALUE : parseInt(e.target.value))}
+                        defaultValue={EXCEPTION_POSITION_Y_DEFAULT_VALUE}
+                        width={64}
                     />
                 </HContainer>
             </VContainer>

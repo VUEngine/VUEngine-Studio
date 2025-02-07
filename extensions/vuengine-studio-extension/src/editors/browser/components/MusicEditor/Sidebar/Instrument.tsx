@@ -424,10 +424,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <VContainer>
             <InfoLabel
                 label={nls.localize('vuengine/editors/music/noteDuration', 'Note Duration')}
-                tooltip={
-                    nls.localize('vuengine/editors/music/noteDurationDescription',
-                        'Specifies how long the current note should play before automatically being shut off.'
-                    )}
+                tooltip={nls.localize(
+                    'vuengine/editors/music/noteDurationDescription',
+                    'Specifies how long the current note should play before automatically being shut off.'
+                )}
             />
             <Range
                 value={instrument.interval?.enabled ? instrument.interval?.value + 1 : 0}
@@ -476,12 +476,12 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/music/envelope', 'Envelope')}
-                    tooltip={
-                        nls.localize('vuengine/editors/music/envelopeDescription',
-                            'The envelope acts like a master volume setting independent from the stereo levels. \
+                    tooltip={nls.localize(
+                        'vuengine/editors/music/envelopeDescription',
+                        'The envelope acts like a master volume setting independent from the stereo levels. \
 It can be configured to grow or decay automatically over time, and optionally reload \
 a pre-configured value and repeat the grow/decay process. '
-                        )}
+                    )}
                 />
                 <RadioSelect
                     options={[{

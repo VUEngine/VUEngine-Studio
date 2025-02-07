@@ -1,5 +1,9 @@
+import { nls } from '@theia/core';
 import React from 'react';
+import HContainer from '../Common/Base/HContainer';
+import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
+import InfoLabel from '../Common/InfoLabel';
 import {
     GAME_CODE_ID_MAX_LENGTH,
     GAME_CODE_LANGUAGE_MAX_LENGTH,
@@ -10,10 +14,6 @@ import {
     REVISION_MIN_VALUE,
     RomInfoData
 } from './RomInfoEditorTypes';
-import { nls } from '@theia/core';
-import InfoLabel from '../Common/InfoLabel';
-import { clamp } from '../Common/Utils';
-import HContainer from '../Common/Base/HContainer';
 
 interface RomInfoEditorProps {
     data: RomInfoData
@@ -54,7 +54,7 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
     const setRevision = (revision: number): void => {
         updateData({
             ...data,
-            revision: clamp(revision, REVISION_MIN_VALUE, REVISION_MAX_VALUE, REVISION_MIN_VALUE),
+            revision,
         });
     };
 
@@ -68,11 +68,10 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                     GAME_TITLE_MAX_LENGTH
                 )}
             />
-            <input
-                className='theia-input'
+            <Input
                 value={data.gameTitle}
                 style={{ width: 288 }}
-                onChange={e => setGameTitle(e.target.value)}
+                setValue={setGameTitle}
             />
         </VContainer>
         <VContainer>
@@ -89,10 +88,10 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                             GAME_CODE_SYSTEM_MAX_LENGTH
                         )}
                     />
-                    <input
-                        className='theia-input'
+                    <Input
                         value={data.gameCodeSystem}
-                        style={{ width: 80 }}
+                        setValue={() => { }}
+                        width={80}
                         disabled
                     />
                 </VContainer>
@@ -105,11 +104,10 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                             GAME_CODE_ID_MAX_LENGTH
                         )}
                     />
-                    <input
-                        className='theia-input'
+                    <Input
                         value={data.gameCodeId}
-                        style={{ width: 80 }}
-                        onChange={e => setGameCodeId(e.target.value)}
+                        width={80}
+                        setValue={setGameCodeId}
                     />
                 </VContainer>
                 <VContainer>
@@ -121,11 +119,10 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                             GAME_CODE_LANGUAGE_MAX_LENGTH
                         )}
                     />
-                    <input
-                        className='theia-input'
+                    <Input
                         value={data.gameCodeLanguage}
-                        style={{ width: 80 }}
-                        onChange={e => setGameCodeLanguage(e.target.value)}
+                        width={80}
+                        setValue={setGameCodeLanguage}
                     />
                 </VContainer>
             </HContainer>
@@ -139,11 +136,10 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                     MAKER_CODE_MAX_LENGTH
                 )}
             />
-            <input
-                className='theia-input'
+            <Input
                 value={data.makerCode}
-                style={{ width: 80 }}
-                onChange={e => setMakerCode(e.target.value)}
+                width={80}
+                setValue={setMakerCode}
             />
         </VContainer>
         <VContainer>
@@ -156,14 +152,13 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
             />
             <HContainer alignItems="center">
                 1.
-                <input
-                    className="theia-input"
-                    style={{ width: 66 }}
+                <Input
                     type="number"
                     value={data.revision}
+                    setValue={setRevision}
                     min={REVISION_MIN_VALUE}
                     max={REVISION_MAX_VALUE}
-                    onChange={e => setRevision(e.target.value === '' ? REVISION_MIN_VALUE : parseInt(e.target.value))}
+                    width={66}
                 />
             </HContainer>
         </VContainer>
