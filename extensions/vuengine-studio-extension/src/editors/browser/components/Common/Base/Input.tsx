@@ -23,6 +23,7 @@ interface InputProps {
     tabIndex?: number
     autoFocus?: boolean
     width?: number
+    grow?: number
     onClick?: MouseEventHandler<HTMLInputElement>
     onBlur?: FocusEventHandler<HTMLInputElement>
 }
@@ -30,13 +31,14 @@ interface InputProps {
 const ClearableContainer = styled.div`
     display: inline-block;
     position: relative;
+    width: 100%;
 
     i {
         cursor: pointer;
         display: none !important;
         position: absolute;
         right: 8px;
-        top: 5px;   
+        top: 5px;
 
         &.invalid {
             color: var(--theia-focusBorder); 
@@ -63,7 +65,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         label, tooltip,
         min, max, step,
         disabled,
-        style, width,
+        style, width, grow,
         tabIndex, autoFocus,
         commands,
         onClick, onBlur,
@@ -130,7 +132,7 @@ export default function Input(props: InputProps): React.JSX.Element {
     ]);
 
     return (
-        <VContainer>
+        <VContainer grow={grow}>
             {label !== undefined &&
                 <InfoLabel
                     label={label}
@@ -157,7 +159,8 @@ export default function Input(props: InputProps): React.JSX.Element {
                         onClick={onClick}
                         disabled={disabled}
                         style={{
-                            width,
+                            boxSizing: 'border-box',
+                            width: width ?? '100%',
                             ...(style ?? {})
                         }}
                         tabIndex={tabIndex}

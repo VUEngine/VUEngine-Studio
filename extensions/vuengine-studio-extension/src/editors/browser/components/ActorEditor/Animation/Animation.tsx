@@ -3,18 +3,19 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
+import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/Base/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 import {
-    AnimationData,
     ActorEditorContext,
     ActorEditorContextType,
+    AnimationData,
     MAX_ANIMATION_CYLCES,
     MIN_ANIMATION_CYLCES
 } from '../ActorEditorTypes';
 import AnimationsSettings from './AnimationsSettings';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 
 interface AnimationProps {
     index: number
@@ -47,15 +48,17 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const setCycles = (cycles: number): void => {
-        updateAnimation({
-            cycles: clamp(cycles, MIN_ANIMATION_CYLCES, MAX_ANIMATION_CYLCES),
-        });
+        updateAnimation({ cycles });
     };
 
     const toggleLoop = (): void => {
         updateAnimation({
             loop: !animation.loop
         });
+    };
+
+    const setName = (name: string): void => {
+        updateAnimation({ name });
     };
 
     const setCallback = (callback: string): void => {
@@ -92,7 +95,14 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     return <div>
         <VContainer gap={15}>
-            <HContainer alignItems='start' gap={15} wrap='wrap'>
+            <HContainer alignItems='start' gap={15}>
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    value={animation.name}
+                    setValue={setName}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    grow={1}
+                />
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/editors/actor/default', 'Default')}
@@ -109,23 +119,24 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
-                <VContainer grow={1}>
+            </HContainer>
+            <HContainer alignItems='start' gap={15}>
+                <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/editors/actor/cycles', 'Cycles')}
                         tooltip={nls.localize(
                             'vuengine/editors/actor/animationCyclesDescription',
-                            'Each frame of this animation Number is display the fiven amount of CPU cycles.'
+                            'Each frame of this animation is displayed the given amount of CPU cycles.'
                         )}
                     />
-                    <input
-                        className='theia-input'
+                    <Input
                         type='number'
+                        value={animation.cycles}
+                        setValue={setCycles}
                         min={MIN_ANIMATION_CYLCES}
                         max={MAX_ANIMATION_CYLCES}
-                        value={animation.cycles}
-                        onChange={e => setCycles(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        width={80}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
@@ -144,23 +155,19 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
-                {!animation.loop &&
-                    <VContainer grow={1}>
-                        <InfoLabel
-                            label={nls.localize('vuengine/editors/actor/callback', 'Callback')}
-                            tooltip={nls.localize(
-                                'vuengine/editors/actor/animationCallbackDescription',
-                                'Provide the name of the method to call on animation completion.'
-                            )}
-                        />
-                        <input
-                            className='theia-input'
-                            value={animation.callback}
-                            onChange={e => setCallback(e.target.value)}
-                        />
-                    </VContainer>
-                }
             </HContainer>
+            {!animation.loop &&
+                <Input
+                    label={nls.localize('vuengine/editors/actor/callback', 'Callback')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/animationCallbackDescription',
+                        'Provide the name of the method to call on animation completion.'
+                    )}
+                    value={animation.callback}
+                    setValue={setCallback}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+            }
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/actor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
