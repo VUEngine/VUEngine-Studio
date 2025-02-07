@@ -2,20 +2,20 @@ import { nls } from '@theia/core';
 import { MacroData } from '../Common/MacrosList';
 
 export interface EngineConfigDataAffine {
-    maxRowsPerCall: number,
+    maxRowsPerCall: number
     maxScale: number
 }
 
 export interface EngineConfigDataAnimation {
-    maxAnimationFunctionNameLength: number,
+    maxAnimationFunctionNameLength: number
     maxFramesPerAnimationFunction: number
 }
 
 export interface EngineConfigDataBrightness {
-    brightRed: number,
-    darkRed: number,
-    fadeDelay: number,
-    fadeIncrement: number,
+    brightRed: number
+    darkRed: number
+    fadeDelay: number
+    fadeIncrement: number
     mediumRed: number
 }
 
@@ -41,19 +41,20 @@ export enum Diagnostics {
 }
 
 export interface EngineConfigDataDebug {
-    enableProfiler: boolean,
-    diagnostics: Diagnostics,
+    enableProfiler: boolean
+    diagnostics: Diagnostics
+    stackHeadroom: number
 }
 
 export interface EngineConfigDataExceptions {
     position: {
-        x: number,
+        x: number
         y: number
     }
 }
 
 export interface EngineConfigDataFrameRate {
-    frameCycle: number,
+    frameCycle: number
     timerResolution: number
 }
 
@@ -67,63 +68,63 @@ export interface EngineConfigDataMemoryPool {
 }
 
 export interface EngineConfigDataMemoryPools {
-    pools: EngineConfigDataMemoryPool[],
+    pools: EngineConfigDataMemoryPool[]
     warningThreshold: number
 }
 
 export interface EngineConfigDataOptics {
-    baseFactor: number,
-    cameraNearPlane: number,
-    horizontalViewPointCenter: number,
-    maximumXViewDistance: number,
-    maximumYViewDistance: number,
-    scalingModifierFactor: number,
-    screenDepth: number,
-    screenHeight: number,
-    screenWidth: number,
-    useLegacyCoordinateProjection: boolean,
+    baseFactor: number
+    cameraNearPlane: number
+    horizontalViewPointCenter: number
+    maximumXViewDistance: number
+    maximumYViewDistance: number
+    scalingModifierFactor: number
+    screenDepth: number
+    screenHeight: number
+    screenWidth: number
+    useLegacyCoordinateProjection: boolean
     verticalViewPointCenter: number
 }
 
 export interface EngineConfigDataPalettes {
-    bgMapPalette0: string,
-    bgMapPalette1: string,
-    bgMapPalette2: string,
-    bgMapPalette3: string,
-    objectPalette0: string,
-    objectPalette1: string,
-    objectPalette2: string,
-    objectPalette3: string,
+    bgMapPalette0: string
+    bgMapPalette1: string
+    bgMapPalette2: string
+    bgMapPalette3: string
+    objectPalette0: string
+    objectPalette1: string
+    objectPalette2: string
+    objectPalette3: string
     printingPalette: number
 }
 
 export interface EngineConfigDataPhysics {
-    angleToPreventColliderDisplacement: number,
-    frictionForceFactorPower: number,
-    gravity: number,
-    highPrecision: boolean,
-    maximumBouncinessCoefficient: number,
-    maximumFrictionCoefficient: number,
-    stopBouncingVelocityThreshold: number,
-    stopVelocityThreshold: number,
+    angleToPreventColliderDisplacement: number
+    frictionForceFactorPower: number
+    gravity: number
+    highPrecision: boolean
+    maximumBouncinessCoefficient: number
+    maximumFrictionCoefficient: number
+    stopBouncingVelocityThreshold: number
+    stopVelocityThreshold: number
     timeElapsedDivisor: number
     collidersMaximumSize: number
 }
 
 export interface EngineConfigDataRandom {
-    addUserInputAndTimeToRandomSeed: boolean,
+    addUserInputAndTimeToRandomSeed: boolean
     seedCycles: number
 }
 
 export interface EngineConfigDataSound {
-    earDisplacement: number,
+    earDisplacement: number
     stereoAttenuationDistance: number
 }
 
 export interface EngineConfigDataSprite {
-    hackBgmapSpriteHeight: boolean,
-    spritesRotateIn3D: boolean,
-    totalLayers: number,
+    hackBgmapSpriteHeight: boolean
+    spritesRotateIn3D: boolean
+    totalLayers: number
     totalObjects: number
 }
 
@@ -132,45 +133,45 @@ export interface EngineConfigDataSram {
 }
 
 export interface EngineConfigDataTexture {
-    bgmapsPerSegments: number,
-    paramTableSegments: number,
+    bgmapsPerSegments: number
+    paramTableSegments: number
     printing: {
         offset: {
-            parallax: number,
-            x: number,
+            parallax: number
+            x: number
             y: number
-        },
+        }
         printableArea: number
     }
 }
 
 export interface EngineConfigDataWireframes {
-    frustumExtensionPower: number,
-    interlacedThreshold: number,
-    lineShrinkingPadding: number,
-    sort: boolean,
+    frustumExtensionPower: number
+    interlacedThreshold: number
+    lineShrinkingPadding: number
+    sort: boolean
     verticalLineOptimization: boolean
 }
 
 export interface EngineConfigData {
-    affine: EngineConfigDataAffine,
-    animation: EngineConfigDataAnimation,
-    brightness: EngineConfigDataBrightness,
-    chars: EngineConfigDataChars,
-    debug: EngineConfigDataDebug,
-    exceptions: EngineConfigDataExceptions,
-    frameRate: EngineConfigDataFrameRate,
-    macros: MacroData[],
-    math: EngineConfigDataMath,
-    memoryPools: EngineConfigDataMemoryPools,
-    optics: EngineConfigDataOptics,
-    palettes: EngineConfigDataPalettes,
-    physics: EngineConfigDataPhysics,
-    random: EngineConfigDataRandom,
-    sound: EngineConfigDataSound,
-    sprite: EngineConfigDataSprite,
-    sram: EngineConfigDataSram,
-    texture: EngineConfigDataTexture,
+    affine: EngineConfigDataAffine
+    animation: EngineConfigDataAnimation
+    brightness: EngineConfigDataBrightness
+    chars: EngineConfigDataChars
+    debug: EngineConfigDataDebug
+    exceptions: EngineConfigDataExceptions
+    frameRate: EngineConfigDataFrameRate
+    macros: MacroData[]
+    math: EngineConfigDataMath
+    memoryPools: EngineConfigDataMemoryPools
+    optics: EngineConfigDataOptics
+    palettes: EngineConfigDataPalettes
+    physics: EngineConfigDataPhysics
+    random: EngineConfigDataRandom
+    sound: EngineConfigDataSound
+    sprite: EngineConfigDataSprite
+    sram: EngineConfigDataSram
+    texture: EngineConfigDataTexture
     wireframes: EngineConfigDataWireframes
 }
 
@@ -244,6 +245,10 @@ export const TIMER_RESOLUTION_MAX_VALUE = 128;
 export const TIMER_RESOLUTION_DEFAULT_VALUE = 10;
 
 export const ENABLE_PROFILER_DEFAULT_VALUE = false;
+
+export const STACK_HEADROOM_MIN_VALUE = 1;
+export const STACK_HEADROOM_MAX_VALUE = 65536;
+export const STACK_HEADROOM_DEFAULT_VALUE = 1000;
 
 export const TOTAL_CHARS_MIN_VALUE = 1;
 export const TOTAL_CHARS_MAX_VALUE = 32768;
