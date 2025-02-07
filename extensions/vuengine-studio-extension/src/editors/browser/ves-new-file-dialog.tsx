@@ -99,7 +99,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                     <select
                         className="theia-select"
                         style={{ flexGrow: 1 }}
-                        value={this.ext}
+                        value={this.ext ? `.${this.ext}` : this.name}
                         onChange={e => {
                             if (e.currentTarget.value.startsWith('.')) {
                                 this.ext = e.currentTarget.value.substring(1);

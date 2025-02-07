@@ -31,7 +31,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                             types[typeId].forFiles?.map(f => {
                                 if ([uri.path.ext, uri.path.base].includes(f)) {
                                     defaultName = uri.path.name;
-                                    defaultExt = types[typeId].file;
+                                    defaultExt = types[typeId].file.substring(1);
                                     didMatchType = true;
                                 }
                             });
@@ -41,7 +41,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                         // ... otherwise, try to match folder (and parent folder) name with a type name
                         Object.keys(types).map(typeId => {
                             if ([uri.path.base, uri.parent.path.base].includes(typeId)) {
-                                defaultExt = types[typeId].file;
+                                defaultExt = types[typeId].file.substring(1);
                             }
                         });
                     }
