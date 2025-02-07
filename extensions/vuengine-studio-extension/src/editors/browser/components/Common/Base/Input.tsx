@@ -19,6 +19,8 @@ interface InputProps {
     step?: number
     commands?: string[]
     style?: object
+    tabIndex?: number
+    autoFocus?: boolean
     width?: number
 }
 
@@ -52,7 +54,7 @@ const ClearableContainer = styled.div`
 `;
 
 export default function Input(props: InputProps): React.JSX.Element {
-    const { value, setValue, type, label, tooltip, min, max, defaultValue, step, commands, style, width } = props;
+    const { value, setValue, type, label, tooltip, min, max, defaultValue, step, commands, style, tabIndex, autoFocus, width } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [internalValue, setInternalValue] = useState<string | number>(value ?? defaultValue);
     const [invalid, setInvalid] = useState<boolean>(false);
@@ -64,14 +66,15 @@ export default function Input(props: InputProps): React.JSX.Element {
         return !isNaN(v as unknown as number) && !isNaN(parseFloat(v));
     };
 
-    const updateInternalValue = (iv: string) => {
+    const updateInternalValue = (iv: string | number) => {
         if (type === 'number' && isNumeric(iv as unknown as number)) {
-            setInternalValue(clamp(
-                isInteger(step) ? parseInt(iv) : parseFloat(iv),
-                min ?? Number.MIN_SAFE_INTEGER,
+            iv = clamp(
+                isInteger(step) ? parseInt(iv as string) : parseFloat(iv as string),
+                Number.MIN_SAFE_INTEGER, // do not enforce min value here
                 max ?? Number.MAX_SAFE_INTEGER,
                 defaultValue as number ?? min ?? 0
-            ));
+            );
+            setInternalValue(iv);
         } else {
             setInternalValue(iv);
         }
@@ -93,7 +96,7 @@ export default function Input(props: InputProps): React.JSX.Element {
 
     const validateAndUpdateValue = useCallback(debounce(
         iv => {
-            if ((type === 'number' && isNumeric(iv))) {
+            if ((type === 'number' && isNumeric(iv) && (min === undefined || iv >= min))) {
                 setValue(iv);
                 setInvalid(false);
             } else if (type !== 'number') {
@@ -137,6 +140,8 @@ export default function Input(props: InputProps): React.JSX.Element {
                             width,
                             ...(style ?? {})
                         }}
+                        tabIndex={tabIndex}
+                        autoFocus={autoFocus}
                     />
                     {type !== 'number' && internalValue !== '' && (
                         <i

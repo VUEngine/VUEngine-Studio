@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { MacroData } from '../Common/MacrosList';
 
 export interface EngineConfigDataAffine {
@@ -22,21 +23,26 @@ export interface EngineConfigDataChars {
     totalChars: number
 }
 
-export interface EngineConfigDataCommunications {
-    enable: boolean
+export enum Diagnostics {
+    NONE = 'NONE',
+    BGMAP_MEMORY = 'BGMAP_MEMORY',
+    CHAR_MEMORY = 'CHAR_MEMORY',
+    COLLISIONS = 'COLLISIONS',
+    FRAME_BUFFERS = 'FRAME_BUFFERS',
+    MEMORY_POOL = 'MEMORY_POOL',
+    MEMORY_POOL_DETAILED = 'MEMORY_POOL_DETAILED',
+    PHYSICS = 'PHYSICS',
+    SPRITES = 'SPRITES',
+    STACK_STATUS = 'STACK_STATUS',
+    STREAMING = 'STREAMING',
+    VIP = 'VIP',
+    VSU = 'VSU',
+    WIREFRAMES = 'WIREFRAMES',
 }
 
 export interface EngineConfigDataDebug {
-    alertVipOvertime: boolean,
-    dimmForProfiling: boolean,
     enableProfiler: boolean,
-    printFramerate: boolean,
-    profileStreaming: boolean,
-    showDetailedMemoryPoolStatus: boolean,
-    showMemoryPoolStatus: boolean,
-    showStackOverflowAlert: boolean,
-    showStreamingProfiling: boolean,
-    stackHeadroom: number
+    diagnostics: Diagnostics,
 }
 
 export interface EngineConfigDataExceptions {
@@ -48,7 +54,6 @@ export interface EngineConfigDataExceptions {
 
 export interface EngineConfigDataFrameRate {
     frameCycle: number,
-    runDelayedMessagesAtHalfFrameRate: boolean,
     timerResolution: number
 }
 
@@ -62,7 +67,6 @@ export interface EngineConfigDataMemoryPool {
 }
 
 export interface EngineConfigDataMemoryPools {
-    cleanUp: boolean,
     pools: EngineConfigDataMemoryPool[],
     warningThreshold: number
 }
@@ -153,7 +157,6 @@ export interface EngineConfigData {
     animation: EngineConfigDataAnimation,
     brightness: EngineConfigDataBrightness,
     chars: EngineConfigDataChars,
-    communications: EngineConfigDataCommunications,
     debug: EngineConfigDataDebug,
     exceptions: EngineConfigDataExceptions,
     frameRate: EngineConfigDataFrameRate,
@@ -170,6 +173,23 @@ export interface EngineConfigData {
     texture: EngineConfigDataTexture,
     wireframes: EngineConfigDataWireframes
 }
+
+export const DIAGNOSTICS_LABELS = {
+    [Diagnostics.NONE]: nls.localize('vuengine/editors/engineConfig/diagnostics/NONE', 'None'),
+    [Diagnostics.BGMAP_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/BGMAP_MEMORY', 'BGMap Memory'),
+    [Diagnostics.CHAR_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/CHAR_MEMORY', 'Char Memory'),
+    [Diagnostics.COLLISIONS]: nls.localize('vuengine/editors/engineConfig/diagnostics/COLLISIONS', 'Collisions'),
+    [Diagnostics.FRAME_BUFFERS]: nls.localize('vuengine/editors/engineConfig/diagnostics/FRAME_BUFFERS', 'Frame Buffers'),
+    [Diagnostics.MEMORY_POOL]: nls.localize('vuengine/editors/engineConfig/diagnostics/MEMORY_POOL', 'Memory Pools'),
+    [Diagnostics.MEMORY_POOL_DETAILED]: nls.localize('vuengine/editors/engineConfig/diagnostics/MEMORY_POOL_DETAILED', 'Memory Pools (Detailed)'),
+    [Diagnostics.PHYSICS]: nls.localize('vuengine/editors/engineConfig/diagnostics/PHYSICS', 'Physics'),
+    [Diagnostics.SPRITES]: nls.localize('vuengine/editors/engineConfig/diagnostics/SPRITES', 'Sprites'),
+    [Diagnostics.STACK_STATUS]: nls.localize('vuengine/editors/engineConfig/diagnostics/STACK_STATUS', 'Stack Status'),
+    [Diagnostics.STREAMING]: nls.localize('vuengine/editors/engineConfig/diagnostics/STREAMING', 'Streaming'),
+    [Diagnostics.VIP]: nls.localize('vuengine/editors/engineConfig/diagnostics/VIP', 'VIP'),
+    [Diagnostics.VSU]: nls.localize('vuengine/editors/engineConfig/diagnostics/VSU', 'VSU'),
+    [Diagnostics.WIREFRAMES]: nls.localize('vuengine/editors/engineConfig/diagnostics/WIREFRAMES', 'Wireframes'),
+};
 
 export const AFFINE_MAX_ROWS_MIN_VALUE = 1;
 export const AFFINE_MAX_ROWS_MAX_VALUE = 128;
@@ -222,27 +242,12 @@ export const TARGET_FPS_OPTIONS: number[] = [
 export const TIMER_RESOLUTION_MIN_VALUE = 1;
 export const TIMER_RESOLUTION_MAX_VALUE = 128;
 export const TIMER_RESOLUTION_DEFAULT_VALUE = 10;
-export const DELAYED_MESSAGES_HALF_FRAME_RATE_DEFAULT_VALUE = false;
 
-export const STACK_HEADROOM_MIN_VALUE = 1;
-export const STACK_HEADROOM_MAX_VALUE = 65536;
-export const STACK_HEADROOM_DEFAULT_VALUE = 1000;
-
-export const ALERT_VIP_OVERTIME_DEFAULT_VALUE = false;
 export const ENABLE_PROFILER_DEFAULT_VALUE = false;
-export const DIMM_FOR_PROFILING_DEFAULT_VALUE = false;
-export const PROFILE_STREAMING_DEFAULT_VALUE = false;
-export const SHOW_STREAMING_PROFILING_DEFAULT_VALUE = false;
-export const PRINT_FRAMERATE_DEFAULT_VALUE = false;
-export const SHOW_MEMORY_POOL_STATUS_DEFAULT_VALUE = false;
-export const SHOW_DETAILED_MEMORY_POOL_STATUS_DEFAULT_VALUE = false;
-export const SHOW_STACK_OVERFLOW_ALERT_DEFAULT_VALUE = false;
 
 export const TOTAL_CHARS_MIN_VALUE = 1;
 export const TOTAL_CHARS_MAX_VALUE = 32768;
 export const TOTAL_CHARS_DEFAULT_VALUE = 2048;
-
-export const COMMUNICATIONS_ENABLE_DEFAULT_VALUE = false;
 
 export const FIXED_POINT_PRECISION_MIN_VALUE = 6;
 export const FIXED_POINT_PRECISION_MAX_VALUE = 13; // TODO: make dropdown
@@ -265,7 +270,6 @@ export const MEMORY_POOL_OBJECTS_DEFAULT_VALUE = 1;
 export const MEMORY_POOLS_WARNING_THRESHOLD_MIN_VALUE = 1;
 export const MEMORY_POOLS_WARNING_THRESHOLD_MAX_VALUE = 100;
 export const MEMORY_POOLS_WARNING_THRESHOLD_DEFAULT_VALUE = 85;
-export const MEMORY_POOLS_CLEAN_UP_DEFAULT_VALUE = false;
 
 export const BGMAP_PALETTE_0_DEFAULT_VALUE = '11100100';
 export const BGMAP_PALETTE_1_DEFAULT_VALUE = '11100000';

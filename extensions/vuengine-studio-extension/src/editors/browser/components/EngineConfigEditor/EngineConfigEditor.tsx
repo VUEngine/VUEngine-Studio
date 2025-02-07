@@ -8,7 +8,6 @@ import EngineConfigAffine from './tabs/EngineConfigAffine';
 import EngineConfigAnimation from './tabs/EngineConfigAnimation';
 import EngineConfigBrightness from './tabs/EngineConfigBrightness';
 import EngineConfigTiles from './tabs/EngineConfigTiles';
-import EngineConfigCommunications from './tabs/EngineConfigCommunications';
 import EngineConfigDebug from './tabs/EngineConfigDebug';
 import EngineConfigExceptions from './tabs/EngineConfigExceptions';
 import EngineConfigFrameRate from './tabs/EngineConfigFrameRate';
@@ -52,7 +51,6 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
                 <Tab>{nls.localize('vuengine/editors/engineConfig/affine', 'Affine')}</Tab>
                 <Tab>{nls.localize('vuengine/editors/engineConfig/animation', 'Animation')}</Tab>
                 <Tab>{nls.localize('vuengine/editors/engineConfig/brightness', 'Brightness')}</Tab>
-                <Tab>{nls.localize('vuengine/editors/engineConfig/communications', 'Communications')}</Tab>
                 <Tab>{nls.localize('vuengine/editors/engineConfig/debug', 'Debug')}</Tab>
                 <Tab>{nls.localize('vuengine/editors/engineConfig/exceptions', 'Exceptions')}</Tab>
                 <Tab>{nls.localize('vuengine/editors/engineConfig/frameRate', 'Frame Rate')}</Tab>
@@ -78,7 +76,6 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
                 <TabPanel><EngineConfigAffine data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigAnimation data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigBrightness data={data} updateData={updateData} /></TabPanel>
-                <TabPanel><EngineConfigCommunications data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigDebug data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigExceptions data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigFrameRate data={data} updateData={updateData} /></TabPanel>

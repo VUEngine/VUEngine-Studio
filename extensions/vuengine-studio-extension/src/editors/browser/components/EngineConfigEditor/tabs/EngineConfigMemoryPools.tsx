@@ -2,9 +2,10 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { clamp, roundToNextMultipleOf4 } from '../../Common/Utils';
+import { clamp } from '../../Common/Utils';
 import {
     EngineConfigData,
     EngineConfigDataMemoryPool,
@@ -15,7 +16,6 @@ import {
     MEMORY_POOL_SIZE_MAX_VALUE,
     MEMORY_POOL_SIZE_MIN_VALUE,
     MEMORY_POOL_SIZE_STEP,
-    MEMORY_POOLS_CLEAN_UP_DEFAULT_VALUE,
     MEMORY_POOLS_ERROR_THRESHOLD,
     MEMORY_POOLS_TOTAL_AVAILABLE_SIZE,
     MEMORY_POOLS_WARNING_THRESHOLD,
@@ -82,16 +82,6 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
         });
     };
 
-    const toggleCleanUp = (): void => {
-        updateData({
-            ...data,
-            memoryPools: {
-                ...(data.memoryPools ?? {}),
-                cleanUp: !(data.memoryPools?.cleanUp ?? MEMORY_POOLS_CLEAN_UP_DEFAULT_VALUE),
-            }
-        });
-    };
-
     const setWarningThreshold = (warningThreshold: number): void => {
         updateData({
             ...data,
@@ -146,47 +136,33 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                                         style={{ order: 1000000 - pool.size }}
                                         alignItems="center"
                                     >
-                                        <input
-                                            className='theia-input'
+                                        <Input
                                             type='number'
-                                            step={MEMORY_POOL_SIZE_STEP}
+                                            value={pool.size}
+                                            setValue={size => setMemoryPool(index, {
+                                                ...pool,
+                                                size: size as number,
+                                            })}
                                             min={MEMORY_POOL_SIZE_MIN_VALUE}
                                             max={MEMORY_POOL_SIZE_MAX_VALUE}
+                                            defaultValue={MEMORY_POOL_SIZE_DEFAULT_VALUE}
+                                            step={MEMORY_POOL_SIZE_STEP}
+                                            width={100}
                                             tabIndex={1000000 - pool.size}
-                                            style={{ width: 100 }}
-                                            value={pool.size}
                                             autoFocus={pool.size === MEMORY_POOL_SIZE_MIN_VALUE}
-                                            onChange={e => setMemoryPool(index, {
-                                                ...pool,
-                                                size: e.target.value === ''
-                                                    ? MEMORY_POOL_SIZE_MIN_VALUE
-                                                    : clamp(
-                                                        roundToNextMultipleOf4(parseInt(e.target.value)),
-                                                        MEMORY_POOL_SIZE_MIN_VALUE,
-                                                        MEMORY_POOL_SIZE_MAX_VALUE,
-                                                        MEMORY_POOL_SIZE_DEFAULT_VALUE
-                                                    ),
-                                            })}
                                         />
-                                        <input
-                                            className='theia-input'
+                                        <Input
                                             type='number'
+                                            value={pool.objects}
+                                            setValue={objects => setMemoryPool(index, {
+                                                ...pool,
+                                                objects: objects as number,
+                                            })}
                                             min={MEMORY_POOL_OBJECTS_MIN_VALUE}
                                             max={MEMORY_POOL_OBJECTS_MAX_VALUE}
+                                            defaultValue={MEMORY_POOL_OBJECTS_DEFAULT_VALUE}
                                             tabIndex={1000000 - pool.size + 1}
-                                            style={{ width: 100 }}
-                                            value={pool.objects}
-                                            onChange={e => setMemoryPool(index, {
-                                                ...pool,
-                                                objects: e.target.value === ''
-                                                    ? MEMORY_POOL_OBJECTS_MIN_VALUE
-                                                    : clamp(
-                                                        parseInt(e.target.value),
-                                                        MEMORY_POOL_OBJECTS_MIN_VALUE,
-                                                        MEMORY_POOL_OBJECTS_MAX_VALUE,
-                                                        MEMORY_POOL_OBJECTS_DEFAULT_VALUE
-                                                    ),
-                                            })}
+                                            width={100}
                                         />
                                         <button
                                             className='theia-button secondary'
@@ -200,6 +176,12 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                                             <i
                                                 className="error codicon codicon-warning"
                                                 title={nls.localize('vuengine/editors/engineConfig/memoryPools/duplicatePoolSize', 'Duplicate Pool Size')}
+                                            />
+                                        }
+                                        {pool.size % 4 !== 0 &&
+                                            <i
+                                                className="error codicon codicon-warning"
+                                                title={nls.localize('vuengine/editors/engineConfig/memoryPools/sizeNotMultipleOf4', 'Size must be a multiple of 4')}
                                             />
                                         }
                                     </HContainer>
@@ -256,21 +238,6 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                     />
                     %
                 </HContainer>
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/memoryPools/cleanUp', 'Clean Up')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/memoryPools/cleanUpDescription',
-                        'Enabling clean-up will reset each byte of each free block to 0 on resetting the game. Use only for debugging! \
-Proper object initialization must make this macro unnecessary.',
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.memoryPools?.cleanUp ?? MEMORY_POOLS_CLEAN_UP_DEFAULT_VALUE}
-                    onChange={() => toggleCleanUp()}
-                />
             </VContainer>
         </VContainer>
     );
