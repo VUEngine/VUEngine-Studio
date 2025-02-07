@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "1.0.0",
+  "version": "0.6.0",
   "license": "MIT",
   "author": "KR155E <c.radke@posteo.de>",
   "homepage": "https://www.vuengine.dev",
@@ -60,7 +60,7 @@
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
     "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.95.3/file/eclipse-theia.builtin-extension-pack-1.95.3.vsix",
-    "vuengine.virtual-c-language-support": "https://github.com/VUEngine/Virtual-C-Language-Support/releases/download/v1.0.0/virtual-c-language-support-1.0.0.vsix"
+    "vuengine.virtual-c-language-support": "https://github.com/VUEngine/Virtual-C-Language-Support/releases/download/v0.6.0/virtual-c-language-support-0.6.0.vsix"
   },
   "theiaPluginsExcludeIds": [
     "ms-vscode.js-debug",
