@@ -808,12 +808,16 @@ export class VesBuildService {
     const gameMakefileUri = workspaceRootUri.resolve('makefile');
     let makefileUri = gameMakefileUri;
     if (!(await this.fileService.exists(makefileUri))) {
-      const engineMakefileUri = engineCoreUri.resolve('makefile-game');
+      const engineMakefileUri = engineCoreUri
+        .resolve('lib')
+        .resolve('compiler')
+        .resolve('make')
+        .resolve('makefile-game');
       makefileUri = engineMakefileUri;
       if (!(await this.fileService.exists(makefileUri))) {
         throw new Error(`${nls.localize('vuengine/build/errorCouldNotFindMakefile', 'Error: Could not find a makefile. Tried the following locations:')}\n` +
           `1) ${this.labelProvider.getLongName(gameMakefileUri)}\n` +
-          `2) ${this.labelProvider.getLongName(engineMakefileUri)}`);
+          `2) [core]/${this.labelProvider.getLongName(engineMakefileUri)}`);
       }
     }
 
