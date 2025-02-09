@@ -98,11 +98,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         if (!imageData?.maps) {
             return;
         }
-        const uncompressedTileData = await services.vesCommonService.uncompressJson(imageData?.tiles?.data) as string[];
+        const uncompressedTileData = await services.vesCommonService.unzipJson(imageData?.tiles?.data) as string[];
         if (!uncompressedTileData) {
             return;
         }
-        const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
+        const uncompressedMapData = await services.vesCommonService.unzipJson(imageData.maps[0]?.data) as string[];
 
         const actualCompression = compression === ImageCompressionType.RLE && imageData.tiles?.compressionRatio && imageData.tiles?.compressionRatio < 0
             ? ImageCompressionType.RLE

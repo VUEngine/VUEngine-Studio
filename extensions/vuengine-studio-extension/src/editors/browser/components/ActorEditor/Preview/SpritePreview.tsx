@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { decompressTiles } from '../../../../../images/browser/ves-images-compressor';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import CanvasImage from '../../Common/CanvasImage';
 import VContainer from '../../Common/Base/VContainer';
+import CanvasImage from '../../Common/CanvasImage';
 import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import {
   ActorEditorContext,
@@ -61,19 +62,46 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
       if (!singleImageData.maps) {
         return;
       }
-      const uncompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
-      if (!uncompressedTileData) {
+      const tilesData = await services.vesCommonService.unzipJson(singleImageData.tiles?.data) as string[];
+      if (!tilesData) {
         return;
       }
       await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
-        const uncompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
+        const mapData = await services.vesCommonService.unzipJson(singleImageDataMap?.data) as string[];
         if (allImageData[i] === undefined) {
           allImageData[i] = [];
         }
-        const compression = sprite.compression === ImageCompressionType.RLE && singleImageData.tiles?.compressionRatio && singleImageData.tiles?.compressionRatio < 0
-          ? ImageCompressionType.RLE
-          : ImageCompressionType.NONE;
-        allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData }, compression);
+
+        const uncompressedTilesData = sprite.compression === ImageCompressionType.RLE && singleImageData.tiles?.compressionRatio && singleImageData.tiles?.compressionRatio < 0
+          ? decompressTiles(tilesData, sprite.compression)
+          : tilesData;
+
+        if (isMultiFileAnimation) {
+          const uncompressedFrameTileOffsets = await services.vesCommonService.unzipJson(singleImageData.tiles?.frameOffsets) as number[];
+          if (allImageData[i] === undefined) {
+            allImageData[i] = [];
+          }
+          const frameMapSize = mapData.length / frames;
+          for (let frameNumber = 0; frameNumber < frames; frameNumber++) {
+            const currentFrameTileOffset = uncompressedFrameTileOffsets[frameNumber] - 1;
+            const currentFrameTileSize = uncompressedFrameTileOffsets[frameNumber + 1] ? uncompressedFrameTileOffsets[frameNumber + 1] - 1 : undefined;
+            const frameMapOffset = frameNumber * frameMapSize;
+            const frameTileData = uncompressedTilesData.slice(currentFrameTileOffset, currentFrameTileSize);
+            const frameMapData = mapData.slice(frameMapOffset, frameMapOffset + frameMapSize);
+
+            allImageData[i][j + frameNumber] = services.vesImagesService.imageDataToPixelData(
+              frameTileData,
+              { ...singleImageDataMap, data: frameMapData },
+              ImageCompressionType.NONE
+            );
+          }
+        } else {
+          allImageData[i][j] = services.vesImagesService.imageDataToPixelData(
+            uncompressedTilesData,
+            { ...singleImageDataMap, data: mapData },
+            ImageCompressionType.NONE
+          );
+        }
       }));
     }));
 
@@ -124,6 +152,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
   }, [
     animate,
     isMultiFileAnimation,
+    currentAnimationFrame,
     imageData
   ]);
 

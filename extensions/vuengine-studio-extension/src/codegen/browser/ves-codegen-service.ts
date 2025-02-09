@@ -660,7 +660,7 @@ export class VesCodeGenService {
     }, true);
 
     env.addFilter('uncompressJson', async (str: unknown, callback): Promise<void> => {
-      const result = await this.vesCommonService.uncompressJson(str);
+      const result = await this.vesCommonService.unzipJson(str);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
