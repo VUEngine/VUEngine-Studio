@@ -137,6 +137,11 @@ export enum ProjectContributor {
   Studio = 'studio',
 }
 
+export enum ProjectUpdateMode {
+  All = 'all',
+  LowerVersionOnly = 'lowerVersionOnly',
+}
+
 export const defaultProjectData: ProjectData = {
   templates: {
     'Image': {

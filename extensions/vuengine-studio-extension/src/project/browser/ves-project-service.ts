@@ -1,4 +1,4 @@
-import { CommandService, Emitter, MessageService, QuickInputService, isObject, isWindows, nls } from '@theia/core';
+import { CommandService, Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, isObject, isWindows, nls } from '@theia/core';
 import { OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -24,7 +24,6 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
-import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectPreferenceIds } from './ves-project-preferences';
 import {
   PROJECT_CHANNEL_NAME,
@@ -38,6 +37,7 @@ import {
   ProjectDataType,
   ProjectDataTypesWithContributor,
   ProjectDataWithContributor,
+  ProjectUpdateMode,
   VUENGINE_WORKSPACE_EXT,
   WithContributor,
   WithFileUri,
@@ -64,6 +64,8 @@ export class VesProjectService {
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(QuickPickService)
+  protected readonly quickPickService: QuickPickService;
   @inject(VesBuildPathsService)
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -863,7 +865,7 @@ export class VesProjectService {
       disableChecks,
     );
     if (answer === yes) {
-      this.commandService.executeCommand(VesProjectCommands.UPDATE_FILES.id);
+      this.updateFiles(ProjectUpdateMode.LowerVersionOnly);
     } else if (answer === disableChecks) {
       this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);
     }
@@ -1127,7 +1129,7 @@ export class VesProjectService {
     });
   }
 
-  async getOutdatedProjectItems(): Promise<(unknown & WithContributor & WithFileUri & WithVersion & WithType)[]> {
+  async getOutdatedProjectItems(updateMode: ProjectUpdateMode = ProjectUpdateMode.LowerVersionOnly): Promise<(unknown & WithContributor & WithFileUri & WithVersion & WithType)[]> {
     const outdatedItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
 
     // find all items
@@ -1155,7 +1157,7 @@ export class VesProjectService {
 
     // find outdated items
     projectItems.map(item => {
-      if (item._version !== VES_VERSION) {
+      if (item._version !== VES_VERSION || updateMode === ProjectUpdateMode.All) {
         outdatedItems.push(item);
       }
     });
@@ -1163,11 +1165,38 @@ export class VesProjectService {
     return outdatedItems;
   }
 
-  async updateFiles(): Promise<void> {
+  async showUpdateModeSelection(): Promise<void> {
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+      title: nls.localize('vuengine/projects/commands/updateFiles', 'Update Files...'),
+      description: nls.localize(
+        'vuengine/codegen/allOrLowerVersionOnly',
+        'Do you want to update all files or only those with a lower version number stamp?'
+      ),
+      placeholder: nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list'),
+      hideInput: true,
+    };
+
+    const items: QuickPickItem[] = [{
+      id: ProjectUpdateMode.All,
+      label: nls.localize('vuengine/projects/allFiles', 'All files'),
+    }, {
+      id: ProjectUpdateMode.LowerVersionOnly,
+      label: nls.localize('vuengine/projects/lowerVersionOnly', 'Lower Version Only'),
+    }];
+
+    const selection = await this.quickPickService.show(items, quickPickOptions);
+    if (!selection) {
+      return;
+    }
+
+    return this.updateFiles(selection.id as ProjectUpdateMode);
+  }
+
+  async updateFiles(updateMode: ProjectUpdateMode): Promise<void> {
     this.isUpdatingFiles = true;
 
     // get outdated files
-    const outdatedItems = await this.getOutdatedProjectItems();
+    const outdatedItems = await this.getOutdatedProjectItems(updateMode);
     if (!outdatedItems.length) {
       this.isUpdatingFiles = false;
       await this.messageService.info(
