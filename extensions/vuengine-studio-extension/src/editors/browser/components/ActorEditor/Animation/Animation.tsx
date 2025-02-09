@@ -16,6 +16,17 @@ import {
     MIN_ANIMATION_CYLCES
 } from '../ActorEditorTypes';
 import AnimationsSettings from './AnimationsSettings';
+import styled from 'styled-components';
+
+export const RemoveFrameButton = styled.button`
+    min-width: 0 !important;
+    padding: 0;
+    width: 16px;
+
+    .codicon {
+        font-size: 90%;
+    }
+`;
 
 interface AnimationProps {
     index: number
@@ -174,26 +185,25 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 </label>
                 <HContainer alignItems='start' wrap='wrap'>
                     {animation.frames.map((f, i) =>
-                        <HContainer key={`frame-${i}`} gap={1}>
-                            <input
-                                key={`frame-${i}`}
-                                className={i === currentAnimationStep ? 'theia-input current' : 'theia-input'}
-                                style={{ width: 40 }}
+                        <HContainer key={i} gap={1}>
+                            <Input
                                 type='number'
-                                min={0}
-                                max={totalFrames - 1}
+                                className={i === currentAnimationStep ? 'current' : undefined}
                                 value={animation.frames[i] + 1}
-                                onChange={e => setFrame(i, e.target.value === '' ? 0 : parseInt(e.target.value) - 1)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setFrame(i, v as number - 1)}
+                                min={1}
+                                max={totalFrames}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={52}
+                                tabIndex={i + 1}
                             />
-                            <button
+                            <RemoveFrameButton
                                 className="theia-button secondary"
                                 onClick={() => removeFrame(i)}
                                 title={nls.localizeByDefault('Remove')}
                             >
                                 <i className='codicon codicon-x' />
-                            </button>
+                            </RemoveFrameButton>
                         </HContainer>
                     )}
                     {animation.frames.length < maxAnimationFrames

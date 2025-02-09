@@ -25,6 +25,7 @@ interface InputProps {
     autoFocus?: boolean
     width?: number
     grow?: number
+    className?: string
     onClick?: MouseEventHandler<HTMLInputElement>
     onBlur?: FocusEventHandler<HTMLInputElement>
 }
@@ -66,7 +67,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         label, tooltip,
         min, max, step,
         disabled, readOnly,
-        style, width, grow,
+        className, style, width, grow,
         tabIndex, autoFocus,
         commands,
         onClick, onBlur,
@@ -147,7 +148,7 @@ export default function Input(props: InputProps): React.JSX.Element {
             <div>
                 <ClearableContainer>
                     <input
-                        className='theia-input'
+                        className={`theia-input${className ? ` ${className}` : ''}`}
                         type={type}
                         min={min}
                         max={max}
