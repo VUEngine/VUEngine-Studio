@@ -5,6 +5,7 @@ import { PluginConfiguration, PluginConfigurationDataType } from '../../../../pl
 import { ProjectDataTypesWithContributor } from '../../../../project/browser/ves-project-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
+import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
 import { PluginConfigurationData, PluginFileTranslatedField } from './PluginFileEditorTypes';
 import TranslatedValue from './TranslatedValue';
@@ -81,16 +82,11 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
 
     return (
         <VContainer gap={15} className='pluginFileEditor'>
-            <VContainer>
-                <label>
-                    {nls.localizeByDefault('Name')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={data.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localizeByDefault('Name')}
+                value={data.name}
+                setValue={setName}
+            />
             <VContainer>
                 <label>
                     {nls.localizeByDefault('Label')}
@@ -151,42 +147,28 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
                     </VContainer>
                 }
                 {data.dataType === PluginConfigurationDataType.integer && <>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/pluginFile/configuration/min', 'Min')}
-                        </label>
-                        <input
-                            type='number'
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            value={data.min}
-                            onChange={e => setMin(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/pluginFile/configuration/max', 'Max')}
-                        </label>
-                        <input
-                            type='number'
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            value={data.max}
-                            onChange={e => setMax(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/pluginFile/configuration/step', 'Step')}
-                        </label>
-                        <input
-                            type='number'
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            value={data.step}
-                            onChange={e => setStep(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        />
-                    </VContainer>
+                    <Input
+                        label={nls.localize('vuengine/editors/pluginFile/configuration/min', 'Min')}
+                        type='number'
+                        value={data.min ?? 0}
+                        setValue={setMin}
+                        width={64}
+                    />
+                    <Input
+                        label={nls.localize('vuengine/editors/pluginFile/configuration/max', 'Max')}
+                        type='number'
+                        value={data.max ?? Number.MAX_SAFE_INTEGER}
+                        setValue={setMax}
+                        width={64}
+                    />
+                    <Input
+                        label={nls.localize('vuengine/editors/pluginFile/configuration/step', 'Step')}
+                        type='number'
+                        value={data.step ?? 1}
+                        min={1}
+                        setValue={setStep}
+                        width={64}
+                    />
                 </>}
             </HContainer>
             <VContainer>
@@ -196,7 +178,7 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
                 <PluginDefaultInput
                     config={data as unknown as PluginConfiguration}
                     value={data.default}
-                    setValue={(value: any, persist?: boolean) => setDefault(value)}
+                    setValue={(value: any) => setDefault(value)}
                     disabled={false}
                     vesCommonService={context.services.vesCommonService!}
                     vesProjectService={context.services.vesProjectService!}

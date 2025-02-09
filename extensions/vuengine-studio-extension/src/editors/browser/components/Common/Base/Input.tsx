@@ -9,7 +9,7 @@ import InfoLabel from '../InfoLabel';
 
 interface InputProps {
     value: string | number
-    setValue: (data: string | number) => void
+    setValue?: (data: string | number) => void
     type?: 'string' | 'number'
     label?: string
     tooltip?: string
@@ -18,6 +18,7 @@ interface InputProps {
     defaultValue?: string | number
     step?: number
     disabled?: boolean
+    readOnly?: boolean
     commands?: string[]
     style?: object
     tabIndex?: number
@@ -64,7 +65,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         value, setValue, defaultValue,
         label, tooltip,
         min, max, step,
-        disabled,
+        disabled, readOnly,
         style, width, grow,
         tabIndex, autoFocus,
         commands,
@@ -112,10 +113,14 @@ export default function Input(props: InputProps): React.JSX.Element {
     const validateAndUpdateValue = useCallback(debounce(
         iv => {
             if ((type === 'number' && isNumeric(iv) && (min === undefined || iv >= min))) {
-                setValue(iv);
+                if (setValue) {
+                    setValue(iv);
+                }
                 setInvalid(false);
             } else if (type !== 'number') {
-                setValue((iv as string).trim());
+                if (setValue) {
+                    setValue((iv as string).trim());
+                }
                 setInvalid(false);
             } else {
                 setInvalid(true);
@@ -158,6 +163,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                         }}
                         onClick={onClick}
                         disabled={disabled}
+                        readOnly={readOnly}
                         style={{
                             boxSizing: 'border-box',
                             width: width ?? '100%',

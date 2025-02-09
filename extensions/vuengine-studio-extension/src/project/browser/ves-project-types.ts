@@ -464,6 +464,8 @@ export const defaultProjectData: ProjectData = {
                 },
                 step: {
                   type: 'integer',
+                  minimum: 1,
+                  default: 1,
                 },
                 default: {
                   type: 'integer',

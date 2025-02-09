@@ -90,7 +90,6 @@ export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Elem
                     />
                     <Input
                         value={data.gameCodeSystem}
-                        setValue={() => { }}
                         width={80}
                         disabled
                     />

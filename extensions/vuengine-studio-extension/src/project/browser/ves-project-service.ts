@@ -504,7 +504,6 @@ export class VesProjectService {
     });
 
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      console.log('onDidFilesChange');
       if (this.fileChangeEventLock) {
         return;
       }

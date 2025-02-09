@@ -166,7 +166,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                     BinaryBuffer.fromString(JSON.stringify(gameConfig, undefined, 4)),
                 );
 
-                // remove library file to force rebuild
+                // remove library file in build folder to force rebuild
                 await this.props.workspaceService.ready;
                 const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
                 const buildPathUri = workspaceRootUri.resolve('build');
@@ -180,9 +180,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         buildPathUri.resolve(`working/libraries/${modeLc}/lib${pluginName}-${modeLc}.a`)
                     );
                 })
-                console.log('libraryFileUris', libraryFileUris);
                 await Promise.all(libraryFileUris.map(async libraryFile => {
-                    console.log('libraryFile', libraryFile);
                     if (await this.props.fileService?.exists(libraryFile)) {
                         await this.props.fileService?.delete(libraryFile);
                     }
