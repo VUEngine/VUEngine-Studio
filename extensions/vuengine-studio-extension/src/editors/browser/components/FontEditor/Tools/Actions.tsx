@@ -7,6 +7,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
+import { FontEditorCommands } from '../FontEditorCommands';
 
 interface ActionsProps {
     currentCharData: number[][]
@@ -28,10 +29,10 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case CommonCommands.COPY.id:
+            case FontEditorCommands.COPY_CHARACTER.id:
                 copy();
                 break;
-            case CommonCommands.PASTE.id:
+            case FontEditorCommands.PASTE_CHARACTER.id:
                 paste();
                 break;
         }

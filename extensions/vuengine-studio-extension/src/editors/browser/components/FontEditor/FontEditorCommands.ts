@@ -104,4 +104,16 @@ export const FontEditorCommands: EditorCommands = {
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'm',
     },
+    COPY_CHARACTER: {
+        id: 'editors.fontEditor.copyCharacter',
+        label: nls.localize('vuengine/editors/font/commands/copyCharacter', 'Copy Character'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'ctrlcmd+c',
+    },
+    PASTE_CHARACTER: {
+        id: 'editors.fontEditor.pasteCharacter',
+        label: nls.localize('vuengine/editors/font/commands/pasteCharacter', 'Paste Character'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'ctrlcmd+v',
+    },
 };

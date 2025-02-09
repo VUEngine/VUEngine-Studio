@@ -113,15 +113,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             }
         });
 
-        commandRegistry.registerHandler(CommonCommands.COPY.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.COPY.id),
-        });
-        commandRegistry.registerHandler(CommonCommands.PASTE.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.PASTE.id),
-        });
-
         EditorsCommands.map(editor => {
             Object.values(editor).map(command => {
                 commandRegistry.registerCommand({
