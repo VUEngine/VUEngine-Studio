@@ -550,7 +550,7 @@ export class VesProjectService {
     });
   }
 
-  protected handleFileUpdate(fileUri: URI): void {
+  protected async handleFileUpdate(fileUri: URI): Promise<void> {
     if (this.gameConfigFileUri && fileUri.isEqual(this.gameConfigFileUri)) {
       if (this.justWroteGameConfigFile) {
         this.justWroteGameConfigFile = false;
@@ -558,7 +558,7 @@ export class VesProjectService {
       }
       this.enableFileChangeEventLock();
       this.updateWindowTitle();
-      this.readProjectData();
+      await this.readProjectData();
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
     } else {
       const types = this.getProjectDataTypes() || {};
