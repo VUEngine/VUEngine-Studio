@@ -504,6 +504,7 @@ export class VesProjectService {
     });
 
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      console.log('onDidFilesChange');
       if (this.fileChangeEventLock) {
         return;
       }
@@ -558,6 +559,7 @@ export class VesProjectService {
       this.enableFileChangeEventLock();
       this.updateWindowTitle();
       this.readProjectData();
+      this.onDidUpdateProjectItemEmitter.fire(fileUri);
     } else {
       const types = this.getProjectDataTypes() || {};
       Object.keys(types).map(async typeId => {
