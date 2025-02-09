@@ -23,7 +23,7 @@ import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Com
 import VContainer from '../../Common/Base/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import ColorModeSelect from './ColorModeSelect';
 import Range from '../../Common/Base/Range';
 

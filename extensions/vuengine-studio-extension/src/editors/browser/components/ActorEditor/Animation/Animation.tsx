@@ -7,7 +7,7 @@ import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
     ActorEditorContext,
     ActorEditorContextType,

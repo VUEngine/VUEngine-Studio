@@ -4,7 +4,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType, MAX_ACTOR_PIXEL_SIZE, MIN_ACTOR_PIXEL_SIZE } from '../ActorEditorTypes';
 
 export default function ExtraProperties(): React.JSX.Element {

@@ -75,20 +75,6 @@ export interface ActorEditorSaveDataOptions {
 const getMostFilesOnASprite = (actorData: ActorData): number =>
   Math.max(...actorData.components?.sprites.map(s => s.texture.files.length));
 
-export const INPUT_BLOCKING_COMMANDS = [
-  ActorEditorCommands.CENTER_CURRENT_COMPONENT.id,
-  ActorEditorCommands.DELETE_CURRENT_COMPONENT.id,
-  ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id,
-  ActorEditorCommands.MOVE_COMPONENT_DOWN.id,
-  ActorEditorCommands.MOVE_COMPONENT_LEFT.id,
-  ActorEditorCommands.MOVE_COMPONENT_RIGHT.id,
-  ActorEditorCommands.MOVE_COMPONENT_UP.id,
-  ActorEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id,
-  ActorEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id,
-  ActorEditorCommands.INCREASE_COMPONENT_PARALLAX.id,
-  ActorEditorCommands.DECREASE_COMPONENT_PARALLAX.id,
-];
-
 export default function ActorEditor(props: ActorEditorProps): React.JSX.Element {
   const { data, updateData } = props;
   const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
@@ -382,7 +368,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
   };
 
   const addComponentByType = async (componentKey: ComponentKey, name: string): Promise<void> => {
-    const updatedComponentKeyData = data.components && data.components[componentKey] ? [...data.components[componentKey]] : [];
     const type = services.vesProjectService.getProjectDataType('Actor');
     if (!type) {
       return;
@@ -396,19 +381,20 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       return;
     }
 
-    updatedComponentKeyData.push({
-      ...newComponentData,
-      name,
-    });
-
     setData({
       components: {
         ...data.components,
-        [componentKey]: updatedComponentKeyData,
+        [componentKey]: [
+          ...(data.components && data.components[componentKey] ? [...data.components[componentKey]] : []),
+          {
+            ...newComponentData,
+            name,
+          },
+        ],
       }
     });
 
-    setCurrentComponent(`${componentKey}-${updatedComponentKeyData.length - 1}`);
+    setCurrentComponent(`${componentKey}-${(data.components[componentKey] ?? []).length}`);
   };
 
   const addPositionedActor = async (): Promise<void> => {

@@ -10,7 +10,7 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import Rotation from '../../Common/Rotation';
 import { ColliderType, PixelVector } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
     ColliderData,
     MAX_COLLIDER_DIAMETER,

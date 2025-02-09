@@ -7,7 +7,7 @@ import ZoomControls from '../../Common/Controls/ZoomControls';
 import HContainer from '../../Common/Base/HContainer';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
 interface PreviewOptionsProps {

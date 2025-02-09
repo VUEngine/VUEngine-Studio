@@ -14,10 +14,11 @@ import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { ActorEditorSaveDataOptions, INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import {
     ActorEditorContext,
     ActorEditorContextType,
+    INPUT_BLOCKING_COMMANDS,
     MAX_SPRITE_REPEAT_SIZE,
     MAX_SPRITE_TEXTURE_DISPLACEMENT,
     MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,

@@ -5,7 +5,7 @@ import HContainer from '../../Common/Base/HContainer';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { SpriteType } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
 export default function SpritesSettings(): React.JSX.Element {

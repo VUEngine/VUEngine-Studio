@@ -3,7 +3,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { MutatorData } from '../ActorEditorTypes';
 import { nls } from '@theia/core';
 import Input from '../../Common/Base/Input';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface MutatorProps {
     mutator: MutatorData

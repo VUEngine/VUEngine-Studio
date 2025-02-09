@@ -23,6 +23,7 @@ import {
     WireframeType
 } from '../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from './ActorEditor';
+import { ActorEditorCommands } from './ActorEditorCommands';
 
 // @ts-ignore
 export const ActorEditorContext = createContext<ActorEditorContextType>({});
@@ -277,3 +278,17 @@ export interface ActorData {
         configuration: Record<string, string>
     }
 }
+
+export const INPUT_BLOCKING_COMMANDS = [
+    ActorEditorCommands.CENTER_CURRENT_COMPONENT.id,
+    ActorEditorCommands.DELETE_CURRENT_COMPONENT.id,
+    ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id,
+    ActorEditorCommands.MOVE_COMPONENT_DOWN.id,
+    ActorEditorCommands.MOVE_COMPONENT_LEFT.id,
+    ActorEditorCommands.MOVE_COMPONENT_RIGHT.id,
+    ActorEditorCommands.MOVE_COMPONENT_UP.id,
+    ActorEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id,
+    ActorEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id,
+    ActorEditorCommands.INCREASE_COMPONENT_PARALLAX.id,
+    ActorEditorCommands.DECREASE_COMPONENT_PARALLAX.id,
+];

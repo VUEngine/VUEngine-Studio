@@ -6,7 +6,7 @@ import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/Base/VContainer';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface AnimationsSettingsProps {
     isMultiFileAnimation: boolean

@@ -6,7 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface ColorModeSelectProps {
     value: ColorMode

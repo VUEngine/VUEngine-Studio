@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { MeshSegmentData } from '../ActorEditorTypes';
 import { clamp } from '../../Common/Utils';
 

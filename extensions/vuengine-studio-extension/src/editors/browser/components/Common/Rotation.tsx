@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import { isNaN } from 'lodash';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor/ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor/ActorEditorTypes';
 import HContainer from './Base/HContainer';
 import Input from './Base/Input';
 import VContainer from './Base/VContainer';

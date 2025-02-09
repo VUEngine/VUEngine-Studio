@@ -9,7 +9,7 @@ import ColorSelector from '../../Common/ColorSelector';
 import TransparencySelect from '../../Common/TransparencySelect';
 import { clamp } from '../../Common/Utils';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
     MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,

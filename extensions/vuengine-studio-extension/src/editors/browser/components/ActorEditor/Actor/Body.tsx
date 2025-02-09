@@ -7,8 +7,7 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { Axis } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
-import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 export default function Body(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
