@@ -21,6 +21,12 @@
 
 				{%- if configuration.dataType == 'string' or configuration.dataType == 'type' -%}
 					{%- set configValue = '"' ~ configValue ~ '"' -%}
+				{%- elseif configuration.dataType == 'boolean' -%}
+					{%- set translatedConfigValue = 0 -%}
+					{%- if configValue == true -%}
+						{%- set translatedConfigValue = 1 -%}
+					{%- endif -%}
+					{%- set configValue = '(' ~ translatedConfigValue ~ ')' -%}
 				{%- else -%}
 					{%- set configValue = '(' ~ configValue ~ ')' -%}
 				{%- endif -%}
