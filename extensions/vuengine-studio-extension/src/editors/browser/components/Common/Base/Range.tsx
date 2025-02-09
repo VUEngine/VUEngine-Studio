@@ -21,7 +21,9 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
     const { min, max, step, value, options, setValue, commandsToDisable, width } = props;
 
     let inputWidth = 32;
-    if (max >= 1000) {
+    if (!Number.isInteger(step)) {
+        inputWidth = 52;
+    } else if (max >= 1000) {
         inputWidth = 48;
     } else if (max >= 100) {
         inputWidth = 40;
@@ -31,7 +33,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
         const v =
             !e.currentTarget.value
                 ? min
-                : Number.isSafeInteger(e.currentTarget.value)
+                : Number.isInteger(e.currentTarget.value)
                     ? parseInt(e.currentTarget.value)
                     : parseFloat(e.currentTarget.value);
         setValue(clamp(v, min, max));
