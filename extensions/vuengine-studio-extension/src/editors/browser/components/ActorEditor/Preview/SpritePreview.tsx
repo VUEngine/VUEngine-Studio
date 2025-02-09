@@ -187,6 +187,9 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
           repeatY={sprite.texture?.repeat?.y}
           width={effectiveWidth}
           colorMode={sprite.colorMode}
+          style={{
+            translate: `${sprite.displacement.x}px ${sprite.displacement.y}px ${-1 * sprite.displacement.parallax}px`,
+          }}
         />
       }
       <div
