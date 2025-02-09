@@ -1,4 +1,4 @@
-import { CommandService, Emitter, MessageService, QuickInputService, isWindows, nls } from '@theia/core';
+import { CommandService, Emitter, MessageService, QuickInputService, isObject, isWindows, nls } from '@theia/core';
 import { OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -16,6 +16,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import { PluginFileTranslatedField } from '../../editors/browser/components/PluginFileEditor/PluginFileEditorTypes';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { ItemData } from '../../editors/browser/ves-editors-widget';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
@@ -887,14 +888,13 @@ export class VesProjectService {
         const fileContent = await this.fileService.readFile(pluginFileUri);
         try {
           const fileContentJson = JSON.parse(fileContent.value.toString());
-          const localeKey = nls.locale || 'en';
+          const localeKey = nls.locale ?? 'en';
           const pluginId = `${prefix}/${pluginRelativeUri.path.fsPath().replace(/\\/g, '/')}`;
           const iconUri = pluginFileUri.parent.resolve('icon.png');
-          const tagsObject = {};
+          const tagsObject = {} as PluginFileTranslatedField;
           if (Array.isArray(fileContentJson.tags)) {
             fileContentJson.tags.map((tag: any) => {
-              // @ts-ignore
-              tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
+              tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, localeKey);
             });
           }
           const configuration: PluginConfiguration[] = [];
@@ -938,13 +938,12 @@ export class VesProjectService {
     return pluginsData;
   }
 
-  protected translatePluginField(field: Object | string, locale: string): string {
-    if (field instanceof Object) {
-      // @ts-ignore
-      return field[locale] || field.en || '';
+  protected translatePluginField(field: PluginFileTranslatedField | string, locale: string): string {
+    if (isObject(field)) {
+      return field[locale] ?? field.en ?? Object.values(field)[0];
     }
 
-    return field;
+    return field as string;
   }
 
   protected async findContributions(root: URI): Promise<ProjectData> {

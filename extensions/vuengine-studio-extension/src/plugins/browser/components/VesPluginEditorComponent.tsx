@@ -225,7 +225,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         {license && <span className='license'>{license}</span>}
                         {tags && <span className='noWrapInfo vesPluginTags'>{
                             // @ts-ignore
-                            Object.keys(tags).map(key => <span className='vesTag' onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
+                            Object.keys(tags).map(key => <span className='vesTag' onClick={() => this.searchTag(tags[key])} key={key}>{tags[key]}</span>)
                         }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>
