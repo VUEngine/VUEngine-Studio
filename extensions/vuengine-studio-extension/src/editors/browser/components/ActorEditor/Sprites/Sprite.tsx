@@ -275,6 +275,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const toggleShareTiles = (): void => {
+        updateSprite({
+            shareTiles: !!!sprite.shareTiles,
+        });
+    };
+
     const setRepeatSize = (axis: 'x' | 'y', value: number): void => {
         updateSprite({
             texture: {
@@ -955,22 +961,40 @@ If 0, the value is inferred from the texture.'
                         </HContainer>
                     </VContainer>
                 }
-                {/* this setting is implicitly handled for animations */}
-                {!isAnimated && <VContainer>
+                <VContainer>
                     <label>
                         {nls.localize('vuengine/editors/actor/tiles', 'Tiles')}
                     </label>
-                    <label>
+                    {/* this setting is implicitly handled for animations */}
+                    {!isAnimated &&
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={sprite.optimizeTiles}
+                                onChange={toggleOptimizeTiles}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            />
+                            {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
+                        </label>
+                    }
+                    <HContainer>
                         <input
                             type="checkbox"
-                            checked={sprite.optimizeTiles}
-                            onChange={toggleOptimizeTiles}
+                            checked={sprite.shareTiles}
+                            onChange={toggleShareTiles}
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
-                        {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
-                    </label>
-                </VContainer>}
+                        <InfoLabel
+                            label={nls.localize('vuengine/editors/actor/share', 'Share')}
+                            tooltip={nls.localize(
+                                'vuengine/editors/actor/shareDescription',
+                                "When enabled, this Sprite's CharSet will be shared with other instances using the same CharSet."
+                            )}
+                        />
+                    </HContainer>
+                </VContainer>
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <InfoLabel

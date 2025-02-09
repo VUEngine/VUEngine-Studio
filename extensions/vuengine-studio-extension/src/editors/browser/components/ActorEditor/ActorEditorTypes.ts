@@ -177,6 +177,7 @@ export interface SpriteData {
     displacement: PixelVector
     manipulationFunction: string
     optimizeTiles: boolean
+    shareTiles: boolean
     texture: {
         files: string[]
         files2: string[] // files for right eye in stereo mode
