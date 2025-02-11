@@ -978,7 +978,7 @@ If 0, the value is inferred from the texture.'
                             {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
                         </label>
                     }
-                    <HContainer>
+                    <HContainer gap={0}>
                         <input
                             type="checkbox"
                             checked={sprite.shareTiles}
