@@ -37,6 +37,7 @@
           "editor.rulers": [
             140
           ],
+          "files.eol": "\n",
           "files.watcherExclude": {
             "**/.git/objects/**": true,
             "**/.git/subtree-cache/**": true,
