@@ -1,11 +1,10 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import React, { useContext } from 'react';
-import VContainer from './Base/VContainer';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import React from 'react';
 import HContainer from './Base/HContainer';
-import { toUpperSnakeCase } from './Utils';
+import VContainer from './Base/VContainer';
+import { nanoid, toUpperSnakeCase } from './Utils';
 
 export enum MacroType {
     Boolean = 'boolean',
@@ -31,14 +30,13 @@ interface MacrosListProps {
 }
 
 export default function MacrosList(props: MacrosListProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
 
     const addMacro = (): void => {
         updateData([
             ...(data ?? []),
             {
-                _id: services.vesCommonService.nanoid(),
+                _id: nanoid(),
                 enabled: true,
                 name: '',
                 type: MacroType.Define,

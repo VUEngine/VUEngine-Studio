@@ -1,7 +1,7 @@
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
-import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
+import { CommandService, Emitter, Event, MessageService, nls, QuickPickService, Reference, UNTITLED_SCHEME, URI } from '@theia/core';
 import {
     CommonCommands,
     ExtractableWidget,
@@ -33,6 +33,7 @@ import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { nanoid } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
 
@@ -143,7 +144,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.initMembers();
 
         const path = (this.uri.scheme === UNTITLED_SCHEME)
-            ? `untitled-${this.options.typeId}-${this.vesCommonService.nanoid()}`
+            ? `untitled-${this.options.typeId}-${nanoid()}`
             : this.uri.path;
         this.id = `vesEditorsWidget:${path}`;
 

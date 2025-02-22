@@ -3,7 +3,6 @@ import { KeybindingRegistry } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { customAlphabet } from 'nanoid';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 
@@ -31,11 +30,6 @@ export class VesCommonService {
 
   getOs(): string {
     return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
-  }
-
-  nanoid(): string {
-    const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 16);
-    return nanoid();
   }
 
   getByKey(o: any, s: string): any {

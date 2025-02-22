@@ -13,6 +13,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
+import { nanoid } from '../../../editors/browser/components/Common/Utils';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
@@ -177,7 +178,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         const tempDir = window.electronVesCore.getTempDir();
         const templateArchiveFolderUri = new URI(tempDir);
-        const templateArchiveFilename = `template-${this.vesCommonService.nanoid()}.zip`;
+        const templateArchiveFilename = `template-${nanoid()}.zip`;
         const templateArchiveUri = templateArchiveFolderUri.resolve(templateArchiveFilename);
         await this.fileService.writeFile(templateArchiveUri, BinaryBuffer.wrap(context.buffer as Uint8Array));
         const result = await window.electronVesCore.decompress(templateArchiveUri.path.fsPath(), templateArchiveFolderUri.path.fsPath());

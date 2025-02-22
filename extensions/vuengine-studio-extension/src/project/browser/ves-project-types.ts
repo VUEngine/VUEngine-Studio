@@ -1,5 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import { nanoid } from '../../editors/browser/components/Common/Utils';
+import { createEmptyPixelData } from '../../editors/browser/components/SpriteEditor/SpriteEditor';
 import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
 import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
@@ -380,7 +382,7 @@ export const defaultProjectData: ProjectData = {
             },
             additionalProperties: false,
           },
-          'colorMode': {
+          colorMode: {
             type: 'number',
             default: 0,
             min: 0,
@@ -565,39 +567,52 @@ export const defaultProjectData: ProjectData = {
             },
             additionalProperties: false,
           },
-          layers: {
+          frames: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'string'
+                  },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          rowIndex: {
+                            type: 'integer'
+                          },
+                          columnIndex: {
+                            type: 'integer'
+                          },
+                          color: {
+                            type: 'string'
+                          }
+                        },
+                        additionalProperties: false,
+                      }
+                    }
+                  }
+                },
+                additionalProperties: false,
+              }
+            },
+            default: [[{
+              id: nanoid(),
+              data: createEmptyPixelData(DEFAULT_SPRITE_SIZE, DEFAULT_SPRITE_SIZE),
+            }]]
+          },
+          layerAttributes: {
             type: 'object',
             properties: {},
             additionalProperties: {
               type: 'object',
               properties: {
-                id: {
-                  type: 'string'
-                },
-                isVisible: {
-                  type: 'boolean'
-                },
-                data: {
-                  type: 'array',
-                  items: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        rowIndex: {
-                          type: 'integer'
-                        },
-                        columnIndex: {
-                          type: 'integer'
-                        },
-                        color: {
-                          type: 'string'
-                        }
-                      },
-                      additionalProperties: false,
-                    }
-                  }
-                },
                 name: {
                   type: 'string'
                 },
@@ -607,6 +622,10 @@ export const defaultProjectData: ProjectData = {
                 displayMode: {
                   type: 'string',
                   default: 'ON'
+                },
+                isVisible: {
+                  type: 'boolean',
+                  default: true
                 }
               },
               additionalProperties: false,

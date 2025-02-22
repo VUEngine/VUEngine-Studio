@@ -7,7 +7,7 @@ import React, { useContext, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
 import PopUpDialog from '../../../Common/Base/PopUpDialog';
-import { SpriteEditorTool } from '../../../SpriteEditor/SpriteEditorTool';
+import { SpriteEditorTool } from '../../../SpriteEditor/Sidebar/SpriteEditorTool';
 import { CHAR_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
 import ExportSettings from './ExportSettings';
 import ImportSettings from './ImportSettings';

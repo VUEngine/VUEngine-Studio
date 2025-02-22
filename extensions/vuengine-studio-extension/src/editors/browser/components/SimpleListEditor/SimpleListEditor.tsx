@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import HContainer from '../Common/Base/HContainer';
-import VContainer from '../Common/Base/VContainer';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import React from 'react';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
+import { nanoid } from '../Common/Utils';
 
 interface SimpleListEditorProps {
     data: Record<string, string>
@@ -12,13 +12,12 @@ interface SimpleListEditorProps {
 }
 
 export default function SimpleListEditor(props: SimpleListEditorProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData, sort } = props;
 
     const addItem = (): void => {
         updateData({
             ...data,
-            [services.vesCommonService.nanoid()]: ''
+            [nanoid()]: ''
         });
     };
 

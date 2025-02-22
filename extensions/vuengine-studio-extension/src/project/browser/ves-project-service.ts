@@ -16,6 +16,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import { nanoid } from '../../editors/browser/components/Common/Utils';
 import { PluginFileTranslatedField } from '../../editors/browser/components/PluginFileEditor/PluginFileEditorTypes';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { ItemData } from '../../editors/browser/ves-editors-widget';
@@ -187,7 +188,7 @@ export class VesProjectService {
     if (type.schema.properties && needsId) {
       type.schema.properties['_id'] = {
         type: 'string',
-        default: this.vesCommonService.nanoid(),
+        default: nanoid(),
       };
     }
     type.schema.properties['_version'] = {

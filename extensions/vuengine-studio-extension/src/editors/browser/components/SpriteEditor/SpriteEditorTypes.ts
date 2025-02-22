@@ -1,14 +1,14 @@
-import { LayerDataForHook } from 'dotting';
+import { LayerProps } from 'dotting';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { Displays } from '../Common/VUEngineTypes';
 
 export const DEFAULT_SPRITE_SIZE = 16;
-export const PLACEHOLDER_LAYER_NAME = 'placeholderLayer';
 
-export interface ExtraSpriteLayerData {
+export interface LayerAttributes {
     name: string
     parallax: number
     displayMode: Displays
+    isVisible: boolean
 }
 
 export interface SpriteData {
@@ -17,11 +17,12 @@ export interface SpriteData {
         x: number
         y: number
     }
-    layers: SpriteLayersData
+    frames: LayerProps[][]
+    layerAttributes: LayerAttributesMap
 }
 
-export interface SpriteLayersData {
-    [id: string]: (LayerDataForHook & ExtraSpriteLayerData)
+export interface LayerAttributesMap {
+    [id: string]: LayerAttributes
 }
 
 export const DOT_BRUSH_PATTERNS = [

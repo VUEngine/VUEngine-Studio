@@ -6,6 +6,7 @@ import { OutputChannelManager } from '@theia/output/lib/browser/output-channel';
 import { OutputContribution } from '@theia/output/lib/browser/output-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { nanoid } from '../../editors/browser/components/Common/Utils';
 import { VesMigrateFromPreviewTo100 } from './migrations/ves-migrate-preview-to-1-0-0';
 import { MigrationRegistry } from './ves-migrate-types';
 
@@ -46,7 +47,7 @@ export class VesMigrateService {
     const channel = this.outputChannelManager.getChannel(channelName);
 
     migrations.map(migration => {
-      const id = this.vesCommonService.nanoid();
+      const id = nanoid();
       this._migrations[id] = new migration(
         this.fileService,
         this.messageService,

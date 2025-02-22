@@ -13,10 +13,10 @@ import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/Base/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/Base/VContainer';
-import PaletteSelect from '../SpriteEditor/PaletteSelect';
-import SpriteEditorCurrentToolSettings from '../SpriteEditor/SpriteEditorCurrentToolSettings';
+import PaletteSelect from '../SpriteEditor/Sidebar/PaletteSelect';
+import SpriteEditorCurrentToolSettings from '../SpriteEditor/Sidebar/SpriteEditorCurrentToolSettings';
 import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';
-import SpriteEditorTools from '../SpriteEditor/SpriteEditorTools';
+import SpriteEditorTools from '../SpriteEditor/Sidebar/SpriteEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharSettings from './Alphabet/CharSettings';
@@ -299,8 +299,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         <div
             ref={canvasContainerRef}
             style={{
-                backgroundImage: 'radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0)',
-                backgroundSize: '16px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 inset: 0,

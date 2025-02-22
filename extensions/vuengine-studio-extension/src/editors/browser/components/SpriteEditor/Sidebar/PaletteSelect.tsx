@@ -1,12 +1,13 @@
 import { nls } from '@theia/core';
 import { DottingRef, useBrush, useHandlers } from 'dotting';
 import React, { useContext, useEffect } from 'react';
-import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/Base/HContainer';
-import VContainer from '../Common/Base/VContainer';
-import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
+import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
+import { FontEditorCommands } from '../../FontEditor/FontEditorCommands';
 import { SpriteEditorTool } from './SpriteEditorTool';
+import InfoLabel from '../../Common/InfoLabel';
 
 interface PaletteSelectProps {
     colorMode?: ColorMode
@@ -112,18 +113,51 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     return (
         <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/sprite/palette', 'Palette')}
-            </label>
-            <HContainer gap={2} wrap='wrap'>
+            {colorMode !== undefined && setColorMode !== undefined
+                ? <InfoLabel
+                    label={nls.localize('vuengine/editors/sprite/palette', 'Palette')}
+                    tooltip={<>
+                        <div>
+                            {nls.localize(
+                                'vuengine/editors/sprite/colorModeDescription',
+                                "Whether to use the system's default 4 color palette or HiColor mode, \
+which simulates 7 colors by blending together adjacent frames to create mix colors."
+                            )}
+                        </div>
+                        <div>
+                            {nls.localize(
+                                'vuengine/editors/sprite/colorModeHiColorMemoryNote',
+                                'Note: HiColor sprites consume more video memory space than regular sprites.'
+                            )}
+                        </div>
+                        <div>
+                            {nls.localize(
+                                'vuengine/editors/sprite/colorModeHiColorFlickerNote',
+                                'Note: Mixed colors look fine on hardware, but flicker on emulators.'
+                            )}
+                        </div>
+                        <div>
+                            {nls.localize(
+                                'vuengine/editors/sprite/colorModeHiColorMaxHeightNote',
+                                'Note: HiColor sprites can be 256 pixels high max.'
+                            )}
+                        </div>
+                    </>}
+                    tooltipPosition='bottom'
+                />
+                : <label>
+                    {nls.localize('vuengine/editors/sprite/palette', 'Palette')}
+                </label>
+            }
+            <HContainer gap={2} wrap={colorMode !== undefined && setColorMode !== undefined ? 'nowrap' : 'wrap'}>
                 {colorMode !== undefined && setColorMode !== undefined &&
                     <SpriteEditorTool
                         onClick={toggleHiColor}
-                        style={{ width: 70 }}
+                        style={{ minWidth: 70 }}
                     >
                         {colorMode === ColorMode.FrameBlend
                             ? ' HiColor'
-                            : nls.localize('vuengine/editors/sprite/4colors', '4 Colors')}
+                            : nls.localizeByDefault('Default')}
                     </SpriteEditorTool>
                 }
                 {[...Array(paletteColors.length)].map((p, paletteIndex) => {

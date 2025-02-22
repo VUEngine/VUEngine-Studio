@@ -1,4 +1,5 @@
 import { QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
+import { customAlphabet } from 'nanoid';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
 
 export const clamp = (value: number, min: number, max: number, deflt: number = 0): number =>
@@ -73,3 +74,6 @@ export const toUpperSnakeCase = (key: string): string => {
         .toUpperCase()
         .replace('VU_ENGINE', 'VUENGINE'); // meh...
 };
+
+export const nanoid = () =>
+    customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 16)();

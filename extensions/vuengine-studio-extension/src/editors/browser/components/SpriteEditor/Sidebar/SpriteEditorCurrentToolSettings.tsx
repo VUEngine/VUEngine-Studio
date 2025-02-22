@@ -1,12 +1,12 @@
 import { BrushTool, DottingRef, useBrush } from 'dotting';
 import React, { useContext, useState } from 'react';
-import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import CanvasImage from '../Common/CanvasImage';
-import HContainer from '../Common/Base/HContainer';
-import { DisplayMode } from '../Common/VUEngineTypes';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import CanvasImage from '../../Common/CanvasImage';
+import HContainer from '../../Common/Base/HContainer';
+import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SpriteEditorTool } from './SpriteEditorTool';
-import { DOT_BRUSH_PATTERNS } from './SpriteEditorTypes';
+import { DOT_BRUSH_PATTERNS } from '../SpriteEditorTypes';
 
 interface SpriteEditorCurrentToolSettingsProps {
     dottingRef: React.RefObject<DottingRef>

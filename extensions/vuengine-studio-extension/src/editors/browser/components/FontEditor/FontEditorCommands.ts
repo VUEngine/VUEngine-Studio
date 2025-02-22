@@ -98,6 +98,36 @@ export const FontEditorCommands: EditorCommands = {
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'g',
     },
+    TOOL_LINE: {
+        id: 'editors.fontEditor.toolLine',
+        label: nls.localize('vuengine/editors/font/commands/toolLine', 'Tool: Line'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'l',
+    },
+    TOOL_RECTANGLE: {
+        id: 'editors.fontEditor.toolRectangle',
+        label: nls.localize('vuengine/editors/font/commands/toolRectangle', 'Tool: Rectangle'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'u',
+    },
+    TOOL_RECTANGLE_FILLED: {
+        id: 'editors.fontEditor.toolRectangleFilled',
+        label: nls.localize('vuengine/editors/font/commands/toolRectangleFilled', 'Tool: Rectangle (Filled)'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'ctrlcmd+u',
+    },
+    TOOL_ELLIPSE: {
+        id: 'editors.fontEditor.toolEllipse',
+        label: nls.localize('vuengine/editors/font/commands/toolEllipse', 'Tool: Ellipse'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'i',
+    },
+    TOOL_ELLIPSE_FILLED: {
+        id: 'editors.fontEditor.toolEllipseFilled',
+        label: nls.localize('vuengine/editors/font/commands/toolEllipseFilled', 'Tool: Ellipse (Filled)'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: 'ctrlcmd+i',
+    },
     TOOL_MARQUEE: {
         id: 'editors.fontEditor.toolMarquee',
         label: nls.localize('vuengine/editors/font/commands/toolMarquee', 'Tool: Marquee'),

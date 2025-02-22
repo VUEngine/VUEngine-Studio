@@ -1,11 +1,11 @@
-import { Eraser, Hand, PaintBucket, PencilSimple, Selection } from '@phosphor-icons/react';
+import { Circle, Eraser, Hand, Minus, PaintBucket, PencilSimple, Selection, Square } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { BrushTool, DottingRef, useBrush } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/Base/HContainer';
-import VContainer from '../Common/Base/VContainer';
-import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
+import { FontEditorCommands } from '../../FontEditor/FontEditorCommands';
 import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface SpriteEditorToolsProps {
@@ -13,7 +13,7 @@ interface SpriteEditorToolsProps {
 }
 
 export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { dottingRef } = props;
     const { brushTool, changeBrushTool } = useBrush(dottingRef);
     const [previousBrushTool, setPreviousBrushTool] = useState<BrushTool>(BrushTool.NONE);
@@ -48,6 +48,15 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
             case FontEditorCommands.TOOL_PENCIL.id:
                 changeBrushTool(BrushTool.DOT);
                 break;
+            case FontEditorCommands.TOOL_LINE.id:
+                changeBrushTool(BrushTool.LINE);
+                break;
+            case FontEditorCommands.TOOL_RECTANGLE.id:
+                changeBrushTool(BrushTool.RECTANGLE);
+                break;
+            case FontEditorCommands.TOOL_ELLIPSE.id:
+                changeBrushTool(BrushTool.ELLIPSE);
+                break;
         }
     };
 
@@ -59,6 +68,12 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
             document.removeEventListener('keyup', onKeyUp);
         };
     }, [brushTool]);
+
+    useEffect(() => {
+        enableCommands([
+            ...Object.values(FontEditorCommands).map(c => c.id)
+        ]);
+    }, []);
 
     useEffect(() => {
         document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
@@ -84,6 +99,16 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     <Hand size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
+                    className={`tool ${brushTool === BrushTool.SELECT ? 'active' : undefined}`}
+                    title={
+                        nls.localize('vuengine/editors/font/tools/marquee', 'Marquee') +
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_MARQUEE.id, true)
+                    }
+                    onClick={() => changeBrushTool(BrushTool.SELECT)}
+                >
+                    <Selection size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
                     className={brushTool === BrushTool.DOT ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/pencil', 'Pencil') +
@@ -94,27 +119,6 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     <PencilSimple size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
-                    className={brushTool === BrushTool.ERASER ? 'active' : ''}
-                    title={
-                        nls.localize('vuengine/editors/font/tools/eraser', 'Eraser') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_ERASER.id, true)
-                    }
-                    onClick={() => changeBrushTool(BrushTool.ERASER)}
-                >
-                    <Eraser size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
-                    className={brushTool === BrushTool.PAINT_BUCKET ? 'active' : ''}
-                    title={
-                        nls.localize('vuengine/editors/font/tools/paintBucket', 'Paint Bucket') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_PAINT_BUCKET.id, true)
-                    }
-                    onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
-                >
-                    <PaintBucket size={20} />
-                </SpriteEditorTool>
-                {/*
-                <SpriteEditorTool
                     className={brushTool === BrushTool.LINE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/line', 'Line') +
@@ -122,7 +126,7 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     }
                     onClick={() => changeBrushTool(BrushTool.LINE)}
                 >
-                    <PencilSimpleLine size={20} />
+                    <Minus size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
                     className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
@@ -135,6 +139,16 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     <Square size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
+                    className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
+                    title={
+                        nls.localize('vuengine/editors/font/tools/rectangleFilled', 'Rectangle (Filled)') +
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_RECTANGLE_FILLED.id, true)
+                    }
+                    onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
+                >
+                    <Square size={20} weight="fill" />
+                </SpriteEditorTool>
+                <SpriteEditorTool
                     className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/ellipse', 'Ellipse') +
@@ -144,16 +158,35 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 >
                     <Circle size={20} />
                 </SpriteEditorTool>
-            */}
                 <SpriteEditorTool
-                    className={`tool ${brushTool === BrushTool.SELECT ? 'active' : undefined}`}
+                    className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/marquee', 'Marquee') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_MARQUEE.id, true)
+                        nls.localize('vuengine/editors/font/tools/ellipseFilled', 'Ellipse (Filled)') +
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_ELLIPSE_FILLED.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.SELECT)}
+                    onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
                 >
-                    <Selection size={20} />
+                    <Circle size={20} weight="fill" />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    className={brushTool === BrushTool.PAINT_BUCKET ? 'active' : ''}
+                    title={
+                        nls.localize('vuengine/editors/font/tools/paintBucket', 'Paint Bucket') +
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_PAINT_BUCKET.id, true)
+                    }
+                    onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
+                >
+                    <PaintBucket size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    className={brushTool === BrushTool.ERASER ? 'active' : ''}
+                    title={
+                        nls.localize('vuengine/editors/font/tools/eraser', 'Eraser') +
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_ERASER.id, true)
+                    }
+                    onClick={() => changeBrushTool(BrushTool.ERASER)}
+                >
+                    <Eraser size={20} />
                 </SpriteEditorTool>
             </HContainer>
         </VContainer>

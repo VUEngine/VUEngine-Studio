@@ -26,8 +26,14 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
                 <div>
                     {nls.localize(
                         'vuengine/editors/actor/colorModeDescription',
-                        'Whether to use the system\'s default 4 color palette or HiColor mode, \
-which simulates 7 colors by blending together adjacent frames to create mix colors.'
+                        "Whether to use the system's default 4 color palette or HiColor mode, \
+which simulates 7 colors by blending together adjacent frames to create mix colors."
+                    )}
+                </div>
+                <div>
+                    {nls.localize(
+                        'vuengine/editors/actor/colorModeHiColorMemoryNote',
+                        'Note: HiColor sprites consume more video memory space than regular sprites.'
                     )}
                 </div>
                 <div>

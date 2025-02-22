@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
+import { SpriteEditorTool } from '../../SpriteEditor/Sidebar/SpriteEditorTool';
 import { FontEditorCommands } from '../FontEditorCommands';
 
 interface ActionsProps {
