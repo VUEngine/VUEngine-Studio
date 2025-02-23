@@ -13,7 +13,8 @@ import {
     OpenerService,
     PreferenceService,
     Saveable,
-    SaveableSource
+    SaveableSource,
+    StatusBar
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
@@ -75,6 +76,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly quickPickService: QuickPickService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(StatusBar)
+    protected readonly statusBar: StatusBar;
     @inject(UndoRedoService)
     protected readonly undoRedoService: UndoRedoService;
     @inject(VesCommonService)
@@ -263,7 +266,17 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.justRequestedUpdate = false;
         }, 50);
         super.update();
+        this.updateStatusBar();
     };
+
+    protected updateStatusBar(): void {
+        this.statusBar.removeElement('editor-language-status-items');
+        this.statusBar.removeElement('editor-status-cursor-position');
+        this.statusBar.removeElement('editor-status-encoding');
+        this.statusBar.removeElement('editor-status-eol');
+        this.statusBar.removeElement('editor-status-language');
+        this.statusBar.removeElement('editor-status-tabbing-config');
+    }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
         let json = {};
