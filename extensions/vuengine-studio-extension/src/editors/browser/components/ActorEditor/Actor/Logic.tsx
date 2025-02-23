@@ -1,15 +1,13 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
-import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 import SimpleListEditor from '../../SimpleListEditor/SimpleListEditor';
+import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 export default function Logic(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setAllocator = (customAllocator: string): void => {
         setData({
@@ -31,22 +29,16 @@ export default function Logic(): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <VContainer grow={1}>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/actor/customAllocator', 'Custom Allocator')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/actor/customAllocatorDescription',
-                        'Define which class to use to attach custom logic to this actor. If left blank, it will be Actor.',
-                    )}
-                />
-                <input
-                    className='theia-input'
-                    value={data.logic.customAllocator}
-                    onChange={e => setAllocator(e.target.value)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/actor/customAllocator', 'Custom Allocator')}
+                tooltip={nls.localize(
+                    'vuengine/editors/actor/customAllocatorDescription',
+                    'Define which class to use to attach custom logic to this actor. If left blank, it will be Actor.',
+                )}
+                value={data.logic.customAllocator}
+                setValue={setAllocator}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
             <VContainer grow={1}>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/actor/configurationValues', 'Configuration Values')}

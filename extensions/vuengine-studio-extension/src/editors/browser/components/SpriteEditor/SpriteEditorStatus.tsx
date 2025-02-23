@@ -1,16 +1,16 @@
 /* eslint-disable no-null/no-null */
-import { CrosshairSimple, FrameCorners, MagnifyingGlass } from '@phosphor-icons/react';
+import { StatusBarAlignment } from '@theia/core/lib/browser';
 import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
-import React, { useEffect, useState } from 'react';
-import HContainer from '../Common/Base/HContainer';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface SpriteEditorStatusProps {
     dottingRef: React.RefObject<DottingRef>
-    style?: object
 }
 
 export default function SpriteEditorStatus(props: SpriteEditorStatusProps): React.JSX.Element {
-    const { dottingRef, style } = props;
+    const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
+    const { dottingRef } = props;
     const {
         addHoverPixelChangeListener,
         removeHoverPixelChangeListener,
@@ -21,6 +21,36 @@ export default function SpriteEditorStatus(props: SpriteEditorStatusProps): Reac
     const [hoveredPixel, setHoveredPixel] = useState<{ rowIndex: number; columnIndex: number; } | null>(null);
     const [canvasPanZoom, setCanvasPanZoom] = useState<PanZoom | null>(null);
 
+    const setStatusBarItems = () => {
+        if (canvasPanZoom) {
+            setStatusBarItem('ves-editors-sprite-pan-zoom', {
+                alignment: StatusBarAlignment.RIGHT,
+                priority: 4,
+                text: `${(Math.round(canvasPanZoom.scale * 100))}%`,
+            });
+        }
+        setStatusBarItem('ves-editors-sprite-dimensions', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 3,
+            text: `${dimensions.columnCount} × ${dimensions.rowCount}`,
+        });
+        if (hoveredPixel) {
+            setStatusBarItem('ves-editors-sprite-hover-coordinates', {
+                alignment: StatusBarAlignment.RIGHT,
+                priority: 5,
+                text: `${hoveredPixel.columnIndex + 1} : ${hoveredPixel.rowIndex + 1}`,
+            });
+        } else {
+            removeStatusBarItem('ves-editors-sprite-hover-coordinates');
+        }
+    };
+
+    const removeStatusBarItems = () => {
+        removeStatusBarItem('ves-editors-sprite-dimensions');
+        removeStatusBarItem('ves-editors-sprite-hover-coordinates');
+        removeStatusBarItem('ves-editors-sprite-pan-zoom');
+    };
+
     const handleHoverPixelChangeHandler: CanvasHoverPixelChangeHandler = ({ indices }) => {
         setHoveredPixel(indices);
     };
@@ -30,6 +60,7 @@ export default function SpriteEditorStatus(props: SpriteEditorStatusProps): Reac
     };
 
     useEffect(() => {
+        setStatusBarItems();
         addHoverPixelChangeListener(handleHoverPixelChangeHandler);
         addCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
         return () => {
@@ -38,21 +69,16 @@ export default function SpriteEditorStatus(props: SpriteEditorStatusProps): Reac
         };
     }, []);
 
-    return (
-        <HContainer gap={10} style={style}>
-            <HContainer alignItems='center' gap={2}>
-                <MagnifyingGlass /> {canvasPanZoom && (Math.round(canvasPanZoom.scale * 100) / 100)}
-            </HContainer>
-            <HContainer alignItems='center' gap={2}>
-                <FrameCorners /> {dimensions.columnCount} × {dimensions.rowCount}
-            </HContainer>
-            <HContainer alignItems='center' gap={2}>
-                {hoveredPixel && <>
-                    <CrosshairSimple /> {hoveredPixel.columnIndex + 1}
-                    :
-                    {hoveredPixel.rowIndex + 1}
-                </>}
-            </HContainer>
-        </HContainer>
-    );
+    useEffect(() => {
+        setStatusBarItems();
+        return () => {
+            removeStatusBarItems();
+        };
+    }, [
+        dimensions,
+        hoveredPixel,
+        canvasPanZoom
+    ]);
+
+    return <></>;
 }

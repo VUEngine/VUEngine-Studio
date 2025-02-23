@@ -1,22 +1,17 @@
 /* eslint-disable no-null/no-null */
-import { CommonCommands, StatusBarAlignment } from '@theia/core/lib/browser';
+import { CommonCommands } from '@theia/core/lib/browser';
 import {
     CanvasDataChangeHandler,
-    CanvasHoverPixelChangeHandler,
-    CanvasInfoChangeHandler,
     Dotting,
     DottingRef,
     LayerProps,
-    PanZoom,
     PixelModifyItem,
     useDotting,
-    useGrids,
     useHandlers,
     useLayers
 } from 'dotting';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
-import { VesEditorsCommands } from '../../ves-editors-commands';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
@@ -28,6 +23,7 @@ import SpriteEditorNavigator from './Sidebar/SpriteEditorNavigator';
 import SpriteEditorSettings from './Sidebar/SpriteEditorSettings';
 import SpriteEditorTools from './Sidebar/SpriteEditorTools';
 import SpriteEditorLayers from './SpriteEditorLayers';
+import SpriteEditorStatus from './SpriteEditorStatus';
 import { SpriteData } from './SpriteEditorTypes';
 
 export const createEmptyPixelData = (width: number, height: number): PixelModifyItem[][] => {
@@ -48,7 +44,7 @@ interface SpriteEditorProps {
 }
 
 export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Element {
-    const { setStatusBarItem, removeStatusBarItem, services } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
     const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
     const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
@@ -56,17 +52,10 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     const dottingRef = useRef<DottingRef>(null);
     const { undo, redo } = useDotting(dottingRef);
     const {
-        addCanvasInfoChangeEventListener,
         addDataChangeListener,
-        addHoverPixelChangeListener,
-        removeCanvasInfoChangeEventListener,
         removeDataChangeListener,
-        removeHoverPixelChangeListener,
     } = useHandlers(dottingRef);
-    const { dimensions } = useGrids(dottingRef);
     const { layers } = useLayers(dottingRef);
-    const [hoveredPixel, setHoveredPixel] = useState<{ rowIndex: number; columnIndex: number; } | null>(null);
-    const [canvasPanZoom, setCanvasPanZoom] = useState<PanZoom | null>(null);
     const [primaryColor, setPrimaryColor] = useState<number>(3);
     const [secondaryColor, setSecondaryColor] = useState<number>(0);
     const [currentFrame, setCurrentFrame] = useState<number>(0);
@@ -169,68 +158,6 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         canvasHeight,
         canvasWidth,
         allowResize,
-    ]);
-
-    const handleHoverPixelChangeHandler: CanvasHoverPixelChangeHandler = ({ indices }) => {
-        setHoveredPixel(indices);
-    };
-
-    const handleCanvasInfoChangeHandler: CanvasInfoChangeHandler = ({ panZoom }) => {
-        setCanvasPanZoom(panZoom);
-    };
-
-    const setStatusBarItems = () => {
-        if (canvasPanZoom) {
-            setStatusBarItem('ves-editors-sprite-pan-zoom', {
-                alignment: StatusBarAlignment.RIGHT,
-                command: VesEditorsCommands.OPEN_IN_EDITOR.id,
-                priority: 4,
-                text: `$(codicon-zoom-in) ${(Math.round(canvasPanZoom.scale * 100) / 100)}`,
-            });
-        }
-        setStatusBarItem('ves-editors-sprite-dimensions', {
-            alignment: StatusBarAlignment.RIGHT,
-            command: VesEditorsCommands.OPEN_IN_EDITOR.id,
-            priority: 3,
-            text: `$(codicon-screen-full) ${dimensions.columnCount} × ${dimensions.rowCount}`,
-        });
-        if (hoveredPixel) {
-            setStatusBarItem('ves-editors-sprite-hover-coordinates', {
-                alignment: StatusBarAlignment.RIGHT,
-                command: VesEditorsCommands.OPEN_IN_EDITOR.id,
-                priority: 5,
-                text: `$(codicon-issues) ${hoveredPixel.columnIndex + 1} : ${hoveredPixel.rowIndex + 1}`,
-            });
-        } else {
-            removeStatusBarItem('ves-editors-sprite-hover-coordinates');
-        }
-    };
-
-    const removeStatusBarItems = () => {
-        removeStatusBarItem('ves-editors-sprite-dimensions');
-        removeStatusBarItem('ves-editors-sprite-hover-coordinates');
-        removeStatusBarItem('ves-editors-sprite-pan-zoom');
-    };
-
-    useEffect(() => {
-        setStatusBarItems();
-        addHoverPixelChangeListener(handleHoverPixelChangeHandler);
-        addCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
-        return () => {
-            removeHoverPixelChangeListener(handleHoverPixelChangeHandler);
-            removeCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
-        };
-    }, []);
-
-    useEffect(() => {
-        setStatusBarItems();
-        return () => {
-            removeStatusBarItems();
-        };
-    }, [
-        dimensions,
-        hoveredPixel,
-        canvasPanZoom
     ]);
 
     useEffect(() => {
@@ -336,6 +263,9 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 setFrames={setFrames}
                 currentFrame={currentFrame}
                 setCurrentFrame={setCurrentFrame}
+            />
+            <SpriteEditorStatus
+                dottingRef={dottingRef}
             />
         </VContainer>
     );

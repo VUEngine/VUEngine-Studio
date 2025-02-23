@@ -308,15 +308,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 position: 'absolute',
             }}
         >
-            <SpriteEditorStatus
-                dottingRef={dottingRef}
-                style={{
-                    bottom: 'var(--padding)',
-                    left: 'var(--padding)',
-                    position: 'absolute',
-                    zIndex: 100,
-                }}
-            />
             <Dotting
                 backgroundColor='transparent'
                 brushColor={PALETTE_COLORS[ColorMode.Default][primaryColorIndex]}
@@ -457,6 +448,9 @@ Will be skipped if compressed data is not smaller than source data.'
                     />
                 </HContainer>
             </EditorSidebar>
-        </HContainer >
-    </div >;
+        </HContainer>
+        <SpriteEditorStatus
+            dottingRef={dottingRef}
+        />
+    </div>;
 }

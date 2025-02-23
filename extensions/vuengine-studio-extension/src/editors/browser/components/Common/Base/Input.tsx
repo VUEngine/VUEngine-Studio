@@ -19,6 +19,7 @@ interface InputProps {
     step?: number
     disabled?: boolean
     readOnly?: boolean
+    clearable?: boolean
     commands?: string[]
     style?: object
     tabIndex?: number
@@ -33,7 +34,6 @@ interface InputProps {
 const ClearableContainer = styled.div`
     display: inline-block;
     position: relative;
-    width: 100%;
 
     i {
         cursor: pointer;
@@ -66,7 +66,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         value, setValue, defaultValue,
         label, tooltip,
         min, max, step,
-        disabled, readOnly,
+        disabled, readOnly, clearable,
         className, style, width, grow,
         tabIndex, autoFocus,
         commands,
@@ -146,7 +146,11 @@ export default function Input(props: InputProps): React.JSX.Element {
                 />
             }
             <div>
-                <ClearableContainer>
+                <ClearableContainer
+                    style={{
+                        width: width ?? '100%',
+                    }}
+                >
                     <input
                         className={`theia-input${className ? ` ${className}` : ''}`}
                         type={type}
@@ -173,7 +177,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                         tabIndex={tabIndex}
                         autoFocus={autoFocus}
                     />
-                    {type !== 'number' && internalValue !== '' && !disabled && (
+                    {clearable !== false && type !== 'number' && internalValue !== '' && !disabled && (
                         <i
                             className="codicon codicon-x"
                             onClick={() => updateInternalValue(defaultValue as string ?? '')}

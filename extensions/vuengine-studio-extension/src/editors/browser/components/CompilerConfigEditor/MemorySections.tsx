@@ -76,7 +76,7 @@ The reserved space will be unavailable for BGMAP data.'
                                 setValue={v => setLength(section, v as number)}
                                 min={0}
                                 max={114}
-                                width={36}
+                                width={48}
                             />
                             KB
                         </HContainer>
@@ -115,7 +115,7 @@ The reserved space will be unavailable for BGMAP data.'
                                 value={data.memorySections[section].length}
                                 setValue={v => setLength(section, v as number)}
                                 min={0}
-                                width={36}
+                                width={48}
                             />
                             {section === 'wram' ? 'KB' : 'MB'}
                         </HContainer>
@@ -125,6 +125,7 @@ The reserved space will be unavailable for BGMAP data.'
                             width={100}
                             value={data.memorySections[section].origin}
                             setValue={v => setOrigin(section, v as string)}
+                            clearable={false}
                         />
                     </td>
                 </tr>
