@@ -31,7 +31,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     @inject(FrontendApplicationStateService)
     protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(OpenerService)
-    protected openerService: OpenerService;
+    protected readonly openerService: OpenerService;
     @inject(UntitledResourceResolver)
     protected readonly untitledResourceResolver: UntitledResourceResolver;
     @inject(VesCodeGenService)

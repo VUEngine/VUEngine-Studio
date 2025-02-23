@@ -2,8 +2,8 @@ import { CommandService } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
 import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
-import { VesCommonService } from 'src/core/browser/ves-common-service';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 
 export interface EmulatorControlsOverlayProps {

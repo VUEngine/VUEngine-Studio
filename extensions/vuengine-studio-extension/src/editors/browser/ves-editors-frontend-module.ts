@@ -11,6 +11,7 @@ import { VesEditorsPreferenceSchema } from './ves-editors-preferences';
 import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
+import { VesEditorsContribution } from './ves-editors-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -20,19 +21,20 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(WorkspaceCommandContribution).to(VesWorkspaceCommandContribution).inSingletonScope();
 
     // context key service
-    bind(VesEditorsContextKeyService)
-        .toSelf()
-        .inSingletonScope();
+    bind(VesEditorsContextKeyService).toSelf().inSingletonScope();
 
-    // editor view
+    // open with
+    bind(VesEditorsContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesEditorsContribution);
+
+    // editors view
+    bind(OpenHandler).to(VesEditorsOpenHandler).inSingletonScope();
     bind(VesEditorsViewContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(VesEditorsViewContribution);
     bind(CommandContribution).toService(VesEditorsViewContribution);
     bind(KeybindingContribution).toService(VesEditorsViewContribution);
     bind(MenuContribution).toService(VesEditorsViewContribution);
     bind(TabBarToolbarContribution).toService(VesEditorsViewContribution);
     bind(LabelProviderContribution).to(VesEditorsLabelProviderContribution).inSingletonScope();
-    bind(OpenHandler).to(VesEditorsOpenHandler).inSingletonScope();
     bind(VesEditorsWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(({ container }) => ({
         id: VesEditorsWidget.ID,

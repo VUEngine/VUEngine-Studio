@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
-import { WithContributor, WithFileUri } from 'src/project/browser/ves-project-types';
+import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
