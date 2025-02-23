@@ -5,13 +5,13 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
 import '../../../src/editors/browser/style/index.css';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
+import { VesEditorsContribution } from './ves-editors-contribution';
 import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
 import { VesEditorsPreferenceSchema } from './ves-editors-preferences';
 import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
-import { VesEditorsContribution } from './ves-editors-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences

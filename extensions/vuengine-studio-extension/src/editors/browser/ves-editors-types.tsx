@@ -4,7 +4,8 @@ import {
     HoverService,
     LocalStorageService,
     OpenerService,
-    PreferenceService
+    PreferenceService,
+    StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
@@ -46,6 +47,8 @@ export interface EditorsContextType {
     setGeneratingProgress: (current: number, total: number) => void
     enableCommands: (commandIds: string[]) => void
     disableCommands: (commandIds: string[]) => void
+    setStatusBarItem: (id: string, entry: StatusBarEntry) => void
+    removeStatusBarItem: (id: string) => void
     services: EditorsServices
 }
 

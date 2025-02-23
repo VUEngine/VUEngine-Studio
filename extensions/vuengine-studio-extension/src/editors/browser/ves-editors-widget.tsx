@@ -5,6 +5,7 @@ import { CommandService, Emitter, Event, MessageService, nls, QuickPickService, 
 import {
     CommonCommands,
     ExtractableWidget,
+    FrontendApplication,
     HoverService,
     LabelProvider,
     LocalStorageService,
@@ -14,7 +15,8 @@ import {
     PreferenceService,
     Saveable,
     SaveableSource,
-    StatusBar
+    StatusBar,
+    StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
@@ -60,6 +62,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly fileDialogService: FileDialogService;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(FrontendApplication)
+    protected readonly app: FrontendApplication;
     @inject(HoverService)
     protected readonly hoverService: HoverService;
     @inject(LabelProvider)
@@ -120,6 +124,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected isLoading: boolean;
     protected isGenerating: boolean;
     protected generatingProgress: number;
+
+    protected statusBarItems: { [id: string]: StatusBarEntry } = {};
 
     isExtractable: boolean = true;
     secondaryWindow: Window | undefined;
@@ -219,6 +225,16 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.node.focus();
     }
 
+    protected setStatusBarItem(id: string, entry: StatusBarEntry): void {
+        this.statusBarItems[id] = entry;
+        this.statusBar.setElement(id, entry);
+    }
+
+    protected removeStatusBarItem(id: string): void {
+        delete (this.statusBarItems[id]);
+        this.statusBar.removeElement(id);
+    }
+
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
         this.isGenerating = isGenerating;
         this.generatingProgress = isGenerating && progress > -1 ? progress : -1;
@@ -266,16 +282,41 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.justRequestedUpdate = false;
         }, 50);
         super.update();
-        this.updateStatusBar();
     };
 
-    protected updateStatusBar(): void {
+    protected onAfterAttach(msg: Message): void {
+        console.log(' ---------- onAfterAttach ---------- ');
+        this.app.shell.addClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
+    }
+
+    protected onAfterDetach(msg: Message): void {
+        console.log(' ---------- onAfterDetach ---------- ');
+        this.app.shell.removeClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
+    }
+
+    protected onAfterShow(msg: Message): void {
+        console.log(' ---------- onAfterShow ---------- ');
+        this.app.shell.addClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
+    }
+
+    protected onAfterHide(msg: Message): void {
+        console.log(' ---------- onAfterHide ---------- ');
+        this.app.shell.removeClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
+    }
+
+    protected cleanStatusBar(): void {
+        /*
         this.statusBar.removeElement('editor-language-status-items');
         this.statusBar.removeElement('editor-status-cursor-position');
         this.statusBar.removeElement('editor-status-encoding');
         this.statusBar.removeElement('editor-status-eol');
         this.statusBar.removeElement('editor-status-language');
         this.statusBar.removeElement('editor-status-tabbing-config');
+        */
     }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
@@ -415,6 +456,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
+                        setStatusBarItem: this.setStatusBarItem.bind(this),
+                        removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,

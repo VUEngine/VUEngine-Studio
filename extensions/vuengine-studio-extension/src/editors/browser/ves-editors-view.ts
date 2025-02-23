@@ -1,5 +1,11 @@
 import { CommandRegistry, CommandService, MenuModelRegistry, nls, UntitledResourceResolver, URI } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
+import {
+    AbstractViewContribution,
+    CommonCommands,
+    KeybindingRegistry,
+    OpenerService,
+    Widget
+} from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
