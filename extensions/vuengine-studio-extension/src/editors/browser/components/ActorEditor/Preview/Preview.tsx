@@ -151,16 +151,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       onMouseMove={onMouseMove}
       onWheel={onWheel}
     >
-      {animate &&
-        <div className='current-frame'>
-          <div>
-            {nls.localize('vuengine/editors/actor/step', 'Step')} {currentAnimationStep + 1}
-          </div>
-          <div>
-            {nls.localize('vuengine/editors/actor/frame', 'Frame')} {actualCurrentFrame + 1}
-          </div>
-        </div>
-      }
       <div
         className={`preview-container-world background-color-${previewBackgroundColor}`}
         style={{

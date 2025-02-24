@@ -14,13 +14,6 @@
     cursor: grabbing;
 }
 
-.jsonforms-container .preview-container .current-frame {
-    left: var(--padding);
-    position: absolute;
-    top: var(--padding);
-    z-index: 10;
-}
-
 .jsonforms-container .preview-container-world {
     align-items: center;
     background: repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
