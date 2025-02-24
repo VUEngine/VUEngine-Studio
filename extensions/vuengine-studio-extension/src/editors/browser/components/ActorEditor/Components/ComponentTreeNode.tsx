@@ -35,7 +35,7 @@ import {
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const {
-        removeComponent,
+        addComponent, removeComponent,
         setCurrentComponent,
         previewShowChildren, setPreviewShowChildren,
         previewShowColliders, setPreviewShowColliders,
@@ -274,7 +274,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 {!node.isLeaf && node.parent?.isRoot && ADDABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-plus'
-                        onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
+                        onClick={() => addComponent(type as ComponentKey)}
                         title={nls.localizeByDefault('Add')}
                     />
                 }

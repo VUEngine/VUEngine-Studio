@@ -659,6 +659,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         value={{
           data,
           setData: setData,
+          addComponent: doAddComponent,
           removeComponent: removeComponent,
           currentComponent: currentComponent,
           setCurrentComponent: setCurrentComponent,

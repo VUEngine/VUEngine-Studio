@@ -41,6 +41,7 @@ export interface LocalStorageActorEditorState {
 export interface ActorEditorContextType {
     data: ActorData
     setData: (partialData: Partial<ActorData>, options?: ActorEditorSaveDataOptions) => Promise<void>
+    addComponent: (key: ComponentKey) => void
     removeComponent: (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
