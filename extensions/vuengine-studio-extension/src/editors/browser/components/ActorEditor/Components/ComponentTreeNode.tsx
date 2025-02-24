@@ -46,7 +46,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     const [dragging, setDragging] = useState<boolean>(false);
 
     const nodeParts = node.id.split('-');
-    const type = nodeParts[0] as ComponentKey | 'body';
+    const type = nodeParts[0] as ComponentKey;
     const index = parseInt(nodeParts[1] || '-1');
 
     const showPreview = useMemo(() => {
@@ -101,8 +101,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     return <File size={16} />;
                 case 'animations':
                     return <FilmStrip size={16} />;
-                case 'mutators':
-                    return <SneakerMove size={16} />;
+                case 'bodies':
+                    return <Atom size={16} />;
                 case 'children':
                     return <UserFocus size={16} />;
                 case 'colliders':
@@ -117,8 +117,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                         case ColliderType.LineField:
                             return <DotsThreeOutline size={16} />;
                     }
-                case 'body':
-                    return <Atom size={16} />;
+                case 'mutators':
+                    return <SneakerMove size={16} />;
                 case 'sprites':
                     if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
                         ((data.components.sprites[index].texture?.files?.length ?? 0) +

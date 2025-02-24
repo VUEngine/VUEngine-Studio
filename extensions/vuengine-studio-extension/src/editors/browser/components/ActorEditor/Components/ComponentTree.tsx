@@ -9,7 +9,7 @@ import { ActorData, ActorEditorContext, ActorEditorContextType, ComponentKey } f
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
-    key: ComponentKey | 'body'
+    key: ComponentKey
     componentKey?: ComponentKey
     labelSingular: string
     labelPlural: string
@@ -99,11 +99,11 @@ export default function ComponentTree(): React.JSX.Element {
             hasContent: data.components?.children?.length > 0,
         },
         {
-            key: 'body',
+            key: 'bodies',
+            componentKey: 'bodies',
             labelSingular: nls.localize('vuengine/editors/actor/body', 'Body'),
-            labelPlural: nls.localize('vuengine/editors/actor/body', 'Body'),
-            // labelPlural: nls.localize('vuengine/editors/actor/bodies', 'Bodies'),
-            hasContent: data.body.enabled,
+            labelPlural: nls.localize('vuengine/editors/actor/bodies', 'Bodies'),
+            hasContent: data.components?.bodies?.length > 0,
         },
     ];
 

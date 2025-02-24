@@ -144,6 +144,17 @@ export interface AnimationData {
     frames: number[]
 }
 
+export interface BodyData {
+    name: string
+    mass: number
+    friction: number
+    bounciness: number
+    maximumSpeed: number
+    maximumVelocity: Vector3D
+    gravityAxes: Axis[]
+    rotationAxes: Axis[]
+}
+
 export interface MutatorData {
     name: string
     mutationClass: string
@@ -219,7 +230,7 @@ export interface PositionedActorData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'mutators' | 'children' | 'colliders' | 'sprites' | 'wireframes';
+export type ComponentKey = 'animations' | 'bodies' | 'mutators' | 'children' | 'colliders' | 'sprites' | 'wireframes';
 export type ComponentData = AnimationData | MutatorData | PositionedActorData | ColliderData | SpriteData | WireframeData;
 
 export const CLONABLE_COMPONENT_TYPES = [
@@ -242,41 +253,32 @@ export const HIDEABLE_COMPONENT_TYPES = [
 
 export interface ActorData {
     _id: string
+    animations: {
+        default: number
+        multiframe: boolean
+        totalFrames: number
+    }
+    components: {
+        animations: AnimationData[]
+        bodies: BodyData[]
+        children: PositionedActorData[]
+        colliders: ColliderData[]
+        mutators: MutatorData[]
+        sprites: SpriteData[]
+        wireframes: WireframeData[]
+    }
     extraProperties: {
         extraInfo: string
         pixelSize: PixelSize
     }
-    animations: {
-        default: number
-        totalFrames: number
-        multiframe: boolean
-    }
-    components: {
-        animations: AnimationData[]
-        mutators: MutatorData[]
-        children: PositionedActorData[]
-        colliders: ColliderData[]
-        sprites: SpriteData[]
-        wireframes: WireframeData[]
-    }
     inGameType: string
-    body: {
-        enabled: boolean
-        mass: number
-        friction: number
-        bounciness: number
-        maximumSpeed: number
-        maximumVelocity: Vector3D
-        gravityAxes: Axis[]
-        rotationAxes: Axis[]
+    logic: {
+        configuration: Record<string, string>
+        customAllocator: string
     }
     sprites: {
-        type: SpriteType
         useZDisplacementInProjection: boolean
-    }
-    logic: {
-        customAllocator: string
-        configuration: Record<string, string>
+        type: SpriteType
     }
 }
 

@@ -9,6 +9,7 @@ import {
     ActorEditorContext,
     ActorEditorContextType,
     AnimationData,
+    BodyData,
     ColliderData,
     ComponentData,
     ComponentKey,
@@ -47,6 +48,11 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         totalFrames={data.animations.totalFrames}
                         isMultiFileAnimation={isMultiFileAnimation}
                     />;
+                case 'bodies':
+                    return <Body
+                        body={data.components.bodies[index]}
+                        updateBody={(partialData: Partial<BodyData>) => updateComponent('bodies', index, partialData)}
+                    />;
                 case 'mutators':
                     return <Mutator
                         mutator={data.components.mutators[index]}
@@ -80,8 +86,6 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                     return <ExtraProperties />;
                 case 'logic':
                     return <Logic />;
-                case 'body':
-                    return <Body />;
                 /*
                 default:
                     return <div className="lightLabel">

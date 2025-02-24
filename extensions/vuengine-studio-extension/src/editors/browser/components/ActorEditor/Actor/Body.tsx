@@ -7,71 +7,49 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { Axis } from '../../Common/VUEngineTypes';
-import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
+import { BodyData, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
-export default function Body(): React.JSX.Element {
-    const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
+interface BodyProps {
+    body: BodyData
+    updateBody: (partialData: Partial<BodyData>) => void
+}
+
+export default function Body(props: BodyProps): React.JSX.Element {
+    const { body, updateBody } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setMass = (mass: number): void => {
-        setData({
-            body: {
-                ...data.body, mass
-            }
-        });
+        updateBody({ mass });
     };
 
     const setFriction = (friction: number): void => {
-        setData({
-            body: {
-                ...data.body, friction
-            }
-        });
+        updateBody({ friction });
     };
 
     const setBounciness = (bounciness: number): void => {
-        setData({
-            body: {
-                ...data.body, bounciness
-            }
-        });
+        updateBody({ bounciness });
     };
 
     const setMaximumSpeed = (maximumSpeed: number): void => {
-        setData({
-            body: {
-                ...data.body, maximumSpeed
-            }
-        });
+        updateBody({ maximumSpeed });
     };
 
     const setMaximumVelocity = (axis: 'x' | 'y' | 'z', value: number): void => {
-        setData({
-            body: {
-                ...data.body,
-                maximumVelocity: {
-                    ...data.body.maximumVelocity,
-                    [axis]: value
-                }
+        updateBody({
+            maximumVelocity: {
+                ...body.maximumVelocity,
+                [axis]: value
             }
         });
     };
 
     const setGravityAxes = (gravityAxes: Axis[]): void => {
-        setData({
-            body: {
-                ...data.body,
-                gravityAxes,
-            }
-        });
+        updateBody({ gravityAxes });
     };
 
     const setRotationAxes = (rotationAxes: Axis[]): void => {
-        setData({
-            body: {
-                ...data.body,
-                rotationAxes,
-            }
+        updateBody({
+            rotationAxes
         });
     };
 
@@ -79,7 +57,7 @@ export default function Body(): React.JSX.Element {
         <HContainer gap={15} wrap='wrap'>
             <Input
                 label={nls.localize('vuengine/editors/actor/mass', 'Mass')}
-                value={data.body.mass}
+                value={body.mass}
                 setValue={v => setMass(v as number)}
                 type='number'
                 min={0}
@@ -90,7 +68,7 @@ export default function Body(): React.JSX.Element {
             />
             <Input
                 label={nls.localize('vuengine/editors/actor/friction', 'Friction')}
-                value={data.body.friction}
+                value={body.friction}
                 setValue={v => setFriction(v as number)}
                 type='number'
                 min={0}
@@ -101,7 +79,7 @@ export default function Body(): React.JSX.Element {
             />
             <Input
                 label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
-                value={data.body.bounciness}
+                value={body.bounciness}
                 setValue={v => setBounciness(v as number)}
                 type='number'
                 min={0}
@@ -116,7 +94,7 @@ export default function Body(): React.JSX.Element {
                 </label>
                 <HContainer>
                     <Input
-                        value={data.body.maximumVelocity.x}
+                        value={body.maximumVelocity.x}
                         setValue={v => setMaximumVelocity('x', v as number)}
                         type='number'
                         min={0}
@@ -125,7 +103,7 @@ export default function Body(): React.JSX.Element {
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
-                        value={data.body.maximumVelocity.y}
+                        value={body.maximumVelocity.y}
                         setValue={v => setMaximumVelocity('y', v as number)}
                         type='number'
                         min={0}
@@ -134,7 +112,7 @@ export default function Body(): React.JSX.Element {
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
-                        value={data.body.maximumVelocity.z}
+                        value={body.maximumVelocity.z}
                         setValue={v => setMaximumVelocity('z', v as number)}
                         type='number'
                         min={0}
@@ -146,7 +124,7 @@ export default function Body(): React.JSX.Element {
             </VContainer>
             <Input
                 label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
-                value={data.body.maximumSpeed}
+                value={body.maximumSpeed}
                 setValue={v => setMaximumSpeed(v as number)}
                 type='number'
                 min={0}
@@ -173,7 +151,7 @@ export default function Body(): React.JSX.Element {
                         value: Axis.ZAxis,
                         label: 'Z',
                     }]}
-                    defaultValue={data.body.gravityAxes}
+                    defaultValue={body.gravityAxes}
                     onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -202,7 +180,7 @@ Note that sprites need to use AFFINE mode to be able to be rotated.',
                         value: Axis.ZAxis,
                         label: 'Z',
                     }]}
-                    defaultValue={data.body.rotationAxes}
+                    defaultValue={body.rotationAxes}
                     onChange={options => setRotationAxes(options.map(o => o.value) as Axis[])}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
