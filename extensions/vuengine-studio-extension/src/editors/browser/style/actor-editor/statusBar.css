@@ -1,0 +1,48 @@
+#status-bar-ves-editors-actor-preview-background-color span {
+    background: repeating-conic-gradient(rgba(0, 0, 0, .3) 0% 25%, transparent 0% 50%) 50% / 13px 13px;
+    background-color: var(--theia-editor-background);
+    border-radius: 2px;
+    height: 20px;
+    outline: 1px solid rgba(0, 0, 0, .5);
+    width: 32px;
+}
+#status-bar-ves-editors-actor-preview-background-color.background-color-0 span {
+    background: #000;
+    outline-width: 0;
+}
+#status-bar-ves-editors-actor-preview-background-color.background-color-1 span {
+    background: #500;
+    outline-width: 0;
+}
+#status-bar-ves-editors-actor-preview-background-color.background-color-2 span {
+    background: #a00;
+    outline-width: 0;
+}
+#status-bar-ves-editors-actor-preview-background-color.background-color-3 span {
+    background: #f00;
+    outline-width: 0;
+}
+
+#status-bar-ves-editors-actor-preview-anaglyph {
+    width: 36px;
+}
+#status-bar-ves-editors-actor-preview-anaglyph span,
+#status-bar-ves-editors-actor-preview-anaglyph span::after {
+    border-radius: 2px;
+    outline: 1px solid var(--theia-statusBar-foreground);
+    content: '';
+    display: block;
+    height: 12px;
+    width: 12px;
+}
+#status-bar-ves-editors-actor-preview-anaglyph span::after {
+    margin-left: 18px;
+}
+#status-bar-ves-editors-actor-preview-anaglyph.is-anaglyph span {
+    background: red;
+    outline-color: red;
+}
+#status-bar-ves-editors-actor-preview-anaglyph.is-anaglyph span::after {
+    background: blue;
+    outline-color: blue;
+}

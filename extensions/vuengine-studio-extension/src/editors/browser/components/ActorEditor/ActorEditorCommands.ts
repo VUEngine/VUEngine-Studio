@@ -73,4 +73,34 @@ export const ActorEditorCommands: EditorCommands = {
         category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
         keybinding: 'shift+left',
     },
+    PREVIEW_BACKGROUND_NEXT: {
+        id: 'editors.actorEditor.previewBackgroundNext',
+        label: nls.localize('vuengine/editors/actor/commands/previewBackgroundNext', 'Preview: Change Background'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
+    PREVIEW_CENTER: {
+        id: 'editors.actorEditor.previewCenter',
+        label: nls.localize('vuengine/editors/actor/commands/previewCenter', 'Preview: Center'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
+    PREVIEW_TOGGLE_ANAGLYPH: {
+        id: 'editors.actorEditor.previewToggleAnaglyph',
+        label: nls.localize('vuengine/editors/actor/commands/previewToggleAnaglyph', 'Preview: Toggle Anaglyph'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
+    PREVIEW_ZOOM_IN: {
+        id: 'editors.actorEditor.previewZoomIn',
+        label: nls.localize('vuengine/editors/actor/commands/previewZoomIn', 'Preview: Zoom In'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
+    PREVIEW_ZOOM_OUT: {
+        id: 'editors.actorEditor.previewZoomOut',
+        label: nls.localize('vuengine/editors/actor/commands/previewZoomOut', 'Preview: Zoom Out'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
+    PREVIEW_ZOOM_RESET: {
+        id: 'editors.actorEditor.previewZoomReset',
+        label: nls.localize('vuengine/editors/actor/commands/previewZoomReset', 'Preview: Reset Zoom'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
 };

@@ -82,8 +82,9 @@ export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
 export const MIN_SPHERE_RADIUS = 0;
 export const MAX_SPHERE_RADIUS = 511;
 export const STEP_SPHERE_RADIUS = 1;
-export const MIN_PREVIEW_SPRITE_ZOOM = 1;
+export const MIN_PREVIEW_SPRITE_ZOOM = 0.5;
 export const MAX_PREVIEW_SPRITE_ZOOM = 20;
+export const PREVIEW_SPRITE_ZOOM_STEP = 0.5;
 export const WHEEL_SENSITIVITY = 50;
 export const WIREFRAME_CANVAS_PADDING = 1;
 

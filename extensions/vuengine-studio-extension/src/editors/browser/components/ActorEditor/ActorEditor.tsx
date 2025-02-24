@@ -1,4 +1,5 @@
 import { isBoolean, isNumber, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -7,23 +8,22 @@ import {
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import { showActorSelection } from '../Common/Utils';
-import ComponentTree from './Components/ComponentTree';
-import CurrentComponent from './Components/CurrentComponent';
 import ActorMeta from './Actor/ActorMeta';
 import { ActorEditorCommands } from './ActorEditorCommands';
 import {
-  ComponentData,
-  ComponentKey,
   ActorData,
   ActorEditorContext,
+  ComponentData,
+  ComponentKey,
   HIDEABLE_COMPONENT_TYPES,
   LocalStorageActorEditorState,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
   SpriteImageData,
 } from './ActorEditorTypes';
+import ComponentTree from './Components/ComponentTree';
+import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 
 export const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
@@ -612,6 +612,9 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       case ActorEditorCommands.DECREASE_COMPONENT_PARALLAX.id:
         setCurrentComponentDisplacement([{ axis: 'parallax', offset: -1 }]);
         break;
+      case ActorEditorCommands.PREVIEW_CENTER.id:
+        setCurrentComponentDisplacement([{ axis: 'parallax', offset: -1 }]);
+        break;
     }
   };
 
@@ -697,9 +700,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
               grow={1}
               justifyContent='space-between'
               overflow='hidden'
-              style={{
-                marginBottom: 40,
-              }}
             >
               <EditorSidebar
                 style={{
@@ -747,6 +747,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
           </ActorEditorContext.Consumer>
         }
       </ActorEditorContext.Provider>
-    </div >
+    </div>
   );
 }

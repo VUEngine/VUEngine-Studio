@@ -1,11 +1,10 @@
 import React, { useContext, useState } from 'react';
+import { WHEEL_SENSITIVITY } from '../../ActorEditor/ActorEditorTypes';
+import VContainer from '../../Common/Base/VContainer';
 import { LogicEditorContext, LogicEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM } from '../LogicEditorTypes';
+import { AVAILABLE_ACTIONS } from './AvailableActions';
 import { ScriptedActionData } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
-import VContainer from '../../Common/Base/VContainer';
-import { AVAILABLE_ACTIONS } from './AvailableActions';
-import { WHEEL_SENSITIVITY } from '../../ActorEditor/ActorEditorTypes';
-import PreviewOptions from './PreviewOptions';
 
 interface ScriptProps {
     index: number
@@ -59,10 +58,12 @@ export default function Script(props: ScriptProps): React.JSX.Element {
         }
     };
 
+    /*
     const center = (): void => {
         setOffsetX(0);
         setOffsetY(0);
     };
+    */
 
     return (
         <VContainer
@@ -72,14 +73,6 @@ export default function Script(props: ScriptProps): React.JSX.Element {
                 inset: 0,
                 position: 'absolute',
             }}>
-            <PreviewOptions
-                zoom={zoom}
-                setZoom={setZoom}
-                minZoom={MIN_PREVIEW_SCRIPT_ZOOM}
-                maxZoom={MAX_PREVIEW_SCRIPT_ZOOM}
-                zoomStep={0.1}
-                center={center}
-            />
             <div
                 className={`script-container${isDragging ? ' dragging' : ''}`}
                 onWheel={onWheel}

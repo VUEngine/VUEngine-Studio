@@ -20,9 +20,9 @@ import {
 import BallCollider from './Colliders/BallCollider';
 import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
-import PreviewOptions from './PreviewOptions';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
+import ActorEditorStatus from '../ActorEditorStatus';
 
 interface PreviewProps {
   hasAnyComponent: boolean
@@ -151,16 +151,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       onMouseMove={onMouseMove}
       onWheel={onWheel}
     >
-      <PreviewOptions
-        enableBackground={true}
-        zoom={previewZoom}
-        setZoom={setPreviewZoom}
-        minZoom={MIN_PREVIEW_SPRITE_ZOOM}
-        maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
-        zoomStep={0.51}
-        roundZoomSteps
-        center={center}
-      />
       {animate &&
         <div className='current-frame'>
           <div>
@@ -229,6 +219,9 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
         )}
       </div>
+      <ActorEditorStatus
+        center={center}
+      />
     </div>
     : <div className='preview-container'>
       <VContainer alignItems='center' style={{ color: 'var(--theia-dropdown-border)' }}>
@@ -284,5 +277,5 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           </>
         }
       </VContainer>
-    </div >;
+    </div>;
 }

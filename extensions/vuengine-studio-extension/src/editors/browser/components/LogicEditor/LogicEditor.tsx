@@ -52,9 +52,6 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
             grow={1}
             justifyContent='space-between'
             overflow='hidden'
-            style={{
-              marginBottom: 40,
-            }}
           >
             <EditorSidebar
               style={{
