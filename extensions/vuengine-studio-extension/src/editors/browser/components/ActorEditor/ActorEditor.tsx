@@ -9,6 +9,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../Common/Base/HContainer';
 import { showActorSelection } from '../Common/Utils';
 import ActorMeta from './Actor/ActorMeta';
+import ActorSettings from './Actor/ActorSettings';
 import { ActorEditorCommands } from './ActorEditorCommands';
 import {
   ActorData,
@@ -24,6 +25,7 @@ import {
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
+import VContainer from '../Common/Base/VContainer';
 
 export const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
@@ -94,7 +96,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const mostFilesOnASprite = getMostFilesOnASprite(data);
   const isMultiFileAnimation = mostFilesOnASprite > 1;
-  const hasAnyComponent = data.body.enabled || data.extraProperties.enabled || data.logic.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
+  const hasAnyComponent = data.body.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
 
   const getStateLocalStorageId = (): string =>
     `ves-editors-Actor-state/${fileUri.path.fsPath()}`;
@@ -312,14 +314,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       key: 'body',
       label: nls.localize('vuengine/editors/actor/body', 'Body'),
       allowAdd: !data.body.enabled,
-    }, {
-      key: 'extraProperties',
-      label: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
-      allowAdd: !data.extraProperties.enabled,
-    }, {
-      key: 'logic',
-      label: nls.localize('vuengine/editors/actor/logic', 'Logic'),
-      allowAdd: !data.logic.enabled,
     }]
       .sort((a, b) => a.label.localeCompare(b.label))
       .map(t => {
@@ -354,10 +348,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         return addPositionedActor();
       case 'colliders':
         return addComponentByType(t, nls.localize('vuengine/editors/actor/collider', 'Collider'));
-      case 'extraProperties':
-        return enableExtraProperties();
-      case 'logic':
-        return enableLogic();
       case 'body':
         return enableBody();
       case 'sprites':
@@ -446,29 +436,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     setCurrentComponent('body');
   };
 
-  const enableExtraProperties = (): void => {
-    setData({
-      extraProperties: {
-        ...data.extraProperties,
-        enabled: true,
-      }
-    });
-
-    setCurrentComponent('extraProperties');
-  };
-
-  const enableLogic = (): void => {
-    setData({
-      logic: {
-        ...data.logic,
-        enabled: true,
-      }
-    });
-
-    setCurrentComponent('logic');
-  };
-
-  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => {
+  const removeComponent = async (key: ComponentKey | 'body', index: number) => {
     const dialog = new ConfirmDialog({
       title: nls.localize('vuengine/editors/actor/removeComponent', 'Remove Component'),
       msg: nls.localize('vuengine/editors/actor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
@@ -486,10 +454,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
           return doRemoveComponent(key, index);
         case 'body':
           return disableBody();
-        case 'extraProperties':
-          return disableExtraProperties();
-        case 'logic':
-          return disableLogic();
       }
     }
   };
@@ -510,24 +474,6 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     setData({
       body: {
         ...data.body,
-        enabled: false,
-      }
-    });
-  };
-
-  const disableExtraProperties = async (): Promise<void> => {
-    setData({
-      extraProperties: {
-        ...data.extraProperties,
-        enabled: false,
-      }
-    });
-  };
-
-  const disableLogic = async (): Promise<void> => {
-    setData({
-      logic: {
-        ...data.logic,
         enabled: false,
       }
     });
@@ -583,7 +529,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         break;
       case ActorEditorCommands.DELETE_CURRENT_COMPONENT.id:
         const [type, indexString] = currentComponent.split('-');
-        removeComponent(type as ComponentKey | 'extraProperties' | 'body' | 'logic', parseInt(indexString));
+        removeComponent(type as ComponentKey | 'body', parseInt(indexString));
         break;
       case ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id:
         setCurrentComponent('');
@@ -715,8 +661,11 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                 >
                   <i className="codicon codicon-chevron-left" />
                 </HideTreeButton>
-                <ActorMeta />
-                <ComponentTree />
+                <VContainer gap={10}>
+                  <ActorMeta />
+                  <ActorSettings />
+                  <ComponentTree />
+                </VContainer>
               </EditorSidebar>
               {!leftSidebarOpen &&
                 <ShowTreeButton

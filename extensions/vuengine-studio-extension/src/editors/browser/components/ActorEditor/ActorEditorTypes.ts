@@ -42,7 +42,7 @@ export interface ActorEditorContextType {
     data: ActorData
     setData: (partialData: Partial<ActorData>, options?: ActorEditorSaveDataOptions) => Promise<void>
     addComponent: (key: ComponentKey) => void
-    removeComponent: (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => void
+    removeComponent: (key: ComponentKey | 'body', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
     currentAnimationStep: number
@@ -243,7 +243,6 @@ export const HIDEABLE_COMPONENT_TYPES = [
 export interface ActorData {
     _id: string
     extraProperties: {
-        enabled: boolean // flag just for the UI to be able to treat as component
         extraInfo: string
         pixelSize: PixelSize
     }
@@ -276,7 +275,6 @@ export interface ActorData {
         useZDisplacementInProjection: boolean
     }
     logic: {
-        enabled: boolean // flag just for the UI to be able to treat as component
         customAllocator: string
         configuration: Record<string, string>
     }

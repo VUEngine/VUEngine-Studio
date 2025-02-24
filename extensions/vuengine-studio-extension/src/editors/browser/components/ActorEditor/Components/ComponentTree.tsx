@@ -9,7 +9,7 @@ import { ActorData, ActorEditorContext, ActorEditorContextType, ComponentKey } f
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
-    key: ComponentKey | 'extraProperties' | 'body' | 'logic'
+    key: ComponentKey | 'body'
     componentKey?: ComponentKey
     labelSingular: string
     labelPlural: string
@@ -105,18 +105,6 @@ export default function ComponentTree(): React.JSX.Element {
             // labelPlural: nls.localize('vuengine/editors/actor/bodies', 'Bodies'),
             hasContent: data.body.enabled,
         },
-        {
-            key: 'extraProperties',
-            labelSingular: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
-            labelPlural: nls.localize('vuengine/editors/actor/extraProperties', 'Extra Properties'),
-            hasContent: data.extraProperties.enabled,
-        },
-        {
-            key: 'logic',
-            labelSingular: nls.localize('vuengine/editors/actor/logic', 'Logic'),
-            labelPlural: nls.localize('vuengine/editors/actor/logic', 'Logic'),
-            hasContent: data.logic.enabled,
-        },
     ];
 
     const treeData: TreeNode[] = [];
@@ -178,7 +166,7 @@ export default function ComponentTree(): React.JSX.Element {
             }}
         >
             <label style={{
-                padding: 'var(--padding) var(--padding) 0',
+                padding: '0 var(--padding)',
             }}>
                 {nls.localize('vuengine/editors/actor/components', 'Components')}
             </label>
