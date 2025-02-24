@@ -1,10 +1,11 @@
+/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Tree } from 'react-arborist';
 import { WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
-import { ComponentKey, ActorData, ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
+import { ActorData, ActorEditorContext, ActorEditorContextType, ComponentKey } from '../ActorEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
@@ -25,6 +26,9 @@ export default function ComponentTree(): React.JSX.Element {
     const { currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const treeContainerRef = useRef<HTMLDivElement>(null);
+    const [treeHeight, setTreeHeight] = useState<number>(300);
+    const [treeWidth, setTreeWidth] = useState<number>(300);
 
     const moveComponent = (
         dragIds: string[],
@@ -154,6 +158,18 @@ export default function ComponentTree(): React.JSX.Element {
         name: nls.localize('vuengine/editors/general/addComponent', 'Add Component'),
     });
 
+    useEffect(() => {
+        if (!treeContainerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            setTreeWidth(treeContainerRef.current?.clientWidth ?? treeHeight);
+            setTreeHeight(treeContainerRef.current?.clientHeight ?? treeWidth);
+        });
+        resizeObserver.observe(treeContainerRef.current);
+        return () => resizeObserver.disconnect();
+    }, []);
+
     return (
         <VContainer
             style={{
@@ -166,22 +182,30 @@ export default function ComponentTree(): React.JSX.Element {
             }}>
                 {nls.localize('vuengine/editors/actor/components', 'Components')}
             </label>
-            <div className='ves-tree' style={{
-                overflow: 'auto',
-                paddingBottom: 'var(--padding)',
-            }}>
-                <Tree
-                    data={treeData}
-                    indent={24}
-                    rowHeight={24}
-                    openByDefault={true}
-                    width='100%'
-                    onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
-                    selection={currentComponent.split('-', 2).join('-')} // ignore sub selections
+            <VContainer
+                style={{
+                    overflow: 'auto',
+                    paddingBottom: 'var(--padding)',
+                }}
+            >
+                <div
+                    className='ves-tree'
+                    ref={treeContainerRef}
                 >
-                    {ComponentTreeNode}
-                </Tree>
-            </div>
+                    <Tree
+                        data={treeData}
+                        indent={24}
+                        rowHeight={24}
+                        openByDefault={true}
+                        onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
+                        selection={currentComponent.split('-', 2).join('-')} // ignore sub selections
+                        height={treeHeight}
+                        width={treeWidth}
+                    >
+                        {ComponentTreeNode}
+                    </Tree>
+                </div>
+            </VContainer>
         </VContainer>
     );
 }
