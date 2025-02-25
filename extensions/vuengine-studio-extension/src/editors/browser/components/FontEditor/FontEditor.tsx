@@ -374,7 +374,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 </VContainer>
             </VContainer>
             <EditorSidebar>
-                <VContainer overflow='hidden'>
+                <VContainer gap={15} overflow='hidden'>
                     <HContainer justifyContent='space-between'>
                         <CharSettings
                             currentCharacter={currentCharacterIndex}

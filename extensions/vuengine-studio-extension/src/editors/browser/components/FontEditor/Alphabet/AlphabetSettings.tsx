@@ -30,20 +30,20 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
             <Input
                 label={nls.localize('vuengine/editors/font/count', 'Count')}
                 type="number"
-                width={48}
+                value={charCount}
                 setValue={setCharCount}
                 min={MIN_CHAR_COUNT}
                 max={effectiveMaxCharCount}
+                width={48}
                 commands={INPUT_BLOCKING_COMMANDS}
-                value={charCount}
             />
             <Input
                 label={nls.localize('vuengine/editors/font/offset', 'Offset')}
                 type="number"
-                min={MIN_OFFSET}
-                max={effectiveMaxOffset}
                 value={offset}
                 setValue={setOffset}
+                min={MIN_OFFSET}
+                max={effectiveMaxOffset}
                 commands={INPUT_BLOCKING_COMMANDS}
                 width={48}
             />
@@ -59,8 +59,8 @@ For all regular use cases, this should be the total amount of characters in the 
                 setValue={setPageSize}
                 min={MIN_PAGE_SIZE}
                 max={effectiveMaxPageSize}
-                commands={INPUT_BLOCKING_COMMANDS}
                 width={48}
+                commands={INPUT_BLOCKING_COMMANDS}
             />
         </HContainer>
         <VContainer>

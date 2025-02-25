@@ -27,6 +27,7 @@ interface InputProps {
     autoFocus?: boolean
     width?: number
     grow?: number
+    id?: string
     className?: string
     onClick?: MouseEventHandler<HTMLInputElement>
     onBlur?: FocusEventHandler<HTMLInputElement>
@@ -68,7 +69,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         label, tooltip, title,
         min, max, step,
         disabled, readOnly, clearable,
-        className, style, width, grow,
+        id, className, style, width, grow,
         tabIndex, autoFocus,
         commands,
         onClick, onBlur,
@@ -153,6 +154,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                     }}
                 >
                     <input
+                        id={id}
                         className={`theia-input${className ? ` ${className}` : ''}`}
                         type={type}
                         min={min}

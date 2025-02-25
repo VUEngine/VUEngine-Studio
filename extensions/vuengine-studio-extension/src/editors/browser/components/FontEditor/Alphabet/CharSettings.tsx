@@ -1,6 +1,5 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -18,7 +17,6 @@ interface CharSettingsProps {
 
 export default function CharSettings(props: CharSettingsProps): React.JSX.Element {
     const { currentCharacter, charHeight, charWidth, variableSize, setCharSize } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setVariablePixelWidth = (size: number) => {
         const updatedVariableSizeX = [...variableSize.x];
@@ -34,9 +32,9 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         y: size,
     });
 
-    const onChangePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const setPixelWidth = (value: number) => {
         const newSize = clamp(
-            roundToNextMultipleOf8(parseInt(e.target.value)),
+            roundToNextMultipleOf8(value),
             MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
             MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
         );
@@ -65,9 +63,9 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         );
     };
 
-    const onChangePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const setPixelHeight = (value: number) => {
         const newSize = clamp(
-            roundToNextMultipleOf8(parseInt(e.target.value)),
+            roundToNextMultipleOf8(value),
             MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
             MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
         );
@@ -147,7 +145,8 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                             setValue={setVariablePixelWidth}
                             min={MIN_VARIABLE_CHAR_SIZE}
                             max={charWidth}
-                            width={48}
+                            width={64}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
                         <Input
@@ -156,7 +155,8 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                             setValue={setVariablePixelHeight}
                             min={MIN_VARIABLE_CHAR_SIZE}
                             max={charWidth}
-                            width={48}
+                            width={64}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
@@ -173,32 +173,26 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     </label>
                 }
                 <HContainer alignItems='center'>
-                    <input
+                    <Input
                         type="number"
-                        className="theia-input"
-                        style={{ width: 48 }}
                         step={CHAR_PIXEL_SIZE}
                         min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                         max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                        id="#/properties/size/properties/x-input"
                         value={charWidth}
-                        onChange={onChangePixelWidth}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={setPixelWidth}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
                     />
                     <div style={{ paddingBottom: 3 }}>×</div>
-                    <input
+                    <Input
                         type="number"
-                        className="theia-input"
-                        style={{ width: 48 }}
                         step={CHAR_PIXEL_SIZE}
                         min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                         max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                        id="#/properties/size/properties/y-input"
                         value={charHeight}
-                        onChange={onChangePixelHeight}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={setPixelHeight}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
                     />
                 </HContainer>
             </VContainer>
