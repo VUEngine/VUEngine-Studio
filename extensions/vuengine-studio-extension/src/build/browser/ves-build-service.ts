@@ -444,7 +444,7 @@ export class VesBuildService {
       }
     });
 
-    // remove transpiled files from build folder if a .c or .h file gets moved 
+    // remove transpiled files from build folder if a .c or .h file gets moved
     // to prevent duplicate symbol build errors
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
