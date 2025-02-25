@@ -30,6 +30,7 @@ import {
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
+    VES_CHANNEL_SHA1,
     VES_CHANNEL_SORT_JSON,
     VES_CHANNEL_ZLIB_DEFLATE
 } from '../electron-common/ves-electron-api';
@@ -97,6 +98,12 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             event.returnValue = sizeOf(path);
         });
         ipcMain.handle(VES_CHANNEL_GET_CPU_INFORMATION, async () => si.cpu());
+        ipcMain.on(VES_CHANNEL_SHA1, (event, data) => {
+            const crypto = require('crypto');
+            const generator = crypto.createHash('sha1');
+            generator.update(data);
+            event.returnValue = generator.digest('hex');
+        });
     }
 }
 

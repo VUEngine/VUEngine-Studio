@@ -18,6 +18,7 @@ import {
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
+    VES_CHANNEL_SHA1,
     VES_CHANNEL_SORT_JSON,
     VES_CHANNEL_ZLIB_DEFLATE,
     VesCoreAPI
@@ -58,6 +59,9 @@ const api: VesCoreAPI = {
     },
     getCpuInformation: function (): Promise<Systeminformation.CpuData> {
         return ipcRenderer.invoke(VES_CHANNEL_GET_CPU_INFORMATION);
+    },
+    sha1: function (data: any): string {
+        return ipcRenderer.sendSync(VES_CHANNEL_SHA1, data);
     },
     onUsbDeviceChange: function (handler: () => void): Disposable {
         const h = (_event: unknown) => {

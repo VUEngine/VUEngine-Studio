@@ -17,6 +17,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangesEvent, FileChangeType, FileStat } from '@theia/filesystem/lib/common/files';
 import { isLinux } from '@theia/monaco-editor-core/esm/vs/base/common/platform';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
@@ -442,7 +443,58 @@ export class VesBuildService {
         }
       }
     });
+
+    // remove transpiled files from build folder if a .c or .h file gets moved 
+    // to prevent duplicate symbol build errors
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      fileChangesEvent.changes.map(change => {
+        if (change.resource.scheme === 'file' &&
+          (change.resource.path.ext === '.c' || change.resource.path.ext === '.h') &&
+          change.type === FileChangeType.DELETED) {
+          this.removeTranspiledObjectFile(change.resource);
+        }
+      });
+    });
   }
+
+  protected async removeTranspiledObjectFile(fileUri: URI): Promise<void> {
+    await this.workspaceService.ready;
+
+    const roots = this.workspaceService.tryGetRoots();
+    const workspaceRootUri = roots[0].resource;
+
+    let parentFileStat: FileStat | undefined;
+    roots.forEach(r => {
+      if (r.resource.isEqualOrParent(fileUri)) {
+        parentFileStat = r;
+      }
+    });
+
+    if (parentFileStat === undefined) {
+      return;
+    }
+
+    const relativePath = parentFileStat.resource.relative(fileUri);
+    if (relativePath === undefined) {
+      return;
+    }
+
+    const buildFolderBaseUri = workspaceRootUri
+      .resolve('build')
+      .resolve('working')
+      .resolve(relativePath.fsPath().split('/')[0])
+      .resolve(parentFileStat.name);
+    const buildFolderFileUri = buildFolderBaseUri
+      .resolve(relativePath.dir.fsPath())
+      .resolve(`${relativePath.name}.o`);
+
+    const buildFolderFileRelativePath = workspaceRootUri.relative(buildFolderFileUri)?.fsPath() + '\n';
+    const shasum = window.electronVesCore.sha1(buildFolderFileRelativePath);
+    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(shasum + '.o');
+    if (await this.fileService.exists(hashFileUri)) {
+      await this.fileService.delete(hashFileUri);
+    }
+  };
 
   // get number of all libraries for which there are no lib*.a files in build folder
   protected async getNumberOfLibrariesToBuild(allPluginNames: string[]): Promise<number> {

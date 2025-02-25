@@ -21,6 +21,7 @@ export interface VesCoreAPI {
     onSerialDeviceChange(handler: () => void): Disposable;
     sendTouchBarCommand(command: string, data?: any): void;
     onTouchBarEvent(command: string, handler: (data?: any) => void): Disposable;
+    sha1(data: any): string;
 }
 
 declare global {
@@ -44,3 +45,4 @@ export const VES_CHANNEL_SEND_TOUCHBAR_COMMAND = 'vesSendTouchBarCommand';
 export const VES_CHANNEL_ON_TOUCHBAR_EVENT = 'vesOnTouchBarEvent';
 export const VES_CHANNEL_CHECK_UPDATE_AVAILABLE = 'vesCheckUpdateAvailable';
 export const VES_CHANNEL_ZLIB_DEFLATE = 'vesCheckZlibDeflate';
+export const VES_CHANNEL_SHA1 = 'vesSha1';
