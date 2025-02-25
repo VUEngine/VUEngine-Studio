@@ -285,38 +285,29 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     };
 
     protected onAfterAttach(msg: Message): void {
-        console.log(' ---------- onAfterAttach ---------- ');
-        this.app.shell.addClass('hide-text-editor-status-bar-items');
-        Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
+        this.setStatusBar();
     }
 
     protected onAfterDetach(msg: Message): void {
-        console.log(' ---------- onAfterDetach ---------- ');
-        this.app.shell.removeClass('hide-text-editor-status-bar-items');
-        Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
+        this.resetStatusBar();
     }
 
     protected onAfterShow(msg: Message): void {
-        console.log(' ---------- onAfterShow ---------- ');
+        this.setStatusBar();
+    }
+
+    protected onAfterHide(msg: Message): void {
+        this.resetStatusBar();
+    }
+
+    protected setStatusBar(): void {
         this.app.shell.addClass('hide-text-editor-status-bar-items');
         Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
     }
 
-    protected onAfterHide(msg: Message): void {
-        console.log(' ---------- onAfterHide ---------- ');
+    protected resetStatusBar(): void {
         this.app.shell.removeClass('hide-text-editor-status-bar-items');
         Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
-    }
-
-    protected cleanStatusBar(): void {
-        /*
-        this.statusBar.removeElement('editor-language-status-items');
-        this.statusBar.removeElement('editor-status-cursor-position');
-        this.statusBar.removeElement('editor-status-encoding');
-        this.statusBar.removeElement('editor-status-eol');
-        this.statusBar.removeElement('editor-status-language');
-        this.statusBar.removeElement('editor-status-tabbing-config');
-        */
     }
 
     protected async loadData(type: ProjectDataType): Promise<void> {

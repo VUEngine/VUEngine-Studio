@@ -52,10 +52,10 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 changeBrushTool(BrushTool.LINE);
                 break;
             case FontEditorCommands.TOOL_RECTANGLE.id:
-                changeBrushTool(BrushTool.RECTANGLE);
+                // changeBrushTool(BrushTool.RECTANGLE);
                 break;
             case FontEditorCommands.TOOL_ELLIPSE.id:
-                changeBrushTool(BrushTool.ELLIPSE);
+                // changeBrushTool(BrushTool.ELLIPSE);
                 break;
         }
     };
@@ -129,42 +129,42 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     <Minus size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
-                    className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
+                    // className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/rectangle', 'Rectangle') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_RECTANGLE.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.RECTANGLE)}
+                // onClick={() => changeBrushTool(BrushTool.RECTANGLE)}
                 >
                     <Square size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
-                    className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
+                    // className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/rectangleFilled', 'Rectangle (Filled)') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_RECTANGLE_FILLED.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
+                // onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
                 >
                     <Square size={20} weight="fill" />
                 </SpriteEditorTool>
                 <SpriteEditorTool
-                    className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
+                    // className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/ellipse', 'Ellipse') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_ELLIPSE.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.ELLIPSE)}
+                // onClick={() => changeBrushTool(BrushTool.ELLIPSE)}
                 >
                     <Circle size={20} />
                 </SpriteEditorTool>
                 <SpriteEditorTool
-                    className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
+                    // className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/ellipseFilled', 'Ellipse (Filled)') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.TOOL_ELLIPSE_FILLED.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
+                // onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
                 >
                     <Circle size={20} weight="fill" />
                 </SpriteEditorTool>
