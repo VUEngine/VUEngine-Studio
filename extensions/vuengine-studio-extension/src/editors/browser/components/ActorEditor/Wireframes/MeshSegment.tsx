@@ -1,10 +1,10 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS, MeshSegmentData } from '../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS, MeshSegmentData } from '../ActorEditorTypes';
 
 const MESH_SEGMENT_MIN_VALUE = -511;
 const MESH_SEGMENT_MAX_VALUE = 512;
@@ -15,13 +15,15 @@ const MESH_SEGMENT_PARALLAX_MAX_VALUE = 64;
 const MESH_SEGMENT_PARALLAX_DEFAULT_VALUE = 0;
 
 interface MeshSegmentProps {
+    index: number
     segment: MeshSegmentData
     updateSegment: (segmentData: Partial<MeshSegmentData>) => void
     removeSegment: () => void
 }
 
 export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element {
-    const { segment, updateSegment, removeSegment } = props;
+    const { index, segment, updateSegment, removeSegment } = props;
+    const { setPreviewCurrentMeshSegment } = useContext(ActorEditorContext) as ActorEditorContextType;
 
     const setPoint = (point: 'to' | 'from', axis: 'x' | 'y' | 'z' | 'parallax', value: number): void => {
         const idx = point === 'to' ? 'toVertex' : 'fromVertex';
@@ -36,7 +38,14 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
     };
 
     return (
-        <HContainer className="item" gap={15} grow={1} wrap='wrap'>
+        <HContainer
+            className="item"
+            gap={15}
+            grow={1}
+            wrap='wrap'
+            onMouseOver={() => setPreviewCurrentMeshSegment(index)}
+            onMouseOut={() => setPreviewCurrentMeshSegment(-1)}
+        >
             <button
                 className="remove-button"
                 onClick={removeSegment}

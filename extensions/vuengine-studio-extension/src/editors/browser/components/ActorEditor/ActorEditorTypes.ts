@@ -52,6 +52,8 @@ export interface ActorEditorContextType {
     setPreviewAnaglyph: Dispatch<SetStateAction<boolean>>
     previewBackgroundColor: number
     setPreviewBackgroundColor: Dispatch<SetStateAction<number>>
+    previewCurrentMeshSegment: number
+    setPreviewCurrentMeshSegment: Dispatch<SetStateAction<number>>
     previewScreenFrame: boolean
     setPreviewScreenFrame: Dispatch<SetStateAction<boolean>>
     previewPalettes: string[]

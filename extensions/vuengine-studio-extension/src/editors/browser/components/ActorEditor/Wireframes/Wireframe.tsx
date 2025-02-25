@@ -253,7 +253,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </label>
                     {wireframe.segments.map((segment, segmentIndex) =>
                         <MeshSegment
-                            key={`segment-${segmentIndex}`}
+                            key={segmentIndex}
+                            index={segmentIndex}
                             segment={segment}
                             updateSegment={(s: Partial<MeshSegmentData>) => setSegment(segmentIndex, s)}
                             removeSegment={() => removeSegment(segmentIndex)}

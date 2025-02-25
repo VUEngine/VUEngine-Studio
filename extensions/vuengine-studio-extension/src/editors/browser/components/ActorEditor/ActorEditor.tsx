@@ -87,6 +87,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
   const [previewAnaglyph, setPreviewAnaglyph] = useState<boolean>(false);
   const [previewProjectionDepth, setPreviewProjectionDepth] = useState<number>(99999/* 128 */);
   const [previewBackgroundColor, setPreviewBackgroundColor] = useState<number>(-1);
+  const [previewCurrentMeshSegment, setPreviewCurrentMeshSegment] = useState<number>(-1);
   const [previewScreenFrame, setPreviewScreenFrame] = useState<boolean>(false);
   const [previewPalettes, setPreviewPalettes] = useState<string[]>(['11100100', '11100000', '11010000', '11100100']);
   const [previewShowChildren, setPreviewShowChildren] = useState<boolean>(true);
@@ -589,6 +590,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
           setPreviewAnaglyph: setPreviewAnaglyph,
           previewBackgroundColor: previewBackgroundColor,
           setPreviewBackgroundColor: setPreviewBackgroundColor,
+          previewCurrentMeshSegment: previewCurrentMeshSegment,
+          setPreviewCurrentMeshSegment: setPreviewCurrentMeshSegment,
           previewScreenFrame: previewScreenFrame,
           setPreviewScreenFrame: setPreviewScreenFrame,
           previewPalettes: previewPalettes,
