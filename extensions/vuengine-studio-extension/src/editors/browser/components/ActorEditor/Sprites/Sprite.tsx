@@ -33,6 +33,7 @@ import {
 import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
 import TransparencySelect from '../../Common/TransparencySelect';
+import Input from '../../Common/Base/Input';
 
 interface SpriteProps {
     sprite: SpriteData
@@ -200,6 +201,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     ...sprite.texture.padding,
                     [axis]: clamp(value, MIN_TEXTURE_PADDING, MAX_TEXTURE_PADDING),
                 },
+            },
+        });
+    };
+
+    const resetDisplacement = (): void => {
+        updateSprite({
+            displacement: {
+                ...sprite.displacement,
+                x: 0,
+                y: 0,
+                z: 0,
             },
         });
     };
@@ -692,50 +704,50 @@ The parallax value controls the depth, while the z value is used for fine tuning
 Positive z (and parallax) values go into the screen, negative stick out."
                         )}
                     />
-                    <HContainer wrap='wrap'>
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                    <HContainer alignItems="center">
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.x}
-                            onChange={e => setDisplacement('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('x', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.y}
-                            onChange={e => setDisplacement('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('y', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.z}
-                            onChange={e => setDisplacement('z', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('z', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             value={sprite.displacement.parallax}
-                            onChange={e => setDisplacementParallax(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={setDisplacementParallax}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
+                        />
+                        <i
+                            className='codicon codicon-issues'
+                            title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                            onClick={resetDisplacement}
+                            style={{
+                                cursor: 'pointer'
+                            }}
                         />
                     </HContainer>
                 </VContainer>
@@ -818,47 +830,36 @@ surrounding textures to appear at the outer edges.'
                                 )}
                             />
                             <HContainer>
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 48 }}
+                                <Input
                                     type='number'
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.x}
-                                    onChange={e => setPadding('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    setValue={v => setPadding('x', v as number)}
+                                    commands={INPUT_BLOCKING_COMMANDS}
+                                    width={54}
                                 />
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 48 }}
+                                <Input
                                     type='number'
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.y}
-                                    onChange={e => setPadding('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    setValue={v => setPadding('y', v as number)}
+                                    commands={INPUT_BLOCKING_COMMANDS}
+                                    width={54}
                                 />
                             </HContainer>
                         </VContainer>
-                        <VContainer grow={1}>
-                            <InfoLabel
-                                label={nls.localize('vuengine/editors/actor/manipulationFunction', 'Manipulation Function')}
-                                tooltip={nls.localize(
-                                    'vuengine/editors/actor/manipulationFunctionDescription',
-                                    'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
-                                )}
-                            />
-                            <input
-                                className='theia-input'
-                                type='string'
-                                value={sprite.manipulationFunction}
-                                onChange={e => setManipulationFunction(e.target.value)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                        </VContainer>
+                        <Input
+                            label={nls.localize('vuengine/editors/actor/manipulationFunction', 'Manipulation Function')}
+                            tooltip={nls.localize(
+                                'vuengine/editors/actor/manipulationFunctionDescription',
+                                'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
+                            )}
+                            value={sprite.manipulationFunction}
+                            setValue={setManipulationFunction}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
                     </HContainer>
                 }
                 <VContainer>
@@ -936,27 +937,23 @@ If 0, the value is inferred from the texture.'
                             )}
                         />
                         <HContainer wrap='wrap'>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
+                            <Input
                                 type='number'
                                 min={MIN_SPRITE_REPEAT_SIZE}
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.x ?? 0}
-                                onChange={e => setRepeatSize('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setRepeatSize('x', v as number)}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={48}
                             />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
+                            <Input
                                 type='number'
                                 min={MIN_SPRITE_REPEAT_SIZE}
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.y ?? 0}
-                                onChange={e => setRepeatSize('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setRepeatSize('y', v as number)}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={48}
                             />
                         </HContainer>
                     </VContainer>

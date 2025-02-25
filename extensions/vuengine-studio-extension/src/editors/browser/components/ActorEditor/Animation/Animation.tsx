@@ -146,7 +146,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         setValue={setCycles}
                         min={MIN_ANIMATION_CYLCES}
                         max={MAX_ANIMATION_CYLCES}
-                        width={80}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>

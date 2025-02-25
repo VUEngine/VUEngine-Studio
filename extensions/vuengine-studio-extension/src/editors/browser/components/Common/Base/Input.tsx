@@ -13,6 +13,7 @@ interface InputProps {
     type?: 'string' | 'number'
     label?: string
     tooltip?: string
+    title?: string
     min?: number
     max?: number
     defaultValue?: string | number
@@ -64,7 +65,7 @@ export default function Input(props: InputProps): React.JSX.Element {
     const {
         type,
         value, setValue, defaultValue,
-        label, tooltip,
+        label, tooltip, title,
         min, max, step,
         disabled, readOnly, clearable,
         className, style, width, grow,
@@ -176,6 +177,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                         }}
                         tabIndex={tabIndex}
                         autoFocus={autoFocus}
+                        title={title}
                     />
                     {clearable !== false && type !== 'number' && internalValue !== '' && !disabled && (
                         <i

@@ -4,21 +4,21 @@ import { SelectComponent } from '@theia/core/lib/browser/widgets/select-componen
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import ColorSelector from '../../Common/ColorSelector';
 import TransparencySelect from '../../Common/TransparencySelect';
 import { clamp } from '../../Common/Utils';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
-    MAX_SPHERE_RADIUS,
+    INPUT_BLOCKING_COMMANDS, MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,
     MIN_SPHERE_RADIUS,
     MIN_WIREFRAME_DISPLACEMENT,
     MeshSegmentData,
     STEP_SPHERE_RADIUS,
     STEP_WIREFRAME_DISPLACEMENT,
-    WireframeData,
+    WireframeData
 } from '../ActorEditorTypes';
 import MeshSegment from './MeshSegment';
 
@@ -43,6 +43,17 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     const setType = (type: WireframeType): void => {
         updateWireframe({
             type,
+        });
+    };
+
+    const resetDisplacement = (): void => {
+        updateWireframe({
+            displacement: {
+                ...wireframe.displacement,
+                x: 0,
+                y: 0,
+                z: 0,
+            },
         });
     };
 
@@ -185,41 +196,44 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
             </HContainer>
             <VContainer>
                 <label>Displacement (x, y, z)</label>
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        type='number'
+                <HContainer alignItems="center">
+                    <Input
+                        type="number"
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.x}
-                        onChange={e => setDisplacement('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={v => setDisplacement('x', v as number)}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
                     />
-                    <input
-                        className='theia-input'
-                        type='number'
+                    <Input
+                        type="number"
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.y}
-                        onChange={e => setDisplacement('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-
+                        setValue={v => setDisplacement('y', v as number)}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
                     />
-                    <input
-                        className='theia-input'
-                        type='number'
+                    <Input
+                        type="number"
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.z}
-                        onChange={e => setDisplacement('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-
+                        setValue={v => setDisplacement('z', v as number)}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
+                    />
+                    <i
+                        className='codicon codicon-issues'
+                        title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                        onClick={resetDisplacement}
+                        style={{
+                            cursor: 'pointer'
+                        }}
                     />
                 </HContainer>
             </VContainer>
@@ -256,17 +270,15 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         <label>
                             {nls.localize('vuengine/editors/actor/radius', 'Radius')}
                         </label>
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPHERE_RADIUS}
                             max={MAX_SPHERE_RADIUS}
                             step={STEP_SPHERE_RADIUS}
                             value={wireframe.radius}
-                            onChange={e => setRadius(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={setRadius}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
                     </VContainer>
                     <VContainer>
@@ -288,17 +300,15 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <label>
                         {nls.localize('vuengine/editors/actor/length', 'Length')}
                     </label>
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
+                    <Input
+                        type="number"
                         min={0}
                         max={255}
                         step={0.1}
                         value={wireframe.length}
-                        onChange={e => setLength(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={setLength}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={64}
                     />
                 </VContainer>
             }

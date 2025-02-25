@@ -96,6 +96,17 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
+    const resetDisplacement = (): void => {
+        updateCollider({
+            displacement: {
+                ...collider.displacement,
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+        });
+    };
+
     const setDisplacement = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             displacement: {
@@ -304,7 +315,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
@@ -313,7 +324,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
@@ -322,7 +333,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
@@ -336,7 +347,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         type='number'
                         min={MIN_COLLIDER_DIAMETER}
                         max={MAX_COLLIDER_DIAMETER}
-                        width={50}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                 }
@@ -349,7 +360,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_LINEFIELD_LENGTH}
                             max={MAX_COLLIDER_LINEFIELD_LENGTH}
-                            width={50}
+                            width={64}
                             commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <VContainer>
@@ -381,7 +392,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_LINEFIELD_THICKNESS}
                             max={MAX_COLLIDER_LINEFIELD_THICKNESS}
-                            width={50}
+                            width={64}
                             commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
@@ -390,15 +401,15 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     <label>
                         {nls.localize('vuengine/editors/actor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
                     </label>
-                    <HContainer>
+                    <HContainer alignItems="center">
                         <Input
                             value={collider.displacement.x}
                             setValue={v => setDisplacement('x', v as number)}
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            width={50}
                             commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
                         <Input
                             value={collider.displacement.y}
@@ -406,8 +417,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            width={50}
                             commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
                         <Input
                             value={collider.displacement.z}
@@ -415,8 +426,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            width={50}
                             commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
                         <Input
                             value={collider.displacement.parallax}
@@ -424,8 +435,16 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT_PARALLAX}
                             max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
-                            width={50}
                             commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
+                        />
+                        <i
+                            className='codicon codicon-issues'
+                            title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                            onClick={resetDisplacement}
+                            style={{
+                                cursor: 'pointer'
+                            }}
                         />
                     </HContainer>
                 </VContainer>
@@ -447,7 +466,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_SCALE}
                                 max={MAX_SCALE}
                                 step={0.5}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
@@ -457,7 +476,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_SCALE}
                                 max={MAX_SCALE}
                                 step={0.5}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
@@ -467,7 +486,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_SCALE}
                                 max={MAX_SCALE}
                                 step={0.5}
-                                width={50}
+                                width={64}
                                 commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
@@ -483,7 +502,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         min={MIN_SCALE}
                         max={MAX_SCALE}
                         step={0.5}
-                        width={50}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                 }

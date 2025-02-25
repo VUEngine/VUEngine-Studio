@@ -68,6 +68,7 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
                     onChange={e => setAnimationFrames(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    width={64}
                 />
             </VContainer>
             {!isMultiFileAnimation && <VContainer>

@@ -52,7 +52,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        width={76}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
@@ -66,7 +66,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        width={76}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
@@ -80,7 +80,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        width={76}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
