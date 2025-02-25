@@ -33,6 +33,17 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
         });
     };
 
+    const resetPosition = (): void => {
+        updatePositionedActor({
+            onScreenPosition: {
+                ...positionedActor.onScreenPosition,
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+        });
+    };
+
     const setPosition = (a: 'x' | 'y' | 'z', value: number): void => {
         updatePositionedActor({
             onScreenPosition: {
@@ -91,7 +102,7 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                 </HContainer>
                 <VContainer>
                     <label>Position (x, y, z)</label>
-                    <HContainer>
+                    <HContainer alignItems="center">
                         <Input
                             type="number"
                             value={positionedActor.onScreenPosition.x}
@@ -112,6 +123,14 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                             setValue={v => setPosition('z', v as number)}
                             commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
+                        />
+                        <i
+                            className='codicon codicon-issues'
+                            title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                            onClick={resetPosition}
+                            style={{
+                                cursor: 'pointer'
+                            }}
                         />
                     </HContainer>
                 </VContainer>
@@ -156,32 +175,30 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                         />
                     </HContainer>
                 </VContainer>
-                <HContainer gap={15} wrap='wrap'>
-                    <Input
-                        label={nls.localizeByDefault('Name')}
-                        value={positionedActor.name}
-                        setValue={setName}
-                        width={80}
-                        commands={INPUT_BLOCKING_COMMANDS}
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    value={positionedActor.name}
+                    setValue={setName}
+                    width={202}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <Input
+                    label={nls.localize('vuengine/editors/general/extraInfo', 'Extra Info')}
+                    value={positionedActor.extraInfo}
+                    setValue={setExtraInfo}
+                    width={202}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={positionedActor.loadRegardlessOfPosition}
+                        onChange={toggleLoadRegardlessOfPosition}
                     />
-                    <Input
-                        label={nls.localize('vuengine/editors/general/extraInfo', 'Extra Info')}
-                        value={positionedActor.extraInfo}
-                        setValue={setExtraInfo}
-                        width={80}
-                        commands={INPUT_BLOCKING_COMMANDS}
-                    />
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
-                        </label>
-                        <input
-                            type="checkbox"
-                            checked={positionedActor.loadRegardlessOfPosition}
-                            onChange={toggleLoadRegardlessOfPosition}
-                        />
-                    </VContainer>
-                </HContainer>
+                </VContainer>
             </>
                 : <VContainer className='error'>
                     {nls.localize('vuengine/editors/general/actorNotFound', 'Actor could not be found')}

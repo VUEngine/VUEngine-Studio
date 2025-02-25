@@ -54,40 +54,81 @@ export default function Body(props: BodyProps): React.JSX.Element {
     };
 
     return (
-        <HContainer gap={15} wrap='wrap'>
-            <Input
-                label={nls.localize('vuengine/editors/actor/mass', 'Mass')}
-                value={body.mass}
-                setValue={v => setMass(v as number)}
-                type='number'
-                min={0}
-                max={511}
-                step={0.1}
-                width={54}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
-            <Input
-                label={nls.localize('vuengine/editors/actor/friction', 'Friction')}
-                value={body.friction}
-                setValue={v => setFriction(v as number)}
-                type='number'
-                min={0}
-                max={511}
-                step={0.1}
-                width={54}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
-            <Input
-                label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
-                value={body.bounciness}
-                setValue={v => setBounciness(v as number)}
-                type='number'
-                min={0}
-                max={511}
-                step={0.1}
-                width={54}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
+        <VContainer gap={15}>
+            <HContainer gap={15}>
+                <Input
+                    label={nls.localize('vuengine/editors/actor/mass', 'Mass')}
+                    value={body.mass}
+                    setValue={v => setMass(v as number)}
+                    type='number'
+                    min={0}
+                    max={511}
+                    step={0.1}
+                    width={64}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/editors/actor/gravityAxes', 'Gravity Axes')}
+                        tooltip={nls.localize(
+                            'vuengine/editors/actor/gravityAxesDescription',
+                            'Select the axes on which the actor should be subject to gravity.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            value: Axis.XAxis,
+                            label: 'X',
+                        }, {
+                            value: Axis.YAxis,
+                            label: 'Y',
+                        }, {
+                            value: Axis.ZAxis,
+                            label: 'Z',
+                        }]}
+                        defaultValue={body.gravityAxes}
+                        onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        canSelectMany
+                        allowBlank
+                    />
+                </VContainer>
+            </HContainer>
+            <HContainer gap={15}>
+                <Input
+                    label={nls.localize('vuengine/editors/actor/friction', 'Friction')}
+                    value={body.friction}
+                    setValue={v => setFriction(v as number)}
+                    type='number'
+                    min={0}
+                    max={511}
+                    step={0.1}
+                    width={64}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <Input
+                    label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
+                    value={body.bounciness}
+                    setValue={v => setBounciness(v as number)}
+                    type='number'
+                    min={0}
+                    max={511}
+                    step={0.1}
+                    width={64}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <Input
+                    label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
+                    value={body.maximumSpeed}
+                    setValue={v => setMaximumSpeed(v as number)}
+                    type='number'
+                    min={0}
+                    max={511}
+                    width={64}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+            </HContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/actor/maximumVelocity', 'Maximum Velocity (x, y, z)')}
@@ -99,7 +140,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         type='number'
                         min={0}
                         max={511}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
@@ -108,7 +149,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         type='number'
                         min={0}
                         max={511}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
@@ -117,47 +158,10 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         type='number'
                         min={0}
                         max={511}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>
-            </VContainer>
-            <Input
-                label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
-                value={body.maximumSpeed}
-                setValue={v => setMaximumSpeed(v as number)}
-                type='number'
-                min={0}
-                max={511}
-                width={54}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/actor/gravityAxes', 'Gravity Axes')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/actor/gravityAxesDescription',
-                        'Select the axes on which the actor should be subject to gravity.'
-                    )}
-                />
-                <RadioSelect
-                    options={[{
-                        value: Axis.XAxis,
-                        label: 'X',
-                    }, {
-                        value: Axis.YAxis,
-                        label: 'Y',
-                    }, {
-                        value: Axis.ZAxis,
-                        label: 'Z',
-                    }]}
-                    defaultValue={body.gravityAxes}
-                    onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    canSelectMany
-                    allowBlank
-                />
             </VContainer>
             <VContainer>
                 <InfoLabel
@@ -188,6 +192,6 @@ Note that sprites need to use AFFINE mode to be able to be rotated.',
                     allowBlank
                 />
             </VContainer>
-        </HContainer>
+        </VContainer >
     );
 }

@@ -55,7 +55,7 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         type='number'
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
@@ -64,7 +64,7 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         type='number'
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
@@ -73,7 +73,7 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         type='number'
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
-                        width={54}
+                        width={64}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>

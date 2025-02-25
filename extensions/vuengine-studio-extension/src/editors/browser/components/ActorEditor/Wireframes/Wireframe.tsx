@@ -103,16 +103,20 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const addSegment = (): void => {
+        const fromVertex = wireframe.segments.length
+            ? wireframe.segments[wireframe.segments.length - 1].toVertex
+            : {
+                x: 0,
+                y: 0,
+                z: 0,
+                parallax: 0,
+            };
+
         updateWireframe({
             segments: [
                 ...wireframe.segments,
                 {
-                    fromVertex: {
-                        x: 0,
-                        y: 0,
-                        z: 0,
-                        parallax: 0,
-                    },
+                    fromVertex,
                     toVertex: {
                         x: 0,
                         y: 0,
