@@ -14,9 +14,11 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     const {
         previewAnaglyph,
         previewBackgroundColor,
+        previewScreenFrame,
         previewZoom,
         setPreviewAnaglyph,
         setPreviewBackgroundColor,
+        setPreviewScreenFrame,
         setPreviewZoom
     } = useContext(ActorEditorContext) as ActorEditorContextType;
 
@@ -39,6 +41,9 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
                 break;
             case ActorEditorCommands.PREVIEW_TOGGLE_ANAGLYPH.id:
                 setPreviewAnaglyph(previousValue => !previousValue);
+                break;
+            case ActorEditorCommands.PREVIEW_TOGGLE_SCREEN_FRAME.id:
+                setPreviewScreenFrame(previousValue => !previousValue);
                 break;
             case ActorEditorCommands.PREVIEW_ZOOM_IN.id:
                 setPreviewZoom(previousValue => boundZoom(previousValue + PREVIEW_SPRITE_ZOOM_STEP));
@@ -79,10 +84,20 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
 
         setStatusBarItem('ves-editors-actor-preview-center', {
             alignment: StatusBarAlignment.RIGHT,
-            priority: 5,
+            priority: 6,
             text: '$(codicon-symbol-array)',
             command: ActorEditorCommands.PREVIEW_CENTER.id,
             tooltip: ActorEditorCommands.PREVIEW_CENTER.label,
+        });
+
+        setStatusBarItem('ves-editors-actor-preview-screen-frame', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 5,
+            text: previewScreenFrame
+                ? '$(codicon-eye)'
+                : '$(codicon-eye-closed)',
+            command: ActorEditorCommands.PREVIEW_TOGGLE_SCREEN_FRAME.id,
+            tooltip: ActorEditorCommands.PREVIEW_TOGGLE_SCREEN_FRAME.label,
         });
 
         setStatusBarItem('ves-editors-actor-preview-anaglyph', {
@@ -115,6 +130,7 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
         removeStatusBarItem('ves-editors-actor-preview-center');
         removeStatusBarItem('ves-editors-actor-preview-anaglyph');
         removeStatusBarItem('ves-editors-actor-preview-background-color');
+        removeStatusBarItem('ves-editors-actor-preview-screen-frame');
     };
 
     useEffect(() => {
@@ -125,6 +141,7 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     }, [
         previewAnaglyph,
         previewBackgroundColor,
+        previewScreenFrame,
         previewZoom,
     ]);
 

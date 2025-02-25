@@ -87,6 +87,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
   const [previewAnaglyph, setPreviewAnaglyph] = useState<boolean>(false);
   const [previewProjectionDepth, setPreviewProjectionDepth] = useState<number>(99999/* 128 */);
   const [previewBackgroundColor, setPreviewBackgroundColor] = useState<number>(-1);
+  const [previewScreenFrame, setPreviewScreenFrame] = useState<boolean>(false);
   const [previewPalettes, setPreviewPalettes] = useState<string[]>(['11100100', '11100000', '11010000', '11100100']);
   const [previewShowChildren, setPreviewShowChildren] = useState<boolean>(true);
   const [previewShowColliders, setPreviewShowColliders] = useState<boolean>(true);
@@ -105,6 +106,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     services.localStorageService.setData<LocalStorageActorEditorState>(getStateLocalStorageId(), {
       previewAnaglyph,
       previewBackgroundColor,
+      previewScreenFrame,
       previewShowChildren,
       previewShowColliders,
       previewShowSprites,
@@ -126,6 +128,9 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       savedState.previewBackgroundColor < 3 &&
       savedState.previewBackgroundColor > -1) {
       setPreviewBackgroundColor(savedState.previewBackgroundColor);
+    }
+    if (isBoolean(savedState.previewScreenFrame)) {
+      setPreviewScreenFrame(savedState.previewScreenFrame);
     }
     if (isBoolean(savedState.previewShowChildren)) {
       setPreviewShowChildren(savedState.previewShowChildren);
@@ -584,6 +589,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
           setPreviewAnaglyph: setPreviewAnaglyph,
           previewBackgroundColor: previewBackgroundColor,
           setPreviewBackgroundColor: setPreviewBackgroundColor,
+          previewScreenFrame: previewScreenFrame,
+          setPreviewScreenFrame: setPreviewScreenFrame,
           previewPalettes: previewPalettes,
           setPreviewPalettes: setPreviewPalettes,
           previewProjectionDepth: previewProjectionDepth,

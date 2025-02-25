@@ -36,6 +36,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     currentComponent, setCurrentComponent,
     currentAnimationStep, setCurrentAnimationStep,
     previewBackgroundColor,
+    previewScreenFrame,
     previewPalettes,
     previewProjectionDepth,
     previewShowColliders,
@@ -161,6 +162,11 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       >
         <div className="preview-container-world-center-vertical"></div>
         <div className="preview-container-world-center-horizontal"></div>
+        {previewScreenFrame &&
+          <div className="preview-container-screen-frame">
+            <div></div><div></div><div></div><div></div>
+          </div>
+        }
         {previewShowSprites && data.components?.sprites?.map((sprite, i) =>
           <SpritePreview
             key={i}

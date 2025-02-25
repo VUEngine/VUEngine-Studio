@@ -46,3 +46,10 @@
     background: blue;
     outline-color: blue;
 }
+
+#status-bar-ves-editors-actor-preview-screen-frame span {
+    outline: 1px solid;
+    padding: 0 3px;
+    border-radius: 2px;
+    outline-offset: -1px;
+}

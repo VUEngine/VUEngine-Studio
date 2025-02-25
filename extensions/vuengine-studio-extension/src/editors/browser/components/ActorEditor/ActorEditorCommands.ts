@@ -88,6 +88,11 @@ export const ActorEditorCommands: EditorCommands = {
         label: nls.localize('vuengine/editors/actor/commands/previewToggleAnaglyph', 'Preview: Toggle Anaglyph'),
         category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
     },
+    PREVIEW_TOGGLE_SCREEN_FRAME: {
+        id: 'editors.actorEditor.previewScreenFrame',
+        label: nls.localize('vuengine/editors/actor/commands/previewScreenFrame', 'Preview: Toggle Screen Frame'),
+        category: nls.localize('vuengine/editors/actor/commands/category', 'Actor Editor'),
+    },
     PREVIEW_ZOOM_IN: {
         id: 'editors.actorEditor.previewZoomIn',
         label: nls.localize('vuengine/editors/actor/commands/previewZoomIn', 'Preview: Zoom In'),

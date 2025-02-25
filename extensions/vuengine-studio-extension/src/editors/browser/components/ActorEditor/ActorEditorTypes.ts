@@ -31,6 +31,7 @@ export const ActorEditorContext = createContext<ActorEditorContextType>({});
 export interface LocalStorageActorEditorState {
     previewAnaglyph: boolean
     previewBackgroundColor: number
+    previewScreenFrame: boolean
     previewShowChildren: boolean
     previewShowColliders: boolean
     previewShowSprites: boolean
@@ -51,6 +52,8 @@ export interface ActorEditorContextType {
     setPreviewAnaglyph: Dispatch<SetStateAction<boolean>>
     previewBackgroundColor: number
     setPreviewBackgroundColor: Dispatch<SetStateAction<number>>
+    previewScreenFrame: boolean
+    setPreviewScreenFrame: Dispatch<SetStateAction<boolean>>
     previewPalettes: string[]
     setPreviewPalettes: Dispatch<SetStateAction<string[]>>
     previewProjectionDepth: number
