@@ -482,15 +482,22 @@ export class VesBuildService {
     const buildFolderBaseUri = workspaceRootUri
       .resolve('build')
       .resolve('working')
-      .resolve(relativePath.fsPath().split('/')[0])
+      .resolve(relativePath.fsPath().split(isWindows ? '\\' : '/')[0])
       .resolve(parentFileStat.name);
     const buildFolderFileUri = buildFolderBaseUri
       .resolve(relativePath.dir.fsPath())
       .resolve(`${relativePath.name}.o`);
 
-    const buildFolderFileRelativePath = workspaceRootUri.relative(buildFolderFileUri)?.fsPath() + '\n';
+    const adjustPath = (p: string) => isWindows ? p.replace(/\\/g, '\/') : p;
+
+    const buildFolderFileRelativeUri = workspaceRootUri.relative(buildFolderFileUri);
+    if (!buildFolderFileRelativeUri) {
+      return;
+    }
+
+    const buildFolderFileRelativePath = `${adjustPath(buildFolderFileRelativeUri.fsPath())}\n`;
     const shasum = window.electronVesCore.sha1(buildFolderFileRelativePath);
-    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(shasum + '.o');
+    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(`${shasum}.o`);
     if (await this.fileService.exists(hashFileUri)) {
       await this.fileService.delete(hashFileUri);
     }
