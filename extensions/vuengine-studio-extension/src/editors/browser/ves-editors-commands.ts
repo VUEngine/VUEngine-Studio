@@ -3,6 +3,7 @@ import { ActorEditorCommands } from './components/ActorEditor/ActorEditorCommand
 import { FontEditorCommands } from './components/FontEditor/FontEditorCommands';
 import { MusicEditorCommands } from './components/MusicEditor/MusicEditorCommands';
 import { EditorCommands } from './ves-editors-types';
+import { CommonEditorCommands } from './components/Common/Editor/CommonEditorCommands';
 
 export namespace VesEditorsCommands {
     export const GENERATE: Command = Command.toLocalizedCommand(
@@ -50,6 +51,7 @@ export namespace VesEditorsCommands {
 
 export const EditorsCommands: EditorCommands[] = [
     ActorEditorCommands,
+    CommonEditorCommands,
     FontEditorCommands,
     MusicEditorCommands,
 ];

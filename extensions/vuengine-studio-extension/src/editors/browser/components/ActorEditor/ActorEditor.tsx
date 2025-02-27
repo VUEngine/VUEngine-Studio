@@ -7,6 +7,8 @@ import {
 } from '../../../../images/browser/ves-images-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
+import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
 import { showActorSelection } from '../Common/Utils';
 import ActorMeta from './Actor/ActorMeta';
 import ActorSettings from './Actor/ActorSettings';
@@ -25,7 +27,6 @@ import {
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
-import VContainer from '../Common/Base/VContainer';
 
 export const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
@@ -533,7 +534,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       case ActorEditorCommands.DECREASE_COMPONENT_PARALLAX.id:
         setCurrentComponentDisplacement([{ axis: 'parallax', offset: -1 }]);
         break;
-      case ActorEditorCommands.PREVIEW_CENTER.id:
+      case CommonEditorCommands.CENTER.id:
         setCurrentComponentDisplacement([{ axis: 'parallax', offset: -1 }]);
         break;
     }
@@ -541,7 +542,10 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   useEffect(() => {
     enableCommands([
-      ...Object.values(ActorEditorCommands).map(c => c.id)
+      ...Object.values({
+        ...CommonEditorCommands,
+        ...ActorEditorCommands,
+      }).map(c => c.id)
     ]);
   }, []);
 

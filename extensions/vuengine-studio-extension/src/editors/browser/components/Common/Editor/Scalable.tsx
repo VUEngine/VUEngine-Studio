@@ -1,0 +1,178 @@
+import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import VContainer from '../Base/VContainer';
+import { StatusBarAlignment } from '@theia/core/lib/browser';
+import { CommonEditorCommands } from './CommonEditorCommands';
+
+const ScalableContainer = styled.div`
+    align-items: center;
+    background-image: radial-gradient(rgba(0, 0, 0, .5) 1px, transparent 0);
+    background-size: 16px 16px;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    inset: 0;
+    overflow: auto;
+    padding: var(--padding);
+    position: absolute;
+    user-select: none;
+
+    &.dragging {
+        cursor: grabbing;
+    }
+`;
+
+interface ScalableProps {
+    minZoom: number
+    maxZoom: number
+    wheelSensitivity: number
+    zoomStep: number
+}
+
+export default function Scalable(props: PropsWithChildren<ScalableProps>): React.JSX.Element {
+    const { children, minZoom, maxZoom, wheelSensitivity, zoomStep } = props;
+    const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
+    const [zoom, setZoom] = useState<number>(1);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [offsetX, setOffsetX] = useState<number>(0);
+    const [offsetY, setOffsetY] = useState<number>(0);
+
+    const onWheel = (e: React.WheelEvent): void => {
+        if (e.ctrlKey) {
+            let z = zoom - e.deltaY / wheelSensitivity;
+
+            if (z > maxZoom) {
+                z = maxZoom;
+            } else if (z < minZoom) {
+                z = minZoom;
+            }
+
+            setZoom(z);
+        }
+    };
+
+    const onMouseMove = (e: React.MouseEvent): void => {
+        if (isDragging) {
+            setOffsetX(offsetX + e.movementX);
+            setOffsetY(offsetY + e.movementY);
+        }
+    };
+
+    const center = (): void => {
+        setOffsetX(0);
+        setOffsetY(0);
+    };
+
+    const boundZoom = (z: number) => {
+        if (z < minZoom) {
+            z = minZoom;
+        } else if (z > maxZoom) {
+            z = maxZoom;
+        }
+        return z;
+    };
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case CommonEditorCommands.ZOOM_IN.id:
+                setZoom(previousValue => boundZoom(previousValue + zoomStep));
+                break;
+            case CommonEditorCommands.ZOOM_OUT.id:
+                setZoom(previousValue => boundZoom(previousValue - zoomStep));
+                break;
+            case CommonEditorCommands.ZOOM_RESET.id:
+                setZoom(1);
+                break;
+            case CommonEditorCommands.CENTER.id:
+                center();
+                break;
+        }
+    };
+
+    const setStatusBarItems = () => {
+        setStatusBarItem('ves-editors-common-zoom-out', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 9,
+            text: '$(codicon-zoom-out)',
+            command: CommonEditorCommands.ZOOM_OUT.id,
+            tooltip: CommonEditorCommands.ZOOM_OUT.label,
+            className: zoom <= minZoom ? 'disabled' : undefined,
+        });
+        setStatusBarItem('ves-editors-common-zoom', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 8,
+            text: `${Math.round(zoom * 100)}%`,
+            command: CommonEditorCommands.ZOOM_RESET.id,
+            tooltip: CommonEditorCommands.ZOOM_RESET.label,
+        });
+        setStatusBarItem('ves-editors-common-zoom-in', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 7,
+            text: '$(codicon-zoom-in)',
+            command: CommonEditorCommands.ZOOM_IN.id,
+            tooltip: CommonEditorCommands.ZOOM_IN.label,
+            className: zoom >= maxZoom ? 'disabled' : undefined,
+        });
+
+        setStatusBarItem('ves-editors-common-center', {
+            alignment: StatusBarAlignment.RIGHT,
+            priority: 6,
+            text: '$(codicon-symbol-array)',
+            command: CommonEditorCommands.CENTER.id,
+            tooltip: CommonEditorCommands.CENTER.label,
+        });
+    };
+
+    const removeStatusBarItems = () => {
+        removeStatusBarItem('ves-editors-common-zoom-out');
+        removeStatusBarItem('ves-editors-common-zoom');
+        removeStatusBarItem('ves-editors-common-zoom-in');
+        removeStatusBarItem('ves-editors-common-center');
+    };
+
+    useEffect(() => {
+        setStatusBarItems();
+        return () => {
+            removeStatusBarItems();
+        };
+    }, [
+        zoom,
+    ]);
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, []);
+
+    return (
+        <VContainer
+            grow={1}
+            overflow='hidden'
+            style={{
+                inset: 0,
+                position: 'absolute',
+            }}>
+            <ScalableContainer
+                className={isDragging ? ' dragging' : ''}
+                onWheel={onWheel}
+                onMouseDown={() => setIsDragging(true)}
+                onMouseUp={() => setIsDragging(false)}
+                onMouseLeave={() => setIsDragging(false)}
+                onMouseMove={onMouseMove}
+            >
+                <div
+                    style={{
+                        transform: `scale(${zoom})`,
+                        translate: `${offsetX}px ${offsetY}px`,
+                    }}
+                >
+                    {children}
+                </div>
+            </ScalableContainer>
+        </VContainer>
+    );
+}

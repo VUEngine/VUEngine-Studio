@@ -10,10 +10,10 @@ export namespace VesProjectCommands {
         'vuengine/projects/commands/createNewProject'
     );
 
-    export const TOGGLE_WIDGET: Command = Command.toLocalizedCommand(
+    export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
         {
-            id: 'project.toggleView',
-            label: 'Toggle Project View',
+            id: 'project.toggleDashboardView',
+            label: 'Toggle Project Dashboard View',
         },
         'vuengine/projects/commands/toggleView'
     );

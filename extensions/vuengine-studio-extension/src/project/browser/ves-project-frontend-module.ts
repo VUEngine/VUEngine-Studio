@@ -1,4 +1,4 @@
-import { FrontendApplicationContribution, PreferenceContribution } from '@theia/core/lib/browser';
+import { bindViewContribution, FrontendApplicationContribution, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -9,6 +9,8 @@ import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
+import { VesProjectDashboardViewContribution } from './ves-project-dashboard-view';
+import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
@@ -42,4 +44,14 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // custom project file name
     bind(VesWorkspaceFileService).toSelf().inSingletonScope();
     rebind(WorkspaceFileService).to(VesWorkspaceFileService);
+
+    // build view
+    bindViewContribution(bind, VesProjectDashboardViewContribution);
+    bind(FrontendApplicationContribution).toService(VesProjectDashboardViewContribution);
+    bind(CommandContribution).toService(VesProjectDashboardViewContribution);
+    bind(VesProjectDashboardWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesProjectDashboardWidget.ID,
+        createWidget: () => ctx.container.get<VesProjectDashboardWidget>(VesProjectDashboardWidget)
+    })).inSingletonScope();
 });

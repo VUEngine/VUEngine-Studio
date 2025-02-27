@@ -1,12 +1,13 @@
 import { nls } from '@theia/core';
-import React, { useState } from 'react';
-import { EditorsContextType } from '../../ves-editors-types';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { EditorSidebar, HideTreeButton, ShowTreeButton } from '../ActorEditor/ActorEditor';
 import HContainer from '../Common/Base/HContainer';
 import { LogicData, LogicEditorContext } from './LogicEditorTypes';
 import Script from './Scripts/Script';
 import ScriptedActionDetail from './Scripts/ScriptedActionDetail';
 import MethodsTree from './Tree/MethodsTree';
+import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
 
 interface LogicEditorProps {
   data: LogicData;
@@ -19,8 +20,15 @@ export const INPUT_BLOCKING_COMMANDS = [
 
 export default function LogicEditor(props: LogicEditorProps): React.JSX.Element {
   const { data, updateData } = props;
+  const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
   const [currentComponent, setCurrentComponent] = useState<string>('');
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(true);
+
+  useEffect(() => {
+    enableCommands([
+      ...Object.values(CommonEditorCommands).map(c => c.id)
+    ]);
+  }, []);
 
   return (
     <div

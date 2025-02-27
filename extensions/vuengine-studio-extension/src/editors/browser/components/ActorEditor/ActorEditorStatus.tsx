@@ -1,6 +1,7 @@
 import { StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { useContext, useEffect } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
 import { ActorEditorCommands } from './ActorEditorCommands';
 import { ActorEditorContext, ActorEditorContextType, MAX_PREVIEW_SPRITE_ZOOM, MIN_PREVIEW_SPRITE_ZOOM, PREVIEW_SPRITE_ZOOM_STEP } from './ActorEditorTypes';
 
@@ -36,7 +37,7 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
             case ActorEditorCommands.PREVIEW_BACKGROUND_NEXT.id:
                 setPreviewBackgroundColor(previousValue => previousValue === 3 ? -1 : previousValue + 1);
                 break;
-            case ActorEditorCommands.PREVIEW_CENTER.id:
+            case CommonEditorCommands.CENTER.id:
                 center();
                 break;
             case ActorEditorCommands.PREVIEW_TOGGLE_ANAGLYPH.id:
@@ -45,49 +46,49 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
             case ActorEditorCommands.PREVIEW_TOGGLE_SCREEN_FRAME.id:
                 setPreviewScreenFrame(previousValue => !previousValue);
                 break;
-            case ActorEditorCommands.PREVIEW_ZOOM_IN.id:
+            case CommonEditorCommands.ZOOM_IN.id:
                 setPreviewZoom(previousValue => boundZoom(previousValue + PREVIEW_SPRITE_ZOOM_STEP));
                 break;
-            case ActorEditorCommands.PREVIEW_ZOOM_OUT.id:
+            case CommonEditorCommands.ZOOM_OUT.id:
                 setPreviewZoom(previousValue => boundZoom(previousValue - PREVIEW_SPRITE_ZOOM_STEP));
                 break;
-            case ActorEditorCommands.PREVIEW_ZOOM_RESET.id:
+            case CommonEditorCommands.ZOOM_RESET.id:
                 setPreviewZoom(1);
                 break;
         }
     };
 
     const setStatusBarItems = () => {
-        setStatusBarItem('ves-editors-actor-preview-zoom-out', {
+        setStatusBarItem('ves-editors-common-zoom-out', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 9,
             text: '$(codicon-zoom-out)',
-            command: ActorEditorCommands.PREVIEW_ZOOM_OUT.id,
-            tooltip: ActorEditorCommands.PREVIEW_ZOOM_OUT.label,
+            command: CommonEditorCommands.ZOOM_OUT.id,
+            tooltip: CommonEditorCommands.ZOOM_OUT.label,
             className: previewZoom <= MIN_PREVIEW_SPRITE_ZOOM ? 'disabled' : undefined,
         });
-        setStatusBarItem('ves-editors-actor-preview-zoom', {
+        setStatusBarItem('ves-editors-common-zoom', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 8,
             text: `${Math.round(previewZoom * 100)}%`,
-            command: ActorEditorCommands.PREVIEW_ZOOM_RESET.id,
-            tooltip: ActorEditorCommands.PREVIEW_ZOOM_RESET.label,
+            command: CommonEditorCommands.ZOOM_RESET.id,
+            tooltip: CommonEditorCommands.ZOOM_RESET.label,
         });
-        setStatusBarItem('ves-editors-actor-preview-zoom-in', {
+        setStatusBarItem('ves-editors-common-zoom-in', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 7,
             text: '$(codicon-zoom-in)',
-            command: ActorEditorCommands.PREVIEW_ZOOM_IN.id,
-            tooltip: ActorEditorCommands.PREVIEW_ZOOM_IN.label,
+            command: CommonEditorCommands.ZOOM_IN.id,
+            tooltip: CommonEditorCommands.ZOOM_IN.label,
             className: previewZoom >= MAX_PREVIEW_SPRITE_ZOOM ? 'disabled' : undefined,
         });
 
-        setStatusBarItem('ves-editors-actor-preview-center', {
+        setStatusBarItem('ves-editors-common-center', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 6,
             text: '$(codicon-symbol-array)',
-            command: ActorEditorCommands.PREVIEW_CENTER.id,
-            tooltip: ActorEditorCommands.PREVIEW_CENTER.label,
+            command: CommonEditorCommands.CENTER.id,
+            tooltip: CommonEditorCommands.CENTER.label,
         });
 
         setStatusBarItem('ves-editors-actor-preview-screen-frame', {
@@ -124,10 +125,10 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     };
 
     const removeStatusBarItems = () => {
-        removeStatusBarItem('ves-editors-actor-preview-zoom-out');
-        removeStatusBarItem('ves-editors-actor-preview-zoom');
-        removeStatusBarItem('ves-editors-actor-preview-zoom-in');
-        removeStatusBarItem('ves-editors-actor-preview-center');
+        removeStatusBarItem('ves-editors-common-center');
+        removeStatusBarItem('ves-editors-common-zoom-in');
+        removeStatusBarItem('ves-editors-common-zoom-out');
+        removeStatusBarItem('ves-editors-common-zoom');
         removeStatusBarItem('ves-editors-actor-preview-anaglyph');
         removeStatusBarItem('ves-editors-actor-preview-background-color');
         removeStatusBarItem('ves-editors-actor-preview-screen-frame');
