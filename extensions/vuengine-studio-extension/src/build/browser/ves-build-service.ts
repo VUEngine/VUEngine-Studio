@@ -458,6 +458,7 @@ export class VesBuildService {
   }
 
   protected async removeTranspiledObjectFile(fileUri: URI): Promise<void> {
+    console.log('removeTranspiledObjectFile');
     await this.workspaceService.ready;
 
     const roots = this.workspaceService.tryGetRoots();
@@ -473,25 +474,38 @@ export class VesBuildService {
     if (parentFileStat === undefined) {
       return;
     }
+    console.log('parentFileStat', parentFileStat);
 
     const relativePath = parentFileStat.resource.relative(fileUri);
     if (relativePath === undefined) {
       return;
     }
+    console.log('relativePath', relativePath);
+    console.log('relativePath.fsPath (adj.) split', relativePath.fsPath().split(isWindows ? '\\' : '/'));
 
     const buildFolderBaseUri = workspaceRootUri
       .resolve('build')
       .resolve('working')
-      .resolve(relativePath.fsPath().split('/')[0])
+      .resolve(relativePath.fsPath().split(isWindows ? '\\' : '/')[0])
       .resolve(parentFileStat.name);
     const buildFolderFileUri = buildFolderBaseUri
       .resolve(relativePath.dir.fsPath())
       .resolve(`${relativePath.name}.o`);
 
-    const buildFolderFileRelativePath = workspaceRootUri.relative(buildFolderFileUri)?.fsPath() + '\n';
+    const adjustPath = (p: string) => isWindows ? p.replace(/\\/g, '\/') : p;
+
+    const buildFolderFileRelativeUri = workspaceRootUri.relative(buildFolderFileUri);
+    if (!buildFolderFileRelativeUri) {
+      return;
+    }
+
+    const buildFolderFileRelativePath = `${adjustPath(buildFolderFileRelativeUri.fsPath())}\n`;
+    console.log('buildFolderFileRelativePath', buildFolderFileRelativePath);
     const shasum = window.electronVesCore.sha1(buildFolderFileRelativePath);
-    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(shasum + '.o');
+    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(`${shasum}.o`);
+    console.log('hashFileUri', hashFileUri);
     if (await this.fileService.exists(hashFileUri)) {
+      console.log('exists');
       await this.fileService.delete(hashFileUri);
     }
   };
