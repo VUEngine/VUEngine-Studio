@@ -57,6 +57,7 @@ export const getMaxScaleInContainer = (containerWidth: number, containerHeight: 
 
 export const roundToNextMultipleOf4 = (x: number) => (x + 3) & (-4);
 export const roundToNextMultipleOf8 = (x: number) => (x + 7) & (-8);
+export const roundToNextMultipleOf16 = (x: number) => (x + 15) & (-16);
 
 export const toUpperSnakeCase = (key: string): string => {
     const splitCaps = (input: string) => input

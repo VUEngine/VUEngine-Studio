@@ -127,7 +127,7 @@ export class VesCodeGenService {
   }
 
   protected async handleFileDelete(fileUri: URI): Promise<void> {
-    const types = this.vesProjectService.getProjectDataTypes() || {};
+    const types = this.vesProjectService.getProjectDataTypes() ?? {};
     await Promise.all(Object.keys(types).map(async typeId => {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
@@ -137,7 +137,7 @@ export class VesCodeGenService {
   }
 
   protected async handleFileUpdate(fileUri: URI): Promise<void> {
-    const types = this.vesProjectService.getProjectDataTypes() || {};
+    const types = this.vesProjectService.getProjectDataTypes() ?? {};
     await Promise.all(Object.keys(types).map(async typeId => {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
@@ -170,7 +170,7 @@ export class VesCodeGenService {
 
   protected async getTemplatableTypes(): Promise<QuickPickItem[]> {
     await this.vesProjectService.projectDataReady;
-    const types = this.vesProjectService.getProjectDataTypes() || {};
+    const types = this.vesProjectService.getProjectDataTypes() ?? {};
     const items: QuickPickItem[] = [];
     Object.keys(types).map(typeId => {
       const numberOfItems = Object.keys(this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || []).length;

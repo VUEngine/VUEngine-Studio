@@ -65,6 +65,7 @@
     "react-arborist": "^3.4.0",
     "react-archer": "^4.4.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
     "react-select": "^5.8.0",
     "react-tabs": "^6.0.2",
     "react-textarea-autosize": "^8.3.4",

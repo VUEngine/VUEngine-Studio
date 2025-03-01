@@ -192,7 +192,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
-                    await opener.open(u);
+                    await opener.open(u, {
+                        widgetOptions: {
+                            mode: 'split-left',
+                        }
+                    });
                 }
             },
         });
@@ -277,7 +281,10 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             return;
         }
         this.editorManager.open(ref.uri, {
-            widgetOptions: { ref },
+            widgetOptions: {
+                mode: 'split-right',
+                ref
+            },
         });
     }
 

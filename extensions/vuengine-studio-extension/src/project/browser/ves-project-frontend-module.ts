@@ -1,4 +1,4 @@
-import { bindViewContribution, FrontendApplicationContribution, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { bindViewContribution, FrontendApplicationContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -9,6 +9,7 @@ import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
+import { VesProjectDashboardOpenHandler } from './ves-project-dashboard-open-handler';
 import { VesProjectDashboardViewContribution } from './ves-project-dashboard-view';
 import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 import { VesProjectPathsService } from './ves-project-paths-service';
@@ -49,6 +50,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindViewContribution(bind, VesProjectDashboardViewContribution);
     bind(FrontendApplicationContribution).toService(VesProjectDashboardViewContribution);
     bind(CommandContribution).toService(VesProjectDashboardViewContribution);
+    bind(OpenHandler).to(VesProjectDashboardOpenHandler).inSingletonScope();
     bind(VesProjectDashboardWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesProjectDashboardWidget.ID,

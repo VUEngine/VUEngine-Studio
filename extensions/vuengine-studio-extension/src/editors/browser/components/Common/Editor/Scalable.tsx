@@ -7,14 +7,12 @@ import { CommonEditorCommands } from './CommonEditorCommands';
 
 const ScalableContainer = styled.div`
     align-items: center;
-    background-image: radial-gradient(rgba(0, 0, 0, .5) 1px, transparent 0);
-    background-size: 16px 16px;
     cursor: grab;
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
     inset: 0;
-    overflow: auto;
+    justify-content: center;
+    overflow: hidden;
     padding: var(--padding);
     position: absolute;
     user-select: none;
@@ -24,15 +22,31 @@ const ScalableContainer = styled.div`
     }
 `;
 
+const ScalableContainerWorld = styled.div`
+    align-items: center;
+    background-image: radial-gradient(rgba(0, 0, 0, .5) 1px, transparent 0);
+    background-position: -1px -1px;
+    background-size: 16px 16px;
+    display: flex;
+    flex-direction: column;
+    height: 10000px;
+    justify-content: center;
+    position: absolute;
+    width: 10000px;
+`;
+
 interface ScalableProps {
     minZoom: number
     maxZoom: number
     wheelSensitivity: number
     zoomStep: number
+    blockMovement?: boolean
+    backgroundClickHandler?: () => void
+    moveHandler?: (e: React.MouseEvent, zoom: number) => void
 }
 
 export default function Scalable(props: PropsWithChildren<ScalableProps>): React.JSX.Element {
-    const { children, minZoom, maxZoom, wheelSensitivity, zoomStep } = props;
+    const { children, minZoom, maxZoom, wheelSensitivity, zoomStep, blockMovement, backgroundClickHandler, moveHandler } = props;
     const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
     const [zoom, setZoom] = useState<number>(1);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -55,8 +69,13 @@ export default function Scalable(props: PropsWithChildren<ScalableProps>): React
 
     const onMouseMove = (e: React.MouseEvent): void => {
         if (isDragging) {
-            setOffsetX(offsetX + e.movementX);
-            setOffsetY(offsetY + e.movementY);
+            if (!blockMovement) {
+                setOffsetX(prev => prev + e.movementX);
+                setOffsetY(prev => prev + e.movementY);
+            }
+            if (moveHandler) {
+                moveHandler(e, zoom);
+            }
         }
     };
 
@@ -164,14 +183,15 @@ export default function Scalable(props: PropsWithChildren<ScalableProps>): React
                 onMouseLeave={() => setIsDragging(false)}
                 onMouseMove={onMouseMove}
             >
-                <div
+                <ScalableContainerWorld
                     style={{
                         transform: `scale(${zoom})`,
                         translate: `${offsetX}px ${offsetY}px`,
                     }}
+                    onClick={() => backgroundClickHandler ? backgroundClickHandler() : {}}
                 >
                     {children}
-                </div>
+                </ScalableContainerWorld>
             </ScalableContainer>
         </VContainer>
     );

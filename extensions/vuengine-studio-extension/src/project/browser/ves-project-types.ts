@@ -54,6 +54,7 @@ export interface ProjectDataTypesWithContributor extends ProjectDataTypes {
 export interface ProjectDataType {
   enabled?: boolean
   file: string
+  excludeFromDashboard?: boolean
   icon?: string
   schema: any
   uiSchema?: any
@@ -232,6 +233,7 @@ export const defaultProjectData: ProjectData = {
   types: {
     GameConfig: {
       file: 'GameConfig',
+      excludeFromDashboard: true,
       schema: {
         title: 'Game Config',
         properties: {
@@ -242,19 +244,12 @@ export const defaultProjectData: ProjectData = {
           },
           projectTitle: {
             type: 'string'
+          },
+          projectAuthor: {
+            type: 'string'
           }
         },
         required: []
-      },
-      uiSchema: {
-        type: 'VerticalLayout',
-        elements: [
-          {
-            type: 'Control',
-            label: 'Project Title',
-            scope: '#/properties/projectTitle'
-          }
-        ]
       },
       icon: 'codicon codicon-gear',
       templates: ['PluginsConfig']
@@ -401,6 +396,7 @@ export const defaultProjectData: ProjectData = {
     },
     PluginFile: {
       file: 'vuengine.plugin',
+      excludeFromDashboard: true,
       schema: {
         title: 'Plugin File',
         properties: {

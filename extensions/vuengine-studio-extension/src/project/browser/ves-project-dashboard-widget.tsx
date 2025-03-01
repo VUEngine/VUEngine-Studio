@@ -1,35 +1,56 @@
-import { nls } from '@theia/core';
-import { ExtractableWidget, Message, StatusBar, StatusBarEntry } from '@theia/core/lib/browser';
+import { CommandService, MessageService, nls, QuickPickService } from '@theia/core';
+import { ExtractableWidget, HoverService, LocalStorageService, Message, OpenerService, PreferenceService, StatusBar, StatusBarEntry } from '@theia/core/lib/browser';
+import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { ArcherContainer } from 'react-archer';
-import styled from 'styled-components';
-import { WHEEL_SENSITIVITY } from '../../editors/browser/components/ActorEditor/ActorEditorTypes';
-import Scalable from '../../editors/browser/components/Common/Editor/Scalable';
+import { FileDialogService } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
-import StagePreview, { MOCK_STAGES } from './components/StagePreview';
+import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import ProjectDashboard from './components/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
-
-const DashboardOuterContainer = styled.div`
-    svg {
-        z-index: 10;
-    }
-`;
-
-const DashboardContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 20;
-    height: 100%;
-`;
 
 @injectable()
 export class VesProjectDashboardWidget extends ReactWidget implements ExtractableWidget {
+    @inject(ColorRegistry)
+    private readonly colorRegistry: ColorRegistry;
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
+    @inject(FileService)
+    protected readonly fileService: FileService;
+    @inject(FileDialogService)
+    protected readonly fileDialogService: FileDialogService;
+    @inject(HoverService)
+    protected readonly hoverService: HoverService;
+    @inject(MessageService)
+    protected readonly messageService: MessageService;
+    @inject(LocalStorageService)
+    protected readonly localStorageService: LocalStorageService;
+    @inject(OpenerService)
+    protected readonly openerService: OpenerService;
+    @inject(QuickPickService)
+    protected readonly quickPickService: QuickPickService;
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
     @inject(StatusBar)
     protected readonly statusBar: StatusBar;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
+    @inject(VesImagesService)
+    protected readonly vesImagesService: VesImagesService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
+    @inject(VesRumblePackService)
+    private readonly vesRumblePackService: VesRumblePackService;
+    @inject(WindowService)
+    private readonly windowService: WindowService;
+    @inject(WorkspaceService)
+    private readonly workspaceService: WorkspaceService;
 
     static readonly ID = 'vesProjectDashboardWidget';
     static readonly LABEL = nls.localize('vuengine/project/dashboard', 'Project Dashboard');
@@ -65,65 +86,35 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
 
     protected render(): React.ReactNode {
         return (
-            <EditorsContext.Provider
-                // @ts-ignore
-                value={{
-                    setStatusBarItem: (id: string, entry: StatusBarEntry) => this.statusBar.setElement(id, entry),
-                    removeStatusBarItem: (id: string) => this.statusBar.removeElement(id),
-                }}
-            >
-                <DashboardOuterContainer>
-                    <Scalable
-                        minZoom={0.25}
-                        maxZoom={5}
-                        wheelSensitivity={WHEEL_SENSITIVITY}
-                        zoomStep={.5}
-                    >
-                        <ArcherContainer
-                            lineStyle="angle"
-                            offset={-8}
-                            strokeColor="var(--theia-foreground)"
-                            strokeWidth={2}
-                        >
-                            <DashboardContainer>
-                                <StagePreview
-                                    id={Object.keys(MOCK_STAGES)[0]}
-                                    relations={[
-                                        {
-                                            targetId: '2345',
-                                            targetAnchor: 'top',
-                                            sourceAnchor: 'bottom',
-                                        },
-                                    ]}
-                                />
-                                <StagePreview
-                                    id={Object.keys(MOCK_STAGES)[1]}
-                                    relations={[
-                                        {
-                                            targetId: '3456',
-                                            targetAnchor: 'top',
-                                            sourceAnchor: 'bottom',
-                                        },
-                                    ]}
-                                />
-                                <StagePreview
-                                    id={Object.keys(MOCK_STAGES)[2]}
-                                    relations={[
-                                        {
-                                            targetId: '4567',
-                                            targetAnchor: 'top',
-                                            sourceAnchor: 'bottom',
-                                        },
-                                    ]}
-                                />
-                                <StagePreview
-                                    id={Object.keys(MOCK_STAGES)[3]}
-                                />
-                            </DashboardContainer>
-                        </ArcherContainer>
-                    </Scalable>
-                </DashboardOuterContainer>
-            </EditorsContext.Provider>
+            <div className="jsonforms-container">
+                <EditorsContext.Provider
+                    // @ts-ignore
+                    value={{
+                        setStatusBarItem: (id: string, entry: StatusBarEntry) => this.statusBar.setElement(id, entry),
+                        removeStatusBarItem: (id: string) => this.statusBar.removeElement(id),
+                        services: {
+                            colorRegistry: this.colorRegistry,
+                            commandService: this.commandService,
+                            fileService: this.fileService,
+                            fileDialogService: this.fileDialogService,
+                            hoverService: this.hoverService,
+                            messageService: this.messageService,
+                            localStorageService: this.localStorageService,
+                            openerService: this.openerService,
+                            quickPickService: this.quickPickService,
+                            preferenceService: this.preferenceService,
+                            vesCommonService: this.vesCommonService,
+                            vesImagesService: this.vesImagesService,
+                            vesProjectService: this.vesProjectService,
+                            vesRumblePackService: this.vesRumblePackService,
+                            windowService: this.windowService,
+                            workspaceService: this.workspaceService,
+                        }
+                    }}
+                >
+                    <ProjectDashboard />
+                </EditorsContext.Provider>
+            </div>
         );
     }
 }

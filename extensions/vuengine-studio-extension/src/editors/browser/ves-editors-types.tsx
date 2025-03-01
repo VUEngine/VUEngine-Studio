@@ -86,6 +86,7 @@ export const TYPE_LABELS: { [typeId: string]: string } = {
     'RomInfo': nls.localize('vuengine/editors/general/typeLabels/romInfo', 'ROM Info'),
     'Sprite': nls.localize('vuengine/editors/general/typeLabels/sprite', 'Sprite'),
     'Stage': nls.localize('vuengine/editors/general/typeLabels/stage', 'Stage'),
+    'Translations': nls.localize('vuengine/editors/general/typeLabels/translations', 'Translations'),
     'VsuSandbox': nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),
     'WaveForm': nls.localize('vuengine/editors/general/typeLabels/waveForm', 'Wave Form'),
 };

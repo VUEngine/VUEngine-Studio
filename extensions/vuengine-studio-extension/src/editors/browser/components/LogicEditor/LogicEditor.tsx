@@ -1,13 +1,14 @@
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import { EditorSidebar, HideTreeButton, ShowTreeButton } from '../ActorEditor/ActorEditor';
+import { HideTreeButton, ShowTreeButton } from '../ActorEditor/ActorEditor';
 import HContainer from '../Common/Base/HContainer';
 import { LogicData, LogicEditorContext } from './LogicEditorTypes';
 import Script from './Scripts/Script';
 import ScriptedActionDetail from './Scripts/ScriptedActionDetail';
 import MethodsTree from './Tree/MethodsTree';
 import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
+import Sidebar from '../Common/Editor/Sidebar';
 
 interface LogicEditorProps {
   data: LogicData;
@@ -32,7 +33,7 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
 
   return (
     <div
-      className="actorEditor"
+      className="logicEditor"
       tabIndex={0}
     >
       <LogicEditorContext.Provider
@@ -61,11 +62,10 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
             justifyContent='space-between'
             overflow='hidden'
           >
-            <EditorSidebar
-              style={{
-                marginLeft: leftSidebarOpen ? 0 : 'calc(-320px - 1px - var(--padding))',
-                position: 'relative',
-              }}
+            <Sidebar
+              open={leftSidebarOpen}
+              side='left'
+              width={320}
             >
               <HideTreeButton
                 className="theia-button secondary"
@@ -75,7 +75,7 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
                 <i className="codicon codicon-chevron-left" />
               </HideTreeButton>
               <MethodsTree />
-            </EditorSidebar>
+            </Sidebar>
             {!leftSidebarOpen &&
               <ShowTreeButton
                 style={{
@@ -89,16 +89,13 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
               </ShowTreeButton>
             }
             {currentComponent !== '' &&
-              <EditorSidebar
-                style={{
-                  marginRight: currentComponent.includes('-')
-                    ? 0
-                    : 'calc(-320px - 1px - var(--padding))',
-                }}
-
+              <Sidebar
+                open={true}
+                side='right'
+                width={320}
               >
                 <ScriptedActionDetail />
-              </EditorSidebar>
+              </Sidebar>
             }
           </HContainer>
           }
