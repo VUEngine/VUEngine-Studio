@@ -5,6 +5,7 @@ import { createEmptyPixelData } from '../../editors/browser/components/SpriteEdi
 import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
 import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
+import { ControlPosition } from 'react-draggable';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
@@ -145,6 +146,21 @@ export enum ProjectUpdateMode {
   LowerVersionOnly = 'lowerVersionOnly',
 }
 
+export interface DashboardConfigPositionMap {
+  [id: string]: ControlPosition
+};
+
+export interface DashboardConfig {
+  positions: DashboardConfigPositionMap
+}
+
+export interface GameConfig {
+  projectTitle: string
+  projectAuthor: string
+  plugins: { [id: string]: object }
+  dashboard: DashboardConfig
+}
+
 export const defaultProjectData: ProjectData = {
   templates: {
     'Image': {
@@ -237,17 +253,29 @@ export const defaultProjectData: ProjectData = {
       schema: {
         title: 'Game Config',
         properties: {
+          dashboard: {
+            type: 'object',
+            properties: {
+              positions: {
+                type: 'object',
+                properties: {},
+                additionalProperties: true,
+              },
+            },
+            additionalProperties: false,
+          },
           plugins: {
             type: 'object',
             properties: {},
             additionalProperties: true,
           },
+          projectAuthor: {
+            type: 'string'
+          },
           projectTitle: {
             type: 'string'
           },
-          projectAuthor: {
-            type: 'string'
-          }
+          additionalProperties: false,
         },
         required: []
       },

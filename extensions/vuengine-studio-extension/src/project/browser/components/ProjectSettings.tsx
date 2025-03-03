@@ -5,7 +5,7 @@ import HContainer from '../../../editors/browser/components/Common/Base/HContain
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { EditorsContext, EditorsContextType, TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
-import { ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
+import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
 import { MOCK_STAGES } from './StagePreview';
 
 interface ConfigType {
@@ -15,8 +15,13 @@ interface ConfigType {
     label: string,
 }
 
-export default function ProjectSettings(): React.JSX.Element {
-    // const { id, relations } = props;
+interface ProjectSettingsProps {
+    gameConfig: GameConfig
+    setGameConfig: (gameConfig: Partial<GameConfig>) => void
+}
+
+export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.Element {
+    const { gameConfig, setGameConfig } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [types, setTypes] = useState<ConfigType[]>([]);
 
@@ -79,11 +84,17 @@ export default function ProjectSettings(): React.JSX.Element {
         <VContainer gap={15}>
             <Input
                 label={nls.localizeByDefault('Name')}
-                value={'VUEngine Showcase'}
+                value={gameConfig.projectTitle ?? ''}
+                setValue={v => setGameConfig({
+                    projectTitle: v as string
+                })}
             />
             <Input
                 label={nls.localizeByDefault('Author')}
-                value={'VUEngine Studio User'}
+                value={gameConfig.projectAuthor ?? ''}
+                setValue={v => setGameConfig({
+                    projectAuthor: v as string
+                })}
             />
             {MOCK_STAGES && Object.keys(MOCK_STAGES).length > 0 && <>
                 <hr />

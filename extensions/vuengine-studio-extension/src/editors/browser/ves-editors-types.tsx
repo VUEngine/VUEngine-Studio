@@ -16,6 +16,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
@@ -28,6 +29,7 @@ export interface EditorsServices {
     openerService: OpenerService
     preferenceService: PreferenceService
     quickPickService: QuickPickService
+    themeService: ThemeService
     vesCommonService: VesCommonService
     vesImagesService: VesImagesService
     vesProjectService: VesProjectService,

@@ -1,43 +1,24 @@
+/* eslint-disable no-null/no-null */
 import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ArcherContainer } from 'react-archer';
+import { ArcherContainerHandle } from 'react-archer/lib/ArcherContainer/ArcherContainer.types';
+import { ControlPosition } from 'react-draggable';
 import styled from 'styled-components';
 import { WHEEL_SENSITIVITY } from '../../../editors/browser/components/ActorEditor/ActorEditorTypes';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import Sidebar from '../../../editors/browser/components/Common/Editor/Sidebar';
+import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves-editors-types';
+import { GameConfig } from '../ves-project-types';
 import ProjectSettings from './ProjectSettings';
 import StagePreview, { MOCK_STAGES } from './StagePreview';
+import StageSettings from './StageSettings';
 
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 3;
 // const ZOOM_STEP = 0.5;
-
-const DashboardContainer = styled.div`
-    align-items: end;
-    overflow: hidden !important;
-
-    > div:first-child {
-        inset: 0;
-        overflow: auto;
-        padding: calc(var(--theia-ui-padding) * 2);
-        position: absolute !important;
-
-        > svg {
-            box-sizing: border-box;
-            overflow: visible;
-            padding: 12px;
-            z-index: 10;
-        }
-
-        > div {
-            display: flex;
-            height: unset !important;
-            min-height: 100%;
-        }
-    }
-`;
 
 const EmptyContainer = styled.div`
     align-items: center;
@@ -51,22 +32,60 @@ const EmptyContainer = styled.div`
     position: absolute;
 `;
 
+const DashboardContainer = styled.div`
+    align-items: end;
+    overflow: hidden !important;
+
+    > div:first-child {
+        inset: 0;
+        overflow: auto;
+        position: absolute !important;
+
+        > svg {
+            box-sizing: border-box;
+            opacity: .5;
+            overflow: visible;
+            z-index: 10;
+        }
+    }
+
+    body.theia-light & {
+        > div:first-child {
+            > svg {
+                opacity: 1;
+            }
+        }
+    }
+`;
+
+export const ShowSidebarButton = styled.button`
+    right: calc(var(--padding) + 4px);
+    position: absolute;
+    top: calc(var(--padding) + 4px);
+    transition: all .1s;
+    width: 32px;
+    z-index: 100;
+`;
+
+export const HideSidebarButton = styled.button`
+    padding: 0;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 32px;
+    z-index: 100;
+`;
+
 export default function ProjectDashboard(): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const archerRef = useRef<ArcherContainerHandle>(null);
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
     const [currentStage, setCurrentStage] = useState<string>('');
     const [scale, setScale] = useState<number>(1);
     const [previewMode, setPreviewMode] = useState<boolean>(false);
-
-    const DragContainer = styled.div`
-        background-image: radial-gradient(rgba(0, 0, 0, .5) ${scale}px, transparent 0);
-        background-position: ${8 * scale}px ${8 * scale}px;
-        background-size: ${16 * scale}px ${16 * scale}px;
-        display: flex;
-        flex-direction: column;
-        gap: ${32 * scale}px;
-        margin: calc(var(--theia-ui-padding) * -2);
-        padding: ${16 * scale}px;
-        width: 100%;
-    `;
+    const [gameConfig, setGameConfig] = useState<GameConfig>();
+    const [dragContainerHeight, setDragContainerHeight] = useState<number>(0);
+    const [dragContainerWidth, setDragContainerWidth] = useState<number>(0);
 
     const onWheel = (e: React.WheelEvent): void => {
         if (e.ctrlKey) {
@@ -95,130 +114,200 @@ export default function ProjectDashboard(): React.JSX.Element {
         }
     };
 
-    return (
-        <DashboardContainer
-            onClick={() => setCurrentStage('')}
-            onWheel={onWheel}
-        >
-            {previewMode && Object.keys(MOCK_STAGES).length > 0
-                ?
-                <ArcherContainer
-                    lineStyle="angle"
-                    offset={-8}
-                    strokeColor="var(--theia-foreground)"
-                    strokeWidth={2}
-                >
-                    <DragContainer>
-                        <StagePreview
-                            id={Object.keys(MOCK_STAGES)[0]}
-                            current={Object.keys(MOCK_STAGES)[0] === currentStage}
-                            scale={scale}
-                            onClick={e => {
-                                setCurrentStage(Object.keys(MOCK_STAGES)[0]);
-                            }}
-                            relations={[
-                                {
-                                    targetId: '2345',
-                                    targetAnchor: 'top',
-                                    sourceAnchor: 'bottom',
-                                },
-                            ]}
-                        />
-                        <StagePreview
-                            id={Object.keys(MOCK_STAGES)[1]}
-                            current={Object.keys(MOCK_STAGES)[1] === currentStage}
-                            scale={scale}
-                            onClick={e => {
-                                setCurrentStage(Object.keys(MOCK_STAGES)[1]);
-                            }}
-                            relations={[
-                                {
-                                    targetId: '3456',
-                                    targetAnchor: 'top',
-                                    sourceAnchor: 'bottom',
-                                },
-                            ]}
-                        />
-                        <StagePreview
-                            id={Object.keys(MOCK_STAGES)[2]}
-                            current={Object.keys(MOCK_STAGES)[2] === currentStage}
-                            scale={scale}
-                            onClick={e => {
-                                setCurrentStage(Object.keys(MOCK_STAGES)[2]);
-                            }}
-                            relations={[
-                                {
-                                    targetId: '4567',
-                                    targetAnchor: 'top',
-                                    sourceAnchor: 'bottom',
-                                },
-                            ]}
-                        />
-                        <StagePreview
-                            id={Object.keys(MOCK_STAGES)[3]}
-                            current={Object.keys(MOCK_STAGES)[3] === currentStage}
-                            scale={scale}
-                            onClick={e => {
-                                setCurrentStage(Object.keys(MOCK_STAGES)[3]);
-                            }}
-                        />
-                    </DragContainer>
-                </ArcherContainer>
-                : <>
-                    <div></div>
-                    <EmptyContainer>
-                        <PuzzlePiece size={32} />
-                        <div
-                            style={{
-                                fontSize: '160%'
-                            }}
-                        >
-                            {nls.localize(
-                                'vuengine/project/projectHasNoStages',
-                                'This project does not yet have any stages',
-                            )}
-                        </div>
-                        <div>
-                            {nls.localize(
-                                'vuengine/project/clickBelowToAddFirstStage',
-                                'Click below to add the first stage',
-                            )}
-                        </div>
-                        <button
-                            className='theia-button secondary large'
-                            onClick={addStage}
-                            style={{
-                                marginTop: 20
-                            }}
-                        >
-                            <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
-                        </button>
-                    </EmptyContainer>
-                </>
+    const getDashboardConfig = async () => {
+        const gc = await services.vesProjectService.getGameConfig();
+        setGameConfig({
+            ...gc,
+            _fileUri: undefined,
+            _contributor: undefined,
+            _contributorUri: undefined,
+        } as GameConfig);
+    };
+
+    const updateGameConfig = async (partialGameConfig: Partial<GameConfig>) => {
+        services.vesProjectService.setGameConfig(partialGameConfig);
+        setGameConfig(prev => ({
+            ...prev as GameConfig,
+            ...partialGameConfig,
+        }));
+    };
+
+    const determineDragContainerDimensions = () => {
+        let height = 0;
+        let width = 0;
+
+        Object.values(MOCK_STAGES).forEach(s => {
+            const position = gameConfig?.dashboard?.positions && gameConfig?.dashboard?.positions[s._id]
+                ? gameConfig?.dashboard?.positions[s._id]
+                : { x: 0, y: 0 };
+            const stageMaxX = s.width + position.x;
+            const stageMaxY = s.height + position.y;
+            if (stageMaxX > width) {
+                width = stageMaxX;
             }
-            <Sidebar
-                open={true}
-                side='right'
-                width={320}
-            >
-                {
-                    currentStage === ''
-                        ? <VContainer
+            if (stageMaxY > height) {
+                height = stageMaxY;
+            }
+        });
+
+        const outerPadding = 32 * 2;
+        setDragContainerHeight(height + outerPadding);
+        setDragContainerWidth(width + outerPadding);
+    };
+
+    useEffect(() => {
+        getDashboardConfig();
+    }, []);
+
+    useEffect(() => {
+        determineDragContainerDimensions();
+    }, [gameConfig]);
+
+    return (
+        <>
+            {gameConfig &&
+                <DashboardContainer
+                    onWheel={onWheel}
+                >
+                    {previewMode && Object.keys(MOCK_STAGES).length > 0
+                        ? <ArcherContainer
+                            ref={archerRef}
+                            lineStyle="straight"
+                            offset={-8}
+                            strokeColor="var(--theia-foreground)"
+                            strokeWidth={2}
+                        >
+                            <div
+                                style={{
+                                    backgroundImage:
+                                        `radial-gradient(rgba(0, 0, 0, .${services.themeService.getCurrentTheme().type === 'light' ? 1 : 5}) ${scale}px, transparent 0)`,
+                                    backgroundPosition: `${8 * scale}px ${8 * scale}px`,
+                                    backgroundSize: `${16 * scale}px ${16 * scale}px`,
+                                    height: dragContainerHeight * scale,
+                                    minHeight: '100%',
+                                    minWidth: '100%',
+                                    width: dragContainerWidth * scale,
+                                }}
+                                onClick={() => setCurrentStage('')}
+                            >
+                                {Object.values(MOCK_STAGES).map(s => (
+                                    <StagePreview
+                                        key={s._id}
+                                        id={s._id}
+                                        archerRef={archerRef}
+                                        stage={MOCK_STAGES[s._id]}
+                                        positions={gameConfig.dashboard?.positions}
+                                        setPosition={(p: ControlPosition) => {
+                                            const partialGameConfig = {
+                                                dashboard: {
+                                                    ...(gameConfig.dashboard ?? {}),
+                                                    positions: {
+                                                        ...(gameConfig.dashboard?.positions ?? {}),
+                                                        [s._id]: p,
+                                                    }
+                                                }
+                                            };
+
+                                            const newGameConfig = { ...gameConfig, ...partialGameConfig };
+                                            if (JSON.stringify(newGameConfig) !== JSON.stringify(gameConfig)) {
+                                                setGameConfig({ ...gameConfig, ...partialGameConfig });
+                                                services.vesProjectService.setGameConfig(partialGameConfig);
+                                            }
+                                        }}
+                                        current={s._id === currentStage}
+                                        scale={scale}
+                                        onClick={e => {
+                                            setCurrentStage(s._id);
+                                            console.log('setCurrentStage(s._id)', s._id);
+                                            e.stopPropagation();
+                                        }}
+                                        relations={s.targets.map((t: any) => ({
+                                            targetId: t.id,
+                                            style: {
+                                                strokeDasharray: t.type === 'pause' ? '4,4' : undefined
+                                            }
+                                        }))}
+                                    />
+                                ))}
+                            </div>
+                        </ArcherContainer>
+                        : <>
+                            <div></div>
+                            <EmptyContainer>
+                                <PuzzlePiece size={32} />
+                                <div
+                                    style={{
+                                        fontSize: '160%'
+                                    }}
+                                >
+                                    {nls.localize(
+                                        'vuengine/project/projectHasNoStages',
+                                        'This project does not yet have any stages',
+                                    )}
+                                </div>
+                                <div>
+                                    {nls.localize(
+                                        'vuengine/project/clickBelowToAddFirstStage',
+                                        'Click below to add the first stage',
+                                    )}
+                                </div>
+                                <button
+                                    className='theia-button secondary large'
+                                    onClick={addStage}
+                                    style={{
+                                        marginTop: 20
+                                    }}
+                                >
+                                    <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
+                                </button>
+                            </EmptyContainer>
+                        </>
+                    }
+                    {!sidebarOpen &&
+                        <ShowSidebarButton
+                            style={{
+                                opacity: sidebarOpen ? 0 : 1,
+                            }}
+                            className="theia-button secondary"
+                            title={nls.localize('vuengine/project/showSidebar', 'Show Sidebar')}
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            <i className="codicon codicon-chevron-left" />
+                        </ShowSidebarButton>
+                    }
+                    <Sidebar
+                        open={sidebarOpen}
+                        side='right'
+                        width={320}
+                    >
+                        <VContainer
                             gap={15}
                             overflow="auto"
                             style={{ padding: 'calc(2 * var(--theia-ui-padding))' }}
                         >
-                            <ProjectSettings />
+                            <HideSidebarButton
+                                className="theia-button secondary"
+                                title={nls.localize('vuengine/project/hideSidebar', 'Hide Sidebar')}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <i className="codicon codicon-chevron-right" />
+                            </HideSidebarButton>
+                            {
+                                currentStage === ''
+                                    ? <ProjectSettings
+                                        gameConfig={gameConfig}
+                                        setGameConfig={updateGameConfig}
+                                    />
+                                    : <StageSettings
+                                        stageId={currentStage}
+                                        gameConfig={gameConfig}
+                                        setGameConfig={updateGameConfig}
+                                    />
+                            }
                         </VContainer>
-                        : <VContainer
-                            gap={15}
-                            overflow="auto"
-                            style={{ padding: 'calc(2 * var(--theia-ui-padding))' }}
-                        >
-                            Stage
-                        </VContainer>
-                }
-            </Sidebar>
-        </DashboardContainer>
+                    </Sidebar>
+                </DashboardContainer >
+            }
+        </>
     );
 }

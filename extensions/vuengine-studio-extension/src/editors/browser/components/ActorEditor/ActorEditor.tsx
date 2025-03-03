@@ -620,7 +620,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                             >
                                 <HideTreeButton
                                     className="theia-button secondary"
-                                    title={nls.localize('vuengine/editors/actor/showComponentsTree', 'Show Components Tree')}
+                                    title={nls.localize('vuengine/editors/actor/hideComponentsTree', 'Hide Components Tree')}
                                     onClick={() => setLeftSidebarOpen(false)}
                                 >
                                     <i className="codicon codicon-chevron-left" />

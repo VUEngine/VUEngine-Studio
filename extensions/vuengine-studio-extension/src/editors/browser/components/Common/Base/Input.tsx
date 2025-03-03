@@ -181,7 +181,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                         autoFocus={autoFocus}
                         title={title}
                     />
-                    {clearable !== false && type !== 'number' && internalValue !== '' && !disabled && (
+                    {clearable !== false && type !== 'number' && internalValue !== '' && !disabled && !readOnly && (
                         <i
                             className="codicon codicon-x"
                             onClick={() => updateInternalValue(defaultValue as string ?? '')}

@@ -39,6 +39,7 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 import { nanoid } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -82,6 +83,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly preferenceService: PreferenceService;
     @inject(StatusBar)
     protected readonly statusBar: StatusBar;
+    @inject(ThemeService)
+    protected readonly themeService: ThemeService;
     @inject(UndoRedoService)
     protected readonly undoRedoService: UndoRedoService;
     @inject(VesCommonService)
@@ -460,6 +463,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             openerService: this.openerService,
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
+                            themeService: this.themeService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
                             vesProjectService: this.vesProjectService,

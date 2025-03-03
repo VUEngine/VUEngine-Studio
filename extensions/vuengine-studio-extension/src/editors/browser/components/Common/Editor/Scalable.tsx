@@ -33,6 +33,10 @@ const ScalableContainerWorld = styled.div`
     justify-content: center;
     position: absolute;
     width: 10000px;
+
+    body.theia-light & {
+        background-image: radial-gradient(rgba(0, 0, 0, .1) 1px, transparent 0);
+    }
 `;
 
 interface ScalableProps {

@@ -27,6 +27,7 @@ import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } fro
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import { VesProjectPreferenceIds } from './ves-project-preferences';
 import {
+  GameConfig,
   PROJECT_CHANNEL_NAME,
   ProjectContributor,
   ProjectData,
@@ -851,6 +852,44 @@ export class VesProjectService {
         await this.promptForFilesUpdate(outdatedItems.length);
       }
     }
+  }
+
+  async getGameConfig(): Promise<GameConfig> {
+    await this.projectDataReady;
+
+    let gameConfig = this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfig;
+    if (!gameConfig) {
+      gameConfig = this.generateDataFromJsonSchema(defaultProjectData!.types!['GameConfig'].schema?.properties) as GameConfig;
+    }
+
+    return gameConfig;
+  }
+
+  async setGameConfig(data: Partial<GameConfig>): Promise<void> {
+    await this.projectDataReady;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+
+    const gameConfig = await this.getGameConfig() as unknown as ProjectDataItem & WithFileUri;
+    const gameConfigFileUri = (gameConfig && gameConfig._fileUri)
+      ? gameConfig._fileUri
+      : workspaceRootUri.resolve('config').resolve('GameConfig');
+
+    await this.fileService.writeFile(
+      gameConfigFileUri,
+      BinaryBuffer.fromString(
+        JSON.stringify(
+          this.sortObjectByKeys({
+            ...gameConfig,
+            ...data,
+            _fileUri: undefined,
+            _contributor: undefined,
+            _contributorUri: undefined,
+          }),
+          undefined,
+          4
+        )
+      ),
+    );
   }
 
   protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {

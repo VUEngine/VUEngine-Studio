@@ -14,6 +14,7 @@ import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import ProjectDashboard from './components/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 
 @injectable()
 export class VesProjectDashboardWidget extends ReactWidget implements ExtractableWidget {
@@ -39,6 +40,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     protected readonly preferenceService: PreferenceService;
     @inject(StatusBar)
     protected readonly statusBar: StatusBar;
+    @inject(ThemeService)
+    protected readonly themeService: ThemeService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesImagesService)
@@ -103,6 +106,7 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                             openerService: this.openerService,
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
+                            themeService: this.themeService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
                             vesProjectService: this.vesProjectService,
