@@ -161,6 +161,57 @@ export const MOCK_STAGES: { [id: string]: any } = {
     },
 };
 
+export const MOCK_POSITIONS: DashboardConfigPositionMap = {
+    '1234': {
+        x: 0,
+        y: 0,
+    },
+    '2345': {
+        x: 416,
+        y: 0,
+    },
+    '3456': {
+        x: 832,
+        y: 0,
+    },
+    '4567': {
+        x: 832,
+        y: 256,
+    },
+    '5678': {
+        x: 416,
+        y: 256,
+    },
+    '6789': {
+        x: 0,
+        y: 256,
+    },
+    '7890': {
+        x: 416,
+        y: 512,
+    },
+    '8901': {
+        x: 416,
+        y: 800,
+    },
+    '9012': {
+        x: 832,
+        y: 800,
+    },
+    'LVL1': {
+        x: 0,
+        y: 1072,
+    },
+    'TOWR': {
+        x: 1392,
+        y: 0,
+    },
+    '0123': {
+        x: 0,
+        y: 800,
+    }
+};
+
 export const MOCK_START_SCREEN = '1234';
 export const MOCK_AUTO_PAUSE_SCREEN = '0123';
 

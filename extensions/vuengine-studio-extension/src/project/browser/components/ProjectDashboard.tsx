@@ -13,7 +13,7 @@ import Sidebar from '../../../editors/browser/components/Common/Editor/Sidebar';
 import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves-editors-types';
 import { GameConfig } from '../ves-project-types';
 import ProjectSettings from './ProjectSettings';
-import StagePreview, { MOCK_STAGES } from './StagePreview';
+import StagePreview, { MOCK_POSITIONS, MOCK_STAGES } from './StagePreview';
 import StageSettings from './StageSettings';
 
 const ZOOM_MIN = 0.5;
@@ -139,7 +139,8 @@ export default function ProjectDashboard(): React.JSX.Element {
         Object.values(MOCK_STAGES).forEach(s => {
             const position = gameConfig?.dashboard?.positions && gameConfig?.dashboard?.positions[s._id]
                 ? gameConfig?.dashboard?.positions[s._id]
-                : { x: 0, y: 0 };
+                // : { x: 0, y: 0 };
+                : MOCK_POSITIONS[s._id] ?? { x: 0, y: 0 };
             const stageMaxX = s.width + position.x;
             const stageMaxY = s.height + position.y;
             if (stageMaxX > width) {
@@ -196,13 +197,13 @@ export default function ProjectDashboard(): React.JSX.Element {
                                         id={s._id}
                                         archerRef={archerRef}
                                         stage={MOCK_STAGES[s._id]}
-                                        positions={gameConfig.dashboard?.positions}
+                                        positions={gameConfig.dashboard?.positions ?? MOCK_POSITIONS}
                                         setPosition={(p: ControlPosition) => {
                                             const partialGameConfig = {
                                                 dashboard: {
                                                     ...(gameConfig.dashboard ?? {}),
                                                     positions: {
-                                                        ...(gameConfig.dashboard?.positions ?? {}),
+                                                        ...(gameConfig.dashboard?.positions ?? MOCK_POSITIONS),
                                                         [s._id]: p,
                                                     }
                                                 }
