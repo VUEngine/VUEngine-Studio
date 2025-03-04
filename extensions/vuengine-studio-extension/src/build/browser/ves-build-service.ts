@@ -1299,6 +1299,33 @@ Beware! This is usually not necessary and will result in the next build taking l
     }
   }
 
+  // removes build cache for core to force rebuild
+  async cleanCore(): Promise<void> {
+    const roots = this.workspaceService.tryGetRoots();
+    const workspaceRootUri = roots[0].resource;
+    const buildFolderWorkingUri = workspaceRootUri
+      .resolve('build')
+      .resolve('working');
+
+    const toDelete = [
+      buildFolderWorkingUri.resolve('libcore.a'),
+      buildFolderWorkingUri.resolve('assets').resolve('core').resolve('hashes'),
+    ];
+
+    Object.values(BuildMode).forEach(bm => toDelete.push(buildFolderWorkingUri
+      .resolve('objects')
+      .resolve(bm.toLowerCase())
+      .resolve('hashes')));
+
+    await Promise.all(toDelete.map(async u => {
+      if (await this.fileService.exists(u)) {
+        await this.fileService.delete(u, {
+          recursive: true
+        });
+      }
+    }));
+  }
+
   protected async deleteLibraryFiles(): Promise<void> {
     const buildPathUri = await this.getBuildPathUri();
     if (await this.fileService.exists(buildPathUri)) {

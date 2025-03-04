@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     EngineConfigData
 } from './EngineConfigEditorTypes';
@@ -22,6 +22,7 @@ import EngineConfigWireframe from './tabs/EngineConfigWireframe';
 import EngineConfigSram from './tabs/EngineConfigSram';
 import EngineConfigSprite from './tabs/EngineConfigSprite';
 import EngineConfigTexture from './tabs/EngineConfigTexture';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface EngineConfigEditorProps {
     data: EngineConfigData
@@ -30,7 +31,12 @@ interface EngineConfigEditorProps {
 
 export default function EngineConfigEditor(props: EngineConfigEditorProps): React.JSX.Element {
     const { data, updateData } = props;
+    const { services, setSaveCallback } = useContext(EditorsContext) as EditorsContextType;
     const [sidebarTab, setSidebarTab] = useState<number>(0);
+
+    useEffect(() => {
+        setSaveCallback(() => services.vesBuildService.cleanCore());
+    }, []);
 
     return (
         <Tabs
