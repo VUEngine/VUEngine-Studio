@@ -188,7 +188,7 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                     </div>}
                 <button
                     className='theia-button add-button'
-                    style={{ width: 262 }}
+                    style={{ width: 244 }}
                     tabIndex={0}
                     onClick={addMemoryPool}
                     title={nls.localizeByDefault('Add')}

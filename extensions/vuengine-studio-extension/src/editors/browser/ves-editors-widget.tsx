@@ -19,6 +19,7 @@ import {
     StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { Message } from '@theia/core/shared/@phosphor/messaging';
@@ -31,6 +32,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -39,7 +41,6 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 import { nanoid } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
-import { ThemeService } from '@theia/core/lib/browser/theming';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -87,6 +88,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly themeService: ThemeService;
     @inject(UndoRedoService)
     protected readonly undoRedoService: UndoRedoService;
+    @inject(VesBuildService)
+    protected readonly vesBuildService: VesBuildService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
@@ -113,6 +116,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected uiSchema: UISchemaElement | undefined;
 
     protected data: ItemData | undefined;
+
+    protected saveCallback: () => void | undefined;
 
     private onEditorContentHasChanged: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
 
@@ -215,6 +220,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.isLoading = true;
         this.isGenerating = false;
         this.generatingProgress = -1;
+    }
+
+    protected setSaveCallback(callback: () => void): void {
+        this.saveCallback = callback;
     }
 
     protected setTitle(): void {
@@ -371,6 +380,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                 console.error('Could not save');
             }
         }
+
+        if (this.saveCallback) {
+            this.saveCallback();
+        }
     }
 
     protected async load(): Promise<void> {
@@ -446,6 +459,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         fileUri: this.uri,
                         isGenerating: this.isGenerating,
                         isReadonly: this.isReadOnly,
+                        setSaveCallback: this.setSaveCallback.bind(this),
                         setIsGenerating: this.setIsGenerating.bind(this),
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
                         enableCommands: this.enableCommands.bind(this),
@@ -464,6 +478,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
                             themeService: this.themeService,
+                            vesBuildService: this.vesBuildService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
                             vesProjectService: this.vesProjectService,

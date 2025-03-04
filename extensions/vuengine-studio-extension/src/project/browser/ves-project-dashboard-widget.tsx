@@ -1,6 +1,7 @@
 import { CommandService, MessageService, nls, QuickPickService } from '@theia/core';
 import { ExtractableWidget, HoverService, LocalStorageService, Message, OpenerService, PreferenceService, StatusBar, StatusBarEntry } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -8,13 +9,13 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import ProjectDashboard from './components/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
-import { ThemeService } from '@theia/core/lib/browser/theming';
 
 @injectable()
 export class VesProjectDashboardWidget extends ReactWidget implements ExtractableWidget {
@@ -42,6 +43,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     protected readonly statusBar: StatusBar;
     @inject(ThemeService)
     protected readonly themeService: ThemeService;
+    @inject(VesBuildService)
+    protected readonly vesBuildService: VesBuildService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesImagesService)
@@ -107,6 +110,7 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
                             themeService: this.themeService,
+                            vesBuildService: this.vesBuildService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
                             vesProjectService: this.vesProjectService,

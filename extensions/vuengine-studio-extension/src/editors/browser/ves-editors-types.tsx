@@ -1,4 +1,3 @@
-import { createContext } from 'react';
 import { CommandService, MessageService, nls, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
@@ -8,15 +7,17 @@ import {
     StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { createContext } from 'react';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
-import { ThemeService } from '@theia/core/lib/browser/theming';
 
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
@@ -30,6 +31,7 @@ export interface EditorsServices {
     preferenceService: PreferenceService
     quickPickService: QuickPickService
     themeService: ThemeService
+    vesBuildService: VesBuildService
     vesCommonService: VesCommonService
     vesImagesService: VesImagesService
     vesProjectService: VesProjectService,
@@ -45,6 +47,7 @@ export interface EditorsContextType {
     fileUri: URI
     isGenerating: boolean
     isReadonly: boolean
+    setSaveCallback: (callback: () => void) => void
     setIsGenerating: (isGenerating: boolean, progress?: number) => void
     setGeneratingProgress: (current: number, total: number) => void
     enableCommands: (commandIds: string[]) => void
