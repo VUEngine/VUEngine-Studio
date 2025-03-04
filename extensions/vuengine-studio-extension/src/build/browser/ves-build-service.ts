@@ -479,12 +479,32 @@ export class VesBuildService {
       return;
     }
 
-    const buildFolderBaseUri = workspaceRootUri
+    const parentFolderName = parentFileStat.name;
+
+    const buildFolderWorkingUri = workspaceRootUri
       .resolve('build')
-      .resolve('working')
-      .resolve(relativePath.fsPath().split(isWindows ? '\\' : '/')[0])
-      .resolve(parentFileStat.name);
+      .resolve('working');
+
+    const subFolder = relativePath.fsPath().split(isWindows ? '\\' : '/')[0];
+    const buildModeLc = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode).toLowerCase();
+
+    let buildFolderBaseUri = buildFolderWorkingUri.resolve(subFolder);
+    const toDeleteBaseUris: URI[] = [];
+
+    if ((subFolder === 'source')) {
+      buildFolderBaseUri = buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(buildModeLc);
+
+      Object.values(BuildMode).forEach(bm => toDeleteBaseUris.push(buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(bm.toLowerCase())));
+    } else {
+      toDeleteBaseUris.push(buildFolderBaseUri);
+    }
+
     const buildFolderFileUri = buildFolderBaseUri
+      .resolve(parentFolderName)
       .resolve(relativePath.dir.fsPath())
       .resolve(`${relativePath.name}.o`);
 
@@ -496,11 +516,22 @@ export class VesBuildService {
     }
 
     const buildFolderFileRelativePath = `${adjustPath(buildFolderFileRelativeUri.fsPath())}\n`;
+
     const shasum = window.electronVesCore.sha1(buildFolderFileRelativePath);
-    const hashFileUri = buildFolderBaseUri.resolve('hashes').resolve(`${shasum}.o`);
-    if (await this.fileService.exists(hashFileUri)) {
-      await this.fileService.delete(hashFileUri);
-    }
+
+    await Promise.all(toDeleteBaseUris.map(async u => {
+      const hashFileUri = (subFolder === 'source')
+        ? u.resolve('hashes')
+          .resolve(parentFolderName)
+          .resolve(`${shasum}.o`)
+        : u.resolve(parentFolderName)
+          .resolve('hashes')
+          .resolve(`${shasum}.o`);
+
+      if (await this.fileService.exists(hashFileUri)) {
+        await this.fileService.delete(hashFileUri);
+      }
+    }));
   };
 
   // get number of all libraries for which there are no lib*.a files in build folder
