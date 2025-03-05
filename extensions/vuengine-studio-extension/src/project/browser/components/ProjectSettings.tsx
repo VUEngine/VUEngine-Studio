@@ -6,7 +6,7 @@ import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { EditorsContext, EditorsContextType, TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
 import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
-import { MOCK_STAGES } from './StagePreview';
+import { MOCK_STAGES } from './ProjectDashboard';
 
 interface ConfigType {
     typeId: string,

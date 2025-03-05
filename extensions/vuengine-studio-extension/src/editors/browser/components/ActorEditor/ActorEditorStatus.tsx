@@ -59,7 +59,7 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     };
 
     const setStatusBarItems = () => {
-        setStatusBarItem('ves-editors-common-zoom-out', {
+        setStatusBarItem('ves-editors-actor-zoom-out', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 9,
             text: '$(codicon-zoom-out)',
@@ -67,14 +67,14 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
             tooltip: CommonEditorCommands.ZOOM_OUT.label,
             className: previewZoom <= MIN_PREVIEW_SPRITE_ZOOM ? 'disabled' : undefined,
         });
-        setStatusBarItem('ves-editors-common-zoom', {
+        setStatusBarItem('ves-editors-actor-zoom', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 8,
             text: `${Math.round(previewZoom * 100)}%`,
             command: CommonEditorCommands.ZOOM_RESET.id,
             tooltip: CommonEditorCommands.ZOOM_RESET.label,
         });
-        setStatusBarItem('ves-editors-common-zoom-in', {
+        setStatusBarItem('ves-editors-actor-zoom-in', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 7,
             text: '$(codicon-zoom-in)',
@@ -83,7 +83,7 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
             className: previewZoom >= MAX_PREVIEW_SPRITE_ZOOM ? 'disabled' : undefined,
         });
 
-        setStatusBarItem('ves-editors-common-center', {
+        setStatusBarItem('ves-editors-actor-center', {
             alignment: StatusBarAlignment.RIGHT,
             priority: 6,
             text: '$(codicon-symbol-array)',
@@ -125,10 +125,10 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     };
 
     const removeStatusBarItems = () => {
-        removeStatusBarItem('ves-editors-common-center');
-        removeStatusBarItem('ves-editors-common-zoom-in');
-        removeStatusBarItem('ves-editors-common-zoom-out');
-        removeStatusBarItem('ves-editors-common-zoom');
+        removeStatusBarItem('ves-editors-actor-center');
+        removeStatusBarItem('ves-editors-actor-zoom-in');
+        removeStatusBarItem('ves-editors-actor-zoom-out');
+        removeStatusBarItem('ves-editors-actor-zoom');
         removeStatusBarItem('ves-editors-actor-preview-anaglyph');
         removeStatusBarItem('ves-editors-actor-preview-background-color');
         removeStatusBarItem('ves-editors-actor-preview-screen-frame');

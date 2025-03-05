@@ -32,5 +32,23 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
                 this.commandService.executeCommand(CommonCommands.PIN_TAB.id);
             }
         });
+
+        commandRegistry.registerCommand(VesProjectCommands.ZOOM_IN, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomIn(),
+        });
+
+        commandRegistry.registerCommand(VesProjectCommands.ZOOM_OUT, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomOut(),
+        });
+
+        commandRegistry.registerCommand(VesProjectCommands.ZOOM_RESET, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomReset(),
+        });
     }
 }

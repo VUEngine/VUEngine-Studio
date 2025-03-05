@@ -5,7 +5,7 @@ import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves-editors-types';
 import { GameConfig, ProjectDataItem, WithFileUri } from '../ves-project-types';
-import { MOCK_AUTO_PAUSE_SCREEN, MOCK_STAGES, MOCK_START_SCREEN } from './StagePreview';
+import { MOCK_AUTO_PAUSE_SCREEN, MOCK_STAGES, MOCK_START_SCREEN } from './ProjectDashboard';
 
 interface StageSettingsProps {
     stageId: string

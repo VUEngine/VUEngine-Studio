@@ -1,5 +1,15 @@
 import { CommandService, MessageService, nls, QuickPickService } from '@theia/core';
-import { ExtractableWidget, HoverService, LocalStorageService, Message, OpenerService, PreferenceService, StatusBar, StatusBarEntry } from '@theia/core/lib/browser';
+import {
+    ExtractableWidget,
+    FrontendApplication,
+    HoverService,
+    LocalStorageService,
+    Message,
+    OpenerService,
+    PreferenceService,
+    StatusBar,
+    StatusBarEntry
+} from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
@@ -17,8 +27,19 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 import ProjectDashboard from './components/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
 
+export const ZOOM_MIN = 0.25;
+export const ZOOM_MAX = 3;
+export const ZOOM_STEP = 0.25;
+export const ZOOM_DEFAULT = 0.5;
+
+interface VesProjectDashboardWidgetState {
+    scale: number
+}
+
 @injectable()
 export class VesProjectDashboardWidget extends ReactWidget implements ExtractableWidget {
+    @inject(FrontendApplication)
+    protected readonly app: FrontendApplication;
     @inject(ColorRegistry)
     private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
@@ -61,10 +82,16 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     static readonly ID = 'vesProjectDashboardWidget';
     static readonly LABEL = nls.localize('vuengine/project/dashboard', 'Project Dashboard');
 
+    protected state: VesProjectDashboardWidgetState = {
+        scale: ZOOM_DEFAULT,
+    };
+
     protected resource = '';
 
     isExtractable: boolean = true;
     secondaryWindow: Window | undefined;
+
+    protected statusBarItems: { [id: string]: StatusBarEntry } = {};
 
     @postConstruct()
     protected init(): void {
@@ -84,10 +111,70 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     protected async doInit(): Promise<void> {
     }
 
+    protected setStatusBarItem(id: string, entry: StatusBarEntry): void {
+        this.statusBarItems[id] = entry;
+        this.statusBar.setElement(id, entry);
+    }
+
+    protected removeStatusBarItem(id: string): void {
+        delete (this.statusBarItems[id]);
+        this.statusBar.removeElement(id);
+    }
+
     protected onActivateRequest(msg: Message): void {
         super.onActivateRequest(msg);
         this.node.tabIndex = 0;
         this.node.focus();
+    }
+
+    protected onAfterAttach(msg: Message): void {
+        this.setStatusBar();
+    }
+
+    protected onAfterDetach(msg: Message): void {
+        this.resetStatusBar();
+    }
+
+    protected onAfterShow(msg: Message): void {
+        this.setStatusBar();
+    }
+
+    protected onAfterHide(msg: Message): void {
+        this.resetStatusBar();
+    }
+
+    protected setStatusBar(): void {
+        this.app.shell.addClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
+    }
+
+    protected resetStatusBar(): void {
+        this.app.shell.removeClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
+    }
+
+    handleZoomIn(): void {
+        console.log('handleZoomIn');
+        if (this.state.scale + ZOOM_STEP <= ZOOM_MAX) {
+            this.setScale(this.state.scale + ZOOM_STEP);
+        }
+    }
+
+    handleZoomOut(): void {
+        console.log('handleZoomOut');
+        if (this.state.scale - ZOOM_STEP >= ZOOM_MIN) {
+            this.setScale(this.state.scale - ZOOM_STEP);
+        }
+    }
+
+    handleZoomReset(): void {
+        console.log('handleZoomReset');
+        this.setScale(ZOOM_DEFAULT);
+    }
+
+    protected setScale(scale: number): void {
+        this.state.scale = scale;
+        this.update();
     }
 
     protected render(): React.ReactNode {
@@ -96,8 +183,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                 <EditorsContext.Provider
                     // @ts-ignore
                     value={{
-                        setStatusBarItem: (id: string, entry: StatusBarEntry) => this.statusBar.setElement(id, entry),
-                        removeStatusBarItem: (id: string) => this.statusBar.removeElement(id),
+                        setStatusBarItem: this.setStatusBarItem.bind(this),
+                        removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
@@ -120,7 +207,10 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                         }
                     }}
                 >
-                    <ProjectDashboard />
+                    <ProjectDashboard
+                        scale={this.state.scale}
+                        setScale={this.setScale.bind(this)}
+                    />
                 </EditorsContext.Provider>
             </div>
         );
