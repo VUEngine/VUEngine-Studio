@@ -107,7 +107,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
     const label = this.options
       ? this.vesCommonService.basename(this.options.uri)
       : VesEmulatorWidget.LABEL;
-    const caption = this.options ? this.options.uri : VesEmulatorWidget.LABEL;
+    const caption = this.options
+      ? this.options.uri.replace('file://', '')
+      : VesEmulatorWidget.LABEL;
 
     this.id = VesEmulatorWidget.ID;
     this.title.label = label;
