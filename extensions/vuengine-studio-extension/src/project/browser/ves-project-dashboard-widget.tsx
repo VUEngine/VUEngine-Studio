@@ -97,9 +97,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     protected init(): void {
         this.doInit();
 
-        const label = nls.localize('vuengine/project/project', 'Project');
         this.id = VesProjectDashboardWidget.ID;
-        this.title.label = label;
+        this.title.label = VesProjectDashboardWidget.LABEL;
         this.title.caption = 'Project Dashboard';
         this.title.iconClass = 'codicon codicon-home';
         this.title.closable = true;
