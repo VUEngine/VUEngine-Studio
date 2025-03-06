@@ -44,6 +44,12 @@ export namespace FontEditorCommands {
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: '7',
     };
+    export const PALETTE_SELECT_INDEX_0: EditorCommand = {
+        id: 'editors.fontEditor.paletteSelectIndex0',
+        label: nls.localize('vuengine/editors/font/commands/paletteSelectIndex0', 'Select Palette Index 0 (Transparent)'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+        keybinding: '0',
+    };
     export const SWAP_COLORS: EditorCommand = {
         id: 'editors.fontEditor.swapColors',
         label: nls.localize('vuengine/editors/font/commands/swapColors', 'Swap Colors'),

@@ -1,18 +1,18 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import SpriteEditor from '../../components/SpriteEditor/SpriteEditor';
-import { SpriteData } from '../../components/SpriteEditor/SpriteEditorTypes';
+import PixelEditor from '../../components/PixelEditor/PixelEditor';
+import { SpriteData } from '../../components/PixelEditor/PixelEditorTypes';
 import { EditorsContext } from '../../ves-editors-types';
 
-interface VesSpriteEditorControlProps {
+interface VesPixelEditorControlProps {
     data: SpriteData;
     handleChange(path: string, value: SpriteData): void;
     path: string;
 }
 
-const VesSpriteEditorControl = ({ data, handleChange, path }: VesSpriteEditorControlProps) =>
+const VesPixelEditorControl = ({ data, handleChange, path }: VesPixelEditorControlProps) =>
     <EditorsContext.Consumer>
-        {context => <SpriteEditor
+        {context => <PixelEditor
             data={data}
             updateData={(newValue: SpriteData) => {
                 if (!context.isReadonly) {
@@ -22,4 +22,4 @@ const VesSpriteEditorControl = ({ data, handleChange, path }: VesSpriteEditorCon
         />}
     </EditorsContext.Consumer>;
 
-export default withJsonFormsControlProps(VesSpriteEditorControl);
+export default withJsonFormsControlProps(VesPixelEditorControl);

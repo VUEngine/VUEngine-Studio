@@ -1,4 +1,4 @@
-.jsonforms-container > .spriteEditor {
+.jsonforms-container > .pixelEditor {
     flex-grow: 1;
     justify-content: space-between;
     gap: 15px;
@@ -6,11 +6,11 @@
     position: relative;
 }
 
-.spriteEditor canvas {
+.pixelEditor canvas {
     border: none !important; 
 }
 
-.spriteEditor .frame {
+.pixelEditor .frame {
     box-sizing: border-box;
     cursor: pointer;
     flex-grow: unset;
@@ -21,21 +21,21 @@
     width: 75px;
 }
 
-.spriteEditor .frame-index {
+.pixelEditor .frame-index {
     position: absolute;
     left: 10px;
     top: 8px;
 }
 
-.spriteEditor .layer {
+.pixelEditor .layer {
     padding: var(--theia-ui-padding)
 }
 
-.spriteEditor .layer input {
+.pixelEditor .layer input {
     width: 120px;
 }
 
-.spriteEditor .pixel-container {
+.pixelEditor .pixel-container {
     flex-grow: 1;
     inset: 0;
     overflow: hidden;

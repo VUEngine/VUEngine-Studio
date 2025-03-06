@@ -1,11 +1,12 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import { ControlPosition } from 'react-draggable';
 import { nanoid } from '../../editors/browser/components/Common/Utils';
-import { createEmptyPixelData } from '../../editors/browser/components/SpriteEditor/SpriteEditor';
-import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
+import { Displays } from '../../editors/browser/components/Common/VUEngineTypes';
+import { createEmptyPixelData } from '../../editors/browser/components/PixelEditor/PixelEditor';
+import { DEFAULT_IMAGE_SIZE } from '../../editors/browser/components/PixelEditor/PixelEditorTypes';
 import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
-import { ControlPosition } from 'react-draggable';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
@@ -422,6 +423,83 @@ export const defaultProjectData: ProjectData = {
       templates: ['Image'],
       forFiles: ['.png']
     },
+    Pixel: {
+      enabled: true,
+      file: '.pixel',
+      schema: {
+        properties: {
+          colorMode: {
+            type: 'number'
+          },
+          dimensions: {
+            type: 'object',
+            properties: {
+              x: {
+                type: 'number',
+                default: DEFAULT_IMAGE_SIZE
+              },
+              y: {
+                type: 'number',
+                default: DEFAULT_IMAGE_SIZE
+              }
+            },
+            additionalProperties: false,
+          },
+          frames: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'string'
+                  },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'number',
+                      }
+                    }
+                  },
+                  isVisible: {
+                    type: 'boolean',
+                    default: true,
+                  },
+                  name: {
+                    type: 'string'
+                  },
+                  parallax: {
+                    type: 'number'
+                  },
+                  displays: {
+                    type: 'string',
+                    default: 'ON'
+                  },
+                },
+                additionalProperties: false,
+              }
+            },
+            default: [[{
+              data: createEmptyPixelData(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
+              displays: Displays.Both,
+              id: nanoid(),
+              isVisible: true,
+              name: '',
+              parallax: 0,
+            }]]
+          },
+        },
+        required: []
+      },
+      uiSchema: {
+        type: 'PixelEditor',
+        scope: '#'
+      },
+      icon: 'codicon codicon-symbol-color'
+    },
     PluginFile: {
       file: 'vuengine.plugin',
       excludeFromDashboard: true,
@@ -567,102 +645,6 @@ export const defaultProjectData: ProjectData = {
       },
       icon: 'codicon codicon-chip',
       templates: ['RomInfo']
-    },
-    Sprite: {
-      enabled: false,
-      file: '.sprite',
-      schema: {
-        title: 'Sprite',
-        properties: {
-          colorMode: {
-            type: 'number'
-          },
-          dimensions: {
-            type: 'object',
-            properties: {
-              x: {
-                type: 'number',
-                default: DEFAULT_SPRITE_SIZE
-              },
-              y: {
-                type: 'number',
-                default: DEFAULT_SPRITE_SIZE
-              }
-            },
-            additionalProperties: false,
-          },
-          frames: {
-            type: 'array',
-            items: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: {
-                    type: 'string'
-                  },
-                  data: {
-                    type: 'array',
-                    items: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          rowIndex: {
-                            type: 'integer'
-                          },
-                          columnIndex: {
-                            type: 'integer'
-                          },
-                          color: {
-                            type: 'string'
-                          }
-                        },
-                        additionalProperties: false,
-                      }
-                    }
-                  }
-                },
-                additionalProperties: false,
-              }
-            },
-            default: [[{
-              id: nanoid(),
-              data: createEmptyPixelData(DEFAULT_SPRITE_SIZE, DEFAULT_SPRITE_SIZE),
-            }]]
-          },
-          layerAttributes: {
-            type: 'object',
-            properties: {},
-            additionalProperties: {
-              type: 'object',
-              properties: {
-                name: {
-                  type: 'string'
-                },
-                parallax: {
-                  type: 'number'
-                },
-                displayMode: {
-                  type: 'string',
-                  default: 'ON'
-                },
-                isVisible: {
-                  type: 'boolean',
-                  default: true
-                }
-              },
-              additionalProperties: false,
-            }
-          }
-        },
-        required: []
-      },
-      uiSchema: {
-        type: 'SpriteEditor',
-        scope: '#'
-      },
-      icon: 'codicon codicon-circuit-board'
     },
     VsuSandbox: {
       enabled: false,

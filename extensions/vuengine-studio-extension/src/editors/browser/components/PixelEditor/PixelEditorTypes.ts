@@ -1,14 +1,15 @@
-import { LayerProps } from 'dotting';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { Displays } from '../Common/VUEngineTypes';
 
-export const DEFAULT_SPRITE_SIZE = 16;
+export const DEFAULT_IMAGE_SIZE = 16;
 
-export interface LayerAttributes {
+export interface LayerPixelData {
+    id: string;
+    data: (number | null)[][];
+    displays: Displays
+    isVisible: boolean
     name: string
     parallax: number
-    displayMode: Displays
-    isVisible: boolean
 }
 
 export interface SpriteData {
@@ -17,12 +18,7 @@ export interface SpriteData {
         x: number
         y: number
     }
-    frames: LayerProps[][]
-    layerAttributes: LayerAttributesMap
-}
-
-export interface LayerAttributesMap {
-    [id: string]: LayerAttributes
+    frames: LayerPixelData[][]
 }
 
 export const DOT_BRUSH_PATTERNS = [

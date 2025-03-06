@@ -13,10 +13,10 @@ import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/Base/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/Base/VContainer';
-import PaletteSelect from '../SpriteEditor/Sidebar/PaletteSelect';
-import SpriteEditorCurrentToolSettings from '../SpriteEditor/Sidebar/SpriteEditorCurrentToolSettings';
-import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';
-import SpriteEditorTools from '../SpriteEditor/Sidebar/SpriteEditorTools';
+import PaletteSelect from '../PixelEditor/Sidebar/PaletteSelect';
+import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCurrentToolSettings';
+import PixelEditorStatus from '../PixelEditor/PixelEditorStatus';
+import PixelEditorTools from '../PixelEditor/Sidebar/PixelEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharSettings from './Alphabet/CharSettings';
@@ -61,6 +61,7 @@ export const INPUT_BLOCKING_COMMANDS = [
     FontEditorCommands.ALPHABET_NAVIGATE_LINE_UP.id,
     FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id,
     FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id,
+    FontEditorCommands.COPY_CHARACTER.id,
     FontEditorCommands.PALETTE_SELECT_INDEX_1.id,
     FontEditorCommands.PALETTE_SELECT_INDEX_2.id,
     FontEditorCommands.PALETTE_SELECT_INDEX_3.id,
@@ -68,6 +69,18 @@ export const INPUT_BLOCKING_COMMANDS = [
     FontEditorCommands.PALETTE_SELECT_INDEX_5.id,
     FontEditorCommands.PALETTE_SELECT_INDEX_6.id,
     FontEditorCommands.PALETTE_SELECT_INDEX_7.id,
+    FontEditorCommands.PASTE_CHARACTER.id,
+    FontEditorCommands.SWAP_COLORS.id,
+    FontEditorCommands.TOOL_DRAG.id,
+    FontEditorCommands.TOOL_ELLIPSE.id,
+    FontEditorCommands.TOOL_ELLIPSE_FILLED.id,
+    FontEditorCommands.TOOL_ERASER.id,
+    FontEditorCommands.TOOL_LINE.id,
+    FontEditorCommands.TOOL_MARQUEE.id,
+    FontEditorCommands.TOOL_PAINT_BUCKET.id,
+    FontEditorCommands.TOOL_PENCIL.id,
+    FontEditorCommands.TOOL_RECTANGLE.id,
+    FontEditorCommands.TOOL_RECTANGLE_FILLED.id,
 ];
 
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
@@ -234,7 +247,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             if (updatedCharacter[mp.rowIndex] === null || updatedCharacter[mp.rowIndex] === undefined) {
                 updatedCharacter[mp.rowIndex] = [];
             }
-            updatedCharacter[mp.rowIndex][mp.columnIndex] = PALETTE_INDICES[mp.color];
+            updatedCharacter[mp.rowIndex][mp.columnIndex] = PALETTE_INDICES[0][mp.color];
         });
         setCurrentCharacterData(updatedCharacter);
     };
@@ -348,13 +361,14 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     setPrimaryColorIndex={setPrimaryColorIndex}
                     secondaryColorIndex={secondaryColorIndex}
                     setSecondaryColorIndex={setSecondaryColorIndex}
+                    includeTransparent={false}
                     dottingRef={dottingRef}
                 />
                 <VContainer gap={10} overflow='auto'>
-                    <SpriteEditorTools
+                    <PixelEditorTools
                         dottingRef={dottingRef}
                     />
-                    <SpriteEditorCurrentToolSettings
+                    <PixelEditorCurrentToolSettings
                         dottingRef={dottingRef}
                     />
                     <Actions
@@ -449,7 +463,7 @@ Will be skipped if compressed data is not smaller than source data.'
                 </HContainer>
             </EditorSidebar>
         </HContainer>
-        <SpriteEditorStatus
+        <PixelEditorStatus
             dottingRef={dottingRef}
         />
     </div>;

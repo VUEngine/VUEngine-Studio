@@ -4,11 +4,11 @@ import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, Pan
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
-interface SpriteEditorStatusProps {
+interface PixelEditorStatusProps {
     dottingRef: React.RefObject<DottingRef>
 }
 
-export default function SpriteEditorStatus(props: SpriteEditorStatusProps): React.JSX.Element {
+export default function PixelEditorStatus(props: PixelEditorStatusProps): React.JSX.Element {
     const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
     const { dottingRef } = props;
     const {

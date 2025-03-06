@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { SpriteEditorTool } from '../../SpriteEditor/Sidebar/SpriteEditorTool';
+import { PixelEditorTool } from '../../PixelEditor/Sidebar/PixelEditorTool';
 import { FontEditorCommands } from '../FontEditorCommands';
 
 interface ActionsProps {
@@ -40,8 +40,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
 
     const confirmClear = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/sprite/clear', 'Clear'),
-            msg: nls.localize('vuengine/editors/sprite/areYouSureYouWantToClear', 'Are you sure you want to clear the entire canvas?'),
+            title: nls.localize('vuengine/editors/pixel/clear', 'Clear'),
+            msg: nls.localize('vuengine/editors/pixel/areYouSureYouWantToClear', 'Are you sure you want to clear the entire canvas?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -136,7 +136,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
             </label>
             <HContainer gap={2} wrap='wrap'>
                 {/* }
-                <SpriteEditorTool
+                <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/rotate', 'Rotate') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.ROTATE.id, true)
@@ -144,8 +144,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                     onClick={rotate}
                 >
                     <ArrowClockwise size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/mirrorHorizontally', 'Mirror Horizontally') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_HORIZONTALLY.id, true)
@@ -153,8 +153,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                     onClick={mirrorHorizontally}
                 >
                     <FlipHorizontal size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/mirrorVertically', 'Mirror Vertically') +
                         services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_VERTICALLY.id, true)
@@ -162,9 +162,9 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                     onClick={mirrorVertically}
                 >
                     <FlipVertical size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
                 {*/}
-                <SpriteEditorTool
+                <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/copy', 'Copy Current Character') +
                         services.vesCommonService.getKeybindingLabel(CommonCommands.COPY.id, true)
@@ -172,8 +172,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                     onClick={copy}
                 >
                     <CopySimple size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/paste', 'Paste To Current Character') +
                         services.vesCommonService.getKeybindingLabel(CommonCommands.PASTE.id, true)
@@ -181,13 +181,13 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                     onClick={paste}
                 >
                     <Clipboard size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     title={nls.localize('vuengine/editors/font/actions/clear', 'Clear Current Character')}
                     onClick={confirmClear}
                 >
                     <Trash size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
             </HContainer>
         </VContainer>
     );

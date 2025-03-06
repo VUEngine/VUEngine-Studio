@@ -18,6 +18,8 @@ import VesMusicEditorControl from './music-editor/ves-music-editor-control';
 import VesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
 import VesPcmEditorControl from './pcm-editor/ves-pcm-editor-control';
 import VesPcmEditorControlTester from './pcm-editor/ves-pcm-editor-control-tester';
+import vesPixelEditorControl from './pixel-editor/ves-pixel-editor-control';
+import vesPixelEditorControlTester from './pixel-editor/ves-pixel-editor-control-tester';
 import VesPluginFileEditorControl from './plugin-file-editor/ves-plugin-file-editor-control';
 import VesPluginFileEditorControlTester from './plugin-file-editor/ves-plugin-file-editor-control-tester';
 import vesRominfoEditorControl from './rominfo-editor/ves-rominfo-editor-control';
@@ -26,8 +28,6 @@ import VesRumbleEffectEditorControl from './rumble-effect-editor/ves-rumble-effe
 import VesRumbleEffectEditorControlTester from './rumble-effect-editor/ves-rumble-effect-editor-control-tester';
 import vesSimpleListEditorControl from './simple-list-editor/ves-simple-list-editor-control';
 import vesSimpleListEditorControlTester from './simple-list-editor/ves-simple-list-editor-control-tester';
-import vesSpriteEditorControl from './sprite-editor/ves-sprite-editor-control';
-import vesSpriteEditorControlTester from './sprite-editor/ves-sprite-editor-control-tester';
 import vesStageEditorControl from './stage-editor/ves-stage-editor-control';
 import vesStageEditorControlTester from './stage-editor/ves-stage-editor-control-tester';
 import VesTranslationsEditorControl from './translations-editor/ves-translations-editor-control';
@@ -48,11 +48,11 @@ export const VES_RENDERERS = [
     { tester: vesLogicEditorControlTester, renderer: VesLogicEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
+    { tester: vesPixelEditorControlTester, renderer: vesPixelEditorControl },
     { tester: VesPluginFileEditorControlTester, renderer: VesPluginFileEditorControl },
     { tester: vesRominfoEditorControlTester, renderer: vesRominfoEditorControl },
     { tester: VesRumbleEffectEditorControlTester, renderer: VesRumbleEffectEditorControl },
     { tester: vesSimpleListEditorControlTester, renderer: vesSimpleListEditorControl },
-    { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },
     { tester: vesStageEditorControlTester, renderer: vesStageEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
     { tester: vesVsuSandboxControlTester, renderer: vesVsuSandboxControl },

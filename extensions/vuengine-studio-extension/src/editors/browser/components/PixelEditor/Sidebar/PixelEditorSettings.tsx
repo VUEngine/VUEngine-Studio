@@ -3,16 +3,16 @@ import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { SpriteEditorTool } from './SpriteEditorTool';
+import { PixelEditorTool } from './PixelEditorTool';
 
-interface SpriteEditorSettingsProps {
+interface PixelEditorSettingsProps {
     allowResize?: boolean
     setAllowResize?: (allowResize: boolean) => void
     gridSize: number
     setGridSize: (gridSize: number) => void
 }
 
-export default function SpriteEditorSettings(props: SpriteEditorSettingsProps): React.JSX.Element {
+export default function PixelEditorSettings(props: PixelEditorSettingsProps): React.JSX.Element {
     const { gridSize, setGridSize, allowResize, setAllowResize } = props;
 
     const toggleGrid = (): void => {
@@ -25,19 +25,19 @@ export default function SpriteEditorSettings(props: SpriteEditorSettingsProps): 
                 {nls.localizeByDefault('Settings')}
             </label>
             <HContainer gap={2} wrap='wrap'>
-                <SpriteEditorTool
+                <PixelEditorTool
                     className={gridSize > 0 ? 'active' : ''}
                     onClick={toggleGrid}
                 >
                     <GridFour size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
                 {allowResize !== undefined && setAllowResize !== undefined &&
-                    <SpriteEditorTool
+                    <PixelEditorTool
                         className={allowResize ? 'active' : ''}
                         onClick={() => setAllowResize(!allowResize)}
                     >
                         <ArrowsOut size={20} />
-                    </SpriteEditorTool>
+                    </PixelEditorTool>
                 }
             </HContainer>
         </VContainer>

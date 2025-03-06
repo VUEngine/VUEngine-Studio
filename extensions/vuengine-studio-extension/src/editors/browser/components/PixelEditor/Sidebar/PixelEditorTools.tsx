@@ -6,13 +6,13 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { FontEditorCommands } from '../../FontEditor/FontEditorCommands';
-import { SpriteEditorTool } from './SpriteEditorTool';
+import { PixelEditorTool } from './PixelEditorTool';
 
-interface SpriteEditorToolsProps {
+interface PixelEditorToolsProps {
     dottingRef: React.RefObject<DottingRef>
 }
 
-export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.JSX.Element {
+export default function PixelEditorTools(props: PixelEditorToolsProps): React.JSX.Element {
     const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { dottingRef } = props;
     const { brushTool, changeBrushTool } = useBrush(dottingRef);
@@ -85,10 +85,10 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
     return (
         <VContainer>
             <label>
-                {nls.localizeByDefault('Tools')}
+                {nls.localize('vuengine/editors/font/tools/title', 'Tools')}
             </label>
             <HContainer gap={2} wrap='wrap'>
-                <SpriteEditorTool
+                <PixelEditorTool
                     className={brushTool === BrushTool.NONE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/drag', 'Drag') +
@@ -97,8 +97,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.NONE)}
                 >
                     <Hand size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     className={`tool ${brushTool === BrushTool.SELECT ? 'active' : undefined}`}
                     title={
                         nls.localize('vuengine/editors/font/tools/marquee', 'Marquee') +
@@ -107,8 +107,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.SELECT)}
                 >
                     <Selection size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     className={brushTool === BrushTool.DOT ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/pencil', 'Pencil') +
@@ -117,8 +117,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.DOT)}
                 >
                     <PencilSimple size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     className={brushTool === BrushTool.LINE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/line', 'Line') +
@@ -127,8 +127,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.LINE)}
                 >
                     <Minus size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     // className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/rectangle', 'Rectangle') +
@@ -137,8 +137,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 // onClick={() => changeBrushTool(BrushTool.RECTANGLE)}
                 >
                     <Square size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     // className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/rectangleFilled', 'Rectangle (Filled)') +
@@ -147,8 +147,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 // onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
                 >
                     <Square size={20} weight="fill" />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     // className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/ellipse', 'Ellipse') +
@@ -157,8 +157,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 // onClick={() => changeBrushTool(BrushTool.ELLIPSE)}
                 >
                     <Circle size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     // className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/ellipseFilled', 'Ellipse (Filled)') +
@@ -167,8 +167,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                 // onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
                 >
                     <Circle size={20} weight="fill" />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     className={brushTool === BrushTool.PAINT_BUCKET ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/paintBucket', 'Paint Bucket') +
@@ -177,8 +177,8 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
                 >
                     <PaintBucket size={20} />
-                </SpriteEditorTool>
-                <SpriteEditorTool
+                </PixelEditorTool>
+                <PixelEditorTool
                     className={brushTool === BrushTool.ERASER ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/font/tools/eraser', 'Eraser') +
@@ -187,7 +187,7 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
                     onClick={() => changeBrushTool(BrushTool.ERASER)}
                 >
                     <Eraser size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
             </HContainer>
         </VContainer>
     );

@@ -7,7 +7,7 @@ import React, { useContext, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
 import PopUpDialog from '../../../Common/Base/PopUpDialog';
-import { SpriteEditorTool } from '../../../SpriteEditor/Sidebar/SpriteEditorTool';
+import { PixelEditorTool } from '../../../PixelEditor/Sidebar/PixelEditorTool';
 import { CHAR_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
 import ExportSettings from './ExportSettings';
 import ImportSettings from './ImportSettings';
@@ -86,18 +86,18 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
     };
 
     return <HContainer gap={2} wrap='wrap'>
-        <SpriteEditorTool
+        <PixelEditorTool
             title={nls.localize('vuengine/editors/font/actions/import', 'Import')}
             onClick={() => setImportDialogOpen(true)}
         >
             <FileArrowUp size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
+        </PixelEditorTool>
+        <PixelEditorTool
             title={nls.localize('vuengine/editors/font/actions/export', 'Export')}
             onClick={() => setExportDialogOpen(true)}
         >
             <FileArrowDown size={20} />
-        </SpriteEditorTool>
+        </PixelEditorTool>
         <PopUpDialog
             height='100%'
             width='100%'

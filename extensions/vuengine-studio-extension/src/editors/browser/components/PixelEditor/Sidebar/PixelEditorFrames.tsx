@@ -1,17 +1,17 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import VContainer from '../../Common/Base/VContainer';
 import HContainer from '../../Common/Base/HContainer';
-import { LayerProps } from 'dotting';
+import VContainer from '../../Common/Base/VContainer';
+import { LayerPixelData } from '../PixelEditorTypes';
 
-interface SpriteEditorFramesProps {
-    frames: LayerProps[][]
-    setFrames: (frames: LayerProps[][]) => void
+interface PixelEditorFramesProps {
+    frames: LayerPixelData[][]
+    setFrames: (frames: LayerPixelData[][]) => void
     currentFrame: number
     setCurrentFrame: React.Dispatch<React.SetStateAction<number>>
 }
 
-export default function SpriteEditorFrames(props: SpriteEditorFramesProps): React.JSX.Element {
+export default function PixelEditorFrames(props: PixelEditorFramesProps): React.JSX.Element {
     const { frames, setFrames, currentFrame, setCurrentFrame } = props;
 
     const removeFrame = (index: number): void => {
@@ -40,7 +40,7 @@ export default function SpriteEditorFrames(props: SpriteEditorFramesProps): Reac
             }}
         >
             <label>
-                {nls.localize('vuengine/editors/sprite/frames', 'Frames')}
+                {nls.localize('vuengine/editors/pixel/frames', 'Frames')}
             </label>
             <HContainer overflow="auto">
                 {
@@ -71,7 +71,10 @@ export default function SpriteEditorFrames(props: SpriteEditorFramesProps): Reac
                     className='theia-button add-button'
                     onClick={addFrame}
                     title={nls.localizeByDefault('Add')}
-                    style={{ zIndex: 100 }}
+                    style={{
+                        backgroundColor: 'var(--theia-editor-background)',
+                        zIndex: 100,
+                    }}
                 >
                     <i className='codicon codicon-plus' />
                 </button>

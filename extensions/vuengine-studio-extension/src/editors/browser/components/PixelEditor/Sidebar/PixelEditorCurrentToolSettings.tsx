@@ -5,14 +5,14 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/Base/HContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { SpriteEditorTool } from './SpriteEditorTool';
-import { DOT_BRUSH_PATTERNS } from '../SpriteEditorTypes';
+import { PixelEditorTool } from './PixelEditorTool';
+import { DOT_BRUSH_PATTERNS } from '../PixelEditorTypes';
 
-interface SpriteEditorCurrentToolSettingsProps {
+interface PixelEditorCurrentToolSettingsProps {
     dottingRef: React.RefObject<DottingRef>
 }
 
-export default function SpriteEditorCurrentToolSettings(props: SpriteEditorCurrentToolSettingsProps): React.JSX.Element {
+export default function PixelEditorCurrentToolSettings(props: PixelEditorCurrentToolSettingsProps): React.JSX.Element {
     const { dottingRef } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { brushTool, changeBrushPattern } = useBrush(dottingRef);
@@ -24,7 +24,7 @@ export default function SpriteEditorCurrentToolSettings(props: SpriteEditorCurre
         [BrushTool.DOT, BrushTool.ERASER].includes(brushTool) ?
             <HContainer gap={2} wrap='wrap'>
                 {DOT_BRUSH_PATTERNS.map((p, i) => (
-                    <SpriteEditorTool
+                    <PixelEditorTool
                         key={i}
                         className={dotBrushPattern === i ? 'active' : ''}
                         onClick={() => {
@@ -42,7 +42,7 @@ export default function SpriteEditorCurrentToolSettings(props: SpriteEditorCurre
                             displayMode={DisplayMode.Mono}
                             colorMode={ColorMode.Default}
                         />
-                    </SpriteEditorTool>
+                    </PixelEditorTool>
                 ))}
             </HContainer>
             : <></>

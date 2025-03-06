@@ -5,46 +5,43 @@ import {
     Dotting,
     DottingRef,
     LayerProps,
-    PixelModifyItem,
     useDotting,
-    useHandlers,
-    useLayers
+    useHandlers
 } from 'dotting';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import PaletteSelect from './Sidebar/PaletteSelect';
-import SpriteEditorCurrentToolSettings from './Sidebar/SpriteEditorCurrentToolSettings';
-import SpriteEditorFrames from './Sidebar/SpriteEditorFrames';
-import SpriteEditorImportExport from './Sidebar/SpriteEditorImportExport';
-import SpriteEditorNavigator from './Sidebar/SpriteEditorNavigator';
-import SpriteEditorSettings from './Sidebar/SpriteEditorSettings';
-import SpriteEditorTools from './Sidebar/SpriteEditorTools';
-import SpriteEditorLayers from './SpriteEditorLayers';
-import SpriteEditorStatus from './SpriteEditorStatus';
-import { SpriteData } from './SpriteEditorTypes';
+import PixelEditorActions from './Sidebar/PixelEditorActions';
+import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
+import PixelEditorFrames from './Sidebar/PixelEditorFrames';
+import PixelEditorNavigator from './Sidebar/PixelEditorNavigator';
+import PixelEditorSettings from './Sidebar/PixelEditorSettings';
+import PixelEditorTools from './Sidebar/PixelEditorTools';
+import PixelEditorLayers from './PixelEditorLayers';
+import PixelEditorStatus from './PixelEditorStatus';
+import { LayerPixelData, SpriteData } from './PixelEditorTypes';
 
-export const createEmptyPixelData = (width: number, height: number): PixelModifyItem[][] => {
-    const data: PixelModifyItem[][] = [];
+export const createEmptyPixelData = (width: number, height: number): (number | null)[][] => {
+    const data: (number | null)[][] = [];
     for (let i = 0; i < width; i++) {
-        const row: PixelModifyItem[] = [];
+        const row: (number | null)[] = [];
         for (let j = 0; j < height; j++) {
-            row.push({ rowIndex: i, columnIndex: j, color: '' });
+            row.push(null);
         }
         data.push(row);
     }
     return data;
 };
 
-interface SpriteEditorProps {
+interface PixelEditorProps {
     data: SpriteData
     updateData: (data: SpriteData) => void
 }
 
-export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+export default function PixelEditor(props: PixelEditorProps): React.JSX.Element {
     const { data, updateData } = props;
     const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
     const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
@@ -55,9 +52,8 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         addDataChangeListener,
         removeDataChangeListener,
     } = useHandlers(dottingRef);
-    const { layers } = useLayers(dottingRef);
-    const [primaryColor, setPrimaryColor] = useState<number>(3);
-    const [secondaryColor, setSecondaryColor] = useState<number>(0);
+    const [primaryColor, setPrimaryColor] = useState<number>(4);
+    const [secondaryColor, setSecondaryColor] = useState<number>(1);
     const [currentFrame, setCurrentFrame] = useState<number>(0);
     const [allowResize, setAllowResize] = useState<boolean>(false);
     const [gridSize, setGridSize] = useState<number>(1);
@@ -80,50 +76,79 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         });
     };
 
-    const setFrames = (frames: LayerProps[][]): void => {
-        setData({ frames });
+    const setFrames = (frames: LayerPixelData[][]): void => {
+        setData({
+            dimensions: { ...data.dimensions }, // Hack to force a state update
+            frames
+        });
     };
 
-    const setCurrentFrameData = (frame: LayerProps[]): void => {
-        setFrames([
-            ...data.frames.slice(0, currentFrame),
-            frame,
-            ...data.frames.slice(currentFrame + 1)
-        ]);
+    const setCurrentFrameData = (updatedFrame: LayerPixelData[]): void => {
+        const updatedFrames = [...data.frames];
+        updatedFrames[currentFrame] = updatedFrame;
+
+        setFrames(updatedFrames);
     };
+
+    const convertToLayerProps = (frame: LayerPixelData[]): LayerProps[] => frame.map(layer => ({
+        id: layer.id,
+        data: layer.data.map((row, rowIndex) => row.map((color, columnIndex) => ({
+            rowIndex,
+            columnIndex,
+            color: color === null ? '' : PALETTE_COLORS[data.colorMode][color],
+        })))
+    }));
 
     const setColorMode = (colorMode: ColorMode): void => {
         setData({ colorMode });
+
+        // TODO: when set to frame blend, trim all layer heights for all frames if > 256
     };
 
+    /*
     const applyPixelChanges = (layerId: string, modifiedPixels: PixelModifyItem[]): void => {
-        /*
-        const updatedFrame: LayerProps[] = [];
-        data.frames[currentFrame].map(layer => {
-            if (layer.id === layerId) {
-                modifiedPixels.map(mp => {
-                    layer.data[mp.rowIndex][mp.columnIndex].color = mp.color;
+        const updatedFrame: LayerPixelData[] = [];
+        data.frames[currentFrame].forEach(layer => {
+            const updatedLayer = { ...layer };
+            if (updatedLayer.id === layerId) {
+                modifiedPixels.forEach(mp => {
+                    updatedLayer.data[mp.rowIndex][mp.columnIndex] = mp.color === '' ? null : PALETTE_INDICES[data.colorMode][mp.color];
                 });
             }
-            updatedFrame.push(layer);
+            updatedFrame.push(updatedLayer);
         });
-        */
 
-        setCurrentFrameData(layers);
+        setCurrentFrameData(updatedFrame);
     };
+    */
 
-    const handlDataChangeHandler: CanvasDataChangeHandler = ({ delta, layerId }) => {
-        console.log('Data change', layerId, delta);
-        // update all layers on resize
-        if (delta?.addedOrDeletedColumns?.length) {
-            // TODO
+    const dataChangeHandler: CanvasDataChangeHandler = ({ delta, layerId }) => {
+        // console.log('Data change', layerId, delta);
+        const updatedData: Partial<SpriteData> = {};
+
+        if (delta?.addedOrDeletedColumns?.length || delta?.addedOrDeletedRows?.length) {
+            const columnsAdded = delta?.addedOrDeletedColumns?.filter(c => c.isDelete === false).length ?? 0;
+            const columnsRemoved = delta?.addedOrDeletedColumns?.filter(c => c.isDelete === true).length ?? 0;
+            const rowsAdded = delta?.addedOrDeletedRows?.filter(r => r.isDelete === false).length ?? 0;
+            const rowsRemoved = delta?.addedOrDeletedRows?.filter(r => r.isDelete === true).length ?? 0;
+            updatedData.dimensions = {
+                x: data.dimensions.x + columnsAdded - columnsRemoved,
+                y: data.dimensions.y + rowsAdded - rowsRemoved,
+            };
+
+            // TODO: update all frame's layers on resize
         }
-        if (delta?.addedOrDeletedRows?.length) {
-            // TODO
-        }
+
         // update current layer on pixel change
         if (delta?.modifiedPixels?.length) {
-            applyPixelChanges(layerId, delta.modifiedPixels);
+            // applyPixelChanges(layerId, delta.modifiedPixels);
+            updatedData.frames = data.frames; // I am just here to trigger the layer change handler
+        }
+
+        // console.log('updatedData', updatedData);
+        if (Object.keys(updatedData).length > 0) {
+            // console.log('SET DATA');
+            setData(updatedData);
         }
     };
 
@@ -132,18 +157,18 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             ref={dottingRef}
             backgroundColor='transparent'
             brushColor={PALETTE_COLORS[data.colorMode][primaryColor]}
-            defaultPixelColor={PALETTE_COLORS[data.colorMode][0]}
-            gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
+            defaultPixelColor="#111" // {PALETTE_COLORS[data.colorMode][0]}
+            gridStrokeColor="#333"
             gridStrokeWidth={gridSize}
             isGridVisible={gridSize > 0}
             height={canvasHeight}
             initAutoScale={true}
-            initLayers={data.frames[currentFrame]}
+            initLayers={convertToLayerProps(data.frames[currentFrame])}
             isGridFixed={!allowResize}
             isPanZoomable={true}
             maxColumnCount={512}
             minColumnCount={8}
-            maxRowCount={512}
+            maxRowCount={data.colorMode === ColorMode.FrameBlend ? 256 : 512}
             minRowCount={8}
             minScale={0.05}
             maxScale={10}
@@ -152,6 +177,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             style={{ zIndex: 1 }}
         />
     ), [
+        currentFrame,
         data.colorMode,
         primaryColor,
         gridSize,
@@ -161,9 +187,9 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     ]);
 
     useEffect(() => {
-        addDataChangeListener(handlDataChangeHandler);
+        addDataChangeListener(dataChangeHandler);
         return () => {
-            removeDataChangeListener(handlDataChangeHandler);
+            removeDataChangeListener(dataChangeHandler);
         };
     }, [data]);
 
@@ -189,13 +215,25 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     }, []);
 
     return (
-        <VContainer className="spriteEditor" gap={15}>
-            <HContainer grow={1} justifyContent="space-between" overflow="hidden">
+        <VContainer
+            className="pixelEditor"
+            gap={15}
+            alignItems="start"
+        >
+            <HContainer
+                alignItems="start"
+                grow={1}
+                justifyContent="space-between"
+                overflow="hidden"
+                style={{
+                    width: '100%'
+                }}
+            >
                 <VContainer
                     gap={15}
                     style={{
-                        maxWidth: 80,
-                        minWidth: 80,
+                        maxWidth: 81,
+                        minWidth: 81,
                     }}
                 >
                     <div style={{ zIndex: 100 }}>
@@ -206,6 +244,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                             setPrimaryColorIndex={setPrimaryColor}
                             secondaryColorIndex={secondaryColor}
                             setSecondaryColorIndex={setSecondaryColor}
+                            includeTransparent={true}
                             dottingRef={dottingRef}
                         />
                     </div>
@@ -213,23 +252,23 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                         gap={15}
                         overflow='auto'
                         style={{
-                            width: 80,
+                            width: 81,
                             zIndex: 100,
                         }}
                     >
-                        <SpriteEditorSettings
+                        <PixelEditorSettings
                             allowResize={allowResize}
                             setAllowResize={setAllowResize}
                             gridSize={gridSize}
                             setGridSize={setGridSize}
                         />
-                        <SpriteEditorTools
+                        <PixelEditorTools
                             dottingRef={dottingRef}
                         />
-                        <SpriteEditorCurrentToolSettings
+                        <PixelEditorCurrentToolSettings
                             dottingRef={dottingRef}
                         />
-                        <SpriteEditorImportExport
+                        <PixelEditorActions
                             dottingRef={dottingRef}
                         />
                     </VContainer>
@@ -244,27 +283,31 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     gap={15}
                     overflow="hidden"
                     style={{
-                        maxWidth: 200,
-                        minWidth: 200,
+                        maxWidth: 240,
+                        minWidth: 240,
                         zIndex: 100,
                     }}
                 >
-                    <SpriteEditorNavigator />
-                    <SpriteEditorLayers
+                    <PixelEditorNavigator
+                        data={data}
+                        currentFrame={currentFrame}
+                    />
+                    <PixelEditorLayers
                         data={data}
                         updateData={updateData}
                         currentFrame={currentFrame}
+                        setCurrentFrameData={setCurrentFrameData}
                         dottingRef={dottingRef}
                     />
                 </VContainer>
             </HContainer >
-            <SpriteEditorFrames
+            <PixelEditorFrames
                 frames={data.frames}
                 setFrames={setFrames}
                 currentFrame={currentFrame}
                 setCurrentFrame={setCurrentFrame}
             />
-            <SpriteEditorStatus
+            <PixelEditorStatus
                 dottingRef={dottingRef}
             />
         </VContainer>

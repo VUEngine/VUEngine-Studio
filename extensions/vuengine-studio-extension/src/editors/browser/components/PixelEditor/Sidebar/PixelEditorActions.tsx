@@ -4,31 +4,31 @@ import { DottingRef, useDotting } from 'dotting';
 import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { SpriteEditorTool } from './SpriteEditorTool';
+import { PixelEditorTool } from './PixelEditorTool';
 
-interface SpriteEditorImportExportProps {
+interface PixelEditorActionsProps {
     dottingRef: React.RefObject<DottingRef>
 }
 
-export default function SpriteEditorImportExport(props: SpriteEditorImportExportProps): React.JSX.Element {
+export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
     const { dottingRef } = props;
     const { downloadImage } = useDotting(dottingRef);
 
     return (
         <VContainer>
             <label>
-                {nls.localizeByDefault('Export')}
+                {nls.localize('vuengine/editors/pixel/actions', 'Actions')}
             </label>
             <HContainer gap={2} wrap='wrap'>
                 { /* }
-                <SpriteEditorTool
+                <PixelEditorTool
                     title={nls.localize('vuengine/editors/font/actions/import', 'Import')}
                     onClick={() => setImportDialogOpen(true)}
                 >
                     <FileArrowUp size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
                 { */ }
-                <SpriteEditorTool
+                <PixelEditorTool
                     title={nls.localizeByDefault('Export')}
                     onClick={() => downloadImage({
                         type: 'png',
@@ -36,7 +36,7 @@ export default function SpriteEditorImportExport(props: SpriteEditorImportExport
                     })}
                 >
                     <FileArrowDown size={20} />
-                </SpriteEditorTool>
+                </PixelEditorTool>
             </HContainer>
         </VContainer>
     );

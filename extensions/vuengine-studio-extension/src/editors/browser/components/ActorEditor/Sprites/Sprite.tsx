@@ -394,9 +394,9 @@ or multiple files, where each represents one animation frame.'
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModeSprite', 'Sprite')}: </b>
+                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModePixel', 'Pixel')}: </b>
                                 {nls.localize(
-                                    'vuengine/editors/actor/spriteSourceModeSpriteDescription',
+                                    'vuengine/editors/actor/spriteSourceModePixelDescription',
                                     "VUEngine Studio's native image format that supports layers and animations."
                                 )}
                             </div><br />
@@ -423,8 +423,8 @@ Supported file types are [...].'
                             value: SpriteSourceType.Image,
                             label: nls.localize('vuengine/editors/actor/spriteSourceModeImage', 'Image'),
                         }, {
-                            value: SpriteSourceType.Sprite,
-                            label: nls.localize('vuengine/editors/actor/spriteSourceModeSprite', 'Sprite'),
+                            value: SpriteSourceType.Pixel,
+                            label: nls.localize('vuengine/editors/actor/spriteSourceModePixel', 'Pixel'),
                         }, {
                             value: SpriteSourceType.TileMap,
                             label: nls.localize('vuengine/editors/actor/spriteSourceModeTileMap', 'Tile Map'),
@@ -609,7 +609,7 @@ or multiple files, where each represents one animation frame.'
                             }
                         </>
                     }
-                    {sprite.sourceType === SpriteSourceType.Sprite &&
+                    {sprite.sourceType === SpriteSourceType.Pixel &&
                         <>This source type is not yet supported</>
                     }
                     {sprite.sourceType === SpriteSourceType.TileMap &&
