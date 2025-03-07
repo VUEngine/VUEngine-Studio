@@ -25,7 +25,9 @@ const LayerPreviewContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);
     border-radius: 2px;
     display: flex;
+    max-height: 50px;
     max-width: 50px;
+    min-height: 50px;
     min-width: 50px;
 
     canvas {
@@ -124,13 +126,29 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
     const handleLayerChangeHandler: LayerChangeHandler = ({ layers: updatedLayers }) => {
         // console.log('updatedLayers', updatedLayers);
         const updatedFrame = [
-            ...updatedLayers.map((layer, index) => ({
+            ...updatedLayers.map(layer => ({
                 ...data.frames[currentFrame].find(l => l.id === layer.getId()) || {
                     displays: Displays.Both,
                     name: '',
                     parallax: 0,
                 },
-                data: layer.getDataArray().map(row => row.map(p => p.color === '' ? null : PALETTE_INDICES[data.colorMode][p.color])),
+                data: [...layer.getData()].sort((a, b) => {
+                    if (a[0] < b[0]) {
+                        return -1;
+                    }
+                    if (a[0] > b[0]) {
+                        return 1;
+                    }
+                    return 0;
+                }).map(r => [...r[1]].sort((a, b) => {
+                    if (a[0] < b[0]) {
+                        return -1;
+                    }
+                    if (a[0] > b[0]) {
+                        return 1;
+                    }
+                    return 0;
+                }).map(p => p[1].color === '' ? null : PALETTE_INDICES[data.colorMode][p[1].color])),
                 id: layer.getId(),
                 isVisible: layer.getIsVisible(),
             }))];
@@ -138,7 +156,7 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         // console.log('updatedFrame', updatedFrame);
         // console.log('data.frames[currentFrame]', data.frames[currentFrame]);
         if (JSON.stringify(updatedFrame) !== JSON.stringify(data.frames[currentFrame])) {
-            // console.log('setData');
+            // console.log('--- setData ---');
             setCurrentFrameData(updatedFrame);
         }
     };

@@ -9,7 +9,7 @@ import {
     useHandlers
 } from 'dotting';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
@@ -47,10 +47,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     const canvasContainerRef = useRef<HTMLDivElement>(null);
     const dottingRef = useRef<DottingRef>(null);
     const { undo, redo } = useDotting(dottingRef);
-    const {
-        addDataChangeListener,
-        removeDataChangeListener,
-    } = useHandlers(dottingRef);
+    const { addDataChangeListener, removeDataChangeListener } = useHandlers(dottingRef);
     const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(4);
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const currentFrame = 0; // const [currentFrame, setCurrentFrame] = useState<number>(0);
@@ -121,32 +118,54 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     };
     */
 
-    const dataChangeHandler: CanvasDataChangeHandler = ({ delta, layerId }) => {
-        // console.log('Data change', layerId, delta);
+    const dataChangeHandler: CanvasDataChangeHandler = change => {
+        // console.log('Data change', change);
+        if (!change.isLocalChange) {
+            return;
+        }
+
         const updatedData: Partial<SpriteData> = {};
 
-        if (delta?.addedOrDeletedColumns?.length || delta?.addedOrDeletedRows?.length) {
-            const columnsAdded = delta?.addedOrDeletedColumns?.filter(c => c.isDelete === false).length ?? 0;
-            const columnsRemoved = delta?.addedOrDeletedColumns?.filter(c => c.isDelete === true).length ?? 0;
-            const rowsAdded = delta?.addedOrDeletedRows?.filter(r => r.isDelete === false).length ?? 0;
-            const rowsRemoved = delta?.addedOrDeletedRows?.filter(r => r.isDelete === true).length ?? 0;
+        if (change.delta?.addedOrDeletedColumns?.length || change.delta?.addedOrDeletedRows?.length || change.delta?.modifiedPixels?.length) {
+            const columnsAdded = change.delta?.addedOrDeletedColumns?.filter(c => c.isDelete === false).length ?? 0;
+            const columnsRemoved = change.delta?.addedOrDeletedColumns?.filter(c => c.isDelete === true).length ?? 0;
+            const rowsAdded = change.delta?.addedOrDeletedRows?.filter(r => r.isDelete === false).length ?? 0;
+            const rowsRemoved = change.delta?.addedOrDeletedRows?.filter(r => r.isDelete === true).length ?? 0;
             updatedData.dimensions = {
                 x: data.dimensions.x + columnsAdded - columnsRemoved,
                 y: data.dimensions.y + rowsAdded - rowsRemoved,
             };
 
-            // TODO: update all frame's layers on resize
-        }
+            const updatedFrames = [...data.frames];
+            updatedFrames[currentFrame] = [
+                ...updatedFrames[currentFrame].map((layer, index) => ({
+                    ...data.frames[currentFrame].find(l => l.id === change.layerId)!,
+                    data: [...change.data].sort((a, b) => {
+                        if (a[0] < b[0]) {
+                            return -1;
+                        }
+                        if (a[0] > b[0]) {
+                            return 1;
+                        }
+                        return 0;
+                    }).map(r => [...r[1]].sort((a, b) => {
+                        if (a[0] < b[0]) {
+                            return -1;
+                        }
+                        if (a[0] > b[0]) {
+                            return 1;
+                        }
+                        return 0;
+                    }).map(p => p[1].color === '' ? null : PALETTE_INDICES[data.colorMode][p[1].color])),
+                }))];
 
-        // update current layer on pixel change
-        if (delta?.modifiedPixels?.length) {
-            // applyPixelChanges(layerId, delta.modifiedPixels);
-            updatedData.frames = data.frames; // I am just here to trigger the layer change handler
+            // TODO: update all frame's layers on resize
+
         }
 
         // console.log('updatedData', updatedData);
         if (Object.keys(updatedData).length > 0) {
-            // console.log('SET DATA');
+            // console.log('--- SET DATA ---');
             setData(updatedData);
         }
     };

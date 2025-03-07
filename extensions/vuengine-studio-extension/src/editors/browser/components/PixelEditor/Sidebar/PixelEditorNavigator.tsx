@@ -72,7 +72,9 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
         [...layers].reverse().forEach(layer => {
             layer.data.forEach((row, rowIndex) => row.forEach((color, columnIndex) => {
                 if (color !== null) {
-                    result[rowIndex][columnIndex] = color;
+                    if (result[rowIndex] !== undefined && result[rowIndex][columnIndex] !== undefined) {
+                        result[rowIndex][columnIndex] = color;
+                    }
                 }
             }));
         });
@@ -130,6 +132,7 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
                             height: `calc(100% - ${topOffset + bottomOffset}px)`,
                             marginLeft: leftOffset,
                             marginTop: topOffset,
+                            visibility: bottomOffset + leftOffset + rightOffset + topOffset === 0 ? 'hidden' : 'visible',
                             width: `calc(100% - ${leftOffset + rightOffset}px)`,
                         }}
                     />
