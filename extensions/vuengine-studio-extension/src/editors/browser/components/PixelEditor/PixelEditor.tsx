@@ -13,7 +13,7 @@ import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/bro
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
-import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
+import { PixelEditorCommands } from './PixelEditorCommands';
 import PixelEditorLayers from './PixelEditorLayers';
 import PixelEditorStatus from './PixelEditorStatus';
 import { LayerPixelData, SpriteData } from './PixelEditorTypes';
@@ -206,7 +206,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
 
     useEffect(() => {
         enableCommands([
-            ...Object.values(FontEditorCommands).map(c => c.id)
+            ...Object.values(PixelEditorCommands).map(c => c.id)
         ]);
     }, []);
 

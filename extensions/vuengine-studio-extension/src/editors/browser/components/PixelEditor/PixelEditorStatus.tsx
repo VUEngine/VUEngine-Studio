@@ -3,7 +3,7 @@ import { StatusBarAlignment } from '@theia/core/lib/browser';
 import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
+import { PixelEditorCommands } from './PixelEditorCommands';
 
 interface PixelEditorStatusProps {
     allowResize?: boolean
@@ -39,19 +39,19 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
     const setStatusBarItems = () => {
         setStatusBarItem('ves-editors-sprite-grid-toggle', {
             alignment: StatusBarAlignment.RIGHT,
-            command: FontEditorCommands.TOGGLE_GRID.id,
+            command: PixelEditorCommands.TOGGLE_GRID.id,
             className: gridSize === 0 ? 'disabled' : undefined,
             priority: 7,
             text: '$(fa-th-large)',
-            tooltip: FontEditorCommands.TOGGLE_GRID.label,
+            tooltip: PixelEditorCommands.TOGGLE_GRID.label,
         });
         setStatusBarItem('ves-editors-sprite-resizer-toggle', {
             alignment: StatusBarAlignment.RIGHT,
-            command: FontEditorCommands.TOGGLE_ALLOW_RESIZE.id,
+            command: PixelEditorCommands.TOGGLE_ALLOW_RESIZE.id,
             className: !allowResize ? 'disabled' : undefined,
             priority: 6,
             text: '$(fa-arrows-alt)',
-            tooltip: FontEditorCommands.TOGGLE_ALLOW_RESIZE.label,
+            tooltip: PixelEditorCommands.TOGGLE_ALLOW_RESIZE.label,
         });
         if (canvasPanZoom) {
             setStatusBarItem('ves-editors-sprite-pan-zoom', {
@@ -94,10 +94,10 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case FontEditorCommands.TOGGLE_GRID.id:
+            case PixelEditorCommands.TOGGLE_GRID.id:
                 toggleGrid();
                 break;
-            case FontEditorCommands.TOGGLE_ALLOW_RESIZE.id:
+            case PixelEditorCommands.TOGGLE_ALLOW_RESIZE.id:
                 toggleAllowResize();
                 break;
         }

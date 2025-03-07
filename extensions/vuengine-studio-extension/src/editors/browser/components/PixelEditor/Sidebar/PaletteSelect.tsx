@@ -5,19 +5,19 @@ import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-commo
 import { EditorCommand, EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { FontEditorCommands } from '../../FontEditor/FontEditorCommands';
-import { PixelEditorTool } from './PixelEditorTool';
 import InfoLabel from '../../Common/InfoLabel';
+import { PixelEditorCommands } from '../PixelEditorCommands';
+import { PixelEditorTool } from './PixelEditorTool';
 
 const PALETTE_COMMANDS: EditorCommand[] = [
-    FontEditorCommands.PALETTE_SELECT_INDEX_0,
-    FontEditorCommands.PALETTE_SELECT_INDEX_1,
-    FontEditorCommands.PALETTE_SELECT_INDEX_2,
-    FontEditorCommands.PALETTE_SELECT_INDEX_3,
-    FontEditorCommands.PALETTE_SELECT_INDEX_4,
-    FontEditorCommands.PALETTE_SELECT_INDEX_5,
-    FontEditorCommands.PALETTE_SELECT_INDEX_6,
-    FontEditorCommands.PALETTE_SELECT_INDEX_7,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_0,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_1,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_2,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_3,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_4,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_5,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_6,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_7,
 ];
 
 interface PaletteSelectProps {
@@ -99,37 +99,37 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case FontEditorCommands.SWAP_COLORS.id:
+            case PixelEditorCommands.SWAP_COLORS.id:
                 const secColorIndex = secondaryColorIndex;
                 setSecondaryColorIndex(primaryColorIndex);
                 setPrimaryColorIndex(secColorIndex);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_0.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_0.id:
                 setPrimaryColorIndex(0);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_1.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_1.id:
                 setPrimaryColorIndex(includeTransparent ? 1 : 0);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_2.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_2.id:
                 setPrimaryColorIndex(includeTransparent ? 2 : 1);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_3.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_3.id:
                 setPrimaryColorIndex(includeTransparent ? 3 : 2);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_4.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_4.id:
                 setPrimaryColorIndex(includeTransparent ? 4 : 3);
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_5.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_5.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 5 : 4);
                 }
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_6.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_6.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 6 : 5);
                 }
                 break;
-            case FontEditorCommands.PALETTE_SELECT_INDEX_7.id:
+            case PixelEditorCommands.PALETTE_SELECT_INDEX_7.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 7 : 6);
                 }

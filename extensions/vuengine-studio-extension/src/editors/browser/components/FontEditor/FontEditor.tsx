@@ -7,19 +7,21 @@ import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/Base/HContainer';
-import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/Base/RadioSelect';
-import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/Base/VContainer';
+import { DataSection } from '../Common/CommonTypes';
+import InfoLabel from '../Common/InfoLabel';
+import SectionSelect from '../Common/SectionSelect';
+import { PixelEditorCommands } from '../PixelEditor/PixelEditorCommands';
+import PixelEditorStatus from '../PixelEditor/PixelEditorStatus';
 import PaletteSelect from '../PixelEditor/Sidebar/PaletteSelect';
 import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCurrentToolSettings';
-import PixelEditorStatus from '../PixelEditor/PixelEditorStatus';
 import PixelEditorTools from '../PixelEditor/Sidebar/PixelEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharSettings from './Alphabet/CharSettings';
+import { FontEditorCommands } from './FontEditorCommands';
 import {
     CHAR_PIXEL_SIZE,
     FontData,
@@ -29,7 +31,6 @@ import {
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
 import ImportExportTools from './Tools/ImportExport/ImportExportTools';
-import { FontEditorCommands } from './FontEditorCommands';
 
 interface FontEditorProps {
     data: FontData
@@ -62,25 +63,25 @@ export const INPUT_BLOCKING_COMMANDS = [
     FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id,
     FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id,
     FontEditorCommands.COPY_CHARACTER.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_1.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_2.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_3.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_4.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_5.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_6.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_7.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_1.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_2.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_3.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_4.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_5.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_6.id,
+    PixelEditorCommands.PALETTE_SELECT_INDEX_7.id,
     FontEditorCommands.PASTE_CHARACTER.id,
-    FontEditorCommands.SWAP_COLORS.id,
-    FontEditorCommands.TOOL_DRAG.id,
-    FontEditorCommands.TOOL_ELLIPSE.id,
-    FontEditorCommands.TOOL_ELLIPSE_FILLED.id,
-    FontEditorCommands.TOOL_ERASER.id,
-    FontEditorCommands.TOOL_LINE.id,
-    FontEditorCommands.TOOL_MARQUEE.id,
-    FontEditorCommands.TOOL_PAINT_BUCKET.id,
-    FontEditorCommands.TOOL_PENCIL.id,
-    FontEditorCommands.TOOL_RECTANGLE.id,
-    FontEditorCommands.TOOL_RECTANGLE_FILLED.id,
+    PixelEditorCommands.SWAP_COLORS.id,
+    PixelEditorCommands.TOOL_DRAG.id,
+    PixelEditorCommands.TOOL_ELLIPSE.id,
+    PixelEditorCommands.TOOL_ELLIPSE_FILLED.id,
+    PixelEditorCommands.TOOL_ERASER.id,
+    PixelEditorCommands.TOOL_LINE.id,
+    PixelEditorCommands.TOOL_MARQUEE.id,
+    PixelEditorCommands.TOOL_PAINT_BUCKET.id,
+    PixelEditorCommands.TOOL_PENCIL.id,
+    PixelEditorCommands.TOOL_RECTANGLE.id,
+    PixelEditorCommands.TOOL_RECTANGLE_FILLED.id,
 ];
 
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
@@ -280,7 +281,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     useEffect(() => {
         enableCommands([
-            ...Object.values(FontEditorCommands).map(c => c.id)
+            ...Object.values(FontEditorCommands).map(c => c.id),
+            ...Object.values(PixelEditorCommands).map(c => c.id),
         ]);
     }, []);
 
