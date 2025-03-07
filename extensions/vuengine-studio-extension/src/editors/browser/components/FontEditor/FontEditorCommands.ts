@@ -152,4 +152,14 @@ export namespace FontEditorCommands {
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'ctrlcmd+v',
     };
+    export const TOGGLE_GRID: EditorCommand = {
+        id: 'editors.fontEditor.toggleGrid',
+        label: nls.localize('vuengine/editors/font/commands/toggleGrid', 'Toggle Grid'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+    };
+    export const TOGGLE_ALLOW_RESIZE: EditorCommand = {
+        id: 'editors.fontEditor.toggleAllowResize',
+        label: nls.localize('vuengine/editors/font/commands/toggleAllowResize', 'Toggle Resizer'),
+        category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
+    };
 };

@@ -8,20 +8,20 @@ import {
     useDotting,
     useHandlers
 } from 'dotting';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
+import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
+import PixelEditorLayers from './PixelEditorLayers';
+import PixelEditorStatus from './PixelEditorStatus';
+import { LayerPixelData, SpriteData } from './PixelEditorTypes';
 import PaletteSelect from './Sidebar/PaletteSelect';
 import PixelEditorActions from './Sidebar/PixelEditorActions';
 import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
 import PixelEditorNavigator from './Sidebar/PixelEditorNavigator';
-import PixelEditorSettings from './Sidebar/PixelEditorSettings';
 import PixelEditorTools from './Sidebar/PixelEditorTools';
-import PixelEditorLayers from './PixelEditorLayers';
-import PixelEditorStatus from './PixelEditorStatus';
-import { LayerPixelData, SpriteData } from './PixelEditorTypes';
 
 export const createEmptyPixelData = (width: number, height: number): (number | null)[][] => {
     const data: (number | null)[][] = [];
@@ -41,6 +41,7 @@ interface PixelEditorProps {
 }
 
 export default function PixelEditor(props: PixelEditorProps): React.JSX.Element {
+    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
     const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
     const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
@@ -176,7 +177,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
             backgroundColor='transparent'
             brushColor={PALETTE_COLORS[data.colorMode][primaryColorIndex]}
             defaultPixelColor="#111" // {PALETTE_COLORS[data.colorMode][0]}
-            gridStrokeColor="#333"
+            gridStrokeColor="#222"
             gridStrokeWidth={gridSize}
             isGridVisible={gridSize > 0}
             height={canvasHeight}
@@ -202,6 +203,12 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         canvasWidth,
         allowResize
     ]);
+
+    useEffect(() => {
+        enableCommands([
+            ...Object.values(FontEditorCommands).map(c => c.id)
+        ]);
+    }, []);
 
     useEffect(() => {
         addDataChangeListener(dataChangeHandler);
@@ -274,12 +281,6 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                             zIndex: 100,
                         }}
                     >
-                        <PixelEditorSettings
-                            allowResize={allowResize}
-                            setAllowResize={setAllowResize}
-                            gridSize={gridSize}
-                            setGridSize={setGridSize}
-                        />
                         <PixelEditorTools
                             dottingRef={dottingRef}
                         />
@@ -330,6 +331,10 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
             />
             */}
             <PixelEditorStatus
+                allowResize={allowResize}
+                setAllowResize={setAllowResize}
+                gridSize={gridSize}
+                setGridSize={setGridSize}
                 dottingRef={dottingRef}
             />
         </VContainer>

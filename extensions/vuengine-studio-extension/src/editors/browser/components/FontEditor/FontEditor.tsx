@@ -325,7 +325,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 backgroundColor='transparent'
                 brushColor={PALETTE_COLORS[ColorMode.Default][primaryColorIndex]}
                 defaultPixelColor={PALETTE_COLORS[ColorMode.Default][0]}
-                gridStrokeColor={'#333'}
+                gridStrokeColor="#222"
                 height={canvasHeight}
                 initLayers={[{
                     id: 'layer1',
@@ -464,6 +464,8 @@ Will be skipped if compressed data is not smaller than source data.'
             </EditorSidebar>
         </HContainer>
         <PixelEditorStatus
+            gridSize={1}
+            setGridSize={() => { }}
             dottingRef={dottingRef}
         />
     </div>;
