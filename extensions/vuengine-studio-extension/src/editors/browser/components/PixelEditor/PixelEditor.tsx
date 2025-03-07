@@ -249,6 +249,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                 <VContainer
                     gap={15}
                     style={{
+                        height: '100%',
                         maxWidth: 81,
                         minWidth: 81,
                     }}
@@ -300,6 +301,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                     gap={15}
                     overflow="hidden"
                     style={{
+                        height: '100%',
                         maxWidth: 240,
                         minWidth: 240,
                         zIndex: 100,
@@ -318,7 +320,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                         dottingRef={dottingRef}
                     />
                 </VContainer>
-            </HContainer >
+            </HContainer>
             {/*
             <PixelEditorFrames
                 frames={data.frames}
