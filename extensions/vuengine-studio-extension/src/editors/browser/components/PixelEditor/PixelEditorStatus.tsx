@@ -51,21 +51,21 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         removeStatusBarItem('ves-editors-sprite-pan-zoom');
     };
 
-    const handleHoverPixelChangeHandler: CanvasHoverPixelChangeHandler = ({ indices }) => {
+    const hoverPixelChangeHandler: CanvasHoverPixelChangeHandler = ({ indices }) => {
         setHoveredPixel(indices);
     };
 
-    const handleCanvasInfoChangeHandler: CanvasInfoChangeHandler = ({ panZoom }) => {
+    const canvasInfoChangeHandler: CanvasInfoChangeHandler = ({ panZoom }) => {
         setCanvasPanZoom(panZoom);
     };
 
     useEffect(() => {
         setStatusBarItems();
-        addHoverPixelChangeListener(handleHoverPixelChangeHandler);
-        addCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
+        addHoverPixelChangeListener(hoverPixelChangeHandler);
+        addCanvasInfoChangeEventListener(canvasInfoChangeHandler);
         return () => {
-            removeHoverPixelChangeListener(handleHoverPixelChangeHandler);
-            removeCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
+            removeHoverPixelChangeListener(hoverPixelChangeHandler);
+            removeCanvasInfoChangeEventListener(canvasInfoChangeHandler);
         };
     }, []);
 

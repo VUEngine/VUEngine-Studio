@@ -16,7 +16,6 @@ import VContainer from '../Common/Base/VContainer';
 import PaletteSelect from './Sidebar/PaletteSelect';
 import PixelEditorActions from './Sidebar/PixelEditorActions';
 import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
-import PixelEditorFrames from './Sidebar/PixelEditorFrames';
 import PixelEditorNavigator from './Sidebar/PixelEditorNavigator';
 import PixelEditorSettings from './Sidebar/PixelEditorSettings';
 import PixelEditorTools from './Sidebar/PixelEditorTools';
@@ -52,9 +51,9 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         addDataChangeListener,
         removeDataChangeListener,
     } = useHandlers(dottingRef);
-    const [primaryColor, setPrimaryColor] = useState<number>(4);
-    const [secondaryColor, setSecondaryColor] = useState<number>(1);
-    const [currentFrame, setCurrentFrame] = useState<number>(0);
+    const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(4);
+    const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
+    const currentFrame = 0; // const [currentFrame, setCurrentFrame] = useState<number>(0);
     const [allowResize, setAllowResize] = useState<boolean>(false);
     const [gridSize, setGridSize] = useState<number>(1);
 
@@ -156,7 +155,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         <Dotting
             ref={dottingRef}
             backgroundColor='transparent'
-            brushColor={PALETTE_COLORS[data.colorMode][primaryColor]}
+            brushColor={PALETTE_COLORS[data.colorMode][primaryColorIndex]}
             defaultPixelColor="#111" // {PALETTE_COLORS[data.colorMode][0]}
             gridStrokeColor="#333"
             gridStrokeWidth={gridSize}
@@ -179,11 +178,10 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     ), [
         currentFrame,
         data.colorMode,
-        primaryColor,
         gridSize,
         canvasHeight,
         canvasWidth,
-        allowResize,
+        allowResize
     ]);
 
     useEffect(() => {
@@ -240,10 +238,10 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                         <PaletteSelect
                             colorMode={data.colorMode}
                             setColorMode={setColorMode}
-                            primaryColorIndex={primaryColor}
-                            setPrimaryColorIndex={setPrimaryColor}
-                            secondaryColorIndex={secondaryColor}
-                            setSecondaryColorIndex={setSecondaryColor}
+                            primaryColorIndex={primaryColorIndex}
+                            setPrimaryColorIndex={setPrimaryColorIndex}
+                            secondaryColorIndex={secondaryColorIndex}
+                            setSecondaryColorIndex={setSecondaryColorIndex}
                             includeTransparent={true}
                             dottingRef={dottingRef}
                         />
@@ -291,6 +289,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                     <PixelEditorNavigator
                         data={data}
                         currentFrame={currentFrame}
+                        dottingRef={dottingRef}
                     />
                     <PixelEditorLayers
                         data={data}
@@ -301,12 +300,14 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                     />
                 </VContainer>
             </HContainer >
+            {/*
             <PixelEditorFrames
                 frames={data.frames}
                 setFrames={setFrames}
                 currentFrame={currentFrame}
                 setCurrentFrame={setCurrentFrame}
             />
+            */}
             <PixelEditorStatus
                 dottingRef={dottingRef}
             />

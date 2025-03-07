@@ -156,6 +156,12 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
         secondaryColorIndex,
     ]);
 
+    useEffect(() => {
+        changeBrushColor(paletteColors[primaryColorIndex]);
+    }, [
+        primaryColorIndex,
+    ]);
+
     return (
         <VContainer>
             {colorMode !== undefined && setColorMode !== undefined
