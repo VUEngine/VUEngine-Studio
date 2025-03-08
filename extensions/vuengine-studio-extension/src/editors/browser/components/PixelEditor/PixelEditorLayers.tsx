@@ -165,7 +165,10 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         return () => {
             removeLayerChangeEventListener(handleLayerChangeHandler);
         };
-    }, [data]);
+    }, [
+        currentFrame,
+        data,
+    ]);
 
     return (
         <VContainer overflow='hidden'>
@@ -219,15 +222,17 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                                 <DotsSixVertical size={16} />
                             </VContainer>
                             <LayerPreviewContainer>
-                                <CanvasImage
-                                    height={data.dimensions.y}
-                                    palette={'11100100'}
-                                    pixelData={[data.frames[currentFrame][index].data]}
-                                    displayMode={DisplayMode.Mono}
-                                    width={data.dimensions.x}
-                                    colorMode={data.colorMode}
-                                    drawBlack={true}
-                                />
+                                {data.frames[currentFrame][index] &&
+                                    <CanvasImage
+                                        height={data.dimensions.y}
+                                        palette={'11100100'}
+                                        pixelData={[data.frames[currentFrame][index].data]}
+                                        displayMode={DisplayMode.Mono}
+                                        width={data.dimensions.x}
+                                        colorMode={data.colorMode}
+                                        drawBlack={true}
+                                    />
+                                }
                             </LayerPreviewContainer>
                             <VContainer>
                                 <Input

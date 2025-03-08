@@ -1,12 +1,12 @@
-/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
+import { CanvasInfoChangeHandler, DottingRef, useDotting, useHandlers } from 'dotting';
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import VContainer from '../../Common/Base/VContainer';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { LayerPixelData, SpriteData } from '../PixelEditorTypes';
-import styled from 'styled-components';
-import { CanvasInfoChangeHandler, DottingRef, useDotting, useHandlers } from 'dotting';
+import { mergeLayers } from '../PixelEditorFrames';
+import { SpriteData } from '../PixelEditorTypes';
 
 const NavigatorContainer = styled.div`
     align-items: center;
@@ -56,31 +56,6 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
         238 / data.dimensions.x,
         178 / data.dimensions.y
     );
-
-    const mergeLayers = (layers: LayerPixelData[]): number[][] => {
-        const result: number[][] = [];
-
-        // initialize as all black
-        for (let i = 0; i < data.dimensions.y; i++) {
-            const row: number[] = [];
-            for (let j = 0; j < data.dimensions.x; j++) {
-                row.push(0);
-            }
-            result.push(row);
-        }
-
-        [...layers].reverse().forEach(layer => {
-            layer.data.forEach((row, rowIndex) => row.forEach((color, columnIndex) => {
-                if (color !== null) {
-                    if (result[rowIndex] !== undefined && result[rowIndex][columnIndex] !== undefined) {
-                        result[rowIndex][columnIndex] = color;
-                    }
-                }
-            }));
-        });
-
-        return result;
-    };
 
     const canvasInfoChangeHandler: CanvasInfoChangeHandler = canvasInfo => {
         const canvas = getForegroundCanvas();

@@ -57,6 +57,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
     const resize = () => {
         // setData();
         alert('Resize to ' + resizeWidth + ' x ' + resizeHeight + ' at ' + resizeDirection);
+        // update all frames' layers!
     };
 
     useEffect(() => {
@@ -117,7 +118,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                 <HContainer gap={15}>
                     <VContainer gap={15}>
                         <Input
-                            label={nls.localizeByDefault('Width')}
+                            label={nls.localize('vuengine/general/width', 'Width')}
                             type="number"
                             value={resizeWidth}
                             setValue={v => setResizeWidth(v as number)}
@@ -129,7 +130,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                             commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <Input
-                            label={nls.localizeByDefault('Height')}
+                            label={nls.localize('vuengine/general/height', 'Height')}
                             type="number"
                             value={resizeHeight}
                             setValue={v => setResizeHeight(v as number)}

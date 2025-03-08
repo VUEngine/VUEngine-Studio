@@ -10,23 +10,6 @@
     border: none !important; 
 }
 
-.pixelEditor .frame {
-    box-sizing: border-box;
-    cursor: pointer;
-    flex-grow: unset;
-    height: 75px;
-    min-height: 75px;
-    min-width: 75px;
-    position: relative;
-    width: 75px;
-}
-
-.pixelEditor .frame-index {
-    position: absolute;
-    left: 10px;
-    top: 8px;
-}
-
 .pixelEditor .layer {
     padding: var(--theia-ui-padding)
 }

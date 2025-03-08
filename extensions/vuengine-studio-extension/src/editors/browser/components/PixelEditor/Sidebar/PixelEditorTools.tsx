@@ -7,6 +7,7 @@ import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { PixelEditorCommands } from '../PixelEditorCommands';
 import { PixelEditorTool } from './PixelEditorTool';
+import { DOT_BRUSH_PATTERNS } from '../PixelEditorTypes';
 
 interface PixelEditorToolsProps {
     dottingRef: React.RefObject<DottingRef>
@@ -15,7 +16,7 @@ interface PixelEditorToolsProps {
 export default function PixelEditorTools(props: PixelEditorToolsProps): React.JSX.Element {
     const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { dottingRef } = props;
-    const { brushTool, changeBrushTool } = useBrush(dottingRef);
+    const { brushTool, changeBrushTool, changeBrushPattern } = useBrush(dottingRef);
     const [previousBrushTool, setPreviousBrushTool] = useState<BrushTool>(BrushTool.NONE);
 
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -50,12 +51,23 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 break;
             case PixelEditorCommands.TOOL_LINE.id:
                 changeBrushTool(BrushTool.LINE);
+                changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_RECTANGLE.id:
                 // changeBrushTool(BrushTool.RECTANGLE);
+                changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                break;
+            case PixelEditorCommands.TOOL_RECTANGLE_FILLED.id:
+                // changeBrushTool(BrushTool.RECTANGLE_FILLED);
+                changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_ELLIPSE.id:
                 // changeBrushTool(BrushTool.ELLIPSE);
+                changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                break;
+            case PixelEditorCommands.TOOL_ELLIPSE_FILLED.id:
+                // changeBrushTool(BrushTool.ELLIPSE_FILLED);
+                changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
         }
     };
@@ -124,7 +136,10 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                         nls.localize('vuengine/editors/pixel/tools/line', 'Line') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_LINE.id, true)
                     }
-                    onClick={() => changeBrushTool(BrushTool.LINE)}
+                    onClick={() => {
+                        changeBrushTool(BrushTool.LINE);
+                        changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                    }}
                 >
                     <Minus size={20} />
                 </PixelEditorTool>
@@ -134,7 +149,10 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                         nls.localize('vuengine/editors/pixel/tools/rectangle', 'Rectangle') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE.id, true)
                     }
-                // onClick={() => changeBrushTool(BrushTool.RECTANGLE)}
+                    onClick={() => {
+                        // changeBrushTool(BrushTool.RECTANGLE);
+                        changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                    }}
                 >
                     <Square size={20} />
                 </PixelEditorTool>
@@ -144,7 +162,10 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                         nls.localize('vuengine/editors/pixel/tools/rectangleFilled', 'Rectangle (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE_FILLED.id, true)
                     }
-                // onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
+                    onClick={() => {
+                        // changeBrushTool(BrushTool.RECTANGLE_FILLED);
+                        changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                    }}
                 >
                     <Square size={20} weight="fill" />
                 </PixelEditorTool>
@@ -154,7 +175,10 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                         nls.localize('vuengine/editors/pixel/tools/ellipse', 'Ellipse') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE.id, true)
                     }
-                // onClick={() => changeBrushTool(BrushTool.ELLIPSE)}
+                    onClick={() => {
+                        // changeBrushTool(BrushTool.ELLIPSE);
+                        changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                    }}
                 >
                     <Circle size={20} />
                 </PixelEditorTool>
@@ -164,7 +188,10 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                         nls.localize('vuengine/editors/pixel/tools/ellipseFilled', 'Ellipse (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE_FILLED.id, true)
                     }
-                // onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
+                    onClick={() => {
+                        // changeBrushTool(BrushTool.ELLIPSE_FILLED);
+                        changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
+                    }}
                 >
                     <Circle size={20} weight="fill" />
                 </PixelEditorTool>

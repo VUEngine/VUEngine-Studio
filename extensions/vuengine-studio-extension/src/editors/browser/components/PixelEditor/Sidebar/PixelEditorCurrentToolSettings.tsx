@@ -1,12 +1,12 @@
 import { BrushTool, DottingRef, useBrush } from 'dotting';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/Base/HContainer';
+import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { PixelEditorTool } from './PixelEditorTool';
 import { DOT_BRUSH_PATTERNS } from '../PixelEditorTypes';
+import { PixelEditorTool } from './PixelEditorTool';
 
 interface PixelEditorCurrentToolSettingsProps {
     dottingRef: React.RefObject<DottingRef>
@@ -15,22 +15,20 @@ interface PixelEditorCurrentToolSettingsProps {
 export default function PixelEditorCurrentToolSettings(props: PixelEditorCurrentToolSettingsProps): React.JSX.Element {
     const { dottingRef } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { brushTool, changeBrushPattern } = useBrush(dottingRef);
-    const [dotBrushPattern, setDotBrushPattern] = useState<number>(0);
+    const { brushTool, brushPattern, changeBrushPattern } = useBrush(dottingRef);
 
     const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
 
+    console.log('...... brushPattern', brushPattern);
     return (
         [BrushTool.DOT, BrushTool.ERASER].includes(brushTool) ?
             <HContainer gap={2} wrap='wrap'>
                 {DOT_BRUSH_PATTERNS.map((p, i) => (
                     <PixelEditorTool
                         key={i}
-                        className={dotBrushPattern === i ? 'active' : ''}
-                        onClick={() => {
-                            setDotBrushPattern(i);
-                            changeBrushPattern(p);
-                        }}
+                        className={(brushPattern.length === 1 && i === 0) || (p.length === brushPattern.length && p.every((value, index) => value === brushPattern[index]))
+                            ? 'active' : ''}
+                        onClick={() => changeBrushPattern(p)}
                     >
                         <CanvasImage
                             height={p.length}
