@@ -4,8 +4,7 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../../FontEditor';
-import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]

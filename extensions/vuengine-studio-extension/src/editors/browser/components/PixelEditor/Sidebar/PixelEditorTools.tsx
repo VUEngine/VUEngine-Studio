@@ -85,13 +85,13 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
     return (
         <VContainer>
             <label>
-                {nls.localize('vuengine/editors/font/tools/title', 'Tools')}
+                {nls.localize('vuengine/editors/pixel/tools/title', 'Tools')}
             </label>
             <HContainer gap={2} wrap='wrap'>
                 <PixelEditorTool
                     className={brushTool === BrushTool.NONE ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/drag', 'Drag') +
+                        nls.localize('vuengine/editors/pixel/tools/drag', 'Drag') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_DRAG.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.NONE)}
@@ -101,7 +101,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     className={`tool ${brushTool === BrushTool.SELECT ? 'active' : undefined}`}
                     title={
-                        nls.localize('vuengine/editors/font/tools/marquee', 'Marquee') +
+                        nls.localize('vuengine/editors/pixel/tools/marquee', 'Marquee') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_MARQUEE.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.SELECT)}
@@ -111,7 +111,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     className={brushTool === BrushTool.DOT ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/pencil', 'Pencil') +
+                        nls.localize('vuengine/editors/pixel/tools/pencil', 'Pencil') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_PENCIL.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.DOT)}
@@ -121,7 +121,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     className={brushTool === BrushTool.LINE ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/line', 'Line') +
+                        nls.localize('vuengine/editors/pixel/tools/line', 'Line') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_LINE.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.LINE)}
@@ -131,7 +131,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     // className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/rectangle', 'Rectangle') +
+                        nls.localize('vuengine/editors/pixel/tools/rectangle', 'Rectangle') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE.id, true)
                     }
                 // onClick={() => changeBrushTool(BrushTool.RECTANGLE)}
@@ -141,7 +141,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     // className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/rectangleFilled', 'Rectangle (Filled)') +
+                        nls.localize('vuengine/editors/pixel/tools/rectangleFilled', 'Rectangle (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE_FILLED.id, true)
                     }
                 // onClick={() => changeBrushTool(BrushTool.RECTANGLE_FILLED)}
@@ -151,7 +151,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     // className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/ellipse', 'Ellipse') +
+                        nls.localize('vuengine/editors/pixel/tools/ellipse', 'Ellipse') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE.id, true)
                     }
                 // onClick={() => changeBrushTool(BrushTool.ELLIPSE)}
@@ -161,7 +161,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     // className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/ellipseFilled', 'Ellipse (Filled)') +
+                        nls.localize('vuengine/editors/pixel/tools/ellipseFilled', 'Ellipse (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE_FILLED.id, true)
                     }
                 // onClick={() => changeBrushTool(BrushTool.ELLIPSE_FILLED)}
@@ -171,7 +171,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     className={brushTool === BrushTool.PAINT_BUCKET ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/paintBucket', 'Paint Bucket') +
+                        nls.localize('vuengine/editors/pixel/tools/paintBucket', 'Paint Bucket') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_PAINT_BUCKET.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
@@ -181,7 +181,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 <PixelEditorTool
                     className={brushTool === BrushTool.ERASER ? 'active' : ''}
                     title={
-                        nls.localize('vuengine/editors/font/tools/eraser', 'Eraser') +
+                        nls.localize('vuengine/editors/pixel/tools/eraser', 'Eraser') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ERASER.id, true)
                     }
                     onClick={() => changeBrushTool(BrushTool.ERASER)}

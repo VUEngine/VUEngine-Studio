@@ -10,16 +10,15 @@ import {
     useLayers
 } from 'dotting';
 import React, { BaseSyntheticEvent, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import HContainer from '../Common/Base/HContainer';
 import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
-import { nanoid } from '../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../FontEditor/FontEditor';
-import { LayerPixelData, SpriteData } from './PixelEditorTypes';
 import CanvasImage from '../Common/CanvasImage';
+import { nanoid } from '../Common/Utils';
 import { DisplayMode, Displays } from '../Common/VUEngineTypes';
-import styled from 'styled-components';
+import { INPUT_BLOCKING_COMMANDS, LayerPixelData, SpriteData } from './PixelEditorTypes';
 
 const LayerPreviewContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);

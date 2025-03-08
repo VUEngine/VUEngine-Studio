@@ -16,8 +16,7 @@ import VContainer from '../../../Common/Base/VContainer';
 import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
-import { INPUT_BLOCKING_COMMANDS } from '../../FontEditor';
-import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
 interface ImportSettingsProps {

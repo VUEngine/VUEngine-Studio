@@ -57,33 +57,6 @@ const EditorSidebar = styled.div`
   }
 `;
 
-export const INPUT_BLOCKING_COMMANDS = [
-    FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_LINE_UP.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id,
-    FontEditorCommands.COPY_CHARACTER.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_1.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_2.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_3.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_4.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_5.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_6.id,
-    PixelEditorCommands.PALETTE_SELECT_INDEX_7.id,
-    FontEditorCommands.PASTE_CHARACTER.id,
-    PixelEditorCommands.SWAP_COLORS.id,
-    PixelEditorCommands.TOOL_DRAG.id,
-    PixelEditorCommands.TOOL_ELLIPSE.id,
-    PixelEditorCommands.TOOL_ELLIPSE_FILLED.id,
-    PixelEditorCommands.TOOL_ERASER.id,
-    PixelEditorCommands.TOOL_LINE.id,
-    PixelEditorCommands.TOOL_MARQUEE.id,
-    PixelEditorCommands.TOOL_PAINT_BUCKET.id,
-    PixelEditorCommands.TOOL_PENCIL.id,
-    PixelEditorCommands.TOOL_RECTANGLE.id,
-    PixelEditorCommands.TOOL_RECTANGLE_FILLED.id,
-];
-
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { data, updateData } = props;
     const { enableCommands } = useContext(EditorsContext) as EditorsContextType;

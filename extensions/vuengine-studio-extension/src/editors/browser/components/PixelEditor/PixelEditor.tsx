@@ -288,6 +288,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                             dottingRef={dottingRef}
                         />
                         <PixelEditorActions
+                            colorMode={data.colorMode}
                             dottingRef={dottingRef}
                         />
                     </VContainer>
