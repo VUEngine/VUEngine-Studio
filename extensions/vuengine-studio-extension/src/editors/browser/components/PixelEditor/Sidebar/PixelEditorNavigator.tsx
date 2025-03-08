@@ -52,9 +52,11 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
     const { addCanvasInfoChangeEventListener, removeCanvasInfoChangeEventListener } = useHandlers(dottingRef);
     const { getForegroundCanvas } = useDotting(dottingRef);
 
+    const height = data.frames[currentFrame][0].data.length;
+    const width = data.frames[currentFrame][0].data[0].length;
     const scale = Math.min(
-        238 / data.dimensions.x,
-        178 / data.dimensions.y
+        238 / width,
+        178 / height
     );
 
     const canvasInfoChangeHandler: CanvasInfoChangeHandler = canvasInfo => {
@@ -86,9 +88,7 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
         return () => {
             removeCanvasInfoChangeEventListener(canvasInfoChangeHandler);
         };
-    }, [
-        data.dimensions
-    ]);
+    }, []);
 
     return (
         <VContainer>
@@ -98,8 +98,8 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
             <NavigatorContainer>
                 <CanvasContainer
                     style={{
-                        height: data.dimensions.y * scale,
-                        width: data.dimensions.x * scale,
+                        height: data.frames[currentFrame][0].data.length * scale,
+                        width: data.frames[currentFrame][0].data[0].length * scale,
                     }}
                 >
                     <NavigatorVisibleWindow
@@ -112,11 +112,11 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
                         }}
                     />
                     <CanvasImage
-                        height={data.dimensions.y}
+                        height={data.frames[currentFrame][0].data.length}
                         palette={'11100100'}
                         pixelData={[mergeLayers(data.frames[currentFrame])]}
                         displayMode={DisplayMode.Mono}
-                        width={data.dimensions.x}
+                        width={data.frames[currentFrame][0].data[0].length}
                         colorMode={data.colorMode}
                         drawBlack={true}
                     />

@@ -15,10 +15,6 @@ export interface LayerPixelData {
 
 export interface SpriteData {
     colorMode: ColorMode
-    dimensions: {
-        x: number
-        y: number
-    }
     frames: LayerPixelData[][]
 }
 

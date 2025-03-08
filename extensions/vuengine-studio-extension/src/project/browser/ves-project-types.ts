@@ -431,20 +431,6 @@ export const defaultProjectData: ProjectData = {
           colorMode: {
             type: 'number'
           },
-          dimensions: {
-            type: 'object',
-            properties: {
-              x: {
-                type: 'number',
-                default: DEFAULT_IMAGE_SIZE
-              },
-              y: {
-                type: 'number',
-                default: DEFAULT_IMAGE_SIZE
-              }
-            },
-            additionalProperties: false,
-          },
           frames: {
             type: 'array',
             items: {

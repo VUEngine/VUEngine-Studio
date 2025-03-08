@@ -88,10 +88,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     };
 
     const setFrames = (frames: LayerPixelData[][]): void => {
-        setData({
-            dimensions: { ...data.dimensions }, // Hack to force a state update
-            frames
-        });
+        setData({ frames });
     };
 
     const setCurrentFrameData = (updatedFrame: LayerPixelData[]): void => {
@@ -130,18 +127,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
             return;
         }
 
-        const updatedData: Partial<SpriteData> = {};
-
         if (change.delta?.addedOrDeletedColumns?.length || change.delta?.addedOrDeletedRows?.length || change.delta?.modifiedPixels?.length) {
-            const columnsAdded = change.delta?.addedOrDeletedColumns?.filter(c => c.isDelete === false).length ?? 0;
-            const columnsRemoved = change.delta?.addedOrDeletedColumns?.filter(c => c.isDelete === true).length ?? 0;
-            const rowsAdded = change.delta?.addedOrDeletedRows?.filter(r => r.isDelete === false).length ?? 0;
-            const rowsRemoved = change.delta?.addedOrDeletedRows?.filter(r => r.isDelete === true).length ?? 0;
-            updatedData.dimensions = {
-                x: data.dimensions.x + columnsAdded - columnsRemoved,
-                y: data.dimensions.y + rowsAdded - rowsRemoved,
-            };
-
             const updatedFrames = [...data.frames];
             updatedFrames[currentFrame] = [
                 ...updatedFrames[currentFrame].map((layer, index) => ({
@@ -165,14 +151,9 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                     }).map(p => p[1].color === '' ? null : PALETTE_INDICES[data.colorMode][p[1].color])),
                 }))];
 
+            setFrames(updatedFrames);
+
             // TODO: update all frames' layers on resize
-
-        }
-
-        // console.log('updatedData', updatedData);
-        if (Object.keys(updatedData).length > 0) {
-            // console.log('--- SET DATA ---');
-            setData(updatedData);
         }
     };
 

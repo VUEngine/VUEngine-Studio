@@ -73,11 +73,13 @@ const FrameIndex = styled.div`
 
 export const mergeLayers = (layers: LayerPixelData[]): number[][] => {
     const result: number[][] = [];
+    const height = layers[0].data.length;
+    const width = layers[0].data[0].length;
 
     // initialize as all black
-    for (let i = 0; i < layers[0].data.length; i++) {
+    for (let i = 0; i < height; i++) {
         const row: number[] = [];
-        for (let j = 0; j < layers[0].data[0].length; j++) {
+        for (let j = 0; j < width; j++) {
             row.push(0);
         }
         result.push(row);

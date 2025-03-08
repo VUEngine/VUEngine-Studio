@@ -224,11 +224,11 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                             <LayerPreviewContainer>
                                 {data.frames[currentFrame][index] &&
                                     <CanvasImage
-                                        height={data.dimensions.y}
+                                        height={layer.data.length}
                                         palette={'11100100'}
                                         pixelData={[data.frames[currentFrame][index].data]}
                                         displayMode={DisplayMode.Mono}
-                                        width={data.dimensions.x}
+                                        width={layer.data[0].length}
                                         colorMode={data.colorMode}
                                         drawBlack={true}
                                     />
