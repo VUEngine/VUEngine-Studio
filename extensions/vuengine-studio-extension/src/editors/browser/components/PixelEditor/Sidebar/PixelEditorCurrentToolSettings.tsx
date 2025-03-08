@@ -19,7 +19,6 @@ export default function PixelEditorCurrentToolSettings(props: PixelEditorCurrent
 
     const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
 
-    console.log('...... brushPattern', brushPattern);
     return (
         [BrushTool.DOT, BrushTool.ERASER].includes(brushTool) ?
             <HContainer gap={2} wrap='wrap'>

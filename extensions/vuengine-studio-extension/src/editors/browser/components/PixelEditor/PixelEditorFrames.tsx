@@ -1,25 +1,47 @@
+import { DotsSixVertical } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { DottingRef, useDotting } from 'dotting';
 import React, { useEffect } from 'react';
-import { ColorMode } from '../../../../core/browser/ves-common-types';
-import HContainer from '../Common/Base/HContainer';
-import VContainer from '../Common/Base/VContainer';
-import { convertToLayerProps } from './PixelEditor';
-import { LayerPixelData } from './PixelEditorTypes';
+import SortableList, { SortableItem } from 'react-easy-sort';
 import styled from 'styled-components';
-import { DotsSixVertical } from '@phosphor-icons/react';
+import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
 import { DisplayMode } from '../Common/VUEngineTypes';
+import { convertToLayerProps } from './PixelEditor';
+import { LayerPixelData } from './PixelEditorTypes';
+
+const FramesContainer = styled.div`
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: end;
+    overflow: hidden;
+    max-width: 100%;
+
+    .frames-list {
+        display: flex;
+        flex-flow: wrap;
+        gap: 5px;
+        overflow: auto;
+        max-height: 155px;
+        padding: 2px;
+        user-select: none;
+        z-index: 100;
+    }
+`;
 
 const Frame = styled.div`
+    background-color: var(--theia-editorGroupHeader-tabsBackground);
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border-radius: 2px;
     box-sizing: border-box;
     cursor: pointer;
-    flex-grow: unset;
-    min-height: 75px;
     max-height: 75px;
-    min-width: 50px;
     max-width: 50px;
-    padding: 28px 3px 3px  !important;
+    min-height: 75px;
+    min-width: 50px;
+    padding: 28px 3px 3px !important;
     position: relative;
 
     canvas {
@@ -29,6 +51,15 @@ const Frame = styled.div`
         height: 100%;
         object-fit: contain;
         width: 100%;
+    }
+
+    &.dragging {
+        border-color: var(--theia-focusBorder);
+        font-size: var(--theia-ui-font-size1);
+
+        .remove-button {
+            display: none;
+        }
     }
 `;
 
@@ -99,6 +130,23 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
         setCurrentFrame(frames.length);
     };
 
+    const arrayMove = (arr: any[], oldIndex: number, newIndex: number) => {
+        const result = [...arr];
+        if (newIndex >= result.length) {
+            let k = newIndex - result.length + 1;
+            while (k--) {
+                result.push(undefined);
+            }
+        }
+        result.splice(newIndex, 0, result.splice(oldIndex, 1)[0]);
+        return result;
+    };
+
+    const onSortEnd = (oldIndex: number, newIndex: number): void => {
+        setFrames(arrayMove(frames, oldIndex, newIndex));
+        setCurrentFrame(newIndex);
+    };
+
     useEffect(() => {
         setLayers(convertToLayerProps(frames[currentFrame], colorMode));
     }, [
@@ -106,59 +154,51 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
     ]);
 
     return (
-        <VContainer
-            alignItems="start"
-            justifyContent="end"
-            overflow="hidden"
-            style={{
-                maxWidth: '100%',
-            }}
-        >
+        <FramesContainer>
             <label style={{ zIndex: 100 }}>
                 {nls.localize('vuengine/editors/pixel/frames', 'Frames')}
             </label>
-            <HContainer
-                overflow="auto"
-                wrap="wrap"
-                style={{
-                    maxHeight: 155,
-                    padding: 2,
-                    zIndex: 100,
-                }}
+            <SortableList
+                onSortEnd={onSortEnd}
+                className="frames-list"
+                draggedItemClassName='dragging'
             >
                 {
                     frames.map((f, i) => (
-                        <Frame
+                        <SortableItem
                             key={i}
-                            className={currentFrame === i ? 'item active' : 'item'}
-                            onClick={() => setCurrentFrame(i)}
                         >
-                            <FrameIndex>
-                                <DotsSixVertical size={16} />
-                                {i + 1}
-                            </FrameIndex>
-                            <CanvasImage
-                                height={f[0].data.length}
-                                palette={'11100100'}
-                                pixelData={[mergeLayers(f)]}
-                                displayMode={DisplayMode.Mono}
-                                width={f[0].data[0].length}
-                                colorMode={colorMode}
-                                drawBlack={true}
-                            />
-                            {frames.length > 1 &&
-                                <button
-                                    className="remove-button"
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        removeFrame(i);
-                                    }}
-                                    title={nls.localizeByDefault('Remove')}
-                                >
-                                    <i className='codicon codicon-x' />
-                                </button>
-                            }
-                        </Frame>
+                            <Frame
+                                className={currentFrame === i ? 'item active' : 'item'}
+                                onClick={() => setCurrentFrame(i)}
+                            >
+                                <FrameIndex>
+                                    <DotsSixVertical size={16} />
+                                    {i + 1}
+                                </FrameIndex>
+                                <CanvasImage
+                                    height={f[0].data.length}
+                                    palette={'11100100'}
+                                    pixelData={[mergeLayers(f)]}
+                                    displayMode={DisplayMode.Mono}
+                                    width={f[0].data[0].length}
+                                    colorMode={colorMode}
+                                    drawBlack={true}
+                                />
+                                {frames.length > 1 &&
+                                    <button
+                                        className="remove-button"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            removeFrame(i);
+                                        }}
+                                        title={nls.localizeByDefault('Remove')}
+                                    >
+                                        <i className='codicon codicon-x' />
+                                    </button>
+                                }
+                            </Frame>
+                        </SortableItem>
                     ))
                 }
                 <button
@@ -173,7 +213,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
                 >
                     <i className='codicon codicon-plus' />
                 </button>
-            </HContainer>
-        </VContainer >
+            </SortableList>
+        </FramesContainer>
     );
 }

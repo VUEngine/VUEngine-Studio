@@ -1,9 +1,15 @@
 .jsonforms-container > .pixelEditor {
+    background-image: radial-gradient(rgba(0, 0, 0, .5) 1px, transparent 0);
+    background-size: 16px 16px;
     flex-grow: 1;
     justify-content: space-between;
     gap: 15px;
     overflow: hidden;
     position: relative;
+
+    body.theia-light & {
+        background-image: radial-gradient(rgba(0, 0, 0, .1) 1px, transparent 0);
+    }
 }
 
 .pixelEditor canvas {

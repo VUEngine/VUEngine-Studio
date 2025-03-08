@@ -90,7 +90,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                 })}
             />
             <Input
-                label={nls.localizeByDefault('Author')}
+                label={nls.localize('vuengine/project/author', 'Author')}
                 value={gameConfig.projectAuthor ?? ''}
                 setValue={v => setGameConfig({
                     projectAuthor: v as string
