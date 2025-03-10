@@ -178,14 +178,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.uri = new URI(this.options.uri);
         this.typeId = this.options.typeId;
 
-        if (this.uri.scheme !== UNTITLED_SCHEME) {
-            const fileStats = await this.fileService.resolve(this.uri);
-            this.isReadOnly = fileStats.isReadonly;
-            if (this.isReadOnly) {
-                lock(this.title);
-            }
-        }
-
         await this.vesProjectService.projectDataReady;
 
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
@@ -206,6 +198,21 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.uiSchema = type?.uiSchema;
         if (type?.icon) {
             this.title.iconClass = type.icon;
+        }
+
+        if (this.uri.scheme !== UNTITLED_SCHEME) {
+            if (await this.fileService.exists(this.uri)) {
+                const fileStats = await this.fileService.resolve(this.uri);
+                this.isReadOnly = fileStats.isReadonly;
+                if (this.isReadOnly) {
+                    lock(this.title);
+                }
+            } else {
+                console.error('File does not exists', this.uri.path.fsPath());
+                this.isLoading = false;
+                this.update();
+                return;
+            }
         }
 
         await this.loadData(type);
