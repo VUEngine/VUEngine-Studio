@@ -140,7 +140,7 @@ export class VesCodeGenService {
     const types = this.vesProjectService.getProjectDataTypes() ?? {};
     await Promise.all(Object.keys(types).map(async typeId => {
       const type = types[typeId];
-      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+      if ([fileUri.path.ext, fileUri.path.base].includes(type.file) && type.templates?.length) {
         await this.deleteFilesForItem(typeId);
         await this.generate([typeId], GenerationMode.All, fileUri);
         // TODO: delete corresponding generated code for moved files and regenerate at new location
