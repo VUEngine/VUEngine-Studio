@@ -1,3 +1,4 @@
+/* eslint-disable no-null/no-null */
 import {
     ArrowDown, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowsOut, ArrowUp, ArrowUpLeft, ArrowUpRight, Circle, FileArrowDown, Trash
 } from '@phosphor-icons/react';
@@ -10,9 +11,10 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import PopUpDialog from '../../Common/Base/PopUpDialog';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../PixelEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SpriteData } from '../PixelEditorTypes';
 import { PixelEditorTool } from './PixelEditorTool';
 import styled from 'styled-components';
+import { convertToLayerProps } from '../PixelEditor';
 
 const ResizeDirectionBox = styled.div`
     align-items: center;
@@ -30,13 +32,15 @@ const ResizeDirectionBox = styled.div`
 `;
 
 interface PixelEditorActionsProps {
-    colorMode: ColorMode
+    data: SpriteData
+    updateData: (data: SpriteData) => void
+    currentFrame: number
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
-    const { colorMode, dottingRef } = props;
-    const { clear, downloadImage } = useDotting(dottingRef);
+    const { data, updateData, currentFrame, dottingRef } = props;
+    const { clear, downloadImage, setLayers } = useDotting(dottingRef);
     const { dimensions } = useGrids(dottingRef);
     const [resizeDialogOpen, setResizeDialogOpen] = useState<boolean>(false);
     const [resizeHeight, setResizeHeight] = useState<number>(0);
@@ -55,9 +59,140 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
     };
 
     const resize = () => {
-        // setData();
-        alert('Resize to ' + resizeWidth + ' x ' + resizeHeight + ' at ' + resizeDirection);
-        // update all frames' layers!
+        const addColumnsLeft = resizeWidth > dimensions.columnCount
+            ? [3, 6, 9].includes(resizeDirection)
+                ? resizeWidth - dimensions.columnCount
+                : [2, 5, 8].includes(resizeDirection)
+                    ? (resizeWidth - dimensions.columnCount) / 2
+                    : 0
+            : 0;
+        const addColumnsRight = resizeWidth > dimensions.columnCount
+            ? [1, 4, 7].includes(resizeDirection)
+                ? resizeWidth - dimensions.columnCount
+                : [2, 5, 8].includes(resizeDirection)
+                    ? (resizeWidth - dimensions.columnCount) / 2
+                    : 0
+            : 0;
+        const removeColumnsLeft = resizeWidth < dimensions.columnCount
+            ? [3, 6, 9].includes(resizeDirection)
+                ? dimensions.columnCount - resizeWidth
+                : [2, 5, 8].includes(resizeDirection)
+                    ? (dimensions.columnCount - resizeWidth) / 2
+                    : 0
+            : 0;
+        const removeColumnsRight = resizeWidth < dimensions.columnCount
+            ? [1, 4, 7].includes(resizeDirection)
+                ? dimensions.columnCount - resizeWidth
+                : [2, 5, 8].includes(resizeDirection)
+                    ? (dimensions.columnCount - resizeWidth) / 2
+                    : 0
+            : 0;
+
+        const addRowsTop = resizeHeight > dimensions.rowCount
+            ? [7, 8, 9].includes(resizeDirection)
+                ? resizeHeight - dimensions.rowCount
+                : [4, 5, 6].includes(resizeDirection)
+                    ? (resizeHeight - dimensions.rowCount) / 2
+                    : 0
+            : 0;
+        const addRowsBottom = resizeHeight > dimensions.rowCount
+            ? [1, 2, 3].includes(resizeDirection)
+                ? resizeHeight - dimensions.rowCount
+                : [4, 5, 6].includes(resizeDirection)
+                    ? (resizeHeight - dimensions.rowCount) / 2
+                    : 0
+            : 0;
+        const removeRowsTop = resizeHeight < dimensions.rowCount
+            ? [7, 8, 9].includes(resizeDirection)
+                ? dimensions.rowCount - resizeHeight
+                : [4, 5, 6].includes(resizeDirection)
+                    ? (dimensions.rowCount - resizeHeight) / 2
+                    : 0
+            : 0;
+        const removeRowsBottom = resizeHeight < dimensions.rowCount
+            ? [1, 2, 3].includes(resizeDirection)
+                ? dimensions.rowCount - resizeHeight
+                : [4, 5, 6].includes(resizeDirection)
+                    ? (dimensions.rowCount - resizeHeight) / 2
+                    : 0
+            : 0;
+
+        console.log('---');
+        console.log('addColumnsLeft', addColumnsLeft);
+        console.log('addColumnsRight', addColumnsRight);
+        console.log('removeColumnsLeft', removeColumnsLeft);
+        console.log('removeColumnsRight', removeColumnsRight);
+
+        console.log('---');
+        console.log('addRowsTop', addRowsTop);
+        console.log('addRowsBottom', addRowsBottom);
+        console.log('removeRowsTop', removeRowsTop);
+        console.log('removeRowsBottom', removeRowsBottom);
+
+        const updatedFrames = [...data.frames];
+
+        if (addColumnsLeft || addColumnsRight || removeColumnsLeft || removeColumnsRight) {
+            data.frames.forEach((frame, frameIndex) =>
+                frame.forEach((layer, layerIndex) =>
+                    layer.data.forEach((row, rowIndex) => {
+                        if (addColumnsLeft) {
+                            for (let i = 0; i < addColumnsLeft; i++) {
+                                updatedFrames[frameIndex][layerIndex].data[rowIndex].unshift(null);
+                            }
+                        }
+                        if (addColumnsRight) {
+                            for (let i = 0; i < addColumnsRight; i++) {
+                                updatedFrames[frameIndex][layerIndex].data[rowIndex].push(null);
+                            }
+                        }
+                        if (removeColumnsLeft) {
+                            for (let i = 0; i < removeColumnsLeft; i++) {
+                                updatedFrames[frameIndex][layerIndex].data[rowIndex].shift();
+                            }
+                        }
+                        if (removeColumnsRight) {
+                            for (let i = 0; i < removeColumnsRight; i++) {
+                                updatedFrames[frameIndex][layerIndex].data[rowIndex].pop();
+                            }
+                        }
+                    })
+                )
+            );
+        }
+
+        if (addRowsTop || addRowsBottom || removeRowsTop || removeRowsBottom) {
+            const emptyRow = [...Array(updatedFrames[0][0].data[0].length)].map(e => null);
+            data.frames.forEach((frame, frameIndex) =>
+                frame.forEach((layer, layerIndex) => {
+                    if (addRowsTop) {
+                        for (let i = 0; i < addRowsTop; i++) {
+                            updatedFrames[frameIndex][layerIndex].data.unshift(emptyRow);
+                        }
+                    }
+                    if (addRowsBottom) {
+                        for (let i = 0; i < addRowsBottom; i++) {
+                            updatedFrames[frameIndex][layerIndex].data.push(emptyRow);
+                        }
+                    }
+                    if (removeRowsTop) {
+                        for (let i = 0; i < removeRowsTop; i++) {
+                            updatedFrames[frameIndex][layerIndex].data.shift();
+                        }
+                    }
+                    if (removeRowsBottom) {
+                        for (let i = 0; i < removeRowsBottom; i++) {
+                            updatedFrames[frameIndex][layerIndex].data.pop();
+                        }
+                    }
+                })
+            );
+        }
+
+        updateData({
+            ...data,
+            frames: updatedFrames,
+        });
+        setLayers(convertToLayerProps(data.frames[currentFrame], data.colorMode));
     };
 
     useEffect(() => {
@@ -135,7 +270,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                             value={resizeHeight}
                             setValue={v => setResizeHeight(v as number)}
                             min={8}
-                            max={colorMode === ColorMode.FrameBlend ? 256 : 512}
+                            max={data.colorMode === ColorMode.FrameBlend ? 256 : 512}
                             step={8}
                             autoFocus
                             width={80}

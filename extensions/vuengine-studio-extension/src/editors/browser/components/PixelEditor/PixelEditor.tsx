@@ -66,7 +66,6 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(4);
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const [currentFrame, setCurrentFrame] = useState<number>(0);
-    const [allowResize, setAllowResize] = useState<boolean>(false);
     const [gridSize, setGridSize] = useState<number>(1);
 
     const commandListener = (e: CustomEvent): void => {
@@ -101,33 +100,18 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     const setColorMode = (colorMode: ColorMode): void => {
         setData({ colorMode });
 
+        // TODO: when set to default, remap all blended colors
         // TODO: when set to frame blend, trim all layer heights for all frames if > 256
     };
 
-    /*
-    const applyPixelChanges = (layerId: string, modifiedPixels: PixelModifyItem[]): void => {
-        const updatedFrame: LayerPixelData[] = [];
-        data.frames[currentFrame].forEach(layer => {
-            const updatedLayer = { ...layer };
-            if (updatedLayer.id === layerId) {
-                modifiedPixels.forEach(mp => {
-                    updatedLayer.data[mp.rowIndex][mp.columnIndex] = mp.color === '' ? null : PALETTE_INDICES[data.colorMode][mp.color];
-                });
-            }
-            updatedFrame.push(updatedLayer);
-        });
-
-        setCurrentFrameData(updatedFrame);
-    };
-    */
-
     const dataChangeHandler: CanvasDataChangeHandler = change => {
-        // console.log('Data change', change);
+        console.log('Data change', change);
         if (!change.isLocalChange) {
             return;
         }
 
-        if (change.delta?.addedOrDeletedColumns?.length || change.delta?.addedOrDeletedRows?.length || change.delta?.modifiedPixels?.length) {
+        /*
+        if (change.delta?.modifiedPixels) {
             const updatedFrames = [...data.frames];
             updatedFrames[currentFrame] = [
                 ...updatedFrames[currentFrame].map((layer, index) => ({
@@ -152,8 +136,25 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                 }))];
 
             setFrames(updatedFrames);
+        }
+        */
 
-            // TODO: update all frames' layers on resize
+        if (change.delta?.modifiedPixels) {
+            const updatedFrames = [...data.frames];
+            updatedFrames[currentFrame] = [
+                ...updatedFrames[currentFrame].map(layer => ({
+                    ...layer,
+                    data: layer.data.map((row, rowIndex) => row.map((column, columnIndex) => {
+                        const modifiedPixel = change.delta?.modifiedPixels.find(m => m.columnIndex === columnIndex && m.rowIndex === rowIndex);
+                        if (modifiedPixel) {
+                            return modifiedPixel.color === '' ? null : PALETTE_INDICES[data.colorMode][modifiedPixel.color];
+                        }
+
+                        return column;
+                    }))
+                }))];
+
+            setFrames(updatedFrames);
         }
     };
 
@@ -169,7 +170,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
             height={canvasHeight}
             initAutoScale={true}
             initLayers={convertToLayerProps(data.frames[currentFrame], data.colorMode)}
-            isGridFixed={!allowResize}
+            isGridFixed={true}
             isPanZoomable={true}
             maxColumnCount={512}
             minColumnCount={8}
@@ -185,8 +186,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         data.colorMode,
         gridSize,
         canvasHeight,
-        canvasWidth,
-        allowResize
+        canvasWidth
     ]);
 
     useEffect(() => {
@@ -276,7 +276,9 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                             dottingRef={dottingRef}
                         />
                         <PixelEditorActions
-                            colorMode={data.colorMode}
+                            data={data}
+                            updateData={updateData}
+                            currentFrame={currentFrame}
                             dottingRef={dottingRef}
                         />
                     </VContainer>
@@ -294,7 +296,6 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                         height: '100%',
                         maxWidth: 240,
                         minWidth: 240,
-                        zIndex: 100,
                     }}
                 >
                     <PixelEditorNavigator
@@ -320,8 +321,6 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                 dottingRef={dottingRef}
             />
             <PixelEditorStatus
-                allowResize={allowResize}
-                setAllowResize={setAllowResize}
                 gridSize={gridSize}
                 setGridSize={setGridSize}
                 dottingRef={dottingRef}

@@ -121,9 +121,4 @@ export namespace PixelEditorCommands {
         label: nls.localize('vuengine/editors/pixel/commands/toggleGrid', 'Toggle Grid'),
         category: nls.localize('vuengine/editors/pixel/commands/category', 'Font Editor'),
     };
-    export const TOGGLE_ALLOW_RESIZE: EditorCommand = {
-        id: 'editors.fontEditor.toggleAllowResize',
-        label: nls.localize('vuengine/editors/pixel/commands/toggleAllowResize', 'Toggle Resizer'),
-        category: nls.localize('vuengine/editors/pixel/commands/category', 'Font Editor'),
-    };
 };

@@ -6,8 +6,6 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import { PixelEditorCommands } from './PixelEditorCommands';
 
 interface PixelEditorStatusProps {
-    allowResize?: boolean
-    setAllowResize?: (allowResize: boolean) => void
     gridSize: number
     setGridSize: (gridSize: number) => void
     dottingRef: React.RefObject<DottingRef>
@@ -15,7 +13,7 @@ interface PixelEditorStatusProps {
 
 export default function PixelEditorStatus(props: PixelEditorStatusProps): React.JSX.Element {
     const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
-    const { allowResize, setAllowResize, gridSize, setGridSize, dottingRef } = props;
+    const { gridSize, setGridSize, dottingRef } = props;
     const {
         addHoverPixelChangeListener,
         removeHoverPixelChangeListener,
@@ -25,12 +23,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
     const { dimensions } = useGrids(dottingRef);
     const [hoveredPixel, setHoveredPixel] = useState<{ rowIndex: number; columnIndex: number; } | null>(null);
     const [canvasPanZoom, setCanvasPanZoom] = useState<PanZoom | null>(null);
-
-    const toggleAllowResize = (): void => {
-        if (setAllowResize) {
-            setAllowResize(!allowResize);
-        }
-    };
 
     const toggleGrid = (): void => {
         setGridSize(gridSize > 0 ? 0 : 1);
@@ -44,14 +36,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
             priority: 7,
             text: '$(fa-th-large)',
             tooltip: PixelEditorCommands.TOGGLE_GRID.label,
-        });
-        setStatusBarItem('ves-editors-sprite-resizer-toggle', {
-            alignment: StatusBarAlignment.RIGHT,
-            command: PixelEditorCommands.TOGGLE_ALLOW_RESIZE.id,
-            className: !allowResize ? 'disabled' : undefined,
-            priority: 6,
-            text: '$(fa-arrows-alt)',
-            tooltip: PixelEditorCommands.TOGGLE_ALLOW_RESIZE.label,
         });
         if (canvasPanZoom) {
             setStatusBarItem('ves-editors-sprite-pan-zoom', {
@@ -78,7 +62,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
 
     const removeStatusBarItems = () => {
         removeStatusBarItem('ves-editors-sprite-grid-toggle');
-        removeStatusBarItem('ves-editors-sprite-resizer-toggle');
         removeStatusBarItem('ves-editors-sprite-dimensions');
         removeStatusBarItem('ves-editors-sprite-hover-coordinates');
         removeStatusBarItem('ves-editors-sprite-pan-zoom');
@@ -96,9 +79,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         switch (e.detail) {
             case PixelEditorCommands.TOGGLE_GRID.id:
                 toggleGrid();
-                break;
-            case PixelEditorCommands.TOGGLE_ALLOW_RESIZE.id:
-                toggleAllowResize();
                 break;
         }
     };
@@ -119,7 +99,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
     }, [
-        allowResize,
         gridSize,
     ]);
 
@@ -129,7 +108,6 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
             removeStatusBarItems();
         };
     }, [
-        allowResize,
         canvasPanZoom,
         dimensions,
         gridSize,

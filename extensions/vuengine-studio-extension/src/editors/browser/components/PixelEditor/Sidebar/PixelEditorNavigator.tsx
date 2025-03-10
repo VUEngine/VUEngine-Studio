@@ -95,7 +95,7 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
     }, []);
 
     return (
-        <VContainer>
+        <VContainer style={{ zIndex: 100 }}>
             <label>
                 {nls.localize('vuengine/editors/pixel/navigator', 'Navigator')}
             </label>

@@ -6,6 +6,7 @@ import SortableList, { SortableItem } from 'react-easy-sort';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
+import { nanoid } from '../Common/Utils';
 import { DisplayMode } from '../Common/VUEngineTypes';
 import { convertToLayerProps } from './PixelEditor';
 import { LayerPixelData } from './PixelEditorTypes';
@@ -128,7 +129,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
         setFrames([
             ...frames,
             [
-                ...frames[frames.length - 1]
+                ...(frames[frames.length - 1].map(layer => ({ ...layer, id: nanoid() })))
             ],
         ]);
         setCurrentFrame(frames.length);

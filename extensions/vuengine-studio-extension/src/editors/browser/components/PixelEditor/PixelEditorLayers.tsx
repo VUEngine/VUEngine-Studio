@@ -46,10 +46,7 @@ interface PixelEditorLayersProps {
 
 export default function PixelEditorLayers(props: PixelEditorLayersProps): React.JSX.Element {
     const { data, updateData, currentFrame, setCurrentFrameData, dottingRef } = props;
-    const {
-        addLayerChangeEventListener,
-        removeLayerChangeEventListener,
-    } = useHandlers(dottingRef);
+    const { addLayerChangeEventListener, removeLayerChangeEventListener } = useHandlers(dottingRef);
     const {
         addLayer,
         changeLayerPosition,
@@ -155,8 +152,8 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         // console.log('updatedFrame', updatedFrame);
         // console.log('data.frames[currentFrame]', data.frames[currentFrame]);
         if (JSON.stringify(updatedFrame) !== JSON.stringify(data.frames[currentFrame])) {
-            // console.log('--- setData ---');
-            setCurrentFrameData(updatedFrame);
+            console.log('--- setData ---');
+            // setCurrentFrameData(updatedFrame);
         }
     };
 
@@ -171,7 +168,7 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
     ]);
 
     return (
-        <VContainer overflow='hidden'>
+        <VContainer overflow='hidden' style={{ zIndex: 100 }}>
             <HContainer alignItems="center" justifyContent="space-between">
                 <label>
                     {nls.localize('vuengine/editors/pixel/layers', 'Layers')}
