@@ -17,7 +17,7 @@ import VContainer from '../Common/Base/VContainer';
 import { PixelEditorCommands } from './PixelEditorCommands';
 import PixelEditorLayers from './PixelEditorLayers';
 import PixelEditorStatus from './PixelEditorStatus';
-import { LayerPixelData, SpriteData } from './PixelEditorTypes';
+import { LayerPixelData, PixelData } from './PixelEditorTypes';
 import PaletteSelect from './Sidebar/PaletteSelect';
 import PixelEditorActions from './Sidebar/PixelEditorActions';
 import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
@@ -50,8 +50,8 @@ export const convertToLayerProps = (frame: LayerPixelData[], colorMode: ColorMod
 }));
 
 interface PixelEditorProps {
-    data: SpriteData
-    updateData: (data: SpriteData) => void
+    data: PixelData
+    updateData: (data: PixelData) => void
 }
 
 export default function PixelEditor(props: PixelEditorProps): React.JSX.Element {
@@ -79,7 +79,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         }
     };
 
-    const setData = (partialData: Partial<SpriteData>): void => {
+    const setData = (partialData: Partial<PixelData>): void => {
         updateData({
             ...data,
             ...partialData,
@@ -105,7 +105,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     };
 
     const dataChangeHandler: CanvasDataChangeHandler = change => {
-        console.log('Data change', change);
+        // console.log('Data change', change);
         if (!change.isLocalChange) {
             return;
         }

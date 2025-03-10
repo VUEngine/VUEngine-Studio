@@ -13,7 +13,7 @@ export interface LayerPixelData {
     parallax: number
 }
 
-export interface SpriteData {
+export interface PixelData {
     colorMode: ColorMode
     frames: LayerPixelData[][]
 }

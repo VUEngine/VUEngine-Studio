@@ -18,7 +18,7 @@ import VContainer from '../Common/Base/VContainer';
 import CanvasImage from '../Common/CanvasImage';
 import { nanoid } from '../Common/Utils';
 import { DisplayMode, Displays } from '../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS, LayerPixelData, SpriteData } from './PixelEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, LayerPixelData, PixelData } from './PixelEditorTypes';
 
 const LayerPreviewContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);
@@ -37,8 +37,8 @@ const LayerPreviewContainer = styled.div`
 `;
 
 interface PixelEditorLayersProps {
-    data: SpriteData
-    updateData: (data: SpriteData) => void
+    data: PixelData
+    updateData: (data: PixelData) => void
     currentFrame: number
     setCurrentFrameData: (frame: LayerPixelData[]) => void
     dottingRef: React.RefObject<DottingRef>
@@ -152,8 +152,8 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         // console.log('updatedFrame', updatedFrame);
         // console.log('data.frames[currentFrame]', data.frames[currentFrame]);
         if (JSON.stringify(updatedFrame) !== JSON.stringify(data.frames[currentFrame])) {
-            console.log('--- setData ---');
-            // setCurrentFrameData(updatedFrame);
+            // console.log('--- setData ---');
+            setCurrentFrameData(updatedFrame);
         }
     };
 

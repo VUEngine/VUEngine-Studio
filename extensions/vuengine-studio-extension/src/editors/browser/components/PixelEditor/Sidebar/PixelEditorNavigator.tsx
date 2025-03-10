@@ -6,7 +6,7 @@ import VContainer from '../../Common/Base/VContainer';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { mergeLayers } from '../PixelEditorFrames';
-import { SpriteData } from '../PixelEditorTypes';
+import { PixelData } from '../PixelEditorTypes';
 
 const NavigatorContainer = styled.div`
     align-items: center;
@@ -38,7 +38,7 @@ const NavigatorVisibleWindow = styled.div`
 `;
 
 interface PixelEditorNavigatorProps {
-    data: SpriteData
+    data: PixelData
     currentFrame: number
     dottingRef: React.RefObject<DottingRef>
 }
