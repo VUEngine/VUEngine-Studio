@@ -36,7 +36,7 @@ interface PixelEditorActionsProps {
 
 export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
     const { colorMode, dottingRef } = props;
-    const { clear, downloadImage, setData } = useDotting(dottingRef);
+    const { clear, downloadImage } = useDotting(dottingRef);
     const { dimensions } = useGrids(dottingRef);
     const [resizeDialogOpen, setResizeDialogOpen] = useState<boolean>(false);
     const [resizeHeight, setResizeHeight] = useState<number>(0);

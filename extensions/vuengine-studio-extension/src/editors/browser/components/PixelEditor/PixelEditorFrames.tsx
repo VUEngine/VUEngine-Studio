@@ -72,6 +72,10 @@ const FrameIndex = styled.div`
 `;
 
 export const mergeLayers = (layers: LayerPixelData[]): number[][] => {
+    if (!layers) {
+        return [];
+    }
+
     const result: number[][] = [];
     const height = layers[0].data.length;
     const width = layers[0].data[0].length;
@@ -116,10 +120,8 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
         if (currentFrame === (frames.length - 1)) {
             setCurrentFrame(frames.length - 2);
         }
-        setFrames([
-            ...frames.slice(0, index),
-            ...frames.slice(index + 1)
-        ]);
+
+        setFrames(frames.filter((_, i) => i !== index));
     };
 
     const addFrame = (): void => {

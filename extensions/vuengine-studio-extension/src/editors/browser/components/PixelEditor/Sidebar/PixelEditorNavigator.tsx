@@ -52,8 +52,12 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
     const { addCanvasInfoChangeEventListener, removeCanvasInfoChangeEventListener } = useHandlers(dottingRef);
     const { getForegroundCanvas } = useDotting(dottingRef);
 
-    const height = data.frames[currentFrame][0].data.length;
-    const width = data.frames[currentFrame][0].data[0].length;
+    const height = data.frames[currentFrame] && data.frames[currentFrame][0]
+        ? data.frames[currentFrame][0].data.length
+        : 0;
+    const width = data.frames[currentFrame] && data.frames[currentFrame][0]
+        ? data.frames[currentFrame][0].data[0].length
+        : 0;
     const scale = Math.min(
         238 / width,
         178 / height
@@ -98,8 +102,8 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
             <NavigatorContainer>
                 <CanvasContainer
                     style={{
-                        height: data.frames[currentFrame][0].data.length * scale,
-                        width: data.frames[currentFrame][0].data[0].length * scale,
+                        height: height * scale,
+                        width: width * scale,
                     }}
                 >
                     <NavigatorVisibleWindow
@@ -112,11 +116,11 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
                         }}
                     />
                     <CanvasImage
-                        height={data.frames[currentFrame][0].data.length}
+                        height={height}
                         palette={'11100100'}
                         pixelData={[mergeLayers(data.frames[currentFrame])]}
                         displayMode={DisplayMode.Mono}
-                        width={data.frames[currentFrame][0].data[0].length}
+                        width={width}
                         colorMode={data.colorMode}
                         drawBlack={true}
                     />
