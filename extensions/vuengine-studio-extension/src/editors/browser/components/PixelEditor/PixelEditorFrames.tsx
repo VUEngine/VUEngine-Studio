@@ -6,7 +6,7 @@ import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
-import { nanoid } from '../Common/Utils';
+import { arrayMove, nanoid } from '../Common/Utils';
 import { DisplayMode } from '../Common/VUEngineTypes';
 import { convertLayerPixelDataToPixelModifyItem, convertToLayerProps } from './PixelEditor';
 import { LayerPixelData } from './PixelEditorTypes';
@@ -143,18 +143,6 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
             ],
         ]);
         setCurrentFrame(frames.length);
-    };
-
-    const arrayMove = (arr: any[], oldIndex: number, newIndex: number) => {
-        const result = [...arr];
-        if (newIndex >= result.length) {
-            let k = newIndex - result.length + 1;
-            while (k--) {
-                result.push(undefined);
-            }
-        }
-        result.splice(newIndex, 0, result.splice(oldIndex, 1)[0]);
-        return result;
     };
 
     const onSortEnd = (oldIndex: number, newIndex: number): void => {

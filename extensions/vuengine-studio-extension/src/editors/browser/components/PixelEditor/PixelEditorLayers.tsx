@@ -9,14 +9,15 @@ import {
     useHandlers,
     useLayers
 } from 'dotting';
-import React, { BaseSyntheticEvent, useEffect, useRef, useState } from 'react';
+import React, { BaseSyntheticEvent, useEffect } from 'react';
+import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import styled from 'styled-components';
 import { PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import HContainer from '../Common/Base/HContainer';
 import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
 import CanvasImage from '../Common/CanvasImage';
-import { nanoid } from '../Common/Utils';
+import { arrayMove, nanoid } from '../Common/Utils';
 import { DisplayMode, Displays } from '../Common/VUEngineTypes';
 import { INPUT_BLOCKING_COMMANDS, LayerPixelData, PixelData } from './PixelEditorTypes';
 
@@ -36,6 +37,54 @@ const LayerPreviewContainer = styled.div`
     }
 `;
 
+const Layer = styled.div`
+    align-items: center;
+    background-color: var(--theia-editorGroupHeader-tabsBackground);
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border-radius: 2px;
+    box-sizing: border-box;
+    display: flex;
+    flex-grow: 1;
+    gap: 5px;
+    justify-content: start;
+    padding: var(--theia-ui-padding) !important;
+    position: relative;
+
+    input {
+        width: 120px;
+    }
+
+    canvas {
+        cursor: pointer;
+    }
+
+    &.dragging {
+        border-color: var(--theia-focusBorder);
+
+        .remove-button {
+            display: none;
+        }
+    }
+`;
+
+const DragHandle = styled.div`
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+`;
+
+const DropTarget = styled.div`
+    border: 1px dotted var(--theia-dropdown-border);
+    border-radius: 2px;
+    box-sizing: border-box;
+    max-height: 66px;
+    max-width: 240px;
+    min-height: 66px;
+    min-width: 240px;
+`;
+
 interface PixelEditorLayersProps {
     data: PixelData
     updateData: (data: PixelData) => void
@@ -49,7 +98,6 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
     const { addLayerChangeEventListener, removeLayerChangeEventListener } = useHandlers(dottingRef);
     const {
         addLayer,
-        changeLayerPosition,
         currentLayer,
         hideLayer,
         isolateLayer,
@@ -60,9 +108,6 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         showAllLayers,
         showLayer,
     } = useLayers(dottingRef);
-    const [draggingSectionId, setDraggingSectionId] = useState<string | null>(null);
-    const draggingItemIndex = useRef<number | null>(null);
-    const draggingOverItemIndex = useRef<number | null>(null);
 
     const addDataLayer = (): void => {
         addLayer(nanoid(), layers.length);
@@ -86,33 +131,8 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         });
     };
 
-    const onDragStart = (e: BaseSyntheticEvent, index: number, id: string) => {
-        draggingItemIndex.current = index;
-        setDraggingSectionId(id);
-    };
-
-    const onAvailableItemDragEnter = (e: BaseSyntheticEvent, index: number) => {
-        draggingOverItemIndex.current = index;
-        const copyListItems = [...layers];
-        const draggingItemContent = copyListItems[draggingItemIndex.current!];
-        copyListItems.splice(draggingItemIndex.current!, 1);
-        copyListItems.splice(
-            draggingOverItemIndex.current!,
-            0,
-            draggingItemContent,
-        );
-        draggingItemIndex.current = draggingOverItemIndex.current;
-        draggingOverItemIndex.current = null;
-        changeLayerPosition(draggingItemContent.id, index);
-    };
-
-    const onDragEnd = (e: BaseSyntheticEvent) => {
-        reorderLayersByIds(layers.map(layer => layer.id));
-        setDraggingSectionId(null);
-    };
-
-    const onDragOver = (e: BaseSyntheticEvent) => {
-        e.preventDefault();
+    const onSortEnd = (oldIndex: number, newIndex: number): void => {
+        reorderLayersByIds(arrayMove(layers, oldIndex, newIndex).map(layer => layer.id));
     };
 
     const onClickHandler = (e: BaseSyntheticEvent, id: string) => {
@@ -183,115 +203,117 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                     </div>
                 }
             </HContainer>
-            <VContainer overflow='auto'>
-                {layers.map((layer, index) => (
-                    <div
-                        key={index}
-                        className={`item layer${currentLayer?.id === layer.id ? ' active' : ''}${draggingSectionId === layer.id ? ' dragging' : ''}`}
-                        style={{
-                            alignItems: 'center',
-                            display: 'flex',
-                            gap: 5,
-                            justifyContent: 'start',
-                            opacity: layer.isVisible ? 1 : 0.5,
-                        }}
-                        onClick={e => onClickHandler(e, layer.id)}
-                        onDragStart={e => onDragStart(e, index, layer.id)}
-                        onDragEnter={e => onAvailableItemDragEnter(e, index)}
-                        onDragEnd={onDragEnd}
-                        onDragOver={onDragOver}
-                        draggable
-                    >
-                        {layers.length > 1 &&
-                            <button
-                                className="remove-button"
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    removeDataLayer(layer.id);
+            <SortableList
+                onSortEnd={onSortEnd}
+                className="frames-list"
+                draggedItemClassName='dragging item'
+                dropTarget={<DropTarget />}
+                lockAxis='y'
+            >
+                <VContainer overflow='auto'>
+                    {layers.map((layer, index) => (
+                        <SortableItem key={index}>
+                            <Layer
+                                className={currentLayer?.id === layer.id ? 'item active' : 'item'}
+                                style={{
+                                    opacity: layer.isVisible ? 1 : 0.5,
                                 }}
-                                title={nls.localize('vuengine/editors/pixel/removeLayer', 'Remove Layer')}
+                                onClick={e => onClickHandler(e, layer.id)}
                             >
-                                <i className='codicon codicon-x' />
-                            </button>
-                        }
-                        <HContainer>
-                            <VContainer justifyContent="center" style={{ cursor: 'grab' }}>
-                                <DotsSixVertical size={16} />
-                            </VContainer>
-                            <LayerPreviewContainer>
-                                {data.frames[currentFrame][index] &&
-                                    <CanvasImage
-                                        height={layer.data.length}
-                                        palette={'11100100'}
-                                        pixelData={[data.frames[currentFrame][index].data]}
-                                        displayMode={DisplayMode.Mono}
-                                        width={layer.data[0].length}
-                                        colorMode={data.colorMode}
-                                        drawBlack={true}
-                                    />
-                                }
-                            </LayerPreviewContainer>
-                            <VContainer>
-                                <Input
-                                    style={{ boxSizing: 'border-box', width: '100%' }}
-                                    value={data.frames[currentFrame].find(l => l.id === layer.id)?.name ?? ''}
-                                    grow={1}
-                                    setValue={v => setLayerName(index, v as string)}
-                                    commands={INPUT_BLOCKING_COMMANDS}
-                                />
-                                <HContainer>
-                                    <div
-                                        style={{ cursor: 'pointer' }}
+                                {layers.length > 1 &&
+                                    <button
+                                        className="remove-button"
                                         onClick={e => {
                                             e.stopPropagation();
-                                            if (layer.isVisible) {
-                                                hideLayer(layer.id);
-                                            } else {
-                                                showLayer(layer.id);
-                                            }
+                                            removeDataLayer(layer.id);
                                         }}
+                                        title={nls.localize('vuengine/editors/pixel/removeLayer', 'Remove Layer')}
                                     >
-                                        {layer.isVisible
-                                            ? <Eye size={16} />
-                                            : <EyeClosed size={16} />
+                                        <i className='codicon codicon-x' />
+                                    </button>
+                                }
+                                <HContainer>
+                                    <SortableKnob>
+                                        <DragHandle>
+                                            <DotsSixVertical size={16} />
+                                        </DragHandle>
+                                    </SortableKnob>
+                                    <LayerPreviewContainer>
+                                        {data.frames[currentFrame][index] &&
+                                            <CanvasImage
+                                                height={layer.data.length}
+                                                palette={'11100100'}
+                                                pixelData={[data.frames[currentFrame][index].data]}
+                                                displayMode={DisplayMode.Mono}
+                                                width={layer.data[0].length}
+                                                colorMode={data.colorMode}
+                                                drawBlack={true}
+                                            />
                                         }
-                                    </div>
-                                    <div
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => {
-                                            isolateLayer(layer.id);
-                                        }}
-                                    >
-                                        <HandEye size={16} />
-                                    </div>
-                                    <div
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={e => {
-                                            duplicateLayer(layer, index + 1);
-                                        }}
-                                    >
-                                        <Copy size={16} />
-                                    </div>
+                                    </LayerPreviewContainer>
+                                    <VContainer>
+                                        <Input
+                                            style={{ boxSizing: 'border-box', width: '100%' }}
+                                            value={data.frames[currentFrame].find(l => l.id === layer.id)?.name ?? ''}
+                                            grow={1}
+                                            setValue={v => setLayerName(index, v as string)}
+                                            commands={INPUT_BLOCKING_COMMANDS}
+                                        />
+                                        <HContainer>
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    if (layer.isVisible) {
+                                                        hideLayer(layer.id);
+                                                    } else {
+                                                        showLayer(layer.id);
+                                                    }
+                                                }}
+                                            >
+                                                {layer.isVisible
+                                                    ? <Eye size={16} />
+                                                    : <EyeClosed size={16} />
+                                                }
+                                            </div>
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => {
+                                                    isolateLayer(layer.id);
+                                                }}
+                                            >
+                                                <HandEye size={16} />
+                                            </div>
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={e => {
+                                                    duplicateLayer(layer, index + 1);
+                                                }}
+                                            >
+                                                <Copy size={16} />
+                                            </div>
+                                        </HContainer>
+                                    </VContainer>
+                                    <div style={{
+                                        maxWidth: 18,
+                                        minWidth: 18,
+                                    }} />
                                 </HContainer>
-                            </VContainer>
-                            <div style={{
-                                maxWidth: 18,
-                                minWidth: 18,
-                            }} />
-                        </HContainer>
-                    </div>
-                ))}
-                <button
-                    className='theia-button add-button'
-                    onClick={addDataLayer}
-                    title={nls.localizeByDefault('Add')}
-                    style={{
-                        backgroundColor: 'var(--theia-editor-background)'
-                    }}
-                >
-                    <i className='codicon codicon-plus' />
-                </button>
-            </VContainer>
+                            </Layer>
+                        </SortableItem>
+                    ))}
+                    <button
+                        className='theia-button add-button'
+                        onClick={addDataLayer}
+                        title={nls.localizeByDefault('Add')}
+                        style={{
+                            backgroundColor: 'var(--theia-editor-background)'
+                        }}
+                    >
+                        <i className='codicon codicon-plus' />
+                    </button>
+                </VContainer>
+            </SortableList>
         </VContainer>
     );
 }

@@ -101,3 +101,15 @@ export const stringify = (input: any) => {
     return (formatter.Serialize(input) ?? '')
         .replace(/(\s+),/g, ',');
 };
+
+export const arrayMove = (arr: any[], oldIndex: number, newIndex: number) => {
+    const result = [...arr];
+    if (newIndex >= result.length) {
+        let k = newIndex - result.length + 1;
+        while (k--) {
+            result.push(undefined);
+        }
+    }
+    result.splice(newIndex, 0, result.splice(oldIndex, 1)[0]);
+    return result;
+};

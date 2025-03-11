@@ -16,14 +16,6 @@
     border: none !important; 
 }
 
-.pixelEditor .layer {
-    padding: var(--theia-ui-padding)
-}
-
-.pixelEditor .layer input {
-    width: 120px;
-}
-
 .pixelEditor .pixel-container {
     flex-grow: 1;
     inset: 0;
