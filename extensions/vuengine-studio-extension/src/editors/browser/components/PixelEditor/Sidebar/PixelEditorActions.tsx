@@ -230,8 +230,8 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                     open={resizeDialogOpen}
                     onClose={() => setResizeDialogOpen(false)}
                     onOk={async () => {
-                        resize();
                         setResizeDialogOpen(false);
+                        resize();
                     }}
                     okLabel={nls.localize('vuengine/editors/pixel/actions/resize', 'Resize Canvas')}
                     title={nls.localize('vuengine/editors/pixel/actions/resize', 'Resize Canvas')}

@@ -213,6 +213,9 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
                     style={{
                         backgroundColor: 'var(--theia-editor-background)',
                         minHeight: 75,
+                        minWidth: 26,
+                        maxWidth: 26,
+                        padding: 0,
                         zIndex: 100,
                     }}
                 >

@@ -121,13 +121,13 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
         addLayer(nanoid(), insertPosition, layer.data);
     };
 
-    const setLayerName = (layerIndex: number, name: string): void => {
-        const updatedFrames = [...data.frames];
-        updatedFrames[currentFrame][layerIndex].name = name;
-
+    const setLayerName = (layerId: string, name: string): void => {
         updateData({
             ...data,
-            frames: updatedFrames,
+            frames: [...data.frames].map(f => f.map(l => ({
+                ...l,
+                name: l.id === layerId ? name : l.name,
+            }))),
         });
     };
 
@@ -255,7 +255,7 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                                             style={{ boxSizing: 'border-box', width: '100%' }}
                                             value={data.frames[currentFrame].find(l => l.id === layer.id)?.name ?? ''}
                                             grow={1}
-                                            setValue={v => setLayerName(index, v as string)}
+                                            setValue={v => setLayerName(layer.id, v as string)}
                                             commands={INPUT_BLOCKING_COMMANDS}
                                         />
                                         <HContainer>
