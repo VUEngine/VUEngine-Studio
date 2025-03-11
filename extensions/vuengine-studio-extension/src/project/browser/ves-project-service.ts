@@ -16,7 +16,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { nanoid } from '../../editors/browser/components/Common/Utils';
+import { nanoid, stringify } from '../../editors/browser/components/Common/Utils';
 import { PluginFileTranslatedField } from '../../editors/browser/components/PluginFileEditor/PluginFileEditorTypes';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { ItemData } from '../../editors/browser/ves-editors-widget';
@@ -323,7 +323,7 @@ export class VesProjectService {
     let fileValue;
     if (type) {
       const data = await this.getSchemaDefaults(type);
-      fileValue = JSON.stringify(data, undefined, 4);
+      fileValue = stringify(data);
     }
     await this.fileService.create(fileUri, fileValue);
 
@@ -466,10 +466,10 @@ export class VesProjectService {
       this.justWroteGameConfigFile = true;
       await this.fileService.writeFile(
         this.gameConfigFileUri!,
-        BinaryBuffer.fromString(JSON.stringify({
+        BinaryBuffer.fromString(stringify({
           ...gameConfig,
           plugins: sortedPlugins
-        }, undefined, 4)),
+        })),
       );
 
       // fire event
@@ -1251,7 +1251,7 @@ export class VesProjectService {
         const fileContent = await this.fileService.readFile(itemtoUpdate._fileUri);
         const fileContentJson = JSON.parse(fileContent.value.buffer.toString()) as ItemData;
         const updatedFileContentJson = await this.getSchemaDefaults(itemtoUpdate.type, fileContentJson);
-        const updatedFileContentBuffer = BinaryBuffer.fromString(JSON.stringify(updatedFileContentJson, undefined, 4));
+        const updatedFileContentBuffer = BinaryBuffer.fromString(stringify(updatedFileContentJson));
         await this.fileService.writeFile(itemtoUpdate._fileUri, updatedFileContentBuffer);
         this.logLine(`Updated item file ${this.workspaceProjectFolderUri?.relative(itemtoUpdate._fileUri)!.fsPath()}.`);
       } catch (error) {

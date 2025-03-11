@@ -26,11 +26,7 @@ export default function StageSettings(props: StageSettingsProps): React.JSX.Elem
 
     const openEditor = async (fileUri: URI): Promise<void> => {
         const opener = await services.openerService.getOpener(fileUri);
-        await opener.open(fileUri, {
-            widgetOptions: {
-                mode: 'split-right',
-            }
-        });
+        await opener.open(fileUri);
     };
 
     return (

@@ -4,6 +4,7 @@ import BasicSelect from '../../../editors/browser/components/Common/Base/BasicSe
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
+import { stringify } from '../../../editors/browser/components/Common/Utils';
 import { EditorsContext, EditorsContextType, TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
 import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
 import { MOCK_STAGES } from './ProjectDashboard';
@@ -35,7 +36,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
             const newFileUri = workspaceRootUri.resolve('config').resolve(type.file);
 
             const data = await services.vesProjectService.getSchemaDefaults(type);
-            await services.fileService.create(newFileUri, JSON.stringify(data, undefined, 4));
+            await services.fileService.create(newFileUri, stringify(data));
 
             openEditor(newFileUri);
         }
@@ -50,11 +51,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
 
     const openEditor = async (fileUri: URI): Promise<void> => {
         const opener = await services.openerService.getOpener(fileUri);
-        await opener.open(fileUri, {
-            widgetOptions: {
-                mode: 'split-right',
-            }
-        });
+        await opener.open(fileUri);
     };
 
     const getTypes = async (): Promise<void> => {

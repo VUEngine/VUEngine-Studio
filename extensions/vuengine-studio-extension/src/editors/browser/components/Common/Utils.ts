@@ -1,4 +1,5 @@
 import { QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
+import { EolStyle, Formatter, FracturedJsonOptions, NumberListAlignment } from 'fracturedjsonjs';
 import { customAlphabet } from 'nanoid';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
 
@@ -78,3 +79,25 @@ export const toUpperSnakeCase = (key: string): string => {
 
 export const nanoid = () =>
     customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 16)();
+
+export const stringify = (input: any) => {
+    const options = new FracturedJsonOptions();
+    options.AllowTrailingCommas = false;
+    options.CommaPadding = false;
+    options.JsonEolStyle = EolStyle.Lf;
+    options.MaxCompactArrayComplexity = 1;
+    options.MaxInlineComplexity = 0;
+    options.MaxInlineLength = Number.MAX_SAFE_INTEGER;
+    options.MaxTableRowComplexity = -1;
+    options.MaxTotalLineLength = Number.MAX_SAFE_INTEGER;
+    options.MinCompactArrayRowItems = 1;
+    options.NumberListAlignment = NumberListAlignment.Left;
+    options.OmitTrailingWhitespace = true;
+    options.UseTabToIndent = true;
+
+    const formatter = new Formatter();
+    formatter.Options = options;
+
+    return (formatter.Serialize(input) ?? '')
+        .replace(/(\s+),/g, ',');
+};

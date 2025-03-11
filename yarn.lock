@@ -8034,6 +8034,11 @@ forwarded@0.2.0:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
 
+fracturedjsonjs@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/fracturedjsonjs/-/fracturedjsonjs-4.0.2.tgz#ca6ba0212ab00fa9b18ad4918653e66f3c93bf97"
+  integrity sha512-+vGJH9wK0EEhbbn50V2sOebLRaar1VL3EXr02kxchIwpkhQk0ItrPjIOtYPYuU9hNFpVzxjrPgzjtMJih+ae4A==
+
 fresh@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"

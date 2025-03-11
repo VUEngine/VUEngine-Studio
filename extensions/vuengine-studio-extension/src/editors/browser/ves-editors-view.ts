@@ -20,7 +20,7 @@ import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { nanoid } from './components/Common/Utils';
+import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { TYPE_LABELS } from './ves-editors-types';
@@ -192,11 +192,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
-                    await opener.open(u, {
-                        widgetOptions: {
-                            mode: 'split-left',
-                        }
-                    });
+                    await opener.open(u);
                 }
             },
         });
@@ -280,12 +276,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (!ref || !ref.uri) {
             return;
         }
-        this.editorManager.open(ref.uri, {
-            widgetOptions: {
-                mode: 'split-right',
-                ref
-            },
-        });
+        this.editorManager.open(ref.uri);
     }
 
     protected generateFiles(widget: Widget): void {
@@ -301,7 +292,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             const fileContents = await this.fileService.readFile(fileUri);
             const fileContentsJson = JSON.parse(fileContents.value.toString());
             fileContentsJson._id = nanoid();
-            await this.fileService.writeFile(fileUri, BinaryBuffer.fromString(JSON.stringify(fileContentsJson, undefined, 4)));
+            await this.fileService.writeFile(fileUri, BinaryBuffer.fromString(stringify(fileContentsJson)));
         } catch (error) {
             console.error('Could not generate ID for file.', fileUri.path.fsPath());
         }

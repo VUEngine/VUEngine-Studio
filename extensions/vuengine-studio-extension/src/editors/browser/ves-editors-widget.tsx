@@ -38,7 +38,7 @@ import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
-import { nanoid } from './components/Common/Utils';
+import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
 
@@ -442,7 +442,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected updateModel(): void {
         this.justUpdatedModel = true;
         this.reference?.object.textEditorModel.pushStackElement();
-        this.reference?.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
+        this.reference?.object.textEditorModel.setValue(stringify(this.data));
     }
 
     protected enableCommands(commandIds: string[]): void {

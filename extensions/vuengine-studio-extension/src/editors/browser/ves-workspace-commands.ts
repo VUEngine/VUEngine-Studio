@@ -3,6 +3,7 @@ import { open } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceCommandContribution, WorkspaceCommands, WorkspaceRootUriAwareCommandHandler } from '@theia/workspace/lib/browser';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { stringify } from './components/Common/Utils';
 import { VesNewFileDialog } from './ves-new-file-dialog';
 
 @injectable()
@@ -64,7 +65,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                                     const type = this.vesProjectService.getProjectDataTypeByExt(ext);
                                     if (type) {
                                         const data = await this.vesProjectService.getSchemaDefaults(type);
-                                        fileValue = JSON.stringify(data, undefined, 4);
+                                        fileValue = stringify(data);
                                     }
                                 }
                                 await this.fileService.create(fileUri, fileValue);

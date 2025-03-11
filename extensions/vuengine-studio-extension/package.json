@@ -51,6 +51,7 @@
     "electron": "30.1.2",
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
+    "fracturedjsonjs": "^4.0.2",
     "fs-extra": "^10.0.0",
     "glob": "^10.3.10",
     "iconv-lite": "^0.6.3",
