@@ -13,6 +13,7 @@ import {
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_KAITAI_PARSE,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
@@ -50,6 +51,9 @@ const api: VesCoreAPI = {
     },
     zlibDeflate: function (data: Buffer): Buffer {
         return ipcRenderer.sendSync(VES_CHANNEL_ZLIB_DEFLATE, data);
+    },
+    kaitaiParse: function (data: ArrayBuffer, format: string): object {
+        return ipcRenderer.sendSync(VES_CHANNEL_KAITAI_PARSE, data, format);
     },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
