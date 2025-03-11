@@ -2,13 +2,14 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import SortableList from 'react-easy-sort';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import ColorSelector from '../../Common/ColorSelector';
 import TransparencySelect from '../../Common/TransparencySelect';
-import { clamp } from '../../Common/Utils';
+import { arrayMove, clamp } from '../../Common/Utils';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import {
     INPUT_BLOCKING_COMMANDS, MAX_SPHERE_RADIUS,
@@ -144,6 +145,10 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         }
     };
 
+    const onSortEnd = (oldIndex: number, newIndex: number): void => {
+        updateWireframe({ segments: arrayMove(wireframe.segments, oldIndex, newIndex) });
+    };
+
     return (
         <VContainer gap={15}>
             <HContainer alignItems='start' gap={15} wrap='wrap'>
@@ -242,34 +247,40 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
             {wireframe.type === WireframeType.Mesh &&
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/actor/segments', 'Segments')}
-                        {wireframe.segments.length > 0 &&
-                            <>
-                                {' '}<span className='count'>{wireframe.segments.length}</span>
-                            </>
-                        }
-                    </label>
-                    {wireframe.segments.map((segment, segmentIndex) =>
-                        <MeshSegment
-                            key={segmentIndex}
-                            index={segmentIndex}
-                            segment={segment}
-                            updateSegment={(s: Partial<MeshSegmentData>) => setSegment(segmentIndex, s)}
-                            removeSegment={() => removeSegment(segmentIndex)}
-                        />
-                    )}
-                    <button
-                        className='theia-button add-button full-width'
-                        onClick={addSegment}
-                        title={nls.localizeByDefault('Add')}
-                    >
-                        <i className='codicon codicon-plus' />
-                    </button>
-                </VContainer>
+                <SortableList
+                    onSortEnd={onSortEnd}
+                    draggedItemClassName='item dragging'
+                    lockAxis='y'
+                >
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/actor/segments', 'Segments')}
+                            {wireframe.segments.length > 0 &&
+                                <>
+                                    {' '}<span className='count'>{wireframe.segments.length}</span>
+                                </>
+                            }
+                        </label>
+                        {wireframe.segments.map((segment, segmentIndex) =>
+                            <MeshSegment
+                                index={segmentIndex}
+                                segment={segment}
+                                updateSegment={(s: Partial<MeshSegmentData>) => setSegment(segmentIndex, s)}
+                                removeSegment={() => removeSegment(segmentIndex)}
+                            />
+                        )}
+                        <button
+                            className='theia-button add-button full-width'
+                            onClick={addSegment}
+                            title={nls.localizeByDefault('Add')}
+                        >
+                            <i className='codicon codicon-plus' />
+                        </button>
+                    </VContainer>
+                </SortableList>
             }
-            {wireframe.type === WireframeType.Sphere &&
+            {
+                wireframe.type === WireframeType.Sphere &&
                 <HContainer gap={15}>
                     <VContainer>
                         <label>
@@ -300,7 +311,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </VContainer>
                 </HContainer>
             }
-            {wireframe.type === WireframeType.Asterisk &&
+            {
+                wireframe.type === WireframeType.Asterisk &&
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/editors/actor/length', 'Length')}

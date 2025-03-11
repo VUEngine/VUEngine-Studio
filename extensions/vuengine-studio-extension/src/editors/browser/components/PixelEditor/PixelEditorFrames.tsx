@@ -170,9 +170,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
             >
                 {
                     frames.map((f, i) => (
-                        <SortableItem
-                            key={i}
-                        >
+                        <SortableItem key={i}>
                             <Frame
                                 className={currentFrame === i ? 'item active' : 'item'}
                                 onClick={() => setCurrentFrame(i)}

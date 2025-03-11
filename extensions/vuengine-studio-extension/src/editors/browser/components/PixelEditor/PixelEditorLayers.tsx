@@ -205,7 +205,6 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
             </HContainer>
             <SortableList
                 onSortEnd={onSortEnd}
-                className="frames-list"
                 draggedItemClassName='dragging item'
                 dropTarget={<DropTarget />}
                 lockAxis='y'
