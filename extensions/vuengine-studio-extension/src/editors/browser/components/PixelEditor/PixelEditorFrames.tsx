@@ -2,7 +2,7 @@ import { DotsSixVertical } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { DottingRef, useDotting } from 'dotting';
 import React, { useEffect } from 'react';
-import SortableList, { SortableItem } from 'react-easy-sort';
+import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
@@ -34,7 +34,7 @@ const FramesContainer = styled.div`
 
 const Frame = styled.div`
     background-color: var(--theia-editorGroupHeader-tabsBackground);
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border: 1px solid var(--theia-dropdown-border);
     border-radius: 2px;
     box-sizing: border-box;
     cursor: pointer;
@@ -62,6 +62,16 @@ const Frame = styled.div`
             display: none;
         }
     }
+`;
+
+const DropTarget = styled.div`
+    border: 1px dotted var(--theia-dropdown-border);
+    border-radius: 2px;
+    box-sizing: border-box;
+    max-height: 75px;
+    max-width: 50px;
+    min-height: 75px;
+    min-width: 50px;
 `;
 
 const FrameIndex = styled.div`
@@ -167,6 +177,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
                 onSortEnd={onSortEnd}
                 className="frames-list"
                 draggedItemClassName='dragging'
+                dropTarget={<DropTarget />}
             >
                 {
                     frames.map((f, i) => (
@@ -177,10 +188,12 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
                                 className={currentFrame === i ? 'item active' : 'item'}
                                 onClick={() => setCurrentFrame(i)}
                             >
-                                <FrameIndex>
-                                    <DotsSixVertical size={16} />
-                                    {i + 1}
-                                </FrameIndex>
+                                <SortableKnob>
+                                    <FrameIndex>
+                                        <DotsSixVertical size={16} />
+                                        {i + 1}
+                                    </FrameIndex>
+                                </SortableKnob>
                                 <CanvasImage
                                     height={f[0].data.length}
                                     palette={'11100100'}

@@ -276,8 +276,9 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                             dottingRef={dottingRef}
                         />
                         <PixelEditorActions
-                            data={data}
-                            updateData={updateData}
+                            colorMode={data.colorMode}
+                            frames={data.frames}
+                            setFrames={setFrames}
                             currentFrame={currentFrame}
                             dottingRef={dottingRef}
                         />

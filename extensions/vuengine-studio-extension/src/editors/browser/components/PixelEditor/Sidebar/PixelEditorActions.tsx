@@ -6,15 +6,15 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { DottingRef, useDotting, useGrids } from 'dotting';
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import PopUpDialog from '../../Common/Base/PopUpDialog';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS, PixelData } from '../PixelEditorTypes';
-import { PixelEditorTool } from './PixelEditorTool';
-import styled from 'styled-components';
 import { convertToLayerProps } from '../PixelEditor';
+import { INPUT_BLOCKING_COMMANDS, LayerPixelData } from '../PixelEditorTypes';
+import { PixelEditorTool } from './PixelEditorTool';
 
 const ResizeDirectionBox = styled.div`
     align-items: center;
@@ -32,14 +32,15 @@ const ResizeDirectionBox = styled.div`
 `;
 
 interface PixelEditorActionsProps {
-    data: PixelData
-    updateData: (data: PixelData) => void
+    colorMode: ColorMode
+    frames: LayerPixelData[][]
+    setFrames: (frames: LayerPixelData[][]) => void
     currentFrame: number
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
-    const { data, updateData, currentFrame, dottingRef } = props;
+    const { colorMode, frames, setFrames, currentFrame, dottingRef } = props;
     const { clear, downloadImage, setLayers } = useDotting(dottingRef);
     const { dimensions } = useGrids(dottingRef);
     const [resizeDialogOpen, setResizeDialogOpen] = useState<boolean>(false);
@@ -117,10 +118,10 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                     : 0
             : 0;
 
-        const updatedFrames = [...data.frames];
+        const updatedFrames = [...frames];
 
         if (addColumnsLeft || addColumnsRight || removeColumnsLeft || removeColumnsRight) {
-            data.frames.forEach((frame, frameIndex) =>
+            frames.forEach((frame, frameIndex) =>
                 frame.forEach((layer, layerIndex) =>
                     layer.data.forEach((row, rowIndex) => {
                         if (addColumnsLeft) {
@@ -150,7 +151,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
 
         if (addRowsTop || addRowsBottom || removeRowsTop || removeRowsBottom) {
             const emptyRow = [...Array(updatedFrames[0][0].data[0].length)].map(e => null);
-            data.frames.forEach((frame, frameIndex) =>
+            frames.forEach((frame, frameIndex) =>
                 frame.forEach((layer, layerIndex) => {
                     if (addRowsTop) {
                         for (let i = 0; i < addRowsTop; i++) {
@@ -176,11 +177,8 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
             );
         }
 
-        updateData({
-            ...data,
-            frames: updatedFrames,
-        });
-        setLayers(convertToLayerProps(data.frames[currentFrame], data.colorMode));
+        setFrames(updatedFrames);
+        setLayers(convertToLayerProps(frames[currentFrame], colorMode));
     };
 
     useEffect(() => {
@@ -260,7 +258,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                                 value={resizeHeight}
                                 setValue={v => setResizeHeight(v as number)}
                                 min={8}
-                                max={data.colorMode === ColorMode.FrameBlend ? 256 : 512}
+                                max={colorMode === ColorMode.FrameBlend ? 256 : 512}
                                 step={8}
                                 width={80}
                                 commands={INPUT_BLOCKING_COMMANDS}
