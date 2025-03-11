@@ -8,7 +8,7 @@ import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
 import { nanoid } from '../Common/Utils';
 import { DisplayMode } from '../Common/VUEngineTypes';
-import { convertToLayerProps } from './PixelEditor';
+import { convertLayerPixelDataToPixelModifyItem, convertToLayerProps } from './PixelEditor';
 import { LayerPixelData } from './PixelEditorTypes';
 
 const FramesContainer = styled.div`
@@ -125,7 +125,7 @@ interface PixelEditorFramesProps {
 
 export default function PixelEditorFrames(props: PixelEditorFramesProps): React.JSX.Element {
     const { frames, setFrames, currentFrame, setCurrentFrame, colorMode, dottingRef } = props;
-    const { setLayers } = useDotting(dottingRef);
+    const { setData, setLayers } = useDotting(dottingRef);
 
     const removeFrame = (index: number): void => {
         if (currentFrame === (frames.length - 1)) {
@@ -164,6 +164,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
 
     useEffect(() => {
         setLayers(convertToLayerProps(frames[currentFrame], colorMode));
+        setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
     }, [
         currentFrame
     ]);

@@ -12,7 +12,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import PopUpDialog from '../../Common/Base/PopUpDialog';
 import VContainer from '../../Common/Base/VContainer';
-import { convertToLayerProps } from '../PixelEditor';
+import { convertLayerPixelDataToPixelModifyItem, convertToLayerProps } from '../PixelEditor';
 import { INPUT_BLOCKING_COMMANDS, LayerPixelData } from '../PixelEditorTypes';
 import { PixelEditorTool } from './PixelEditorTool';
 
@@ -41,7 +41,7 @@ interface PixelEditorActionsProps {
 
 export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
     const { colorMode, frames, setFrames, currentFrame, dottingRef } = props;
-    const { clear, downloadImage, setLayers } = useDotting(dottingRef);
+    const { clear, downloadImage, setData, setLayers } = useDotting(dottingRef);
     const { dimensions } = useGrids(dottingRef);
     const [resizeDialogOpen, setResizeDialogOpen] = useState<boolean>(false);
     const [resizeHeight, setResizeHeight] = useState<number>(0);
@@ -179,6 +179,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
 
         setFrames(updatedFrames);
         setLayers(convertToLayerProps(frames[currentFrame], colorMode));
+        setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
     };
 
     useEffect(() => {
