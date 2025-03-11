@@ -37,7 +37,7 @@ interface AnimationProps {
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData, currentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { data, setData, currentAnimationStep, setCurrentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
@@ -154,17 +154,28 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     <InfoLabel
                         label={nls.localize('vuengine/editors/actor/loop', 'Loop')}
                         tooltip={nls.localize(
-                            'vuengine/editors/actor/animationLoopDescription',
+                            'vuengine/editors/actor/loopDescription',
                             'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
                         )}
                     />
-                    <input
-                        type="checkbox"
-                        checked={animation.loop}
-                        onChange={toggleLoop}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
+                    <HContainer>
+                        <input
+                            type="checkbox"
+                            checked={animation.loop}
+                            onChange={toggleLoop}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        />
+                        <i
+                            className="codicon codicon-debug-restart"
+                            onClick={() => setCurrentAnimationStep(0)}
+                            title={nls.localizeByDefault('Restart')}
+                            style={{
+                                fontSize: 18,
+                                cursor: 'pointer',
+                            }}
+                        />
+                    </HContainer>
                 </VContainer>
             </HContainer>
             {!animation.loop &&
