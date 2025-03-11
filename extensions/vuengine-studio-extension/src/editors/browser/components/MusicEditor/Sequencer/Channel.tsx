@@ -1,4 +1,5 @@
 import React from 'react';
+import SortableList from 'react-easy-sort';
 import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, SongData } from '../MusicEditorTypes';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
@@ -45,6 +46,19 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         classNames.push('current');
     }
 
+    const moveSequencePattern = (channelId: number, from: number, to: number): void => {
+        const sequence = [...songData.channels[channelId].sequence];
+        const removedPattern = sequence.splice(from, 1).pop();
+        sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
+        setChannel(channelId, {
+            sequence: sequence
+        });
+    };
+
+    const onSortEnd = (oldIndex: number, newIndex: number): void => {
+        moveSequencePattern(currentChannelId, oldIndex, newIndex);
+    };
+
     return (
         <StyledChannel className={classNames.join(' ')}>
             <ChannelHeader
@@ -54,21 +68,32 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
             />
-            {channelConfig.sequence.map((patternId, index) =>
-                <Pattern
-                    songData={songData}
-                    key={index}
-                    index={index}
-                    channel={number}
-                    pattern={channelConfig.patterns[patternId]}
-                    patternSize={BAR_PATTERN_LENGTH_MULT_MAP[channelConfig.patterns[patternId].bar] * songData.noteResolution}
-                    patternId={patternId}
-                    currentChannelId={currentChannelId}
-                    currentPatternId={currentPatternId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    setCurrentSequenceIndex={setCurrentSequenceIndex}
-                    setChannel={setChannel}
-                />)}
+
+            <SortableList
+                onSortEnd={onSortEnd}
+                draggedItemClassName='dragging'
+                lockAxis='x'
+                style={{
+                    display: 'flex',
+                }}
+            >
+                {channelConfig.sequence.map((patternId, index) =>
+                    <Pattern
+                        songData={songData}
+                        key={index}
+                        index={index}
+                        channel={number}
+                        pattern={channelConfig.patterns[patternId]}
+                        patternSize={BAR_PATTERN_LENGTH_MULT_MAP[channelConfig.patterns[patternId].bar] * songData.noteResolution}
+                        patternId={patternId}
+                        currentChannelId={currentChannelId}
+                        currentPatternId={currentPatternId}
+                        currentSequenceIndex={currentSequenceIndex}
+                        setCurrentSequenceIndex={setCurrentSequenceIndex}
+                        setChannel={setChannel}
+                    />
+                )}
+            </SortableList>
             <AddPattern
                 songData={songData}
                 channel={channelConfig}

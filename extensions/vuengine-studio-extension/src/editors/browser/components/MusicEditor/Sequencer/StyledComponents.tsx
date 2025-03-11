@@ -182,8 +182,7 @@ export const StyledPattern = styled.div`
     border: 1px solid transparent;
     border-radius: 2px;
     box-sizing: border-box;
-    color: transparent;
-    cursor: pointer;
+    cursor: grab;
     display: flex;
     justify-content: center;
     margin-right: 1px;
@@ -192,7 +191,6 @@ export const StyledPattern = styled.div`
 
     ${StyledChannel}:hover & {
         background-color: var(--theia-secondaryButton-hoverBackground);
-        color: unset;
     }
 
     &:hover,
@@ -200,16 +198,10 @@ export const StyledPattern = styled.div`
         border-color: var(--theia-focusBorder);
     }
 
-    &.beingDragged {
+    &.dragging {
         border: 1px solid var(--theia-focusBorder);
         cursor: grabbing;
         outline: 0;
-        opacity: .1;
-    }
-
-    &.dragOver {
-        border: 1px dashed var(--theia-focusBorder);
-        border-left: 4px solid var(--theia-focusBorder);
     }
 `;
 
@@ -225,11 +217,15 @@ export const StyledPatternRemove = styled.div`
     bottom: 0;
     line-height: 17px;
 
-    ${StyledPattern}.current &:hover {
+    ${StyledPattern}.dragging & {
+        display: none !important;
+    }
+
+    ${StyledPattern} &:hover {
         background-color: var(--theia-focusBorder);
     }
 
-    ${StyledPattern}.current:hover & {
+    ${StyledPattern}:hover & {
         display: block;
     }
 `;

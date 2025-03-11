@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
+import { SortableItem } from 'react-easy-sort';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
@@ -22,7 +23,6 @@ interface PatternProps {
 }
 
 export default function Pattern(props: PatternProps): React.JSX.Element {
-    const [dragged, setDragged] = useState<boolean>(false);
     const {
         songData,
         index,
@@ -67,15 +67,6 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         songData.noteResolution,
     ]);
 
-    const moveSequencePattern = (channelId: number, from: number, to: number): void => {
-        const sequence = [...songData.channels[channelId].sequence];
-        const removedPattern = sequence.splice(from, 1).pop();
-        sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
-        setChannel(channelId, {
-            sequence: sequence
-        });
-    };
-
     const removeFromSequence = (channelId: number, i: number): void => {
         setChannel(channelId, {
             sequence: [
@@ -85,87 +76,47 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         });
     };
 
-    const onDragStart = (e: React.DragEvent<HTMLDivElement>): void => {
-        setDragged(true);
-        e.currentTarget.classList.add('beingDragged');
-        e.dataTransfer.setData('channel', e.currentTarget.getAttribute('data-channel') ?? '');
-        e.dataTransfer.setData('position', e.currentTarget.getAttribute('data-position') ?? '');
-    };
-
-    const onDragEnd = (e: React.DragEvent<HTMLDivElement>): void => {
-        setDragged(false);
-        e.currentTarget.classList.remove('beingDragged');
-
-        const dragOverElements = document.getElementsByClassName('dragOver');
-        for (let i = 0; i < dragOverElements.length; i++) {
-            dragOverElements[i].classList.remove('dragOver');
-        }
-    };
-
-    const onDrop = (e: React.DragEvent<HTMLDivElement>): void => {
-        const from = parseInt(e.dataTransfer.getData('position'));
-        const to = parseInt(e.currentTarget.getAttribute('data-position') ?? '');
-        const fromChannelId = parseInt(e.dataTransfer.getData('channel'));
-        if (channel === fromChannelId) {
-            moveSequencePattern(channel, from, to);
-        }
-    };
-
-    const onDragEnter = (e: React.DragEvent<HTMLDivElement>): void => {
-        if (dragged) {
-            e.currentTarget.classList.add('dragOver');
-        }
-    };
-
-    const onDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
-        e.currentTarget.classList.remove('dragOver');
-    };
-
     return (
-        <StyledPattern
-            className={isCurrent ? 'current' : undefined}
-            style={{
-                backgroundColor: currentChannelId === channel && currentSequenceIndex === index
-                    ? 'var(--theia-focusBorder)'
-                    : undefined,
-                height: `${PATTERN_HEIGHT}px`,
-                minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
-                width: `${(patternSize * patternNoteWidth) - 1}px`
-            }}
-            data-channel={channel}
-            data-position={index}
-            onClick={() => setCurrentSequenceIndex(channel, index)}
-            draggable={true}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onDragEnter={onDragEnter}
-            onDragLeave={onDragLeave}
-            onDrop={onDrop}
-        >
-            <CanvasImage
-                height={PATTERN_HEIGHT}
-                palette={'00000000'}
-                pixelData={patternPixels}
-                textColor={textColor}
-                width={patternSize * patternNoteWidth}
-                displayMode={DisplayMode.Mono}
-                colorMode={ColorMode.Default}
+        <SortableItem>
+            <StyledPattern
+                className={isCurrent ? 'current' : undefined}
                 style={{
-                    left: 0,
-                    position: 'absolute',
-                    top: 0,
+                    backgroundColor: currentChannelId === channel && currentSequenceIndex === index
+                        ? 'var(--theia-focusBorder)'
+                        : undefined,
+                    height: `${PATTERN_HEIGHT}px`,
+                    minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
+                    width: `${(patternSize * patternNoteWidth) - 1}px`
                 }}
-            />
-            {patternId + 1}
-            <StyledPatternRemove
-                title={nls.localizeByDefault('Remove')}
-                onClick={e => {
-                    removeFromSequence(channel, index);
-                    e.stopPropagation();
-                }}
+                data-channel={channel}
+                data-position={index}
+                onClick={() => setCurrentSequenceIndex(channel, index)}
             >
-                &times;
-            </StyledPatternRemove>
-        </StyledPattern>
+                <CanvasImage
+                    height={PATTERN_HEIGHT}
+                    palette={'00000000'}
+                    pixelData={patternPixels}
+                    textColor={textColor}
+                    width={patternSize * patternNoteWidth}
+                    displayMode={DisplayMode.Mono}
+                    colorMode={ColorMode.Default}
+                    style={{
+                        left: 0,
+                        position: 'absolute',
+                        top: 0,
+                    }}
+                />
+                {patternId + 1}
+                <StyledPatternRemove
+                    title={nls.localizeByDefault('Remove')}
+                    onClick={e => {
+                        removeFromSequence(channel, index);
+                        e.stopPropagation();
+                    }}
+                >
+                    &times;
+                </StyledPatternRemove>
+            </StyledPattern>
+        </SortableItem>
     );
 }
