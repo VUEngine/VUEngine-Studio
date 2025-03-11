@@ -18,11 +18,11 @@
 input[type="range"] {
     appearance: none;
     background: transparent;
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 100px;
     cursor: ew-resize;
-    height: var(--theia-ui-padding);
+    height: 8px;
     margin: 0;
+    outline: var(--theia-border-width) solid var(--theia-dropdown-border);
     position: relative;
     width: 100%;
 }
@@ -32,7 +32,7 @@ input[type="range"]::before {
     border-radius: 100px;
     content: '';
     display: block;
-    height: var(--theia-ui-padding);
+    height: 8px;
     position: absolute;
 }
 input[type="range"].value-1::before { width: 1%; }
@@ -136,8 +136,9 @@ input[type="range"].value-98::before { width: 98%; }
 input[type="range"].value-99::before { width: 99%; }
 input[type="range"].value-100::before { width: 100%; }
 
+input[type="range"]:active,
 input[type="range"]:focus {
-    outline-width: 0;
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 input[type="range"]:active::before,
@@ -162,11 +163,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
     outline: 1px solid var(--theia-focusBorder);
 }
 */
-
-input[type="range"]:active,
-input[type="range"]:focus {
-    outline: 1px solid var(--theia-focusBorder);
-}
 
 input[type=range]::-webkit-slider-runnable-track {
     -webkit-appearance: none;

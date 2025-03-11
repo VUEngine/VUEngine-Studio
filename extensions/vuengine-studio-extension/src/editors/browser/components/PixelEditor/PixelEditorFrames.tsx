@@ -152,7 +152,7 @@ export default function PixelEditorFrames(props: PixelEditorFramesProps): React.
 
     useEffect(() => {
         setLayers(convertToLayerProps(frames[currentFrame], colorMode));
-        setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
+        // setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
     }, [
         currentFrame
     ]);

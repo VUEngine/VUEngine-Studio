@@ -42,7 +42,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
     return <HContainer alignItems="center" style={{ width }}>
         <input
             type="range"
-            className={`value-${Math.round(100 / (max - min) * (value ?? max))}`}
+            className={`value-${Math.floor(100 / (max - min) * ((value ?? max) - min))}`}
             style={{ flexGrow: 1 }}
             min={min}
             max={max}
