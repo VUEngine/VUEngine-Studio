@@ -54,19 +54,19 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                 changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_RECTANGLE.id:
-                // changeBrushTool(BrushTool.RECTANGLE);
+                changeBrushTool(BrushTool.RECTANGLE);
                 changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_RECTANGLE_FILLED.id:
-                // changeBrushTool(BrushTool.RECTANGLE_FILLED);
+                changeBrushTool(BrushTool.RECTANGLE_FILLED);
                 changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_ELLIPSE.id:
-                // changeBrushTool(BrushTool.ELLIPSE);
+                changeBrushTool(BrushTool.ELLIPSE);
                 changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
             case PixelEditorCommands.TOOL_ELLIPSE_FILLED.id:
-                // changeBrushTool(BrushTool.ELLIPSE_FILLED);
+                changeBrushTool(BrushTool.ELLIPSE_FILLED);
                 changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                 break;
         }
@@ -144,52 +144,52 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
                     <Minus size={20} />
                 </PixelEditorTool>
                 <PixelEditorTool
-                    // className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
+                    className={brushTool === BrushTool.RECTANGLE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/pixel/tools/rectangle', 'Rectangle') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE.id, true)
                     }
                     onClick={() => {
-                        // changeBrushTool(BrushTool.RECTANGLE);
+                        changeBrushTool(BrushTool.RECTANGLE);
                         changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                     }}
                 >
                     <Square size={20} />
                 </PixelEditorTool>
                 <PixelEditorTool
-                    // className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
+                    className={brushTool === BrushTool.RECTANGLE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/pixel/tools/rectangleFilled', 'Rectangle (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_RECTANGLE_FILLED.id, true)
                     }
                     onClick={() => {
-                        // changeBrushTool(BrushTool.RECTANGLE_FILLED);
+                        changeBrushTool(BrushTool.RECTANGLE_FILLED);
                         changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                     }}
                 >
                     <Square size={20} weight="fill" />
                 </PixelEditorTool>
                 <PixelEditorTool
-                    // className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
+                    className={brushTool === BrushTool.ELLIPSE ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/pixel/tools/ellipse', 'Ellipse') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE.id, true)
                     }
                     onClick={() => {
-                        // changeBrushTool(BrushTool.ELLIPSE);
+                        changeBrushTool(BrushTool.ELLIPSE);
                         changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                     }}
                 >
                     <Circle size={20} />
                 </PixelEditorTool>
                 <PixelEditorTool
-                    // className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
+                    className={brushTool === BrushTool.ELLIPSE_FILLED ? 'active' : ''}
                     title={
                         nls.localize('vuengine/editors/pixel/tools/ellipseFilled', 'Ellipse (Filled)') +
                         services.vesCommonService.getKeybindingLabel(PixelEditorCommands.TOOL_ELLIPSE_FILLED.id, true)
                     }
                     onClick={() => {
-                        // changeBrushTool(BrushTool.ELLIPSE_FILLED);
+                        changeBrushTool(BrushTool.ELLIPSE_FILLED);
                         changeBrushPattern(DOT_BRUSH_PATTERNS[0]);
                     }}
                 >

@@ -6829,10 +6829,10 @@ dotenv@~10.0.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
-dotting@^2.1.12:
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.12.tgz#8a8c4f06c9b0d86f2970ecec61bc2d884679b9a2"
-  integrity sha512-2fSyKqbLpds3AlyNycEHjwmBNiZOv/PNpqPUydBKt0beGMAJweZZNRD97LQLWhKCEohVvQiA8mkQTlcScCr6jw==
+dotting@^2.1.13:
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.13.tgz#c9e3967fd341bb33574f49a0875938f704c05438"
+  integrity sha512-M+RMm2IMnVamoms+5vOJaaU1NURwfCM40hSjZhG5gJHCJRu9iH3x8iLDhsW5u+9zP2i5ANbtgHjkafYSyotWkA==
 
 drivelist@^9.0.2:
   version "9.2.4"
