@@ -1,4 +1,4 @@
-import React, { Dispatch, memo, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { EventsMap, MusicEditorTool, MusicEvent } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
@@ -22,7 +22,7 @@ interface PianoRollRowProps {
     bar: string
 }
 
-export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
+export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
     const {
         note,
         noteId,
@@ -63,7 +63,9 @@ export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.E
                 />);
         })}
     </StyledPianoRollRow>;
-}, (oldProps, newProps) => {
+}
+/*
+, (oldProps, newProps) => {
     const propsAreEqual =
         oldProps.tool === newProps.tool &&
         oldProps.currentChannelId === newProps.currentChannelId &&
@@ -71,13 +73,12 @@ export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.E
         oldProps.bar === newProps.bar &&
         oldProps.noteResolution === newProps.noteResolution &&
         JSON.stringify(oldProps.events) === JSON.stringify(newProps.events);
-    /*
-    newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&
-    oldProps.notes[newProps.lastSetNoteId] !== newProps.noteId;
+    //    newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&
+    //    oldProps.notes[newProps.lastSetNoteId] !== newProps.noteId;
 
-    // reset last set note id after every check, to not re-render on unrelated changes
-    newProps.setLastSetNoteId(-1);
-    */
+    //    // reset last set note id after every check, to not re-render on unrelated changes
+    //    newProps.setLastSetNoteId(-1);
 
     return propsAreEqual;
-});
+})
+*/;

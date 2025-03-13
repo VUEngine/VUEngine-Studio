@@ -199,7 +199,7 @@ export const MetaLineHeader = styled.div`
     background: var(--theia-editor-background);
     display: flex;
     flex-direction: column;
-    height: 24px;
+    height: 28px;
     left: 0;
     margin-right: 3px;
     min-width: 50px;
