@@ -81,6 +81,7 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             event.returnValue = zlib.deflateSync(data);
         });
         ipcMain.on(VES_CHANNEL_KAITAI_PARSE, (event, data, format) => {
+            /*
             let result = '';
             const KaitaiStream = require('kaitai-struct/KaitaiStream');
             switch (format) {
@@ -90,6 +91,8 @@ export class VesMainApi implements ElectronMainApplicationContribution {
                     break;
             }
             event.returnValue = result;
+            */
+            event.returnValue = '';
         });
         ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];

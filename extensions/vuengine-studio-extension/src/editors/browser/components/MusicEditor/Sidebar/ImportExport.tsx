@@ -15,7 +15,7 @@ export default function ImportExport(): React.JSX.Element {
             canSelectFiles: true,
             canSelectMany: false,
             filters: {
-                'Scream Tracker 3 Module, MIDI': ['s3m', 'midi', 'mid'],
+                'MIDI': ['midi', 'mid'],
             }
         };
         const currentPath = await services.fileService.resolve(fileUri.parent);
@@ -28,9 +28,11 @@ export default function ImportExport(): React.JSX.Element {
                 case '.midi':
                     parsed = midiManager.parseMidi(fileContent.value.buffer);
                     break;
+                /*
                 case '.s3m':
                     parsed = window.electronVesCore.kaitaiParse(fileContent.value.buffer, uri.path.ext);
                     break;
+                */
             }
 
             if (!parsed) {
@@ -56,7 +58,7 @@ export default function ImportExport(): React.JSX.Element {
             className='theia-button secondary'
             onClick={selectFileForImport}
         >
-            {nls.localize('vuengine/editors/music/importS3mOrMidi', 'Import s3m or MIDI')}
+            {nls.localize('vuengine/editors/music/importMidi', 'Import MIDI')}
         </button>
     </VContainer>;
 }
