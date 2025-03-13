@@ -8,7 +8,7 @@ import VContainer from '../../Common/Base/VContainer';
 export default function ImportExport(): React.JSX.Element {
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
 
-    const selectFiles = async (): Promise<void> => {
+    const selectFileForImport = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
             title: nls.localize('vuengine/editors/music/selectFiles', 'Select file to import'),
             canSelectFolders: false,
@@ -44,6 +44,7 @@ export default function ImportExport(): React.JSX.Element {
             }
 
             // ...
+            console.log('parsed', parsed);
         }
     };
 
@@ -53,7 +54,7 @@ export default function ImportExport(): React.JSX.Element {
         </label>
         <button
             className='theia-button secondary'
-            onClick={selectFiles}
+            onClick={selectFileForImport}
         >
             {nls.localize('vuengine/editors/music/importS3mOrMidi', 'Import s3m or MIDI')}
         </button>

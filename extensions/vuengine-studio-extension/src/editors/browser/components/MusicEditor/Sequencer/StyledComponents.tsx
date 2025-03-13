@@ -184,6 +184,7 @@ export const StyledPattern = styled.div`
     box-sizing: border-box;
     cursor: grab;
     display: flex;
+    font-size: 11px;
     justify-content: center;
     margin-right: 1px;
     overflow: hidden;
