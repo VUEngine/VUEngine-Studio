@@ -141,7 +141,6 @@ export class VesCodeGenService {
     await Promise.all(Object.keys(types).map(async typeId => {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file) && type.templates?.length) {
-        await this.deleteFilesForItem(typeId);
         await this.generate([typeId], GenerationMode.All, fileUri);
         // TODO: delete corresponding generated code for moved files and regenerate at new location
       }
@@ -344,20 +343,6 @@ export class VesCodeGenService {
       channel.append(`${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} `);
       channel.appendLine(message, severity);
     }
-  }
-
-  async deleteFilesForItem(typeId: string): Promise<void> {
-    const type = this.vesProjectService.getProjectDataType(typeId);
-    if (type && Array.isArray(type.delete)) {
-      await this.workspaceService.ready;
-      const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-      await Promise.all(type.delete.map(async deletePath => {
-        const deletePathUri = workspaceRootUri.resolve(deletePath);
-        if (await this.fileService?.exists(deletePathUri)) {
-          await this.fileService?.delete(deletePathUri);
-        }
-      }));
-    };
   }
 
   protected async getTemplateString(template: ProjectDataTemplate & WithContributor): Promise<string> {

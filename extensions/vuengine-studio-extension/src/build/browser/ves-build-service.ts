@@ -1303,19 +1303,24 @@ Beware! This is usually not necessary and will result in the next build taking l
   async cleanCore(): Promise<void> {
     const roots = this.workspaceService.tryGetRoots();
     const workspaceRootUri = roots[0].resource;
-    const buildFolderWorkingUri = workspaceRootUri
-      .resolve('build')
-      .resolve('working');
+    const buildFolderUri = workspaceRootUri.resolve('build');
+    const buildFolderWorkingUri = buildFolderUri.resolve('working');
 
     const toDelete = [
-      buildFolderWorkingUri.resolve('libcore.a'),
+      buildFolderUri.resolve('libcore.a'),
       buildFolderWorkingUri.resolve('assets').resolve('core').resolve('hashes'),
     ];
 
-    Object.values(BuildMode).forEach(bm => toDelete.push(buildFolderWorkingUri
-      .resolve('objects')
-      .resolve(bm.toLowerCase())
-      .resolve('hashes')));
+    Object.values(BuildMode).forEach(bm => {
+      toDelete.push(buildFolderWorkingUri
+        .resolve('libraries')
+        .resolve(bm.toLowerCase())
+        .resolve(`libcore-${bm.toLowerCase()}.a`));
+      toDelete.push(buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(bm.toLowerCase())
+        .resolve('hashes'));
+    });
 
     await Promise.all(toDelete.map(async u => {
       if (await this.fileService.exists(u)) {
