@@ -88,10 +88,6 @@ export class VesMainApi implements ElectronMainApplicationContribution {
                     const S3m = require('./parsers/S3m');
                     result = new S3m(new KaitaiStream(data));
                     break;
-                case '.xm':
-                    const FasttrackerXmModule = require('./parsers/FasttrackerXmModule');
-                    result = new FasttrackerXmModule(new KaitaiStream(data));
-                    break;
             }
             event.returnValue = result;
         });
