@@ -90,17 +90,17 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         {nls.localize('vuengine/editors/music/instrument', 'Instrument')}
                     </label>
                     <InputWithAction>
-                        <select
-                            className='theia-select'
-                            onChange={e => setChannelInstrument(parseInt(e.target.value))}
+                        <BasicSelect
+                            options={songData.instruments.map((n, i) => ({
+                                value: i,
+                                label: n.name,
+                                disabled: n.type !== channel.type,
+                            }))}
                             value={channel.instrument}
+                            onChange={e => setChannelInstrument(parseInt(e.target.value))}
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        >
-                            {songData.instruments.map((n, i) =>
-                                <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
-                            )}
-                        </select>
+                        />
                         <InputWithActionButton
                             className='theia-button secondary'
                             title={nls.localize('vuengine/editors/music/editInstrument', 'Edit Instrument')}
