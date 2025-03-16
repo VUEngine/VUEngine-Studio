@@ -566,7 +566,7 @@ a pre-configured value and repeat the grow/decay process. '
                 <hr />
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/editors/music/sweepModulation', 'Sweep / Modulation')}
+                        label={nls.localizeByDefault('Mode')}
                         tooltip={<>
                             {nls.localize('vuengine/editors/music/sweepModDescription',
                                 "The VSU's channel 5 has, in addition to all of the features of channels 1-4, \

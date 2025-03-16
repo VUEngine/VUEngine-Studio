@@ -1,6 +1,7 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
@@ -23,6 +24,7 @@ const setNthByte = (num: number, byte: number, newValue: number): number => {
 
 interface EffectProps {
     songData: SongData
+    currentChannelId: number
     event: MusicEvent
     value: any
     setValue: (value: any) => void
@@ -31,9 +33,10 @@ interface EffectProps {
 
 export default function Effect(props: EffectProps): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { songData, event, value, setValue, removeEvent } = props;
+    const { songData, currentChannelId, event, value, setValue, removeEvent } = props;
 
     const eventDetails = AVAILABLE_EVENTS[event];
+    const channel = songData.channels[currentChannelId];
 
     return (
         <VContainer className="item">
@@ -93,17 +96,17 @@ export default function Effect(props: EffectProps): React.JSX.Element {
 
             {event === MusicEvent.Instrument &&
                 <VContainer>
-                    <select
-                        className='theia-select'
-                        onChange={e => setValue(parseInt(e.target.value))}
+                    <BasicSelect
+                        options={songData.instruments.map((n, i) => ({
+                            value: i,
+                            label: n.name,
+                            disabled: n.type !== channel.type,
+                        }))}
                         value={value}
+                        onChange={e => setValue(parseInt(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    >
-                        {songData.instruments.map((n, i) =>
-                            <option key={i} value={i}>{n.name}</option>
-                        )}
-                    </select>
+                    />
                 </VContainer>
             }
 

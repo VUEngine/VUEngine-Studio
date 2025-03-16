@@ -195,6 +195,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     <Effect
                         key={i}
                         songData={songData}
+                        currentChannelId={currentChannelId}
                         event={event}
                         value={events[event]}
                         setValue={(value: any) => updateEvents(currentNote, event, value)}
