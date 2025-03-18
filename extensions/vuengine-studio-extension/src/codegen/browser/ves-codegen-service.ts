@@ -151,6 +151,39 @@ export class VesCodeGenService {
     this.logLine('');
   }
 
+  async getGeneratedFileUris(itemUri: URI, typeId: string): Promise<URI[]> {
+    let result: URI[] = [];
+    const type = this.vesProjectService.getProjectDataType(typeId);
+    if (!type || !type.templates) {
+      return [];
+    }
+    const item = Object.values(this.vesProjectService.getProjectDataItemsForType(typeId) ?? {}).filter(i => i._fileUri.isEqual(itemUri));
+    if (!item) {
+      return [];
+    }
+
+    await Promise.all(type.templates.map(async templateId => {
+      const template = this.vesProjectService.getProjectDataTemplate(templateId);
+      if (!template) {
+        return;
+      }
+
+      const targetUris = await this.getTargetUris(template, {
+        ...item,
+        _filename: itemUri.path.name,
+        _folder: itemUri.parent.path.name,
+      }, itemUri);
+      if (targetUris.length) {
+        result = [
+          ...result,
+          ...targetUris,
+        ];
+      }
+    }));
+
+    return result;
+  }
+
   async promptGenerateAll(): Promise<void> {
     const selectedTypes = await this.showTypeSelection();
     if (selectedTypes?.length) {
@@ -362,6 +395,76 @@ export class VesCodeGenService {
     return templateString;
   }
 
+  protected async getTargetUris(template: ProjectDataTemplate & WithContributor, item: any, itemUri?: URI): Promise<URI[]> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return [];
+    }
+
+    const result: URI[] = [];
+    template.targets.map(async t => {
+      if (t.conditions && jsonLogic.apply(t.conditions, item) !== true) {
+        return;
+      }
+
+      const findTarget = async (additionalData?: object): Promise<void> => {
+        const updatedItem = {
+          ...item,
+          ...(additionalData || {})
+        };
+
+        const target = t.path
+          .replace(/\$\{([\s\S]*?)\}/ig, match => {
+            match = match.substring(2, match.length - 1);
+            return this.vesCommonService.getByKey(updatedItem, match);
+          });
+
+        const targetPathParts = target.split('/');
+        let targetUri = t.root === 'project'
+          ? workspaceRootUri
+          : itemUri?.parent;
+        targetPathParts.forEach(targetPathPart => {
+          targetUri = targetUri?.resolve(targetPathPart);
+        });
+
+        if (targetUri !== undefined) {
+          result.push(targetUri);
+        }
+      };
+
+      if (t.forEachOf) {
+        const forEachOfType = Object.keys(t.forEachOf)[0] as string;
+        const forEachOfValue = Object.values(t.forEachOf)[0] as string;
+        const items = [];
+        switch (forEachOfType) {
+          case ProjectDataTemplateTargetForEachOfType.var:
+            items.push(...this.vesCommonService.getByKey(item, forEachOfValue));
+            if (!Array.isArray(items)) {
+              return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
+            }
+            break;
+          case ProjectDataTemplateTargetForEachOfType.fileInFolder:
+            if (itemUri !== undefined) {
+              const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue));
+              items.push(...paths);
+            }
+            break;
+        }
+
+        await Promise.all(items.map(async (x: unknown, index) => findTarget({
+          _forEachOf: x,
+          _forEachOfIndex: index + 1,
+          _forEachOfBasename: workspaceRootUri.resolve(x as string).path.name,
+        })));
+      } else {
+        return findTarget();
+      }
+    });
+
+    return result;
+  }
+
   protected async renderTemplate(templateId: string, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
     await this.vesProjectService.projectDataReady;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
@@ -422,93 +525,36 @@ export class VesCodeGenService {
 
     await Promise.all(
       toRender.map(async data => {
-        await Promise.all(
-          template.targets.map(async t => {
-            if (t.conditions && jsonLogic.apply(t.conditions, data.item) !== true) {
+        const targetUris = await this.getTargetUris(template, data.item, data.itemUri);
+        if (!targetUris) {
+          return;
+        }
+
+        await Promise.all(targetUris.map(async targetUri => {
+          if (generationMode === GenerationMode.ChangedOnly) {
+            if (!data.itemUri) {
               return;
             }
 
-            const findTargetAndRender = async (additionalData?: object): Promise<void> => {
-              const updatedData = {
-                ...data,
-                item: {
-                  ...data.item,
-                  ...(additionalData || {})
-                }
-              };
-
-              const target = t.path
-                .replace(/\$\{([\s\S]*?)\}/ig, match => {
-                  match = match.substring(2, match.length - 1);
-                  return this.vesCommonService.getByKey(updatedData.item, match);
-                });
-
-              const targetPathParts = target.split('/');
-              let targetUri = t.root === 'project'
-                ? workspaceRootUri
-                : data.itemUri?.parent;
-              targetPathParts.forEach(targetPathPart => {
-                targetUri = targetUri?.resolve(targetPathPart);
-              });
-
-              if (targetUri === undefined) {
-                return;
-              }
-
-              if (generationMode === GenerationMode.ChangedOnly) {
-                if (!data.itemUri) {
-                  return;
-                }
-
-                const itemFileStat = await this.fileService.resolve(data.itemUri, { resolveMetadata: true });
-                const targetFileExists = targetUri !== undefined && await this.fileService.exists(targetUri);
-                const targetFileStat = targetFileExists
-                  ? await this.fileService.resolve(targetUri as URI, { resolveMetadata: true })
-                  : undefined;
-                if (!this.fileHasChanged(itemFileStat, targetFileStat)) {
-                  return;
-                }
-              }
-
-              numberOfGeneratedFiles++;
-              return this.renderTemplateToFile(
-                templateId,
-                targetUri,
-                templateString,
-                updatedData,
-                encoding
-              );
-            };
-
-            if (t.forEachOf) {
-              const forEachOfType = Object.keys(t.forEachOf)[0] as string;
-              const forEachOfValue = Object.values(t.forEachOf)[0] as string;
-              const items = [];
-              switch (forEachOfType) {
-                case ProjectDataTemplateTargetForEachOfType.var:
-                  items.push(...this.vesCommonService.getByKey(data.item, forEachOfValue));
-                  if (!Array.isArray(items)) {
-                    return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
-                  }
-                  break;
-                case ProjectDataTemplateTargetForEachOfType.fileInFolder:
-                  if (data.itemUri !== undefined) {
-                    const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(data.itemUri.parent), forEachOfValue));
-                    items.push(...paths);
-                  }
-                  break;
-              }
-
-              await Promise.all(items.map(async (x: unknown, index) => findTargetAndRender({
-                _forEachOf: x,
-                _forEachOfIndex: index + 1,
-                _forEachOfBasename: workspaceRootUri.resolve(x as string).path.name,
-              })));
-            } else {
-              return findTargetAndRender();
+            const itemFileStat = await this.fileService.resolve(data.itemUri, { resolveMetadata: true });
+            const targetFileExists = targetUri !== undefined && await this.fileService.exists(targetUri);
+            const targetFileStat = targetFileExists
+              ? await this.fileService.resolve(targetUri as URI, { resolveMetadata: true })
+              : undefined;
+            if (!this.fileHasChanged(itemFileStat, targetFileStat)) {
+              return;
             }
-          })
-        );
+          }
+
+          numberOfGeneratedFiles++;
+          await this.renderTemplateToFile(
+            templateId,
+            targetUri,
+            templateString,
+            data,
+            encoding
+          );
+        }));
       })
     );
 

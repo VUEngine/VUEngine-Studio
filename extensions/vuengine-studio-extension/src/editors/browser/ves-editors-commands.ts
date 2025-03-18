@@ -37,7 +37,16 @@ export namespace VesEditorsCommands {
         'vuengine/editors/commands/showSource',
         'vuengine/editors/commands/category'
     );
-
+    export const OPEN_GENERATED_FILES: Command = Command.toLocalizedCommand(
+        {
+            id: 'editors.openGeneratedFiles',
+            label: 'Open Generated File(s)',
+            category: 'Editor',
+            iconClass: 'codicon codicon-file-symlink-file',
+        },
+        'vuengine/editors/commands/openGeneratedFiles',
+        'vuengine/editors/commands/category'
+    );
     export const GENERATE_ID: Command = Command.toLocalizedCommand(
         {
             id: 'editors.generateId',

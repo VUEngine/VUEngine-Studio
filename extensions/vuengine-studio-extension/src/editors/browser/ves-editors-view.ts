@@ -91,13 +91,18 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget,
-            execute: widget => this.generateFiles(widget),
+            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: () => this.generateFiles(this.shell.currentWidget as VesEditorsWidget),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget,
-            execute: widget => this.openSource(widget),
+            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: () => this.openSource(this.shell.currentWidget as VesEditorsWidget),
+        });
+        commandRegistry.registerCommand(VesEditorsCommands.OPEN_GENERATED_FILES, {
+            isEnabled: () => true,
+            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: () => this.openGeneratedFiles(this.shell.currentWidget as VesEditorsWidget),
         });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
             isEnabled: () => true,
@@ -177,8 +182,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
             isEnabled: () => true,
-            isVisible: (widget: Widget) => {
-                const p = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri.path;
+            isVisible: () => {
+                const p = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri.path;
                 if (p) {
                     for (const t of Object.values(types || {})) {
                         if ([p.ext, p.base].includes(t.file)) {
@@ -188,8 +193,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }
                 return false;
             },
-            execute: async widget => {
-                const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
+            execute: async () => {
+                const u = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
@@ -225,6 +230,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             command: VesEditorsCommands.GENERATE.id,
             tooltip: VesEditorsCommands.GENERATE.label,
             priority: 0,
+        });
+        toolbar.registerItem({
+            id: VesEditorsCommands.OPEN_GENERATED_FILES.id,
+            command: VesEditorsCommands.OPEN_GENERATED_FILES.id,
+            tooltip: VesEditorsCommands.OPEN_GENERATED_FILES.label,
+            priority: 1,
         });
         toolbar.registerItem({
             id: VesEditorsCommands.OPEN_SOURCE.id,
@@ -277,6 +288,20 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             return;
         }
         this.editorManager.open(ref.uri);
+    }
+
+    protected async openGeneratedFiles(widget: Widget): Promise<void> {
+        const ref = widget instanceof VesEditorsWidget && widget || undefined;
+        if (!ref || !ref.uri || !ref.typeId) {
+            return;
+        }
+
+        const uris = await this.vesCodeGenService.getGeneratedFileUris(ref.uri, ref.typeId);
+        uris.forEach(async u => {
+            if (await this.fileService.exists(u)) {
+                this.editorManager.open(u);
+            }
+        });
     }
 
     protected generateFiles(widget: Widget): void {
