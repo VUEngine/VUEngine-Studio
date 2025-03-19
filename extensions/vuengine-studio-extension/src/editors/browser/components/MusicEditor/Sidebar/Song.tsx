@@ -9,7 +9,7 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
-import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_SPEED, MIN_SPEED, NoteResolution, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_TICK_DURATION, MIN_TICK_DURATION, NoteResolution, SongData } from '../MusicEditorTypes';
 import Range from '../../Common/Base/Range';
 
 interface SongProps {
@@ -47,8 +47,8 @@ export default function Song(props: SongProps): React.JSX.Element {
         updateSongData({ ...songData, loop: !songData.loop });
     };
 
-    const setSpeed = (s: number): void => {
-        if (s <= MAX_SPEED && s >= MIN_SPEED) {
+    const setTickDuration = (s: number): void => {
+        if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
             updateSongData({ ...songData, speed: s });
         }
     };
@@ -73,9 +73,9 @@ export default function Song(props: SongProps): React.JSX.Element {
             </label>
             <Range
                 value={songData.speed}
-                max={MAX_SPEED}
-                min={MIN_SPEED}
-                setValue={(v: number) => setSpeed(v)}
+                max={MAX_TICK_DURATION}
+                min={MIN_TICK_DURATION}
+                setValue={(v: number) => setTickDuration(v)}
                 commandsToDisable={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
