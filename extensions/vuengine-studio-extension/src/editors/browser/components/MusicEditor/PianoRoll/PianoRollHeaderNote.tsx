@@ -82,6 +82,10 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
             className={classNames.join(' ')}
             onClick={() => updatePlayRangeStart(index)}
             onContextMenu={() => updatePlayRangeEnd(index)}
-        />
+        >
+            {(index) % 4 === 0 &&
+                index
+            }
+        </StyledPianoRollHeaderNote>
     );
 }

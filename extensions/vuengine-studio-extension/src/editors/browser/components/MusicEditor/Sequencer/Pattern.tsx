@@ -1,11 +1,10 @@
 import { nls } from '@theia/core';
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { SortableItem } from 'react-easy-sort';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { ChannelConfig, MusicEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
+import { CHANNEL_BG_COLORS, ChannelConfig, MusicEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
 import { StyledPattern, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
@@ -35,10 +34,8 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
-
     const isCurrent = currentChannelId === channel && currentPatternId === patternId;
-    const textColor = isCurrent ? '#fff' : services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
+    const noteColor = isCurrent ? '#fff' : CHANNEL_BG_COLORS[channel];
 
     const patternNoteWidth = Math.max(0, 16 / songData.noteResolution);
     const patternPixels: number[][][] = useMemo(() => {
@@ -84,19 +81,19 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                     backgroundColor: currentChannelId === channel && currentSequenceIndex === index
                         ? 'var(--theia-focusBorder)'
                         : undefined,
-                    height: `${PATTERN_HEIGHT}px`,
                     minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
                     width: `${(patternSize * patternNoteWidth) - 1}px`
                 }}
                 data-channel={channel}
                 data-position={index}
                 onClick={() => setCurrentSequenceIndex(channel, index)}
+                title={`${patternId + 1}${pattern.name ? `: ${pattern.name}` : ''}`}
             >
                 <CanvasImage
                     height={PATTERN_HEIGHT}
                     palette={'00000000'}
                     pixelData={patternPixels}
-                    textColor={textColor}
+                    colorOverride={noteColor}
                     width={patternSize * patternNoteWidth}
                     displayMode={DisplayMode.Mono}
                     colorMode={ColorMode.Default}

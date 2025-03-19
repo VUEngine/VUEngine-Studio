@@ -18,7 +18,7 @@ export const StyledChannel = styled.div`
     flex-direction: row;
     flex-grow: 1;
     margin-bottom: 1px;
-    max-height: ${PATTERN_HEIGHT}px;
+    max-height: calc(${PATTERN_HEIGHT}px + 2px);
 
     &.muted {
         opacity: .4;
@@ -45,7 +45,7 @@ export const StyledChannelHeader = styled.div`
     flex-direction: row;
     font-size: 10px;
     font-weight: bold;
-    height: ${PATTERN_HEIGHT}px;
+    height: calc(${PATTERN_HEIGHT}px + 2px);
     left: 0;
     margin-right: 2px;
     min-width: 50px;
@@ -185,6 +185,7 @@ export const StyledPattern = styled.div`
     cursor: grab;
     display: flex;
     font-size: 11px;
+    height: 23px;
     justify-content: center;
     margin-right: 1px;
     overflow: hidden;

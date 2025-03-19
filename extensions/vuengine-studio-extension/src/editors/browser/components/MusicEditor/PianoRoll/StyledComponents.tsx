@@ -7,7 +7,6 @@ export const StyledPianoRollEditor = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 1px 0;
 
     body.theia-light & {
         background: var(--theia-secondaryButton-background);
@@ -225,25 +224,27 @@ export const MetaLineNote = styled.div`
     flex-grow: 1;
     gap: 1px;
     margin-bottom: 1px;
-    margin-right: 1px;
+    padding-right: 1px;
     min-width: 15px;
     max-width: 15px;
     position: relative;
+    user-select: none;
 
     &:hover {
         border-radius: 1px;
         outline: 1px solid var(--theia-focusBorder);
     }
     &:nth-child(4n + 1) {
-        margin-right: 2px;
+        padding-right: 2px;
     }
     &:last-child {
-        margin-right: 0 !important;
+        padding-right: 0 !important;
     }
 `;
 
 export const MetaLineNoteEffects = styled.div`
     align-items: center;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -265,11 +266,14 @@ export const MetaLineNoteVolumeChannel = styled.div`
 `;
 
 export const StyledPianoRollHeaderNote = styled(MetaLineNote)`
-    margin-right: 0px !important;
+    border-top: 1px solid transparent;
+    color: var(--theia-secondaryButton-background);
+    justify-content: end;
+    min-height: 16px;
     padding-right: 1px;
 
     &.rangeStart, &.rangeEnd, &.inRange {
-        border-top: 1px solid var(--theia-focusBorder);
+        border-top-color: var(--theia-focusBorder);
     }
     
     &.rangeStart::before {
@@ -303,22 +307,30 @@ export const StyledPianoRoll = styled.div`
     flex-direction: column;
     font-size: 10px;
     overflow: auto;
-    margin: 0 var(--padding) var(--padding);
+    margin: var(--theia-ui-padding) var(--padding) var(--padding);
     position: relative;
 
-    &.noteResolution-4 ${MetaLineNote}:nth-child(4n + 1),
+    &.noteResolution-4 ${MetaLineNote}:nth-child(4n + 1) {
+        padding-right: 3px;
+    }
     &.noteResolution-4 ${StyledPianoRollNote}:nth-child(4n + 1) {
         margin-right: 3px;
     }
-    &.noteResolution-8 ${MetaLineNote}:nth-child(8n + 1),
+    &.noteResolution-8 ${MetaLineNote}:nth-child(8n + 1) {
+        padding-right: 3px;
+    }
     &.noteResolution-8 ${StyledPianoRollNote}:nth-child(8n + 1) {
         margin-right: 3px;
     }
-    &.noteResolution-16 ${MetaLineNote}:nth-child(16n + 1),
+    &.noteResolution-16 ${MetaLineNote}:nth-child(16n + 1) {
+        padding-right: 3px;
+    }
     &.noteResolution-16 ${StyledPianoRollNote}:nth-child(16n + 1) {
         margin-right: 3px;
     }
-    &.noteResolution-32 ${MetaLineNote}:nth-child(32n + 1),
+    &.noteResolution-32 ${MetaLineNote}:nth-child(32n + 1) {
+        padding-right: 3px;
+    }
     &.noteResolution-32 ${StyledPianoRollNote}:nth-child(32n + 1) {
         margin-right: 3px;
     }

@@ -9,3 +9,9 @@
 		{%- set array = (array.push(value), array) -%}
 	{%- endif -%}
 {%- endmacro -%}
+
+{%- macro prepend(array, value, condition=true) -%}
+	{%- if (condition) -%}
+		{%- set array = (array.unshift(value), array) -%}
+	{%- endif -%}
+{%- endmacro -%}

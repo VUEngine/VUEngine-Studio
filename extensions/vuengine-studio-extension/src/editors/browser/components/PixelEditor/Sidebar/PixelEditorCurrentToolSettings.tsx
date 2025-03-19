@@ -34,7 +34,7 @@ export default function PixelEditorCurrentToolSettings(props: PixelEditorCurrent
                             palette={'00000000'}
                             pixelData={[p]}
                             style={{ zoom: 3 }}
-                            textColor={textColor}
+                            colorOverride={textColor}
                             width={p.length}
                             displayMode={DisplayMode.Mono}
                             colorMode={ColorMode.Default}

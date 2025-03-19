@@ -28,7 +28,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
 
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
-            style={{ height: 11 }}
+            style={{ height: 18 }}
         >
             <MetaLineHeaderLine>
             </MetaLineHeaderLine>

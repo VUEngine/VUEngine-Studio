@@ -618,6 +618,11 @@ export class VesCodeGenService {
       return obj;
     });
 
+    env.addFilter('setArrayIndex', (arr: any[], index: number, value: unknown) => {
+      arr[index] = value;
+      return arr;
+    });
+
     // @ts-ignore
     env.addFilter('typeId', (arr: unknown[], typeId: string) => arr.filter(item => item.typeId === typeId));
 

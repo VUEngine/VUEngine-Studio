@@ -14,7 +14,7 @@ interface CanvasImageProps {
     style?: object
     repeatX?: boolean
     repeatY?: boolean
-    textColor?: string
+    colorOverride?: string
     drawBlack?: boolean
 }
 
@@ -30,7 +30,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         style,
         repeatX,
         repeatY,
-        textColor,
+        colorOverride,
         drawBlack
     } = props;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -75,7 +75,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                     return;
                 }
 
-                const fillColor = textColor ?? getColor(effectiveColorByPalette);
+                const fillColor = colorOverride ?? getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
