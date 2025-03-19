@@ -12,11 +12,11 @@ import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
+import { hexFromBitsArray, intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
 import { TYPE_LABELS } from '../../editors/browser/ves-editors-types';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
-import { AnimationConfig, ImageCompressionType, ImageConfigWithName, TilesCompressionResult } from '../../images/browser/ves-images-types';
+import { ImageConfigWithName } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -638,16 +638,7 @@ export class VesCodeGenService {
 
     env.addFilter('hexToInt', (value: string) => parseInt(value, 16));
 
-    env.addFilter('intToHex', (value: number, length?: number) => {
-      // catch null
-      if (!value) {
-        value = 0;
-      }
-      return value.toString(16).toUpperCase().padStart(
-        length === 8 ? 10 : length === 2 ? 4 : 6,
-        length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
-      );
-    });
+    env.addFilter('intToHex', intToHex);
 
     env.addFilter('intToBin', (value: number, length?: number) => {
       // catch null
@@ -697,8 +688,7 @@ export class VesCodeGenService {
     }, true);
 
     // add functions
-    env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig): TilesCompressionResult =>
-      compressTiles(tilesData, compressor, animationConfig)
-    );
+    env.addGlobal('compressTiles', compressTiles);
+    env.addGlobal('hexFromBitsArray', hexFromBitsArray);
   }
 }

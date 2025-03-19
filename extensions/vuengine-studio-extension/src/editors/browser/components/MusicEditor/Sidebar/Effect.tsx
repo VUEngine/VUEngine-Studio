@@ -59,10 +59,10 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                             L
                         </div>
                         <Range
-                            value={getNthByte(value, 1)}
+                            value={getNthByte(value, 0)}
                             max={15}
                             min={0}
-                            setValue={(v: number) => setValue(setNthByte(value, 1, v))}
+                            setValue={(v: number) => setValue(setNthByte(value, 0, v))}
                             width="100%"
                             commandsToDisable={INPUT_BLOCKING_COMMANDS}
                         />
@@ -72,10 +72,10 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                             R
                         </div>
                         <Range
-                            value={getNthByte(value, 0)}
+                            value={getNthByte(value, 1)}
                             max={15}
                             min={0}
-                            setValue={(v: number) => setValue(setNthByte(value, 0, v))}
+                            setValue={(v: number) => setValue(setNthByte(value, 1, v))}
                             width="100%"
                             commandsToDisable={INPUT_BLOCKING_COMMANDS}
                         />

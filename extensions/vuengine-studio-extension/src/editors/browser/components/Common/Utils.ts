@@ -113,3 +113,32 @@ export const arrayMove = (arr: any[], oldIndex: number, newIndex: number) => {
     result.splice(newIndex, 0, result.splice(oldIndex, 1)[0]);
     return result;
 };
+
+export const trimBits = (int: number, length: number) =>
+    int & ((1 << length) - 1);
+
+export const intToHex = (value: number, length?: number) => {
+    // catch null
+    if (!value) {
+        value = 0;
+    }
+    return value.toString(16).toUpperCase().padStart(
+        length === 8 ? 10 : length === 2 ? 4 : 6,
+        length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
+    );
+};
+
+export const hexFromBitsArray = (bitsArray: (number | undefined)[][]): string => {
+    let sum = 0;
+    let totalBits = 0;
+    if (bitsArray.length) {
+        bitsArray.reverse().forEach(b => {
+            if (b[0] !== undefined) {
+                sum += trimBits(b[0], b[1]!) * Math.pow(2, totalBits);
+            }
+            totalBits += b[1]!;
+        });
+    }
+
+    return intToHex(sum, totalBits / 4);
+};
