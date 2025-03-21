@@ -102,7 +102,6 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     className='theia-button secondary'
                     title={nls.localize('vuengine/editors/music/deleteInstrument', 'Delete Instrument')}
                     onClick={removeCurrentInstrument}
-                    disabled={songData.instruments.length <= 1}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >

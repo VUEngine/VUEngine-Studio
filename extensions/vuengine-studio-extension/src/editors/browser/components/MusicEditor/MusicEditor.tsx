@@ -487,7 +487,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 width='100%'
             >
                 <WaveformSelect
-                    value={songData.instruments[Math.max(0, waveformDialogOpen)].waveform}
+                    value={songData.instruments[Math.max(0, waveformDialogOpen)]?.waveform ?? 0}
                     setValue={setInstrumentWaveForm}
                 />
                 {/*
