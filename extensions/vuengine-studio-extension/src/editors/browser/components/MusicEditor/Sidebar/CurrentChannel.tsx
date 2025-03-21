@@ -93,7 +93,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         <BasicSelect
                             options={songData.instruments.map((n, i) => ({
                                 value: i,
-                                label: n.name,
+                                label: `${i + 1}: ${n.name}`,
                                 disabled: n.type !== channel.type,
                             }))}
                             value={channel.instrument}

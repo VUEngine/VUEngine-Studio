@@ -95,7 +95,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     onChange={e => setCurrentInstrument(parseInt(e.target.value))}
                 >
                     {songData.instruments.map((n, i) =>
-                        <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
+                        <option key={`instrument-select-${i}`} value={i}>{i + 1}: {n.name}</option>
                     )}
                 </select>
                 <InputWithActionButton

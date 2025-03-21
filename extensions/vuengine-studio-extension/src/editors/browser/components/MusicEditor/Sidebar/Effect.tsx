@@ -99,7 +99,7 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                     <BasicSelect
                         options={songData.instruments.map((n, i) => ({
                             value: i,
-                            label: n.name,
+                            label: `${i + 1}: ${n.name}`,
                             disabled: n.type !== channel.type,
                         }))}
                         value={value}
