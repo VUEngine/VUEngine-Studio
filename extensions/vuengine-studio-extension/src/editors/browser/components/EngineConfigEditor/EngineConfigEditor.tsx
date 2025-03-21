@@ -1,6 +1,9 @@
 import { nls } from '@theia/core';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { VesBuildCommands } from '../../../../build/browser/ves-build-commands';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/Base/HContainer';
 import {
     EngineConfigData
 } from './EngineConfigEditorTypes';
@@ -30,6 +33,7 @@ interface EngineConfigEditorProps {
 
 export default function EngineConfigEditor(props: EngineConfigEditorProps): React.JSX.Element {
     const { data, updateData } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const [sidebarTab, setSidebarTab] = useState<number>(0);
 
     return (
@@ -70,9 +74,26 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
             <div
                 style={{
                     display: 'flex',
-                    flexGrow: 1
+                    flexDirection: 'column',
+                    flexGrow: 1,
                 }}
             >
+                <HContainer alignItems="center" gap={15}>
+                    <HContainer alignItems="center">
+                        <i className='codicon codicon-warning' />
+                        {nls.localize(
+                            'vuengine/editors/engineConfig/cleanWarning',
+                            'Many setting in this editor only take effect after cleaning the build folder.'
+                        )}
+                    </HContainer>
+                    <button
+                        className="theia-button secondary"
+                        onClick={() => services.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
+                    >
+                        {VesBuildCommands.CLEAN.label}
+                    </button>
+                </HContainer>
+                <br />
                 <TabPanel><EngineConfigAffine data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigAnimation data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigBrightness data={data} updateData={updateData} /></TabPanel>
