@@ -43,6 +43,12 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
 
     const addPattern = () => {
         // TODO
+        alert('not yet implemented');
+    };
+
+    const clonePattern = () => {
+        // TODO
+        alert('not yet implemented');
     };
 
     const removeCurrentPattern = async () => {
@@ -53,6 +59,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         const remove = await dialog.open();
         if (remove) {
             // TODO
+            alert('not yet implemented');
         }
     };
 
@@ -75,8 +82,9 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </select>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/music/deletePattern', 'Delete Pattern')}
+                    title={nls.localizeByDefault('Remove')}
                     onClick={removeCurrentPattern}
+                    disabled={!pattern}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
@@ -84,12 +92,22 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </InputWithActionButton>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/music/addPattern', 'Add Pattern')}
+                    title={nls.localizeByDefault('Add')}
                     onClick={addPattern}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='codicon codicon-plus' />
+                </InputWithActionButton>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localize('vuengine/editors/music/clone', 'Clone')}
+                    onClick={clonePattern}
+                    disabled={!pattern}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <i className='codicon codicon-copy' />
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>

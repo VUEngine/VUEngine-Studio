@@ -1,4 +1,4 @@
-import { FadersHorizontal, GearSix, Guitar, Keyboard } from '@phosphor-icons/react';
+import { FadersHorizontal, GearSix, Guitar, Keyboard, MusicNote } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
@@ -381,7 +381,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             title={nls.localize('vuengine/editors/music/selected', 'Selected')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
-                            <FadersHorizontal size={20} />
+                            <MusicNote size={20} />
                         </Tab>
                         <Tab
                             title={nls.localize('vuengine/editors/music/instruments', 'Instruments')}
@@ -399,7 +399,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             title={nls.localize('vuengine/editors/music/settings', 'Settings')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
-                            <GearSix size={20} />
+                            <FadersHorizontal size={20} />
                         </Tab>
                     </TabList>
                     <TabPanel>

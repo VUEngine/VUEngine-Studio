@@ -19,9 +19,9 @@ export const InputWithAction = styled.div`
 
 export const InputWithActionButton = styled.button`
     margin: 0;
-    min-width: 32px;
+    min-width: 26px !important;
     padding: 0;
-    width: 32px;
+    width: 26px;
 `;
 
 interface InstrumentsProps {
@@ -68,6 +68,17 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         }
     };
 
+    const cloneInstrument = async () => {
+        setInstruments([
+            ...songData.instruments,
+            {
+                ...instrument,
+                name: `${instrument.name} ${nls.localize('vuengine/general/copy', 'copy')}}`,
+            },
+        ]);
+        setCurrentInstrument(songData.instruments.length);
+    };
+
     const removeCurrentInstrument = async () => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/music/deleteInstrumentQuestion', 'Delete Instrument?'),
@@ -100,8 +111,9 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </select>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/music/deleteInstrument', 'Delete Instrument')}
+                    title={nls.localizeByDefault('Remove')}
                     onClick={removeCurrentInstrument}
+                    disabled={!instrument}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
@@ -115,6 +127,16 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='codicon codicon-plus' />
+                </InputWithActionButton>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localize('vuengine/editors/music/clone', 'Clone')}
+                    onClick={cloneInstrument}
+                    disabled={!instrument}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <i className='codicon codicon-copy' />
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>

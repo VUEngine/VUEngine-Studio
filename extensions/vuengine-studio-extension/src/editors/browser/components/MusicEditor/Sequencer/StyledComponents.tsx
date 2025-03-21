@@ -10,6 +10,7 @@ export const StyledSequencer = styled.div`
     min-height: calc((${PATTERN_HEIGHT}px + 1px) * 6 + 10px);
     overflow-x: auto;
     overflow-y: hidden;
+    padding-bottom: 12px;
     position: relative;
 `;
 

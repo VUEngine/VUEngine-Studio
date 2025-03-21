@@ -431,7 +431,9 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     label={nls.localize('vuengine/editors/music/noteDuration', 'Note Duration')}
                     tooltip={nls.localize(
                         'vuengine/editors/music/noteDurationDescription',
-                        'Specifies how long the current note should play before automatically being shut off.'
+                        'Specifies how long the current note should play before automatically being shut off. \
+This are the durations that are natively supported by the Virtual Boy\'s sound chip. \
+Longer durations can be achieved with the "Note Cut" effect.'
                     )}
                 />
                 <Range
@@ -524,7 +526,7 @@ a pre-configured value and repeat the grow/decay process. '
                             </VContainer>
                             <VContainer>
                                 <label>
-                                    {nls.localizeByDefault('Repeat')}
+                                    {nls.localize('vuengine/editors/music/repeat', 'Repeat')}
                                 </label>
                                 <input
                                     type="checkbox"
@@ -651,7 +653,7 @@ from the first modulation value. '
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localizeByDefault('Repeat')}
+                                        {nls.localize('vuengine/editors/music/repeat', 'Repeat')}
                                     </label>
                                     <input
                                         type="checkbox"

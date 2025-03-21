@@ -307,7 +307,7 @@ export const StyledPianoRoll = styled.div`
     flex-direction: column;
     font-size: 10px;
     overflow: auto;
-    margin: var(--theia-ui-padding) var(--padding) var(--padding);
+    margin: 0 var(--padding) var(--padding);
     position: relative;
 
     &.noteResolution-4 ${MetaLineNote}:nth-child(4n + 1) {

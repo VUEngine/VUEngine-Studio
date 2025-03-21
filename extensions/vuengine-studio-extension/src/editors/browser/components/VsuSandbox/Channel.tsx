@@ -483,7 +483,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             checked={channel?.sweepMod?.repeat ?? false}
                                             onChange={toggleSweepModulationRepeat}
                                         />
-                                        {nls.localizeByDefault('Repeat')}
+                                        {nls.localize('vuengine/editors/music/repeat', 'Repeat')}
                                     </label>
                                 }
                             </VContainer>
