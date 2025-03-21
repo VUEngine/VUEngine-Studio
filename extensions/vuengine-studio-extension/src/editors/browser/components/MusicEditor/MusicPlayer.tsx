@@ -79,6 +79,9 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
             const instrument = songData.instruments[
                 testing ? testingInstrument : channel.instrument
             ];
+            if (!instrument) {
+                return;
+            }
             const waveform = services.vesProjectService.getProjectDataItemById(instrument.waveform, 'WaveForm') as WaveFormData;
             if (channel.sequence.length > 0 && instrument && waveform) {
                 updatedChannels[index] = {
