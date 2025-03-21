@@ -1,12 +1,13 @@
+import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
 import Instrument from './Instrument';
-import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -18,6 +19,8 @@ export const InputWithAction = styled.div`
 `;
 
 export const InputWithActionButton = styled.button`
+    align-items: center;
+    display: flex;
     margin: 0;
     min-width: 26px !important;
     padding: 0;
@@ -117,16 +120,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
-                    <i className='fa fa-minus' />
-                </InputWithActionButton>
-                <InputWithActionButton
-                    className='theia-button secondary'
-                    title={nls.localizeByDefault('Add')}
-                    onClick={addInstrument}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <i className='codicon codicon-plus' />
+                    <Trash size={16} />
                 </InputWithActionButton>
                 <InputWithActionButton
                     className='theia-button secondary'
@@ -136,7 +130,16 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
-                    <i className='codicon codicon-copy' />
+                    <Copy size={16} />
+                </InputWithActionButton>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localizeByDefault('Add')}
+                    onClick={addInstrument}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <i className='codicon codicon-plus' />
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>

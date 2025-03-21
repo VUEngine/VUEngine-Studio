@@ -1,8 +1,8 @@
-import { nls } from '@theia/core';
+import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
-import { StyledAddPattern, StyledAddPatternButton, StyledAddPatternExisting, StyledAddPatternNewPatternButton, StyledAddPatternPatternSelect } from './StyledComponents';
+import { StyledAddPatternButton } from './StyledComponents';
 
 interface AddPatternProps {
     songData: SongData
@@ -37,28 +37,37 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setCurrentPatternId(channelId, patternId);
     };
 
+    const showPatternSelection = async (): Promise<QuickPickItem | undefined> => services.quickPickService.show(
+        [
+            {
+                id: `${channel.patterns.length}`,
+                label: nls.localize('vuengine/editors/music/newPattern', 'New Pattern'),
+            },
+            ...channel.patterns.map((p, i) => ({
+                id: `${i}`,
+                label: `${i + 1}`,
+                description: p.name,
+            })),
+        ],
+        {
+            title: nls.localize('vuengine/editors/music/addPattern', 'Add Pattern'),
+            placeholder: nls.localize('vuengine/editors/music/selectPatternToAdd', 'Select a pattern to add...'),
+        }
+    );
+
+    const addPattern = async (): Promise<void> => {
+        const patternToAdd = await showPatternSelection();
+        if (patternToAdd && patternToAdd.id) {
+            addToSequence(channel.id, parseInt(patternToAdd.id));
+        }
+    };
+
     return (
-        <StyledAddPattern>
+        <StyledAddPatternButton
+            title={nls.localizeByDefault('Add')}
+            onClick={addPattern}
+        >
             <i className='codicon codicon-plus' />
-            <StyledAddPatternPatternSelect>
-                <StyledAddPatternNewPatternButton
-                    title={nls.localizeByDefault('Add')}
-                    onClick={() => addToSequence(channel.id, channel.patterns.length)}
-                >
-                    <i className='codicon codicon-plus' />
-                </StyledAddPatternNewPatternButton>
-                <StyledAddPatternExisting>
-                    {channel.patterns.map((pattern, patternId) => (
-                        <StyledAddPatternButton
-                            key={patternId}
-                            title={nls.localize('vuengine/editors/music/addPatternX', 'Add Pattern {0}', patternId)}
-                            onClick={() => addToSequence(channel.id, patternId)}
-                        >
-                            {patternId + 1}
-                        </StyledAddPatternButton>
-                    ))}
-                </StyledAddPatternExisting>
-            </StyledAddPatternPatternSelect>
-        </StyledAddPattern>
+        </StyledAddPatternButton>
     );
 }

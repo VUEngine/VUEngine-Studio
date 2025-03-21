@@ -62,7 +62,16 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentSequenceIndex,
     ]);
 
-    return <StyledSequencer>
+    const mapVerticalToHorizontalScroll = (e: React.WheelEvent): void => {
+        if (e.deltaY === 0) {
+            return;
+        }
+        e.currentTarget.scrollTo({
+            left: e.currentTarget.scrollLeft + e.deltaY
+        });
+    };
+
+    return <StyledSequencer onWheel={mapVerticalToHorizontalScroll}>
         {<StepIndicator
             currentStep={currentStep}
             noteResolution={songData.noteResolution}

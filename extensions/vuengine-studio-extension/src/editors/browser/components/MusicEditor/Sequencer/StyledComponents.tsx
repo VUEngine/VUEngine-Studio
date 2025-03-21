@@ -256,47 +256,24 @@ export const StyledAddPattern = styled.div`
     }
 `;
 
-export const StyledAddPatternPatternSelect = styled.div`
-    display: none;
-    flex-direction: row;
-    gap: 1px;
-    height: 100%;
-
-    ${StyledAddPattern}:hover & {
-        display: flex;
-    }
-`;
-
-export const StyledAddPatternExisting = styled.div`
-    display: flex;
-    flex-grow: 1;
-    gap: 1px;
-`;
-
 export const StyledAddPatternButton = styled.div`
     align-items: center;
-    background-color: var(--theia-secondaryButton-background);
+    background-color: transparent;
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
-    border: 0;
-    color: var(--theia-secondaryButton-foreground);
+    box-sizing: border-box;
+    color: var(--theia-dropdown-border);
     cursor: pointer;
     display: flex;
-    font-size: 12px;
-    height: 100%;
     justify-content: center;
-    min-height: unset;
-    min-width: 16px;
-    padding: 0;
-    width: 16px;
-
-    &:hover {
-        background-color: var(--theia-button-background) !important;
-    }
-`;
-
-export const StyledAddPatternNewPatternButton = styled(StyledAddPatternButton)`
     min-width: 23px;
     width: 23px;
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        border-color: var(--theia-focusBorder);
+        color: #fff;
+    }
 `;
 
 export const StyledStepIndicator = styled.div`

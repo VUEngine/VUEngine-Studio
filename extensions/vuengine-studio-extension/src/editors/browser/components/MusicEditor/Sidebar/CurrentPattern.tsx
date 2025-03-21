@@ -1,3 +1,4 @@
+import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
@@ -8,6 +9,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, PatternConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import Input from '../../Common/Base/Input';
 
 interface CurrentPatternProps {
     songData: SongData
@@ -88,7 +90,17 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
-                    <i className='fa fa-minus' />
+                    <Trash size={16} />
+                </InputWithActionButton>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localize('vuengine/editors/music/clone', 'Clone')}
+                    onClick={clonePattern}
+                    disabled={!pattern}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <Copy size={16} />
                 </InputWithActionButton>
                 <InputWithActionButton
                     className='theia-button secondary'
@@ -99,16 +111,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 >
                     <i className='codicon codicon-plus' />
                 </InputWithActionButton>
-                <InputWithActionButton
-                    className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/music/clone', 'Clone')}
-                    onClick={clonePattern}
-                    disabled={!pattern}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <i className='codicon codicon-copy' />
-                </InputWithActionButton>
             </InputWithAction>
         </VContainer>
         <HContainer gap={15}>
@@ -116,12 +118,10 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 <label>
                     {nls.localizeByDefault('Name')}
                 </label>
-                <input
-                    className='theia-input'
+                <Input
                     value={pattern.name}
-                    onChange={e => setPatternName(e.target.value)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    setValue={setPatternName}
+                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
             <VContainer>

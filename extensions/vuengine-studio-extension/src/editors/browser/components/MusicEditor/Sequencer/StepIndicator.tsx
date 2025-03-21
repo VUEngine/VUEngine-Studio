@@ -29,9 +29,9 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
     const style = {
         display: hidden ? 'none' : undefined,
         left: offset,
-        top: isPianoRoll ? 14 : 0,
+        top: isPianoRoll ? 20 : 0,
         bottom: isPianoRoll ? undefined : 11,
-        height: isPianoRoll ? 845 : undefined,
+        height: isPianoRoll ? 845 : 143,
         opacity: isPianoRoll ? .5 : 1,
         width: isPianoRoll ? 15 : 1,
     };
