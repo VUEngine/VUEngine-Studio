@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
+import React from 'react';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
@@ -32,7 +31,6 @@ interface EffectProps {
 }
 
 export default function Effect(props: EffectProps): React.JSX.Element {
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { songData, currentChannelId, event, value, setValue, removeEvent } = props;
 
     const eventDetails = AVAILABLE_EVENTS[event];
@@ -96,16 +94,15 @@ export default function Effect(props: EffectProps): React.JSX.Element {
 
             {event === MusicEvent.Instrument &&
                 <VContainer>
-                    <BasicSelect
+                    <AdvancedSelect
                         options={songData.instruments.map((n, i) => ({
-                            value: i,
+                            value: `${i}`,
                             label: `${i + 1}: ${n.name}`,
                             disabled: n.type !== channel.type,
                         }))}
-                        value={value}
-                        onChange={e => setValue(parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        defaultValue={value}
+                        onChange={options => setValue(parseInt(options[0]))}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
             }

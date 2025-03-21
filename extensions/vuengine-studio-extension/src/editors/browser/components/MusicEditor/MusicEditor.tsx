@@ -1,4 +1,4 @@
-import { FadersHorizontal, GearSix, Guitar, Keyboard, MusicNote } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Keyboard, MusicNote } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
@@ -409,8 +409,6 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 currentChannelId={currentChannelId}
                                 setCurrentChannelId={setCurrentChannelId}
                                 setChannel={setChannel}
-                                toggleChannelMuted={toggleChannelMuted}
-                                toggleChannelSolo={toggleChannelSolo}
                                 setCurrentInstrument={setCurrentInstrument}
                                 setSidebarTab={setSidebarTab}
                             />

@@ -1,6 +1,6 @@
 import { nls, URI } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import BasicSelect from '../../../editors/browser/components/Common/Base/BasicSelect';
+import AdvancedSelect from '../../../editors/browser/components/Common/Base/AdvancedSelect';
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
@@ -100,16 +100,13 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                         {nls.localize('vuengine/project/startScreen', 'Start Screen')}
                     </label>
                     <HContainer alignItems='end' grow={1}>
-                        <BasicSelect
+                        <AdvancedSelect
                             options={Object.values(MOCK_STAGES).map(v => ({
                                 value: v._id,
                                 label: v.name,
                             }))}
-                            value={startStage._id}
+                            defaultValue={startStage._id}
                             onChange={() => { }}
-                            style={{
-                                flexGrow: 1
-                            }}
                         />
                         <button
                             className='theia-button secondary'
@@ -120,7 +117,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                                 minWidth: 'unset',
                             }}
                         >
-                            <i className='codicon codicon-edit' />
+                            <i className='codicon codicon-settings-gear' />
                         </button>
                     </HContainer>
                 </VContainer>

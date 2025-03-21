@@ -28,6 +28,8 @@ import {
     VsuSweepModulationFunction
 } from '../VsuEmulator/VsuEmulatorTypes';
 import WaveformSelect from './WaveformSelect';
+import AdvancedSelect from '../Common/Base/AdvancedSelect';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor/MusicEditor';
 
 interface ChannelProps {
     index: number
@@ -286,15 +288,15 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         <label>
                             {nls.localize('vuengine/editors/vsuSandbox/tap', 'Tap')}
                         </label>
-                        <select
-                            className="theia-select"
-                            value={channel?.tap ?? 0}
-                            onChange={e => setTap(parseInt(e.target.value))}
-                        >
-                            {VSU_NOISE_TAP.map((tl, i) =>
-                                <option value={i}>{tl[0]}</option>
-                            )}
-                        </select>
+                        <AdvancedSelect
+                            options={VSU_NOISE_TAP.map((tl, i) => ({
+                                label: tl[0].toString(),
+                                value: i.toString()
+                            }))}
+                            defaultValue={channel?.tap?.toString() ?? '0'}
+                            onChange={options => setTap(parseInt(options[0]))}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
                     </VContainer>
                 }
                 <VContainer>
@@ -372,15 +374,15 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 <label>
                                     {nls.localize('vuengine/editors/vsuSandbox/length', 'Length')}
                                 </label>
-                                <select
-                                    className="theia-select"
-                                    value={channel?.interval?.value ?? 0}
-                                    onChange={e => setInterval(parseInt(e.target.value))}
-                                >
-                                    {VSU_INTERVAL_VALUES.map((intv, i) =>
-                                        <option value={i}>{intv} ms</option>
-                                    )}
-                                </select>
+                                <AdvancedSelect
+                                    options={VSU_INTERVAL_VALUES.map((intv, i) => ({
+                                        label: `${intv} ms`,
+                                        value: i.toString(),
+                                    }))}
+                                    defaultValue={channel?.interval?.value?.toString() ?? '0'}
+                                    onChange={options => setInterval(parseInt(options[0]))}
+                                    commands={INPUT_BLOCKING_COMMANDS}
+                                />
                             </VContainer>
                         }
                     </HContainer>
@@ -433,15 +435,15 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     <label>
                                         {nls.localize('vuengine/editors/vsuSandbox/stepTime', 'Step Time')}
                                     </label>
-                                    <select
-                                        className="theia-select"
-                                        value={channel?.envelope?.stepTime ?? 0}
-                                        onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
-                                    >
-                                        {VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
-                                            <option value={i}>{st} ms</option>
-                                        )}
-                                    </select>
+                                    <AdvancedSelect
+                                        options={VSU_ENVELOPE_STEP_TIME_VALUES.map((intv, i) => ({
+                                            label: `${intv} ms`,
+                                            value: i.toString(),
+                                        }))}
+                                        defaultValue={channel?.envelope?.stepTime?.toString() ?? '0'}
+                                        onChange={options => setEnvelopeStepTime(parseInt(options[0]))}
+                                        commands={INPUT_BLOCKING_COMMANDS}
+                                    />
                                 </VContainer>
                                 <VContainer>
                                     <label>
@@ -510,14 +512,18 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         <label>
                                             {nls.localize('vuengine/editors/vsuSandbox/clockFrequency', 'Clock Frequency')}
                                         </label>
-                                        <select
-                                            className="theia-select"
-                                            value={channel?.sweepMod?.frequency ?? 0}
-                                            onChange={e => setSweepModulationFrequency(parseInt(e.target.value))}
-                                        >
-                                            <option value="0">0.96 ms</option>
-                                            <option value="1">7.68 ms</option>
-                                        </select>
+                                        <AdvancedSelect
+                                            options={[{
+                                                label: '0.96 ms',
+                                                value: '0',
+                                            }, {
+                                                label: '7.68 ms',
+                                                value: '1',
+                                            }]}
+                                            defaultValue={channel?.sweepMod?.frequency?.toString() ?? '0'}
+                                            onChange={options => setSweepModulationFrequency(parseInt(options[0]))}
+                                            commands={INPUT_BLOCKING_COMMANDS}
+                                        />
                                     </VContainer>
                                     <VContainer>
                                         <label>

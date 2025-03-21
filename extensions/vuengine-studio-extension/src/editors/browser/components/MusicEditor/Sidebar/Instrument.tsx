@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import Range from '../../Common/Base/Range';
@@ -351,7 +351,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     <label>
                         {nls.localizeByDefault('Type')}
                     </label>
-                    <BasicSelect
+                    <AdvancedSelect
                         options={[{
                             label: nls.localize('vuengine/editors/music/wave', 'Wave'),
                             value: MusicEditorChannelType.WAVE,
@@ -363,10 +363,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             label: nls.localize('vuengine/editors/music/noise', 'Noise'),
                             value: MusicEditorChannelType.NOISE,
                         }]}
-                        value={instrument?.type}
-                        onChange={e => setType(e.currentTarget.value as MusicEditorChannelType)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        defaultValue={instrument?.type}
+                        onChange={options => setType(options[0] as MusicEditorChannelType)}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={96}
                     />
                 </VContainer>
             </HContainer>
@@ -452,6 +452,7 @@ Longer durations can be achieved with the "Note Cut" effect.'
                     min={0}
                     setValue={updateInterval}
                     commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                    selectWidth={96}
                 />
             </VContainer>
             {
@@ -465,16 +466,15 @@ Longer durations can be achieved with the "Note Cut" effect.'
 Different bits will produce pseudorandom bit sequences of different lengths before the sequences repeat.'
                         )}
                     />
-                    <BasicSelect
+                    <AdvancedSelect
                         options={Object.keys(VSU_NOISE_TAP).map((tl, i) => ({
                             label: `${nls.localize('vuengine/editors/music/bit', 'Bit')} ${VSU_NOISE_TAP[i][0]}, ` +
                                 `${nls.localize('vuengine/editors/music/sequenceLength', 'Sequence Length')}: ${VSU_NOISE_TAP[i][1]}`,
-                            value: i,
+                            value: i.toString(),
                         }))}
-                        value={instrument?.tap}
-                        onChange={e => setTap(parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        defaultValue={instrument?.tap?.toString()}
+                        onChange={options => setTap(parseInt(options[0]))}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
             }
@@ -522,6 +522,7 @@ a pre-configured value and repeat the grow/decay process. '
                                         value: i,
                                         label: `${st} ms`,
                                     }))}
+                                    selectWidth={80}
                                 />
                             </VContainer>
                             <VContainer>
@@ -639,7 +640,7 @@ from the first modulation value. '
                                     </label>
                                     <input
                                         className='theia-input'
-                                        style={{ width: 72 }}
+                                        style={{ width: 48 }}
                                         type='number'
                                         min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
                                         max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
@@ -722,19 +723,19 @@ from the first modulation value. '
                     {nls.localize('vuengine/editors/music/try', 'Try')}
                 </label>
                 <InputWithAction>
-                    <BasicSelect
+                    <AdvancedSelect
                         options={Object.keys(NOTES).map((n, i) => ({
                             label: n,
-                            value: i,
+                            value: i.toString(),
                         }))}
-                        value={instrumentTestingNote}
-                        onChange={e => {
-                            const noteId = parseInt(e.currentTarget.value);
+                        defaultValue={instrumentTestingNote.toString()}
+                        onChange={options => {
+                            const noteId = parseInt(options[0]);
                             setTestingNote(Object.values(NOTES)[noteId]);
                             setInstrumentTestingNote(noteId);
                         }}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        menuPlacement="top"
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className={`theia-button ${testing ? 'primary' : 'secondary'}`}

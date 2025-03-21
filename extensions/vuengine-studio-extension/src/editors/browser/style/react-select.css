@@ -8,6 +8,10 @@
     padding: 1px 3px;
 }
 
+.react-select-container {
+    flex-grow: 1;
+}
+
 .react-select-container .react-select__control--is-focused {
     outline: 1px solid var(--theia-button-background) !important;
     outline-offset: -1px;
@@ -25,7 +29,7 @@
 }
 
 .react-select__input-container {
-    padding: 0 4px;
+    padding: 0;
 }
 
 .react-select__input {
@@ -43,7 +47,7 @@
 }
 
 .react-select__indicator {
-    padding: 0px 4px;
+    padding: 0px 2px;
 }
 
 .react-select__clear-indicator {
@@ -67,6 +71,7 @@
     border-radius: 0 0 2px 2px;
     outline: 1px solid var(--theia-button-background);
     outline-offset: -1px;
+    z-index: 1000 !important;
 }
 
 .react-select__option {
@@ -76,6 +81,10 @@
 
 .react-select__option--is-focused {
     background-color: var(--theia-list-activeSelectionBackground);
+}
+
+.react-select__option--is-disabled {
+    opacity: .2;
 }
 
 .react-select__menu-notice {

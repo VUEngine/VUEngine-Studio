@@ -1,4 +1,4 @@
-import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import { nls, QuickPickItem } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { PluginConfigurationDataType } from '../../../../plugins/browser/ves-plugins-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
-import MultiSelect from '../Common/Base/MultiSelect';
+import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import VContainer from '../Common/Base/VContainer';
 import PluginConfiguration from './PluginConfiguration';
 import { PluginConfigurationData, PluginFileData, PluginFileTranslatedField } from './PluginFileEditorTypes';
@@ -279,7 +279,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
             <label>
                 {nls.localizeByDefault('Dependencies')}
             </label>
-            <MultiSelect
+            <AdvancedSelect
                 options={availablePlugins?.map(d => ({
                     label: d,
                     value: d,
@@ -287,6 +287,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 defaultValue={data.dependencies}
                 onChange={options => setDependencies(options)}
                 placeholder='No dependencies'
+                multi
             />
         </VContainer>
         <VContainer>

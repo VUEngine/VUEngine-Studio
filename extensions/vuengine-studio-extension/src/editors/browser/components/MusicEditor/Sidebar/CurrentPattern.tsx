@@ -3,13 +3,13 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, PatternConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import Input from '../../Common/Base/Input';
 
 interface CurrentPatternProps {
     songData: SongData
@@ -71,17 +71,15 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 {nls.localize('vuengine/editors/music/currentPattern', 'Current Pattern')}
             </label>
             <InputWithAction>
-                <select
-                    className='theia-select'
-                    value={currentPatternId}
-                    onChange={e => setCurrentPatternId(channel.id, parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    {channel.patterns.map((n, i) => (
-                        <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
-                    ))}
-                </select>
+                <AdvancedSelect
+                    options={channel.patterns.map((n, i) => ({
+                        label: getName(i),
+                        value: i.toString(),
+                    }))}
+                    defaultValue={currentPatternId.toString()}
+                    onChange={options => setCurrentPatternId(channel.id, parseInt(options[0]))}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
                 <InputWithActionButton
                     className='theia-button secondary'
                     title={nls.localizeByDefault('Remove')}
@@ -128,12 +126,15 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 <label>
                     {nls.localize('vuengine/editors/music/bar', 'Bar')}
                 </label>
-                <BasicSelect
-                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
-                    value={pattern.bar}
-                    onChange={e => setBar(e.target.value)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                <AdvancedSelect
+                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({
+                        label: v,
+                        value: v,
+                    }))}
+                    defaultValue={pattern.bar}
+                    onChange={options => setBar(options[0])}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    width={64}
                 />
             </VContainer>
         </HContainer>

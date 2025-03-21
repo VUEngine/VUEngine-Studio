@@ -1,7 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 import * as iq from 'image-q';
+import { AdvancedSelectOption } from 'src/editors/browser/components/Common/Base/AdvancedSelect';
 import { ColorMode } from '../../core/browser/ves-common-types';
-import { BasicSelectOption } from '../../editors/browser/components/Common/Base/BasicSelect';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
 export const DEFAULT_COLOR_DISTANCE_CALCULATOR = 'euclidean';
@@ -143,7 +143,7 @@ export interface ImageProcessingSettings {
   invert?: boolean,
 }
 
-export const DISTANCE_CALCULATOR_OPTIONS: BasicSelectOption[] = [
+export const DISTANCE_CALCULATOR_OPTIONS: AdvancedSelectOption[] = [
   {
     label: 'CIE94',
     value: 'cie94-graphic-arts'
@@ -186,7 +186,7 @@ export const DISTANCE_CALCULATOR_OPTIONS: BasicSelectOption[] = [
   },
 ];
 
-export const IMAGE_QUANTIZATION_ALGORITHM_OPTIONS: BasicSelectOption[] = [
+export const IMAGE_QUANTIZATION_ALGORITHM_OPTIONS: AdvancedSelectOption[] = [
   {
     label: 'Floyd-Steinberg',
     value: 'floyd-steinberg'

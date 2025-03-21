@@ -1,6 +1,5 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -14,6 +13,7 @@ import {
     STACK_HEADROOM_MAX_VALUE,
     STACK_HEADROOM_MIN_VALUE,
 } from '../EngineConfigEditorTypes';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 
 interface EngineConfigDebugProps {
     data: EngineConfigData
@@ -79,13 +79,13 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
                         label={nls.localize('vuengine/editors/engineConfig/debug/showDiagnostics', 'Show Diagnostics')}
                     />
                     <div style={{ width: 200 }}>
-                        <BasicSelect
+                        <AdvancedSelect
                             options={Object.values(Diagnostics).map(d => ({
                                 value: d,
                                 label: DIAGNOSTICS_LABELS[d] ?? d,
                             }))}
-                            value={data.debug?.diagnostics ?? Diagnostics.NONE}
-                            onChange={e => setDiagnostics(e.target.value as Diagnostics)}
+                            defaultValue={data.debug?.diagnostics ?? Diagnostics.NONE}
+                            onChange={options => setDiagnostics(options[0] as Diagnostics)}
                         />
                     </div>
                 </VContainer>

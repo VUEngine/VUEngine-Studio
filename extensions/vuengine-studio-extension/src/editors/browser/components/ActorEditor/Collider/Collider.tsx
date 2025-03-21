@@ -5,7 +5,7 @@ import { ProjectContributor } from '../../../../../project/browser/ves-project-t
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
-import MultiSelect, { MultiSelectOption } from '../../Common/Base/MultiSelect';
+import AdvancedSelect, { AdvancedSelectOption } from '../../Common/Base/AdvancedSelect';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import Rotation from '../../Common/Rotation';
@@ -154,8 +154,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
-    const getColliderLayerOptions = (): MultiSelectOption[] => {
-        const options: MultiSelectOption[] = [];
+    const getColliderLayerOptions = (): AdvancedSelectOption[] => {
+        const options: AdvancedSelectOption[] = [];
 
         // get all colliders from all contributors
         let clayers: Record<string, string> = {};
@@ -248,7 +248,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         <label>
                             {nls.localizeByDefault('Type')}
                         </label>
-                        <SelectComponent
+                        <AdvancedSelect
                             options={[{
                                 value: ColliderType.Ball,
                                 label: nls.localize('vuengine/editors/actor/colliderTypeBall', 'Ball'),
@@ -263,7 +263,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 label: nls.localize('vuengine/editors/actor/colliderTypeLineField', 'LineField'),
                             }]}
                             defaultValue={collider.type}
-                            onChange={option => setType(option.value as ColliderType)}
+                            onChange={option => setType(option[0] as ColliderType)}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </VContainer>
                     <VContainer>
@@ -287,11 +288,12 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </label>
                     <HContainer>
                         <VContainer grow={1}>
-                            <MultiSelect
+                            <AdvancedSelect
                                 defaultValue={collider.layers}
                                 onChange={options => setColliderLayers(options)}
                                 options={colliderLayerOptions}
-                            // onCreateOption={options => console.log(options)}
+                                // onCreateOption={options => console.log(options)}
+                                multi
                             />
                         </VContainer>
                         <button
@@ -531,12 +533,13 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         </label>
                         <HContainer>
                             <VContainer grow={1}>
-                                <MultiSelect
+                                <AdvancedSelect
                                     defaultValue={collider.layersToCheck}
                                     onChange={options => setColliderLayersToCheck(options)}
                                     options={colliderLayerOptions}
+                                    // onCreateOption={options => console.log(options)}
                                     menuPlacement='top'
-                                // onCreateOption={options => console.log(options)}
+                                    multi
                                 />
                             </VContainer>
                             <button

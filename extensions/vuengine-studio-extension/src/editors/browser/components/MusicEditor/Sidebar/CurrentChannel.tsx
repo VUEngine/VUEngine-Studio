@@ -1,20 +1,19 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import HoverInfo from '../../Common/HoverInfo';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import InfoLabel from '../../Common/InfoLabel';
 
 interface CurrentChannelProps {
     songData: SongData
     currentChannelId: number
     setCurrentChannelId: (channelId: number) => void
-    toggleChannelMuted: (channelId: number) => void
-    toggleChannelSolo: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     setCurrentInstrument: Dispatch<SetStateAction<number>>
     setSidebarTab: Dispatch<SetStateAction<number>>
@@ -25,8 +24,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
     const {
         songData,
         currentChannelId, setCurrentChannelId,
-        toggleChannelMuted,
-        toggleChannelSolo,
         setChannel,
         setCurrentInstrument,
         setSidebarTab,
@@ -57,49 +54,47 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                 <label>
                     {nls.localize('vuengine/editors/music/currentChannel', 'Current Channel')}
                 </label>
-                <BasicSelect
+                <AdvancedSelect
                     options={[{
                         label: `1: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 1`,
-                        value: 0,
+                        value: '0',
                     }, {
                         label: `2: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 2`,
-                        value: 1,
+                        value: '1',
                     }, {
                         label: `3: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 3`,
-                        value: 2,
+                        value: '2',
                     }, {
                         label: `4: ${nls.localize('vuengine/editors/music/wave', 'Wave')} 4`,
-                        value: 3,
+                        value: '3',
                     }, {
                         label: `5: ${nls.localize('vuengine/editors/music/sweepModulation', 'Sweep / Modulation')}`,
-                        value: 4,
+                        value: '4',
                     }, {
                         label: `6: ${nls.localize('vuengine/editors/music/noise', 'Noise')}`,
-                        value: 5,
+                        value: '5',
                     }]}
-                    value={channel.id}
-                    onChange={e => setCurrentChannelId(parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    defaultValue={`${channel.id}`}
+                    onChange={options => setCurrentChannelId(parseInt(options[0]))}
+                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
 
-            <HContainer alignItems='end' gap={20}>
+            <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>
                         {nls.localize('vuengine/editors/music/instrument', 'Instrument')}
                     </label>
                     <InputWithAction>
-                        <BasicSelect
+                        <AdvancedSelect
                             options={songData.instruments.map((n, i) => ({
-                                value: i,
+                                value: `${i}`,
                                 label: `${i + 1}: ${n.name}`,
                                 disabled: n.type !== channel.type,
                             }))}
-                            value={channel.instrument}
-                            onChange={e => setChannelInstrument(parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            defaultValue={`${channel.instrument}`}
+                            onChange={options => setChannelInstrument(parseInt(options[0]))}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <InputWithActionButton
                             className='theia-button secondary'
@@ -112,52 +107,22 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         </InputWithActionButton>
                     </InputWithAction>
                 </VContainer>
-            </HContainer>
-            <HContainer gap={10} justifyContent='space-between'>
                 <VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={channel.allowSkip}
-                            onChange={() => toggleChannelAllowSkip()}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        {nls.localize('vuengine/editors/music/skip', 'Skip')}
-                        <HoverInfo
-                            value={nls.localize(
-                                'vuengine/editors/music/allowSkipDescription',
-                                'Allow to skip notes during play back if no sound source is available when requested.'
-                            )}
-                        />
-                    </label>
+                    <InfoLabel
+                        label={nls.localize('vuengine/editors/music/skip', 'Skip')}
+                        tooltip={nls.localize(
+                            'vuengine/editors/music/allowSkipDescription',
+                            'Allow to skip notes during play back if no sound source is available when requested.'
+                        )}
+                    />
+                    <input
+                        type="checkbox"
+                        checked={channel.allowSkip}
+                        onChange={() => toggleChannelAllowSkip()}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
                 </VContainer>
-                <HContainer gap={10}>
-                    <VContainer>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={channel.muted}
-                                onChange={() => toggleChannelMuted(channel.id)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            {nls.localize('vuengine/editors/music/muted', 'Muted')}
-                        </label>
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={channel.solo}
-                                onChange={() => toggleChannelSolo(channel.id)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            {nls.localize('vuengine/editors/music/solo', 'Solo')}
-                        </label>
-                    </VContainer>
-                </HContainer>
             </HContainer>
         </VContainer>
     );

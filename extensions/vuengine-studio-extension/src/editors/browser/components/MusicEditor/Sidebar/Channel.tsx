@@ -8,8 +8,6 @@ interface ChannelProps {
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    toggleChannelMuted: (channelId: number) => void
-    toggleChannelSolo: (channelId: number) => void
     setCurrentInstrument: Dispatch<SetStateAction<number>>
     setSidebarTab: Dispatch<SetStateAction<number>>
 }
@@ -19,8 +17,6 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         songData,
         currentChannelId, setCurrentChannelId,
         setChannel,
-        toggleChannelMuted,
-        toggleChannelSolo,
         setCurrentInstrument,
         setSidebarTab,
     } = props;
@@ -31,8 +27,6 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 songData={songData}
                 currentChannelId={currentChannelId}
                 setCurrentChannelId={setCurrentChannelId}
-                toggleChannelMuted={toggleChannelMuted}
-                toggleChannelSolo={toggleChannelSolo}
                 setChannel={setChannel}
                 setCurrentInstrument={setCurrentInstrument}
                 setSidebarTab={setSidebarTab}

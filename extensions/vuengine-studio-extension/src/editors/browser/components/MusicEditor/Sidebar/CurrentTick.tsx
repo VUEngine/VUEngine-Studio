@@ -1,14 +1,14 @@
 import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import VContainer from '../../Common/Base/VContainer';
+import { clamp } from '../../Common/Utils';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEvent, NOTES, SINGLE_NOTE_TESTING_DURATION, SongData } from '../MusicEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 import Effect from './Effect';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
-import { clamp } from '../../Common/Utils';
 
 interface CurrentNoteProps {
     songData: SongData
@@ -138,34 +138,28 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     {nls.localize('vuengine/editors/music/note', 'Note')}
                 </label>
                 <InputWithAction>
-                    <BasicSelect
+                    <AdvancedSelect
                         options={[
                             {
-                                value: undefined,
+                                value: 'undefined',
                                 label: nls.localize('vuengine/editors/music/none', 'None'),
                             },
                             ...Object.keys(NOTES).map((n, i) => ({
                                 label: n,
-                                value: i,
+                                value: i.toString(),
                             }))
                         ]}
-                        value={note}
-                        onChange={e => updateEvents(currentNote, MusicEvent.Note, parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        defaultValue={note === -1 ? 'undefined' : note?.toString() ?? 'undefined'}
+                        onChange={options => updateEvents(
+                            currentNote,
+                            MusicEvent.Note,
+                            options[0] === 'undefined'
+                                ? undefined
+                                : parseInt(options[0])
+                        )}
+                        menuPlacement="top"
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
-                    {/* <SelectComponent
-                        options={[{
-                            value: undefined,
-                            label: 'none'
-                        }].concat(Notes
-                            .map((n, i) => ({
-                                value: i.toString(),
-                                label: n.toString()
-                            })))}
-                        defaultValue={note?.toString() ?? undefined}
-                        onChange={option => setNote(currentNote, parseInt(option.value!))}
-                    /> */}
                     <InputWithActionButton
                         className={`theia-button ${testing ? 'primary' : 'secondary'}`}
                         title={nls.localize('vuengine/editors/music/try', 'Try')}

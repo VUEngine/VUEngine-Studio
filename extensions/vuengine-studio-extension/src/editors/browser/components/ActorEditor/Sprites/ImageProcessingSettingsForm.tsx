@@ -16,7 +16,6 @@ import {
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/Base/HContainer';
 import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
@@ -26,6 +25,7 @@ import Images from '../../ImageEditor/Images';
 import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import ColorModeSelect from './ColorModeSelect';
 import Range from '../../Common/Base/Range';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 
 const ReconvertButton = styled.button`
     background-color: transparent;
@@ -338,13 +338,14 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     <label>
                                         {nls.localize('vuengine/editors/general/quantizationAlgorithm', 'Quantization Algorithm')}
                                     </label>
-                                    <BasicSelect
+                                    <AdvancedSelect
                                         options={IMAGE_QUANTIZATION_ALGORITHM_OPTIONS}
-                                        value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                                        onChange={e => updateProcessingSettings({
-                                            imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
+                                        defaultValue={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                                        onChange={options => updateProcessingSettings({
+                                            imageQuantizationAlgorithm: options[0] as iq.ImageQuantization,
                                         })}
                                         disabled={!image}
+                                        menuPlacement="top"
                                     />
                                 </VContainer>
                                 <VContainer>
@@ -367,13 +368,14 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                         <label>
                                             {nls.localize('vuengine/editors/general/colorDistanceCalculator', 'Color Distance Calculator')}
                                         </label>
-                                        <BasicSelect
+                                        <AdvancedSelect
                                             options={DISTANCE_CALCULATOR_OPTIONS}
-                                            value={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
-                                            onChange={e => updateProcessingSettings({
-                                                distanceCalculator: e.target.value as iq.ColorDistanceFormula,
+                                            defaultValue={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
+                                            onChange={options => updateProcessingSettings({
+                                                distanceCalculator: options[0] as iq.ColorDistanceFormula,
                                             })}
                                             disabled={!image}
+                                            menuPlacement="top"
                                         />
                                     </VContainer>
                                 }

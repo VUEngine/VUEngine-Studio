@@ -1,16 +1,16 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
-import { DataSection } from '../../Common/CommonTypes';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/Base/RadioSelect';
-import SectionSelect from '../../Common/SectionSelect';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import { DataSection } from '../../Common/CommonTypes';
+import InfoLabel from '../../Common/InfoLabel';
+import SectionSelect from '../../Common/SectionSelect';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_TICK_DURATION, MIN_TICK_DURATION, NoteResolution, SongData } from '../MusicEditorTypes';
-import Range from '../../Common/Base/Range';
 
 interface SongProps {
     songData: SongData
@@ -98,12 +98,14 @@ export default function Song(props: SongProps): React.JSX.Element {
                 <label>
                     {nls.localize('vuengine/editors/music/defaultBar', 'Default Bar')}
                 </label>
-                <BasicSelect
-                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
-                    value={songData.defaultBar}
-                    onChange={e => setDefaultBar(e.target.value)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                <AdvancedSelect
+                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({
+                        label: v,
+                        value: v,
+                    }))}
+                    defaultValue={songData.defaultBar}
+                    onChange={options => setDefaultBar(options[0])}
+                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
             <VContainer>

@@ -8,6 +8,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
 import Instrument from './Instrument';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -103,15 +104,15 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         <VContainer>
             {nls.localize('vuengine/editors/music/instruments', 'Instruments')}
             <InputWithAction>
-                <select
-                    className='theia-select'
-                    value={currentInstrument}
-                    onChange={e => setCurrentInstrument(parseInt(e.target.value))}
-                >
-                    {songData.instruments.map((n, i) =>
-                        <option key={`instrument-select-${i}`} value={i}>{i + 1}: {n.name}</option>
-                    )}
-                </select>
+                <AdvancedSelect
+                    options={songData.instruments.map((n, i) => ({
+                        label: `${i + 1}: ${n.name}`,
+                        value: `${i}`,
+                    }))}
+                    defaultValue={`${currentInstrument}`}
+                    onChange={options => setCurrentInstrument(parseInt(options[0]))}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
                 <InputWithActionButton
                     className='theia-button secondary'
                     title={nls.localizeByDefault('Remove')}

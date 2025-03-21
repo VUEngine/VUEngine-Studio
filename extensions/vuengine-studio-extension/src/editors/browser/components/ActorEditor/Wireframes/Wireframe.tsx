@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import SortableList from 'react-easy-sort';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -156,7 +156,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <label>
                         {nls.localizeByDefault('Type')}
                     </label>
-                    <SelectComponent
+                    <AdvancedSelect
                         options={[{
                             value: WireframeType.Sphere,
                             label: nls.localize('vuengine/editors/actor/wireframeTypeAffine', 'Sphere'),
@@ -168,9 +168,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             label: nls.localize('vuengine/editors/actor/wireframeTypeAsterisk', 'Asterisk'),
                         }]}
                         defaultValue={wireframe.type}
-                        onChange={option => setType(option.value as WireframeType)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onChange={options => setType(options[0] as WireframeType)}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
