@@ -1300,6 +1300,7 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   // removes build cache for core to force rebuild
+  /*
   async cleanCore(): Promise<void> {
     const roots = this.workspaceService.tryGetRoots();
     const workspaceRootUri = roots[0].resource;
@@ -1330,6 +1331,7 @@ Beware! This is usually not necessary and will result in the next build taking l
       }
     }));
   }
+  */
 
   protected async deleteLibraryFiles(): Promise<void> {
     const buildPathUri = await this.getBuildPathUri();

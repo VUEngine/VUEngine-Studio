@@ -1,6 +1,7 @@
 import { nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
+import BasicSelect from '../../Common/Base/BasicSelect';
+import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -28,6 +29,7 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
             debug: {
                 ...(data.debug ?? {}),
                 diagnostics,
+                enableProfiler: false,
             }
         });
     };
@@ -55,36 +57,39 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
 
     return (
         <VContainer gap={15}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/engineConfig/debug/profiler', 'Profiler')}
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={data.debug?.enableProfiler ?? ENABLE_PROFILER_DEFAULT_VALUE}
-                        onChange={() => toggleEnableProfiler()}
-                    />
-                    {nls.localizeByDefault('Enable')}
-                </label>
-            </VContainer>
-            {!data.debug?.enableProfiler &&
+            <HContainer gap={25}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/engineConfig/debug/profiler', 'Profiler')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={data.debug?.enableProfiler ?? ENABLE_PROFILER_DEFAULT_VALUE}
+                            onChange={toggleEnableProfiler}
+                        />
+                        {nls.localizeByDefault('Enable')}
+                    </label>
+                </VContainer>
+                <VContainer style={{ alignSelf: 'center' }}>
+                    {nls.localizeByDefault('or')}
+                </VContainer>
                 <VContainer grow={1}>
                     <InfoLabel
                         label={nls.localize('vuengine/editors/engineConfig/debug/showDiagnostics', 'Show Diagnostics')}
                     />
                     <div style={{ width: 200 }}>
-                        <SelectComponent
+                        <BasicSelect
                             options={Object.values(Diagnostics).map(d => ({
                                 value: d,
                                 label: DIAGNOSTICS_LABELS[d] ?? d,
                             }))}
-                            defaultValue={data.debug?.diagnostics ?? Diagnostics.NONE}
-                            onChange={option => setDiagnostics(option.value as Diagnostics)}
+                            value={data.debug?.diagnostics ?? Diagnostics.NONE}
+                            onChange={e => setDiagnostics(e.target.value as Diagnostics)}
                         />
                     </div>
                 </VContainer>
-            }
+            </HContainer>
             <Input
                 label={nls.localize('vuengine/editors/engineConfig/debug/stackHeadroom', 'Stack Headroom')}
                 type="number"

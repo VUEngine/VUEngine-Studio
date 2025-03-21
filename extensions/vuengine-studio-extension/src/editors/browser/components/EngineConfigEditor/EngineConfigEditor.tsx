@@ -1,28 +1,27 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { nls } from '@theia/core';
+import React, { useState } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import {
     EngineConfigData
 } from './EngineConfigEditorTypes';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { nls } from '@theia/core';
 import EngineConfigAffine from './tabs/EngineConfigAffine';
 import EngineConfigAnimation from './tabs/EngineConfigAnimation';
 import EngineConfigBrightness from './tabs/EngineConfigBrightness';
-import EngineConfigTiles from './tabs/EngineConfigTiles';
 import EngineConfigDebug from './tabs/EngineConfigDebug';
 import EngineConfigExceptions from './tabs/EngineConfigExceptions';
 import EngineConfigFrameRate from './tabs/EngineConfigFrameRate';
 import EngineConfigMacros from './tabs/EngineConfigGameMacros';
 import EngineConfigMath from './tabs/EngineConfigMath';
-import EngineConfigOptics from './tabs/EngineConfigOptics';
 import EngineConfigMemoryPools from './tabs/EngineConfigMemoryPools';
+import EngineConfigOptics from './tabs/EngineConfigOptics';
 import EngineConfigPalettes from './tabs/EngineConfigPalettes';
 import EngineConfigPhysics from './tabs/EngineConfigPhysics';
 import EngineConfigSound from './tabs/EngineConfigSound';
-import EngineConfigWireframe from './tabs/EngineConfigWireframe';
-import EngineConfigSram from './tabs/EngineConfigSram';
 import EngineConfigSprite from './tabs/EngineConfigSprite';
+import EngineConfigSram from './tabs/EngineConfigSram';
 import EngineConfigTexture from './tabs/EngineConfigTexture';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import EngineConfigTiles from './tabs/EngineConfigTiles';
+import EngineConfigWireframe from './tabs/EngineConfigWireframe';
 
 interface EngineConfigEditorProps {
     data: EngineConfigData
@@ -31,12 +30,7 @@ interface EngineConfigEditorProps {
 
 export default function EngineConfigEditor(props: EngineConfigEditorProps): React.JSX.Element {
     const { data, updateData } = props;
-    const { services, setSaveCallback } = useContext(EditorsContext) as EditorsContextType;
     const [sidebarTab, setSidebarTab] = useState<number>(0);
-
-    useEffect(() => {
-        setSaveCallback(() => services.vesBuildService.cleanCore());
-    }, []);
 
     return (
         <Tabs
