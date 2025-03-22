@@ -576,7 +576,7 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
                             }
                         </VContainer>
                     </Sidebar>
-                </DashboardContainer >
+                </DashboardContainer>
             }
         </>
     );

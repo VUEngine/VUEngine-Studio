@@ -22,6 +22,7 @@ export const InputWithAction = styled.div`
 export const InputWithActionButton = styled.button`
     align-items: center;
     display: flex;
+    justify-content: center;
     margin: 0;
     min-width: 26px !important;
     padding: 0;

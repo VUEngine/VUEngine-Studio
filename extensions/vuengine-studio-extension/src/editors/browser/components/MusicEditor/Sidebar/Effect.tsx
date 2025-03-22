@@ -92,6 +92,21 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                 />
             }
 
+            {(
+                event === MusicEvent.NoteCut ||
+                event === MusicEvent.PortamentoDown ||
+                event === MusicEvent.PortamentoUp
+            ) &&
+                <Range
+                    value={value}
+                    max={255}
+                    min={0}
+                    setValue={setValue}
+                    width="100%"
+                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                />
+            }
+
             {event === MusicEvent.Instrument &&
                 <VContainer>
                     <AdvancedSelect

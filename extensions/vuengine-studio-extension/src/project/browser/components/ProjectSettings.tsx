@@ -35,8 +35,10 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
             const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
             const newFileUri = workspaceRootUri.resolve('config').resolve(type.file);
 
-            const data = await services.vesProjectService.getSchemaDefaults(type);
-            await services.fileService.create(newFileUri, stringify(data));
+            if (!(await services.fileService.exists(newFileUri))) {
+                const data = await services.vesProjectService.getSchemaDefaults(type);
+                await services.fileService.create(newFileUri, stringify(data));
+            }
 
             openEditor(newFileUri);
         }
