@@ -1,8 +1,9 @@
 import { nls, QuickPickItem } from '@theia/core';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React, { useContext, useEffect } from 'react';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { StyledAddPatternButton } from './StyledComponents';
+import { MusicEditorCommands } from '../MusicEditorCommands';
 
 interface AddPatternProps {
     songData: SongData
@@ -15,7 +16,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { songData, channel, setChannel, setCurrentPatternId } = props;
 
-    const addToSequence = async (channelId: number, patternId: number): Promise<void> => {
+    const addPatternToSequence = async (channelId: number, patternId: number): Promise<void> => {
         const updatedChannel = {
             ...songData.channels[channelId],
             sequence: [
@@ -58,9 +59,24 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const addPattern = async (): Promise<void> => {
         const patternToAdd = await showPatternSelection();
         if (patternToAdd && patternToAdd.id) {
-            addToSequence(channel.id, parseInt(patternToAdd.id));
+            addPatternToSequence(channel.id, parseInt(patternToAdd.id));
         }
     };
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case MusicEditorCommands.ADD_PATTERN.id:
+                addPattern();
+                break;
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, []);
 
     return (
         <StyledAddPatternButton

@@ -1,9 +1,11 @@
 import { nls } from '@theia/core';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { SortableItem } from 'react-easy-sort';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
+import { MusicEditorCommands } from '../MusicEditorCommands';
 import { CHANNEL_BG_COLORS, ChannelConfig, MusicEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
 import { StyledPattern, StyledPatternRemove } from './StyledComponents';
 
@@ -72,6 +74,25 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             ],
         });
     };
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case MusicEditorCommands.REMOVE_CURRENT_PATTERN.id:
+                removeFromSequence(currentChannelId, index);
+                break;
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, [
+        currentChannelId,
+        currentSequenceIndex,
+        songData,
+    ]);
 
     return (
         <SortableItem>
