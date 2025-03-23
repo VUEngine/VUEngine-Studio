@@ -3,7 +3,6 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import HoverInfo from '../../Common/HoverInfo';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';

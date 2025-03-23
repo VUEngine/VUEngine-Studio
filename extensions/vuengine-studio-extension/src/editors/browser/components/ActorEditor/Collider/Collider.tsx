@@ -1,5 +1,4 @@
 import { URI, nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
