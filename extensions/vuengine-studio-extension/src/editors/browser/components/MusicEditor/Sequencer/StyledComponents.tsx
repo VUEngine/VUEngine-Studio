@@ -209,23 +209,19 @@ export const StyledPattern = styled.div`
 `;
 
 export const StyledPatternRemove = styled.div`
-    background-color: var(--theia-secondaryButton-hoverBackground);
     cursor: pointer;
+    border-radius: 2px;
     display: none;
+    height: 10px;
+    line-height: 9px;
     position: absolute;
     right: 0;
     text-align: center;
     top: 0;
-    width: 14px;
-    bottom: 0;
-    line-height: 17px;
+    width: 10px;
 
     ${StyledPattern}.dragging & {
         display: none !important;
-    }
-
-    ${StyledPattern} &:hover {
-        background-color: var(--theia-focusBorder);
     }
 
     ${StyledPattern}:hover & {

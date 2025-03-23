@@ -37,7 +37,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     const isCurrent = currentChannelId === channel && currentPatternId === patternId;
     const noteColor = isCurrent ? '#fff' : CHANNEL_BG_COLORS[channel];
 
-    const patternNoteWidth = Math.max(0, 16 / songData.noteResolution);
+    const patternNoteWidth = Math.max(0, 8 / songData.noteResolution);
     const patternPixels: number[][][] = useMemo(() => {
         const result: number[][] = [[]];
 
