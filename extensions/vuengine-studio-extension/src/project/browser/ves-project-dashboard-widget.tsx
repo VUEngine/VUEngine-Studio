@@ -19,10 +19,14 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import ProjectDashboard from './components/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
@@ -64,12 +68,20 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     protected readonly statusBar: StatusBar;
     @inject(ThemeService)
     protected readonly themeService: ThemeService;
+    @inject(VesBuildPathsService)
+    protected readonly vesBuildPathsService: VesBuildPathsService;
     @inject(VesBuildService)
     protected readonly vesBuildService: VesBuildService;
+    @inject(VesCodeGenService)
+    protected readonly vesCodeGenService: VesCodeGenService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesImagesService)
     protected readonly vesImagesService: VesImagesService;
+    @inject(VesProcessService)
+    protected readonly vesProcessService: VesProcessService;
+    @inject(VesProcessWatcher)
+    protected readonly vesProcessWatcher: VesProcessWatcher;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -196,9 +208,13 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
                             themeService: this.themeService,
+                            vesBuildPathsService: this.vesBuildPathsService,
                             vesBuildService: this.vesBuildService,
+                            vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
+                            vesProcessService: this.vesProcessService,
+                            vesProcessWatcher: this.vesProcessWatcher,
                             vesProjectService: this.vesProjectService,
                             vesRumblePackService: this.vesRumblePackService,
                             windowService: this.windowService,

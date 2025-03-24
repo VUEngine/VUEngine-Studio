@@ -28,7 +28,7 @@ import {
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction,
-} from '../../VsuEmulator/VsuEmulatorTypes';
+} from '../../Emulator/VsuTypes';
 import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, MusicEditorChannelType, NOTES, SongData } from '../MusicEditorTypes';
@@ -49,6 +49,7 @@ interface InstrumentProps {
     setTestingNote: Dispatch<SetStateAction<number>>
     setTestingInstrument: Dispatch<SetStateAction<number>>
     setTestingChannel: Dispatch<SetStateAction<number>>
+    emulatorInitialized: boolean
 }
 
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
@@ -60,12 +61,12 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setWaveformDialogOpen, setModulationDataDialogOpen,
         playing,
         testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
+        emulatorInitialized,
     } = props;
     const [instrumentTestingNote, setInstrumentTestingNote] = useState<number>(59); // C4
 
     const instrument = songData.instruments[currentInstrument];
 
-    // TODO: why does changing the frequency have no effect on channel 5?
     const startTesting = () => {
         setTesting(true);
         setTestingDuration(0);
@@ -741,9 +742,9 @@ from the first modulation value. '
                         className={`theia-button ${testing ? 'primary' : 'secondary'}`}
                         title={nls.localize('vuengine/editors/music/try', 'Try')}
                         onClick={() => testing ? stopTesting() : startTesting()}
-                        disabled={playing}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        disabled={!emulatorInitialized || playing}
                     >
                         {testing
                             ? <i className='fa fa-stop' />

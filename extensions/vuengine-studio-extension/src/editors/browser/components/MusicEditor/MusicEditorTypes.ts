@@ -1,5 +1,5 @@
 import { DataSection } from '../Common/CommonTypes';
-import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from '../VsuEmulator/VsuEmulatorTypes';
+import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from '../Emulator/VsuTypes';
 
 export interface SongData {
     name: string

@@ -26,7 +26,7 @@ import {
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction
-} from '../VsuEmulator/VsuEmulatorTypes';
+} from '../Emulator/VsuTypes';
 import WaveformSelect from './WaveformSelect';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor/MusicEditor';

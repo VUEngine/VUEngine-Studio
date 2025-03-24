@@ -322,22 +322,25 @@ export class VesCodeGenService {
     );
   }
 
-  protected async renderTemplateToFile(
+  async renderTemplateToFile(
     templateId: string,
     targetUri: URI,
     templateString: string,
     data: object,
-    encoding: ProjectDataTemplateEncoding = ProjectDataTemplateEncoding.utf8
+    encoding: ProjectDataTemplateEncoding = ProjectDataTemplateEncoding.utf8,
+    silent?: boolean
   ): Promise<void> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     return new Promise((resolve, reject) => {
       nunjucks.renderString(templateString, data, (err, res) => {
         if (err) {
-          this.logLine(
-            `Failed to render template ${templateId}.Nunjucks output: ${err}`,
-            OutputChannelSeverity.Error
-          );
+          if (!silent === true) {
+            this.logLine(
+              `Failed to render template ${templateId}.Nunjucks output: ${err}`,
+              OutputChannelSeverity.Error
+            );
+          }
           reject();
         } else if (res) {
           const writeFile = () => {
@@ -346,7 +349,9 @@ export class VesCodeGenService {
               BinaryBuffer.wrap(iconv.encode(res, encoding))
             ).then(() => {
               const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
-              this.logLine(`Rendered template ${templateId} to ${p}.`);
+              if (!silent === true) {
+                this.logLine(`Rendered template ${templateId} to ${p}.`);
+              }
               resolve();
             });
           };
@@ -378,7 +383,7 @@ export class VesCodeGenService {
     }
   }
 
-  protected async getTemplateString(template: ProjectDataTemplate & WithContributor): Promise<string> {
+  async getTemplateString(template: ProjectDataTemplate & WithContributor): Promise<string> {
     let templateUri = template._contributorUri;
     const templatePathParts = template.template.split('/');
     templatePathParts.forEach(templatePathPart => {

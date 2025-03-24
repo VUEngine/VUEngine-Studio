@@ -5,7 +5,7 @@ import { nanoid } from '../../editors/browser/components/Common/Utils';
 import { Displays } from '../../editors/browser/components/Common/VUEngineTypes';
 import { createEmptyPixelData } from '../../editors/browser/components/PixelEditor/PixelEditor';
 import { DEFAULT_IMAGE_SIZE } from '../../editors/browser/components/PixelEditor/PixelEditorTypes';
-import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
+import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/Emulator/VsuTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';

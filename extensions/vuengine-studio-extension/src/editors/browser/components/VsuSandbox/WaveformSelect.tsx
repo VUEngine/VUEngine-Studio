@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import HContainer from '../Common/Base/HContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
-import { VSU_NUMBER_OF_WAVEFORM_BANKS } from '../VsuEmulator/VsuEmulatorTypes';
+import { VSU_NUMBER_OF_WAVEFORM_BANKS } from '../Emulator/VsuTypes';
 
 const WaveFormSelection = styled(HContainer)`
     outline: none !important;

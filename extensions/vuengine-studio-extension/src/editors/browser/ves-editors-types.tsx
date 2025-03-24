@@ -13,9 +13,13 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { createContext } from 'react';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 
@@ -31,9 +35,13 @@ export interface EditorsServices {
     preferenceService: PreferenceService
     quickPickService: QuickPickService
     themeService: ThemeService
+    vesBuildPathsService: VesBuildPathsService
     vesBuildService: VesBuildService
+    vesCodeGenService: VesCodeGenService
     vesCommonService: VesCommonService
     vesImagesService: VesImagesService
+    vesProcessService: VesProcessService,
+    vesProcessWatcher: VesProcessWatcher,
     vesProjectService: VesProjectService,
     vesRumblePackService: VesRumblePackService
     windowService: WindowService

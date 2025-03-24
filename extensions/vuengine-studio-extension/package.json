@@ -128,7 +128,8 @@
       "backend": "lib/emulator/node/ves-emulator-backend-module"
     },
     {
-      "frontend": "lib/editors/browser/ves-editors-frontend-module"
+      "frontend": "lib/editors/browser/ves-editors-frontend-module",
+      "backend": "lib/editors/node/ves-editors-backend-module"
     },
     {
       "frontend": "lib/export/browser/ves-export-frontend-module"

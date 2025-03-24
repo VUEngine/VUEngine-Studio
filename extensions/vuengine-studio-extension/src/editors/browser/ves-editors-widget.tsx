@@ -32,9 +32,13 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
@@ -90,12 +94,20 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly undoRedoService: UndoRedoService;
     @inject(VesBuildService)
     protected readonly vesBuildService: VesBuildService;
+    @inject(VesBuildPathsService)
+    protected readonly vesBuildPathsService: VesBuildPathsService;
+    @inject(VesCodeGenService)
+    protected readonly vesCodeGenService: VesCodeGenService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesImagesService)
     protected readonly vesImagesService: VesImagesService;
+    @inject(VesProcessService)
+    protected readonly vesProcessService: VesProcessService;
+    @inject(VesProcessWatcher)
+    protected readonly vesProcessWatcher: VesProcessWatcher;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -486,9 +498,13 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
                             themeService: this.themeService,
+                            vesBuildPathsService: this.vesBuildPathsService,
                             vesBuildService: this.vesBuildService,
+                            vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
+                            vesProcessService: this.vesProcessService,
+                            vesProcessWatcher: this.vesProcessWatcher,
                             vesProjectService: this.vesProjectService,
                             vesRumblePackService: this.vesRumblePackService,
                             windowService: this.windowService,

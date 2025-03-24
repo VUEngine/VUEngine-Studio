@@ -61,16 +61,19 @@ interface MusicEditorToolbarProps {
     stopPlaying: () => void
     tool: MusicEditorTool
     setTool: Dispatch<SetStateAction<MusicEditorTool>>
-    playbackElapsedTime: number
-    totalLength: number
+    emulatorInitialized: boolean
     speed: number
 }
 
 export default function MusicEditorToolbar(props: MusicEditorToolbarProps): React.JSX.Element {
     const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const {
-        currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool, playbackElapsedTime, totalLength, speed
+        currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool, speed, emulatorInitialized
     } = props;
+
+    // TODO: compute
+    const totalLength = 0;
+    const playbackElapsedTime = 0;
 
     return (
         <StyledMusicEditorToolbar>
@@ -103,6 +106,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     style={{ outlineWidth: playing ? 1 : 0 }}
+                    disabled={!emulatorInitialized}
                 >
                     <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
                 </StyledMusicEditorToolbarWideButton>
@@ -114,6 +118,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     onClick={stopPlaying}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    disabled={!emulatorInitialized}
                 >
                     <i className="fa fa-stop" />
                 </StyledMusicEditorToolbarButton>

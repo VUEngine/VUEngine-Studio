@@ -25,6 +25,7 @@ interface CurrentNoteProps {
     setTestingNote: (note: number) => void
     setTestingInstrument: (note: number) => void
     setTestingChannel: (channel: number) => void
+    emulatorInitialized: boolean
 }
 
 export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element {
@@ -35,6 +36,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
         updateEvents,
         playing,
         testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
+        emulatorInitialized,
     } = props;
 
     const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
@@ -166,7 +168,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                         onClick={() => testing ? stopTesting() : startTesting(note)}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        disabled={playing}
+                        disabled={!emulatorInitialized || playing}
                     >
                         {testing
                             ? <i className='fa fa-stop' />

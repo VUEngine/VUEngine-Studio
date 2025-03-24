@@ -6,6 +6,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
+import Emulator from '../Emulator/Emulator';
 import ModulationData from '../VsuSandbox/ModulationData';
 import { MusicEditorCommands } from './MusicEditorCommands';
 import MusicEditorToolbar from './MusicEditorToolbar';
@@ -22,7 +23,6 @@ import {
     SINGLE_NOTE_TESTING_DURATION,
     SongData
 } from './MusicEditorTypes';
-import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Channel from './Sidebar/Channel';
@@ -41,16 +41,32 @@ interface MusicEditorProps {
 }
 
 export const INPUT_BLOCKING_COMMANDS = [
+    MusicEditorCommands.ADD_EFFECT.id,
+    MusicEditorCommands.ADD_NOTE.id,
+    MusicEditorCommands.ADD_PATTERN.id,
+    MusicEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id,
+    MusicEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id,
     MusicEditorCommands.PLAY_PAUSE.id,
+    MusicEditorCommands.REMOVE_CURRENT_NOTE.id,
+    MusicEditorCommands.REMOVE_CURRENT_PATTERN.id,
+    MusicEditorCommands.SELECT_CHANNEL_1.id,
+    MusicEditorCommands.SELECT_CHANNEL_2.id,
+    MusicEditorCommands.SELECT_CHANNEL_3.id,
+    MusicEditorCommands.SELECT_CHANNEL_4.id,
+    MusicEditorCommands.SELECT_CHANNEL_5.id,
+    MusicEditorCommands.SELECT_CHANNEL_6.id,
+    MusicEditorCommands.SELECT_NEXT_CHANNEL.id,
+    MusicEditorCommands.SELECT_PREVIOUS_CHANNEL.id,
     MusicEditorCommands.STOP.id,
-    MusicEditorCommands.TOOL_PENCIL.id,
     MusicEditorCommands.TOOL_ERASER.id,
     MusicEditorCommands.TOOL_MARQUEE.id,
+    MusicEditorCommands.TOOL_PENCIL.id,
 ];
 
 export default function MusicEditor(props: MusicEditorProps): React.JSX.Element {
     const { songData, updateSongData } = props;
     const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
     const [testing, setTesting] = useState<boolean>(false);
     const [testingDuration, setTestingDuration] = useState<number>(0);
@@ -59,8 +75,6 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<MusicEditorTool>(MusicEditorTool.DEFAULT);
     const [editorMode, setEditorMode] = useState<MusicEditorMode>(MusicEditorMode.PIANOROLL);
-    const [playbackElapsedTime, setPlaybackElapsedTime] = useState<number>(0);
-    const [totalLength, setTotalLength] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
@@ -259,6 +273,12 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
             case MusicEditorCommands.TOOL_MARQUEE.id:
                 // setTool(MusicEditorTool.MARQUEE);
                 break;
+            case MusicEditorCommands.ADD_NOTE.id:
+                // TODO
+                break;
+            case MusicEditorCommands.ADD_EFFECT.id:
+                // TODO
+                break;
         }
     };
 
@@ -299,11 +319,12 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
 
     return (
         <HContainer className="musicEditor" overflow="hidden" style={{ padding: 0 }}>
-            <MusicPlayer
-                songData={songData}
+            <Emulator
+                playing={playing}
+                setEmulatorInitialized={setEmulatorInitialized}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
-                playing={playing}
+                songData={songData}
                 setPlaying={setPlaying}
                 testing={testing}
                 setTesting={setTesting}
@@ -313,11 +334,6 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 testingChannel={testingChannel}
                 playRangeStart={playRangeStart}
                 playRangeEnd={playRangeEnd}
-                currentPatternNoteOffset={currentPatternNoteOffset}
-                playbackElapsedTime={playbackElapsedTime}
-                setPlaybackElapsedTime={setPlaybackElapsedTime}
-                totalLength={totalLength}
-                setTotalLength={setTotalLength}
             />
             <VContainer gap={0} grow={1} overflow="hidden">
                 <MusicEditorToolbar
@@ -329,8 +345,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                     stopPlaying={stopPlaying}
                     tool={tool}
                     setTool={setTool}
-                    playbackElapsedTime={playbackElapsedTime}
-                    totalLength={totalLength}
+                    emulatorInitialized={emulatorInitialized}
                     speed={songData.speed}
                 />
                 {editorMode === MusicEditorMode.TRACKER
@@ -436,6 +451,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 setTestingNote={setTestingNote}
                                 setTestingInstrument={setTestingInstrument}
                                 setTestingChannel={setTestingChannel}
+                                emulatorInitialized={emulatorInitialized}
                             />
                         </VContainer>
                     </TabPanel>
@@ -455,6 +471,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 setTestingNote={setTestingNote}
                                 setTestingInstrument={setTestingInstrument}
                                 setTestingChannel={setTestingChannel}
+                                emulatorInitialized={emulatorInitialized}
                             />
                         </VContainer>
                     </TabPanel>
