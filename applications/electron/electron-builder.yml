@@ -27,6 +27,8 @@ files:
   - resources/icons/512x512.png
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web
+  - from: binaries/vuengine-studio-tools/vb
+    to: binaries/vuengine-studio-tools/vb
   - from: documentation
     to: documentation
   - from: templates
