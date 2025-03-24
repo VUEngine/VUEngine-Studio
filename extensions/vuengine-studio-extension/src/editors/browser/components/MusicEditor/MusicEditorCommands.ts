@@ -84,13 +84,13 @@ export namespace MusicEditorCommands {
         id: 'editors.musicEditor.addPattern',
         label: nls.localize('vuengine/editors/music/commands/addPattern', 'Add Pattern To Current Channel'),
         category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
-        keybinding: ['p', 'add'],
+        keybinding: ['shift+add', 'shift+plus'],
     };
     export const REMOVE_CURRENT_PATTERN: EditorCommand = {
         id: 'editors.musicEditor.removeCurrentPattern',
         label: nls.localize('vuengine/editors/music/commands/removeCurrentPattern', 'Remove Current Pattern From Sequence'),
         category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
-        keybinding: 'del',
+        keybinding: 'shift+del',
     };
     export const SELECT_NEXT_SEQUENCE_INDEX: EditorCommand = {
         id: 'editors.musicEditor.selectNextSequenceIndex',
@@ -115,5 +115,23 @@ export namespace MusicEditorCommands {
         label: nls.localize('vuengine/editors/music/commands/addEffect', 'Add Effect'),
         category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
         keybinding: 'f',
+    };
+    export const PIANO_ROLL_SELECT_NEXT_TICK: EditorCommand = {
+        id: 'editors.musicEditor.pianoRollSelectNextTick',
+        label: nls.localize('vuengine/editors/music/commands/pianoRollSelectNextTick', 'Piano Roll: Select Next Tick'),
+        category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
+        keybinding: 'right',
+    };
+    export const PIANO_ROLL_SELECT_PREVIOUS_TICK: EditorCommand = {
+        id: 'editors.musicEditor.pianoRollSelectPreviousTick',
+        label: nls.localize('vuengine/editors/music/commands/pianoRollSelectPreviousTick', 'Piano Roll: Select Previous Tick'),
+        category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
+        keybinding: 'left',
+    };
+    export const REMOVE_CURRENT_NOTE: EditorCommand = {
+        id: 'editors.musicEditor.removeCurrentNote',
+        label: nls.localize('vuengine/editors/music/commands/removeCurrentNote', 'Remove Current Note'),
+        category: nls.localize('vuengine/editors/music/commands/category', 'Music Editor'),
+        keybinding: 'del',
     };
 };

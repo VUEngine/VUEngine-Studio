@@ -1,10 +1,12 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 import { StyledPianoRoll } from './StyledComponents';
+import { MusicEditorCommands } from '../MusicEditorCommands';
 
 interface PianoRollProps {
     songData: SongData
@@ -70,6 +72,37 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             patternStartStep += patternSize;
         });
     }
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+
+            case MusicEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id:
+                const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
+                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+                if (currentTick < patternSize - 1) {
+                    setCurrentTick(currentTick + 1);
+                }
+                break;
+            case MusicEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id:
+                if (currentTick > 0) {
+                    setCurrentTick(currentTick - 1);
+                }
+                break;
+            case MusicEditorCommands.REMOVE_CURRENT_NOTE.id:
+                setNote(currentTick, undefined);
+                break;
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, [
+        songData,
+        currentTick,
+    ]);
 
     return <StyledPianoRoll
         className={classNames.join(' ')}
