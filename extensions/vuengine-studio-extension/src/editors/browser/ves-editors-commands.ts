@@ -2,7 +2,7 @@ import { Command } from '@theia/core';
 import { ActorEditorCommands } from './components/ActorEditor/ActorEditorCommands';
 import { CommonEditorCommands } from './components/Common/Editor/CommonEditorCommands';
 import { FontEditorCommands } from './components/FontEditor/FontEditorCommands';
-import { MusicEditorCommands } from './components/MusicEditor/MusicEditorCommands';
+import { SoundEditorCommands } from './components/SoundEditor/SoundEditorCommands';
 import { PixelEditorCommands } from './components/PixelEditor/PixelEditorCommands';
 import { EditorCommands } from './ves-editors-types';
 
@@ -63,6 +63,6 @@ export const EditorsCommands: EditorCommands[] = [
     ActorEditorCommands,
     CommonEditorCommands,
     FontEditorCommands,
-    MusicEditorCommands,
+    SoundEditorCommands,
     PixelEditorCommands,
 ];

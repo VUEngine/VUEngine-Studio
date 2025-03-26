@@ -1,6 +1,6 @@
 import React from 'react';
-import PianoRollKey from '../MusicEditor/PianoRoll/PianoRollKey';
-import { NOTES } from '../MusicEditor/MusicEditorTypes';
+import PianoRollKey from '../SoundEditor/PianoRoll/PianoRollKey';
+import { NOTES } from '../SoundEditor/SoundEditorTypes';
 
 interface PianoKeysProps {
     note: string

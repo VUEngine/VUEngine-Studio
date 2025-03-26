@@ -6,7 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import { clamp } from '../Common/Utils';
-import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from '../Emulator/VsuTypes';
+import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from '../SoundEditor/Emulator/VsuTypes';
 import Channel from './Channel';
 import ModulationData from './ModulationData';
 import Piano from './Piano';

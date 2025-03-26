@@ -1,5 +1,5 @@
 import React from 'react';
-import { NOTES } from '../MusicEditor/MusicEditorTypes';
+import { NOTES } from '../SoundEditor/SoundEditorTypes';
 import PianoKeys from './PianoKeys';
 
 interface PianoProps {

@@ -5,7 +5,10 @@ import RadioSelect from '../Common/Base/RadioSelect';
 import Range from '../Common/Base/Range';
 import VContainer from '../Common/Base/VContainer';
 import { clamp } from '../Common/Utils';
-import { NOTES } from '../MusicEditor/MusicEditorTypes';
+import { NOTES } from '../SoundEditor/SoundEditorTypes';
+import WaveformSelect from './WaveformSelect';
+import AdvancedSelect from '../Common/Base/AdvancedSelect';
+import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor/SoundEditor';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,
@@ -26,10 +29,7 @@ import {
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction
-} from '../Emulator/VsuTypes';
-import WaveformSelect from './WaveformSelect';
-import AdvancedSelect from '../Common/Base/AdvancedSelect';
-import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor/MusicEditor';
+} from '../SoundEditor/Emulator/VsuTypes';
 
 interface ChannelProps {
     index: number
@@ -485,7 +485,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             checked={channel?.sweepMod?.repeat ?? false}
                                             onChange={toggleSweepModulationRepeat}
                                         />
-                                        {nls.localize('vuengine/editors/music/repeat', 'Repeat')}
+                                        {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
                                     </label>
                                 }
                             </VContainer>

@@ -1,8 +1,8 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import { EditorsContext } from '../../ves-editors-types';
+import { VsuData } from '../../components/SoundEditor/Emulator/VsuTypes';
 import VsuSandbox from '../../components/VsuSandbox/VsuSandbox';
-import { VsuData } from '../../components/Emulator/VsuTypes';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesVsuSandboxControlProps {
     data: VsuData;
