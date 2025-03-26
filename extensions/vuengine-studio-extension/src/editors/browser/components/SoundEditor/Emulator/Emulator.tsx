@@ -1,4 +1,4 @@
-import { DisposableCollection, URI } from '@theia/core';
+import { DisposableCollection, isWindows, URI } from '@theia/core';
 import { Endpoint } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { VesBuildPreferenceIds } from '../../../../../build/browser/ves-build-preferences.js';
@@ -43,12 +43,76 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const init = async (): Promise<void> => {
+        console.log(' ');
+        console.log('  ');
+        console.log('========================');
+        console.log('--- 1) init() ---');
         await initTemplating();
         await initEmulator();
         setEmulatorInitialized(true);
+        console.log('--- 4) setEmulatorInitialized(true) ---');
+        console.log('========================');
+        console.log(' ');
+        console.log('  ');
+    };
+
+    const initTemplating = async (): Promise<void> => {
+        console.log('--- 2) initTemplating() ---');
+        await services.vesProjectService.projectDataReady;
+        const soundSpecTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
+        if (!soundSpecTemplate) {
+            console.error('could not find SoundSpec template');
+            return;
+        }
+        setSoundSpecTemplateString(await services.vesCodeGenService.getTemplateString(soundSpecTemplate));
+
+        const resourcesUri = await services.vesCommonService.getResourcesUri();
+        const waveFormsFileUri = resourcesUri.resolve('binaries/vuengine-studio-tools/vb/sound/WaveForms.h.njk');
+        const waveFormsFileContent = await services.fileService.readFile(waveFormsFileUri);
+        const waveFormsTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
+        if (!waveFormsTemplate) {
+            console.error('could not find WaveForms template');
+            return;
+        }
+        setWaveFormsTemplateString(waveFormsFileContent.value.toString());
+
+        const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
+        const randomDirName = nanoid();
+        const tempDir = tempDirBaseUri.resolve('SoundEditor').resolve(randomDirName);
+        setTempBaseDir(tempDir);
+    };
+
+    const initEmulator = async (): Promise<void> => {
+        console.log('--- 3) initEmulator() ---');
+        let VB;
+        try {
+            // bundled
+            VB = require('../../binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
+        } catch (e) {
+            // dev
+            VB = require('../../../../../../../../applications/electron/binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
+        }
+
+        const newCore = await VB.create({
+            audioUrl: new Endpoint({ path: '/shrooms/Audio.js' }).getRestUrl().toString(),
+            coreUrl: new Endpoint({ path: '/shrooms/Core.js' }).getRestUrl().toString(),
+            wasmUrl: new Endpoint({ path: '/shrooms/core.wasm' }).getRestUrl().toString(),
+        });
+        const newSim = await newCore.create();
+        await newSim.setVolume(2);
+
+        setCore(newCore);
+        setSim(newSim);
+    };
+
+    const createSoundRom = async (): Promise<void> => {
+        console.log('--- 2) createSoundRom ---');
+        await generateSpecFile();
+        await compileSpecFile();
     };
 
     const generateSpecFile = async (): Promise<void> => {
+        console.log('--- 3) generateSpecFile ---');
         const specFileUri = tempBaseDir?.resolve('SoundSpec.c');
         await services.vesCodeGenService.renderTemplateToFile(
             'SoundSpec',
@@ -77,6 +141,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const compileSpecFile = async (): Promise<void> => {
+        console.log('--- 4) compileSpecFile ---');
         const SpecFileUri = tempBaseDir?.resolve('SoundSpec.c');
 
         const useWsl = services.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
@@ -85,30 +150,47 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         const resourcesUri = await services.vesCommonService.getResourcesUri();
         const soundBaseUri = resourcesUri.resolve('binaries/vuengine-studio-tools/vb/sound');
 
-        const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, {
-            // TODO: Windows support
+        const args = isWindows ? {
+            command: (await services.vesBuildPathsService.getMsysBashUri()).path.fsPath(),
+            args: [
+                '--login',
+                '-c', [
+                    '-o', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
+                    '-nostartfiles',
+                    '-Tvb_release.ld',
+                    '-lm',
+                    '-I', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!),
+                    '-I', await services.vesBuildService.convertToEnvPath(false, soundBaseUri),
+                    await services.vesBuildService.convertToEnvPath(false, SpecFileUri!),
+                    '-L', await services.vesBuildService.convertToEnvPath(false, soundBaseUri),
+                    '-lcore', '-lsound', '-lcore',
+                ].join(' '),
+            ],
+        } : {
             command: compilerUri.resolve('bin/v810-gcc').path.fsPath(),
             args: [
                 '-o', tempBaseDir!.resolve('sound.elf').path.fsPath(),
                 '-nostartfiles',
                 '-Tvb_release.ld',
                 '-lm',
+                '-I', tempBaseDir!.path.fsPath(),
+                '-I', soundBaseUri.path.fsPath(),
                 SpecFileUri!.path.fsPath(),
+                '-L', soundBaseUri.path.fsPath(),
                 '-lcore', '-lsound', '-lcore',
             ],
-            options: {
-                cwd: soundBaseUri.path.fsPath(),
-                env: {
-                    C_INCLUDE_PATH: [
-                        tempBaseDir!.path.fsPath(),
-                        soundBaseUri.path.fsPath(),
-                    ].join(':'),
-                },
-            },
-        });
+        };
+
+        console.log('compile with args:', args);
+        const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, args);
+        console.log('processId:', processId);
+        console.log('processManagerId:', processManagerId);
+        console.log('set up event handler');
 
         setEventHandler(new DisposableCollection(
             services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
+                console.log('process exit event');
+                console.log('process ID:', pId);
                 if (processId === pId || processManagerId === pId) {
                     disposeEventHandlers();
                     objcopy();
@@ -118,12 +200,21 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const objcopy = async (): Promise<void> => {
-        const useWsl = services.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
-        const isWslInstalled = useWsl && services.vesCommonService.isWslInstalled;
-        const compilerUri = await services.vesBuildPathsService.getCompilerUri(isWslInstalled);
+        console.log('--- 5) objcopy ---');
+        const compilerUri = await services.vesBuildPathsService.getCompilerUri();
 
-        const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, {
-            // TODO: Windows support
+        const args = isWindows ? {
+            command: (await services.vesBuildPathsService.getMsysBashUri()).path.fsPath(),
+            args: [
+                '--login',
+                '-c', [
+                    '-O',
+                    'binary',
+                    await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
+                    await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.vb')),
+                ].join(' '),
+            ],
+        } : {
             command: compilerUri.resolve('bin/v810-objcopy').path.fsPath(),
             args: [
                 '-O',
@@ -131,10 +222,18 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 tempBaseDir!.resolve('sound.elf').path.fsPath(),
                 tempBaseDir!.resolve('sound.vb').path.fsPath(),
             ],
-        });
+        };
+
+        console.log('objcopy with args:', args);
+        const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, args);
+        console.log('processId:', processId);
+        console.log('processManagerId:', processManagerId);
+        console.log('set up event handler');
 
         setEventHandler(new DisposableCollection(
             services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
+                console.log('process exit event');
+                console.log('process ID:', pId);
                 if (processId === pId || processManagerId === pId) {
                     disposeEventHandlers();
                     loadRom();
@@ -144,63 +243,17 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const loadRom = async (): Promise<void> => {
+        console.log('--- 6) loadRom ---');
         const romFileUri = tempBaseDir!.resolve('sound.vb');
+        console.log('romFileUri:', romFileUri);
         const romFileContent = await services.fileService.readFile(romFileUri);
+        console.log('romFileContent:', romFileContent);
         await sim.setCartROM(romFileContent.value.buffer);
         await sim.reset();
         core.emulate(sim, true);
-    };
-
-    const createSoundRom = async (): Promise<void> => {
-        await generateSpecFile();
-        await compileSpecFile();
-    };
-
-    const initTemplating = async (): Promise<void> => {
-        await services.vesProjectService.projectDataReady;
-        const soundSpecTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
-        if (!soundSpecTemplate) {
-            console.error('could not find SoundSpec template');
-            return;
-        }
-        setSoundSpecTemplateString(await services.vesCodeGenService.getTemplateString(soundSpecTemplate));
-
-        const resourcesUri = await services.vesCommonService.getResourcesUri();
-        const waveFormsFileUri = resourcesUri.resolve('binaries/vuengine-studio-tools/vb/sound/WaveForms.h.njk');
-        const waveFormsFileContent = await services.fileService.readFile(waveFormsFileUri);
-        const waveFormsTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
-        if (!waveFormsTemplate) {
-            console.error('could not find WaveForms template');
-            return;
-        }
-        setWaveFormsTemplateString(waveFormsFileContent.value.toString());
-
-        const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
-        const randomDirName = nanoid();
-        const tempDir = tempDirBaseUri.resolve('SoundEditor').resolve(randomDirName);
-        setTempBaseDir(tempDir);
-    };
-
-    const initEmulator = async (): Promise<void> => {
-        let VB;
-        try {
-            // bundled
-            VB = require('../../binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
-        } catch (e) {
-            // dev
-            VB = require('../../../../../../../../applications/electron/binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
-        }
-
-        const newCore = await VB.create({
-            audioUrl: new Endpoint({ path: '/shrooms/Audio.js' }).getRestUrl().toString(),
-            coreUrl: new Endpoint({ path: '/shrooms/Core.js' }).getRestUrl().toString(),
-            wasmUrl: new Endpoint({ path: '/shrooms/core.wasm' }).getRestUrl().toString(),
-        });
-        const newSim = await newCore.create();
-        await newSim.setVolume(2);
-
-        setCore(newCore);
-        setSim(newSim);
+        console.log('========================');
+        console.log(' ');
+        console.log('  ');
     };
 
     const cleanUp = async (): Promise<void> => {
@@ -233,13 +286,25 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         }
 
         if (playing) {
+            console.log(' ');
+            console.log('  ');
+            console.log('========================');
+            console.log('--- 1) play ---');
+            console.log('compare checksums');
             const currentSongDataChecksum = window.electronVesCore.sha1(JSON.stringify(songData));
+            console.log('current:', currentSongDataChecksum);
+            console.log('previous:', songDataChecksum);
             if (songDataChecksum !== currentSongDataChecksum) {
+                console.log('checksums differ, compile song');
                 setProjectDataChecksum(currentSongDataChecksum);
                 setCurrentStep(0);
                 createSoundRom();
             } else {
+                console.log('checksums are the same, play song');
                 core.emulate(sim, true);
+                console.log('========================');
+                console.log(' ');
+                console.log('  ');
             }
         } else {
             core.suspend(sim);
