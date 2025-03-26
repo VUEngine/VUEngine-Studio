@@ -49,7 +49,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
 
     const value: AdvancedSelectOption[] = [];
     options.map(o => {
-        if (defaultValue && defaultValue.includes(o.value)) {
+        if (defaultValue && ((Array.isArray(defaultValue) && defaultValue.includes(o.value)) || defaultValue === o.value)) {
             value.push(o);
         }
     });
