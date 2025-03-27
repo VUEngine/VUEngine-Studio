@@ -1,7 +1,6 @@
 import { DisposableCollection, isWindows, URI } from '@theia/core';
 import { Endpoint } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { VesBuildPreferenceIds } from '../../../../../build/browser/ves-build-preferences.js';
 import { VesProcessType } from '../../../../../process/common/ves-process-service-protocol.js';
 import { ProjectDataTemplateEncoding } from '../../../../../project/browser/ves-project-types.js';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
@@ -144,9 +143,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         console.log('--- 4) compileSpecFile ---');
         const SpecFileUri = tempBaseDir?.resolve('SoundSpec.c');
 
-        const useWsl = services.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
-        const isWslInstalled = useWsl && services.vesCommonService.isWslInstalled;
-        const compilerUri = await services.vesBuildPathsService.getCompilerUri(isWslInstalled);
+        const compilerUri = await services.vesBuildPathsService.getCompilerUri(false);
         const resourcesUri = await services.vesCommonService.getResourcesUri();
         const soundBaseUri = resourcesUri.resolve('binaries/vuengine-studio-tools/vb/sound');
 
@@ -155,6 +152,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             args: [
                 '--login',
                 '-c', [
+                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-gcc')),
                     '-o', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
                     '-nostartfiles',
                     '-Tvb_release.ld',
@@ -195,7 +193,17 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                     disposeEventHandlers();
                     objcopy();
                 }
-            })
+            }),
+            services.vesProcessWatcher.onDidReceiveErrorStreamData(async ({ pId, data }) => {
+                console.log('process error event');
+                console.log('process ID:', pId);
+                console.log('data:', data);
+            }),
+            services.vesProcessWatcher.onDidReceiveOutputStreamData(async ({ pId, data }) => {
+                console.log('process data event');
+                console.log('process ID:', pId);
+                console.log('data:', data);
+            }),
         ));
     };
 
@@ -208,6 +216,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             args: [
                 '--login',
                 '-c', [
+                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-objcopy')),
                     '-O',
                     'binary',
                     await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
