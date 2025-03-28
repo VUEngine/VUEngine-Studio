@@ -152,7 +152,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             args: [
                 '--login',
                 '-c', [
-                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-gcc')),
+                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-gcc.exe')),
                     '-o', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
                     '-nostartfiles',
                     '-Tvb_release.ld',
@@ -216,7 +216,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             args: [
                 '--login',
                 '-c', [
-                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-objcopy')),
+                    await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-objcopy.exe')),
                     '-O',
                     'binary',
                     await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
