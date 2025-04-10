@@ -91,18 +91,27 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
-            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => this.generateFiles(this.shell.currentWidget as VesEditorsWidget),
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.generateFiles(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
-            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => this.openSource(this.shell.currentWidget as VesEditorsWidget),
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.openSource(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_GENERATED_FILES, {
             isEnabled: () => true,
-            isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => this.openGeneratedFiles(this.shell.currentWidget as VesEditorsWidget),
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.openGeneratedFiles(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
             isEnabled: () => true,
@@ -111,17 +120,23 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => {
-                (this.shell.currentWidget as VesEditorsWidget)?.undo();
-                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.UNDO.id);
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => {
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.undo();
+                w?.dispatchCommandEvent(CommonCommands.UNDO.id);
             }
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => {
-                (this.shell.currentWidget as VesEditorsWidget)?.redo();
-                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.REDO.id);
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => {
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.redo();
+                w?.dispatchCommandEvent(CommonCommands.REDO.id);
             }
         });
 
@@ -133,9 +148,24 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     category: command.category,
                 }, {
                     // enable and make visible only for the editors for which command is registered
-                    isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
-                    isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
-                    execute: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.dispatchCommandEvent(command.id),
+                    isEnabled: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands[command.id] === true;
+                    },
+                    isVisible: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands[command.id] === true;
+                    },
+                    execute: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        w?.dispatchCommandEvent(command.id);
+                    }
                 });
             });
         });
@@ -263,7 +293,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             // See also: line 144
             /*
             if (type.file?.startsWith('.')) {
-                const id = `editors.new - untitled.${ typeId }`;
+                const id = `editors.new-untitled.${ typeId }`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
                     id,
                     sortString: typeId,
@@ -274,7 +304,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
-                    commandId: `editors.new - file.${typeId}`,
+                    commandId: `editors.new-file.${typeId}`,
                     order: '-500',
                     when: type.forFiles.map(f => `explorerResourceExt == ${f}`).join(' || '),
                 });
