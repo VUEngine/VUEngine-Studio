@@ -157,7 +157,8 @@ export class VesCodeGenService {
     if (!type || !type.templates) {
       return [];
     }
-    const item = Object.values(this.vesProjectService.getProjectDataItemsForType(typeId) ?? {}).filter(i => i._fileUri.isEqual(itemUri));
+    const items = Object.values(this.vesProjectService.getProjectDataItemsForType(typeId) ?? {}).filter(i => i._fileUri.isEqual(itemUri));
+    const item = Array.isArray(items) && items.length ? items[0] : undefined;
     if (!item) {
       return [];
     }
