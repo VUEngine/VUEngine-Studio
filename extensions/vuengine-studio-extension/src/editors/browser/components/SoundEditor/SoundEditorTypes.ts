@@ -1,10 +1,12 @@
 import { DataSection } from '../Common/CommonTypes';
 import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
 
+export type InstrumentMap = Record<string, InstrumentConfig>;
+
 export interface SoundData {
     name: string
     channels: ChannelConfig[]
-    instruments: InstrumentConfig[]
+    instruments: InstrumentMap
     speed: number
     noteResolution: number
     loop: boolean
@@ -38,7 +40,7 @@ export interface PatternConfig {
 export interface ChannelConfig {
     id: number
     type: SoundEditorChannelType
-    instrument: number
+    instrument: string
     sequence: number[]
     patterns: PatternConfig[]
     allowSkip: boolean

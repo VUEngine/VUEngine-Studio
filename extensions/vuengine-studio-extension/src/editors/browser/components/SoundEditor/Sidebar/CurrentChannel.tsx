@@ -14,7 +14,7 @@ interface CurrentChannelProps {
     currentChannelId: number
     setCurrentChannelId: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    setCurrentInstrument: Dispatch<SetStateAction<number>>
+    setCurrentInstrument: Dispatch<SetStateAction<string>>
     setSidebarTab: Dispatch<SetStateAction<number>>
 }
 
@@ -30,9 +30,9 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
 
     const channel = songData.channels[currentChannelId];
 
-    const setChannelInstrument = (instrument: number): void => {
+    const setChannelInstrument = (instrumentId: string): void => {
         setChannel(currentChannelId, {
-            instrument,
+            instrument: instrumentId,
         });
     };
 
@@ -86,13 +86,16 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     </label>
                     <InputWithAction>
                         <AdvancedSelect
-                            options={songData.instruments.map((n, i) => ({
-                                value: `${i}`,
-                                label: `${i + 1}: ${n.name}`,
-                                disabled: n.type !== channel.type,
-                            }))}
+                            options={Object.keys(songData.instruments).map((instrumentId, i) => {
+                                const instrument = songData.instruments[instrumentId];
+                                return {
+                                    value: `${instrumentId}`,
+                                    label: `${i + 1}: ${instrument.name}`,
+                                    disabled: instrument.type !== channel.type,
+                                };
+                            })}
                             defaultValue={`${channel.instrument}`}
-                            onChange={options => setChannelInstrument(parseInt(options[0]))}
+                            onChange={options => setChannelInstrument(options[0])}
                             commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <InputWithActionButton

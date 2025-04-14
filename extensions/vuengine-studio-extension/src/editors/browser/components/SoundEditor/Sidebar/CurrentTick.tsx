@@ -23,7 +23,7 @@ interface CurrentNoteProps {
     setTesting: (testing: boolean) => void
     setTestingDuration: (note: number) => void
     setTestingNote: (note: number) => void
-    setTestingInstrument: (note: number) => void
+    setTestingInstrument: (instrument: string) => void
     setTestingChannel: (channel: number) => void
     emulatorInitialized: boolean
 }

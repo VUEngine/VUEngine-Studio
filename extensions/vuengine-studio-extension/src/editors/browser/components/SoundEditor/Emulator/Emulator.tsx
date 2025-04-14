@@ -18,7 +18,7 @@ interface EmulatorProps {
     setCurrentStep: Dispatch<SetStateAction<number>>
     testingDuration: number;
     testingNote: number;
-    testingInstrument: number;
+    testingInstrument: string;
     testingChannel: number;
     playRangeStart: number;
     playRangeEnd: number;

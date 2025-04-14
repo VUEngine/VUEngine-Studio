@@ -23,7 +23,7 @@ import {
     BAR_PATTERN_LENGTH_MULT_MAP,
     ChannelConfig,
     EventsMap,
-    InstrumentConfig,
+    InstrumentMap,
     NOTES,
     PatternConfig,
     SINGLE_NOTE_TESTING_DURATION,
@@ -71,7 +71,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testing, setTesting] = useState<boolean>(false);
     const [testingDuration, setTestingDuration] = useState<number>(0);
     const [testingNote, setTestingNote] = useState<number>(0);
-    const [testingInstrument, setTestingInstrument] = useState<number>(0);
+    const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
     const [editorMode, setEditorMode] = useState<SoundEditorMode>(SoundEditorMode.PIANOROLL);
@@ -80,12 +80,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<number>(0);
     const [currentTick, setCurrentTick] = useState<number>(0);
-    const [currentInstrument, setCurrentInstrument] = useState<number>(0);
+    const [currentInstrument, setCurrentInstrument] = useState<string>('');
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [sidebarTab, setSidebarTab] = useState<number>(0);
-    const [waveformDialogOpen, setWaveformDialogOpen] = useState<number>(-1);
-    const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<number>(-1);
+    const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
+    const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [lastSetNoteId, setLastSetNoteId] = useState<number>(-1);
 
     const updateNote = (index: number, note: number | undefined) => {
@@ -232,12 +232,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const setNote = (index: number, note: number | undefined): void =>
         updateEvents(index, SoundEvent.Note, note);
 
-    const setInstruments = (instruments: InstrumentConfig[]): void => {
+    const setInstruments = (instruments: InstrumentMap): void => {
         updateSongData({ ...songData, instruments });
     };
 
     const setInstrumentWaveForm = (waveform: string) => {
-        const updatedInstruments = [...songData.instruments];
+        const updatedInstruments = { ...songData.instruments };
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             waveform,
@@ -247,7 +247,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const setInstrumentModulationData = (modulationData: number[]) => {
-        const updatedInstruments = [...songData.instruments];
+        const updatedInstruments = { ...songData.instruments };
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             modulationData,
@@ -493,16 +493,16 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 </Tabs>
             </VContainer>
             <PopUpDialog
-                open={waveformDialogOpen > -1}
-                onClose={() => setWaveformDialogOpen(-1)}
-                onOk={() => setWaveformDialogOpen(-1)}
+                open={waveformDialogOpen !== ''}
+                onClose={() => setWaveformDialogOpen('')}
+                onOk={() => setWaveformDialogOpen('')}
                 title={nls.localize('vuengine/editors/sound/selectWaveform', 'Select Waveform')
                 }
                 height='100%'
                 width='100%'
             >
                 <WaveformSelect
-                    value={songData.instruments[Math.max(0, waveformDialogOpen)]?.waveform ?? 0}
+                    value={songData.instruments[waveformDialogOpen]?.waveform ?? 0}
                     setValue={setInstrumentWaveForm}
                 />
                 {/*
@@ -513,9 +513,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 */}
             </PopUpDialog>
             <PopUpDialog
-                open={modulationDataDialogOpen > -1}
-                onClose={() => setModulationDataDialogOpen(-1)}
-                onOk={() => setModulationDataDialogOpen(-1)}
+                open={modulationDataDialogOpen !== ''}
+                onClose={() => setModulationDataDialogOpen('')}
+                onOk={() => setModulationDataDialogOpen('')}
                 title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                 height='100%'
                 width='100%'

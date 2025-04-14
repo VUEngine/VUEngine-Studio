@@ -8,7 +8,7 @@ interface ChannelProps {
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    setCurrentInstrument: Dispatch<SetStateAction<number>>
+    setCurrentInstrument: Dispatch<SetStateAction<string>>
     setSidebarTab: Dispatch<SetStateAction<number>>
 }
 

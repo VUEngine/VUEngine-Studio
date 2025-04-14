@@ -110,11 +110,14 @@ export default function Effect(props: EffectProps): React.JSX.Element {
             {event === SoundEvent.Instrument &&
                 <VContainer>
                     <AdvancedSelect
-                        options={songData.instruments.map((n, i) => ({
-                            value: `${i}`,
-                            label: `${i + 1}: ${n.name}`,
-                            disabled: n.type !== channel.type,
-                        }))}
+                        options={Object.keys(songData.instruments).map((instrumentId, i) => {
+                            const instrument = songData.instruments[instrumentId];
+                            return {
+                                value: `${instrumentId}`,
+                                label: `${i + 1}: ${instrument.name}`,
+                                disabled: instrument.type !== channel.type,
+                            };
+                        })}
                         defaultValue={value}
                         onChange={options => setValue(parseInt(options[0]))}
                         commands={INPUT_BLOCKING_COMMANDS}
