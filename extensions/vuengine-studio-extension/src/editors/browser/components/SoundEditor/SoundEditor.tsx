@@ -11,7 +11,7 @@ import Emulator from './Emulator/Emulator';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Channel from './Sidebar/Channel';
-import CurrentTick from './Sidebar/CurrentTick';
+import CurrentPatternStep from './Sidebar/CurrentPatternStep';
 import ImportExport from './Sidebar/ImportExport';
 import InputDevices from './Sidebar/InputDevices';
 import Instruments from './Sidebar/Instruments';
@@ -24,15 +24,14 @@ import {
     ChannelConfig,
     EventsMap,
     InstrumentMap,
+    NOTE_RESOLUTION,
     NOTES,
     PatternConfig,
     SINGLE_NOTE_TESTING_DURATION,
     SoundData,
-    SoundEditorMode,
     SoundEditorTool,
     SoundEvent
 } from './SoundEditorTypes';
-import Tracker from './Tracker/Tracker';
 import WaveformSelect from './WaveformSelect';
 
 interface SoundEditorProps {
@@ -67,6 +66,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const { songData, updateSongData } = props;
     const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
+    const [sequencerHidden, setSequencerHidden] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
     const [testing, setTesting] = useState<boolean>(false);
     const [testingDuration, setTestingDuration] = useState<number>(0);
@@ -74,7 +74,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
-    const [editorMode, setEditorMode] = useState<SoundEditorMode>(SoundEditorMode.PIANOROLL);
     const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
@@ -170,10 +169,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentTick(note);
     };
 
-    const toggleEditorMode = (): void => {
-        setEditorMode(editorMode === SoundEditorMode.PIANOROLL ? SoundEditorMode.TRACKER : SoundEditorMode.PIANOROLL);
-    };
-
     const togglePlaying = (): void => {
         if (currentStep === -1) {
             setCurrentStep(playRangeStart);
@@ -194,6 +189,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
+    const toggleChannelSeeThrough = (channelId: number): void => {
+        setChannel(channelId, {
+            seeThrough: !songData.channels[channelId].seeThrough,
+        });
+    };
+
     const toggleChannelSolo = (channelId: number): void => {
         updateSongData({
             ...songData,
@@ -203,7 +204,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 muted: false,
             } : {
                 ...channel,
-                collapsed: false,
+                solo: false,
             }))
         });
     };
@@ -289,7 +290,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         currentChannel.sequence.forEach((s, sequenceIndex) => {
             if (currentSequenceIndex > sequenceIndex) {
                 const pattern = currentChannel.patterns[s];
-                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
                 result += patternSize;
             }
         });
@@ -339,8 +340,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 <SoundEditorToolbar
                     currentStep={currentStep}
                     playing={playing}
-                    editorMode={editorMode}
-                    toggleEditorMode={toggleEditorMode}
                     togglePlaying={togglePlaying}
                     stopPlaying={stopPlaying}
                     tool={tool}
@@ -348,43 +347,42 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     emulatorInitialized={emulatorInitialized}
                     speed={songData.speed}
                 />
-                {editorMode === SoundEditorMode.TRACKER
-                    ? <Tracker />
-                    : <>
-                        <Sequencer
-                            songData={songData}
-                            currentStep={currentStep}
-                            currentPatternId={currentPatternId}
-                            setCurrentPatternId={updateCurrentPatternId}
-                            currentChannelId={currentChannelId}
-                            setCurrentChannelId={updateCurrentChannelId}
-                            currentSequenceIndex={currentSequenceIndex}
-                            setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                            toggleChannelMuted={toggleChannelMuted}
-                            toggleChannelSolo={toggleChannelSolo}
-                            setChannel={setChannel}
-                        />
-                        <PianoRoll
-                            songData={songData}
-                            currentStep={currentStep}
-                            currentTick={currentTick}
-                            setCurrentTick={updateCurrentTick}
-                            currentPatternId={currentPatternId}
-                            currentPatternNoteOffset={currentPatternNoteOffset}
-                            currentChannelId={currentChannelId}
-                            currentSequenceIndex={currentSequenceIndex}
-                            playRangeStart={playRangeStart}
-                            setPlayRangeStart={updatePlayRangeStart}
-                            playRangeEnd={playRangeEnd}
-                            setPlayRangeEnd={setPlayRangeEnd}
-                            playNote={playNote}
-                            setNote={updateNote}
-                            tool={tool}
-                            lastSetNoteId={lastSetNoteId}
-                            setLastSetNoteId={setLastSetNoteId}
-                        />
-                    </>
-                }
+                <Sequencer
+                    visible={!sequencerHidden}
+                    songData={songData}
+                    currentStep={currentStep}
+                    currentPatternId={currentPatternId}
+                    setCurrentPatternId={updateCurrentPatternId}
+                    currentChannelId={currentChannelId}
+                    setCurrentChannelId={updateCurrentChannelId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                    toggleChannelMuted={toggleChannelMuted}
+                    toggleChannelSolo={toggleChannelSolo}
+                    toggleChannelSeeThrough={toggleChannelSeeThrough}
+                    setChannel={setChannel}
+                />
+                <PianoRoll
+                    songData={songData}
+                    currentStep={currentStep}
+                    currentTick={currentTick}
+                    setCurrentTick={updateCurrentTick}
+                    currentPatternId={currentPatternId}
+                    currentPatternNoteOffset={currentPatternNoteOffset}
+                    currentChannelId={currentChannelId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    playRangeStart={playRangeStart}
+                    setPlayRangeStart={updatePlayRangeStart}
+                    playRangeEnd={playRangeEnd}
+                    setPlayRangeEnd={setPlayRangeEnd}
+                    playNote={playNote}
+                    setNote={updateNote}
+                    tool={tool}
+                    lastSetNoteId={lastSetNoteId}
+                    setLastSetNoteId={setLastSetNoteId}
+                    sequencerHidden={sequencerHidden}
+                    setSequencerHidden={setSequencerHidden}
+                />
             </VContainer>
             <VContainer gap={15} overflow="auto" style={{ maxWidth: 300, minWidth: 300 }}>
                 <Tabs
@@ -436,7 +434,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 setPattern={setPattern}
                             />
                             <hr />
-                            <CurrentTick
+                            <CurrentPatternStep
                                 songData={songData}
                                 currentChannelId={currentChannelId}
                                 currentPatternId={currentPatternId}

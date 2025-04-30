@@ -1,13 +1,14 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
+import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
 import { ChannelConfig, SoundData } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
-import InfoLabel from '../../Common/InfoLabel';
 
 interface CurrentChannelProps {
     songData: SoundData
@@ -82,18 +83,21 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
             <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/editors/sound/instrument', 'Instrument')}
+                        {nls.localize('vuengine/editors/sound/defaultInstrument', 'Default Instrument')}
                     </label>
                     <InputWithAction>
                         <AdvancedSelect
-                            options={Object.keys(songData.instruments).map((instrumentId, i) => {
-                                const instrument = songData.instruments[instrumentId];
-                                return {
-                                    value: `${instrumentId}`,
-                                    label: `${i + 1}: ${instrument.name}`,
-                                    disabled: instrument.type !== channel.type,
-                                };
-                            })}
+                            options={Object.keys(songData.instruments)
+                                .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                                .map((instrumentId, i) => {
+                                    const instrument = songData.instruments[instrumentId];
+                                    return {
+                                        value: `${instrumentId}`,
+                                        label: `${i + 1}: ${instrument.name}`,
+                                        disabled: instrument.type !== channel.type,
+                                        backgroundColor: instrument.color ?? COLOR_PALETTE[0][0],
+                                    };
+                                })}
                             defaultValue={`${channel.instrument}`}
                             onChange={options => setChannelInstrument(options[0])}
                             commands={INPUT_BLOCKING_COMMANDS}

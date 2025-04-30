@@ -1,11 +1,11 @@
+import { Eraser, PencilSimple, Selection } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import { SoundEditorCommands } from './SoundEditorCommands';
-import { SoundEditorMode, SoundEditorTool } from './SoundEditorTypes';
-import { DotsNine, Eraser, PencilSimple, PianoKeys, Selection } from '@phosphor-icons/react';
 import { INPUT_BLOCKING_COMMANDS } from './SoundEditor';
+import { SoundEditorCommands } from './SoundEditorCommands';
+import { SoundEditorTool } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -55,8 +55,6 @@ export const StyledSoundEditorToolbarTime = styled.div`
 interface SoundEditorToolbarProps {
     currentStep: number
     playing: boolean
-    editorMode: number
-    toggleEditorMode: () => void
     togglePlaying: () => void
     stopPlaying: () => void
     tool: SoundEditorTool
@@ -68,7 +66,7 @@ interface SoundEditorToolbarProps {
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
     const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const {
-        currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool, speed, emulatorInitialized
+        currentStep, playing, togglePlaying, stopPlaying, tool, setTool, speed, emulatorInitialized
     } = props;
 
     // TODO: compute
@@ -77,23 +75,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
 
     return (
         <StyledSoundEditorToolbar>
-            <StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarWideButton
-                    className='theia-button secondary'
-                    title={(editorMode === SoundEditorMode.PIANOROLL
-                        ? nls.localize('vuengine/editors/sound/switchToTrackerMode', 'Switch To Tracker Mode')
-                        : nls.localize('vuengine/editors/sound/switchToPianoRollMode', 'Switch To Piano Roll Mode'))
-                    }
-                    onClick={toggleEditorMode}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    {editorMode === SoundEditorMode.PIANOROLL
-                        ? <PianoKeys size={20} style={{ rotate: '-90deg' }} />
-                        : <DotsNine size={20} />
-                    }
-                </StyledSoundEditorToolbarWideButton>
-            </StyledSoundEditorToolbarGroup>
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarWideButton
                     className={`theia-button ${playing ? 'primary' : 'secondary'}`}
@@ -118,9 +99,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     onClick={stopPlaying}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    disabled={!emulatorInitialized}
+                    disabled={!emulatorInitialized || currentStep < 0}
                 >
-                    <i className="fa fa-stop" />
+                    <i className="fa fa-fast-backward" />
                 </StyledSoundEditorToolbarButton>
                 <StyledSoundEditorToolbarTime>
                     {currentStep + 1}

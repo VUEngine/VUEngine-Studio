@@ -1,5 +1,5 @@
-import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, SoundData } from '../SoundEditorTypes';
+import React, { Dispatch, SetStateAction } from 'react';
+import { BAR_PATTERN_LENGTH_MULT_MAP, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
@@ -11,6 +11,8 @@ interface PianoRollHeaderProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
+    sequencerHidden: boolean,
+    setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -20,17 +22,21 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         currentPatternId,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
+        sequencerHidden, setSequencerHidden,
     } = props;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
 
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
             style={{ height: 18 }}
         >
             <MetaLineHeaderLine>
+                <button onClick={() => setSequencerHidden(!sequencerHidden)}>
+                    <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
+                </button>
             </MetaLineHeaderLine>
         </MetaLineHeader>
         {[...Array(patternSize)].map((x, index) => (

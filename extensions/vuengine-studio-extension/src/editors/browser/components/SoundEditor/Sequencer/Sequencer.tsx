@@ -8,6 +8,7 @@ import { StyledSequencer } from './StyledComponents';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 
 interface SequencerProps {
+    visible: boolean
     songData: SoundData
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
@@ -18,11 +19,13 @@ interface SequencerProps {
     currentStep: number
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
+    toggleChannelSeeThrough: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
+        visible,
         songData,
         currentChannelId, setCurrentChannelId,
         currentPatternId, setCurrentPatternId,
@@ -30,6 +33,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentStep,
         toggleChannelMuted,
         toggleChannelSolo,
+        toggleChannelSeeThrough,
         setChannel,
     } = props;
 
@@ -42,8 +46,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             <Channel
                 key={channel.id}
                 songData={songData}
-                channelConfig={channel}
-                number={channel.id}
+                channel={channel}
                 otherSolo={soloChannel > -1 && soloChannel !== channel.id}
                 currentChannelId={currentChannelId}
                 setCurrentChannelId={setCurrentChannelId}
@@ -54,6 +57,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setChannel={setChannel}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
+                toggleChannelSeeThrough={toggleChannelSeeThrough}
             />
         )
     ), [
@@ -127,10 +131,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         songData,
     ]);
 
-    return <StyledSequencer onWheel={mapVerticalToHorizontalScroll}>
+    return <StyledSequencer
+        className={visible ? undefined : 'hidden'}
+        onWheel={mapVerticalToHorizontalScroll}
+    >
         {<StepIndicator
             currentStep={currentStep}
-            noteResolution={songData.noteResolution}
             isPianoRoll={false}
             hidden={currentStep === -1}
         />}

@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import VContainer from '../../Common/Base/VContainer';
+import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
 import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
 import { InstrumentMap, SoundData } from '../SoundEditorTypes';
@@ -111,13 +112,16 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             {nls.localize('vuengine/editors/sound/instruments', 'Instruments')}
             <InputWithAction>
                 <AdvancedSelect
-                    options={Object.keys(songData.instruments).map((instrumentId, i) => {
-                        const instr = songData.instruments[instrumentId];
-                        return {
-                            value: `${instrumentId}`,
-                            label: `${i + 1}: ${instr.name}`,
-                        };
-                    })}
+                    options={Object.keys(songData.instruments)
+                        .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                        .map((instrumentId, i) => {
+                            const instr = songData.instruments[instrumentId];
+                            return {
+                                value: `${instrumentId}`,
+                                label: `${i + 1}: ${instr.name}`,
+                                backgroundColor: instr.color ?? COLOR_PALETTE[0][0],
+                            };
+                        })}
                     defaultValue={`${currentInstrument}`}
                     onChange={options => setCurrentInstrument(options[0])}
                     commands={INPUT_BLOCKING_COMMANDS}

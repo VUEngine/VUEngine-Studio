@@ -1,16 +1,18 @@
 import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { clamp } from '../../Common/Utils';
 import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { BAR_PATTERN_LENGTH_MULT_MAP, SoundEvent, NOTES, SINGLE_NOTE_TESTING_DURATION, SoundData } from '../SoundEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, EXCLUDED_SOUND_EVENTS, NOTE_RESOLUTION, NOTES, SINGLE_NOTE_TESTING_DURATION, SoundData, SoundEvent } from '../SoundEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 import Effect from './Effect';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
-interface CurrentNoteProps {
+interface CurrentPatternStepProps {
     songData: SoundData
     currentChannelId: number
     currentPatternId: number
@@ -28,7 +30,7 @@ interface CurrentNoteProps {
     emulatorInitialized: boolean
 }
 
-export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element {
+export default function CurrentPatternStep(props: CurrentPatternStepProps): React.JSX.Element {
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
         songData,
@@ -40,7 +42,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
     } = props;
 
     const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern?.bar ?? '4/4'] * songData.noteResolution;
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern?.bar ?? '4/4'] * NOTE_RESOLUTION;
 
     if (currentNote === -1) {
         return <VContainer gap={15} className="lightLabel">
@@ -50,8 +52,31 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
 
     const events = pattern.events[currentNote] ?? {};
     const note = events ? events[SoundEvent.Note] ?? -1 : -1;
-    const eventsWithoutNoteKeys = Object.keys(events).filter(e => e !== SoundEvent.Note) as SoundEvent[];
+    const channel = songData.channels[currentChannelId];
+    const instrumentId = (events[SoundEvent.Instrument] ?? channel.instrument) as string;
+    const eventsWithoutNoteKeys = Object.keys(events).filter(e => !EXCLUDED_SOUND_EVENTS.includes(e as SoundEvent)) as SoundEvent[];
     const unusedEvents = Object.keys(AVAILABLE_EVENTS).filter(e => !eventsWithoutNoteKeys.includes(e as SoundEvent));
+
+    const maxDuration = useMemo(() => {
+        const patternLength = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+        const allEventKeys = Object.keys(pattern.events);
+        const noteEventKeys: string[] = [];
+        allEventKeys.forEach(key => {
+            const event = pattern.events[parseInt(key)];
+            if (event[SoundEvent.Note] !== undefined) {
+                noteEventKeys.push(key);
+            }
+        });
+        const noteIndex = noteEventKeys.indexOf(currentNote.toString());
+
+        return noteEventKeys[noteIndex + 1] !== undefined
+            ? parseInt(noteEventKeys[noteIndex + 1]) - currentNote
+            : patternLength - currentNote;
+    }, [
+        currentNote,
+        pattern.bar,
+        pattern.events,
+    ]);
 
     const startTesting = (noteId: number) => {
         setTesting(true);
@@ -118,7 +143,7 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/editors/sound/currentTick', 'Current Tick')}
+                    {nls.localize('vuengine/editors/sound/currentPatternStep', 'Current Pattern Step')}
                 </label>
                 <input
                     className='theia-input'
@@ -178,6 +203,41 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     </InputWithActionButton>
                 </InputWithAction>
             </VContainer>
+            {note > -1 && <>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/instrument', 'Instrument')}
+                    </label>
+                    <AdvancedSelect
+                        options={Object.keys(songData.instruments)
+                            .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                            .map((instrId, i) => {
+                                const instr = songData.instruments[instrId];
+                                return {
+                                    value: `${instrId}`,
+                                    label: `${i + 1}: ${instr.name}`,
+                                    disabled: instr.type !== channel.type,
+                                    backgroundColor: instr.color ?? COLOR_PALETTE[0][0],
+                                };
+                            })}
+                        defaultValue={instrumentId}
+                        onChange={options => updateEvents(currentNote, SoundEvent.Instrument, options[0])}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/duration', 'Duration')}
+                    </label>
+                    <Range
+                        value={events[SoundEvent.Duration] ?? 1}
+                        setValue={d => updateEvents(currentNote, SoundEvent.Duration, d)}
+                        min={1}
+                        max={maxDuration}
+                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                    />
+                </VContainer>
+            </>}
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/effects', 'Effects')}

@@ -1,13 +1,12 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
 import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { SoundEvent, SoundData } from '../SoundEditorTypes';
+import { SoundData, SoundEvent } from '../SoundEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 
 const getNthByte = (num: number, byte: number): number =>
@@ -31,10 +30,9 @@ interface EffectProps {
 }
 
 export default function Effect(props: EffectProps): React.JSX.Element {
-    const { songData, currentChannelId, event, value, setValue, removeEvent } = props;
+    const { event, value, setValue, removeEvent } = props;
 
     const eventDetails = AVAILABLE_EVENTS[event];
-    const channel = songData.channels[currentChannelId];
 
     return (
         <VContainer className="item">
@@ -105,24 +103,6 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                     width="100%"
                     commandsToDisable={INPUT_BLOCKING_COMMANDS}
                 />
-            }
-
-            {event === SoundEvent.Instrument &&
-                <VContainer>
-                    <AdvancedSelect
-                        options={Object.keys(songData.instruments).map((instrumentId, i) => {
-                            const instrument = songData.instruments[instrumentId];
-                            return {
-                                value: `${instrumentId}`,
-                                label: `${i + 1}: ${instrument.name}`,
-                                disabled: instrument.type !== channel.type,
-                            };
-                        })}
-                        defaultValue={value}
-                        onChange={options => setValue(parseInt(options[0]))}
-                        commands={INPUT_BLOCKING_COMMANDS}
-                    />
-                </VContainer>
             }
 
         </VContainer>

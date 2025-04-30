@@ -1,3 +1,4 @@
+import chroma from 'chroma-js';
 import React, { FunctionComponent, useContext } from 'react';
 import Select, { GroupBase, MenuPlacement, OptionProps } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -7,6 +8,7 @@ export interface AdvancedSelectOption {
     value: string
     label: string
     disabled?: boolean
+    backgroundColor?: string
 };
 
 const CustomClearIndicator: FunctionComponent<OptionProps<AdvancedSelectOption, true, GroupBase<AdvancedSelectOption>>> = ({ innerProps, isDisabled }) => <>{
@@ -98,6 +100,22 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
                 ...baseStyles,
                 width,
             }),
+            option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                const backgroundColor = chroma(data.backgroundColor ?? '#000');
+                return {
+                    ...styles,
+                    backgroundColor: !data.backgroundColor
+                        ? undefined
+                        : isSelected || isFocused || isDisabled
+                            ? data.backgroundColor
+                            : backgroundColor.darken(0.25).css(),
+                    color: !data.backgroundColor
+                        ? undefined
+                        : chroma.contrast(backgroundColor, 'white') > 2
+                            ? 'white'
+                            : 'black',
+                };
+            },
         }}
     />;
 }

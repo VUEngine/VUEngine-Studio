@@ -6,15 +6,15 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types'
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { CHANNEL_BG_COLORS, ChannelConfig, SoundEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SoundData } from '../SoundEditorTypes';
-import { StyledPattern, StyledPatternRemove } from './StyledComponents';
+import { CHANNEL_BG_COLORS, ChannelConfig, SoundEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SoundData, NOTE_RESOLUTION } from '../SoundEditorTypes';
+import { StyledPattern, StyledPatternName, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
     songData: SoundData
     index: number
     pattern: PatternConfig
     patternSize: number
-    channel: number
+    channelId: number
     patternId: number
     currentChannelId: number
     currentPatternId: number
@@ -27,7 +27,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     const {
         songData,
         index,
-        channel,
+        channelId,
         pattern,
         patternSize,
         patternId,
@@ -36,10 +36,10 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
     } = props;
-    const isCurrent = currentChannelId === channel && currentPatternId === patternId;
-    const noteColor = isCurrent ? '#fff' : CHANNEL_BG_COLORS[channel];
+    const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
+    const noteColor = isCurrent ? '#fff' : CHANNEL_BG_COLORS[channelId];
 
-    const patternNoteWidth = Math.max(0, 8 / songData.noteResolution);
+    const patternNoteWidth = Math.max(0, 8 / NOTE_RESOLUTION);
     const patternPixels: number[][][] = useMemo(() => {
         const result: number[][] = [[]];
 
@@ -52,10 +52,16 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             const tick = parseInt(key);
             const event = pattern.events[tick];
             const note = event[SoundEvent.Note];
-            if (note) {
+            if (note !== undefined) {
                 const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
                 for (let k = 0; k < patternNoteWidth; k++) {
                     result[noteYPosition][tick * patternNoteWidth + k] = 1;
+                    if (result[noteYPosition - 1]) {
+                        result[noteYPosition - 1][tick * patternNoteWidth + k] = 1;
+                    }
+                    if (result[noteYPosition + 1]) {
+                        result[noteYPosition + 1][tick * patternNoteWidth + k] = 1;
+                    }
                 }
             }
         });
@@ -63,14 +69,13 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         return [result];
     }, [
         pattern.events,
-        songData.noteResolution,
     ]);
 
-    const removeFromSequence = (channelId: number, i: number): void => {
-        setChannel(channelId, {
+    const removeFromSequence = (cId: number, i: number): void => {
+        setChannel(cId, {
             sequence: [
-                ...songData.channels[channelId].sequence.slice(0, i),
-                ...songData.channels[channelId].sequence.slice(i + 1)
+                ...songData.channels[cId].sequence.slice(0, i),
+                ...songData.channels[cId].sequence.slice(i + 1)
             ],
         });
     };
@@ -99,19 +104,19 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             <StyledPattern
                 className={isCurrent ? 'current' : undefined}
                 style={{
-                    backgroundColor: currentChannelId === channel && currentSequenceIndex === index
+                    backgroundColor: currentChannelId === channelId && currentSequenceIndex === index
                         ? 'var(--theia-focusBorder)'
                         : undefined,
                     minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
                     width: `${(patternSize * patternNoteWidth) - 1}px`
                 }}
-                data-channel={channel}
+                data-channel={channelId}
                 data-position={index}
-                onClick={() => setCurrentSequenceIndex(channel, index)}
+                onClick={() => setCurrentSequenceIndex(channelId, index)}
                 title={`${patternId + 1}${pattern.name ? `: ${pattern.name}` : ''}`}
             >
                 <CanvasImage
-                    height={PATTERN_HEIGHT}
+                    height={PATTERN_HEIGHT + 1}
                     palette={'00000000'}
                     pixelData={patternPixels}
                     colorOverride={noteColor}
@@ -124,11 +129,13 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                         top: 0,
                     }}
                 />
-                {patternId + 1}
+                <StyledPatternName>
+                    {patternId + 1}
+                </StyledPatternName>
                 <StyledPatternRemove
                     title={nls.localizeByDefault('Remove')}
                     onClick={e => {
-                        removeFromSequence(channel, index);
+                        removeFromSequence(channelId, index);
                         e.stopPropagation();
                     }}
                 >

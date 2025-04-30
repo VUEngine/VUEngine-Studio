@@ -42,21 +42,21 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const init = async (): Promise<void> => {
-        console.log(' ');
-        console.log('  ');
-        console.log('========================');
-        console.log('--- 1) init() ---');
+        // console.log(' ');
+        // console.log('  ');
+        // console.log('========================');
+        // console.log('--- 1) init() ---');
         await initTemplating();
         await initEmulator();
         setEmulatorInitialized(true);
-        console.log('--- 4) setEmulatorInitialized(true) ---');
-        console.log('========================');
-        console.log(' ');
-        console.log('  ');
+        // console.log('--- 4) setEmulatorInitialized(true) ---');
+        // console.log('========================');
+        // console.log(' ');
+        // console.log('  ');
     };
 
     const initTemplating = async (): Promise<void> => {
-        console.log('--- 2) initTemplating() ---');
+        // console.log('--- 2) initTemplating() ---');
         await services.vesProjectService.projectDataReady;
         const soundSpecTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
         if (!soundSpecTemplate) {
@@ -82,7 +82,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const initEmulator = async (): Promise<void> => {
-        console.log('--- 3) initEmulator() ---');
+        // console.log('--- 3) initEmulator() ---');
         let VB;
         try {
             // bundled
@@ -105,13 +105,13 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const createSoundRom = async (): Promise<void> => {
-        console.log('--- 2) createSoundRom ---');
+        // console.log('--- 2) createSoundRom ---');
         await generateSpecFile();
         await compileSpecFile();
     };
 
     const generateSpecFile = async (): Promise<void> => {
-        console.log('--- 3) generateSpecFile ---');
+        // console.log('--- 3) generateSpecFile ---');
         const specFileUri = tempBaseDir?.resolve('SoundSpec.c');
         await services.vesCodeGenService.renderTemplateToFile(
             'SoundSpec',
@@ -121,6 +121,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 item: songData,
                 project: services.vesProjectService.getProjectData(),
                 itemUri: new URI('Dummy.sound'),
+                isSoundEditorPreview: true,
             },
             ProjectDataTemplateEncoding.utf8,
             true
@@ -140,7 +141,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const compileSpecFile = async (): Promise<void> => {
-        console.log('--- 4) compileSpecFile ---');
+        // console.log('--- 4) compileSpecFile ---');
         const SpecFileUri = tempBaseDir?.resolve('SoundSpec.c');
 
         const compilerUri = await services.vesBuildPathsService.getCompilerUri(false);
@@ -179,36 +180,36 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             ],
         };
 
-        console.log('compile with args:', args);
+        // console.log('compile with args:', args);
         const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, args);
-        console.log('processId:', processId);
-        console.log('processManagerId:', processManagerId);
-        console.log('set up event handler');
+        // console.log('processId:', processId);
+        // console.log('processManagerId:', processManagerId);
+        // console.log('set up event handler');
 
         setEventHandler(new DisposableCollection(
             services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
-                console.log('process exit event');
-                console.log('process ID:', pId);
+                // console.log('process exit event');
+                // console.log('process ID:', pId);
                 if (processId === pId || processManagerId === pId) {
                     disposeEventHandlers();
                     objcopy();
                 }
             }),
             services.vesProcessWatcher.onDidReceiveErrorStreamData(async ({ pId, data }) => {
-                console.log('process error event');
-                console.log('process ID:', pId);
-                console.log('data:', data);
+                // console.log('process error event');
+                // console.log('process ID:', pId);
+                // console.log('data:', data);
             }),
             services.vesProcessWatcher.onDidReceiveOutputStreamData(async ({ pId, data }) => {
-                console.log('process data event');
-                console.log('process ID:', pId);
-                console.log('data:', data);
+                // console.log('process data event');
+                // console.log('process ID:', pId);
+                // console.log('data:', data);
             }),
         ));
     };
 
     const objcopy = async (): Promise<void> => {
-        console.log('--- 5) objcopy ---');
+        // console.log('--- 5) objcopy ---');
         const compilerUri = await services.vesBuildPathsService.getCompilerUri();
 
         const args = isWindows ? {
@@ -233,16 +234,16 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             ],
         };
 
-        console.log('objcopy with args:', args);
+        // console.log('objcopy with args:', args);
         const { processId, processManagerId } = await services.vesProcessService.launchProcess(VesProcessType.Raw, args);
-        console.log('processId:', processId);
-        console.log('processManagerId:', processManagerId);
-        console.log('set up event handler');
+        // console.log('processId:', processId);
+        // console.log('processManagerId:', processManagerId);
+        // console.log('set up event handler');
 
         setEventHandler(new DisposableCollection(
             services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
-                console.log('process exit event');
-                console.log('process ID:', pId);
+                // console.log('process exit event');
+                // console.log('process ID:', pId);
                 if (processId === pId || processManagerId === pId) {
                     disposeEventHandlers();
                     loadRom();
@@ -252,17 +253,17 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const loadRom = async (): Promise<void> => {
-        console.log('--- 6) loadRom ---');
+        // console.log('--- 6) loadRom ---');
         const romFileUri = tempBaseDir!.resolve('sound.vb');
-        console.log('romFileUri:', romFileUri);
+        // console.log('romFileUri:', romFileUri);
         const romFileContent = await services.fileService.readFile(romFileUri);
-        console.log('romFileContent:', romFileContent);
+        // console.log('romFileContent:', romFileContent);
         await sim.setCartROM(romFileContent.value.buffer);
         await sim.reset();
         core.emulate(sim, true);
-        console.log('========================');
-        console.log(' ');
-        console.log('  ');
+        // console.log('========================');
+        // console.log(' ');
+        // console.log('  ');
     };
 
     const cleanUp = async (): Promise<void> => {
@@ -295,25 +296,25 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         }
 
         if (playing) {
-            console.log(' ');
-            console.log('  ');
-            console.log('========================');
-            console.log('--- 1) play ---');
-            console.log('compare checksums');
+            // console.log(' ');
+            // console.log('  ');
+            // console.log('========================');
+            // console.log('--- 1) play ---');
+            // console.log('compare checksums');
             const currentSongDataChecksum = window.electronVesCore.sha1(JSON.stringify(songData));
-            console.log('current:', currentSongDataChecksum);
-            console.log('previous:', songDataChecksum);
+            // console.log('current:', currentSongDataChecksum);
+            // console.log('previous:', songDataChecksum);
             if (songDataChecksum !== currentSongDataChecksum) {
-                console.log('checksums differ, compile song');
+                // console.log('checksums differ, compile song');
                 setProjectDataChecksum(currentSongDataChecksum);
                 setCurrentStep(0);
                 createSoundRom();
             } else {
-                console.log('checksums are the same, play song');
+                // console.log('checksums are the same, play song');
                 core.emulate(sim, true);
-                console.log('========================');
-                console.log(' ');
-                console.log('  ');
+                // console.log('========================');
+                // console.log(' ');
+                // console.log('  ');
             }
         } else {
             core.suspend(sim);

@@ -9,6 +9,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
+import PaletteColorSelect, { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { clamp } from '../../Common/Utils';
 import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import {
@@ -93,6 +94,16 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             name,
+        };
+
+        setInstruments(updatedInstruments);
+    };
+
+    const setColor = (color: string) => {
+        const updatedInstruments = { ...songData.instruments };
+        updatedInstruments[currentInstrument] = {
+            ...updatedInstruments[currentInstrument],
+            color,
         };
 
         setInstruments(updatedInstruments);
@@ -371,6 +382,15 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     />
                 </VContainer>
             </HContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/color', 'Color')}
+                </label>
+                <PaletteColorSelect
+                    color={instrument.color}
+                    updateColor={setColor}
+                />
+            </VContainer>
             <HContainer gap={15}>
                 <VContainer>
                     <label>
@@ -412,6 +432,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <VContainer>
                             <NumberArrayPreview
                                 active={true}
+                                color={instrument.color ?? COLOR_PALETTE[0][0]}
                                 height={52}
                                 width={64}
                                 maximum={64}

@@ -9,10 +9,11 @@ interface ChannelHeaderProps {
     setCurrentChannelId: (currentChannelId: number) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
+    toggleChannelSeeThrough: (channelId: number) => void
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
-    const { channel, currentChannelId, setCurrentChannelId, toggleChannelMuted, toggleChannelSolo } = props;
+    const { channel, currentChannelId, setCurrentChannelId, toggleChannelMuted, toggleChannelSolo, toggleChannelSeeThrough } = props;
 
     const classNames = [];
     if (currentChannelId === channel.id) {
@@ -25,11 +26,11 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
             case 1:
             case 2:
             case 3:
-                return `${nls.localize('vuengine/editors/sound/waveShort', 'W')}${i + 1}`;
+                return `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`;
             case 4:
-                return nls.localize('vuengine/editors/sound/sweepModulationShort', 'SM');
+                return nls.localize('vuengine/editors/sound/sweepModulationShort', 'Sw./Mod.');
             case 5:
-                return nls.localize('vuengine/editors/sound/noiseShort', 'N');
+                return nls.localize('vuengine/editors/sound/noise', 'Noise');
         }
         return '';
     };
@@ -43,6 +44,12 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
             </div>
         </StyledChannelHeaderInfo>
         <StyledChannelHeaderButtons>
+            <StyledChannelHeaderButton
+                className={channel.seeThrough ? 'active' : undefined}
+                onClick={() => toggleChannelSeeThrough(channel.id)}
+            >
+                <i className={`fa fa-${channel.seeThrough ? 'eye' : 'eye-slash'}`} />
+            </StyledChannelHeaderButton>
             <StyledChannelHeaderButton
                 className={channel.muted ? 'active' : undefined}
                 onClick={() => toggleChannelMuted(channel.id)}

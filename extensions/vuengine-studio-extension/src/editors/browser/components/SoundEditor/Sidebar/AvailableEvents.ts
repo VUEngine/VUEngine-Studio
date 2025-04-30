@@ -119,17 +119,4 @@ export const AVAILABLE_EVENTS: EventMap = {
         category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
         defaultValue: 0x00,
     },
-
-    // Other
-    [SoundEvent.Instrument]: {
-        id: SoundEvent.Instrument,
-        shortId: 'I',
-        label: nls.localize('vuengine/editors/sound/effects/changeInstrument', 'Change Instrument'),
-        description: nls.localize(
-            'vuengine/editors/sound/effects/changeInstrumentDescription',
-            'Load a different instrument for the current channel.'
-        ),
-        category: nls.localize('vuengine/editors/sound/effects/other', 'Other'),
-        defaultValue: 0x00,
-    },
 };

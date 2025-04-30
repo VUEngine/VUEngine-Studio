@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { EventsMap, SoundEditorTool, SoundEvent } from '../SoundEditorTypes';
+import { SoundEditorTool } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 import { StyledPianoRollRow } from './StyledComponents';
@@ -7,18 +7,14 @@ import { StyledPianoRollRow } from './StyledComponents';
 interface PianoRollRowProps {
     note: string
     noteId: number
-    currentChannelId: number
     currentPatternId: number
     setCurrentTick: (note: number) => void
-    channelsNotes: { [noteId: string]: number[] }[]
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: SoundEditorTool
     patternSize: number
-    events: EventsMap
     lastSetNoteId: number
     setLastSetNoteId: Dispatch<SetStateAction<number>>
-    noteResolution: number
     bar: string
 }
 
@@ -26,17 +22,12 @@ export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): Reac
     const {
         note,
         noteId,
-        currentChannelId,
-        channelsNotes,
         setCurrentTick,
         playNote,
         setNote,
         tool,
         patternSize,
-        events,
     } = props;
-
-    const noteIdStr = noteId.toString();
 
     return <StyledPianoRollRow>
         <PianoRollKey
@@ -44,24 +35,17 @@ export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): Reac
             note={note}
             playNote={playNote}
         />
-        {[...Array(patternSize)].map((x, lineIndex) => {
-            const channelsIndex = Object.keys(channelsNotes[lineIndex] ?? {}).find(key => key === noteIdStr);
-            const channelNotes = channelsIndex ? channelsNotes[lineIndex][channelsIndex] : [];
-            const lineNote = events[lineIndex] ? events[lineIndex][SoundEvent.Note] ?? -1 : -1;
-            return (
-                <PianoRollNote
-                    key={lineIndex}
-                    index={lineIndex}
-                    noteId={noteId}
-                    set={lineNote === noteId}
-                    currentChannelId={currentChannelId}
-                    channelNotes={channelNotes}
-                    setCurrentTick={setCurrentTick}
-                    playNote={playNote}
-                    setNote={setNote}
-                    tool={tool}
-                />);
-        })}
+        {[...Array(patternSize)].map((x, colIndex) =>
+            <PianoRollNote
+                key={colIndex}
+                index={colIndex}
+                noteId={noteId}
+                setCurrentTick={setCurrentTick}
+                playNote={playNote}
+                setNote={setNote}
+                tool={tool}
+            />
+        )}
     </StyledPianoRollRow>;
 }
 /*

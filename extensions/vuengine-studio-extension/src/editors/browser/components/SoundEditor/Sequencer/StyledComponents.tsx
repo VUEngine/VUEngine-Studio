@@ -1,17 +1,21 @@
 import styled from 'styled-components';
-import { CHANNEL_BG_COLORS, PATTERN_HEIGHT } from '../SoundEditorTypes';
+import { PATTERN_HEIGHT } from '../SoundEditorTypes';
 
-// these need to be in a single fine for references to each other to work
+// these need to be in a single file for references to each other to work
 
 export const StyledSequencer = styled.div`
     display: flex;
     flex-direction: row;
     margin: 0 var(--padding);
-    min-height: calc((${PATTERN_HEIGHT}px + 1px) * 6 + 10px);
+    min-height: calc((${PATTERN_HEIGHT}px + 2px) * 6 + 10px);
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 12px;
     position: relative;
+
+    &.hidden {
+        display: none;
+    }
 `;
 
 export const StyledChannel = styled.div`
@@ -19,7 +23,7 @@ export const StyledChannel = styled.div`
     flex-direction: row;
     flex-grow: 1;
     margin-bottom: 1px;
-    max-height: calc(${PATTERN_HEIGHT}px + 2px);
+    max-height: calc(${PATTERN_HEIGHT}px + 3px);
 
     &.muted {
         opacity: .4;
@@ -28,33 +32,42 @@ export const StyledChannel = styled.div`
 
 export const StyledPatternFill = styled.div`
     background-color: var(--theia-secondaryButton-background);
-    border-radius: 2px;
     cursor: pointer;
     flex-grow: 1;
+    margin-left: 1px;
     opacity: 0;
 
     ${StyledChannel}:hover & {
         opacity: .1;
     }
+
+    ${StyledChannel}.current & {
+        opacity: .3;
+    }
 `;
 
 export const StyledChannelHeader = styled.div`
-    background-color: var(--theia-editor-background);
-    border-radius: 2px;
-    color: var(--theia-secondaryButton-foreground);
+    background-color: var(--theia-secondaryButton-background);
+    border: 1px solid var(--theia-secondaryButton-background);
+    box-sizing: border-box;
+    color: #fff;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     font-size: 10px;
-    font-weight: bold;
-    height: calc(${PATTERN_HEIGHT}px + 2px);
+    height: calc(${PATTERN_HEIGHT}px + 3px);
     left: 0;
     margin-right: 2px;
     min-width: 50px;
     overflow: hidden;
-    padding-right: 1px;
     position: sticky;
-    width: 50px;
+    width: 52px;
     z-index: 100;
+
+    &.current {
+        background-color: var(--theia-focusBorder);
+        border-color: var(--theia-focusBorder);
+        color: #fff;
+    }
 `;
 
 export const StyledChannelHeaderInfo = styled.div`
@@ -64,93 +77,12 @@ export const StyledChannelHeaderInfo = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 5px;
-    width: 26px;
-
-    ${StyledChannel}:nth-child(1) & {
-        background-color: ${CHANNEL_BG_COLORS[0]}85;
-    }
-    ${StyledChannel}:nth-child(1):hover & {
-        background-color: ${CHANNEL_BG_COLORS[0]};
-    }
-    ${StyledChannel}:nth-child(2) & {
-        background-color: ${CHANNEL_BG_COLORS[1]}85;
-    }
-    ${StyledChannel}:nth-child(2):hover & {
-        background-color: ${CHANNEL_BG_COLORS[1]};
-    }
-    ${StyledChannel}:nth-child(3) & {
-        background-color: ${CHANNEL_BG_COLORS[2]}85;
-    }
-    ${StyledChannel}:nth-child(3):hover & {
-        background-color: ${CHANNEL_BG_COLORS[2]};
-    }
-    ${StyledChannel}:nth-child(4) & {
-        background-color: ${CHANNEL_BG_COLORS[3]}85;
-    }
-    ${StyledChannel}:nth-child(4):hover & {
-        background-color: ${CHANNEL_BG_COLORS[3]};
-    }
-    ${StyledChannel}:nth-child(5) & {
-        background-color: ${CHANNEL_BG_COLORS[4]}85;
-    }
-    ${StyledChannel}:nth-child(5):hover & {
-        background-color: ${CHANNEL_BG_COLORS[4]};
-    }
-    ${StyledChannel}:nth-child(6) & {
-        background-color: ${CHANNEL_BG_COLORS[5]}85;
-    }
-    ${StyledChannel}:nth-child(6):hover & {
-        background-color: ${CHANNEL_BG_COLORS[5]};
-    }
-
-    ${StyledChannelHeader}.current & {
-        background-color: var(--theia-focusBorder) !important;
-        color: #fff;
-    }
+    padding: 3px 3px 1px;
 `;
 
 export const StyledChannelHeaderButtons = styled.div`
     display: flex;
-    font-size: 10px;
     height: 100%;
-
-    ${StyledChannel}:nth-child(1) & {
-        background-color: ${CHANNEL_BG_COLORS[0]}85;
-    }
-    ${StyledChannel}:nth-child(1):hover & {
-        background-color: ${CHANNEL_BG_COLORS[0]};
-    }
-    ${StyledChannel}:nth-child(2) & {
-        background-color: ${CHANNEL_BG_COLORS[1]}85;
-    }
-    ${StyledChannel}:nth-child(2):hover & {
-        background-color: ${CHANNEL_BG_COLORS[1]};
-    }
-    ${StyledChannel}:nth-child(3) & {
-        background-color: ${CHANNEL_BG_COLORS[2]}85;
-    }
-    ${StyledChannel}:nth-child(3):hover & {
-        background-color: ${CHANNEL_BG_COLORS[2]};
-    }
-    ${StyledChannel}:nth-child(4) & {
-        background-color: ${CHANNEL_BG_COLORS[3]}85;
-    }
-    ${StyledChannel}:nth-child(4):hover & {
-        background-color: ${CHANNEL_BG_COLORS[3]};
-    }
-    ${StyledChannel}:nth-child(5) & {
-        background-color: ${CHANNEL_BG_COLORS[4]}85;
-    }
-    ${StyledChannel}:nth-child(5):hover & {
-        background-color: ${CHANNEL_BG_COLORS[4]};
-    }
-    ${StyledChannel}:nth-child(6) & {
-        background-color: ${CHANNEL_BG_COLORS[5]}85;
-    }
-    ${StyledChannel}:nth-child(6):hover & {
-        background-color: ${CHANNEL_BG_COLORS[5]};
-    }
 `;
 
 export const StyledChannelHeaderButton = styled.div`
@@ -159,20 +91,8 @@ export const StyledChannelHeaderButton = styled.div`
     display: flex;
     justify-content: center;
     flex-grow: 1;
-    width: 12px;
 
-    ${StyledChannel} &:hover,
-    ${StyledChannel} &.active {
-        background-color: var(--theia-editor-background);
-        color: #fff;
-    }
-
-    ${StyledChannelHeader}.current & {
-        background-color: var(--theia-focusBorder);
-        color: #fff;
-    }
-
-    ${StyledChannelHeader}.current &:hover {
+    ${StyledChannel} &:hover {
         background-color: var(--theia-button-hoverBackground);
     }
 `;
@@ -180,21 +100,14 @@ export const StyledChannelHeaderButton = styled.div`
 export const StyledPattern = styled.div`
     align-items: center;
     background-color: var(--theia-secondaryButton-background);
-    border: 1px solid transparent;
-    border-radius: 2px;
+    border: 1px solid var(--theia-secondaryButton-background);
     box-sizing: border-box;
     cursor: grab;
     display: flex;
-    font-size: 11px;
-    height: 23px;
     justify-content: center;
     margin-right: 1px;
     overflow: hidden;
     position: relative;
-
-    ${StyledChannel}:hover & {
-        background-color: var(--theia-secondaryButton-hoverBackground);
-    }
 
     &:hover,
     &.current {
@@ -208,9 +121,14 @@ export const StyledPattern = styled.div`
     }
 `;
 
+export const StyledPatternName = styled.div`
+    font-size: 11px;
+    position: relative;
+    z-index: 1;
+`;
+
 export const StyledPatternRemove = styled.div`
     cursor: pointer;
-    border-radius: 2px;
     display: none;
     height: 10px;
     line-height: 9px;
@@ -239,8 +157,8 @@ export const StyledAddPattern = styled.div`
     display: flex;
     justify-content: center;
     margin-right: 2px;
-    min-width: 23px;
-    width: 23px;
+    min-width: 30px;
+    width: 30px;
 
     &:hover {
         border-width: 0;
@@ -262,8 +180,8 @@ export const StyledAddPatternButton = styled.div`
     cursor: pointer;
     display: flex;
     justify-content: center;
-    min-width: 23px;
-    width: 23px;
+    min-width: 30px;
+    width: 30px;
 
     &:hover {
         background-color: var(--theia-focusBorder);

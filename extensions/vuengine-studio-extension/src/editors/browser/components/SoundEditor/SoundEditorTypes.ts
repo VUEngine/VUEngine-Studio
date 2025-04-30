@@ -8,7 +8,6 @@ export interface SoundData {
     channels: ChannelConfig[]
     instruments: InstrumentMap
     speed: number
-    noteResolution: number
     loop: boolean
     defaultBar: string
     section: DataSection
@@ -18,6 +17,7 @@ export enum SoundEvent {
     Arpeggio = 'arpeggio',
     Instrument = 'instrument',
     Note = 'note',
+    Duration = 'duration',
     NoteCut = 'noteCut',
     PortamentoDown = 'PortamentoDown',
     PortamentoUp = 'PortamentoUp',
@@ -28,7 +28,13 @@ export enum SoundEvent {
     MasterVolume = 'masterVolume',
 }
 
-export type SoundEventMap = Record<string, number>;
+export const EXCLUDED_SOUND_EVENTS = [
+    SoundEvent.Duration,
+    SoundEvent.Instrument,
+    SoundEvent.Note,
+];
+
+export type SoundEventMap = Record<string, any>;
 export type EventsMap = Record<number, SoundEventMap>;
 
 export interface PatternConfig {
@@ -46,11 +52,13 @@ export interface ChannelConfig {
     allowSkip: boolean
     muted: boolean
     solo: boolean
+    seeThrough: boolean
 }
 
 export interface InstrumentConfig {
     name: string
     type: SoundEditorChannelType
+    color: string
     waveform: string
     volume: VsuChannelStereoLevelsData
     interval: VsuChannelIntervalData
@@ -66,22 +74,10 @@ export enum SoundEditorChannelType {
     NOISE = 'noise',
 }
 
-export enum SoundEditorMode {
-    PIANOROLL,
-    TRACKER,
-}
-
 export enum SoundEditorTool {
     DEFAULT,
     ERASER,
     MARQUEE,
-}
-
-export enum NoteResolution {
-    QUARTER = 4,
-    EIGHTH = 8,
-    SIXTEENTH = 16,
-    THIRTYSECOND = 32,
 }
 
 export const NOTES: { [note: string]: number } = {
@@ -212,8 +208,10 @@ export const NOTES: { [note: string]: number } = {
 };
 
 export const NOTES_SPECTRUM = Object.keys(NOTES).length;
-export const PATTERN_HEIGHT = Math.round(NOTES_SPECTRUM / 4);
+export const PATTERN_HEIGHT = 28;
 export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
+
+export const NOTE_RESOLUTION = 16;
 
 export const PIANO_ROLL_NOTE_HEIGHT = 9;
 export const PIANO_ROLL_NOTE_WIDTH = 15;

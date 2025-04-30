@@ -1,6 +1,6 @@
 import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, SoundData } from '../SoundEditorTypes';
-import { StyledPianoRollHeaderNote } from './StyledComponents';
+import { BAR_PATTERN_LENGTH_MULT_MAP, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
+import { StyledPianoRollHeaderTick } from './StyledComponents';
 
 interface PianoRollHeaderNoteProps {
     songData: SoundData
@@ -25,7 +25,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
 
     const classNames = [];
     if (playRangeStart === index) {
@@ -78,7 +78,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     };
 
     return (
-        <StyledPianoRollHeaderNote
+        <StyledPianoRollHeaderTick
             className={classNames.join(' ')}
             onClick={() => updatePlayRangeStart(index)}
             onContextMenu={() => updatePlayRangeEnd(index)}
@@ -86,6 +86,6 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
             {(index + 1) % 4 === 0 &&
                 index + 1
             }
-        </StyledPianoRollHeaderNote>
+        </StyledPianoRollHeaderTick>
     );
 }
