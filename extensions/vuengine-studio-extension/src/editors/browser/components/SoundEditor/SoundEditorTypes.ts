@@ -25,7 +25,6 @@ export enum SoundEvent {
     Vibrato = 'vibrato',
     Volume = 'volume',
     VolumeSlide = 'volumeSlide',
-    MasterVolume = 'masterVolume',
 }
 
 export const EXCLUDED_SOUND_EVENTS = [
@@ -58,7 +57,7 @@ export interface ChannelConfig {
 export interface InstrumentConfig {
     name: string
     type: SoundEditorChannelType
-    color: string
+    color: number
     waveform: string
     volume: VsuChannelStereoLevelsData
     interval: VsuChannelIntervalData

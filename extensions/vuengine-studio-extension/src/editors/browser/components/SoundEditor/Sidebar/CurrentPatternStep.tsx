@@ -28,6 +28,7 @@ interface CurrentPatternStepProps {
     setTestingInstrument: (instrument: string) => void
     setTestingChannel: (channel: number) => void
     emulatorInitialized: boolean
+    editInstrument: (instrument: string) => void
 }
 
 export default function CurrentPatternStep(props: CurrentPatternStepProps): React.JSX.Element {
@@ -39,6 +40,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
         playing,
         testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
         emulatorInitialized,
+        editInstrument,
     } = props;
 
     const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
@@ -208,22 +210,34 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                     <label>
                         {nls.localize('vuengine/editors/sound/instrument', 'Instrument')}
                     </label>
-                    <AdvancedSelect
-                        options={Object.keys(songData.instruments)
-                            .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
-                            .map((instrId, i) => {
-                                const instr = songData.instruments[instrId];
-                                return {
-                                    value: `${instrId}`,
-                                    label: `${i + 1}: ${instr.name}`,
-                                    disabled: instr.type !== channel.type,
-                                    backgroundColor: instr.color ?? COLOR_PALETTE[0][0],
-                                };
-                            })}
-                        defaultValue={instrumentId}
-                        onChange={options => updateEvents(currentNote, SoundEvent.Instrument, options[0])}
-                        commands={INPUT_BLOCKING_COMMANDS}
-                    />
+                    <InputWithAction>
+                        <AdvancedSelect
+                            options={Object.keys(songData.instruments)
+                                .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                                .map((instrId, i) => {
+                                    const instr = songData.instruments[instrId];
+                                    return {
+                                        value: `${instrId}`,
+                                        label: `${i + 1}: ${instr.name}`,
+                                        disabled: instr.type !== channel.type,
+                                        backgroundColor: COLOR_PALETTE[instr.color ?? 4],
+                                    };
+                                })}
+                            defaultValue={instrumentId}
+                            onChange={options => updateEvents(currentNote, SoundEvent.Instrument, options[0])}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
+
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
+                            onClick={() => editInstrument(channel.instrument)}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        >
+                            <i className='codicon codicon-settings-gear' />
+                        </InputWithActionButton>
+                    </InputWithAction>
                 </VContainer>
                 <VContainer>
                     <label>

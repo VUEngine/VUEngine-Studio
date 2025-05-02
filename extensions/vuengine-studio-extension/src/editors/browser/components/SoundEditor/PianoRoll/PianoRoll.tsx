@@ -132,6 +132,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             currentPatternId={currentPatternId}
             currentPatternNoteOffset={currentPatternNoteOffset}
             currentSequenceIndex={currentSequenceIndex}
+            currentTick={currentTick}
             setCurrentTick={setCurrentTick}
             setNote={setNote}
             playNote={playNote}

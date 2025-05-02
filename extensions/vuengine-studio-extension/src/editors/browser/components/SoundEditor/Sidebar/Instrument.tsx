@@ -99,7 +99,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setColor = (color: string) => {
+    const setColor = (color: number) => {
         const updatedInstruments = { ...songData.instruments };
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
@@ -432,7 +432,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <VContainer>
                             <NumberArrayPreview
                                 active={true}
-                                color={instrument.color ?? COLOR_PALETTE[0][0]}
+                                color={COLOR_PALETTE[instrument.color ?? 4]}
                                 height={52}
                                 width={64}
                                 maximum={64}

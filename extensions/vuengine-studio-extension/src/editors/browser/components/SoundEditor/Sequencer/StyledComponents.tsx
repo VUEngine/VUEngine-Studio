@@ -50,7 +50,6 @@ export const StyledChannelHeader = styled.div`
     background-color: var(--theia-secondaryButton-background);
     border: 1px solid var(--theia-secondaryButton-background);
     box-sizing: border-box;
-    color: #fff;
     display: flex;
     flex-direction: column;
     font-size: 10px;
@@ -87,13 +86,14 @@ export const StyledChannelHeaderButtons = styled.div`
 
 export const StyledChannelHeaderButton = styled.div`
     align-items: center;
+    border-radius: 2px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     flex-grow: 1;
 
     ${StyledChannel} &:hover {
-        background-color: var(--theia-button-hoverBackground);
+        background-color: rgba(0, 0, 0, .25);
     }
 `;
 
@@ -112,6 +112,11 @@ export const StyledPattern = styled.div`
     &:hover,
     &.current {
         border-color: var(--theia-focusBorder);
+    }
+        
+    &.selected {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
     }
 
     &.dragging {

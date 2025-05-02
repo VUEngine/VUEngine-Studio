@@ -97,17 +97,6 @@ export const AVAILABLE_EVENTS: EventMap = {
         category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
         defaultValue: 0xFF,
     },
-    [SoundEvent.MasterVolume]: {
-        id: SoundEvent.MasterVolume,
-        shortId: 'W',
-        label: nls.localize('vuengine/editors/sound/effects/setMasterVolume', 'Set Master Volume'),
-        description: nls.localize(
-            'vuengine/editors/sound/effects/setVolumeDescription',
-            'Sets volume on the envelope which acts as a master volume control.'
-        ),
-        category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
-        defaultValue: 0x0F,
-    },
     [SoundEvent.VolumeSlide]: {
         id: SoundEvent.VolumeSlide,
         shortId: 'A',

@@ -1,7 +1,9 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import { BAR_PATTERN_LENGTH_MULT_MAP, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
-import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
+import { MetaLine, MetaLineHeader, MetaLineHeaderLine, SequencerCollapseButton } from './StyledComponents';
 
 interface PianoRollHeaderProps {
     songData: SoundData
@@ -24,6 +26,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
@@ -34,9 +37,16 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             style={{ height: 18 }}
         >
             <MetaLineHeaderLine>
-                <button onClick={() => setSequencerHidden(!sequencerHidden)}>
+                <SequencerCollapseButton
+                    className='theia-button secondary'
+                    onClick={() => setSequencerHidden(!sequencerHidden)}
+                    title={
+                        `${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label
+                        }${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id, true)}`
+                    }
+                >
                     <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
-                </button>
+                </SequencerCollapseButton>
             </MetaLineHeaderLine>
         </MetaLineHeader>
         {[...Array(patternSize)].map((x, index) => (

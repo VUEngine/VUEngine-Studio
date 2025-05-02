@@ -8,6 +8,10 @@ import VContainer from '../../Common/Base/VContainer';
 export default function ImportExport(): React.JSX.Element {
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
 
+    const exportRom = () => {
+        // TODO
+    };
+
     const selectFileForImport = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
             title: nls.localize('vuengine/editors/sound/selectFiles', 'Select file to import'),
@@ -59,6 +63,12 @@ export default function ImportExport(): React.JSX.Element {
             onClick={selectFileForImport}
         >
             {nls.localize('vuengine/editors/sound/importMidi', 'Import MIDI')}
+        </button>
+        <button
+            className='theia-button secondary'
+            onClick={exportRom}
+        >
+            {nls.localize('vuengine/editors/sound/exportRom', 'Export ROM')}
         </button>
     </VContainer>;
 }

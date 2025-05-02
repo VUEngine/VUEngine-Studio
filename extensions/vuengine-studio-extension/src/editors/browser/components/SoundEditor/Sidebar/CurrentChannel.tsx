@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
@@ -15,8 +15,7 @@ interface CurrentChannelProps {
     currentChannelId: number
     setCurrentChannelId: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    setCurrentInstrument: Dispatch<SetStateAction<string>>
-    setSidebarTab: Dispatch<SetStateAction<number>>
+    editInstrument: (instrument: string) => void
 }
 
 export default function CurrentChannel(props: CurrentChannelProps): React.JSX.Element {
@@ -25,8 +24,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         songData,
         currentChannelId, setCurrentChannelId,
         setChannel,
-        setCurrentInstrument,
-        setSidebarTab,
+        editInstrument,
     } = props;
 
     const channel = songData.channels[currentChannelId];
@@ -41,11 +39,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         setChannel(currentChannelId, {
             allowSkip: !songData.channels[currentChannelId].allowSkip,
         });
-    };
-
-    const editInstrument = (): void => {
-        setCurrentInstrument(channel.instrument);
-        setSidebarTab(1);
     };
 
     return (
@@ -95,7 +88,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                         value: `${instrumentId}`,
                                         label: `${i + 1}: ${instrument.name}`,
                                         disabled: instrument.type !== channel.type,
-                                        backgroundColor: instrument.color ?? COLOR_PALETTE[0][0],
+                                        backgroundColor: COLOR_PALETTE[instrument.color ?? 4],
                                     };
                                 })}
                             defaultValue={`${channel.instrument}`}
@@ -105,7 +98,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         <InputWithActionButton
                             className='theia-button secondary'
                             title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
-                            onClick={editInstrument}
+                            onClick={() => editInstrument(channel.instrument)}
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         >

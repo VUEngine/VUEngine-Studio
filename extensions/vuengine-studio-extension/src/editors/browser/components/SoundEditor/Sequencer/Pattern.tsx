@@ -102,11 +102,12 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     return (
         <SortableItem>
             <StyledPattern
-                className={isCurrent ? 'current' : undefined}
+                className={currentChannelId === channelId && currentSequenceIndex === index
+                    ? 'current selected'
+                    : isCurrent
+                        ? 'current'
+                        : undefined}
                 style={{
-                    backgroundColor: currentChannelId === channelId && currentSequenceIndex === index
-                        ? 'var(--theia-focusBorder)'
-                        : undefined,
                     minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
                     width: `${(patternSize * patternNoteWidth) - 1}px`
                 }}

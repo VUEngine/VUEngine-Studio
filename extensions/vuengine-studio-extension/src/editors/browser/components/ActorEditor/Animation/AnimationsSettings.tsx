@@ -55,9 +55,14 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
         </label>
         <HContainer gap={15} wrap='wrap'>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/actor/totalFrames', ' Total Frames')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/actor/totalFrames', ' Total Frames')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/totalFramesDescription',
+                        'The total number of frames that sprites on this actor consist of. \
+The maximum value is specified in the engine config and can be changed in the engine config editor.'
+                    )}
+                />
                 <input
                     className='theia-input'
                     type='number'

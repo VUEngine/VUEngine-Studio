@@ -119,7 +119,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                             return {
                                 value: `${instrumentId}`,
                                 label: `${i + 1}: ${instr.name}`,
-                                backgroundColor: instr.color ?? COLOR_PALETTE[0][0],
+                                backgroundColor: COLOR_PALETTE[instr.color ?? 4],
                             };
                         })}
                     defaultValue={`${currentInstrument}`}

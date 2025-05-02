@@ -134,4 +134,16 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'del',
     };
+    export const TOGGLE_SEQUENCER_VISIBILITY: EditorCommand = {
+        id: 'editors.soundEditor.toggleSequencerVisibility',
+        label: nls.localize('vuengine/editors/sound/commands/toggleSequencerVisibility', 'Toggle Sequencer Visibility'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'a',
+    };
+    export const TOGGLE_SIDEBAR_VISIBILITY: EditorCommand = {
+        id: 'editors.soundEditor.toggleSidebarVisibility',
+        label: nls.localize('vuengine/editors/sound/commands/toggleSidebarVisibility', 'Toggle Sidebar Visibility'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 's',
+    };
 };

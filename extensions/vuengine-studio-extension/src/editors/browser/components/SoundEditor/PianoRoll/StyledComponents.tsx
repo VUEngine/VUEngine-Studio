@@ -34,11 +34,6 @@ export const StyledPianoRollEditorTick = styled.div`
     min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
     max-width: ${PIANO_ROLL_NOTE_WIDTH}px;
 
-    body.theia-light &,
-    body.theia-hc & {
-        background-color: rgba(0, 0, 0, .1);;
-    }
-
     &:hover {
         border-radius: 1px;
         outline: 3px solid var(--theia-focusBorder);
@@ -49,11 +44,24 @@ export const StyledPianoRollEditorTick = styled.div`
         margin-right: 2px;
     }
 
+    &.sharpNote {
+        background-color: rgba(255, 255, 255, .15);
+    }
+
+    body.theia-light &,
+    body.theia-hc & {
+        background-color: rgba(0, 0, 0, .1);
+
+        &.sharpNote {
+            background-color: rgba(0, 0, 0, .15);
+        }
+    }
+
     ${StyledPianoRollRow}:hover & {
-        background-color: rgba(255, 255, 255, .2);
+        background-color: rgba(255, 255, 255, .3) !important;
 
         body.theia-light & {
-            background: rgba(0, 0, 0, .2);
+            background-color: rgba(0, 0, 0, .3) !important;
         }
     }
 `;
@@ -133,15 +141,16 @@ export const StyledPianoRollKeyName = styled.div`
 `;
 
 export const StyledPianoRollPlacedNote = styled.div`
+    background-color: rgba(0, 0, 0, .75);
     border-radius: 1px;
     box-sizing: border-box;
+    color: #fff;
     cursor: pointer;
     font-size: ${PIANO_ROLL_NOTE_HEIGHT}px;
     line-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
     min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
     max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
     min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
-    outline: 3px solid var(--theia-focusBorder);
     outline-offset: 1px;
     padding-left: 1px;
     position: absolute;
@@ -153,6 +162,10 @@ export const StyledPianoRollPlacedNote = styled.div`
         opacity: .5;
         z-index: 0;
     }
+
+    &.selected {
+        outline: 3px solid var(--theia-focusBorder);
+    }
 `;
 
 export const MetaLine = styled.div`
@@ -160,7 +173,7 @@ export const MetaLine = styled.div`
     flex-direction: row;
     flex-grow: 1;
     left: 0;
-    padding: 1px 4px 1px 0;
+    padding: 1px 4px 0 0;
     position: sticky;
     background: var(--theia-editor-background);
     z-index: 200;
@@ -186,6 +199,18 @@ export const MetaLineHeaderLine = styled.div`
     justify-content: center;
     min-height: 13px;
     opacity: .75;
+`;
+
+export const SequencerCollapseButton = styled.button`
+    align-items: center;
+    align-self: start;
+    display: flex;
+    font-size: 8px;
+    height: 16px;
+    justify-content: center;
+    min-height: unset !important;
+    outline-width: 0 !important;
+    width: 100%;
 `;
 
 export const MetaLineTick = styled.div`

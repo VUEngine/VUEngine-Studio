@@ -1,5 +1,5 @@
 import React from 'react';
-import { SoundEditorTool } from '../SoundEditorTypes';
+import { NOTES, SoundEditorTool } from '../SoundEditorTypes';
 import { StyledPianoRollEditorTick } from './StyledComponents';
 
 interface PianoRollNoteProps {
@@ -14,14 +14,10 @@ interface PianoRollNoteProps {
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
     const { index, noteId, playNote, setCurrentTick, setNote, tool } = props;
 
-    /*
     const classNames = [];
-    if (set) {
-        classNames.push(`current-${currentChannelId + 1}`);
+    if (Object.keys(NOTES)[noteId].includes('#')) {
+        classNames.push('sharpNote');
     }
-
-    channelNotes.map(cn => classNames.push(`set-${cn + 1}`));
-    */
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         /*
@@ -34,9 +30,6 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
             playNote(noteId);
             setCurrentTick(index);
         }
-        /*
-        }
-        */
     };
 
     /*
@@ -46,7 +39,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     */
 
     return <StyledPianoRollEditorTick
-        // className={classNames.join(' ')}
+        className={classNames.join(' ')}
         onClick={onClick}
     // onContextMenu={doUnsetNote}
     />;

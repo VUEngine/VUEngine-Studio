@@ -11,7 +11,7 @@ const getLeftOffset = (index: number) =>
     1 * Math.floor(index / NOTE_RESOLUTION) + // step / full note separators
     index * (PIANO_ROLL_NOTE_WIDTH + 1);
 
-const getTopOffset = (note: number) => 20 + // meta line
+const getTopOffset = (note: number) => 19 + // meta line
     1 * Math.floor(note / 12) + // octave separators
     note * (PIANO_ROLL_NOTE_HEIGHT + 1);
 
@@ -21,6 +21,7 @@ interface PianoRollEditorProps {
     currentPatternId: number
     currentPatternNoteOffset: number
     currentSequenceIndex: number
+    currentTick: number
     setCurrentTick: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
@@ -36,6 +37,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentPatternId,
         currentPatternNoteOffset,
         currentSequenceIndex,
+        currentTick,
         setCurrentTick,
         setNote,
         playNote,
@@ -74,7 +76,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     ) {
                         const instrumentId = otherChannelPattern.events[noteIndex][SoundEvent.Instrument] ?? otherChannel.instrument;
                         const instrument = songData.instruments[instrumentId];
-                        const instrumentColor = instrument.color ?? COLOR_PALETTE[0][0];
+                        const instrumentColor = COLOR_PALETTE[instrument.color ?? 4];
                         const index = patternNoteOffset + noteIndex - currentPatternNoteOffset;
                         const left = getLeftOffset(index);
                         const lastNoteLeft = getLeftOffset(index + noteDuration - 1);
@@ -83,12 +85,21 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                         result.push(
                             <StyledPianoRollPlacedNote
                                 key={`${otherChannel.id}-${index}`}
-                                className={otherChannel.id !== currentChannelId ? 'oc' : undefined}
+                                className={otherChannel.id !== currentChannelId
+                                    ? 'oc'
+                                    : currentTick === index
+                                        ? 'selected'
+                                        : undefined
+                                }
                                 style={{
-                                    backgroundColor: instrumentColor,
-                                    color: chroma.contrast(instrumentColor, 'white') > 2
-                                        ? 'white'
-                                        : 'black',
+                                    backgroundColor: otherChannel.id !== currentChannelId
+                                        ? undefined
+                                        : instrumentColor,
+                                    color: otherChannel.id !== currentChannelId
+                                        ? undefined
+                                        : chroma.contrast(instrumentColor, 'white') > 2
+                                            ? 'white'
+                                            : 'black',
                                     left,
                                     top,
                                     width,
@@ -96,7 +107,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                                 onClick={() => setCurrentTick(index)}
                             >
                                 {Object.keys(NOTES)[note]}
-                            </StyledPianoRollPlacedNote>
+                            </StyledPianoRollPlacedNote >
                         );
                     }
                 });
@@ -109,6 +120,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentChannelId,
         currentPatternId,
         currentSequenceIndex,
+        currentTick,
+        songData.instruments[songData.channels[currentChannelId].instrument],
     ]);
 
     return <StyledPianoRollEditor>
