@@ -1,13 +1,13 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { DataSection } from '../../Common/CommonTypes';
 import SectionSelect from '../../Common/SectionSelect';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MAX_TICK_DURATION, MIN_PATTERN_SIZE, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
 
 interface SongProps {
     songData: SoundData
@@ -22,8 +22,12 @@ export default function Song(props: SongProps): React.JSX.Element {
         updateSongData({ ...songData, name: n });
     };
 
-    const setDefaultBar = (defaultBar: string): void => {
-        updateSongData({ ...songData, defaultBar });
+    const setDefaultSize = (defaultSize: number): void => {
+        updateSongData({ ...songData, defaultSize });
+    };
+
+    const setLoopPoint = (loopPoint: number): void => {
+        updateSongData({ ...songData, loopPoint });
     };
 
     const setSection = (section: DataSection): void => {
@@ -41,18 +45,12 @@ export default function Song(props: SongProps): React.JSX.Element {
     };
 
     return <VContainer gap={15}>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/sound/songName', 'Song Name')}
-            </label>
-            <input
-                className='theia-input'
-                value={songData.name}
-                onChange={e => setName(e.target.value)}
-                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-            />
-        </VContainer>
+        <Input
+            label={nls.localize('vuengine/editors/sound/songName', 'Song Name')}
+            value={songData.name}
+            setValue={v => setName(v as string)}
+            commands={INPUT_BLOCKING_COMMANDS}
+        />
 
         <VContainer>
             <label>
@@ -67,8 +65,11 @@ export default function Song(props: SongProps): React.JSX.Element {
             />
         </VContainer>
 
-        <VContainer>
-            <label>
+        <HContainer gap={20}>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/loop', 'Loop')}
+                </label>
                 <input
                     type="checkbox"
                     checked={songData.loop}
@@ -76,28 +77,35 @@ export default function Song(props: SongProps): React.JSX.Element {
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
-                {nls.localize('vuengine/editors/sound/loop', 'Loop')}
-            </label>
-        </VContainer>
-        <VContainer grow={1}>
-            <label>
-                {nls.localize('vuengine/editors/sound/defaultBar', 'Default Bar')}
-            </label>
-            <AdvancedSelect
-                options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({
-                    label: v,
-                    value: v,
-                }))}
-                defaultValue={songData.defaultBar}
-                onChange={options => setDefaultBar(options[0])}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
-        </VContainer>
+            </VContainer>
+            {songData.loop &&
+                <Input
+                    label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}
+                    value={songData.loopPoint}
+                    setValue={v => setLoopPoint(v as number)}
+                    type='number'
+                    min={0}
+                    max={512}
+                    width={64}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+            }
+        </HContainer>
+        <Input
+            label={nls.localize('vuengine/editors/sound/defaultPatternSize', 'Default Pattern Size')}
+            value={songData.defaultSize}
+            setValue={v => setDefaultSize(v as number)}
+            type='number'
+            min={MIN_PATTERN_SIZE}
+            max={MAX_PATTERN_SIZE}
+            width={64}
+            commands={INPUT_BLOCKING_COMMANDS}
+        />
         <SectionSelect
             value={songData.section}
             setValue={setSection}
             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
         />
-    </VContainer>;
+    </VContainer >;
 }

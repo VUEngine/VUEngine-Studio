@@ -2,6 +2,7 @@ import { FadersHorizontal, Guitar, MusicNote } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
@@ -19,7 +20,6 @@ import Song from './Sidebar/Song';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
-    BAR_PATTERN_LENGTH_MULT_MAP,
     ChannelConfig,
     EventsMap,
     InstrumentMap,
@@ -33,39 +33,43 @@ import {
 } from './SoundEditorTypes';
 import WaveformSelect from './WaveformSelect';
 
+export const StyledSidebarHideToggle = styled.button`
+    background-color: transparent;
+    border: 0;
+    box-shadow: 5px 0 0 var(--theia-editor-background) inset, 6px 0 0 inset;
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    font-size: 9px;
+    margin: 10px 0;
+    max-width: 12px;
+    min-width: 12px !important;
+    padding: 0;
+
+    i {
+        background-color: var(--theia-editor-background);
+        padding: var(--theia-ui-padding) 0;
+    }
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        border-radius: 2px;
+        box-shadow: none;
+        color: #fff;
+
+        i {
+            background-color: transparent;
+        }
+    }
+`;
+
 interface SoundEditorProps {
     songData: SoundData
     updateSongData: (songData: SoundData) => void
 }
 
-export const INPUT_BLOCKING_COMMANDS = [
-    SoundEditorCommands.ADD_EFFECT.id,
-    SoundEditorCommands.ADD_NOTE.id,
-    SoundEditorCommands.ADD_PATTERN.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id,
-    SoundEditorCommands.PLAY_PAUSE.id,
-    SoundEditorCommands.REMOVE_CURRENT_NOTE.id,
-    SoundEditorCommands.REMOVE_CURRENT_PATTERN.id,
-    SoundEditorCommands.SELECT_CHANNEL_1.id,
-    SoundEditorCommands.SELECT_CHANNEL_2.id,
-    SoundEditorCommands.SELECT_CHANNEL_3.id,
-    SoundEditorCommands.SELECT_CHANNEL_4.id,
-    SoundEditorCommands.SELECT_CHANNEL_5.id,
-    SoundEditorCommands.SELECT_CHANNEL_6.id,
-    SoundEditorCommands.SELECT_NEXT_CHANNEL.id,
-    SoundEditorCommands.SELECT_PREVIOUS_CHANNEL.id,
-    SoundEditorCommands.STOP.id,
-    SoundEditorCommands.TOOL_ERASER.id,
-    SoundEditorCommands.TOOL_MARQUEE.id,
-    SoundEditorCommands.TOOL_PENCIL.id,
-    SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
-    SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id,
-];
-
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { songData, updateSongData } = props;
-    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [sidebarHidden, setSidebarHidden] = useState<boolean>(false);
     const [sequencerHidden, setSequencerHidden] = useState<boolean>(false);
@@ -212,7 +216,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const updateEvents = (index: number, event: SoundEvent, value: any): void => {
-        value = isNaN(value) ? undefined : value;
         const updatedEvents: EventsMap = {
             ...songData.channels[currentChannelId].patterns[currentPatternId].events,
             [index]: {
@@ -232,8 +235,50 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const setNote = (index: number, note: number | undefined): void =>
-        updateEvents(index, SoundEvent.Note, note);
+    const setNote = (step: number, note?: number): void => {
+        const updatedEvents: EventsMap = {
+            ...songData.channels[currentChannelId].patterns[currentPatternId].events,
+            [step]: {
+                ...songData.channels[currentChannelId].patterns[currentPatternId].events[step] ?? {},
+                [SoundEvent.Note]: note,
+            },
+        };
+
+        if (note === undefined) {
+            // remove note and duration events
+            delete updatedEvents[step][SoundEvent.Note];
+            if (updatedEvents[step][SoundEvent.Duration] !== undefined) {
+                delete updatedEvents[step][SoundEvent.Duration];
+            }
+            if (Object.keys(updatedEvents[step]).length === 0) {
+                delete updatedEvents[step];
+            }
+        } else {
+            // cap previous note's duration
+            const events = songData.channels[currentChannelId].patterns[currentPatternId].events;
+            const eventKeys = Object.keys(events);
+            let stop = false;
+            eventKeys
+                .reverse()
+                .forEach(key => {
+                    const prevEventStep = parseInt(key);
+                    const event = events[prevEventStep];
+                    if (!stop && prevEventStep < step &&
+                        event[SoundEvent.Note] !== undefined &&
+                        event[SoundEvent.Duration] !== undefined
+                    ) {
+                        stop = true;
+                        if (event[SoundEvent.Duration] + prevEventStep >= step) {
+                            updatedEvents[prevEventStep][SoundEvent.Duration] = step - prevEventStep;
+                        }
+                    }
+                });
+        }
+
+        setPattern(currentChannelId, currentPatternId, {
+            events: updatedEvents
+        });
+    };
 
     const setInstruments = (instruments: InstrumentMap): void => {
         updateSongData({ ...songData, instruments });
@@ -303,7 +348,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         currentChannel.sequence.forEach((s, sequenceIndex) => {
             if (currentSequenceIndex > sequenceIndex) {
                 const pattern = currentChannel.patterns[s];
-                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+                const patternSize = pattern.size * NOTE_RESOLUTION;
                 result += patternSize;
             }
         });
@@ -332,7 +377,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     ]);
 
     return (
-        <HContainer className="musicEditor" overflow="hidden" style={{ padding: 0 }}>
+        <HContainer className="musicEditor" gap={0} overflow="hidden" style={{ padding: 0 }}>
             <Emulator
                 playing={playing}
                 setEmulatorInitialized={setEmulatorInitialized}
@@ -358,11 +403,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     tool={tool}
                     setTool={setTool}
                     emulatorInitialized={emulatorInitialized}
-                    sidebarHidden={sidebarHidden}
-                    setSidebarHidden={setSidebarHidden}
                 />
                 <Sequencer
-                    visible={!sequencerHidden}
                     songData={songData}
                     currentStep={currentStep}
                     currentPatternId={currentPatternId}
@@ -375,10 +417,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     toggleChannelSolo={toggleChannelSolo}
                     toggleChannelSeeThrough={toggleChannelSeeThrough}
                     setChannel={setChannel}
+                    sequencerHidden={sequencerHidden}
+                    setSequencerHidden={setSequencerHidden}
                 />
                 <PianoRoll
                     songData={songData}
                     currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
                     currentTick={currentTick}
                     setCurrentTick={updateCurrentTick}
                     currentPatternId={currentPatternId}
@@ -394,10 +439,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     tool={tool}
                     lastSetNoteId={lastSetNoteId}
                     setLastSetNoteId={setLastSetNoteId}
-                    sequencerHidden={sequencerHidden}
-                    setSequencerHidden={setSequencerHidden}
                 />
             </VContainer>
+            <StyledSidebarHideToggle
+                onClick={() => setSidebarHidden(prev => !prev)}
+                title={`${SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id, true)
+                    }`}
+            >
+                <i className={sidebarHidden ? 'fa fa-chevron-left' : 'fa fa-chevron-right'} />
+            </StyledSidebarHideToggle>
             {!sidebarHidden &&
                 <>
                     <VContainer gap={15} overflow="auto" style={{ maxWidth: 300, minWidth: 300 }}>

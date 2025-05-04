@@ -1,5 +1,6 @@
 import { DataSection } from '../Common/CommonTypes';
 import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
+import { SoundEditorCommands } from './SoundEditorCommands';
 
 export type InstrumentMap = Record<string, InstrumentConfig>;
 
@@ -9,7 +10,8 @@ export interface SoundData {
     instruments: InstrumentMap
     speed: number
     loop: boolean
-    defaultBar: string
+    loopPoint: number
+    defaultSize: number
     section: DataSection
 }
 
@@ -27,6 +29,31 @@ export enum SoundEvent {
     VolumeSlide = 'volumeSlide',
 }
 
+export const INPUT_BLOCKING_COMMANDS = [
+    SoundEditorCommands.ADD_EFFECT.id,
+    SoundEditorCommands.ADD_NOTE.id,
+    SoundEditorCommands.ADD_PATTERN.id,
+    SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id,
+    SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id,
+    SoundEditorCommands.PLAY_PAUSE.id,
+    SoundEditorCommands.REMOVE_CURRENT_NOTE.id,
+    SoundEditorCommands.REMOVE_CURRENT_PATTERN.id,
+    SoundEditorCommands.SELECT_CHANNEL_1.id,
+    SoundEditorCommands.SELECT_CHANNEL_2.id,
+    SoundEditorCommands.SELECT_CHANNEL_3.id,
+    SoundEditorCommands.SELECT_CHANNEL_4.id,
+    SoundEditorCommands.SELECT_CHANNEL_5.id,
+    SoundEditorCommands.SELECT_CHANNEL_6.id,
+    SoundEditorCommands.SELECT_NEXT_CHANNEL.id,
+    SoundEditorCommands.SELECT_PREVIOUS_CHANNEL.id,
+    SoundEditorCommands.STOP.id,
+    SoundEditorCommands.TOOL_ERASER.id,
+    SoundEditorCommands.TOOL_MARQUEE.id,
+    SoundEditorCommands.TOOL_PENCIL.id,
+    SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
+    SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id,
+];
+
 export const EXCLUDED_SOUND_EVENTS = [
     SoundEvent.Duration,
     SoundEvent.Instrument,
@@ -38,7 +65,7 @@ export type EventsMap = Record<number, SoundEventMap>;
 
 export interface PatternConfig {
     name: string
-    bar: string
+    size: number
     events: EventsMap
 }
 
@@ -220,32 +247,7 @@ export const MAX_TICK_DURATION = 128;
 
 export const VOLUME_STEPS = 16;
 
-// length value is bar * 4
-export const BAR_PATTERN_LENGTH_MULT_MAP: { [bar: string]: number } = {
-    '2/2': 4,
-    '3/2': 6,
-    '2/4': 2,
-    '3/4': 3,
-    '4/4': 4,
-    '5/4': 5,
-    '6/4': 6,
-    '3/8': 1.5,
-    '4/8': 2,
-    '6/8': 3,
-    '7/8': 3.5,
-    '11/8': 5.5,
-    '4/16': 1,
-    '15/16': 3.75,
-    '12/16': 3,
-};
-
-export const CHANNEL_BG_COLORS = [
-    '#5a8ea3',
-    '#a6d2d1',
-    '#bcab43',
-    '#efc24b',
-    '#df6745',
-    '#e370a9',
-];
+export const MIN_PATTERN_SIZE = 1;
+export const MAX_PATTERN_SIZE = 8;
 
 export const SINGLE_NOTE_TESTING_DURATION = 500;

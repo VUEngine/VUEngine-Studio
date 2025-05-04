@@ -44,17 +44,21 @@ export const StyledPianoRollEditorTick = styled.div`
         margin-right: 2px;
     }
 
+    /*
     &.sharpNote {
         background-color: rgba(255, 255, 255, .15);
     }
+    */
 
     body.theia-light &,
     body.theia-hc & {
         background-color: rgba(0, 0, 0, .1);
 
+        /*
         &.sharpNote {
             background-color: rgba(0, 0, 0, .15);
         }
+        */
     }
 
     ${StyledPianoRollRow}:hover & {
@@ -152,6 +156,7 @@ export const StyledPianoRollPlacedNote = styled.div`
     max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
     min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
     outline-offset: 1px;
+    overflow: hidden;
     padding-left: 1px;
     position: absolute;
     z-index: 10;
@@ -199,18 +204,6 @@ export const MetaLineHeaderLine = styled.div`
     justify-content: center;
     min-height: 13px;
     opacity: .75;
-`;
-
-export const SequencerCollapseButton = styled.button`
-    align-items: center;
-    align-self: start;
-    display: flex;
-    font-size: 8px;
-    height: 16px;
-    justify-content: center;
-    min-height: unset !important;
-    outline-width: 0 !important;
-    width: 100%;
 `;
 
 export const MetaLineTick = styled.div`
@@ -289,6 +282,10 @@ export const StyledPianoRollHeaderTick = styled(MetaLineTick)`
 
     &:nth-child(4n + 1) {
         padding-right: 2px;
+    }
+
+    &:nth-child(16n + 2) {
+        color: inherit;
     }
 `;
 

@@ -48,7 +48,12 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
                 className={channel.seeThrough ? 'active' : undefined}
                 onClick={() => toggleChannelSeeThrough(channel.id)}
             >
-                <i className={`fa fa-${channel.seeThrough ? 'eye' : 'eye-slash'}`} />
+                <i
+                    className={`fa fa-${channel.seeThrough ? 'eye' : 'eye-slash'}`}
+                    style={{
+                        opacity: channel.seeThrough ? 1 : .3,
+                    }}
+                />
             </StyledChannelHeaderButton>
             <StyledChannelHeaderButton
                 className={channel.muted ? 'active' : undefined}

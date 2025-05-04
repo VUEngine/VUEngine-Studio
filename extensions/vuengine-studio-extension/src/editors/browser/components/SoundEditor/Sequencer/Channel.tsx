@@ -1,7 +1,7 @@
 import React from 'react';
 import SortableList from 'react-easy-sort';
 import { arrayMove } from '../../Common/Utils';
-import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
+import { ChannelConfig, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
@@ -81,7 +81,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         index={index}
                         channelId={channel.id}
                         pattern={channel.patterns[patternId]}
-                        patternSize={BAR_PATTERN_LENGTH_MULT_MAP[channel.patterns[patternId].bar] * NOTE_RESOLUTION}
+                        patternSize={channel.patterns[patternId].size * NOTE_RESOLUTION}
                         patternId={patternId}
                         currentChannelId={currentChannelId}
                         currentPatternId={currentPatternId}

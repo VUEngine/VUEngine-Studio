@@ -5,8 +5,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { SoundData, SoundEvent } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEvent } from '../SoundEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 
 const getNthByte = (num: number, byte: number): number =>
@@ -77,17 +76,6 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                         />
                     </HContainer>
                 </VContainer>
-            }
-
-            {event === SoundEvent.MasterVolume &&
-                <Range
-                    value={value}
-                    max={15}
-                    min={0}
-                    setValue={setValue}
-                    width="100%"
-                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                />
             }
 
             {(

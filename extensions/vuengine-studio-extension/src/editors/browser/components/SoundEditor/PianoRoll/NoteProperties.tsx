@@ -1,7 +1,7 @@
 import { MagicWand } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, EXCLUDED_SOUND_EVENTS, NOTE_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { EXCLUDED_SOUND_EVENTS, NOTE_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
@@ -25,7 +25,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+    const patternSize = pattern.size * NOTE_RESOLUTION;
 
     return <MetaLine style={{ bottom: 0 }}>
         <MetaLineHeader>

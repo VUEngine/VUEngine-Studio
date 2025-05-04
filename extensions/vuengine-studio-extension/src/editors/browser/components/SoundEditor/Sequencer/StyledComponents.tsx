@@ -10,11 +10,40 @@ export const StyledSequencer = styled.div`
     min-height: calc((${PATTERN_HEIGHT}px + 2px) * 6 + 10px);
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 12px;
+    padding-bottom: 1px;
     position: relative;
 
     &.hidden {
         display: none;
+    }
+`;
+
+export const StyledSequencerHideToggle = styled.button`
+    background-color: transparent;
+    border: 0;
+    box-shadow: 0 5px 0 var(--theia-editor-background) inset, 0 6px 0 inset;
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    font-size: 9px;
+    margin: 0 12px !important;
+    max-height: 12px;
+    min-height: 12px !important;
+    padding: 0;
+
+    i {
+        background-color: var(--theia-editor-background);
+        padding: 0 var(--theia-ui-padding);
+    }
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        border-radius: 2px;
+        box-shadow: none;
+        color: #fff;
+
+        i {
+            background-color: transparent;
+        }
     }
 `;
 
@@ -127,8 +156,11 @@ export const StyledPattern = styled.div`
 `;
 
 export const StyledPatternName = styled.div`
-    font-size: 11px;
+    font-size: 9px;
+    overflow: hidden;
+    padding: 0 3px;
     position: relative;
+    text-overflow: ellipsis;
     z-index: 1;
 `;
 

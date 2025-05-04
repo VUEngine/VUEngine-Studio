@@ -15,7 +15,6 @@ interface PianoRollRowProps {
     patternSize: number
     lastSetNoteId: number
     setLastSetNoteId: Dispatch<SetStateAction<number>>
-    bar: string
 }
 
 export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
@@ -54,7 +53,6 @@ export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): Reac
         oldProps.tool === newProps.tool &&
         oldProps.currentChannelId === newProps.currentChannelId &&
         oldProps.currentPatternId === newProps.currentPatternId &&
-        oldProps.bar === newProps.bar &&
         oldProps.noteResolution === newProps.noteResolution &&
         JSON.stringify(oldProps.events) === JSON.stringify(newProps.events);
     //    newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&

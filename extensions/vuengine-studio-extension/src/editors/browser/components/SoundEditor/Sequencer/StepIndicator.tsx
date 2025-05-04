@@ -20,7 +20,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         const dividersNoteResolutionTotal = Math.round(currentStep / (NOTE_RESOLUTION ?? 1));
         offset = 2 + headerWidth + elapsedNotesWidth + dividers4Total + dividersNoteResolutionTotal;
     } else {
-        const patternNoteWidth = 16 / NOTE_RESOLUTION;
+        const patternNoteWidth = Math.max(0, 16 / NOTE_RESOLUTION);
         const headerPadding = 3;
         const elapsedNotesWidth = currentStep * patternNoteWidth;
         offset = headerWidth + headerPadding + elapsedNotesWidth;

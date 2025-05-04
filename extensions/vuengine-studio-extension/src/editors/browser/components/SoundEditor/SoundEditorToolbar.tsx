@@ -3,17 +3,14 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/Base/HContainer';
-import { INPUT_BLOCKING_COMMANDS } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
-import { SoundEditorTool } from './SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SoundEditorTool } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: var(--padding);
-    justify-content: space-between;
+    gap: 20px;
     margin: var(--padding);
 `;
 
@@ -74,8 +71,6 @@ interface SoundEditorToolbarProps {
     tool: SoundEditorTool
     setTool: Dispatch<SetStateAction<SoundEditorTool>>
     emulatorInitialized: boolean
-    sidebarHidden: boolean
-    setSidebarHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
@@ -85,44 +80,42 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         playing, togglePlaying, stopPlaying,
         tool, setTool,
         emulatorInitialized,
-        sidebarHidden, setSidebarHidden,
     } = props;
 
     return (
         <StyledSoundEditorToolbar>
-            <HContainer gap={20}>
-                <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarWideButton
-                        className={`theia-button ${playing ? 'primary' : 'secondary'}`}
-                        title={(playing
-                            ? nls.localize('vuengine/editors/sound/pause', 'Pause')
-                            : nls.localize('vuengine/editors/sound/play', 'Play')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
-                        }
-                        onClick={togglePlaying}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        style={{ outlineWidth: playing ? 1 : 0 }}
-                        disabled={!emulatorInitialized}
-                    >
-                        <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
-                    </StyledSoundEditorToolbarWideButton>
-                    <StyledSoundEditorToolbarButton
-                        className='theia-button secondary'
-                        title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
-                        }
-                        onClick={stopPlaying}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        disabled={!emulatorInitialized || currentStep < 0}
-                    >
-                        <i className="fa fa-fast-backward" />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarTime>
-                        {currentStep + 1}
-                    </StyledSoundEditorToolbarTime>
-                    { /* }
+            <StyledSoundEditorToolbarGroup>
+                <StyledSoundEditorToolbarWideButton
+                    className={`theia-button ${playing ? 'primary' : 'secondary'}`}
+                    title={(playing
+                        ? nls.localize('vuengine/editors/sound/pause', 'Pause')
+                        : nls.localize('vuengine/editors/sound/play', 'Play')) +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
+                    }
+                    onClick={togglePlaying}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    style={{ outlineWidth: playing ? 1 : 0 }}
+                    disabled={!emulatorInitialized}
+                >
+                    <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
+                </StyledSoundEditorToolbarWideButton>
+                <StyledSoundEditorToolbarButton
+                    className='theia-button secondary'
+                    title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
+                    }
+                    onClick={stopPlaying}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    disabled={!emulatorInitialized || currentStep < 0}
+                >
+                    <i className="fa fa-fast-backward" />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarTime>
+                    {currentStep + 1}
+                </StyledSoundEditorToolbarTime>
+                { /* }
                     <StyledSoundEditorToolbarTime>
                         <span>
                             {currentStep > -1
@@ -141,33 +134,33 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         </span>
                     </StyledSoundEditorToolbarTime>
                     { */ }
-                </StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarButton
-                        className='theia-button secondary'
-                        title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
-                        }
-                        onClick={() => setTool(SoundEditorTool.DEFAULT)}
-                        style={{ outlineWidth: tool === SoundEditorTool.DEFAULT ? 1 : 0 }}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    >
-                        <PencilSimple size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className='theia-button secondary'
-                        title={(nls.localize('vuengine/editors/sound/toolEraser', 'Eraser')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true)
-                        }
-                        onClick={() => setTool(SoundEditorTool.ERASER)}
-                        style={{ outlineWidth: tool === SoundEditorTool.ERASER ? 1 : 0 }}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    >
-                        <Eraser size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    { /* }
+            </StyledSoundEditorToolbarGroup>
+            <StyledSoundEditorToolbarGroup>
+                <StyledSoundEditorToolbarButton
+                    className='theia-button secondary'
+                    title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
+                    }
+                    onClick={() => setTool(SoundEditorTool.DEFAULT)}
+                    style={{ outlineWidth: tool === SoundEditorTool.DEFAULT ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <PencilSimple size={17} />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className='theia-button secondary'
+                    title={(nls.localize('vuengine/editors/sound/toolEraser', 'Eraser')) +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true)
+                    }
+                    onClick={() => setTool(SoundEditorTool.ERASER)}
+                    style={{ outlineWidth: tool === SoundEditorTool.ERASER ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <Eraser size={17} />
+                </StyledSoundEditorToolbarButton>
+                { /* }
                     <StyledSoundEditorToolbarButton
                         className='theia-button secondary'
                         title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
@@ -192,16 +185,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         <i className='fa fa-circle' />
                     </StyledSoundEditorToolbarButton>
                     { */ }
-                </StyledSoundEditorToolbarGroup>
-            </HContainer>
-            <SidebarCollapseButton
-                className='theia-button secondary'
-                onClick={() => setSidebarHidden(prev => !prev)}
-                title={`${SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id, true)
-                    }`}
-            >
-                <i className={sidebarHidden ? 'fa fa-chevron-left' : 'fa fa-chevron-right'} />
-            </SidebarCollapseButton>
+            </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbar>
     );
 }

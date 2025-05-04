@@ -25,13 +25,17 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             ],
         };
 
+        // create if it's a new pattern
         const largestPatternId = songData.channels[channelId].patterns.length - 1;
         if (patternId > largestPatternId) {
-            const type = services.vesProjectService.getProjectDataType('Audio');
+            const type = services.vesProjectService.getProjectDataType('Sound');
             const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
             // @ts-ignore
             const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.channels?.items?.properties?.patterns?.items);
-            updatedChannel.patterns.push(newPattern);
+            updatedChannel.patterns.push({
+                ...newPattern,
+                size: songData.defaultSize,
+            });
         }
 
         setChannel(channelId, updatedChannel);
@@ -45,9 +49,8 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                 label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
             },
             ...channel.patterns.map((p, i) => ({
-                id: `${i}`,
-                label: `${i + 1}`,
-                description: p.name,
+                id: i.toString(),
+                label: p.name.length ? p.name : (i + 1).toString(),
             })),
         ],
         {

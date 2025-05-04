@@ -9,7 +9,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import PaletteColorSelect, { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
+import PaletteColorSelect, { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp } from '../../Common/Utils';
 import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import {
@@ -31,8 +31,7 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction,
 } from '../Emulator/VsuTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { InstrumentMap, NOTES, SoundData, SoundEditorChannelType } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, InstrumentMap, NOTES, SoundData, SoundEditorChannelType } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ENVELOPE_PREVIEW_SIZE = 272;
@@ -432,7 +431,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <VContainer>
                             <NumberArrayPreview
                                 active={true}
-                                color={COLOR_PALETTE[instrument.color ?? 4]}
+                                color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
                                 height={52}
                                 width={64}
                                 maximum={64}

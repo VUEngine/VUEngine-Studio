@@ -1,20 +1,18 @@
-import React, { Dispatch, SetStateAction, useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { SoundEditorCommands } from '../SoundEditorCommands';
-import { BAR_PATTERN_LENGTH_MULT_MAP, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
+import React, { Dispatch, SetStateAction } from 'react';
+import { NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
-import { MetaLine, MetaLineHeader, MetaLineHeaderLine, SequencerCollapseButton } from './StyledComponents';
+import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
 interface PianoRollHeaderProps {
     songData: SoundData
     currentChannelId: number
     currentPatternId: number
+    currentPatternNoteOffset: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    sequencerHidden: boolean,
-    setSequencerHidden: Dispatch<SetStateAction<boolean>>
+    setCurrentStep: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -22,31 +20,22 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         songData,
         currentChannelId,
         currentPatternId,
+        currentPatternNoteOffset,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
-        sequencerHidden, setSequencerHidden,
+        setCurrentStep,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+    const patternSize = pattern.size * NOTE_RESOLUTION;
 
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
             style={{ height: 18 }}
         >
             <MetaLineHeaderLine>
-                <SequencerCollapseButton
-                    className='theia-button secondary'
-                    onClick={() => setSequencerHidden(!sequencerHidden)}
-                    title={
-                        `${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label
-                        }${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id, true)}`
-                    }
-                >
-                    <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
-                </SequencerCollapseButton>
+
             </MetaLineHeaderLine>
         </MetaLineHeader>
         {[...Array(patternSize)].map((x, index) => (
@@ -56,10 +45,12 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
                 index={index}
                 currentChannelId={currentChannelId}
                 currentPatternId={currentPatternId}
+                currentPatternNoteOffset={currentPatternNoteOffset}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}
                 setPlayRangeEnd={setPlayRangeEnd}
+                setCurrentStep={setCurrentStep}
             />
         ))
         }

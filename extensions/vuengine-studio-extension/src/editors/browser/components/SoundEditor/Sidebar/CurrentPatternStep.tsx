@@ -4,10 +4,9 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { BAR_PATTERN_LENGTH_MULT_MAP, EXCLUDED_SOUND_EVENTS, NOTE_RESOLUTION, NOTES, SINGLE_NOTE_TESTING_DURATION, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { EXCLUDED_SOUND_EVENTS, INPUT_BLOCKING_COMMANDS, NOTE_RESOLUTION, NOTES, SINGLE_NOTE_TESTING_DURATION, SoundData, SoundEvent } from '../SoundEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 import Effect from './Effect';
 import { InputWithAction, InputWithActionButton } from './Instruments';
@@ -44,7 +43,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
     } = props;
 
     const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern?.bar ?? '4/4'] * NOTE_RESOLUTION;
+    const patternSize = (pattern?.size ?? 4) * NOTE_RESOLUTION;
 
     if (currentNote === -1) {
         return <VContainer gap={15} className="lightLabel">
@@ -60,7 +59,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
     const unusedEvents = Object.keys(AVAILABLE_EVENTS).filter(e => !eventsWithoutNoteKeys.includes(e as SoundEvent));
 
     const maxDuration = useMemo(() => {
-        const patternLength = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+        const patternLength = pattern.size * NOTE_RESOLUTION;
         const allEventKeys = Object.keys(pattern.events);
         const noteEventKeys: string[] = [];
         allEventKeys.forEach(key => {
@@ -76,7 +75,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
             : patternLength - currentNote;
     }, [
         currentNote,
-        pattern.bar,
+        pattern.size,
         pattern.events,
     ]);
 
@@ -218,9 +217,9 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                                     const instr = songData.instruments[instrId];
                                     return {
                                         value: `${instrId}`,
-                                        label: `${i + 1}: ${instr.name}`,
+                                        label: instr.name.length ? instr.name : (i + 1).toString(),
                                         disabled: instr.type !== channel.type,
-                                        backgroundColor: COLOR_PALETTE[instr.color ?? 4],
+                                        backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                                     };
                                 })}
                             defaultValue={instrumentId}

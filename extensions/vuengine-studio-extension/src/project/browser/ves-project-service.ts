@@ -289,6 +289,9 @@ export class VesProjectService {
         if (schema.additionalProperties !== false) {
           resultObject = deepmerge(resultObject, data ?? {});
         }
+        if (Object.keys(resultObject).length === 0 && schema.default) {
+          resultObject = schema.default;
+        }
         return this.sortObjectByKeys(resultObject);
 
       case 'string':

@@ -54,7 +54,7 @@ export default function ImportExport(): React.JSX.Element {
         }
     };
 
-    return <VContainer gap={15}>
+    return <VContainer>
         <label>
             {nls.localize('vuengine/editors/sound/importExport', 'Import/Export')}
         </label>

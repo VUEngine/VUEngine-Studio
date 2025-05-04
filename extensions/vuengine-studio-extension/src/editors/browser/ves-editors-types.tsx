@@ -80,7 +80,6 @@ export interface EditorCommands {
 
 export const TYPE_LABELS: { [typeId: string]: string } = {
     'Actor': nls.localize('vuengine/editors/general/typeLabels/actor', 'Actor'),
-    'Audio': nls.localize('vuengine/editors/general/typeLabels/audio', 'Audio'),
     'BrightnessRepeat': nls.localize('vuengine/editors/general/typeLabels/brightnessRepeat', 'Brightness Repeat'),
     'ColliderLayers': nls.localize('vuengine/editors/general/typeLabels/colliderLayers', 'Collider Layers'),
     'ColumnTable': nls.localize('vuengine/editors/general/typeLabels/columnTable', 'Column Table'),
@@ -98,6 +97,7 @@ export const TYPE_LABELS: { [typeId: string]: string } = {
     'PluginFile': nls.localize('vuengine/editors/general/typeLabels/pluginFile', 'Plugin File'),
     'RumbleEffect': nls.localize('vuengine/editors/general/typeLabels/rumbleEffect', 'Rumble Effect'),
     'RomInfo': nls.localize('vuengine/editors/general/typeLabels/romInfo', 'ROM Info'),
+    'Sound': nls.localize('vuengine/editors/general/typeLabels/sound', 'Sound'),
     'Stage': nls.localize('vuengine/editors/general/typeLabels/stage', 'Stage'),
     'Translations': nls.localize('vuengine/editors/general/typeLabels/translations', 'Translations'),
     'VsuSandbox': nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),

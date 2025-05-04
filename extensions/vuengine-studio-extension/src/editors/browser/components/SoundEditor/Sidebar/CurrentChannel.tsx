@@ -5,9 +5,8 @@ import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { ChannelConfig, SoundData } from '../SoundEditorTypes';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import { ChannelConfig, INPUT_BLOCKING_COMMANDS, SoundData } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentChannelProps {
@@ -49,22 +48,22 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                 </label>
                 <AdvancedSelect
                     options={[{
-                        label: `1: ${nls.localize('vuengine/editors/sound/wave', 'Wave')} 1`,
+                        label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} 1`,
                         value: '0',
                     }, {
-                        label: `2: ${nls.localize('vuengine/editors/sound/wave', 'Wave')} 2`,
+                        label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} 2`,
                         value: '1',
                     }, {
-                        label: `3: ${nls.localize('vuengine/editors/sound/wave', 'Wave')} 3`,
+                        label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} 3`,
                         value: '2',
                     }, {
-                        label: `4: ${nls.localize('vuengine/editors/sound/wave', 'Wave')} 4`,
+                        label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} 4`,
                         value: '3',
                     }, {
-                        label: `5: ${nls.localize('vuengine/editors/sound/sweepModulation', 'Sweep / Modulation')}`,
+                        label: nls.localize('vuengine/editors/sound/sweepModulation', 'Sweep / Modulation'),
                         value: '4',
                     }, {
-                        label: `6: ${nls.localize('vuengine/editors/sound/noise', 'Noise')}`,
+                        label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
                         value: '5',
                     }]}
                     defaultValue={`${channel.id}`}
@@ -86,9 +85,9 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                     const instrument = songData.instruments[instrumentId];
                                     return {
                                         value: `${instrumentId}`,
-                                        label: `${i + 1}: ${instrument.name}`,
+                                        label: instrument.name.length ? instrument.name : (i + 1).toString(),
                                         disabled: instrument.type !== channel.type,
-                                        backgroundColor: COLOR_PALETTE[instrument.color ?? 4],
+                                        backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
                                     };
                                 })}
                             defaultValue={`${channel.instrument}`}

@@ -8,6 +8,8 @@ export const COLOR_PALETTE = [
     '#a91e29', '#a9581e', '#a9861e', '#1ea96f', '#1e92a9', '#1e35a9', '#4c1ea9', '#a91e58',
 ];
 
+export const DEFAULT_COLOR_INDEX = 4;
+
 const ColorSquare = styled.div`
     cursor: pointer;
     height: 16px;

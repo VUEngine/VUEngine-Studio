@@ -6,10 +6,9 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor';
-import { InstrumentMap, SoundData } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData } from '../SoundEditorTypes';
 import Instrument from './Instrument';
 
 export const InputWithAction = styled.div`
@@ -62,20 +61,25 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     const instrument = songData.instruments[currentInstrument];
 
     const addInstrument = async () => {
-        const type = services.vesProjectService.getProjectDataType('Audio');
+        const type = services.vesProjectService.getProjectDataType('Sound');
         const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-        const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.instruments?.items);
-        const newId = nanoid();
-        if (newInstrument) {
-            setInstruments({
-                ...songData.instruments,
-                [newId]: {
-                    ...newInstrument,
-                    name: nls.localizeByDefault('New'),
-                },
-            });
-            setCurrentInstrument(newId);
+        console.log('schema', schema);
+        // @ts-ignore
+        const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties);
+        console.log('newInstrument', newInstrument);
+        if (!newInstrument) {
+            return;
         }
+
+        const newId = nanoid();
+        setInstruments({
+            ...songData.instruments,
+            [newId]: {
+                ...newInstrument,
+                name: nls.localizeByDefault('New'),
+            },
+        });
+        setCurrentInstrument(newId);
     };
 
     const cloneInstrument = async () => {
@@ -118,8 +122,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                             const instr = songData.instruments[instrumentId];
                             return {
                                 value: `${instrumentId}`,
-                                label: `${i + 1}: ${instr.name}`,
-                                backgroundColor: COLOR_PALETTE[instr.color ?? 4],
+                                label: instr.name.length ? instr.name : (i + 1).toString(),
+                                backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                             };
                         })}
                     defaultValue={`${currentInstrument}`}

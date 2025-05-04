@@ -4,9 +4,10 @@ import { SortableItem } from 'react-easy-sort';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { CHANNEL_BG_COLORS, ChannelConfig, SoundEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SoundData, NOTE_RESOLUTION } from '../SoundEditorTypes';
+import { ChannelConfig, NOTE_RESOLUTION, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
 import { StyledPattern, StyledPatternName, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
@@ -37,11 +38,28 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         setChannel,
     } = props;
     const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
-    const noteColor = isCurrent ? '#fff' : CHANNEL_BG_COLORS[channelId];
+    const channel = songData.channels[channelId];
+    const instrument = songData.instruments[channel.instrument];
+    const noteColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+    // TODO: color _each note_ by instrument instead of whole channel
 
-    const patternNoteWidth = Math.max(0, 8 / NOTE_RESOLUTION);
+    const patternName = pattern.name ? pattern.name : (patternId + 1).toString();
+
+    const patternNoteWidth = Math.max(0, 16 / NOTE_RESOLUTION);
     const patternPixels: number[][][] = useMemo(() => {
         const result: number[][] = [[]];
+
+        const placePixel = (x: number, y: number) => {
+            for (let k = 0; k < patternNoteWidth; k++) {
+                result[y][x * patternNoteWidth + k] = 1;
+                if (result[y - 1]) {
+                    result[y - 1][x * patternNoteWidth + k] = 1;
+                }
+                if (result[y + 1]) {
+                    result[y + 1][x * patternNoteWidth + k] = 1;
+                }
+            }
+        };
 
         // init array
         const emptyLine = [...Array(patternSize * patternNoteWidth)].map(v => 0);
@@ -53,15 +71,10 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             const event = pattern.events[tick];
             const note = event[SoundEvent.Note];
             if (note !== undefined) {
+                const duration = event[SoundEvent.Duration] ?? 1;
                 const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
-                for (let k = 0; k < patternNoteWidth; k++) {
-                    result[noteYPosition][tick * patternNoteWidth + k] = 1;
-                    if (result[noteYPosition - 1]) {
-                        result[noteYPosition - 1][tick * patternNoteWidth + k] = 1;
-                    }
-                    if (result[noteYPosition + 1]) {
-                        result[noteYPosition + 1][tick * patternNoteWidth + k] = 1;
-                    }
+                for (let k = 0; k < duration; k++) {
+                    placePixel(tick + k, noteYPosition);
                 }
             }
         });
@@ -114,7 +127,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                 data-channel={channelId}
                 data-position={index}
                 onClick={() => setCurrentSequenceIndex(channelId, index)}
-                title={`${patternId + 1}${pattern.name ? `: ${pattern.name}` : ''}`}
+                title={patternName}
             >
                 <CanvasImage
                     height={PATTERN_HEIGHT + 1}
@@ -131,7 +144,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                     }}
                 />
                 <StyledPatternName>
-                    {patternId + 1}
+                    {patternName}
                 </StyledPatternName>
                 <StyledPatternRemove
                     title={nls.localizeByDefault('Remove')}

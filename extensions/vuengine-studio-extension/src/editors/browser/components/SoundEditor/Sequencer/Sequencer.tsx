@@ -1,14 +1,13 @@
-import React, { useEffect, useMemo } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 'react';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import { ChannelConfig, SoundData } from '../SoundEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
-import { StyledSequencer } from './StyledComponents';
-import { SoundEditorCommands } from '../SoundEditorCommands';
+import { StyledSequencer, StyledSequencerHideToggle } from './StyledComponents';
 
 interface SequencerProps {
-    visible: boolean
     songData: SoundData
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
@@ -21,11 +20,12 @@ interface SequencerProps {
     toggleChannelSolo: (channelId: number) => void
     toggleChannelSeeThrough: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    sequencerHidden: boolean,
+    setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
-        visible,
         songData,
         currentChannelId, setCurrentChannelId,
         currentPatternId, setCurrentPatternId,
@@ -35,7 +35,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleChannelSolo,
         toggleChannelSeeThrough,
         setChannel,
+        sequencerHidden, setSequencerHidden,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const soloChannel = useMemo(() => songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1, [
         songData.channels,
@@ -62,7 +64,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         )
     ), [
         soloChannel,
-        songData.channels,
+        songData,
         currentChannelId,
         currentPatternId,
         currentSequenceIndex,
@@ -131,17 +133,26 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         songData,
     ]);
 
-    return <StyledSequencer
-        className={visible ? undefined : 'hidden'}
-        onWheel={mapVerticalToHorizontalScroll}
-    >
-        {<StepIndicator
-            currentStep={currentStep}
-            isPianoRoll={false}
-            hidden={currentStep === -1}
-        />}
-        <VContainer gap={0} grow={1}>
-            {channels}
-        </VContainer>
-    </StyledSequencer>;
+    return <VContainer gap={0}>
+        <StyledSequencer
+            className={sequencerHidden ? 'hidden' : undefined}
+            onWheel={mapVerticalToHorizontalScroll}
+        >
+            {<StepIndicator
+                currentStep={currentStep}
+                isPianoRoll={false}
+                hidden={currentStep === -1}
+            />}
+            <VContainer gap={0} grow={1}>
+                {channels}
+            </VContainer>
+        </StyledSequencer>
+        <StyledSequencerHideToggle
+            onClick={() => setSequencerHidden(prev => !prev)}
+            title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id, true)
+                }`}
+        >
+            <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
+        </StyledSequencerHideToggle>
+    </VContainer>;
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
+import React, { Dispatch, SetStateAction } from 'react';
+import { NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import { StyledPianoRollHeaderTick } from './StyledComponents';
 
 interface PianoRollHeaderNoteProps {
@@ -7,10 +7,12 @@ interface PianoRollHeaderNoteProps {
     index: number
     currentChannelId: number
     currentPatternId: number
+    currentPatternNoteOffset: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
+    setCurrentStep: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): React.JSX.Element {
@@ -19,13 +21,15 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
         index,
         currentChannelId,
         currentPatternId,
+        currentPatternNoteOffset,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
+        setCurrentStep,
     } = props;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+    const patternSize = pattern.size * NOTE_RESOLUTION;
 
     const classNames = [];
     if (playRangeStart === index) {
@@ -36,9 +40,11 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
         classNames.push('inRange');
     }
 
+    /*
     const updatePlayRangeStart = (start: number): void => {
         setPlayRange(start);
     };
+    */
 
     const updatePlayRangeEnd = (end: number): void => {
         setPlayRange(undefined, end);
@@ -80,11 +86,17 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     return (
         <StyledPianoRollHeaderTick
             className={classNames.join(' ')}
-            onClick={() => updatePlayRangeStart(index)}
+            onClick={() => setCurrentStep(prev => prev === currentPatternNoteOffset + index
+                ? -1
+                : currentPatternNoteOffset + index
+            )}
             onContextMenu={() => updatePlayRangeEnd(index)}
         >
-            {(index + 1) % 4 === 0 &&
-                index + 1
+            {index % 16 === 0
+                ? (index / 16) + 1
+                : index % 4 === 0
+                    ? index % 16 / 4 + 1
+                    : undefined
             }
         </StyledPianoRollHeaderTick>
     );

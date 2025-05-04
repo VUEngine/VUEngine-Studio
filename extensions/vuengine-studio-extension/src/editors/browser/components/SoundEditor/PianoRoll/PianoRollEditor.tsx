@@ -1,9 +1,9 @@
 import chroma from 'chroma-js';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, SoundEditorTool, SoundEvent, NOTES, SoundData, NOTE_RESOLUTION, PIANO_ROLL_NOTE_WIDTH, PIANO_ROLL_NOTE_HEIGHT } from '../SoundEditorTypes';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import { NOTE_RESOLUTION, NOTES, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH, SoundData, SoundEditorTool, SoundEvent } from '../SoundEditorTypes';
 import PianoRollRow from './PianoRollRow';
 import { StyledPianoRollEditor, StyledPianoRollPlacedNote } from './StyledComponents';
-import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 
 const getLeftOffset = (index: number) =>
     53 + // piano
@@ -47,12 +47,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * NOTE_RESOLUTION;
+    const patternSize = pattern.size * NOTE_RESOLUTION;
 
     const channelsNotes = useMemo(() => {
         const currentChannel = songData.channels[currentChannelId];
         const currentPattern = currentChannel.patterns[currentPatternId];
-        const currentPatternSize = BAR_PATTERN_LENGTH_MULT_MAP[currentPattern.bar] * NOTE_RESOLUTION;
+        const currentPatternSize = currentPattern.size * NOTE_RESOLUTION;
         const result: React.JSX.Element[] = [];
         songData.channels.forEach((otherChannel, channelIndex) => {
             let patternNoteOffset = 0;
@@ -61,7 +61,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     return;
                 }
                 const otherChannelPattern = otherChannel.patterns[s];
-                const otherChannelPatternSize = BAR_PATTERN_LENGTH_MULT_MAP[otherChannelPattern.bar] * NOTE_RESOLUTION;
+                const otherChannelPatternSize = otherChannelPattern.size * NOTE_RESOLUTION;
                 [...Array(otherChannelPatternSize)].forEach((x, noteIndex) => {
                     const note = otherChannelPattern.events[noteIndex]
                         ? otherChannelPattern.events[noteIndex][SoundEvent.Note] ?? -1
@@ -76,7 +76,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     ) {
                         const instrumentId = otherChannelPattern.events[noteIndex][SoundEvent.Instrument] ?? otherChannel.instrument;
                         const instrument = songData.instruments[instrumentId];
-                        const instrumentColor = COLOR_PALETTE[instrument.color ?? 4];
+                        const instrumentColor = COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX];
                         const index = patternNoteOffset + noteIndex - currentPatternNoteOffset;
                         const left = getLeftOffset(index);
                         const lastNoteLeft = getLeftOffset(index + noteDuration - 1);
@@ -138,7 +138,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 patternSize={patternSize}
                 lastSetNoteId={lastSetNoteId}
                 setLastSetNoteId={setLastSetNoteId}
-                bar={pattern.bar}
             />
         )}
         {channelsNotes}
