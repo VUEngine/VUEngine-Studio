@@ -88,7 +88,7 @@ export const StyledChannelHeader = styled.div`
     min-width: 50px;
     overflow: hidden;
     position: sticky;
-    width: 52px;
+    width: 50px;
     z-index: 100;
 
     &.current {
@@ -233,4 +233,20 @@ export const StyledStepIndicator = styled.div`
     left: 0;
     position: absolute;
     z-index: 1;
+`;
+
+export const StyledLoopIndicator = styled.div`
+    background-color: var(--theia-editor-foreground);
+    bottom: 0;
+    opacity: .5;
+    position: absolute;
+    top: 0;
+    width: 1px;
+
+    i {
+        bottom: -1px;
+        font-size: 9px;
+        margin-left: 1px;
+        position: absolute;
+    }
 `;

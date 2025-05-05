@@ -1,5 +1,11 @@
 import styled from 'styled-components';
-import { PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+import { MAX_PATTERN_SIZE, NOTE_RESOLUTION, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+
+const getPianoRollWidth = (size: number) =>
+    53 + // piano
+    size * 4 - 1 + // quarter note separators
+    size - 1 + // full note separators
+    size * (PIANO_ROLL_NOTE_WIDTH + 1) * NOTE_RESOLUTION; // notes
 
 // these need to be in a single fine for references to each other to work
 
@@ -7,11 +13,13 @@ export const StyledPianoRollEditor = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    user-select: none;
 `;
 
 export const StyledPianoRollRow = styled.div`
     display: flex;
     min-height: ${PIANO_ROLL_NOTE_HEIGHT + 1}px;
+    overflow-x: hidden;
     position: relative;
     z-index: 10;
 
@@ -35,9 +43,7 @@ export const StyledPianoRollEditorTick = styled.div`
     max-width: ${PIANO_ROLL_NOTE_WIDTH}px;
 
     &:hover {
-        border-radius: 1px;
-        outline: 3px solid var(--theia-focusBorder);
-        outline-offset: 1px;
+        background-color: var(--theia-focusBorder) !important;
         z-index: 100;
     }
     &:nth-child(4n + 1) {
@@ -62,10 +68,10 @@ export const StyledPianoRollEditorTick = styled.div`
     }
 
     ${StyledPianoRollRow}:hover & {
-        background-color: rgba(255, 255, 255, .3) !important;
+        background-color: rgba(255, 255, 255, .2);
 
         body.theia-light & {
-            background-color: rgba(0, 0, 0, .3) !important;
+            background-color: rgba(0, 0, 0, .2);
         }
     }
 `;
@@ -159,6 +165,7 @@ export const StyledPianoRollPlacedNote = styled.div`
     overflow: hidden;
     padding-left: 1px;
     position: absolute;
+    text-overflow: ellipsis;
     z-index: 10;
 
     &.oc {
@@ -173,11 +180,24 @@ export const StyledPianoRollPlacedNote = styled.div`
     }
 `;
 
+export const StyledPianoRollPlacedNoteDragHandle = styled.div`
+    border-left: 1px solid;
+    bottom: 2px;
+    cursor: col-resize;
+    position: absolute;
+    right: 0;
+    top: 2px;
+    width: 2px;
+`;
+
 export const MetaLine = styled.div`
+    box-sizing: border-box;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
     left: 0;
+    min-height: 19px;
+    overflow-x: hidden;
     padding: 1px 4px 0 0;
     position: sticky;
     background: var(--theia-editor-background);
@@ -221,8 +241,8 @@ export const MetaLineTick = styled.div`
     user-select: none;
 
     &:hover {
-        border-radius: 1px;
-        outline: 1px solid var(--theia-focusBorder);
+        background-color: var(--theia-focusBorder) !important;
+        color: #fff;
     }
     &:nth-child(4n + 1) {
         padding-right: 2px;
@@ -246,13 +266,17 @@ export const MetaLineTickEffects = styled.div`
     
     ${MetaLineTick}.current & {
         background-color: var(--theia-secondaryButton-hoverBackground);
+
+        &:hover {
+            background-color: var(--theia-focusBorder);
+            color: #fff;
+        }
     }
 `;
 
 export const StyledPianoRollHeaderTick = styled(MetaLineTick)`
     border-top: 1px solid transparent;
     color: var(--theia-secondaryButton-background);
-    justify-content: end;
     min-height: 16px;
     padding-right: 1px;
 
@@ -295,7 +319,7 @@ export const StyledPianoRoll = styled.div`
     flex-direction: column;
     font-size: 10px;
     overflow: auto;
-    margin: 0 var(--padding) var(--padding);
+    margin: 2px var(--padding) var(--padding);
     position: relative;
 
     &.noteResolution-4 ${MetaLineTick}:nth-child(4n + 1) {
@@ -521,4 +545,11 @@ export const StyledPianoRoll = styled.div`
             background: rgba(0, 0, 0, .2);
         }
     }
+
+    ${[...Array(MAX_PATTERN_SIZE)].map((i, j) => `&.size-${j}  { 
+        ${MetaLine}, 
+        ${StyledPianoRollRow} { 
+            width: ${getPianoRollWidth(j)}px; 
+        } 
+    }`)}
 `;

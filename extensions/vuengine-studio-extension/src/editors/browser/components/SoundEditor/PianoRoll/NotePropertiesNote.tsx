@@ -8,16 +8,16 @@ interface NotePropertiesNoteProps {
     current: boolean
     effects: SoundEvent[]
     setCurrentTick: (currentTick: number) => void
-    setNote: (index: number, note: number | undefined) => void
+    setNote: (step: number, note?: number) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
-    const { index, current, effects, setCurrentTick, setNote } = props;
+    const { index, current, effects, setCurrentTick, setNote: removeNote } = props;
 
     return <MetaLineTick
         className={current ? 'current' : undefined}
         onClick={() => setCurrentTick(index)}
-        onContextMenu={() => setNote(index, undefined)}
+        onContextMenu={() => removeNote(index)}
     >
         <MetaLineTickEffects>
             <div>

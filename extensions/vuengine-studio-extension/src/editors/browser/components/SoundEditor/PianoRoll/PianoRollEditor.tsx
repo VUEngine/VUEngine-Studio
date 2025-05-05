@@ -1,19 +1,9 @@
-import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { NOTE_RESOLUTION, NOTES, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH, SoundData, SoundEditorTool, SoundEvent } from '../SoundEditorTypes';
+import { NOTE_RESOLUTION, NOTES, SoundData, SoundEvent } from '../SoundEditorTypes';
+import PianoRollPlacedNote from './PianoRollPlacedNote';
 import PianoRollRow from './PianoRollRow';
-import { StyledPianoRollEditor, StyledPianoRollPlacedNote } from './StyledComponents';
-
-const getLeftOffset = (index: number) =>
-    53 + // piano
-    1 * Math.floor(index / NOTE_RESOLUTION * 4) + // quarter note separators
-    1 * Math.floor(index / NOTE_RESOLUTION) + // step / full note separators
-    index * (PIANO_ROLL_NOTE_WIDTH + 1);
-
-const getTopOffset = (note: number) => 19 + // meta line
-    1 * Math.floor(note / 12) + // octave separators
-    note * (PIANO_ROLL_NOTE_HEIGHT + 1);
+import { StyledPianoRollEditor } from './StyledComponents';
 
 interface PianoRollEditorProps {
     songData: SoundData
@@ -23,11 +13,8 @@ interface PianoRollEditorProps {
     currentSequenceIndex: number
     currentTick: number
     setCurrentTick: (note: number) => void
-    setNote: (index: number, note: number | undefined) => void
+    setNote: (step: number, note?: number) => void
     playNote: (note: number) => void
-    tool: SoundEditorTool
-    lastSetNoteId: number
-    setLastSetNoteId: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -41,20 +28,16 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         setCurrentTick,
         setNote,
         playNote,
-        tool,
-        lastSetNoteId, setLastSetNoteId,
     } = props;
-
-    const channel = songData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
-    const patternSize = pattern.size * NOTE_RESOLUTION;
+    const [placeNote, setPlaceNote] = useState<number>(-1);
+    const [placeNoteStep, setPlaceNoteStep] = useState<number>(-1);
 
     const channelsNotes = useMemo(() => {
         const currentChannel = songData.channels[currentChannelId];
         const currentPattern = currentChannel.patterns[currentPatternId];
         const currentPatternSize = currentPattern.size * NOTE_RESOLUTION;
         const result: React.JSX.Element[] = [];
-        songData.channels.forEach((otherChannel, channelIndex) => {
+        songData.channels.forEach(otherChannel => {
             let patternNoteOffset = 0;
             otherChannel.sequence.forEach(s => {
                 if (!otherChannel.seeThrough && otherChannel.id !== currentChannelId) {
@@ -76,38 +59,21 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     ) {
                         const instrumentId = otherChannelPattern.events[noteIndex][SoundEvent.Instrument] ?? otherChannel.instrument;
                         const instrument = songData.instruments[instrumentId];
-                        const instrumentColor = COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX];
-                        const index = patternNoteOffset + noteIndex - currentPatternNoteOffset;
-                        const left = getLeftOffset(index);
-                        const lastNoteLeft = getLeftOffset(index + noteDuration - 1);
-                        const top = getTopOffset(note);
-                        const width = lastNoteLeft - left + PIANO_ROLL_NOTE_WIDTH;
+                        const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+                        const step = patternNoteOffset + noteIndex - currentPatternNoteOffset;
                         result.push(
-                            <StyledPianoRollPlacedNote
-                                key={`${otherChannel.id}-${index}`}
-                                className={otherChannel.id !== currentChannelId
-                                    ? 'oc'
-                                    : currentTick === index
-                                        ? 'selected'
-                                        : undefined
-                                }
-                                style={{
-                                    backgroundColor: otherChannel.id !== currentChannelId
-                                        ? undefined
-                                        : instrumentColor,
-                                    color: otherChannel.id !== currentChannelId
-                                        ? undefined
-                                        : chroma.contrast(instrumentColor, 'white') > 2
-                                            ? 'white'
-                                            : 'black',
-                                    left,
-                                    top,
-                                    width,
-                                }}
-                                onClick={() => setCurrentTick(index)}
-                            >
-                                {Object.keys(NOTES)[note]}
-                            </StyledPianoRollPlacedNote >
+                            <PianoRollPlacedNote
+                                key={`${otherChannel.id}-${step}`}
+                                instrumentColor={instrumentColor}
+                                note={note}
+                                step={step}
+                                duration={noteDuration}
+                                currentChannelId={currentChannelId}
+                                channelId={otherChannel.id}
+                                currentTick={currentTick}
+                                setCurrentTick={setCurrentTick}
+                                setNote={setNote}
+                            />
                         );
                     }
                 });
@@ -122,24 +88,34 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentSequenceIndex,
         currentTick,
         songData.instruments[songData.channels[currentChannelId].instrument],
+        setNote,
+    ]);
+
+    const grid = useMemo(() => Object.keys(NOTES).map((note, index) =>
+        <PianoRollRow
+            key={index}
+            note={note}
+            noteId={index}
+            setCurrentTick={setCurrentTick}
+            playNote={playNote}
+            setPlaceNote={setPlaceNote}
+            setPlaceNoteStep={setPlaceNoteStep}
+        />
+    ), []);
+
+    useEffect(() => {
+        if (placeNoteStep > -1 && placeNote > -1) {
+            setNote(placeNoteStep, placeNote);
+            setPlaceNote(-1);
+            setPlaceNoteStep(-1);
+        }
+    }, [
+        setNote,
+        placeNote,
     ]);
 
     return <StyledPianoRollEditor>
-        {Object.keys(NOTES).map((note, index) =>
-            <PianoRollRow
-                key={index}
-                note={note}
-                noteId={index}
-                currentPatternId={currentPatternId}
-                setCurrentTick={setCurrentTick}
-                setNote={setNote}
-                playNote={playNote}
-                tool={tool}
-                patternSize={patternSize}
-                lastSetNoteId={lastSetNoteId}
-                setLastSetNoteId={setLastSetNoteId}
-            />
-        )}
+        {grid}
         {channelsNotes}
     </StyledPianoRollEditor>;
 }

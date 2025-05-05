@@ -5,10 +5,9 @@ import RadioSelect from '../Common/Base/RadioSelect';
 import Range from '../Common/Base/Range';
 import VContainer from '../Common/Base/VContainer';
 import { clamp } from '../Common/Utils';
-import { NOTES } from '../SoundEditor/SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, NOTES } from '../SoundEditor/SoundEditorTypes';
 import WaveformSelect from './WaveformSelect';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
-import { INPUT_BLOCKING_COMMANDS } from '../SoundEditor/SoundEditor';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,

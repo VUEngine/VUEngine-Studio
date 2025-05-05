@@ -1,4 +1,3 @@
-import { Eraser, PencilSimple } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -78,7 +77,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const {
         currentStep,
         playing, togglePlaying, stopPlaying,
-        tool, setTool,
+        // tool, setTool,
         emulatorInitialized,
     } = props;
 
@@ -135,6 +134,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     </StyledSoundEditorToolbarTime>
                     { */ }
             </StyledSoundEditorToolbarGroup>
+            { /* }
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarButton
                     className='theia-button secondary'
@@ -148,19 +148,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 >
                     <PencilSimple size={17} />
                 </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarButton
-                    className='theia-button secondary'
-                    title={(nls.localize('vuengine/editors/sound/toolEraser', 'Eraser')) +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true)
-                    }
-                    onClick={() => setTool(SoundEditorTool.ERASER)}
-                    style={{ outlineWidth: tool === SoundEditorTool.ERASER ? 1 : 0 }}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <Eraser size={17} />
-                </StyledSoundEditorToolbarButton>
-                { /* }
                     <StyledSoundEditorToolbarButton
                         className='theia-button secondary'
                         title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
@@ -184,8 +171,8 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     >
                         <i className='fa fa-circle' />
                     </StyledSoundEditorToolbarButton>
-                    { */ }
             </StyledSoundEditorToolbarGroup>
+            { */ }
         </StyledSoundEditorToolbar>
     );
 }

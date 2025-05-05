@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { SoundEditorTool } from '../SoundEditorTypes';
+import { MAX_PATTERN_SIZE, NOTE_RESOLUTION } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 import { StyledPianoRollRow } from './StyledComponents';
@@ -7,25 +7,19 @@ import { StyledPianoRollRow } from './StyledComponents';
 interface PianoRollRowProps {
     note: string
     noteId: number
-    currentPatternId: number
     setCurrentTick: (note: number) => void
-    setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
-    tool: SoundEditorTool
-    patternSize: number
-    lastSetNoteId: number
-    setLastSetNoteId: Dispatch<SetStateAction<number>>
+    setPlaceNote: Dispatch<SetStateAction<number>>
+    setPlaceNoteStep: Dispatch<SetStateAction<number>>
 }
 
-export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
+export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
     const {
         note,
         noteId,
         setCurrentTick,
         playNote,
-        setNote,
-        tool,
-        patternSize,
+        setPlaceNote, setPlaceNoteStep,
     } = props;
 
     return <StyledPianoRollRow>
@@ -34,33 +28,16 @@ export default /* memo( */ function PianoRollRow(props: PianoRollRowProps): Reac
             note={note}
             playNote={playNote}
         />
-        {[...Array(patternSize)].map((x, colIndex) =>
+        {[...Array(MAX_PATTERN_SIZE * NOTE_RESOLUTION)].map((x, colIndex) =>
             <PianoRollNote
                 key={colIndex}
-                index={colIndex}
+                step={colIndex}
                 noteId={noteId}
                 setCurrentTick={setCurrentTick}
                 playNote={playNote}
-                setNote={setNote}
-                tool={tool}
+                setPlaceNote={setPlaceNote}
+                setPlaceNoteStep={setPlaceNoteStep}
             />
         )}
     </StyledPianoRollRow>;
-}
-/*
-, (oldProps, newProps) => {
-    const propsAreEqual =
-        oldProps.tool === newProps.tool &&
-        oldProps.currentChannelId === newProps.currentChannelId &&
-        oldProps.currentPatternId === newProps.currentPatternId &&
-        oldProps.noteResolution === newProps.noteResolution &&
-        JSON.stringify(oldProps.events) === JSON.stringify(newProps.events);
-    //    newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&
-    //    oldProps.notes[newProps.lastSetNoteId] !== newProps.noteId;
-
-    //    // reset last set note id after every check, to not re-render on unrelated changes
-    //    newProps.setLastSetNoteId(-1);
-
-    return propsAreEqual;
-})
-*/;
+};

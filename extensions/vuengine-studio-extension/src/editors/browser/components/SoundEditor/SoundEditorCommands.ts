@@ -20,12 +20,6 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'b',
     };
-    export const TOOL_ERASER: EditorCommand = {
-        id: 'editors.soundEditor.toolEraser',
-        label: nls.localize('vuengine/editors/sound/commands/toolEraser', 'Tool: Eraser'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'e',
-    };
     export const TOOL_MARQUEE: EditorCommand = {
         id: 'editors.soundEditor.toolMarquee',
         label: nls.localize('vuengine/editors/sound/commands/toolMarquee', 'Tool: Marquee'),

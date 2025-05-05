@@ -47,7 +47,6 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.SELECT_NEXT_CHANNEL.id,
     SoundEditorCommands.SELECT_PREVIOUS_CHANNEL.id,
     SoundEditorCommands.STOP.id,
-    SoundEditorCommands.TOOL_ERASER.id,
     SoundEditorCommands.TOOL_MARQUEE.id,
     SoundEditorCommands.TOOL_PENCIL.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
@@ -102,7 +101,6 @@ export enum SoundEditorChannelType {
 
 export enum SoundEditorTool {
     DEFAULT,
-    ERASER,
     MARQUEE,
 }
 
@@ -239,7 +237,7 @@ export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
 
 export const NOTE_RESOLUTION = 16;
 
-export const PIANO_ROLL_NOTE_HEIGHT = 9;
+export const PIANO_ROLL_NOTE_HEIGHT = 11;
 export const PIANO_ROLL_NOTE_WIDTH = 15;
 
 export const MIN_TICK_DURATION = 1;
@@ -248,6 +246,6 @@ export const MAX_TICK_DURATION = 128;
 export const VOLUME_STEPS = 16;
 
 export const MIN_PATTERN_SIZE = 1;
-export const MAX_PATTERN_SIZE = 8;
+export const MAX_PATTERN_SIZE = 16;
 
 export const SINGLE_NOTE_TESTING_DURATION = 500;

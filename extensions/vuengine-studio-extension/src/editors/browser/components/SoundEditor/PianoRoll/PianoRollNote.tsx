@@ -1,18 +1,18 @@
-import React from 'react';
-import { NOTES, SoundEditorTool } from '../SoundEditorTypes';
+import React, { Dispatch, SetStateAction } from 'react';
+import { NOTES } from '../SoundEditorTypes';
 import { StyledPianoRollEditorTick } from './StyledComponents';
 
 interface PianoRollNoteProps {
-    index: number
+    step: number
     noteId: number
     setCurrentTick: (note: number) => void
-    setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
-    tool: SoundEditorTool
+    setPlaceNote: Dispatch<SetStateAction<number>>
+    setPlaceNoteStep: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
-    const { index, noteId, playNote, setCurrentTick, setNote, tool } = props;
+    const { step, noteId, playNote, setCurrentTick, setPlaceNote, setPlaceNoteStep } = props;
 
     const classNames = [];
     if (Object.keys(NOTES)[noteId].includes('#')) {
@@ -20,28 +20,15 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     }
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        /*
-        if (tool === SoundEditorTool.ERASER) {
-            doUnsetNote();
-        } else {
-        */
-        if (tool === SoundEditorTool.DEFAULT) {
-            setNote(index, noteId);
-            playNote(noteId);
-            setCurrentTick(index);
-        }
+        playNote(noteId);
+        setCurrentTick(step);
+        setPlaceNote(noteId);
+        setPlaceNoteStep(step);
     };
-
-    /*
-    const doUnsetNote = () => {
-        setNote(index, undefined);
-    };
-    */
 
     return <StyledPianoRollEditorTick
         className={classNames.join(' ')}
         onClick={onClick}
-    // onContextMenu={doUnsetNote}
     />;
 }
 

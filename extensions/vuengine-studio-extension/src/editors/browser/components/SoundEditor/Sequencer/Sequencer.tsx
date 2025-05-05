@@ -6,6 +6,7 @@ import { ChannelConfig, SoundData } from '../SoundEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 import { StyledSequencer, StyledSequencerHideToggle } from './StyledComponents';
+import LoopIndicator from './LoopIndicator';
 
 interface SequencerProps {
     songData: SoundData
@@ -138,11 +139,15 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             className={sequencerHidden ? 'hidden' : undefined}
             onWheel={mapVerticalToHorizontalScroll}
         >
-            {<StepIndicator
+            <StepIndicator
                 currentStep={currentStep}
                 isPianoRoll={false}
                 hidden={currentStep === -1}
-            />}
+            />
+            <LoopIndicator
+                position={songData.loopPoint}
+                hidden={songData.loopPoint === 0}
+            />
             <VContainer gap={0} grow={1}>
                 {channels}
             </VContainer>

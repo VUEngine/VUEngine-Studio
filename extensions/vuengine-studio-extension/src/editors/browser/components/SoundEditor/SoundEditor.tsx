@@ -80,10 +80,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(4);
     const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
+    const [currentPatternId, setCurrentPatternId] = useState<number>(songData.channels[0].sequence[0]);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
-    const [currentPatternId, setCurrentPatternId] = useState<number>(0);
     const [currentTick, setCurrentTick] = useState<number>(0);
     const [currentInstrument, setCurrentInstrument] = useState<string>('');
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
@@ -91,10 +92,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [sidebarTab, setSidebarTab] = useState<number>(0);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
-    const [lastSetNoteId, setLastSetNoteId] = useState<number>(-1);
 
     const updateNote = (index: number, note: number | undefined) => {
-        setLastSetNoteId(index);
         setNote(index, note);
     };
 
@@ -238,10 +237,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const setNote = (step: number, note?: number): void => {
         const updatedEvents: EventsMap = {
             ...songData.channels[currentChannelId].patterns[currentPatternId].events,
-            [step]: {
-                ...songData.channels[currentChannelId].patterns[currentPatternId].events[step] ?? {},
-                [SoundEvent.Note]: note,
-            },
         };
 
         if (note === undefined) {
@@ -254,25 +249,53 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 delete updatedEvents[step];
             }
         } else {
-            // cap previous note's duration
             const events = songData.channels[currentChannelId].patterns[currentPatternId].events;
             const eventKeys = Object.keys(events);
             let stop = false;
-            eventKeys
-                .reverse()
-                .forEach(key => {
-                    const prevEventStep = parseInt(key);
-                    const event = events[prevEventStep];
-                    if (!stop && prevEventStep < step &&
-                        event[SoundEvent.Note] !== undefined &&
-                        event[SoundEvent.Duration] !== undefined
-                    ) {
-                        stop = true;
-                        if (event[SoundEvent.Duration] + prevEventStep >= step) {
-                            updatedEvents[prevEventStep][SoundEvent.Duration] = step - prevEventStep;
+
+            // set note & duration
+            if (updatedEvents[step] === undefined) {
+                updatedEvents[step] = {};
+
+                let cappedDuration = 0;
+                if (newNoteDuration > 1) {
+                    // cap note's duration
+                    stop = false;
+                    eventKeys.forEach(key => {
+                        const nextEventStep = parseInt(key);
+                        const event = events[nextEventStep];
+                        if (!stop && nextEventStep > step &&
+                            event[SoundEvent.Note] !== undefined
+                        ) {
+                            stop = true;
+                            cappedDuration = Math.min(newNoteDuration, nextEventStep - step);
                         }
+                    });
+                    if (cappedDuration === 0) {
+                        const currentChannel = songData.channels[currentChannelId];
+                        const currentPattern = currentChannel.patterns[currentPatternId];
+                        cappedDuration = Math.min(newNoteDuration, currentPattern.size * NOTE_RESOLUTION - step);
                     }
-                });
+                }
+                updatedEvents[step][SoundEvent.Duration] = cappedDuration;
+            }
+            updatedEvents[step][SoundEvent.Note] = note;
+
+            // cap previous note's duration
+            stop = false;
+            eventKeys.reverse().forEach(key => {
+                const prevEventStep = parseInt(key);
+                const event = events[prevEventStep];
+                if (!stop && prevEventStep < step &&
+                    event[SoundEvent.Note] !== undefined &&
+                    event[SoundEvent.Duration] !== undefined
+                ) {
+                    stop = true;
+                    if (event[SoundEvent.Duration] + prevEventStep >= step) {
+                        updatedEvents[prevEventStep][SoundEvent.Duration] = step - prevEventStep;
+                    }
+                }
+            });
         }
 
         setPattern(currentChannelId, currentPatternId, {
@@ -319,9 +342,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 break;
             case SoundEditorCommands.TOOL_PENCIL.id:
                 setTool(SoundEditorTool.DEFAULT);
-                break;
-            case SoundEditorCommands.TOOL_ERASER.id:
-                setTool(SoundEditorTool.ERASER);
                 break;
             case SoundEditorCommands.TOOL_MARQUEE.id:
                 // setTool(SoundEditorTool.MARQUEE);
@@ -436,9 +456,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     setPlayRangeEnd={setPlayRangeEnd}
                     playNote={playNote}
                     setNote={updateNote}
-                    tool={tool}
-                    lastSetNoteId={lastSetNoteId}
-                    setLastSetNoteId={setLastSetNoteId}
+                    newNoteDuration={newNoteDuration}
+                    setNewNoteDuration={setNewNoteDuration}
                 />
             </VContainer>
             <StyledSidebarHideToggle

@@ -33,6 +33,7 @@ const CustomMultiValueRemove: FunctionComponent<OptionProps<AdvancedSelectOption
 interface AdvancedSelectProps {
     options: AdvancedSelectOption[]
     multi?: boolean
+    small?: boolean
     disabled?: boolean
     defaultValue: string | string[]
     placeholder?: string
@@ -40,12 +41,13 @@ interface AdvancedSelectProps {
     onChange: (options: string[]) => void
     onCreateOption?: (value: string) => void
     commands?: string[]
+    style?: object
     width?: number
 }
 
 export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.Element {
     const {
-        options, multi, disabled, defaultValue, placeholder, menuPlacement, commands, width, onChange, onCreateOption
+        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, style, onChange, onCreateOption
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
@@ -68,6 +70,10 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         }
     };
 
+    const className = small
+        ? 'react-select-container small'
+        : 'react-select-container';
+
     const SelectType = onCreateOption ? CreatableSelect : Select;
     return <SelectType
         value={value}
@@ -89,15 +95,19 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         // menuIsOpen={true}
         isOptionDisabled={option => option.disabled ?? false}
         unstyled
-        className="react-select-container"
+        className={className}
         classNamePrefix="react-select"
         maxMenuHeight={212}
         menuPlacement={menuPlacement}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         styles={{
-            control: baseStyles => ({
-                ...baseStyles,
+            container: styles => ({
+                ...styles,
+                ...(style ?? {})
+            }),
+            control: styles => ({
+                ...styles,
                 width,
             }),
             option: (styles, { data, isDisabled, isFocused, isSelected }) => {

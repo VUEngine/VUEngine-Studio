@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
+import { MAX_PATTERN_SIZE, NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
@@ -26,19 +26,14 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         setCurrentStep,
     } = props;
 
-    const channel = songData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
-    const patternSize = pattern.size * NOTE_RESOLUTION;
-
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
             style={{ height: 18 }}
         >
             <MetaLineHeaderLine>
-
             </MetaLineHeaderLine>
         </MetaLineHeader>
-        {[...Array(patternSize)].map((x, index) => (
+        {[...Array(MAX_PATTERN_SIZE * NOTE_RESOLUTION)].map((x, index) => (
             <PianoRollHeaderNote
                 songData={songData}
                 key={index}
