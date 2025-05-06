@@ -2,18 +2,11 @@ import chroma from 'chroma-js';
 import React, { SyntheticEvent, useMemo } from 'react';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import { getMaxNoteDuration } from '../Sidebar/Note';
-import { EventsMap, NOTE_RESOLUTION, NOTES, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+import { EventsMap, NOTES, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
 import { StyledPianoRollPlacedNote } from './StyledComponents';
 
-const getLeftOffset = (index: number) =>
-    53 + // piano
-    1 * Math.floor(index / NOTE_RESOLUTION * 4) + // quarter note separators
-    1 * Math.floor(index / NOTE_RESOLUTION) + // full note separators
-    index * (PIANO_ROLL_NOTE_WIDTH + 1);
-
-const getTopOffset = (note: number) => 19 + // meta line
-    1 * Math.floor(note / 12) + // octave separators
-    note * (PIANO_ROLL_NOTE_HEIGHT + 1);
+const getLeftOffset = (index: number) => 50 + (index * PIANO_ROLL_NOTE_WIDTH);
+const getTopOffset = (note: number) => 19 + (note * PIANO_ROLL_NOTE_HEIGHT);
 
 interface PianoRollPlacedNoteProps {
     currentChannelId: number
@@ -44,7 +37,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const left = getLeftOffset(step);
     const lastNoteLeft = getLeftOffset(step + duration - 1);
     const top = getTopOffset(note);
-    const width = lastNoteLeft - left + PIANO_ROLL_NOTE_WIDTH;
+    const width = lastNoteLeft - left + PIANO_ROLL_NOTE_WIDTH - 1;
 
     const maxDuration = useMemo(() =>
         getMaxNoteDuration(events, step, patternSize),
@@ -84,11 +77,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 width={width}
                 height={PIANO_ROLL_NOTE_HEIGHT}
                 draggableOpts={{
-                    grid: [(PIANO_ROLL_NOTE_WIDTH + 1), PIANO_ROLL_NOTE_HEIGHT]
+                    grid: [PIANO_ROLL_NOTE_WIDTH, PIANO_ROLL_NOTE_HEIGHT]
                 }}
                 axis="x"
-                minConstraints={[(PIANO_ROLL_NOTE_WIDTH + 1), PIANO_ROLL_NOTE_HEIGHT]}
-                maxConstraints={[(PIANO_ROLL_NOTE_WIDTH + 1) * maxDuration, PIANO_ROLL_NOTE_HEIGHT]}
+                minConstraints={[PIANO_ROLL_NOTE_WIDTH, PIANO_ROLL_NOTE_HEIGHT]}
+                maxConstraints={[PIANO_ROLL_NOTE_WIDTH * maxDuration, PIANO_ROLL_NOTE_HEIGHT]}
                 resizeHandles={channelId === currentChannelId ? ['e'] : []}
                 onResizeStop={onResizeStop}
             >

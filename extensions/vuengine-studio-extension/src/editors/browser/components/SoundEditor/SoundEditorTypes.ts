@@ -237,8 +237,8 @@ export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
 
 export const NOTE_RESOLUTION = 16;
 
-export const PIANO_ROLL_NOTE_HEIGHT = 11;
-export const PIANO_ROLL_NOTE_WIDTH = 15;
+export const PIANO_ROLL_NOTE_HEIGHT = 12;
+export const PIANO_ROLL_NOTE_WIDTH = 16;
 
 export const MIN_TICK_DURATION = 1;
 export const MAX_TICK_DURATION = 128;

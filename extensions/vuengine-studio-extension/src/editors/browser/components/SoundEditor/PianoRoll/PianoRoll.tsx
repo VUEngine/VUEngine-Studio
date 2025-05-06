@@ -49,9 +49,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const pattern = channel.patterns[currentPatternId];
 
     const classNames = [
-        `noteResolution-${NOTE_RESOLUTION}`,
+        `size-${pattern?.size ?? 0}`,
         `currentTick-${currentTick}`,
-        `size-${pattern.size}`,
     ];
 
     if (currentPatternId === -1) {
@@ -132,11 +131,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 label: '1/16',
                 value: '1'
             }]}
-            width={50}
+            width={47}
             small={true}
             style={{
                 marginBottom: -16,
-                position: 'relative',
+                position: 'fixed',
                 zIndex: 300,
             }}
         />
