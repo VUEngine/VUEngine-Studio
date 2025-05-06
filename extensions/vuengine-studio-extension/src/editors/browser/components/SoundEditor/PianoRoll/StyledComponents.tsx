@@ -171,23 +171,22 @@ export const StyledPianoRollPlacedNote = styled.div`
     &.oc {
         border-radius: 0;
         outline-width: 0;
-        opacity: .5;
         z-index: 0;
     }
 
     &.selected {
         outline: 3px solid var(--theia-focusBorder);
     }
-`;
 
-export const StyledPianoRollPlacedNoteDragHandle = styled.div`
-    border-left: 1px solid;
-    bottom: 2px;
-    cursor: col-resize;
-    position: absolute;
-    right: 0;
-    top: 2px;
-    width: 2px;
+    .react-resizable-handle-e {
+        border-left: 1px solid;
+        bottom: 2px;
+        cursor: col-resize;
+        position: absolute;
+        right: 0;
+        top: 2px;
+        width: 2px;
+    }
 `;
 
 export const MetaLine = styled.div`

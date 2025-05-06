@@ -8,7 +8,7 @@ interface NotePropertiesNoteProps {
     current: boolean
     effects: SoundEvent[]
     setCurrentTick: (currentTick: number) => void
-    setNote: (step: number, note?: number) => void
+    setNote: (step: number, note?: number, duration?: number) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {

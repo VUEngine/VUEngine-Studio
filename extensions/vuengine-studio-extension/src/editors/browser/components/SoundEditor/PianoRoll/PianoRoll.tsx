@@ -23,7 +23,7 @@ interface PianoRollProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setNote: (step: number, note?: number) => void
+    setNote: (step: number, note?: number, duration?: number) => void
     playNote: (note: number) => void
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>

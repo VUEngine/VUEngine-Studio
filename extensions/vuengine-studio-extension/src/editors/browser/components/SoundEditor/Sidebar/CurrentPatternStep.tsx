@@ -10,12 +10,13 @@ import { EXCLUDED_SOUND_EVENTS, INPUT_BLOCKING_COMMANDS, NOTE_RESOLUTION, NOTES,
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 import Effect from './Effect';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import { getMaxNoteDuration } from './Note';
 
 interface CurrentPatternStepProps {
     songData: SoundData
     currentChannelId: number
     currentPatternId: number
-    currentTick: number
+    currentStep: number
     setCurrentTick: (tick: number) => void
     setCurrentPatternId: (channelId: number, patternId: number) => void
     updateEvents: (index: number, event: SoundEvent, value: any) => void
@@ -34,7 +35,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
         songData,
-        currentChannelId, currentPatternId, currentTick: currentNote, setCurrentTick,
+        currentChannelId, currentPatternId, currentStep, setCurrentTick,
         updateEvents,
         playing,
         testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
@@ -45,39 +46,22 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
     const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
     const patternSize = (pattern?.size ?? 4) * NOTE_RESOLUTION;
 
-    if (currentNote === -1) {
+    if (currentStep === -1) {
         return <VContainer gap={15} className="lightLabel">
             {nls.localize('vuengine/editors/sound/selectNoteToEditProperties', 'Select a note to edit its properties')}
         </VContainer>;
     }
 
-    const events = pattern.events[currentNote] ?? {};
+    const events = pattern.events[currentStep] ?? {};
     const note = events ? events[SoundEvent.Note] ?? -1 : -1;
     const channel = songData.channels[currentChannelId];
     const instrumentId = (events[SoundEvent.Instrument] ?? channel.instrument) as string;
     const eventsWithoutNoteKeys = Object.keys(events).filter(e => !EXCLUDED_SOUND_EVENTS.includes(e as SoundEvent)) as SoundEvent[];
     const unusedEvents = Object.keys(AVAILABLE_EVENTS).filter(e => !eventsWithoutNoteKeys.includes(e as SoundEvent));
 
-    const maxDuration = useMemo(() => {
-        const patternLength = pattern.size * NOTE_RESOLUTION;
-        const allEventKeys = Object.keys(pattern.events);
-        const noteEventKeys: string[] = [];
-        allEventKeys.forEach(key => {
-            const event = pattern.events[parseInt(key)];
-            if (event[SoundEvent.Note] !== undefined) {
-                noteEventKeys.push(key);
-            }
-        });
-        const noteIndex = noteEventKeys.indexOf(currentNote.toString());
-
-        return noteEventKeys[noteIndex + 1] !== undefined
-            ? parseInt(noteEventKeys[noteIndex + 1]) - currentNote
-            : patternLength - currentNote;
-    }, [
-        currentNote,
-        pattern.size,
-        pattern.events,
-    ]);
+    const maxDuration = useMemo(() =>
+        getMaxNoteDuration(pattern.events, currentStep, pattern.size),
+        [pattern.events, currentStep, pattern.size]);
 
     const startTesting = (noteId: number) => {
         setTesting(true);
@@ -97,11 +81,11 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
             return;
         }
 
-        updateEvents(currentNote, event.id as SoundEvent, AVAILABLE_EVENTS[event.id].defaultValue);
+        updateEvents(currentStep, event.id as SoundEvent, AVAILABLE_EVENTS[event.id].defaultValue);
     };
 
     const removeEvent = (event: SoundEvent) =>
-        updateEvents(currentNote, event, undefined);
+        updateEvents(currentStep, event, undefined);
 
     const showNewEventSelection = (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
@@ -151,7 +135,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                     type='number'
                     min={1}
                     max={patternSize}
-                    value={currentNote + 1}
+                    value={currentStep + 1}
                     onChange={e => setCurrentTick(
                         e.target.value === ''
                             ? 0
@@ -179,7 +163,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                         ]}
                         defaultValue={note === -1 ? 'undefined' : note?.toString() ?? 'undefined'}
                         onChange={options => updateEvents(
-                            currentNote,
+                            currentStep,
                             SoundEvent.Note,
                             options[0] === 'undefined'
                                 ? undefined
@@ -223,7 +207,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                                     };
                                 })}
                             defaultValue={instrumentId}
-                            onChange={options => updateEvents(currentNote, SoundEvent.Instrument, options[0])}
+                            onChange={options => updateEvents(currentStep, SoundEvent.Instrument, options[0])}
                             commands={INPUT_BLOCKING_COMMANDS}
                         />
 
@@ -244,7 +228,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                     </label>
                     <Range
                         value={events[SoundEvent.Duration] ?? 1}
-                        setValue={d => updateEvents(currentNote, SoundEvent.Duration, d)}
+                        setValue={d => updateEvents(currentStep, SoundEvent.Duration, d)}
                         min={1}
                         max={maxDuration}
                         commandsToDisable={INPUT_BLOCKING_COMMANDS}
@@ -267,7 +251,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                         currentChannelId={currentChannelId}
                         event={event}
                         value={events[event]}
-                        setValue={(value: any) => updateEvents(currentNote, event, value)}
+                        setValue={(value: any) => updateEvents(currentStep, event, value)}
                         removeEvent={removeEvent}
                     />
                 )}

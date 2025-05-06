@@ -93,10 +93,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
 
-    const updateNote = (index: number, note: number | undefined) => {
-        setNote(index, note);
-    };
-
     const updatePlayRangeStart = (value: number) => {
         if (currentStep > -1) {
             setCurrentStep(value);
@@ -234,9 +230,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const setNote = (step: number, note?: number): void => {
+    const setNote = (step: number, note?: number, duration?: number): void => {
         const updatedEvents: EventsMap = {
             ...songData.channels[currentChannelId].patterns[currentPatternId].events,
+            [step]: {
+                ...(songData.channels[currentChannelId].patterns[currentPatternId].events[step] ?? {}),
+                [SoundEvent.Note]: note,
+            }
         };
 
         if (note === undefined) {
@@ -253,12 +253,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             const eventKeys = Object.keys(events);
             let stop = false;
 
-            // set note & duration
-            if (updatedEvents[step] === undefined) {
-                updatedEvents[step] = {};
-
+            // set duration
+            if (duration || updatedEvents[step][SoundEvent.Duration] === undefined) {
+                const effectiveDuration = duration ? duration : newNoteDuration;
+                console.log(effectiveDuration);
                 let cappedDuration = 0;
-                if (newNoteDuration > 1) {
+                if (effectiveDuration > 1) {
                     // cap note's duration
                     stop = false;
                     eventKeys.forEach(key => {
@@ -268,18 +268,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             event[SoundEvent.Note] !== undefined
                         ) {
                             stop = true;
-                            cappedDuration = Math.min(newNoteDuration, nextEventStep - step);
+                            cappedDuration = Math.min(effectiveDuration, nextEventStep - step);
                         }
                     });
                     if (cappedDuration === 0) {
                         const currentChannel = songData.channels[currentChannelId];
                         const currentPattern = currentChannel.patterns[currentPatternId];
-                        cappedDuration = Math.min(newNoteDuration, currentPattern.size * NOTE_RESOLUTION - step);
+                        cappedDuration = Math.min(effectiveDuration, currentPattern.size * NOTE_RESOLUTION - step);
                     }
                 }
                 updatedEvents[step][SoundEvent.Duration] = cappedDuration;
             }
-            updatedEvents[step][SoundEvent.Note] = note;
 
             // cap previous note's duration
             stop = false;
@@ -455,7 +454,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     playRangeEnd={playRangeEnd}
                     setPlayRangeEnd={setPlayRangeEnd}
                     playNote={playNote}
-                    setNote={updateNote}
+                    setNote={setNote}
                     newNoteDuration={newNoteDuration}
                     setNewNoteDuration={setNewNoteDuration}
                 />
@@ -517,7 +516,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         currentChannelId={currentChannelId}
                                         currentPatternId={currentPatternId}
                                         setCurrentPatternId={updateCurrentPatternId}
-                                        currentTick={currentTick}
+                                        currentStep={currentTick}
                                         setCurrentTick={setCurrentTick}
                                         updateEvents={updateEvents}
                                         playing={playing}

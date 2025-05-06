@@ -11,7 +11,7 @@ interface NotePropertiesProps {
     setCurrentTick: (currentTick: number) => void
     currentChannelId: number
     currentPatternId: number
-    setNote: (step: number, note?: number) => void
+    setNote: (step: number, note?: number, duration?: number) => void
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
