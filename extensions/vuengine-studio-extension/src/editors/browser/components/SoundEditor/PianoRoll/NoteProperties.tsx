@@ -1,29 +1,29 @@
 import { MagicWand } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React from 'react';
-import { EXCLUDED_SOUND_EVENTS, MAX_PATTERN_SIZE, NOTE_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { EXCLUDED_SOUND_EVENTS, NOTE_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
 interface NotePropertiesProps {
-    songData: SoundData
+    soundData: SoundData
     currentTick: number
     setCurrentTick: (currentTick: number) => void
     currentChannelId: number
     currentPatternId: number
-    setNote: (step: number, note?: number, duration?: number) => void
+    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentTick, setCurrentTick,
         currentChannelId,
         currentPatternId,
         setNote,
     } = props;
 
-    const channel = songData.channels[currentChannelId];
+    const channel = soundData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
 
     return <MetaLine
@@ -37,7 +37,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 <MagicWand size={16} />
             </MetaLineHeaderLine>
         </MetaLineHeader>
-        {[...Array(MAX_PATTERN_SIZE * NOTE_RESOLUTION)].map((x, index) => {
+        {[...Array(pattern.size * NOTE_RESOLUTION)].map((x, index) => {
             const events = pattern.events[index] ?? {};
             const effects = Object.keys(events).filter(e => !EXCLUDED_SOUND_EVENTS.includes(e as SoundEvent)) as SoundEvent[];
             return (

@@ -31,7 +31,7 @@ export const InputWithActionButton = styled.button`
 `;
 
 interface InstrumentsProps {
-    songData: SoundData
+    soundData: SoundData
     currentInstrument: string
     setCurrentInstrument: (instrument: string) => void
     setInstruments: (instruments: InstrumentMap) => void
@@ -49,7 +49,7 @@ interface InstrumentsProps {
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentInstrument, setCurrentInstrument,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen,
@@ -58,22 +58,20 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         emulatorInitialized,
     } = props;
     const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
-    const instrument = songData.instruments[currentInstrument];
+    const instrument = soundData.instruments[currentInstrument];
 
     const addInstrument = async () => {
         const type = services.vesProjectService.getProjectDataType('Sound');
         const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-        console.log('schema', schema);
         // @ts-ignore
         const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties);
-        console.log('newInstrument', newInstrument);
         if (!newInstrument) {
             return;
         }
 
         const newId = nanoid();
         setInstruments({
-            ...songData.instruments,
+            ...soundData.instruments,
             [newId]: {
                 ...newInstrument,
                 name: nls.localizeByDefault('New'),
@@ -85,7 +83,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     const cloneInstrument = async () => {
         const newId = nanoid();
         setInstruments({
-            ...songData.instruments,
+            ...soundData.instruments,
             [newId]: {
                 ...instrument,
                 name: `${instrument.name} ${nls.localize('vuengine/general/copy', 'copy')}`,
@@ -101,10 +99,10 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedInstruments = { ...songData.instruments };
+            const updatedInstruments = { ...soundData.instruments };
             delete updatedInstruments[currentInstrument];
 
-            setCurrentInstrument((Object.keys(songData.instruments) ?? [''])[0]);
+            setCurrentInstrument((Object.keys(soundData.instruments) ?? [''])[0]);
             // TODO: update references in channels
 
             setInstruments(updatedInstruments);
@@ -116,10 +114,10 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             {nls.localize('vuengine/editors/sound/instruments', 'Instruments')}
             <InputWithAction>
                 <AdvancedSelect
-                    options={Object.keys(songData.instruments)
-                        .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                    options={Object.keys(soundData.instruments)
+                        .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                         .map((instrumentId, i) => {
-                            const instr = songData.instruments[instrumentId];
+                            const instr = soundData.instruments[instrumentId];
                             return {
                                 value: `${instrumentId}`,
                                 label: instr.name.length ? instr.name : (i + 1).toString(),
@@ -163,7 +161,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         </VContainer>
         <hr />
         <Instrument
-            songData={songData}
+            soundData={soundData}
             currentInstrument={currentInstrument}
             setInstruments={setInstruments}
             setWaveformDialogOpen={setWaveformDialogOpen}

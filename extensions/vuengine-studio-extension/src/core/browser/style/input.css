@@ -6,6 +6,11 @@
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
 }
 
+.theia-input.small {
+    font-size: 10px;
+    height: 16px;
+}
+
 .theia-input.large {
     font-size: 130%;
     line-height: 160%;

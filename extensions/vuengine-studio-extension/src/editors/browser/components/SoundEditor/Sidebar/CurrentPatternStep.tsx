@@ -13,7 +13,7 @@ import { InputWithAction, InputWithActionButton } from './Instruments';
 import { getMaxNoteDuration } from './Note';
 
 interface CurrentPatternStepProps {
-    songData: SoundData
+    soundData: SoundData
     currentChannelId: number
     currentPatternId: number
     currentStep: number
@@ -34,7 +34,7 @@ interface CurrentPatternStepProps {
 export default function CurrentPatternStep(props: CurrentPatternStepProps): React.JSX.Element {
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
-        songData,
+        soundData,
         currentChannelId, currentPatternId, currentStep, setCurrentTick,
         updateEvents,
         playing,
@@ -43,7 +43,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
         editInstrument,
     } = props;
 
-    const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
+    const pattern = soundData.channels[currentChannelId].patterns[currentPatternId];
     const patternSize = (pattern?.size ?? 4) * NOTE_RESOLUTION;
 
     if (currentStep === -1) {
@@ -54,7 +54,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
 
     const events = pattern.events[currentStep] ?? {};
     const note = events ? events[SoundEvent.Note] ?? -1 : -1;
-    const channel = songData.channels[currentChannelId];
+    const channel = soundData.channels[currentChannelId];
     const instrumentId = (events[SoundEvent.Instrument] ?? channel.instrument) as string;
     const eventsWithoutNoteKeys = Object.keys(events).filter(e => !EXCLUDED_SOUND_EVENTS.includes(e as SoundEvent)) as SoundEvent[];
     const unusedEvents = Object.keys(AVAILABLE_EVENTS).filter(e => !eventsWithoutNoteKeys.includes(e as SoundEvent));
@@ -67,7 +67,7 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
         setTesting(true);
         setTestingDuration(SINGLE_NOTE_TESTING_DURATION);
         setTestingNote(Object.values(NOTES)[noteId]);
-        setTestingInstrument(songData.channels[currentChannelId].instrument);
+        setTestingInstrument(soundData.channels[currentChannelId].instrument);
         setTestingChannel(currentChannelId);
     };
 
@@ -195,10 +195,10 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                     </label>
                     <InputWithAction>
                         <AdvancedSelect
-                            options={Object.keys(songData.instruments)
-                                .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                            options={Object.keys(soundData.instruments)
+                                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                                 .map((instrId, i) => {
-                                    const instr = songData.instruments[instrId];
+                                    const instr = soundData.instruments[instrId];
                                     return {
                                         value: `${instrId}`,
                                         label: instr.name.length ? instr.name : (i + 1).toString(),
@@ -247,7 +247,6 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
                 {eventsWithoutNoteKeys.map((event, i) =>
                     <Effect
                         key={i}
-                        songData={songData}
                         currentChannelId={currentChannelId}
                         event={event}
                         value={events[event]}

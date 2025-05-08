@@ -1,82 +1,26 @@
 import styled from 'styled-components';
-import { MAX_PATTERN_SIZE, NOTE_RESOLUTION, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+import { PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
 
 // these need to be in a single fine for references to each other to work
 
 export const StyledPianoRollEditor = styled.div`
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
     user-select: none;
 `;
 
-export const StyledPianoRollRow = styled.div`
+export const StyledPiano = styled.div`
+    border-left: 1px solid rgba(0, 0, 0, .6);
+    border-right: 1px solid rgba(0, 0, 0, .6);
     display: flex;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    position: relative;
+    flex-direction: column;
+    position: sticky;
     z-index: 10;
 `;
 
-export const StyledPianoRollEditorTick = styled.div`
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
-    border-right: 1px solid rgba(255, 255, 255, .1);
-    box-sizing: border-box;
-    cursor: crosshair;
-    flex-grow: 1;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
-    max-width: ${PIANO_ROLL_NOTE_WIDTH}px;
-
-    body.theia-light &,
-    body.theia-hc & {
-        border-bottom-color: rgba(0, 0, 0, .1);
-        border-right-color: rgba(0, 0, 0, .1);
-    }
-
-    &:hover {
-        background-color: var(--theia-focusBorder) !important;
-        z-index: 100;
-    }
-    &:nth-child(4n + 1) {
-        border-right-color: rgba(255, 255, 255, .2);
-
-        body.theia-light &,
-        body.theia-hc & {
-            border-right-color: rgba(0, 0, 0, .2);
-        }
-    }
-
-    ${StyledPianoRollRow}:nth-child(12n) & {
-        border-bottom-color: rgba(255, 255, 255, .4);
-
-        body.theia-light &,
-        body.theia-hc & {
-            border-bottom-color: rgba(0, 0, 0, .4);
-        }
-    }
-    ${StyledPianoRollRow}:nth-child(84) & {
-        border-bottom-color: transparent;
-
-        body.theia-light &,
-        body.theia-hc & {
-            border-bottom-color: transparent;
-        }
-    }
-
-    ${StyledPianoRollRow}:hover & {
-        background-color: rgba(255, 255, 255, .1);
-
-        body.theia-light &,
-        body.theia-hc & {
-            background-color: rgba(0, 0, 0, .1);
-        }
-    }
-`;
-
-export const StyledPianoRollKey = styled.div`
+export const StyledPianoKey = styled.div`
     align-items: center;
-    background-color: #f1f1f1;
+    background-color: #eee;
     border-bottom: 0px solid rgba(0, 0, 0, .5);
     box-sizing: border-box;
     color: #666;
@@ -109,28 +53,18 @@ export const StyledPianoRollKey = styled.div`
         }
     }
 
-    ${StyledPianoRollRow}:hover &,
     &:hover,
-    &.sharpNote:hover:after,
-    ${StyledPianoRollRow}:hover &.sharpNote:after {
+    &.sharpNote:hover:after {
         background: var(--theia-button-background);
         color: var(--theia-button-foreground)
     }
 
-    ${StyledPianoRollRow}:nth-child(12n) & {
+    &:nth-child(12n) {
         border-bottom-width: 1px;
     }
 
-    ${StyledPianoRollRow}:nth-child(84) & {
+    &:nth-child(84) {
         border-bottom-width: 0;
-    }
-
-    body.theia-light & {
-        border-right: 1px solid rgba(0, 0, 0, .4);
-    }
-
-    body.theia-light ${StyledPianoRollRow}:first-child & {
-        border-top: 1px solid rgba(0, 0, 0, .4);
     }
 `;
 
@@ -138,8 +72,8 @@ export const StyledPianoRollKeyName = styled.div`
     display: none;
     z-index: 1;
 
-    ${StyledPianoRollRow}:nth-child(12n) &,
-    ${StyledPianoRollRow}:hover & {
+    ${StyledPianoKey}:nth-child(12n) &,
+    ${StyledPianoKey}:hover & {
         display: block;
     }
 `;
@@ -149,7 +83,7 @@ export const StyledPianoRollPlacedNote = styled.div`
     border-radius: 1px;
     box-sizing: border-box;
     color: #fff;
-    cursor: pointer;
+    cursor: move;
     font-size: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
     line-height: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
     min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
@@ -207,13 +141,13 @@ export const MetaLineHeader = styled.div`
     left: 0;
     min-width: 50px;
     position: sticky;
-    width: 50px;
+    width: 52px;
     z-index: 10;
 
     body.theia-light &,
     body.theia-hc & {
-        border-bottom-color: rgba(0, 0, 0, .1);
-        border-right-color: rgba(0, 0, 0, .1);
+        border-bottom-color: rgba(0, 0, 0, .4);
+        border-right-color: rgba(0, 0, 0, .4);
     }
 
     ${MetaLine}:last-child & {
@@ -340,10 +274,10 @@ export const StyledPianoRoll = styled.div`
     font-size: 10px;
     overflow: auto;
     margin: 2px var(--padding) var(--padding);
+    padding-right: 64px;
     position: relative;
 
-    ${MetaLineTick}:nth-child(16n + 1),
-    ${StyledPianoRollEditorTick}:nth-child(16n + 1) {
+    ${MetaLineTick}:nth-child(16n + 1) {
         border-right-color: rgba(255, 255, 255, .4);
 
         body.theia-light &,
@@ -351,21 +285,4 @@ export const StyledPianoRoll = styled.div`
             border-right-color: rgba(0, 0, 0, .4);
         }
     }
-    
-    ${[...Array(MAX_PATTERN_SIZE * NOTE_RESOLUTION)].map((i, j) => `
-        &.currentTick-${j} ${StyledPianoRollEditorTick}:nth-child(${j + 2})${j < (MAX_PATTERN_SIZE * NOTE_RESOLUTION - 1) ? ',' : ''}
-    `)} {
-        background-color: rgba(255, 255, 255, .1);
-
-        body.theia-light & {
-            background: rgba(0, 0, 0, .1);
-        }
-    }
-
-    ${[...Array(MAX_PATTERN_SIZE)].map((i, j) => `&.size-${j + 1}  { 
-        ${MetaLineTick}:nth-child(${(j + 1) * NOTE_RESOLUTION + 1}) ~ ${MetaLineTick},
-        ${StyledPianoRollEditorTick}:nth-child(${(j + 1) * NOTE_RESOLUTION + 1}) ~ ${StyledPianoRollEditorTick} { 
-            display: none;
-        } 
-    }`)}
 `;

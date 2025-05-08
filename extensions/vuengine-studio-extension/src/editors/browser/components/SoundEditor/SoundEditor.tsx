@@ -11,7 +11,7 @@ import ModulationData from '../VsuSandbox/ModulationData';
 import Emulator from './Emulator/Emulator';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
-import Channel from './Sidebar/Channel';
+import SidebarChannel from './Sidebar/SidebarChannel';
 import CurrentPatternStep from './Sidebar/CurrentPatternStep';
 import ImportExport from './Sidebar/ImportExport';
 import Instruments from './Sidebar/Instruments';
@@ -63,12 +63,12 @@ export const StyledSidebarHideToggle = styled.button`
 `;
 
 interface SoundEditorProps {
-    songData: SoundData
-    updateSongData: (songData: SoundData) => void
+    soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
 }
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
-    const { songData, updateSongData } = props;
+    const { soundData, updateSoundData } = props;
     const { enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [sidebarHidden, setSidebarHidden] = useState<boolean>(false);
@@ -80,10 +80,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
+    const [newPatternSize, setNewPatternSize] = useState<number>(4);
     const [newNoteDuration, setNewNoteDuration] = useState<number>(4);
     const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
-    const [currentPatternId, setCurrentPatternId] = useState<number>(songData.channels[0].sequence[0]);
+    const [currentPatternId, setCurrentPatternId] = useState<number>(soundData.channels[0].sequence[0]);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
     const [currentTick, setCurrentTick] = useState<number>(0);
     const [currentInstrument, setCurrentInstrument] = useState<string>('');
@@ -101,15 +102,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const setChannel = (channelId: number, channel: Partial<ChannelConfig>): void => {
-        updateSongData({
-            ...songData,
+        updateSoundData({
+            ...soundData,
             channels: [
-                ...songData.channels.slice(0, channelId),
+                ...soundData.channels.slice(0, channelId),
                 {
-                    ...songData.channels[channelId],
+                    ...soundData.channels[channelId],
                     ...channel
                 },
-                ...songData.channels.slice(channelId + 1)
+                ...soundData.channels.slice(channelId + 1)
             ]
         });
     };
@@ -117,12 +118,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const setPattern = (channelId: number, patternId: number, pattern: Partial<PatternConfig>): void => {
         setChannel(channelId, {
             patterns: [
-                ...songData.channels[channelId].patterns.slice(0, patternId),
+                ...soundData.channels[channelId].patterns.slice(0, patternId),
                 {
-                    ...songData.channels[channelId].patterns[patternId],
+                    ...soundData.channels[channelId].patterns[patternId],
                     ...pattern
                 },
-                ...songData.channels[channelId].patterns.slice(patternId + 1)
+                ...soundData.channels[channelId].patterns.slice(patternId + 1)
             ]
         });
     };
@@ -132,15 +133,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             setTesting(true);
             setTestingNote(Object.values(NOTES)[note]);
             setTestingChannel(currentChannelId);
-            setTestingInstrument(songData.channels[currentChannelId].instrument);
+            setTestingInstrument(soundData.channels[currentChannelId].instrument);
             setTestingDuration(SINGLE_NOTE_TESTING_DURATION);
         }
     };
 
     const updateCurrentChannelId = (id: number): void => {
         setCurrentChannelId(id);
-        setCurrentPatternId(songData.channels[id].sequence[0] ?? -1);
-        setCurrentTick(songData.channels[id].sequence.length ? 0 : -1);
+        setCurrentPatternId(soundData.channels[id].sequence[0] ?? -1);
+        setCurrentTick(soundData.channels[id].sequence.length ? 0 : -1);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
         setSidebarTab(0);
@@ -149,7 +150,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const updateCurrentSequenceIndex = (channel: number, sequenceIndex: number): void => {
         setCurrentChannelId(channel);
         setCurrentSequenceIndex(sequenceIndex);
-        setCurrentPatternId(songData.channels[channel].sequence[sequenceIndex]);
+        setCurrentPatternId(soundData.channels[channel].sequence[sequenceIndex]);
         setCurrentTick(0);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
@@ -185,21 +186,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const toggleChannelMuted = (channelId: number): void => {
         setChannel(channelId, {
-            muted: !songData.channels[channelId].muted,
+            muted: !soundData.channels[channelId].muted,
             solo: false
         });
     };
 
     const toggleChannelSeeThrough = (channelId: number): void => {
         setChannel(channelId, {
-            seeThrough: !songData.channels[channelId].seeThrough,
+            seeThrough: !soundData.channels[channelId].seeThrough,
         });
     };
 
     const toggleChannelSolo = (channelId: number): void => {
-        updateSongData({
-            ...songData,
-            channels: songData.channels.map((channel, index) => (index === channelId ? {
+        updateSoundData({
+            ...soundData,
+            channels: soundData.channels.map((channel, index) => (index === channelId ? {
                 ...channel,
                 solo: !channel.solo,
                 muted: false,
@@ -212,9 +213,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const updateEvents = (index: number, event: SoundEvent, value: any): void => {
         const updatedEvents: EventsMap = {
-            ...songData.channels[currentChannelId].patterns[currentPatternId].events,
+            ...soundData.channels[currentChannelId].patterns[currentPatternId].events,
             [index]: {
-                ...songData.channels[currentChannelId].patterns[currentPatternId].events[index] ?? {},
+                ...soundData.channels[currentChannelId].patterns[currentPatternId].events[index] ?? {},
                 [event]: value,
             },
         };
@@ -230,33 +231,40 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const setNote = (step: number, note?: number, duration?: number): void => {
+    const setNote = (step: number, note?: number, duration?: number, prevStep?: number): void => {
+
         const updatedEvents: EventsMap = {
-            ...songData.channels[currentChannelId].patterns[currentPatternId].events,
+            ...soundData.channels[currentChannelId].patterns[currentPatternId].events,
             [step]: {
-                ...(songData.channels[currentChannelId].patterns[currentPatternId].events[step] ?? {}),
+                ...(soundData.channels[currentChannelId].patterns[currentPatternId].events[step] ?? {}),
                 [SoundEvent.Note]: note,
+            }
+        };
+        const removeNoteFromEvents = (stepToRemove: number) => {
+            delete updatedEvents[stepToRemove][SoundEvent.Note];
+            if (updatedEvents[stepToRemove][SoundEvent.Duration] !== undefined) {
+                delete updatedEvents[stepToRemove][SoundEvent.Duration];
+            }
+            if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
+                delete updatedEvents[stepToRemove];
             }
         };
 
         if (note === undefined) {
-            // remove note and duration events
-            delete updatedEvents[step][SoundEvent.Note];
-            if (updatedEvents[step][SoundEvent.Duration] !== undefined) {
-                delete updatedEvents[step][SoundEvent.Duration];
-            }
-            if (Object.keys(updatedEvents[step]).length === 0) {
-                delete updatedEvents[step];
-            }
+            removeNoteFromEvents(step);
         } else {
-            const events = songData.channels[currentChannelId].patterns[currentPatternId].events;
+            const events = soundData.channels[currentChannelId].patterns[currentPatternId].events;
             const eventKeys = Object.keys(events);
             let stop = false;
+
+            // remove previous note if it was moved from another step
+            if (prevStep !== undefined && prevStep !== step) {
+                removeNoteFromEvents(prevStep);
+            }
 
             // set duration
             if (duration || updatedEvents[step][SoundEvent.Duration] === undefined) {
                 const effectiveDuration = duration ? duration : newNoteDuration;
-                console.log(effectiveDuration);
                 let cappedDuration = 0;
                 if (effectiveDuration > 1) {
                     // cap note's duration
@@ -272,7 +280,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         }
                     });
                     if (cappedDuration === 0) {
-                        const currentChannel = songData.channels[currentChannelId];
+                        const currentChannel = soundData.channels[currentChannelId];
                         const currentPattern = currentChannel.patterns[currentPatternId];
                         cappedDuration = Math.min(effectiveDuration, currentPattern.size * NOTE_RESOLUTION - step);
                     }
@@ -303,11 +311,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const setInstruments = (instruments: InstrumentMap): void => {
-        updateSongData({ ...songData, instruments });
+        updateSoundData({ ...soundData, instruments });
     };
 
     const setInstrumentWaveForm = (waveform: string) => {
-        const updatedInstruments = { ...songData.instruments };
+        const updatedInstruments = { ...soundData.instruments };
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             waveform,
@@ -317,7 +325,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const setInstrumentModulationData = (modulationData: number[]) => {
-        const updatedInstruments = { ...songData.instruments };
+        const updatedInstruments = { ...soundData.instruments };
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             modulationData,
@@ -363,7 +371,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     // the starting note index of the current pattern
     const currentPatternNoteOffset = useMemo(() => {
         let result = 0;
-        const currentChannel = songData.channels[currentChannelId];
+        const currentChannel = soundData.channels[currentChannelId];
         currentChannel.sequence.forEach((s, sequenceIndex) => {
             if (currentSequenceIndex > sequenceIndex) {
                 const pattern = currentChannel.patterns[s];
@@ -374,7 +382,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         return result;
     }, [
-        songData.channels,
+        soundData.channels,
         currentChannelId,
         currentSequenceIndex,
     ]);
@@ -402,7 +410,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 setEmulatorInitialized={setEmulatorInitialized}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
-                songData={songData}
+                soundData={soundData}
                 setPlaying={setPlaying}
                 testing={testing}
                 setTesting={setTesting}
@@ -424,7 +432,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     emulatorInitialized={emulatorInitialized}
                 />
                 <Sequencer
-                    songData={songData}
+                    soundData={soundData}
+                    updateSoundData={updateSoundData}
+                    newPatternSize={newPatternSize}
+                    setNewPatternSize={setNewPatternSize}
                     currentStep={currentStep}
                     currentPatternId={currentPatternId}
                     setCurrentPatternId={updateCurrentPatternId}
@@ -440,7 +451,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     setSequencerHidden={setSequencerHidden}
                 />
                 <PianoRoll
-                    songData={songData}
+                    soundData={soundData}
+                    updateSoundData={updateSoundData}
                     currentStep={currentStep}
                     setCurrentStep={setCurrentStep}
                     currentTick={currentTick}
@@ -495,16 +507,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             </TabList>
                             <TabPanel>
                                 <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
-                                    <Channel
-                                        songData={songData}
+                                    <SidebarChannel
+                                        soundData={soundData}
                                         currentChannelId={currentChannelId}
                                         setCurrentChannelId={setCurrentChannelId}
+                                        setCurrentPatternId={setCurrentPatternId}
                                         setChannel={setChannel}
                                         editInstrument={editInstrument}
                                     />
                                     <hr />
                                     <Pattern
-                                        songData={songData}
+                                        soundData={soundData}
                                         currentChannelId={currentChannelId}
                                         currentPatternId={currentPatternId}
                                         setCurrentPatternId={updateCurrentPatternId}
@@ -512,7 +525,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     />
                                     <hr />
                                     <CurrentPatternStep
-                                        songData={songData}
+                                        soundData={soundData}
                                         currentChannelId={currentChannelId}
                                         currentPatternId={currentPatternId}
                                         setCurrentPatternId={updateCurrentPatternId}
@@ -534,7 +547,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             <TabPanel>
                                 <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
                                     <Instruments
-                                        songData={songData}
+                                        soundData={soundData}
                                         currentInstrument={currentInstrument}
                                         setCurrentInstrument={setCurrentInstrument}
                                         setInstruments={setInstruments}
@@ -554,8 +567,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             <TabPanel>
                                 <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
                                     <Song
-                                        songData={songData}
-                                        updateSongData={updateSongData}
+                                        soundData={soundData}
+                                        updateSoundData={updateSoundData}
                                     />
                                     <hr />
                                     <ImportExport />
@@ -573,12 +586,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         width='100%'
                     >
                         <WaveformSelect
-                            value={songData.instruments[waveformDialogOpen]?.waveform ?? 0}
+                            value={soundData.instruments[waveformDialogOpen]?.waveform ?? 0}
                             setValue={setInstrumentWaveForm}
                         />
                         {/*
                         <WaveformWithPresets
-                            value={songData.waveforms[Math.max(0, waveformDialogOpen)]}
+                            value={soundData.waveforms[Math.max(0, waveformDialogOpen)]}
                             setValue={setWaveform}
                         />
                         */}
@@ -591,9 +604,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         height='100%'
                         width='100%'
                     >
-                        {songData.instruments[modulationDataDialogOpen] &&
+                        {soundData.instruments[modulationDataDialogOpen] &&
                             <ModulationData
-                                value={songData.instruments[modulationDataDialogOpen].modulationData}
+                                value={soundData.instruments[modulationDataDialogOpen].modulationData}
                                 setValue={setInstrumentModulationData}
                             />
                         }

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { PATTERN_HEIGHT } from '../SoundEditorTypes';
+import { PATTERN_HEIGHT, SEQUENCER_GRID_METER_HEIGHT } from '../SoundEditorTypes';
 
 // these need to be in a single file for references to each other to work
 
@@ -7,7 +7,8 @@ export const StyledSequencer = styled.div`
     display: flex;
     flex-direction: row;
     margin: 0 var(--padding);
-    min-height: calc((${PATTERN_HEIGHT}px + 2px) * 6 + 10px);
+    min-height: calc(${PATTERN_HEIGHT}px * 6 + ${SEQUENCER_GRID_METER_HEIGHT}px + 1px + 10px);
+    margin-bottom: 2px;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 1px;
@@ -47,54 +48,66 @@ export const StyledSequencerHideToggle = styled.button`
     }
 `;
 
-export const StyledChannel = styled.div`
+export const StyledChannelHeaderContainer = styled.div`
+    border-left: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6);
     display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    margin-bottom: 1px;
-    max-height: calc(${PATTERN_HEIGHT}px + 3px);
+    flex-direction: column;
+    position: fixed;
+    z-index: 10;
 
-    &.muted {
-        opacity: .4;
+    body.theia-light &,
+    body.theia-hc & {
+        border-left-color: rgba(0, 0, 0, .6);
+        border-right-color: rgba(0, 0, 0, .6);
     }
 `;
 
-export const StyledPatternFill = styled.div`
-    background-color: var(--theia-secondaryButton-background);
-    cursor: pointer;
-    flex-grow: 1;
-    margin-left: 1px;
-    opacity: 0;
+export const StyledChannelsHeader = styled.div`
+    background-color: var(--theia-editor-background);
+    border-bottom: 1px solid rgba(255, 255, 255, .6);
+    box-sizing: border-box;
+    height: ${SEQUENCER_GRID_METER_HEIGHT}px;
 
-    ${StyledChannel}:hover & {
-        opacity: .1;
-    }
-
-    ${StyledChannel}.current & {
-        opacity: .3;
+    body.theia-light &,
+    body.theia-hc & {
+        border-bottom-color: rgba(0, 0, 0, .6);
     }
 `;
 
 export const StyledChannelHeader = styled.div`
-    background-color: var(--theia-secondaryButton-background);
-    border: 1px solid var(--theia-secondaryButton-background);
+    background-color: #eee;
+    border-bottom: 1px solid rgba(0, 0, 0, .2);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     font-size: 10px;
-    height: calc(${PATTERN_HEIGHT}px + 3px);
+    height: ${PATTERN_HEIGHT}px;
     left: 0;
-    margin-right: 2px;
     min-width: 50px;
     overflow: hidden;
     position: sticky;
     width: 50px;
     z-index: 100;
 
+    body.theia-light &,
+    body.theia-hc & {
+        background-color: #eee;
+    }
+
     &.current {
-        background-color: var(--theia-focusBorder);
-        border-color: var(--theia-focusBorder);
+        background-color: var(--theia-focusBorder) !important;
+        border-color: var(--theia-focusBorder) !important;
         color: #fff;
+    }
+
+    ${StyledChannelHeaderContainer} &:last-child {
+        border-bottom-color: rgba(255, 255, 255, .4);
+
+        body.theia-light &,
+        body.theia-hc & {
+            border-bottom-color: rgba(0, 0, 0, .4);
+        }
     }
 `;
 
@@ -120,27 +133,26 @@ export const StyledChannelHeaderButton = styled.div`
     display: flex;
     justify-content: center;
     flex-grow: 1;
-
-    ${StyledChannel} &:hover {
-        background-color: rgba(0, 0, 0, .25);
-    }
 `;
 
 export const StyledPattern = styled.div`
     align-items: center;
     background-color: var(--theia-secondaryButton-background);
-    border: 1px solid var(--theia-secondaryButton-background);
+    border-right: 1px solid rgba(255, 255, 255, .1);
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
     box-sizing: border-box;
-    cursor: grab;
+    cursor: ew-resize;
     display: flex;
+    height: ${PATTERN_HEIGHT}px;
     justify-content: center;
     margin-right: 1px;
     overflow: hidden;
-    position: relative;
+    position: absolute;
 
     &:hover,
     &.current {
-        border-color: var(--theia-focusBorder);
+        outline: 1px solid var(--theia-focusBorder);
+        outline-offset: -1px;
     }
         
     &.selected {
@@ -153,10 +165,30 @@ export const StyledPattern = styled.div`
         cursor: grabbing;
         outline: 0;
     }
+
+    canvas {
+        box-sizing: border-box;
+        height: ${PATTERN_HEIGHT}px;
+    }
+
+    .react-resizable-handle {
+        border-left: 1px solid rgba(255, 255, 255, .5);
+        bottom: 3px;
+        cursor: col-resize;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        width: 2px;
+        z-index: 10;
+    }
 `;
 
 export const StyledPatternName = styled.div`
+    align-items: center;
+    display: flex;
     font-size: 9px;
+    height: 100%;
+    justify-content: center;
     overflow: hidden;
     padding: 0 3px;
     position: relative;
@@ -181,49 +213,6 @@ export const StyledPatternRemove = styled.div`
 
     ${StyledPattern}:hover & {
         display: block;
-    }
-`;
-
-export const StyledAddPattern = styled.div`
-    align-items: center;
-    border-radius: 2px;
-    border: 1px solid #333;
-    box-sizing: border-box;
-    color: #333;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    margin-right: 2px;
-    min-width: 30px;
-    width: 30px;
-
-    &:hover {
-        border-width: 0;
-        width: unset;
-
-        > i {
-            display: none;
-        }
-    }
-`;
-
-export const StyledAddPatternButton = styled.div`
-    align-items: center;
-    background-color: transparent;
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
-    border-radius: 2px;
-    box-sizing: border-box;
-    color: var(--theia-dropdown-border);
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    min-width: 30px;
-    width: 30px;
-
-    &:hover {
-        background-color: var(--theia-focusBorder);
-        border-color: var(--theia-focusBorder);
-        color: #fff;
     }
 `;
 

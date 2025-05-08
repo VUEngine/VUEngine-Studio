@@ -1,17 +1,28 @@
 import { nls } from '@theia/core';
-import React, { useEffect, useMemo } from 'react';
-import { SortableItem } from 'react-easy-sort';
+import React, { SyntheticEvent, useEffect, useMemo } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, NOTE_RESOLUTION, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
+import {
+    ChannelConfig,
+    NOTE_RESOLUTION,
+    PATTERN_HEIGHT,
+    PATTERN_MAPPING_FACTOR,
+    PatternConfig,
+    SEQUENCER_GRID_METER_HEIGHT,
+    SoundData,
+    SoundEvent,
+} from '../SoundEditorTypes';
 import { StyledPattern, StyledPatternName, StyledPatternRemove } from './StyledComponents';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 
 interface PatternProps {
-    songData: SoundData
+    soundData: SoundData
     index: number
     pattern: PatternConfig
     patternSize: number
@@ -26,22 +37,26 @@ interface PatternProps {
 
 export default function Pattern(props: PatternProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         index,
         channelId,
-        pattern,
-        patternSize,
-        patternId,
-        currentChannelId,
-        currentPatternId,
+        pattern, patternSize, patternId,
+        currentChannelId, currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
     } = props;
     const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
-    const channel = songData.channels[channelId];
-    const instrument = songData.instruments[channel.instrument];
+    const channel = soundData.channels[channelId];
+    const instrument = soundData.instruments[channel.instrument];
     const noteColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
     // TODO: color _each note_ by instrument instead of whole channel
+
+    const classNames = ['placedPattern'];
+    if (currentChannelId === channelId && currentSequenceIndex === index) {
+        classNames.push('current selected');
+    } else if (isCurrent) {
+        classNames.push('curren');
+    }
 
     const patternName = pattern.name ? pattern.name : (patternId + 1).toString();
 
@@ -87,8 +102,8 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     const removeFromSequence = (cId: number, i: number): void => {
         setChannel(cId, {
             sequence: [
-                ...songData.channels[cId].sequence.slice(0, i),
-                ...songData.channels[cId].sequence.slice(i + 1)
+                ...soundData.channels[cId].sequence.slice(0, i),
+                ...soundData.channels[cId].sequence.slice(i + 1)
             ],
         });
     };
@@ -109,53 +124,86 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     }, [
         currentChannelId,
         currentSequenceIndex,
-        songData,
+        soundData,
     ]);
 
+    const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
+        // const newDuration = Math.floor(data.size.width / PIANO_ROLL_NOTE_WIDTH);
+        // setNote(step, note, newDuration);
+    };
+
+    const onStop = (e: DraggableEvent, data: DraggableData) => {
+        // const newStep = Math.ceil((data.x - PIANO_WIDTH) / PIANO_ROLL_NOTE_WIDTH);
+        // const newNoteId = Math.floor(data.y / PIANO_ROLL_NOTE_HEIGHT);
+        // setNote(newStep, newNoteId, duration, step);
+    };
+
     return (
-        <SortableItem>
+        <Draggable
+            grid={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
+            handle=".placedPattern"
+            cancel=".react-resizable-handle"
+            onStop={onStop}
+            axis="x"
+            position={{
+                x: 50 + index * NOTE_RESOLUTION,
+                y: SEQUENCER_GRID_METER_HEIGHT + channelId * PATTERN_HEIGHT,
+            }}
+            bounds={{
+                bottom: SEQUENCER_GRID_METER_HEIGHT + (VSU_NUMBER_OF_CHANNELS - 1) * PATTERN_HEIGHT,
+                left: 50,
+                right: 50 + soundData.size * NOTE_RESOLUTION - patternSize,
+                top: SEQUENCER_GRID_METER_HEIGHT,
+            }}
+        >
             <StyledPattern
-                className={currentChannelId === channelId && currentSequenceIndex === index
-                    ? 'current selected'
-                    : isCurrent
-                        ? 'current'
-                        : undefined}
-                style={{
-                    minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
-                    width: `${(patternSize * patternNoteWidth) - 1}px`
-                }}
+                className={classNames.join(' ')}
                 data-channel={channelId}
                 data-position={index}
                 onClick={() => setCurrentSequenceIndex(channelId, index)}
                 title={patternName}
             >
-                <CanvasImage
-                    height={PATTERN_HEIGHT + 1}
-                    palette={'00000000'}
-                    pixelData={patternPixels}
-                    colorOverride={noteColor}
+                <ResizableBox
                     width={patternSize * patternNoteWidth}
-                    displayMode={DisplayMode.Mono}
-                    colorMode={ColorMode.Default}
-                    style={{
-                        left: 0,
-                        position: 'absolute',
-                        top: 0,
+                    height={PATTERN_HEIGHT}
+                    draggableOpts={{
+                        grid: [NOTE_RESOLUTION, PATTERN_HEIGHT]
                     }}
-                />
-                <StyledPatternName>
-                    {patternName}
-                </StyledPatternName>
-                <StyledPatternRemove
-                    title={nls.localizeByDefault('Remove')}
-                    onClick={e => {
-                        removeFromSequence(channelId, index);
-                        e.stopPropagation();
-                    }}
+                    axis="x"
+                    minConstraints={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
+                    maxConstraints={[NOTE_RESOLUTION * soundData.size, PATTERN_HEIGHT]}
+                    resizeHandles={channelId === currentChannelId ? ['e'] : []}
+                    onResize={onResize}
                 >
-                    &times;
-                </StyledPatternRemove>
+                    <CanvasImage
+                        height={PATTERN_HEIGHT + 1}
+                        palette={'00000000'}
+                        pixelData={patternPixels}
+                        colorOverride={noteColor}
+                        width={patternSize * patternNoteWidth}
+                        displayMode={DisplayMode.Mono}
+                        colorMode={ColorMode.Default}
+                        style={{
+                            left: 0,
+                            position: 'absolute',
+                            top: 0,
+                            width: patternSize * patternNoteWidth,
+                        }}
+                    />
+                    <StyledPatternName>
+                        {patternName}
+                    </StyledPatternName>
+                    <StyledPatternRemove
+                        title={nls.localizeByDefault('Remove')}
+                        onClick={e => {
+                            removeFromSequence(channelId, index);
+                            e.stopPropagation();
+                        }}
+                    >
+                        &times;
+                    </StyledPatternRemove>
+                </ResizableBox>
             </StyledPattern>
-        </SortableItem>
+        </Draggable>
     );
 }

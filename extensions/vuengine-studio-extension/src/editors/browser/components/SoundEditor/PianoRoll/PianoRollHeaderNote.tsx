@@ -3,7 +3,7 @@ import { NOTE_RESOLUTION, SoundData } from '../SoundEditorTypes';
 import { StyledPianoRollHeaderTick } from './StyledComponents';
 
 interface PianoRollHeaderNoteProps {
-    songData: SoundData
+    soundData: SoundData
     index: number
     currentChannelId: number
     currentPatternId: number
@@ -17,7 +17,7 @@ interface PianoRollHeaderNoteProps {
 
 export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         index,
         currentChannelId,
         currentPatternId,
@@ -27,7 +27,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
         setCurrentStep,
     } = props;
 
-    const channel = songData.channels[currentChannelId];
+    const channel = soundData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
     const patternSize = pattern.size * NOTE_RESOLUTION;
 

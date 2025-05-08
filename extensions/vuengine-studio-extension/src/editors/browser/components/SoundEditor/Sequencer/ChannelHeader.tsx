@@ -10,12 +10,24 @@ interface ChannelHeaderProps {
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
     toggleChannelSeeThrough: (channelId: number) => void
+    otherSolo: boolean
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
-    const { channel, currentChannelId, setCurrentChannelId, toggleChannelMuted, toggleChannelSolo, toggleChannelSeeThrough } = props;
+    const {
+        channel,
+        currentChannelId, setCurrentChannelId,
+        toggleChannelMuted, toggleChannelSolo, toggleChannelSeeThrough,
+        otherSolo,
+    } = props;
 
     const classNames = [];
+    if (channel.muted || otherSolo) {
+        classNames.push('muted');
+    }
+    if (channel.solo) {
+        classNames.push('solo');
+    }
     if (currentChannelId === channel.id) {
         classNames.push('current');
     }

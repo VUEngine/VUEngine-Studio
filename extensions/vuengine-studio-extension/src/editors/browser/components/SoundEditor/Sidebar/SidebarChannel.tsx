@@ -1,20 +1,22 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { ChannelConfig, SoundData } from '../SoundEditorTypes';
 import CurrentChannel from './CurrentChannel';
 
-interface ChannelProps {
-    songData: SoundData
+interface SidebarChannelProps {
+    soundData: SoundData
     currentChannelId: number
-    setCurrentChannelId: (currentChannelId: number) => void
+    setCurrentChannelId: Dispatch<SetStateAction<number>>
+    setCurrentPatternId: Dispatch<SetStateAction<number>>
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     editInstrument: (instrument: string) => void
 }
 
-export default function Channel(props: ChannelProps): React.JSX.Element {
+export default function SidebarChannel(props: SidebarChannelProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentChannelId, setCurrentChannelId,
+        setCurrentPatternId,
         setChannel,
         editInstrument,
     } = props;
@@ -22,9 +24,10 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     return <>
         {currentChannelId > -1
             ? <CurrentChannel
-                songData={songData}
+                soundData={soundData}
                 currentChannelId={currentChannelId}
                 setCurrentChannelId={setCurrentChannelId}
+                setCurrentPatternId={setCurrentPatternId}
                 setChannel={setChannel}
                 editInstrument={editInstrument}
             />

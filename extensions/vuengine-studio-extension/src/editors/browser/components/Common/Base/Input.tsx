@@ -13,6 +13,7 @@ interface InputProps {
     type?: 'string' | 'number'
     label?: string
     tooltip?: string
+    size?: 'small' | 'large'
     title?: string
     placeholder?: string
     min?: number
@@ -66,6 +67,7 @@ const ClearableContainer = styled.div`
 export default function Input(props: InputProps): React.JSX.Element {
     const {
         type,
+        size,
         value, setValue, defaultValue,
         label, tooltip, title, placeholder,
         min, max, step,
@@ -156,7 +158,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                 >
                     <input
                         id={id}
-                        className={`theia-input${className ? ` ${className}` : ''}`}
+                        className={`theia-input${size ? ` ${size}` : ''}${className ? ` ${className}` : ''}`}
                         type={type}
                         min={min}
                         max={max}

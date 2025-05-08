@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
@@ -10,9 +10,10 @@ import { ChannelConfig, INPUT_BLOCKING_COMMANDS, SoundData } from '../SoundEdito
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentChannelProps {
-    songData: SoundData
+    soundData: SoundData
     currentChannelId: number
-    setCurrentChannelId: (channelId: number) => void
+    setCurrentChannelId: Dispatch<SetStateAction<number>>
+    setCurrentPatternId: Dispatch<SetStateAction<number>>
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     editInstrument: (instrument: string) => void
 }
@@ -20,13 +21,19 @@ interface CurrentChannelProps {
 export default function CurrentChannel(props: CurrentChannelProps): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
-        songData,
+        soundData,
         currentChannelId, setCurrentChannelId,
+        // setCurrentPatternId,
         setChannel,
         editInstrument,
     } = props;
 
-    const channel = songData.channels[currentChannelId];
+    const channel = soundData.channels[currentChannelId];
+
+    const onSelectChannel = (channelId: number): void => {
+        setCurrentChannelId(channelId);
+        // setCurrentPatternId(soundData.channels[channelId].sequence[0] ?? 0);
+    };
 
     const setChannelInstrument = (instrumentId: string): void => {
         setChannel(currentChannelId, {
@@ -36,7 +43,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
 
     const toggleChannelAllowSkip = (): void => {
         setChannel(currentChannelId, {
-            allowSkip: !songData.channels[currentChannelId].allowSkip,
+            allowSkip: !soundData.channels[currentChannelId].allowSkip,
         });
     };
 
@@ -67,7 +74,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         value: '5',
                     }]}
                     defaultValue={`${channel.id}`}
-                    onChange={options => setCurrentChannelId(parseInt(options[0]))}
+                    onChange={options => onSelectChannel(parseInt(options[0]))}
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
@@ -79,10 +86,10 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     </label>
                     <InputWithAction>
                         <AdvancedSelect
-                            options={Object.keys(songData.instruments)
-                                .sort((a, b) => songData.instruments[a].name.localeCompare(songData.instruments[b].name))
+                            options={Object.keys(soundData.instruments)
+                                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                                 .map((instrumentId, i) => {
-                                    const instrument = songData.instruments[instrumentId];
+                                    const instrument = soundData.instruments[instrumentId];
                                     return {
                                         value: `${instrumentId}`,
                                         label: instrument.name.length ? instrument.name : (i + 1).toString(),

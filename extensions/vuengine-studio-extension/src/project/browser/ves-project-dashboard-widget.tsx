@@ -165,21 +165,18 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     }
 
     handleZoomIn(): void {
-        console.log('handleZoomIn');
         if (this.state.scale + ZOOM_STEP <= ZOOM_MAX) {
             this.setScale(this.state.scale + ZOOM_STEP);
         }
     }
 
     handleZoomOut(): void {
-        console.log('handleZoomOut');
         if (this.state.scale - ZOOM_STEP >= ZOOM_MIN) {
             this.setScale(this.state.scale - ZOOM_STEP);
         }
     }
 
     handleZoomReset(): void {
-        console.log('handleZoomReset');
         this.setScale(ZOOM_DEFAULT);
     }
 

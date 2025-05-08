@@ -7,57 +7,72 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { DataSection } from '../../Common/CommonTypes';
 import SectionSelect from '../../Common/SectionSelect';
-import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MAX_TICK_DURATION, MIN_PATTERN_SIZE, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, MAX_SEQUENCE_SIZE, MAX_TICK_DURATION, MIN_SEQUENCE_SIZE, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
 
 interface SongProps {
-    songData: SoundData
-    updateSongData: (songData: SoundData) => void
+    soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
 }
 
 export default function Song(props: SongProps): React.JSX.Element {
-    const { songData, updateSongData } = props;
+    const { soundData, updateSoundData } = props;
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setName = (n: string): void => {
-        updateSongData({ ...songData, name: n });
+        updateSoundData({ ...soundData, name: n });
     };
 
-    const setDefaultSize = (defaultSize: number): void => {
-        updateSongData({ ...songData, defaultSize });
+    const setSize = (size: number): void => {
+        if (size <= MAX_SEQUENCE_SIZE && size >= MIN_SEQUENCE_SIZE) {
+            updateSoundData({ ...soundData, size });
+        }
     };
 
     const setLoopPoint = (loopPoint: number): void => {
-        updateSongData({ ...songData, loopPoint });
+        updateSoundData({ ...soundData, loopPoint });
     };
 
     const setSection = (section: DataSection): void => {
-        updateSongData({ ...songData, section });
+        updateSoundData({ ...soundData, section });
     };
 
     const toggleLoop = (): void => {
-        updateSongData({ ...songData, loop: !songData.loop });
+        updateSoundData({ ...soundData, loop: !soundData.loop });
     };
 
     const setTickDuration = (s: number): void => {
         if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
-            updateSongData({ ...songData, speed: s });
+            updateSoundData({ ...soundData, speed: s });
         }
     };
 
     return <VContainer gap={15}>
         <Input
             label={nls.localize('vuengine/editors/sound/songName', 'Song Name')}
-            value={songData.name}
+            value={soundData.name}
             setValue={v => setName(v as string)}
             commands={INPUT_BLOCKING_COMMANDS}
         />
 
         <VContainer>
             <label>
+                {nls.localize('vuengine/editors/sound/length', 'Song Length')}
+            </label>
+            <Range
+                value={soundData.size}
+                max={MAX_SEQUENCE_SIZE}
+                min={MIN_SEQUENCE_SIZE}
+                setValue={(v: number) => setSize(v)}
+                commandsToDisable={INPUT_BLOCKING_COMMANDS}
+            />
+        </VContainer>
+
+        <VContainer>
+            <label>
                 {nls.localize('vuengine/editors/sound/tickDurationMs', 'Tick duration (in milliseconds)')}
             </label>
             <Range
-                value={songData.speed}
+                value={soundData.speed}
                 max={MAX_TICK_DURATION}
                 min={MIN_TICK_DURATION}
                 setValue={(v: number) => setTickDuration(v)}
@@ -72,16 +87,16 @@ export default function Song(props: SongProps): React.JSX.Element {
                 </label>
                 <input
                     type="checkbox"
-                    checked={songData.loop}
+                    checked={soundData.loop}
                     onChange={() => toggleLoop()}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
-            {songData.loop &&
+            {soundData.loop &&
                 <Input
                     label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}
-                    value={songData.loopPoint}
+                    value={soundData.loopPoint}
                     setValue={v => setLoopPoint(v as number)}
                     type='number'
                     min={0}
@@ -91,18 +106,8 @@ export default function Song(props: SongProps): React.JSX.Element {
                 />
             }
         </HContainer>
-        <Input
-            label={nls.localize('vuengine/editors/sound/defaultPatternSize', 'Default Pattern Size')}
-            value={songData.defaultSize}
-            setValue={v => setDefaultSize(v as number)}
-            type='number'
-            min={MIN_PATTERN_SIZE}
-            max={MAX_PATTERN_SIZE}
-            width={64}
-            commands={INPUT_BLOCKING_COMMANDS}
-        />
         <SectionSelect
-            value={songData.section}
+            value={soundData.section}
             setValue={setSection}
             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}

@@ -11,7 +11,7 @@ import { EventsMap, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE,
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentPatternProps {
-    songData: SoundData
+    soundData: SoundData
     currentChannelId: number
     currentPatternId: number
     setCurrentPatternId: (channelId: number, patternId: number) => void
@@ -20,14 +20,14 @@ interface CurrentPatternProps {
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentChannelId,
         currentPatternId, setCurrentPatternId,
         setPattern,
     } = props;
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
-    const channel = songData.channels[currentChannelId];
+    const channel = soundData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
 
     const getName = (i: number): string => channel.patterns[i].name?.length

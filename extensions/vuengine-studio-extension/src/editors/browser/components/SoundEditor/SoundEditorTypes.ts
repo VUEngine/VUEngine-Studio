@@ -8,10 +8,10 @@ export interface SoundData {
     name: string
     channels: ChannelConfig[]
     instruments: InstrumentMap
+    size: number
     speed: number
     loop: boolean
     loopPoint: number
-    defaultSize: number
     section: DataSection
 }
 
@@ -232,11 +232,16 @@ export const NOTES: { [note: string]: number } = {
 };
 
 export const NOTES_SPECTRUM = Object.keys(NOTES).length;
+export const NOTES_PER_OCTAVE = 12;
 export const PATTERN_HEIGHT = 28;
 export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
+export const MIN_SEQUENCE_SIZE = 1;
+export const MAX_SEQUENCE_SIZE = 512;
+export const SEQUENCER_GRID_METER_HEIGHT = 18;
 
 export const NOTE_RESOLUTION = 16;
 
+export const PIANO_ROLL_GRID_METER_HEIGHT = 18;
 export const PIANO_ROLL_NOTE_HEIGHT = 12;
 export const PIANO_ROLL_NOTE_WIDTH = 16;
 

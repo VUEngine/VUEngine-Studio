@@ -43,11 +43,12 @@ interface AdvancedSelectProps {
     commands?: string[]
     style?: object
     width?: number
+    title?: string
 }
 
 export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.Element {
     const {
-        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, style, onChange, onCreateOption
+        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, style, onChange, onCreateOption, title
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
@@ -75,57 +76,59 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         : 'react-select-container';
 
     const SelectType = onCreateOption ? CreatableSelect : Select;
-    return <SelectType
-        value={value}
-        onChange={multi
-            ? (opts: AdvancedSelectOption[]) => onChange(opts.map(opt => opt.value))
-            : (opt: AdvancedSelectOption) => onChange([opt.value])
-        }
-        onCreateOption={onCreateOption}
-        options={options}
-        isMulti={multi}
-        isDisabled={disabled}
-        isSearchable
-        placeholder={placeholder ?? ''}
-        components={{
-            ClearIndicator: CustomClearIndicator,
-            MultiValueRemove: CustomMultiValueRemove,
-            DropdownIndicator: CustomDropdownIndicator,
-        }}
-        // menuIsOpen={true}
-        isOptionDisabled={option => option.disabled ?? false}
-        unstyled
-        className={className}
-        classNamePrefix="react-select"
-        maxMenuHeight={212}
-        menuPlacement={menuPlacement}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        styles={{
-            container: styles => ({
-                ...styles,
-                ...(style ?? {})
-            }),
-            control: styles => ({
-                ...styles,
-                width,
-            }),
-            option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-                const backgroundColor = chroma(data.backgroundColor ?? '#000');
-                return {
+    return <div title={title ?? undefined}>
+        <SelectType
+            value={value}
+            onChange={multi
+                ? (opts: AdvancedSelectOption[]) => onChange(opts.map(opt => opt.value))
+                : (opt: AdvancedSelectOption) => onChange([opt.value])
+            }
+            onCreateOption={onCreateOption}
+            options={options}
+            isMulti={multi}
+            isDisabled={disabled}
+            isSearchable
+            placeholder={placeholder ?? ''}
+            components={{
+                ClearIndicator: CustomClearIndicator,
+                MultiValueRemove: CustomMultiValueRemove,
+                DropdownIndicator: CustomDropdownIndicator,
+            }}
+            // menuIsOpen={true}
+            isOptionDisabled={option => option.disabled ?? false}
+            unstyled
+            className={className}
+            classNamePrefix="react-select"
+            maxMenuHeight={212}
+            menuPlacement={menuPlacement}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            styles={{
+                container: styles => ({
                     ...styles,
-                    backgroundColor: !data.backgroundColor
-                        ? undefined
-                        : isSelected || isFocused || isDisabled
-                            ? data.backgroundColor
-                            : backgroundColor.darken(0.25).css(),
-                    color: !data.backgroundColor
-                        ? undefined
-                        : chroma.contrast(backgroundColor, 'white') > 2
-                            ? 'white'
-                            : 'black',
-                };
-            },
-        }}
-    />;
+                    ...(style ?? {})
+                }),
+                control: styles => ({
+                    ...styles,
+                    width,
+                }),
+                option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                    const backgroundColor = chroma(data.backgroundColor ?? '#000');
+                    return {
+                        ...styles,
+                        backgroundColor: !data.backgroundColor
+                            ? undefined
+                            : isSelected || isFocused || isDisabled
+                                ? data.backgroundColor
+                                : backgroundColor.darken(0.25).css(),
+                        color: !data.backgroundColor
+                            ? undefined
+                            : chroma.contrast(backgroundColor, 'white') > 2
+                                ? 'white'
+                                : 'black',
+                    };
+                },
+            }}
+        />
+    </div>;
 }

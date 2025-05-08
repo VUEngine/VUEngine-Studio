@@ -13,8 +13,8 @@ interface VesSoundEditorControlProps {
 const VesSoundEditorControl = ({ data, handleChange, path }: VesSoundEditorControlProps) =>
     <EditorsContext.Consumer>
         {context => <SoundEditor
-            songData={data}
-            updateSongData={(newValue: SoundData) => {
+            soundData={data}
+            updateSoundData={(newValue: SoundData) => {
                 if (!context.isReadonly) {
                     handleChange(path, newValue);
                 }

@@ -1,15 +1,20 @@
+import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, SoundData } from '../SoundEditorTypes';
-import Channel from './Channel';
-import StepIndicator from './StepIndicator';
-import { StyledSequencer, StyledSequencerHideToggle } from './StyledComponents';
+import { ChannelConfig, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, SoundData } from '../SoundEditorTypes';
+import ChannelHeader from './ChannelHeader';
 import LoopIndicator from './LoopIndicator';
+import SequencerGrid from './SequencerGrid';
+import StepIndicator from './StepIndicator';
+import { StyledChannelHeaderContainer, StyledChannelsHeader, StyledSequencer, StyledSequencerHideToggle } from './StyledComponents';
 
 interface SequencerProps {
-    songData: SoundData
+    soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
     currentPatternId: number
@@ -23,13 +28,15 @@ interface SequencerProps {
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     sequencerHidden: boolean,
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
+    newPatternSize: number
+    setNewPatternSize: Dispatch<SetStateAction<number>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
-        songData,
+        soundData, updateSoundData,
         currentChannelId, setCurrentChannelId,
-        currentPatternId, setCurrentPatternId,
+        currentPatternId, /* setCurrentPatternId, */
         currentSequenceIndex, setCurrentSequenceIndex,
         currentStep,
         toggleChannelMuted,
@@ -37,35 +44,30 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleChannelSeeThrough,
         setChannel,
         sequencerHidden, setSequencerHidden,
+        newPatternSize, setNewPatternSize,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const soloChannel = useMemo(() => songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1, [
-        songData.channels,
+    const soloChannel = useMemo(() => soundData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1, [
+        soundData.channels,
     ]);
 
     const channels = useMemo(() => (
-        songData.channels.map(channel =>
-            <Channel
+        soundData.channels.map(channel =>
+            <ChannelHeader
                 key={channel.id}
-                songData={songData}
                 channel={channel}
-                otherSolo={soloChannel > -1 && soloChannel !== channel.id}
                 currentChannelId={currentChannelId}
                 setCurrentChannelId={setCurrentChannelId}
-                currentPatternId={currentPatternId}
-                setCurrentPatternId={setCurrentPatternId}
-                currentSequenceIndex={currentSequenceIndex}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
-                setChannel={setChannel}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
                 toggleChannelSeeThrough={toggleChannelSeeThrough}
+                otherSolo={soloChannel > -1 && soloChannel !== channel.id}
             />
         )
     ), [
         soloChannel,
-        songData,
+        soundData,
         currentChannelId,
         currentPatternId,
         currentSequenceIndex,
@@ -111,7 +113,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id:
-                if (currentSequenceIndex < songData.channels[currentChannelId].sequence.length - 1) {
+                if (currentSequenceIndex < soundData.channels[currentChannelId].sequence.length - 1) {
                     setCurrentSequenceIndex(currentChannelId, currentSequenceIndex + 1);
                 }
                 break;
@@ -131,7 +133,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     }, [
         currentChannelId,
         currentSequenceIndex,
-        songData,
+        soundData,
     ]);
 
     return <VContainer gap={0}>
@@ -145,12 +147,36 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 hidden={currentStep === -1}
             />
             <LoopIndicator
-                position={songData.loopPoint}
-                hidden={songData.loopPoint === 0}
+                position={soundData.loopPoint}
+                hidden={soundData.loopPoint === 0}
             />
-            <VContainer gap={0} grow={1}>
-                {channels}
-            </VContainer>
+            <HContainer gap={0} grow={1}>
+                <StyledChannelHeaderContainer>
+                    <StyledChannelsHeader>
+                        <Input
+                            title={nls.localize('vuengine/editors/sound/defaultPatternLength', 'Default Pattern Length')}
+                            type='number'
+                            size='small'
+                            value={newPatternSize}
+                            setValue={v => setNewPatternSize(v as number)}
+                            min={1}
+                            max={MAX_PATTERN_SIZE}
+                            width={47}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
+                    </StyledChannelsHeader>
+                    {channels}
+                </StyledChannelHeaderContainer>
+                <SequencerGrid
+                    soundData={soundData}
+                    updateSoundData={updateSoundData}
+                    currentChannelId={currentChannelId}
+                    currentPatternId={currentPatternId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={setCurrentSequenceIndex}
+                    setChannel={setChannel}
+                />
+            </HContainer>
         </StyledSequencer>
         <StyledSequencerHideToggle
             onClick={() => setSequencerHidden(prev => !prev)}

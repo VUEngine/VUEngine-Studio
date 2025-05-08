@@ -4,7 +4,7 @@ import PianoRollHeaderNote from './PianoRollHeaderNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
 interface PianoRollHeaderProps {
-    songData: SoundData
+    soundData: SoundData
     currentChannelId: number
     currentPatternId: number
     currentPatternNoteOffset: number
@@ -17,7 +17,7 @@ interface PianoRollHeaderProps {
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentChannelId,
         currentPatternId,
         currentPatternNoteOffset,
@@ -26,6 +26,9 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         setCurrentStep,
     } = props;
 
+    const channel = soundData.channels[currentChannelId];
+    const pattern = channel.patterns[currentPatternId];
+
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
             style={{ height: 19 }}
@@ -33,9 +36,9 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             <MetaLineHeaderLine>
             </MetaLineHeaderLine>
         </MetaLineHeader>
-        {[...Array(MAX_PATTERN_SIZE * NOTE_RESOLUTION)].map((x, index) => (
+        {[...Array(pattern.size * NOTE_RESOLUTION)].map((x, index) => (
             <PianoRollHeaderNote
-                songData={songData}
+                soundData={soundData}
                 key={index}
                 index={index}
                 currentChannelId={currentChannelId}

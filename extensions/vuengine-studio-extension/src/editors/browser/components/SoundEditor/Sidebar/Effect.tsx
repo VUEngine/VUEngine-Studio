@@ -5,7 +5,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SoundEvent } from '../SoundEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
 
 const getNthByte = (num: number, byte: number): number =>
@@ -20,7 +20,6 @@ const setNthByte = (num: number, byte: number, newValue: number): number => {
 };
 
 interface EffectProps {
-    songData: SoundData
     currentChannelId: number
     event: SoundEvent
     value: any

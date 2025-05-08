@@ -8,9 +8,11 @@ import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 import { StyledPianoRoll } from './StyledComponents';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import { nls } from '@theia/core';
 
 interface PianoRollProps {
-    songData: SoundData
+    soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
     currentTick: number
     setCurrentTick: (currentTick: number) => void
     currentChannelId: number
@@ -23,7 +25,7 @@ interface PianoRollProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setNote: (step: number, note?: number, duration?: number) => void
+    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
     playNote: (note: number) => void
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
@@ -31,7 +33,7 @@ interface PianoRollProps {
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const {
-        songData,
+        soundData, updateSoundData,
         currentTick, setCurrentTick,
         currentChannelId,
         currentPatternId,
@@ -45,13 +47,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         newNoteDuration, setNewNoteDuration
     } = props;
 
-    const channel = songData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
-
-    const classNames = [
-        `size-${pattern?.size ?? 0}`,
-        `currentTick-${currentTick}`,
-    ];
+    const channel = soundData.channels[currentChannelId];
 
     if (currentPatternId === -1) {
         return <>
@@ -77,7 +73,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id:
-                const p = songData.channels[currentChannelId].patterns[currentPatternId];
+                const p = soundData.channels[currentChannelId].patterns[currentPatternId];
                 const pSize = p.size * NOTE_RESOLUTION;
                 if (currentTick < pSize - 1) {
                     setCurrentTick(currentTick + 1);
@@ -100,19 +96,18 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
     }, [
-        songData,
+        soundData,
         currentTick,
     ]);
 
-    return <StyledPianoRoll
-        className={classNames.join(' ')}
-    >
+    return <StyledPianoRoll>
         {<StepIndicator
             currentStep={currentPatternStep}
             isPianoRoll={true}
             hidden={currentStep === -1 || currentPatternStep === -1}
         />}
         <AdvancedSelect
+            title={nls.localize('vuengine/editors/sound/defaultNoteLength', 'Default Note Length')}
             defaultValue={newNoteDuration.toString()}
             onChange={options => setNewNoteDuration(parseInt(options[0]))}
             options={[{
@@ -140,7 +135,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             }}
         />
         <PianoRollHeader
-            songData={songData}
+            soundData={soundData}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
             currentPatternNoteOffset={currentPatternNoteOffset}
@@ -151,7 +146,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentStep={setCurrentStep}
         />
         <PianoRollEditor
-            songData={songData}
+            soundData={soundData}
+            updateSoundData={updateSoundData}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
             currentPatternNoteOffset={currentPatternNoteOffset}
@@ -162,7 +158,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             playNote={playNote}
         />
         <NoteProperties
-            songData={songData}
+            soundData={soundData}
             currentTick={currentTick}
             setCurrentTick={setCurrentTick}
             currentChannelId={currentChannelId}

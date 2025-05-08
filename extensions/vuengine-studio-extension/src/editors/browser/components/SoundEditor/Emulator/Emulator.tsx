@@ -8,7 +8,7 @@ import { nanoid } from '../../Common/Utils.js';
 import { SoundData } from '../SoundEditorTypes.js';
 
 interface EmulatorProps {
-    songData: SoundData
+    soundData: SoundData
     playing: boolean
     setPlaying: React.Dispatch<React.SetStateAction<boolean>>
     testing: boolean
@@ -26,14 +26,14 @@ interface EmulatorProps {
 
 export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { songData, playing, setEmulatorInitialized, currentStep, setCurrentStep } = props;
+    const { soundData, playing, setEmulatorInitialized, currentStep, setCurrentStep } = props;
     const [soundSpecTemplateString, setSoundSpecTemplateString] = useState<string>('');
     const [waveFormsTemplateString, setWaveFormsTemplateString] = useState<string>('');
     const [core, setCore] = useState<any>();
     const [sim, setSim] = useState<any>();
     const [tempBaseDir, setTempBaseDir] = useState<URI>();
     const [eventHandler, setEventHandler] = useState<DisposableCollection>();
-    const [songDataChecksum, setProjectDataChecksum] = useState<string>('');
+    const [soundDataChecksum, setSoundDataChecksum] = useState<string>('');
 
     const disposeEventHandlers = () => {
         if (eventHandler) {
@@ -118,7 +118,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             specFileUri!,
             soundSpecTemplateString,
             {
-                item: songData,
+                item: soundData,
                 project: services.vesProjectService.getProjectData(),
                 itemUri: new URI('Dummy.sound'),
                 isSoundEditorPreview: true,
@@ -301,12 +301,12 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             // console.log('========================');
             // console.log('--- 1) play ---');
             // console.log('compare checksums');
-            const currentSongDataChecksum = window.electronVesCore.sha1(JSON.stringify(songData));
-            // console.log('current:', currentSongDataChecksum);
-            // console.log('previous:', songDataChecksum);
-            if (songDataChecksum !== currentSongDataChecksum) {
+            const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify(soundData));
+            // console.log('current:', currentSoundDataChecksum);
+            // console.log('previous:', soundDataChecksum);
+            if (soundDataChecksum !== currentSoundDataChecksum) {
                 // console.log('checksums differ, compile song');
-                setProjectDataChecksum(currentSongDataChecksum);
+                setSoundDataChecksum(currentSoundDataChecksum);
                 setCurrentStep(0);
                 createSoundRom();
             } else {
@@ -327,7 +327,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         currentStep,
         playing,
         sim,
-        songData,
+        soundData,
     ]);
 
     return <></>;

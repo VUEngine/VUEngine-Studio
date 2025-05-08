@@ -4,7 +4,7 @@ import { PatternConfig, SoundData } from '../SoundEditorTypes';
 import CurrentPattern from './CurrentPattern';
 
 interface PatternProps {
-    songData: SoundData
+    soundData: SoundData
     currentChannelId: number
     currentPatternId: number
     setCurrentPatternId: (channelId: number, patternId: number) => void
@@ -13,7 +13,7 @@ interface PatternProps {
 
 export default function Pattern(props: PatternProps): React.JSX.Element {
     const {
-        songData,
+        soundData,
         currentChannelId,
         currentPatternId, setCurrentPatternId,
         setPattern,
@@ -22,7 +22,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     return <>
         {currentPatternId > -1
             ? <CurrentPattern
-                songData={songData}
+                soundData={soundData}
                 currentChannelId={currentChannelId}
                 currentPatternId={currentPatternId}
                 setCurrentPatternId={setCurrentPatternId}
