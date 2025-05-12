@@ -130,7 +130,7 @@ export default function StagePreview(props: StagePreviewProps): React.JSX.Elemen
         archerRef.current?.refreshScreen();
     };
 
-    const onStop = (e: DraggableEvent, data: DraggableData) => {
+    const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newPosition = {
             x: roundToNextMultipleOf16(data.x / scale),
             y: roundToNextMultipleOf16(data.y / scale),
@@ -167,7 +167,7 @@ export default function StagePreview(props: StagePreviewProps): React.JSX.Elemen
         <Draggable
             grid={[16 * scale, 16 * scale]}
             handle=".stage"
-            onStop={onStop}
+            onStop={onDragStop}
             onDrag={onDrag}
             position={{
                 x: pos.x * scale,

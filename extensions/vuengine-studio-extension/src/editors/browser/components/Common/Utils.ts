@@ -142,3 +142,23 @@ export const hexFromBitsArray = (bitsArray: (number | undefined)[][]): string =>
 
     return intToHex(sum, totalBits / 4);
 };
+
+export const sortObjectByKeys = (unordered: object) =>
+    Object.keys(unordered)
+        .sort()
+        .reduce((ordered, key) => {
+            // @ts-ignore
+            ordered[key] = unordered[key];
+            return ordered;
+        }, {});
+
+export const scaleCanvasAccountForDpi = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, width: number, height: number) => {
+    const dpr = window.devicePixelRatio ?? 1;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    context.scale(dpr, dpr);
+
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+};

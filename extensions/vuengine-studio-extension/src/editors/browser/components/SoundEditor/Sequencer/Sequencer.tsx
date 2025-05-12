@@ -1,24 +1,108 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, SoundData } from '../SoundEditorTypes';
+import {
+    ChannelConfig,
+    INPUT_BLOCKING_COMMANDS,
+    MAX_PATTERN_SIZE,
+    NOTE_RESOLUTION,
+    PATTERN_HEIGHT,
+    PIANO_ROLL_KEY_WIDTH,
+    SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT,
+    SEQUENCER_GRID_METER_HEIGHT,
+    SoundData,
+} from '../SoundEditorTypes';
 import ChannelHeader from './ChannelHeader';
 import LoopIndicator from './LoopIndicator';
+import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
 import StepIndicator from './StepIndicator';
-import { StyledChannelHeaderContainer, StyledChannelsHeader, StyledSequencer, StyledSequencerHideToggle } from './StyledComponents';
+import { StyledChannelHeaderContainer, StyledChannelsHeader } from './StyledComponents';
+import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+
+const StyledSequencer = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin: 0 var(--padding);
+    margin-bottom: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 11px;
+    position: relative;
+    transition: all .2s;
+
+    &.hidden {
+        height: 0 !important;
+        padding-bottom: 0;
+    }
+`;
+
+const StyledSequencerHideToggle = styled.button`
+    background-color: transparent;
+    border: 0;
+    box-shadow: 0 5px 0 var(--theia-editor-background) inset, 0 6px 0 inset;
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    font-size: 9px;
+    margin: 0 12px !important;
+    max-height: 12px;
+    min-height: 12px !important;
+    padding: 0;
+
+    i {
+        background-color: var(--theia-editor-background);
+        padding: 0 var(--theia-ui-padding);
+    }
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        border-radius: 2px;
+        box-shadow: none;
+        color: #fff;
+
+        i {
+            background-color: transparent;
+        }
+    }
+`;
+
+const StyledAddChannelButton = styled.button`
+    align-items: center;
+    background-color: var(--theia-editor-background);
+    border: 1px solid var(--theia-dropdown-border);
+    box-sizing: border-box;
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    margin-top: 2px;
+    min-height: ${SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT}px !important;
+    position: sticky;
+    width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
+    }
+
+    i {
+        font-size: 12px !important;
+    }
+`;
 
 interface SequencerProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
     currentChannelId: number
-    setCurrentChannelId: (currentChannelId: number) => void
-    currentPatternId: number
-    setCurrentPatternId: (channel: number, patternId: number) => void
+    setCurrentChannelId: Dispatch<SetStateAction<number>>
+    currentPatternId: string
+    setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     currentStep: number
@@ -36,7 +120,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
         currentChannelId, setCurrentChannelId,
-        currentPatternId, /* setCurrentPatternId, */
+        currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentStep,
         toggleChannelMuted,
@@ -48,21 +132,25 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const soloChannel = useMemo(() => soundData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1, [
-        soundData.channels,
-    ]);
+    const soloChannel = useMemo(() =>
+        soundData.channels.filter(c => c.solo).map((c, i) => i).pop() ?? -1,
+        [
+            soundData.channels,
+        ]
+    );
 
     const channels = useMemo(() => (
-        soundData.channels.map(channel =>
+        soundData.channels.map((channel, index) =>
             <ChannelHeader
-                key={channel.id}
+                key={index}
                 channel={channel}
+                channelId={index}
                 currentChannelId={currentChannelId}
                 setCurrentChannelId={setCurrentChannelId}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
                 toggleChannelSeeThrough={toggleChannelSeeThrough}
-                otherSolo={soloChannel > -1 && soloChannel !== channel.id}
+                otherSolo={soloChannel > -1 && soloChannel !== index}
             />
         )
     ), [
@@ -113,14 +201,18 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id:
+                /*
                 if (currentSequenceIndex < soundData.channels[currentChannelId].sequence.length - 1) {
                     setCurrentSequenceIndex(currentChannelId, currentSequenceIndex + 1);
                 }
+                */
                 break;
             case SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX.id:
+                /*
                 if (currentSequenceIndex > 0) {
                     setCurrentSequenceIndex(currentChannelId, currentSequenceIndex - 1);
                 }
+                */
                 break;
         }
     };
@@ -140,18 +232,27 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         <StyledSequencer
             className={sequencerHidden ? 'hidden' : undefined}
             onWheel={mapVerticalToHorizontalScroll}
+            style={{
+                height: soundData.channels.length * PATTERN_HEIGHT + SEQUENCER_GRID_METER_HEIGHT +
+                    (soundData.channels.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT + 2 : 0),
+            }}
         >
             <StepIndicator
+                soundData={soundData}
                 currentStep={currentStep}
                 isPianoRoll={false}
                 hidden={currentStep === -1}
             />
             <LoopIndicator
                 position={soundData.loopPoint}
-                hidden={soundData.loopPoint === 0}
+                hidden={!soundData.loop}
             />
             <HContainer gap={0} grow={1}>
-                <StyledChannelHeaderContainer>
+                <StyledChannelHeaderContainer
+                    style={{
+                        position: sequencerHidden ? 'unset' : undefined,
+                    }}
+                >
                     <StyledChannelsHeader>
                         <Input
                             title={nls.localize('vuengine/editors/sound/defaultPatternLength', 'Default Pattern Length')}
@@ -167,16 +268,48 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     </StyledChannelsHeader>
                     {channels}
                 </StyledChannelHeaderContainer>
+                {soundData.channels.map((channel, index) =>
+                    Object.keys(channel.sequence).map(key => {
+                        const step = parseInt(key);
+                        const patternId = channel.sequence[step];
+                        const pattern = channel.patterns[patternId];
+                        const patternIndex = Object.keys(channel.patterns).indexOf(patternId);
+                        return <PlacedPattern
+                            key={`${index}-${step}`}
+                            soundData={soundData}
+                            patternIndex={patternIndex}
+                            step={step}
+                            channelId={index}
+                            pattern={pattern}
+                            patternSize={pattern.size * NOTE_RESOLUTION}
+                            patternId={patternId}
+                            currentChannelId={currentChannelId}
+                            currentPatternId={currentPatternId}
+                            currentSequenceIndex={currentSequenceIndex}
+                            setCurrentSequenceIndex={setCurrentSequenceIndex}
+                            setChannel={setChannel}
+                        />;
+                    })
+                )}
                 <SequencerGrid
                     soundData={soundData}
                     updateSoundData={updateSoundData}
                     currentChannelId={currentChannelId}
                     currentPatternId={currentPatternId}
+                    setCurrentPatternId={setCurrentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setChannel={setChannel}
                 />
             </HContainer>
+            {soundData.channels.length < VSU_NUMBER_OF_CHANNELS &&
+                <StyledAddChannelButton
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
+                    title={nls.localizeByDefault('Add')}
+                >
+                    <i className='codicon codicon-plus' />
+                </StyledAddChannelButton>
+            }
         </StyledSequencer>
         <StyledSequencerHideToggle
             onClick={() => setSequencerHidden(prev => !prev)}

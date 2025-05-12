@@ -7,7 +7,7 @@ interface SidebarChannelProps {
     soundData: SoundData
     currentChannelId: number
     setCurrentChannelId: Dispatch<SetStateAction<number>>
-    setCurrentPatternId: Dispatch<SetStateAction<number>>
+    setCurrentPatternId: Dispatch<SetStateAction<string>>
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     editInstrument: (instrument: string) => void
 }

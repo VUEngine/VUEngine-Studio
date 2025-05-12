@@ -2,6 +2,11 @@ import { nls } from '@theia/core';
 import { EditorCommand } from '../../ves-editors-types';
 
 export namespace SoundEditorCommands {
+    export const ADD_CHANNEL: EditorCommand = {
+        id: 'editors.soundEditor.addChannel',
+        label: nls.localize('vuengine/editors/sound/commands/addChannel', 'Add Channel'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
     export const PLAY_PAUSE: EditorCommand = {
         id: 'editors.soundEditor.playPause',
         label: nls.localize('vuengine/editors/sound/commands/playPause', 'Play / Pause'),
@@ -40,25 +45,25 @@ export namespace SoundEditorCommands {
     };
     export const SELECT_CHANNEL_3: EditorCommand = {
         id: 'editors.soundEditor.selectChannel3',
-        label: nls.localize('vuengine/editors/sound/commands/selectChannel3', 'Select Channel 1'),
+        label: nls.localize('vuengine/editors/sound/commands/selectChannel3', 'Select Channel 3'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: '3',
     };
     export const SELECT_CHANNEL_4: EditorCommand = {
         id: 'editors.soundEditor.selectChannel4',
-        label: nls.localize('vuengine/editors/sound/commands/selectChannel4', 'Select Channel 1'),
+        label: nls.localize('vuengine/editors/sound/commands/selectChannel4', 'Select Channel 4'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: '4',
     };
     export const SELECT_CHANNEL_5: EditorCommand = {
         id: 'editors.soundEditor.selectChannel5',
-        label: nls.localize('vuengine/editors/sound/commands/selectChannel5', 'Select Channel 1'),
+        label: nls.localize('vuengine/editors/sound/commands/selectChannel5', 'Select Channel 5'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: '5',
     };
     export const SELECT_CHANNEL_6: EditorCommand = {
         id: 'editors.soundEditor.selectChannel6',
-        label: nls.localize('vuengine/editors/sound/commands/selectChannel6', 'Select Channel 1'),
+        label: nls.localize('vuengine/editors/sound/commands/selectChannel6', 'Select Channel 6'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: '6',
     };
@@ -104,12 +109,6 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'n',
     };
-    export const ADD_EFFECT: EditorCommand = {
-        id: 'editors.soundEditor.addEffect',
-        label: nls.localize('vuengine/editors/sound/commands/addEffect', 'Add Effect'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'f',
-    };
     export const PIANO_ROLL_SELECT_NEXT_TICK: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectNextTick',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextTick', 'Piano Roll: Select Next Tick'),
@@ -134,10 +133,10 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'a',
     };
-    export const TOGGLE_SIDEBAR_VISIBILITY: EditorCommand = {
-        id: 'editors.soundEditor.toggleSidebarVisibility',
-        label: nls.localize('vuengine/editors/sound/commands/toggleSidebarVisibility', 'Toggle Sidebar Visibility'),
+    export const TOGGLE_EFFECTS_VISIBILITY: EditorCommand = {
+        id: 'editors.soundEditor.toggleEffectsVisibility',
+        label: nls.localize('vuengine/editors/sound/commands/toggleEffectsVisibility', 'Toggle Effects Visibility'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 's',
+        keybinding: 'y',
     };
 };

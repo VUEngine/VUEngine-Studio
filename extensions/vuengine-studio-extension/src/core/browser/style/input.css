@@ -153,7 +153,7 @@ input[type="range"]:focus::before {
 
 input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    background: var(--theia-foreground);
+    background: var(--theia-editor-foreground);
     border-radius: 100px;
     cursor: ew-resize;
     height: calc(var(--theia-ui-font-size2) + 2 * var(--theia-border-width));

@@ -1,33 +1,36 @@
 import React from 'react';
-import { NOTE_RESOLUTION, NOTES_SPECTRUM, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+import {
+    EFFECTS_PANEL_EXPANDED_HEIGHT,
+    NOTE_RESOLUTION,
+    NOTES_SPECTRUM,
+    PATTERN_HEIGHT,
+    PIANO_ROLL_GRID_METER_HEIGHT,
+    PIANO_ROLL_KEY_WIDTH,
+    PIANO_ROLL_NOTE_HEIGHT,
+    PIANO_ROLL_NOTE_WIDTH,
+    SEQUENCER_GRID_METER_HEIGHT,
+    SoundData,
+} from '../SoundEditorTypes';
 import { StyledStepIndicator } from './StyledComponents';
 
 interface StepIndicatorProps {
+    soundData: SoundData
     currentStep: number
     isPianoRoll: boolean
     hidden: boolean
 }
 
 export default function StepIndicator(props: StepIndicatorProps): React.JSX.Element {
-    const { currentStep, isPianoRoll, hidden } = props;
-
-    let offset = 0;
-    const headerWidth = 50;
-    if (isPianoRoll) {
-        offset = headerWidth + currentStep * PIANO_ROLL_NOTE_WIDTH;
-    } else {
-        const patternNoteWidth = Math.max(0, 16 / NOTE_RESOLUTION);
-        offset = headerWidth + currentStep * patternNoteWidth;
-    }
+    const { soundData, currentStep, isPianoRoll, hidden } = props;
 
     const style = {
         display: hidden ? 'none' : undefined,
-        left: offset,
-        top: isPianoRoll ? 20 : 0,
-        bottom: isPianoRoll ? undefined : 11,
-        height: isPianoRoll ? NOTES_SPECTRUM * PIANO_ROLL_NOTE_HEIGHT + 5 : 191,
-        opacity: isPianoRoll ? .5 : 1,
-        width: isPianoRoll ? 15 : 1,
+        left: isPianoRoll
+            ? PIANO_ROLL_KEY_WIDTH + currentStep * PIANO_ROLL_NOTE_WIDTH + 1
+            : PIANO_ROLL_KEY_WIDTH + currentStep * Math.max(0, 16 / NOTE_RESOLUTION) + 1,
+        height: isPianoRoll
+            ? PIANO_ROLL_GRID_METER_HEIGHT + NOTES_SPECTRUM * PIANO_ROLL_NOTE_HEIGHT + EFFECTS_PANEL_EXPANDED_HEIGHT
+            : soundData.channels.length * PATTERN_HEIGHT + SEQUENCER_GRID_METER_HEIGHT,
     };
 
     return <StyledStepIndicator style={style} />;

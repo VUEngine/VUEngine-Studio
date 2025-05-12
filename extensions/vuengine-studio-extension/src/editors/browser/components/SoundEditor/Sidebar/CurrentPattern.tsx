@@ -13,9 +13,9 @@ import { InputWithAction, InputWithActionButton } from './Instruments';
 interface CurrentPatternProps {
     soundData: SoundData
     currentChannelId: number
-    currentPatternId: number
-    setCurrentPatternId: (channelId: number, patternId: number) => void
-    setPattern: (channelId: number, patternId: number, pattern: Partial<PatternConfig>) => void
+    currentPatternId: string
+    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setPattern: (channelId: number, patternId: string, pattern: Partial<PatternConfig>) => void
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
@@ -30,8 +30,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
     const channel = soundData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
 
-    const getName = (i: number): string => channel.patterns[i].name?.length
-        ? channel.patterns[i].name
+    const getName = (patternId: string, i: number): string => channel.patterns[patternId] && channel.patterns[patternId].name?.length
+        ? channel.patterns[patternId].name
         : (i + 1).toString();
 
     const setPatternName = (name: string): void => {
@@ -85,73 +85,75 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         }
     };
 
-    return <VContainer gap={15}>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}
-            </label>
-            <InputWithAction>
-                <AdvancedSelect
-                    options={channel.patterns.map((n, i) => ({
-                        label: getName(i),
-                        value: i.toString(),
-                    }))}
-                    defaultValue={currentPatternId.toString()}
-                    onChange={options => setCurrentPatternId(channel.id, parseInt(options[0]))}
-                    commands={INPUT_BLOCKING_COMMANDS}
-                />
-                <InputWithActionButton
-                    className='theia-button secondary'
-                    title={nls.localizeByDefault('Remove')}
-                    onClick={removeCurrentPattern}
-                    disabled={!pattern}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <Trash size={16} />
-                </InputWithActionButton>
-                <InputWithActionButton
-                    className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
-                    onClick={clonePattern}
-                    disabled={!pattern}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <Copy size={16} />
-                </InputWithActionButton>
-                <InputWithActionButton
-                    className='theia-button secondary'
-                    title={nls.localizeByDefault('Add')}
-                    onClick={addPattern}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                >
-                    <i className='codicon codicon-plus' />
-                </InputWithActionButton>
-            </InputWithAction>
-        </VContainer>
-        <HContainer gap={15}>
-            <VContainer grow={1}>
+    return pattern
+        ? <VContainer gap={15}>
+            <VContainer>
                 <label>
-                    {nls.localizeByDefault('Name')}
+                    {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}
                 </label>
+                <InputWithAction>
+                    <AdvancedSelect
+                        options={Object.keys(channel.patterns).map((n, i) => ({
+                            label: getName(n, i),
+                            value: n,
+                        }))}
+                        defaultValue={currentPatternId.toString()}
+                        onChange={options => setCurrentPatternId(currentChannelId, options[0])}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                    <InputWithActionButton
+                        className='theia-button secondary'
+                        title={nls.localizeByDefault('Remove')}
+                        onClick={removeCurrentPattern}
+                        disabled={!pattern}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    >
+                        <Trash size={16} />
+                    </InputWithActionButton>
+                    <InputWithActionButton
+                        className='theia-button secondary'
+                        title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
+                        onClick={clonePattern}
+                        disabled={!pattern}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    >
+                        <Copy size={16} />
+                    </InputWithActionButton>
+                    <InputWithActionButton
+                        className='theia-button secondary'
+                        title={nls.localizeByDefault('Add')}
+                        onClick={addPattern}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    >
+                        <i className='codicon codicon-plus' />
+                    </InputWithActionButton>
+                </InputWithAction>
+            </VContainer>
+            <HContainer gap={15}>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localizeByDefault('Name')}
+                    </label>
+                    <Input
+                        value={pattern.name ?? ''}
+                        setValue={setPatternName}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                </VContainer>
                 <Input
-                    value={pattern.name}
-                    setValue={setPatternName}
+                    label={nls.localize('vuengine/editors/sound/size', 'Size')}
+                    value={pattern.size}
+                    setValue={v => setSize(v as number)}
+                    type='number'
+                    min={MIN_PATTERN_SIZE}
+                    max={MAX_PATTERN_SIZE}
+                    width={64}
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
-            </VContainer>
-            <Input
-                label={nls.localize('vuengine/editors/sound/size', 'Size')}
-                value={pattern.size}
-                setValue={v => setSize(v as number)}
-                type='number'
-                min={MIN_PATTERN_SIZE}
-                max={MAX_PATTERN_SIZE}
-                width={64}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
-        </HContainer>
-    </VContainer>;
+            </HContainer>
+        </VContainer>
+        : <></>;
 }

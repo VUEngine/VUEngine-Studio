@@ -30,7 +30,7 @@ export enum SoundEvent {
 }
 
 export const INPUT_BLOCKING_COMMANDS = [
-    SoundEditorCommands.ADD_EFFECT.id,
+    SoundEditorCommands.ADD_CHANNEL.id,
     SoundEditorCommands.ADD_NOTE.id,
     SoundEditorCommands.ADD_PATTERN.id,
     SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id,
@@ -50,7 +50,7 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.TOOL_MARQUEE.id,
     SoundEditorCommands.TOOL_PENCIL.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
-    SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id,
+    SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id,
 ];
 
 export const EXCLUDED_SOUND_EVENTS = [
@@ -61,6 +61,8 @@ export const EXCLUDED_SOUND_EVENTS = [
 
 export type SoundEventMap = Record<string, any>;
 export type EventsMap = Record<number, SoundEventMap>;
+export type PatternMap = Record<string, PatternConfig>;
+export type SequenceMap = Record<number, string>;
 
 export interface PatternConfig {
     name: string
@@ -69,11 +71,10 @@ export interface PatternConfig {
 }
 
 export interface ChannelConfig {
-    id: number
     type: SoundEditorChannelType
     instrument: string
-    sequence: number[]
-    patterns: PatternConfig[]
+    sequence: SequenceMap
+    patterns: PatternMap
     allowSkip: boolean
     muted: boolean
     solo: boolean
@@ -233,17 +234,19 @@ export const NOTES: { [note: string]: number } = {
 
 export const NOTES_SPECTRUM = Object.keys(NOTES).length;
 export const NOTES_PER_OCTAVE = 12;
-export const PATTERN_HEIGHT = 28;
+export const PATTERN_HEIGHT = 32;
 export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
 export const MIN_SEQUENCE_SIZE = 1;
 export const MAX_SEQUENCE_SIZE = 512;
 export const SEQUENCER_GRID_METER_HEIGHT = 18;
+export const SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT = 16;
 
 export const NOTE_RESOLUTION = 16;
 
 export const PIANO_ROLL_GRID_METER_HEIGHT = 18;
 export const PIANO_ROLL_NOTE_HEIGHT = 12;
 export const PIANO_ROLL_NOTE_WIDTH = 16;
+export const PIANO_ROLL_KEY_WIDTH = 75;
 
 export const MIN_TICK_DURATION = 1;
 export const MAX_TICK_DURATION = 128;
@@ -252,5 +255,9 @@ export const VOLUME_STEPS = 16;
 
 export const MIN_PATTERN_SIZE = 1;
 export const MAX_PATTERN_SIZE = 16;
+
+export const EFFECTS_PANEL_HEADER_HEIGHT = 24;
+export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 24;
+export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128 + EFFECTS_PANEL_HEADER_HEIGHT;
 
 export const SINGLE_NOTE_TESTING_DURATION = 500;

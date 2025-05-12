@@ -1,132 +1,24 @@
 import styled from 'styled-components';
-import { PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
+import { PIANO_ROLL_KEY_WIDTH, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
 
 // these need to be in a single fine for references to each other to work
 
-export const StyledPianoRollEditor = styled.div`
-    display: flex;
-    flex-grow: 1;
-    user-select: none;
-`;
-
-export const StyledPiano = styled.div`
-    border-left: 1px solid rgba(0, 0, 0, .6);
-    border-right: 1px solid rgba(0, 0, 0, .6);
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    z-index: 10;
-`;
-
-export const StyledPianoKey = styled.div`
-    align-items: center;
-    background-color: #eee;
-    border-bottom: 0px solid rgba(0, 0, 0, .5);
-    box-sizing: border-box;
-    color: #666;
-    cursor: pointer;
-    display: flex;
-    font-size: 9px;
-    left: 0;
-    line-height: 6px;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    min-width: 50px;
-    padding-left: 3px;
-    position: sticky;
-    width: 50px;
-    z-index: 100;
-
-    &.sharpNote {
-        background-color: #eee !important;
-        color: rgba(0, 0, 0, .5);
-
-        &:after {
-            background: #111;
-            border-top-right-radius: 2px;
-            border-bottom-right-radius: 2px;
-            content: "";
-            height: 100%;
-            position: absolute;
-            left: 0;
-            width: 75%;
-        }
-    }
-
-    &:hover,
-    &.sharpNote:hover:after {
-        background: var(--theia-button-background);
-        color: var(--theia-button-foreground)
-    }
-
-    &:nth-child(12n) {
-        border-bottom-width: 1px;
-    }
-
-    &:nth-child(84) {
-        border-bottom-width: 0;
-    }
-`;
-
-export const StyledPianoRollKeyName = styled.div`
-    display: none;
-    z-index: 1;
-
-    ${StyledPianoKey}:nth-child(12n) &,
-    ${StyledPianoKey}:hover & {
-        display: block;
-    }
-`;
-
-export const StyledPianoRollPlacedNote = styled.div`
-    background-color: rgba(0, 0, 0, .75);
-    border-radius: 1px;
-    box-sizing: border-box;
-    color: #fff;
-    cursor: move;
-    font-size: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
-    line-height: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
-    outline-offset: 1px;
-    overflow: hidden;
-    padding-left: 1px;
-    position: absolute;
-    text-overflow: ellipsis;
-    z-index: 10;
-
-    &.oc {
-        border-radius: 0;
-        outline-width: 0;
-        z-index: 0;
-    }
-
-    &.selected {
-        outline: 3px solid var(--theia-focusBorder);
-    }
-
-    .react-resizable-handle-e {
-        border-left: 1px solid;
-        bottom: 2px;
-        cursor: col-resize;
-        position: absolute;
-        right: 0;
-        top: 2px;
-        width: 2px;
-    }
-`;
-
 export const MetaLine = styled.div`
+    background: var(--theia-editor-background);
+    border-top: 0px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
     left: 0;
-    min-height: 19px;
     position: sticky;
-    background: var(--theia-editor-background);
+    transition: all .2s;
     z-index: 200;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-top-color: rgba(0, 0, 0, .6);
+    }
 `;
 
 export const MetaLineHeader = styled.div`
@@ -137,11 +29,10 @@ export const MetaLineHeader = styled.div`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    height: 28px;
     left: 0;
-    min-width: 50px;
+    max-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     position: sticky;
-    width: 52px;
     z-index: 10;
 
     body.theia-light &,
@@ -159,15 +50,6 @@ export const MetaLineHeader = styled.div`
             border-top-color: rgba(0, 0, 0, .4);
         }
     }
-`;
-
-export const MetaLineHeaderLine = styled.div`
-    align-items: center;
-    display: flex;
-    flex-grow: 1;
-    justify-content: center;
-    min-height: 13px;
-    opacity: .75;
 `;
 
 export const MetaLineTick = styled.div`
@@ -218,8 +100,6 @@ export const MetaLineTickEffects = styled.div`
     flex-direction: column;
     flex-grow: 1;
     justify-content: center;
-    min-height: 28px;
-    max-height: 28px;
     overflow: hidden;
     width: 100%;    
     
@@ -274,7 +154,6 @@ export const StyledPianoRoll = styled.div`
     font-size: 10px;
     overflow: auto;
     margin: 2px var(--padding) var(--padding);
-    padding-right: 64px;
     position: relative;
 
     ${MetaLineTick}:nth-child(16n + 1) {

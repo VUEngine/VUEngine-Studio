@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyledLoopIndicator } from './StyledComponents';
-import { NOTE_RESOLUTION } from '../SoundEditorTypes';
+import { NOTE_RESOLUTION, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
 interface LoopIndicatorProps {
     position: number
@@ -10,12 +10,7 @@ interface LoopIndicatorProps {
 export default function LoopIndicator(props: LoopIndicatorProps): React.JSX.Element {
     const { position, hidden } = props;
 
-    let offset = 0;
-    const headerWidth = 50;
-    const patternNoteWidth = Math.max(0, 16 / NOTE_RESOLUTION);
-    const headerPadding = 3;
-    const elapsedNotesWidth = position * NOTE_RESOLUTION * patternNoteWidth;
-    offset = headerWidth + headerPadding + elapsedNotesWidth;
+    const offset = PIANO_ROLL_KEY_WIDTH + position * NOTE_RESOLUTION * Math.max(0, 16 / NOTE_RESOLUTION);
 
     const style = {
         display: hidden ? 'none' : undefined,

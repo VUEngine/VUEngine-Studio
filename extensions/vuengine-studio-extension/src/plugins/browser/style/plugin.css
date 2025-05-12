@@ -1,6 +1,6 @@
 .theia-vsx-extension-icon.vesPlaceholder i,
 .icon-container.vesPlaceholder i {
-    background: var(--theia-foreground);
+    background: var(--theia-editor-foreground);
     border-radius: 50%;
     color: var(--theia-sideBar-background);
     font-size: 26px;
@@ -23,7 +23,7 @@
 }
 
 .vesTag {
-    background: var(--theia-foreground);
+    background: var(--theia-editor-foreground);
     border-radius: 10px;
     color: var(--theia-sideBar-background);
     display: inline-block;

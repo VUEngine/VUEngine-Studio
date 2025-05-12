@@ -21,7 +21,7 @@ export const StyledSidebar = styled.div`
     }
 
      hr {
-        background-color: var(--theia-foreground);
+        background-color: var(--theia-editor-foreground);
         border: none;
         height: 0;
         margin: 0;

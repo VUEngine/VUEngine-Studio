@@ -1,5 +1,6 @@
-import { nls } from '@theia/core';
 import React, { SyntheticEvent, useEffect, useMemo } from 'react';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
@@ -12,33 +13,33 @@ import {
     PATTERN_HEIGHT,
     PATTERN_MAPPING_FACTOR,
     PatternConfig,
+    PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_GRID_METER_HEIGHT,
     SoundData,
     SoundEvent,
 } from '../SoundEditorTypes';
-import { StyledPattern, StyledPatternName, StyledPatternRemove } from './StyledComponents';
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
-import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
-import { ResizableBox, ResizeCallbackData } from 'react-resizable';
+import { StyledPattern, StyledPatternName } from './StyledComponents';
 
 interface PatternProps {
     soundData: SoundData
-    index: number
+    patternIndex: number
+    step: number
     pattern: PatternConfig
     patternSize: number
     channelId: number
-    patternId: number
+    patternId: string
     currentChannelId: number
-    currentPatternId: number
+    currentPatternId: string
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
 }
 
-export default function Pattern(props: PatternProps): React.JSX.Element {
+export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     const {
         soundData,
-        index,
+        patternIndex,
+        step,
         channelId,
         pattern, patternSize, patternId,
         currentChannelId, currentPatternId,
@@ -52,13 +53,13 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     // TODO: color _each note_ by instrument instead of whole channel
 
     const classNames = ['placedPattern'];
-    if (currentChannelId === channelId && currentSequenceIndex === index) {
+    if (currentChannelId === channelId && currentSequenceIndex === step) {
         classNames.push('current selected');
     } else if (isCurrent) {
-        classNames.push('curren');
+        classNames.push('current');
     }
 
-    const patternName = pattern.name ? pattern.name : (patternId + 1).toString();
+    const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
 
     const patternNoteWidth = Math.max(0, 16 / NOTE_RESOLUTION);
     const patternPixels: number[][][] = useMemo(() => {
@@ -100,19 +101,53 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     ]);
 
     const removeFromSequence = (cId: number, i: number): void => {
+        const updatedSequence = { ...soundData.channels[cId].sequence };
+        delete (updatedSequence[i]);
         setChannel(cId, {
-            sequence: [
-                ...soundData.channels[cId].sequence.slice(0, i),
-                ...soundData.channels[cId].sequence.slice(i + 1)
-            ],
+            sequence: updatedSequence,
         });
     };
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.REMOVE_CURRENT_PATTERN.id:
-                removeFromSequence(currentChannelId, index);
+                removeFromSequence(currentChannelId, step);
                 break;
+        }
+    };
+
+    const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
+        const newSize = Math.floor(data.size.width / NOTE_RESOLUTION);
+        setChannel(channelId, {
+            ...channel,
+            patterns: {
+                ...channel.patterns,
+                [patternId]: {
+                    ...channel.patterns[patternId],
+                    size: newSize
+                },
+            },
+        });
+    };
+
+    const onDragStop = (e: DraggableEvent, data: DraggableData) => {
+        const newStep = Math.ceil((data.x - PIANO_ROLL_KEY_WIDTH) / NOTE_RESOLUTION);
+        const updatedSequence = { ...soundData.channels[channelId].sequence };
+        updatedSequence[newStep] = updatedSequence[step];
+        delete (updatedSequence[step]);
+        setChannel(channelId, {
+            sequence: updatedSequence,
+        });
+        setCurrentSequenceIndex(channelId, newStep);
+    };
+
+    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+        console.log('PlacedPattern onClick e.buttons', e.buttons);
+        if (e.buttons === 0) {
+            console.log('setCurrentSequenceIndex(channelId, step);', channelId, step);
+            // setCurrentSequenceIndex(channelId, step);
+        } else if (e.buttons === 2) {
+            // removeFromSequence(channelId, step);
         }
     };
 
@@ -127,40 +162,30 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         soundData,
     ]);
 
-    const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        // const newDuration = Math.floor(data.size.width / PIANO_ROLL_NOTE_WIDTH);
-        // setNote(step, note, newDuration);
-    };
-
-    const onStop = (e: DraggableEvent, data: DraggableData) => {
-        // const newStep = Math.ceil((data.x - PIANO_WIDTH) / PIANO_ROLL_NOTE_WIDTH);
-        // const newNoteId = Math.floor(data.y / PIANO_ROLL_NOTE_HEIGHT);
-        // setNote(newStep, newNoteId, duration, step);
-    };
-
     return (
         <Draggable
             grid={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
             handle=".placedPattern"
             cancel=".react-resizable-handle"
-            onStop={onStop}
+            onStop={onDragStop}
             axis="x"
             position={{
-                x: 50 + index * NOTE_RESOLUTION,
+                x: PIANO_ROLL_KEY_WIDTH + step * NOTE_RESOLUTION,
                 y: SEQUENCER_GRID_METER_HEIGHT + channelId * PATTERN_HEIGHT,
             }}
             bounds={{
-                bottom: SEQUENCER_GRID_METER_HEIGHT + (VSU_NUMBER_OF_CHANNELS - 1) * PATTERN_HEIGHT,
-                left: 50,
-                right: 50 + soundData.size * NOTE_RESOLUTION - patternSize,
+                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.channels.length - 1) * PATTERN_HEIGHT,
+                left: PIANO_ROLL_KEY_WIDTH,
+                right: PIANO_ROLL_KEY_WIDTH + soundData.size * NOTE_RESOLUTION - patternSize,
                 top: SEQUENCER_GRID_METER_HEIGHT,
             }}
         >
             <StyledPattern
                 className={classNames.join(' ')}
                 data-channel={channelId}
-                data-position={index}
-                onClick={() => setCurrentSequenceIndex(channelId, index)}
+                data-position={step}
+                onClick={onClick}
+                onContextMenu={onClick}
                 title={patternName}
             >
                 <ResizableBox
@@ -173,35 +198,28 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                     minConstraints={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
                     maxConstraints={[NOTE_RESOLUTION * soundData.size, PATTERN_HEIGHT]}
                     resizeHandles={channelId === currentChannelId ? ['e'] : []}
-                    onResize={onResize}
+                    onResizeStop={onResize}
                 >
-                    <CanvasImage
-                        height={PATTERN_HEIGHT + 1}
-                        palette={'00000000'}
-                        pixelData={patternPixels}
-                        colorOverride={noteColor}
-                        width={patternSize * patternNoteWidth}
-                        displayMode={DisplayMode.Mono}
-                        colorMode={ColorMode.Default}
-                        style={{
-                            left: 0,
-                            position: 'absolute',
-                            top: 0,
-                            width: patternSize * patternNoteWidth,
-                        }}
-                    />
-                    <StyledPatternName>
-                        {patternName}
-                    </StyledPatternName>
-                    <StyledPatternRemove
-                        title={nls.localizeByDefault('Remove')}
-                        onClick={e => {
-                            removeFromSequence(channelId, index);
-                            e.stopPropagation();
-                        }}
-                    >
-                        &times;
-                    </StyledPatternRemove>
+                    <>
+                        <CanvasImage
+                            height={PATTERN_HEIGHT + 1}
+                            palette={'00000000'}
+                            pixelData={patternPixels}
+                            colorOverride={noteColor}
+                            width={patternSize * patternNoteWidth}
+                            displayMode={DisplayMode.Mono}
+                            colorMode={ColorMode.Default}
+                            style={{
+                                left: 0,
+                                position: 'absolute',
+                                top: 0,
+                                width: patternSize * patternNoteWidth,
+                            }}
+                        />
+                        <StyledPatternName>
+                            {patternName}
+                        </StyledPatternName>
+                    </>
                 </ResizableBox>
             </StyledPattern>
         </Draggable>

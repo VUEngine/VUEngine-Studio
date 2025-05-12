@@ -1,5 +1,4 @@
 /* eslint-disable no-null/no-null */
-import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog, StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -10,6 +9,7 @@ import styled from 'styled-components';
 import { WHEEL_SENSITIVITY } from '../../../editors/browser/components/ActorEditor/ActorEditorTypes';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import Sidebar from '../../../editors/browser/components/Common/Editor/Sidebar';
+import EmptyContainer from '../../../editors/browser/components/Common/EmptyContainer';
 import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves-editors-types';
 import { VesProjectCommands } from '../ves-project-commands';
 import { ZOOM_MAX, ZOOM_MIN } from '../ves-project-dashboard-widget';
@@ -227,18 +227,6 @@ export const MOCK_POSITIONS: DashboardConfigPositionMap = {
 export const MOCK_START_SCREEN = '1234';
 export const MOCK_AUTO_PAUSE_SCREEN = '0123';
 
-const EmptyContainer = styled.div`
-    align-items: center;
-    color: var(--theia-dropdown-border);
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 5px;
-    inset: 0;
-    justify-content: center;
-    position: absolute;
-`;
-
 const DashboardContainer = styled.div`
     align-items: end;
     overflow: hidden !important;
@@ -444,7 +432,7 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
                             ref={archerRef}
                             lineStyle="straight"
                             offset={-8}
-                            strokeColor="var(--theia-foreground)"
+                            strokeColor="var(--theia-editor-foreground)"
                             strokeWidth={getArrowStrokeWidth()}
                         >
                             <div
@@ -503,34 +491,17 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
                         </ArcherContainer>
                         : <>
                             <div></div>
-                            <EmptyContainer>
-                                <PuzzlePiece size={32} />
-                                <div
-                                    style={{
-                                        fontSize: '160%'
-                                    }}
-                                >
-                                    {nls.localize(
-                                        'vuengine/project/projectHasNoStages',
-                                        'This project does not yet have any stages',
-                                    )}
-                                </div>
-                                <div>
-                                    {nls.localize(
-                                        'vuengine/project/clickBelowToAddFirstStage',
-                                        'Click below to add the first stage',
-                                    )}
-                                </div>
-                                <button
-                                    className='theia-button secondary large'
-                                    onClick={addStage}
-                                    style={{
-                                        marginTop: 20
-                                    }}
-                                >
-                                    <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
-                                </button>
-                            </EmptyContainer>
+                            <EmptyContainer
+                                title={nls.localize(
+                                    'vuengine/project/projectHasNoStages',
+                                    'This project does not yet have any stages',
+                                )}
+                                description={nls.localize(
+                                    'vuengine/project/clickBelowToAddFirstStage',
+                                    'Click below to add the first stage',
+                                )}
+                                onClick={addStage}
+                            />
                         </>
                     }
                     {!sidebarOpen &&

@@ -15,10 +15,10 @@ import { getMaxNoteDuration } from './Note';
 interface CurrentPatternStepProps {
     soundData: SoundData
     currentChannelId: number
-    currentPatternId: number
+    currentPatternId: string
     currentStep: number
     setCurrentTick: (tick: number) => void
-    setCurrentPatternId: (channelId: number, patternId: number) => void
+    setCurrentPatternId: (channelId: number, patternId: string) => void
     updateEvents: (index: number, event: SoundEvent, value: any) => void
     playing: boolean
     testing: boolean
@@ -44,6 +44,10 @@ export default function CurrentPatternStep(props: CurrentPatternStepProps): Reac
     } = props;
 
     const pattern = soundData.channels[currentChannelId].patterns[currentPatternId];
+    if (!pattern) {
+        return <></>;
+    }
+
     const patternSize = (pattern?.size ?? 4) * NOTE_RESOLUTION;
 
     if (currentStep === -1) {

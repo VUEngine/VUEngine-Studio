@@ -6,9 +6,9 @@ import CurrentPattern from './CurrentPattern';
 interface PatternProps {
     soundData: SoundData
     currentChannelId: number
-    currentPatternId: number
-    setCurrentPatternId: (channelId: number, patternId: number) => void
-    setPattern: (channelId: number, patternId: number, pattern: Partial<PatternConfig>) => void
+    currentPatternId: string
+    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setPattern: (channelId: number, patternId: string, pattern: Partial<PatternConfig>) => void
 }
 
 export default function Pattern(props: PatternProps): React.JSX.Element {
@@ -20,7 +20,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     } = props;
 
     return <>
-        {currentPatternId > -1
+        {currentPatternId !== ''
             ? <CurrentPattern
                 soundData={soundData}
                 currentChannelId={currentChannelId}

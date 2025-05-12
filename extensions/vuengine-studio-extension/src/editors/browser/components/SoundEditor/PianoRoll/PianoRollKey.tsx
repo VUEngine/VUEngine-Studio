@@ -1,5 +1,66 @@
 import React from 'react';
-import { StyledPianoKey, StyledPianoRollKeyName } from './StyledComponents';
+import styled from 'styled-components';
+import { PIANO_ROLL_KEY_WIDTH, PIANO_ROLL_NOTE_HEIGHT } from '../SoundEditorTypes';
+
+export const StyledPianoKey = styled.div`
+    align-items: center;
+    background-color: #eee;
+    border-bottom: 0px solid rgba(0, 0, 0, .5);
+    box-sizing: border-box;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    font-size: 9px;
+    left: 0;
+    line-height: 6px;
+    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
+    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
+    min-width: ${PIANO_ROLL_KEY_WIDTH}px;
+    padding-left: 3px;
+    position: sticky;
+    width: ${PIANO_ROLL_KEY_WIDTH}px;
+    z-index: 300;
+
+    &.sharpNote {
+        background-color: #eee !important;
+        color: rgba(0, 0, 0, .5);
+
+        &:after {
+            background: #111;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+            content: "";
+            height: 100%;
+            position: absolute;
+            left: 0;
+            width: 75%;
+        }
+    }
+
+    &:hover,
+    &.sharpNote:hover:after {
+        background: var(--theia-button-background);
+        color: var(--theia-button-foreground)
+    }
+
+    &:nth-child(12n) {
+        border-bottom-width: 1px;
+    }
+
+    &:nth-child(84) {
+        border-bottom-width: 0;
+    }
+`;
+
+export const StyledPianoRollKeyName = styled.div`
+    display: none;
+    z-index: 1;
+
+    ${StyledPianoKey}:nth-child(12n) &,
+    ${StyledPianoKey}:hover & {
+        display: block;
+    }
+`;
 
 interface PianoRollKeyProps {
     noteId: number

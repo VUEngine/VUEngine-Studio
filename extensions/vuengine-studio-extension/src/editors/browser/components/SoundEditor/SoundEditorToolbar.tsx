@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { SoundEditorCommands } from './SoundEditorCommands';
-import { INPUT_BLOCKING_COMMANDS, SoundEditorTool } from './SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, PIANO_ROLL_KEY_WIDTH, SoundEditorTool } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -31,7 +31,7 @@ export const StyledSoundEditorToolbarButton = styled.button`
 `;
 
 export const StyledSoundEditorToolbarWideButton = styled(StyledSoundEditorToolbarButton)`
-    width: 50px;
+    width: ${PIANO_ROLL_KEY_WIDTH}px;
 `;
 
 export const StyledSoundEditorToolbarTime = styled.div`

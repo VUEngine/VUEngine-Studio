@@ -2,17 +2,48 @@ import chroma from 'chroma-js';
 import React, { SyntheticEvent, useMemo } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
+import styled from 'styled-components';
 import { getMaxNoteDuration } from '../Sidebar/Note';
 import { EventsMap, NOTE_RESOLUTION, NOTES, NOTES_SPECTRUM, PIANO_ROLL_NOTE_HEIGHT, PIANO_ROLL_NOTE_WIDTH } from '../SoundEditorTypes';
-import { StyledPianoRollPlacedNote } from './StyledComponents';
 
-const PIANO_WIDTH = 51;
-const getLeftOffset = (index: number) => PIANO_WIDTH + (index * PIANO_ROLL_NOTE_WIDTH);
-const getTopOffset = (note: number) => note * PIANO_ROLL_NOTE_HEIGHT;
+const StyledPianoRollPlacedNote = styled.div`
+    border-radius: 1px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: move;
+    font-size: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
+    line-height: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
+    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
+    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
+    min-width: ${PIANO_ROLL_NOTE_WIDTH}px;
+    outline-offset: 1px;
+    overflow: hidden;
+    padding-left: 1px;
+    position: absolute;
+    text-align: center;
+    text-overflow: ellipsis;
+    z-index: 10;
+
+    &.selected {
+        outline: 3px solid var(--theia-focusBorder);
+    }
+
+    .react-resizable-handle-e {
+        border-left: 1px solid;
+        bottom: 2px;
+        cursor: col-resize;
+        opacity: .5;
+        position: absolute;
+        right: 0;
+        top: 2px;
+        width: 2px;
+    }
+`;
 
 interface PianoRollPlacedNoteProps {
     currentChannelId: number
     channelId: number
+    currentSequenceIndex: number
     currentTick: number
     setCurrentTick: (playRangeEnd: number) => void
     note: number
@@ -27,6 +58,7 @@ interface PianoRollPlacedNoteProps {
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
     const {
         channelId, currentChannelId,
+        currentSequenceIndex,
         currentTick, setCurrentTick,
         note, duration,
         step,
@@ -35,31 +67,40 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         events,
         patternSize,
     } = props;
+    const localStep = step - currentSequenceIndex * NOTE_RESOLUTION;
 
-    const left = getLeftOffset(step);
-    const top = getTopOffset(note);
+    const left = step * PIANO_ROLL_NOTE_WIDTH;
+    const top = note * PIANO_ROLL_NOTE_HEIGHT;
     const width = duration * PIANO_ROLL_NOTE_WIDTH - 1;
 
     const classNames = ['placedNote'];
-    if (channelId !== currentChannelId) {
-        classNames.push('oc');
-    } else if (currentTick === step) {
+    if (currentTick === step) {
         classNames.push('selected');
     }
 
     const maxDuration = useMemo(() =>
-        getMaxNoteDuration(events, step, patternSize),
-        [events, step, patternSize]);
+        getMaxNoteDuration(events, localStep, patternSize),
+        [events, step, currentSequenceIndex, patternSize]
+    );
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newDuration = Math.floor(data.size.width / PIANO_ROLL_NOTE_WIDTH);
-        setNote(step, note, newDuration);
+        console.log(data.size.width, Math.ceil(data.size.width / PIANO_ROLL_NOTE_WIDTH));
+        const newDuration = Math.ceil(data.size.width / PIANO_ROLL_NOTE_WIDTH);
+        setNote(localStep, note, newDuration);
     };
 
-    const onStop = (e: DraggableEvent, data: DraggableData) => {
-        const newStep = Math.ceil((data.x - PIANO_WIDTH) / PIANO_ROLL_NOTE_WIDTH);
+    const onDragStop = (e: DraggableEvent, data: DraggableData) => {
+        const newStep = Math.ceil(data.x / PIANO_ROLL_NOTE_WIDTH) - currentSequenceIndex * NOTE_RESOLUTION;
         const newNoteId = Math.floor(data.y / PIANO_ROLL_NOTE_HEIGHT);
-        setNote(newStep, newNoteId, duration, step);
+        setNote(newStep, newNoteId, duration, localStep);
+    };
+
+    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+        if (e.buttons === 0) {
+            setCurrentTick(step);
+        } else if (e.buttons === 2) {
+            setNote(localStep);
+        }
     };
 
     return (
@@ -67,32 +108,26 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             grid={[PIANO_ROLL_NOTE_WIDTH, PIANO_ROLL_NOTE_HEIGHT]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
-            onStop={onStop}
+            onStop={onDragStop}
             position={{
                 x: left,
                 y: top,
             }}
             bounds={{
                 bottom: (NOTES_SPECTRUM - 1) * PIANO_ROLL_NOTE_HEIGHT,
-                left: PIANO_WIDTH,
-                right: PIANO_WIDTH + (patternSize * NOTE_RESOLUTION - duration) * PIANO_ROLL_NOTE_WIDTH,
+                left: currentSequenceIndex * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH,
+                right: ((currentSequenceIndex + patternSize) * NOTE_RESOLUTION - duration) * PIANO_ROLL_NOTE_WIDTH,
                 top: 0,
             }}
         >
             <StyledPianoRollPlacedNote
                 className={classNames.join(' ')}
                 style={{
-                    backgroundColor: channelId !== currentChannelId
-                        ? undefined
-                        : instrumentColor,
-                    color: channelId !== currentChannelId
-                        ? undefined
-                        : chroma.contrast(instrumentColor, 'white') > 2
-                            ? 'white'
-                            : 'black',
+                    backgroundColor: instrumentColor,
+                    color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                 }}
-                onClick={() => setCurrentTick(step)}
-                onContextMenu={() => setNote(step)}
+                onClick={onClick}
+                onContextMenu={onClick}
             >
                 <ResizableBox
                     width={width}
@@ -104,10 +139,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     minConstraints={[PIANO_ROLL_NOTE_WIDTH, PIANO_ROLL_NOTE_HEIGHT]}
                     maxConstraints={[PIANO_ROLL_NOTE_WIDTH * maxDuration, PIANO_ROLL_NOTE_HEIGHT]}
                     resizeHandles={channelId === currentChannelId ? ['e'] : []}
-                    onResize={onResize}
+                    onResizeStop={onResize}
                 >
                     <>
-                        { /* width > PIANO_ROLL_NOTE_WIDTH && */
+                        {width > PIANO_ROLL_NOTE_WIDTH &&
                             Object.keys(NOTES)[note]
                         }
                     </>

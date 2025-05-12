@@ -1,18 +1,19 @@
-import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
+import EmptyContainer from '../../Common/EmptyContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import { ActorEditorCommands } from '../ActorEditorCommands';
+import ActorEditorStatus from '../ActorEditorStatus';
 import {
+  ActorEditorContext,
+  ActorEditorContextType,
   AnimationData,
   ComponentData,
   ComponentKey,
-  ActorEditorContext,
-  ActorEditorContextType,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
   WHEEL_SENSITIVITY
@@ -22,7 +23,6 @@ import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
-import ActorEditorStatus from '../ActorEditorStatus';
 
 interface PreviewProps {
   hasAnyComponent: boolean
@@ -222,55 +222,28 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     : <div className='preview-container'>
       <VContainer alignItems='center' style={{ color: 'var(--theia-dropdown-border)' }}>
         {!hasAnyComponent
-          ? <>
-            <PuzzlePiece size={32} />
-            <div
-              style={{
-                fontSize: '160%'
-              }}
-            >
-              {
-                nls.localize(
-                  'vuengine/editors/actor/actorIsEmpty',
-                  'This Actor is empty',
-                )
-              }
-            </div>
-            <div>
-              {nls.localize(
-                'vuengine/editors/actor/clickBelowToAddFirstComponent',
-                'Click below to add the first component',
-              )}
-            </div>
-            <button
-              className='theia-button secondary large'
-              onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
-              style={{
-                marginTop: 20
-              }}
-            >
-              <i className='codicon codicon-add' /> {nls.localize('vuengine/editors/general/addComponent', 'Add Component')}
-            </button>
-          </>
-          : <>
-            <PuzzlePiece size={32} />
-            <div
-              style={{
-                fontSize: '160%'
-              }}
-            >
-              {nls.localize(
-                'vuengine/editors/actor/noPreviewableComponents',
-                'This actor does not yet have any previewable components',
-              )}
-            </div>
-            <div>
-              {nls.localize(
-                'vuengine/editors/actor/previewableComponentsList',
-                'Add either a child, collider, sprite or wireframe',
-              )}
-            </div>
-          </>
+          ? <EmptyContainer
+            title={nls.localize(
+              'vuengine/editors/actor/actorIsEmpty',
+              'This Actor is empty',
+            )}
+            description={nls.localize(
+              'vuengine/editors/actor/clickBelowToAddFirstComponent',
+              'Click below to add the first component',
+            )}
+            onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
+          />
+          : <EmptyContainer
+            title={nls.localize(
+              'vuengine/editors/actor/noPreviewableComponents',
+              'This actor does not yet have any previewable components',
+            )}
+            description={nls.localize(
+              'vuengine/editors/actor/previewableComponentsList',
+              'Add either a child, collider, sprite or wireframe',
+            )}
+            onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
+          />
         }
       </VContainer>
     </div>;

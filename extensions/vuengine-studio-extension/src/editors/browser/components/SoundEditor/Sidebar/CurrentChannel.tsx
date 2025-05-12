@@ -13,7 +13,7 @@ interface CurrentChannelProps {
     soundData: SoundData
     currentChannelId: number
     setCurrentChannelId: Dispatch<SetStateAction<number>>
-    setCurrentPatternId: Dispatch<SetStateAction<number>>
+    setCurrentPatternId: Dispatch<SetStateAction<string>>
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     editInstrument: (instrument: string) => void
 }
@@ -23,7 +23,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
     const {
         soundData,
         currentChannelId, setCurrentChannelId,
-        // setCurrentPatternId,
+        setCurrentPatternId,
         setChannel,
         editInstrument,
     } = props;
@@ -32,7 +32,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
 
     const onSelectChannel = (channelId: number): void => {
         setCurrentChannelId(channelId);
-        // setCurrentPatternId(soundData.channels[channelId].sequence[0] ?? 0);
+        setCurrentPatternId(Object.values(soundData.channels[channelId].sequence)[0] ?? '');
     };
 
     const setChannelInstrument = (instrumentId: string): void => {
@@ -67,13 +67,13 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} 4`,
                         value: '3',
                     }, {
-                        label: nls.localize('vuengine/editors/sound/sweepModulation', 'Sweep / Modulation'),
+                        label: nls.localize('vuengine/editors/sound/waveSm', 'Wave (Sweep / Modulation)'),
                         value: '4',
                     }, {
                         label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
                         value: '5',
                     }]}
-                    defaultValue={`${channel.id}`}
+                    defaultValue={`${currentChannelId}`}
                     onChange={options => onSelectChannel(parseInt(options[0]))}
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
