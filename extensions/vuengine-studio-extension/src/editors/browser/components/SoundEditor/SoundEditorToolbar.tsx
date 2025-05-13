@@ -31,7 +31,7 @@ export const StyledSoundEditorToolbarButton = styled.button`
 `;
 
 export const StyledSoundEditorToolbarWideButton = styled(StyledSoundEditorToolbarButton)`
-    width: ${PIANO_ROLL_KEY_WIDTH}px;
+    width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
 `;
 
 export const StyledSoundEditorToolbarTime = styled.div`
@@ -81,6 +81,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         emulatorInitialized,
     } = props;
 
+    const playbackElapsedTime = 0;
+    const totalLength = 1;
+    const speed = 1;
+
     return (
         <StyledSoundEditorToolbar>
             <StyledSoundEditorToolbarGroup>
@@ -114,25 +118,23 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 <StyledSoundEditorToolbarTime>
                     {currentStep + 1}
                 </StyledSoundEditorToolbarTime>
-                { /* }
-                    <StyledSoundEditorToolbarTime>
-                        <span>
-                            {currentStep > -1
-                                ? Math.floor(playbackElapsedTime / 1000 / 60) + ':' +
-                                Math.floor((playbackElapsedTime / 1000) % 60).toString().padStart(2, '0') + ',' +
-                                Math.floor((playbackElapsedTime / 100) % 10)
-                                : '0:00,0'
-                            }
-                        </span>
-                        <span>
-                            {
-                                Math.floor(totalLength * speed / 1000 / 60) + ':' +
-                                Math.floor((totalLength * speed / 1000) % 60).toString().padStart(2, '0') + ',' +
-                                Math.floor((totalLength * speed / 100) % 10)
-                            }
-                        </span>
-                    </StyledSoundEditorToolbarTime>
-                    { */ }
+                <StyledSoundEditorToolbarTime>
+                    <span>
+                        {currentStep > -1
+                            ? Math.floor(playbackElapsedTime / 1000 / 60) + ':' +
+                            Math.floor((playbackElapsedTime / 1000) % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((playbackElapsedTime / 100) % 10)
+                            : '0:00,0'
+                        }
+                    </span>
+                    <span>
+                        {
+                            Math.floor(totalLength * speed / 1000 / 60) + ':' +
+                            Math.floor((totalLength * speed / 1000) % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((totalLength * speed / 100) % 10)
+                        }
+                    </span>
+                </StyledSoundEditorToolbarTime>
             </StyledSoundEditorToolbarGroup>
             { /* }
             <StyledSoundEditorToolbarGroup>

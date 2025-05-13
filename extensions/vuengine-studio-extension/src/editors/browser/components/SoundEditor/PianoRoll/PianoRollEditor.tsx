@@ -33,7 +33,8 @@ interface PianoRollEditorProps {
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     currentTick: number
     setCurrentTick: (note: number) => void
-    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
+    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
 }
 
@@ -46,13 +47,14 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentTick,
         setCurrentTick,
         setNote,
+        setNoteEvent,
         playNote,
     } = props;
 
     const placedNotesCurrentPattern = useMemo(() => {
         const channel = soundData.channels[currentChannelId];
         const patternId = channel?.sequence[currentSequenceIndex];
-        const pattern = channel?.patterns[patternId];
+        const pattern = soundData.patterns[patternId];
         if (!pattern) {
             return;
         }
@@ -79,6 +81,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                         currentTick={currentTick}
                         setCurrentTick={setCurrentTick}
                         setNote={setNote}
+                        setNoteEvent={setNoteEvent}
                         events={pattern.events}
                         patternSize={pattern.size}
                     />

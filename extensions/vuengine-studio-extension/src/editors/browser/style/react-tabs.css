@@ -11,10 +11,12 @@
 }
 
 .react-tabs__tab {
+    align-items: center;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    display: inline-block;
+    display: inline-flex;
     font-weight: bold;
+    gap: 5px;
     line-height: 30px;
     list-style: none;
     margin-right: 15px;

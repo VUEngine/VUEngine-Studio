@@ -1,6 +1,3 @@
-import { nls } from '@theia/core';
-import { SoundEvent } from '../SoundEditorTypes';
-
 export interface EventData {
     id: string
     shortId: string
@@ -15,6 +12,7 @@ export interface EventMap {
 }
 
 export const AVAILABLE_EVENTS: EventMap = {
+    /*
     // Note
     [SoundEvent.NoteCut]: {
         id: SoundEvent.NoteCut,
@@ -108,4 +106,5 @@ export const AVAILABLE_EVENTS: EventMap = {
         category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
         defaultValue: 0x00,
     },
+    */
 };

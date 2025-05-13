@@ -22,10 +22,9 @@ import LoopIndicator from './LoopIndicator';
 import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
 import StepIndicator from './StepIndicator';
-import { StyledChannelHeaderContainer, StyledChannelsHeader } from './StyledComponents';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 
-const StyledSequencer = styled.div`
+export const StyledSequencer = styled.div`
     display: flex;
     flex-direction: column;
     margin: 0 var(--padding);
@@ -35,6 +34,7 @@ const StyledSequencer = styled.div`
     padding-bottom: 11px;
     position: relative;
     transition: all .2s;
+    user-select: none;
 
     &.hidden {
         height: 0 !important;
@@ -68,6 +68,31 @@ const StyledSequencerHideToggle = styled.button`
         i {
             background-color: transparent;
         }
+    }
+`;
+
+export const StyledChannelHeaderContainer = styled.div`
+    border-right: 1px solid rgba(255, 255, 255, .6);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 100;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-right-color: rgba(0, 0, 0, .6);
+    }
+`;
+
+const StyledChannelsHeader = styled.div`
+    background-color: var(--theia-editor-background);
+    border-bottom: 1px solid rgba(255, 255, 255, .6);
+    box-sizing: border-box;
+    height: ${SEQUENCER_GRID_METER_HEIGHT}px;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-bottom-color: rgba(0, 0, 0, .6);
     }
 `;
 
@@ -114,6 +139,8 @@ interface SequencerProps {
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
     newPatternSize: number
     setNewPatternSize: Dispatch<SetStateAction<number>>
+    setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
+    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -129,6 +156,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setChannel,
         sequencerHidden, setSequencerHidden,
         newPatternSize, setNewPatternSize,
+        setChannelDialogOpen, setPatternDialogOpen,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -151,6 +179,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 toggleChannelSolo={toggleChannelSolo}
                 toggleChannelSeeThrough={toggleChannelSeeThrough}
                 otherSolo={soloChannel > -1 && soloChannel !== index}
+                setChannelDialogOpen={setChannelDialogOpen}
             />
         )
     ), [
@@ -173,25 +202,37 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.SELECT_CHANNEL_1.id:
-                setCurrentChannelId(0);
+                if (soundData.channels.length > 0) {
+                    setCurrentChannelId(0);
+                }
                 break;
             case SoundEditorCommands.SELECT_CHANNEL_2.id:
-                setCurrentChannelId(1);
+                if (soundData.channels.length > 1) {
+                    setCurrentChannelId(1);
+                }
                 break;
             case SoundEditorCommands.SELECT_CHANNEL_3.id:
-                setCurrentChannelId(2);
+                if (soundData.channels.length > 2) {
+                    setCurrentChannelId(2);
+                }
                 break;
             case SoundEditorCommands.SELECT_CHANNEL_4.id:
-                setCurrentChannelId(3);
+                if (soundData.channels.length > 3) {
+                    setCurrentChannelId(3);
+                }
                 break;
             case SoundEditorCommands.SELECT_CHANNEL_5.id:
-                setCurrentChannelId(4);
+                if (soundData.channels.length > 4) {
+                    setCurrentChannelId(4);
+                }
                 break;
             case SoundEditorCommands.SELECT_CHANNEL_6.id:
-                setCurrentChannelId(5);
+                if (soundData.channels.length > 5) {
+                    setCurrentChannelId(5);
+                }
                 break;
             case SoundEditorCommands.SELECT_NEXT_CHANNEL.id:
-                if (currentChannelId < 5) {
+                if (currentChannelId < soundData.channels.length - 1) {
                     setCurrentChannelId(currentChannelId + 1);
                 }
                 break;
@@ -272,11 +313,15 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     Object.keys(channel.sequence).map(key => {
                         const step = parseInt(key);
                         const patternId = channel.sequence[step];
-                        const pattern = channel.patterns[patternId];
-                        const patternIndex = Object.keys(channel.patterns).indexOf(patternId);
+                        const pattern = soundData.patterns[patternId];
+                        const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
+                        if (!pattern) {
+                            return;
+                        }
                         return <PlacedPattern
                             key={`${index}-${step}`}
                             soundData={soundData}
+                            updateSoundData={updateSoundData}
                             patternIndex={patternIndex}
                             step={step}
                             channelId={index}
@@ -288,6 +333,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             currentSequenceIndex={currentSequenceIndex}
                             setCurrentSequenceIndex={setCurrentSequenceIndex}
                             setChannel={setChannel}
+                            setPatternDialogOpen={setPatternDialogOpen}
                         />;
                     })
                 )}

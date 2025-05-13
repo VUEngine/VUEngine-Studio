@@ -4,7 +4,6 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
-import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { EventsMap, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, NOTE_RESOLUTION, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
@@ -15,7 +14,7 @@ interface CurrentPatternProps {
     currentChannelId: number
     currentPatternId: string
     setCurrentPatternId: (channelId: number, patternId: string) => void
-    setPattern: (channelId: number, patternId: string, pattern: Partial<PatternConfig>) => void
+    setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
@@ -27,15 +26,14 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
     } = props;
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
-    const channel = soundData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
+    const pattern = soundData.patterns[currentPatternId];
 
-    const getName = (patternId: string, i: number): string => channel.patterns[patternId] && channel.patterns[patternId].name?.length
-        ? channel.patterns[patternId].name
+    const getName = (patternId: string, i: number): string => soundData.patterns[patternId] && soundData.patterns[patternId].name?.length
+        ? soundData.patterns[patternId].name
         : (i + 1).toString();
 
     const setPatternName = (name: string): void => {
-        setPattern(currentChannelId, currentPatternId, { name });
+        setPattern(currentPatternId, { name });
     };
 
     const setSize = (size: number): void => {
@@ -57,7 +55,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
             }
         });
 
-        setPattern(currentChannelId, currentPatternId, {
+        setPattern(currentPatternId, {
             events: updatedEvents,
             size,
         });
@@ -93,7 +91,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </label>
                 <InputWithAction>
                     <AdvancedSelect
-                        options={Object.keys(channel.patterns).map((n, i) => ({
+                        options={Object.keys(soundData.patterns).map((n, i) => ({
                             label: getName(n, i),
                             value: n,
                         }))}
@@ -132,28 +130,26 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     </InputWithActionButton>
                 </InputWithAction>
             </VContainer>
-            <HContainer gap={15}>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localizeByDefault('Name')}
-                    </label>
-                    <Input
-                        value={pattern.name ?? ''}
-                        setValue={setPatternName}
-                        commands={INPUT_BLOCKING_COMMANDS}
-                    />
-                </VContainer>
+            <VContainer>
+                <label>
+                    {nls.localizeByDefault('Name')}
+                </label>
                 <Input
-                    label={nls.localize('vuengine/editors/sound/size', 'Size')}
-                    value={pattern.size}
-                    setValue={v => setSize(v as number)}
-                    type='number'
-                    min={MIN_PATTERN_SIZE}
-                    max={MAX_PATTERN_SIZE}
-                    width={64}
+                    value={pattern.name ?? ''}
+                    setValue={setPatternName}
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
-            </HContainer>
+            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/sound/size', 'Size')}
+                value={pattern.size}
+                setValue={v => setSize(v as number)}
+                type='number'
+                min={MIN_PATTERN_SIZE}
+                max={MAX_PATTERN_SIZE}
+                width={64}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
         </VContainer>
         : <></>;
 }

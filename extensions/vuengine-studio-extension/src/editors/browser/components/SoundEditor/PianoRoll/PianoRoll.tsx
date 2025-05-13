@@ -1,14 +1,24 @@
+import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { NOTE_RESOLUTION, PIANO_ROLL_NOTE_WIDTH, SoundData } from '../SoundEditorTypes';
+import { NOTE_RESOLUTION, PIANO_ROLL_NOTE_WIDTH, SoundData, SoundEvent } from '../SoundEditorTypes';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
-import { StyledPianoRoll } from './StyledComponents';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
-import { nls } from '@theia/core';
+
+const StyledPianoRoll = styled.div`
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    overflow: auto;
+    margin: 2px var(--padding) var(--padding);
+    position: relative;
+`;
 
 interface PianoRollProps {
     soundData: SoundData
@@ -26,7 +36,8 @@ interface PianoRollProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
+    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
@@ -44,6 +55,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         setNote,
+        setNoteEvent,
         playNote,
         newNoteDuration, setNewNoteDuration
     } = props;
@@ -53,7 +65,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id:
-                const p = soundData.channels[currentChannelId].patterns[currentPatternId];
+                const p = soundData.patterns[currentPatternId];
                 const pSize = p.size * NOTE_RESOLUTION;
                 if (currentTick < pSize - 1) {
                     setCurrentTick(currentTick + 1);
@@ -65,7 +77,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.REMOVE_CURRENT_NOTE.id:
-                setNote(currentTick, undefined);
+                setNote(currentTick);
                 break;
         }
     };
@@ -148,6 +160,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             currentTick={currentTick}
             setCurrentTick={setCurrentTick}
             setNote={setNote}
+            setNoteEvent={setNoteEvent}
             playNote={playNote}
         />
         <NoteProperties

@@ -6,7 +6,7 @@ import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
 import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
-import { InputWithActionButton } from './Sidebar/Instruments';
+import { InputWithActionButton } from './Other/Instruments';
 
 interface WaveformSelectProps {
     value: string

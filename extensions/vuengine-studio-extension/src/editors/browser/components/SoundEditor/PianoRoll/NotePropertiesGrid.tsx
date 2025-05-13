@@ -17,7 +17,7 @@ interface NotePropertiesGridProps {
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     currentTick: number
     setCurrentTick: (currentTick: number) => void
-    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
+    setNote: (step: number, note?: number, prevStep?: number) => void
 }
 
 export default function NotePropertiesGrid(props: NotePropertiesGridProps): React.JSX.Element {

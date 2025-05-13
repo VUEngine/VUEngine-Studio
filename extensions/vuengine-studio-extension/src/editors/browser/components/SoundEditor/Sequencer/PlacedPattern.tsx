@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useMemo } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
@@ -18,10 +18,74 @@ import {
     SoundData,
     SoundEvent,
 } from '../SoundEditorTypes';
-import { StyledPattern, StyledPatternName } from './StyledComponents';
+import styled from 'styled-components';
+
+const StyledPattern = styled.div`
+    align-items: center;
+    background-color: var(--theia-secondaryButton-background);
+    border-right: 1px solid rgba(255, 255, 255, .1);
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+    box-sizing: border-box;
+    cursor: move;
+    display: flex;
+    height: ${PATTERN_HEIGHT}px;
+    justify-content: center;
+    margin-right: 1px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 10;
+
+    &:hover,
+    &.current {
+        outline: 1px solid var(--theia-focusBorder);
+        outline-offset: -1px;
+        z-index: 11;
+    }
+        
+    &.selected {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
+    }
+
+    &.dragging {
+        border: 1px solid var(--theia-focusBorder);
+        cursor: grabbing;
+        outline: 0;
+    }
+
+    canvas {
+        box-sizing: border-box;
+        height: ${PATTERN_HEIGHT}px;
+    }
+
+    .react-resizable-handle {
+        border-left: 1px solid rgba(255, 255, 255, .5);
+        bottom: 3px;
+        cursor: col-resize;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        width: 2px;
+        z-index: 10;
+    }
+`;
+
+const StyledPatternName = styled.div`
+    align-items: center;
+    display: flex;
+    font-size: 9px;
+    height: 100%;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0 3px;
+    position: relative;
+    text-overflow: ellipsis;
+    z-index: 1;
+`;
 
 interface PatternProps {
     soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
     patternIndex: number
     step: number
     pattern: PatternConfig
@@ -33,11 +97,12 @@ interface PatternProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     const {
-        soundData,
+        soundData, updateSoundData,
         patternIndex,
         step,
         channelId,
@@ -45,6 +110,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         currentChannelId, currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
+        setPatternDialogOpen,
     } = props;
     const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
     const channel = soundData.channels[channelId];
@@ -118,12 +184,12 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newSize = Math.floor(data.size.width / NOTE_RESOLUTION);
-        setChannel(channelId, {
-            ...channel,
+        updateSoundData({
+            ...soundData,
             patterns: {
-                ...channel.patterns,
+                ...soundData.patterns,
                 [patternId]: {
-                    ...channel.patterns[patternId],
+                    ...soundData.patterns[patternId],
                     size: newSize
                 },
             },
@@ -131,24 +197,33 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
+        const newChannelId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / PATTERN_HEIGHT);
         const newStep = Math.ceil((data.x - PIANO_ROLL_KEY_WIDTH) / NOTE_RESOLUTION);
-        const updatedSequence = { ...soundData.channels[channelId].sequence };
-        updatedSequence[newStep] = updatedSequence[step];
-        delete (updatedSequence[step]);
-        setChannel(channelId, {
-            sequence: updatedSequence,
+        if (newChannelId === channelId && newStep === step) {
+            return;
+        }
+
+        const updatedChannels = [...soundData.channels];
+        updatedChannels[newChannelId].sequence[newStep] = updatedChannels[channelId].sequence[step];
+        delete (updatedChannels[channelId].sequence[step]);
+
+        updateSoundData({
+            ...soundData,
+            channels: updatedChannels,
         });
-        setCurrentSequenceIndex(channelId, newStep);
+        setCurrentSequenceIndex(newChannelId, newStep);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        console.log('PlacedPattern onClick e.buttons', e.buttons);
         if (e.buttons === 0) {
-            console.log('setCurrentSequenceIndex(channelId, step);', channelId, step);
-            // setCurrentSequenceIndex(channelId, step);
+            setCurrentSequenceIndex(channelId, step);
         } else if (e.buttons === 2) {
-            // removeFromSequence(channelId, step);
+            removeFromSequence(channelId, step);
         }
+    };
+
+    const onDblClick = (e: React.MouseEvent<HTMLElement>) => {
+        setPatternDialogOpen(true);
     };
 
     useEffect(() => {
@@ -168,7 +243,6 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             handle=".placedPattern"
             cancel=".react-resizable-handle"
             onStop={onDragStop}
-            axis="x"
             position={{
                 x: PIANO_ROLL_KEY_WIDTH + step * NOTE_RESOLUTION,
                 y: SEQUENCER_GRID_METER_HEIGHT + channelId * PATTERN_HEIGHT,
@@ -186,6 +260,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                 data-position={step}
                 onClick={onClick}
                 onContextMenu={onClick}
+                onDoubleClick={onDblClick}
                 title={patternName}
             >
                 <ResizableBox

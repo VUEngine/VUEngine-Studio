@@ -22,7 +22,7 @@ interface PianoRollGridProps {
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     currentTick: number
     setCurrentTick: (currentTick: number) => void
-    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
+    setNote: (step: number, note?: number, prevStep?: number) => void
 }
 
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
@@ -83,7 +83,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 }
                 const patternOffset = parseInt(key);
                 const patternId = channel.sequence[patternOffset];
-                const pattern = channel.patterns[patternId];
+                const pattern = soundData.patterns[patternId];
+                if (!pattern) {
+                    return;
+                }
                 Object.keys(pattern.events).map(stepStr => {
                     const step = parseInt(stepStr);
                     const note = pattern.events[step][SoundEvent.Note] ?? -1;
@@ -159,8 +162,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // highlight current pattern
-        const currentChannel = soundData.channels[currentChannelId];
-        const currentPattern = currentChannel?.patterns[currentPatternId];
+        const currentPattern = soundData.patterns[currentPatternId];
         if (currentPattern) {
             const currentPatternSize = currentPattern.size;
             const highlightColor = services.colorRegistry.getCurrentColor('focusBorder') ?? 'red';
@@ -183,7 +185,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         Object.keys(currentChannel.sequence).reverse().map(bStr => {
             const b = parseInt(bStr);
             const patternId = currentChannel.sequence[b];
-            const pattern = currentChannel.patterns[patternId];
+            const pattern = soundData.patterns[patternId];
             if (!stop && b <= bar && b + pattern.size > bar) {
                 stop = true;
                 setCurrentSequenceIndex(currentChannelId, b);
@@ -201,8 +203,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         const step = Math.floor(x / PIANO_ROLL_NOTE_WIDTH);
 
         if (e.button === 0) {
-            const currentChannel = soundData.channels[currentChannelId];
-            const currentPattern = currentChannel?.patterns[currentPatternId];
+            const currentPattern = soundData.patterns[currentPatternId];
             const currentStep = currentSequenceIndex * NOTE_RESOLUTION;
             if (!currentPattern) {
                 return;

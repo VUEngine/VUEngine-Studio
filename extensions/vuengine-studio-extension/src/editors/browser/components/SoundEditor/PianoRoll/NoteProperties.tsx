@@ -1,12 +1,12 @@
+import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { Tab, TabList, Tabs } from 'react-tabs';
+import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import { EFFECTS_PANEL_COLLAPSED_HEIGHT, EFFECTS_PANEL_EXPANDED_HEIGHT, EFFECTS_PANEL_HEADER_HEIGHT, SoundData } from '../SoundEditorTypes';
 import NotePropertiesGrid from './NotePropertiesGrid';
-import { MetaLine, MetaLineHeader } from './StyledComponents';
-import styled from 'styled-components';
-import { nls } from '@theia/core';
+import { MetaLine, MetaLineHeader } from './PianoRollHeader';
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -59,7 +59,7 @@ interface NotePropertiesProps {
     setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
-    setNote: (step: number, note?: number, duration?: number, prevStep?: number) => void
+    setNote: (step: number, note?: number, prevStep?: number) => void
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -97,7 +97,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
             minHeight: visible ? EFFECTS_PANEL_EXPANDED_HEIGHT : EFFECTS_PANEL_COLLAPSED_HEIGHT,
         }}
     >
-        <MetaLineHeader>
+        <MetaLineHeader
+            style={{ borderBottom: 'none' }}
+        >
             <StyledToggleButton
                 onClick={() => setVisible(prev => !prev)}
                 title={

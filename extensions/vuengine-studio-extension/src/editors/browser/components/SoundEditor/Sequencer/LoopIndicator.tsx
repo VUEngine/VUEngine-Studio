@@ -1,6 +1,22 @@
 import React from 'react';
-import { StyledLoopIndicator } from './StyledComponents';
 import { NOTE_RESOLUTION, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
+import styled from 'styled-components';
+
+export const StyledLoopIndicator = styled.div`
+    background-color: var(--theia-editor-foreground);
+    bottom: 12px;
+    opacity: .5;
+    position: absolute;
+    top: 0;
+    width: 1px;
+
+    i {
+        font-size: 9px;
+        margin-left: 1px;
+        position: absolute;
+        top: 4px;
+    }
+`;
 
 interface LoopIndicatorProps {
     position: number

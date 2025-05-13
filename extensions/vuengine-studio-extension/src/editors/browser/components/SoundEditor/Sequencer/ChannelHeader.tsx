@@ -1,9 +1,83 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
+import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, SoundEditorChannelType } from '../SoundEditorTypes';
-import { StyledChannelHeader, StyledChannelHeaderButton, StyledChannelHeaderButtons, StyledChannelHeaderButtonsGroup, StyledChannelHeaderInfo } from './StyledComponents';
+import { ChannelConfig, PATTERN_HEIGHT, PIANO_ROLL_KEY_WIDTH, SoundEditorChannelType } from '../SoundEditorTypes';
+import { StyledChannelHeaderContainer } from './Sequencer';
+
+const StyledChannelHeader = styled.div`
+    background-color: var(--theia-editor-background);
+    border-bottom: 1px solid rgba(255, 255, 255, .2);
+    border-left: 1px solid rgba(255, 255, 255, .6);
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    height: ${PATTERN_HEIGHT}px;
+    left: 0;
+    min-width: ${PIANO_ROLL_KEY_WIDTH}px;
+    overflow: hidden;
+    position: sticky;
+    width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
+    z-index: 100;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-bottom-color: rgba(0, 0, 0, .2);
+        border-left-color: rgba(0, 0, 0, .6);
+    }
+
+    &.current {
+        background-color: var(--theia-focusBorder) !important;
+        color: #fff;
+    }
+
+    ${StyledChannelHeaderContainer} &:last-child {
+        border-bottom-color: rgba(255, 255, 255, .4);
+
+        body.theia-light &,
+        body.theia-hc & {
+            border-bottom-color: rgba(0, 0, 0, .4);
+        }
+    }
+`;
+
+const StyledChannelHeaderInfo = styled.div`
+    align-items: start;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    padding: 3px 3px 1px;
+`;
+
+const StyledChannelHeaderButtons = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 1px 1px;
+`;
+
+const StyledChannelHeaderButtonsGroup = styled.div`
+    display: flex;
+`;
+
+const StyledChannelHeaderButton = styled.div`
+    align-items: center;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    height: 16px;
+    justify-content: center;
+    flex-grow: 1;
+    width: 16px;
+
+    &:hover {
+        background: rgba(0, 0, 0, .2);
+    }
+`;
 
 const getChannelCommand = (i: number): EditorCommand => {
     switch (i) {
@@ -38,6 +112,7 @@ interface ChannelHeaderProps {
     toggleChannelSolo: (channelId: number) => void
     toggleChannelSeeThrough: (channelId: number) => void
     otherSolo: boolean
+    setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
@@ -47,6 +122,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
         currentChannelId, setCurrentChannelId,
         toggleChannelMuted, toggleChannelSolo, toggleChannelSeeThrough,
         otherSolo,
+        setChannelDialogOpen,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -110,7 +186,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
             </StyledChannelHeaderButtonsGroup>
             <StyledChannelHeaderButtonsGroup>
                 <StyledChannelHeaderButton
-                    onClick={() => { }}
+                    onClick={() => setChannelDialogOpen(true)}
                 >
                     <i className="fa fa-cog" />
                 </StyledChannelHeaderButton>

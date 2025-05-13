@@ -7,6 +7,7 @@ export type InstrumentMap = Record<string, InstrumentConfig>;
 export interface SoundData {
     name: string
     channels: ChannelConfig[]
+    patterns: PatternMap
     instruments: InstrumentMap
     size: number
     speed: number
@@ -16,17 +17,11 @@ export interface SoundData {
 }
 
 export enum SoundEvent {
-    Arpeggio = 'arpeggio',
+    Duration = 'duration',
     Instrument = 'instrument',
     Note = 'note',
-    Duration = 'duration',
-    NoteCut = 'noteCut',
-    PortamentoDown = 'PortamentoDown',
-    PortamentoUp = 'PortamentoUp',
-    TonePortamento = 'tonePortamento',
-    Vibrato = 'vibrato',
+    NoteSlide = 'noteSlide',
     Volume = 'volume',
-    VolumeSlide = 'volumeSlide',
 }
 
 export const INPUT_BLOCKING_COMMANDS = [
@@ -74,7 +69,6 @@ export interface ChannelConfig {
     type: SoundEditorChannelType
     instrument: string
     sequence: SequenceMap
-    patterns: PatternMap
     allowSkip: boolean
     muted: boolean
     solo: boolean
@@ -83,7 +77,6 @@ export interface ChannelConfig {
 
 export interface InstrumentConfig {
     name: string
-    type: SoundEditorChannelType
     color: number
     waveform: string
     volume: VsuChannelStereoLevelsData
@@ -234,14 +227,15 @@ export const NOTES: { [note: string]: number } = {
 
 export const NOTES_SPECTRUM = Object.keys(NOTES).length;
 export const NOTES_PER_OCTAVE = 12;
+export const NOTE_RESOLUTION = 16; // 1/16 note
+export const CYCLES_PER_NOTE = 64;
+
 export const PATTERN_HEIGHT = 32;
 export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
 export const MIN_SEQUENCE_SIZE = 1;
 export const MAX_SEQUENCE_SIZE = 512;
 export const SEQUENCER_GRID_METER_HEIGHT = 18;
 export const SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT = 16;
-
-export const NOTE_RESOLUTION = 16;
 
 export const PIANO_ROLL_GRID_METER_HEIGHT = 18;
 export const PIANO_ROLL_NOTE_HEIGHT = 12;
