@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import { INPUT_BLOCKING_COMMANDS, PIANO_ROLL_KEY_WIDTH, SoundEditorTool } from './SoundEditorTypes';
+import { PencilSimple, Selection } from '@phosphor-icons/react';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -77,7 +78,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const {
         currentStep,
         playing, togglePlaying, stopPlaying,
-        // tool, setTool,
+        tool, setTool,
         emulatorInitialized,
     } = props;
 
@@ -136,7 +137,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     </span>
                 </StyledSoundEditorToolbarTime>
             </StyledSoundEditorToolbarGroup>
-            { /* }
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarButton
                     className='theia-button secondary'
@@ -150,31 +150,34 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 >
                     <PencilSimple size={17} />
                 </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className='theia-button secondary'
-                        title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
-                        }
-                        onClick={() => setTool(SoundEditorTool.MARQUEE)}
-                        style={{ outlineWidth: tool === SoundEditorTool.MARQUEE ? 1 : 0 }}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        disabled={true}
-                    >
-                        <Selection size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${recording ? 'primary' : 'secondary'} recordButton`}
-                        title='Recording Mode'
-                        disabled={true}
-                        onClick={() => setState({ recording: !recording })}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    >
-                        <i className='fa fa-circle' />
-                    </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className='theia-button secondary'
+                    title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
+                    }
+                    // onClick={() => setTool(SoundEditorTool.MARQUEE)}
+                    style={{ outlineWidth: tool === SoundEditorTool.MARQUEE ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    disabled={true}
+                    // TODO
+                    onClick={() => alert('Not yet implemented')}
+                >
+                    <Selection size={17} />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className={`theia-button ${/* recording */false ? 'primary' : 'secondary'} recordButton`}
+                    title='Recording Mode'
+                    disabled={true}
+                    // TODO
+                    onClick={() => alert('Not yet implemented')}
+                    // onClick={() => setState({ recording: !recording })}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                >
+                    <i className='fa fa-circle' />
+                </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
-            { */ }
         </StyledSoundEditorToolbar>
     );
 }

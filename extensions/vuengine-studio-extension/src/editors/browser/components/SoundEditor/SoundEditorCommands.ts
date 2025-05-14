@@ -68,16 +68,34 @@ export namespace SoundEditorCommands {
         keybinding: '6',
     };
     export const SELECT_NEXT_CHANNEL: EditorCommand = {
-        id: 'editors.soundEditor.nextSequenceIndex',
-        label: nls.localize('vuengine/editors/sound/commands/nextSequenceIndex', 'Select Next Sequence Index'),
+        id: 'editors.soundEditor.nextChannel',
+        label: nls.localize('vuengine/editors/sound/commands/nextChannel', 'Select Next Channel'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+down',
     };
     export const SELECT_PREVIOUS_CHANNEL: EditorCommand = {
-        id: 'editors.soundEditor.previousSequenceIndex',
-        label: nls.localize('vuengine/editors/sound/commands/previousSequenceIndex', 'Select Previous Sequence Index'),
+        id: 'editors.soundEditor.previousChannel',
+        label: nls.localize('vuengine/editors/sound/commands/previousChannel', 'Select Previous Channel'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+up',
+    };
+    export const SHOW_SEQUENCER_VIEW: EditorCommand = {
+        id: 'editors.soundEditor.showSequencerView',
+        label: nls.localize('vuengine/editors/sound/commands/showSequencerView', 'Show Sequencer View'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '7',
+    };
+    export const SHOW_INSTRUMENTS_VIEW: EditorCommand = {
+        id: 'editors.soundEditor.showInstrumentsView',
+        label: nls.localize('vuengine/editors/sound/commands/showInstrumentsView', 'Show Instruments View'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '8',
+    };
+    export const SHOW_SETTINGS_VIEW: EditorCommand = {
+        id: 'editors.soundEditor.showSettingsView',
+        label: nls.localize('vuengine/editors/sound/commands/showSettingsView', 'Show Settings View'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '9',
     };
     export const ADD_PATTERN: EditorCommand = {
         id: 'editors.soundEditor.addPattern',
@@ -120,6 +138,30 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousTick', 'Piano Roll: Select Previous Tick'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'left',
+    };
+    export const PIANO_ROLL_NOTE_UP: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollNoteUp',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteUp', 'Piano Roll: Move Note Up'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'up',
+    };
+    export const PIANO_ROLL_NOTE_DOWN: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollNoteDown',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteDown', 'Piano Roll: Move Note Down'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'down',
+    };
+    export const PIANO_ROLL_NOTE_UP_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollNoteUpAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteUpAnOctave', 'Piano Roll: Move Note Up 1 Octave'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+up',
+    };
+    export const PIANO_ROLL_NOTE_DOWN_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollNoteDownAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteDownAnOctave', 'Piano Roll: Move Note Down 1 Octave'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+down',
     };
     export const REMOVE_CURRENT_NOTE: EditorCommand = {
         id: 'editors.soundEditor.removeCurrentNote',

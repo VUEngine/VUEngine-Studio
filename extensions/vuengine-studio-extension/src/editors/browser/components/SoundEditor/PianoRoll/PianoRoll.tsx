@@ -5,7 +5,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types'
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { NOTE_RESOLUTION, PIANO_ROLL_NOTE_WIDTH, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { NOTE_RESOLUTION, NOTES_PER_OCTAVE, NOTES_SPECTRUM, PIANO_ROLL_NOTE_WIDTH, SoundData, SoundEvent } from '../SoundEditorTypes';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
@@ -62,18 +62,40 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
+    const pattern = soundData.patterns[currentPatternId];
+    const patternSize = pattern.size * NOTE_RESOLUTION;
+
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id:
-                const p = soundData.patterns[currentPatternId];
-                const pSize = p.size * NOTE_RESOLUTION;
-                if (currentTick < pSize - 1) {
+                if (currentTick < patternSize - 1) {
                     setCurrentTick(currentTick + 1);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id:
                 if (currentTick > 0) {
                     setCurrentTick(currentTick - 1);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_NOTE_UP.id:
+                if (pattern.events[currentTick] && pattern.events[currentTick][SoundEvent.Note] && pattern.events[currentTick][SoundEvent.Note] > 0) {
+                    setNote(currentTick, pattern.events[currentTick][SoundEvent.Note] - 1);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_NOTE_DOWN.id:
+                if (pattern.events[currentTick] && pattern.events[currentTick][SoundEvent.Note] && pattern.events[currentTick][SoundEvent.Note] < NOTES_SPECTRUM - 1) {
+                    setNote(currentTick, pattern.events[currentTick][SoundEvent.Note] + 1);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_NOTE_UP_AN_OCTAVE.id:
+                if (pattern.events[currentTick] && pattern.events[currentTick][SoundEvent.Note] && pattern.events[currentTick][SoundEvent.Note] > NOTES_PER_OCTAVE) {
+                    setNote(currentTick, pattern.events[currentTick][SoundEvent.Note] - NOTES_PER_OCTAVE);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_NOTE_DOWN_AN_OCTAVE.id:
+                if (pattern.events[currentTick] && pattern.events[currentTick][SoundEvent.Note] &&
+                    pattern.events[currentTick][SoundEvent.Note] < NOTES_SPECTRUM - NOTES_PER_OCTAVE - 1) {
+                    setNote(currentTick, pattern.events[currentTick][SoundEvent.Note] + NOTES_PER_OCTAVE);
                 }
                 break;
             case SoundEditorCommands.REMOVE_CURRENT_NOTE.id:

@@ -63,7 +63,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentInstrument, setCurrentInstrument] = useState<string>('');
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
-    const [sidebarTab, setSidebarTab] = useState<number>(0);
+    const [tab, setTab] = useState<number>(0);
     const [channelDialogOpen, setChannelDialogOpen] = useState<boolean>(false);
     const [patternDialogOpen, setPatternDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
@@ -121,7 +121,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         // setCurrentTick(soundData.channels[id].sequence.length ? 0 : -1);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
-        setSidebarTab(0);
+        setTab(0);
     };
 
     const updateCurrentSequenceIndex = (channel: number, sequenceIndex: number): void => {
@@ -131,7 +131,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentTick(0);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
-        setSidebarTab(0);
+        setTab(0);
     };
 
     const updateCurrentPatternId = (channelId: number, patternId: string): void => {
@@ -140,11 +140,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentTick(0);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
-        setSidebarTab(0);
+        setTab(0);
     };
 
     const updateCurrentTick = (note: number): void => {
-        setSidebarTab(0);
+        setTab(0);
         setCurrentTick(note);
     };
 
@@ -398,7 +398,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const editInstrument = (instrument: string): void => {
         setChannelDialogOpen(false);
         setCurrentInstrument(instrument);
-        setSidebarTab(1);
+        setTab(1);
     };
 
     // the starting note index of the current pattern
@@ -422,8 +422,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         currentSequenceIndex,
     ]);
 
+    const sequencerTabCommand = SoundEditorCommands.SHOW_SEQUENCER_VIEW;
+    const instrumentsTabCommand = SoundEditorCommands.SHOW_INSTRUMENTS_VIEW;
+    const settingsTabCommand = SoundEditorCommands.SHOW_SETTINGS_VIEW;
+
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
+            case sequencerTabCommand.id:
+                setTab(0);
+                break;
+            case instrumentsTabCommand.id:
+                setTab(1);
+                break;
+            case settingsTabCommand.id:
+                setTab(2);
+                break;
             case SoundEditorCommands.ADD_CHANNEL.id:
                 addChannel();
                 break;
@@ -485,8 +498,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             />
             <VContainer gap={0} grow={1} overflow="hidden">
                 <Tabs
-                    selectedIndex={sidebarTab}
-                    onSelect={index => setSidebarTab(index)}
+                    selectedIndex={tab}
+                    onSelect={index => setTab(index)}
                 >
                     <HContainer justifyContent='space-between'>
                         <SoundEditorToolbar
@@ -499,13 +512,19 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             emulatorInitialized={emulatorInitialized}
                         />
                         <TabList style={{ padding: 'var(--padding) var(--padding) 0 var(--padding)' }}>
-                            <Tab>
+                            <Tab
+                                title={`${sequencerTabCommand.label}${services.vesCommonService.getKeybindingLabel(sequencerTabCommand.id, true)}`}
+                            >
                                 <PianoKeys size={20} /> {nls.localize('vuengine/editors/sound/sequencer', 'Sequencer')}
                             </Tab>
-                            <Tab>
+                            <Tab
+                                title={`${instrumentsTabCommand.label}${services.vesCommonService.getKeybindingLabel(instrumentsTabCommand.id, true)}`}
+                            >
                                 <Guitar size={20} /> {nls.localize('vuengine/editors/sound/instruments', 'Instruments')}
                             </Tab>
-                            <Tab>
+                            <Tab
+                                title={`${settingsTabCommand.label}${services.vesCommonService.getKeybindingLabel(settingsTabCommand.id, true)}`}
+                            >
                                 <FadersHorizontal size={20} /> {nls.localize('vuengine/editors/sound/settings', 'Settings')}
                             </Tab>
                         </TabList>
