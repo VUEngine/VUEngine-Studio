@@ -67,14 +67,24 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_TICK.id:
+            case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (currentTick < patternSize - 1) {
                     setCurrentTick(currentTick + 1);
                 }
                 break;
-            case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_TICK.id:
+            case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id:
                 if (currentTick > 0) {
                     setCurrentTick(currentTick - 1);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id:
+                if (currentTick < patternSize - NOTE_RESOLUTION) {
+                    setCurrentTick(currentTick + NOTE_RESOLUTION);
+                }
+                break;
+            case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR.id:
+                if (currentTick >= NOTE_RESOLUTION) {
+                    setCurrentTick(currentTick - NOTE_RESOLUTION);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_NOTE_UP.id:
