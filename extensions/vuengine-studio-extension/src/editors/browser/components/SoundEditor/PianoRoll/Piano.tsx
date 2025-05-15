@@ -5,14 +5,20 @@ import PianoRollKey from './PianoRollKey';
 
 // TODO: only show box-shadow if horizontal scroll position is > 0. Also add to sequencer channel headers.
 const StyledPiano = styled.div`
-    border-left: 1px solid rgba(0, 0, 0, .6);
-    border-right: 1px solid rgba(0, 0, 0, .6); 
+    border-left: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6); 
     box-shadow: 0px 0 10px rgba(0, 0, 0, .3);
     display: flex;
     flex-direction: column;
     left: 0;
     position: sticky;
     z-index: 100;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-left-color: rgba(0, 0, 0, .6);
+        border-right-color: rgba(0, 0, 0, .6); 
+    }
 `;
 
 interface PianoProps {

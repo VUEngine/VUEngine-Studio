@@ -26,7 +26,7 @@ interface LoopIndicatorProps {
 export default function LoopIndicator(props: LoopIndicatorProps): React.JSX.Element {
     const { position, hidden } = props;
 
-    const offset = PIANO_ROLL_KEY_WIDTH + position * NOTE_RESOLUTION * Math.max(0, 16 / NOTE_RESOLUTION);
+    const offset = PIANO_ROLL_KEY_WIDTH + position * NOTE_RESOLUTION;
 
     const style = {
         display: hidden ? 'none' : undefined,

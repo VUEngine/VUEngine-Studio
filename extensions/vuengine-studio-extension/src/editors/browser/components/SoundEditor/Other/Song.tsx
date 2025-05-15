@@ -40,7 +40,7 @@ export default function Song(props: SongProps): React.JSX.Element {
         updateSoundData({ ...soundData, loop: !soundData.loop });
     };
 
-    const setTickDuration = (s: number): void => {
+    const setSpeed = (s: number): void => {
         if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
             updateSoundData({ ...soundData, speed: s });
         }
@@ -69,13 +69,13 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/editors/sound/tickDurationMs', 'Tick duration (in milliseconds)')}
+                {nls.localize('vuengine/editors/sound/sixteenthNoteDurationMs', '1/16 note duration (in milliseconds)')}
             </label>
             <Range
                 value={soundData.speed}
                 max={MAX_TICK_DURATION}
                 min={MIN_TICK_DURATION}
-                setValue={(v: number) => setTickDuration(v)}
+                setValue={(v: number) => setSpeed(v)}
                 commandsToDisable={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>

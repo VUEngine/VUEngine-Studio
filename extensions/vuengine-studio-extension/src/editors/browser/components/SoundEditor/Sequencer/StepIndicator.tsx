@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
+    EFFECTS_PANEL_COLLAPSED_HEIGHT,
     EFFECTS_PANEL_EXPANDED_HEIGHT,
     NOTE_RESOLUTION,
     NOTES_SPECTRUM,
@@ -39,11 +40,14 @@ interface StepIndicatorProps {
     soundData: SoundData
     currentStep: number
     isPianoRoll: boolean
+    effectsPanelHidden: boolean
     hidden: boolean
 }
 
 export default function StepIndicator(props: StepIndicatorProps): React.JSX.Element {
-    const { soundData, currentStep, isPianoRoll, hidden } = props;
+    const { soundData, currentStep, isPianoRoll, effectsPanelHidden, hidden } = props;
+
+    const effectsPanelHeight = effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT;
 
     const style = {
         display: hidden ? 'none' : undefined,
@@ -51,8 +55,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
             ? PIANO_ROLL_KEY_WIDTH + currentStep * PIANO_ROLL_NOTE_WIDTH + 1
             : PIANO_ROLL_KEY_WIDTH + currentStep * Math.max(0, 16 / NOTE_RESOLUTION) + 1,
         height: isPianoRoll
-            // TODO: handle collapsed effects panels
-            ? PIANO_ROLL_GRID_METER_HEIGHT + NOTES_SPECTRUM * PIANO_ROLL_NOTE_HEIGHT + EFFECTS_PANEL_EXPANDED_HEIGHT
+            ? PIANO_ROLL_GRID_METER_HEIGHT + NOTES_SPECTRUM * PIANO_ROLL_NOTE_HEIGHT + effectsPanelHeight
             : soundData.channels.length * PATTERN_HEIGHT + SEQUENCER_GRID_METER_HEIGHT,
     };
 

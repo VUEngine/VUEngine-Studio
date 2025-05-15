@@ -6,7 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { EventsMap, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, NOTE_RESOLUTION, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, EventsMap, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentPatternProps {
@@ -40,7 +40,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         // removed all events that are beyond the limits of the pattern
         // this would come into play when resizing down
         const updatedEvents: EventsMap = {};
-        const totalTicks = size * NOTE_RESOLUTION;
+        const totalTicks = size * BAR_NOTE_RESOLUTION;
         Object.keys(pattern.events).forEach(tickStr => {
             const tick = parseInt(tickStr);
             if (tick < totalTicks) {

@@ -1,22 +1,20 @@
+import { nls, QuickPickItem } from '@theia/core';
 import React, { SyntheticEvent, useContext, useEffect, useRef } from 'react';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { nanoid, scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     ChannelConfig,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
     NOTE_RESOLUTION,
     PATTERN_HEIGHT,
-    PIANO_ROLL_KEY_WIDTH,
     SequenceMap,
     SEQUENCER_GRID_METER_HEIGHT,
-    SoundData,
+    SoundData
 } from '../SoundEditorTypes';
-import { nanoid, scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { SoundEditorCommands } from '../SoundEditorCommands';
-import { nls, QuickPickItem } from '@theia/core';
-import { StyledSequencer } from './Sequencer';
 
 const NEW_PATTERN_ID = '+';
 
@@ -26,18 +24,11 @@ const StyledGridContainer = styled.div`
 
     > .react-resizable {
         height: 100% !important;
-        margin-left: ${PIANO_ROLL_KEY_WIDTH + 1}px;
         margin-right: 80px;
         overflow: hidden;
 
         canvas {
             cursor: crosshair;
-        }
-    }
-
-    ${StyledSequencer}.hidden & {
-        > .react-resizable {
-            margin-left: -1px;
         }
     }
 

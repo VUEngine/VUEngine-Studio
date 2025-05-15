@@ -1,12 +1,13 @@
 import { nls } from '@theia/core';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Tab, TabList, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { EFFECTS_PANEL_COLLAPSED_HEIGHT, EFFECTS_PANEL_EXPANDED_HEIGHT, EFFECTS_PANEL_HEADER_HEIGHT, SoundData } from '../SoundEditorTypes';
+import { EFFECTS_PANEL_COLLAPSED_HEIGHT, EFFECTS_PANEL_EXPANDED_HEIGHT, SoundData } from '../SoundEditorTypes';
 import NotePropertiesGrid from './NotePropertiesGrid';
 import { MetaLine, MetaLineHeader } from './PianoRollHeader';
+import NotePropertiesGridOverview from './NotePropertiesGridOverview';
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -17,7 +18,7 @@ const StyledToggleButton = styled.button`
     display: flex;
     font-size: 10px;
     justify-content: center;
-    min-height: ${EFFECTS_PANEL_HEADER_HEIGHT}px !important;
+    min-height: ${EFFECTS_PANEL_COLLAPSED_HEIGHT}px !important;
     outline-offset: -1px;
 
     &:hover {
@@ -29,7 +30,7 @@ const StyledToggleButton = styled.button`
 const StyledTabList = styled(TabList)`
     border-bottom: 1px solid rgba(255, 255, 255, .6);
     margin: 0;
-    height: ${EFFECTS_PANEL_HEADER_HEIGHT}px;
+    height: ${EFFECTS_PANEL_COLLAPSED_HEIGHT}px;
     box-sizing: border-box;
     padding: 0 var(--padding);
 
@@ -39,7 +40,7 @@ const StyledTabList = styled(TabList)`
     }
 
     .react-tabs__tab {
-        line-height: ${EFFECTS_PANEL_HEADER_HEIGHT - 3}px;
+        line-height: ${EFFECTS_PANEL_COLLAPSED_HEIGHT - 3}px;
     }
 `;
 
@@ -52,36 +53,67 @@ const NotePropertiesTabs = [
 
 interface NotePropertiesProps {
     soundData: SoundData
-    currentTick: number
-    setCurrentTick: (currentTick: number) => void
+    noteCursor: number
+    setNoteCursor: (noteCursor: number) => void
     currentChannelId: number
     currentPatternId: string
     setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
+    effectsPanelHidden: boolean,
+    setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
         soundData,
-        currentTick, setCurrentTick,
+        noteCursor: noteCursor, setNoteCursor,
         currentChannelId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
+        effectsPanelHidden, setEffectsPanelHidden,
         setNote,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const [visible, setVisible] = useState<boolean>(false);
     const [tab, setTab] = useState<number>(0);
+
+    const toggleEffectsPanel = () => {
+        setEffectsPanelHidden(prev => !prev);
+    };
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id:
-                setVisible(prev => !prev);
+                toggleEffectsPanel();
                 break;
         }
     };
+
+    let grid = <></>;
+    if (effectsPanelHidden) {
+        grid = <NotePropertiesGridOverview
+            soundData={soundData}
+            expandPanel={toggleEffectsPanel}
+        />;
+    } else {
+        switch (tab) {
+            default:
+            case 0:
+                grid = <NotePropertiesGrid
+                    soundData={soundData}
+                    noteCursor={noteCursor}
+                    currentChannelId={currentChannelId}
+                    currentPatternId={currentPatternId}
+                    setCurrentPatternId={setCurrentPatternId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={setCurrentSequenceIndex}
+                    setNoteCursor={setNoteCursor}
+                    setNote={setNote}
+                />;
+                break;
+        }
+    }
 
     useEffect(() => {
         document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
@@ -94,19 +126,19 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         style={{
             bottom: 0,
             borderTopWidth: 1,
-            minHeight: visible ? EFFECTS_PANEL_EXPANDED_HEIGHT : EFFECTS_PANEL_COLLAPSED_HEIGHT,
+            minHeight: effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT,
         }}
     >
         <MetaLineHeader
             style={{ borderBottom: 'none' }}
         >
             <StyledToggleButton
-                onClick={() => setVisible(prev => !prev)}
+                onClick={toggleEffectsPanel}
                 title={
                     `${SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id, true)}`
                 }
             >
-                <i className={visible ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
+                <i className={effectsPanelHidden ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} />
             </StyledToggleButton>
         </MetaLineHeader>
 
@@ -114,22 +146,12 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
             selectedIndex={tab}
             onSelect={i => setTab(i)}
         >
-            {visible &&
+            {!effectsPanelHidden &&
                 <StyledTabList>
                     {NotePropertiesTabs.map(n => <Tab>{n}</Tab>)}
                 </StyledTabList>
             }
-            <NotePropertiesGrid
-                soundData={soundData}
-                currentTick={currentTick}
-                currentChannelId={currentChannelId}
-                currentPatternId={currentPatternId}
-                setCurrentPatternId={setCurrentPatternId}
-                currentSequenceIndex={currentSequenceIndex}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
-                setCurrentTick={setCurrentTick}
-                setNote={setNote}
-            />
+            {grid}
         </Tabs>
     </MetaLine>;
 }

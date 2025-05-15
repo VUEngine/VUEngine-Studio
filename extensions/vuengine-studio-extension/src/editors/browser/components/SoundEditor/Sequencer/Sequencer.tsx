@@ -28,7 +28,6 @@ export const StyledSequencer = styled.div`
     display: flex;
     flex-direction: column;
     margin: 0 var(--padding);
-    margin-bottom: 2px;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 11px;
@@ -42,40 +41,12 @@ export const StyledSequencer = styled.div`
     }
 `;
 
-const StyledSequencerHideToggle = styled.button`
-    background-color: transparent;
-    border: 0;
-    box-shadow: 0 5px 0 var(--theia-editor-background) inset, 0 6px 0 inset;
-    color: var(--theia-dropdown-border);
-    cursor: pointer;
-    font-size: 9px;
-    margin: 0 12px !important;
-    max-height: 12px;
-    min-height: 12px !important;
-    padding: 0;
-
-    i {
-        background-color: var(--theia-editor-background);
-        padding: 0 var(--theia-ui-padding);
-    }
-
-    &:hover {
-        background-color: var(--theia-focusBorder);
-        border-radius: 2px;
-        box-shadow: none;
-        color: #fff;
-
-        i {
-            background-color: transparent;
-        }
-    }
-`;
-
 export const StyledChannelHeaderContainer = styled.div`
     border-right: 1px solid rgba(255, 255, 255, .6);
     display: flex;
     flex-direction: column;
-    position: fixed;
+    left: 0;
+    position: sticky;
     z-index: 100;
 
     body.theia-light &,
@@ -135,12 +106,11 @@ interface SequencerProps {
     toggleChannelSolo: (channelId: number) => void
     toggleChannelSeeThrough: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    sequencerHidden: boolean,
-    setSequencerHidden: Dispatch<SetStateAction<boolean>>
     newPatternSize: number
     setNewPatternSize: Dispatch<SetStateAction<number>>
     setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    sequencerHidden: boolean
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -154,9 +124,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleChannelSolo,
         toggleChannelSeeThrough,
         setChannel,
-        sequencerHidden, setSequencerHidden,
         newPatternSize, setNewPatternSize,
         setChannelDialogOpen, setPatternDialogOpen,
+        sequencerHidden,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -289,11 +259,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 hidden={!soundData.loop}
             />
             <HContainer gap={0} grow={1}>
-                <StyledChannelHeaderContainer
-                    style={{
-                        position: sequencerHidden ? 'unset' : undefined,
-                    }}
-                >
+                <StyledChannelHeaderContainer>
                     <StyledChannelsHeader>
                         <Input
                             title={nls.localize('vuengine/editors/sound/defaultPatternLength', 'Default Pattern Length')}
@@ -323,7 +289,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             soundData={soundData}
                             updateSoundData={updateSoundData}
                             patternIndex={patternIndex}
-                            step={step}
+                            bar={step}
                             channelId={index}
                             pattern={pattern}
                             patternSize={pattern.size * NOTE_RESOLUTION}
@@ -357,12 +323,5 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 </StyledAddChannelButton>
             }
         </StyledSequencer>
-        <StyledSequencerHideToggle
-            onClick={() => setSequencerHidden(prev => !prev)}
-            title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id, true)
-                }`}
-        >
-            <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
-        </StyledSequencerHideToggle>
     </VContainer>;
 }

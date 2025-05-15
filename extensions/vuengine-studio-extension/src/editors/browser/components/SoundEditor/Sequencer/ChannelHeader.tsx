@@ -16,10 +16,8 @@ const StyledChannelHeader = styled.div`
     flex-direction: column;
     font-size: 10px;
     height: ${PATTERN_HEIGHT}px;
-    left: 0;
     min-width: ${PIANO_ROLL_KEY_WIDTH}px;
     overflow: hidden;
-    position: sticky;
     width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
     z-index: 100;
 

@@ -1,7 +1,9 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import { PIANO_ROLL_KEY_WIDTH, SoundData } from '../SoundEditorTypes';
-import PianoRollHeaderGrid from './PianoRollHeaderGrid';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { SoundEditorCommands } from '../SoundEditorCommands';
+import { PIANO_ROLL_GRID_METER_HEIGHT, PIANO_ROLL_KEY_WIDTH, SoundData } from '../SoundEditorTypes';
+import PianoRollHeaderGrid from './PianoRollHeaderGrid';
 
 export const MetaLine = styled.div`
     background: var(--theia-editor-background);
@@ -43,6 +45,24 @@ export const MetaLineHeader = styled.div`
     }
 `;
 
+const StyledToggleButton = styled.button`
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    color: var(--theia-editor-foreground);
+    cursor: pointer;
+    display: flex;
+    font-size: 10px;
+    justify-content: center;
+    min-height: ${PIANO_ROLL_GRID_METER_HEIGHT - 2}px !important;
+    outline-offset: -1px;
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
+    }
+`;
+
 interface PianoRollHeaderProps {
     soundData: SoundData
     currentChannelId: number
@@ -53,6 +73,8 @@ interface PianoRollHeaderProps {
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
     setCurrentStep: Dispatch<SetStateAction<number>>
+    sequencerHidden: boolean,
+    setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -64,7 +86,11 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         // playRangeStart, setPlayRangeStart,
         // playRangeEnd, setPlayRangeEnd,
         setCurrentStep,
+        sequencerHidden, setSequencerHidden,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+
+    const sequencerToggleCommand = SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY;
 
     return <MetaLine
         style={{
@@ -75,6 +101,14 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         <MetaLineHeader
             style={{ minHeight: 18 }}
         >
+            <StyledToggleButton
+                onClick={() => setSequencerHidden(prev => !prev)}
+                title={
+                    `${sequencerToggleCommand.label}${services.vesCommonService.getKeybindingLabel(sequencerToggleCommand.id, true)}`
+                }
+            >
+                <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
+            </StyledToggleButton>
         </MetaLineHeader>
         <PianoRollHeaderGrid
             soundData={soundData}

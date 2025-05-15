@@ -83,19 +83,19 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.showSequencerView',
         label: nls.localize('vuengine/editors/sound/commands/showSequencerView', 'Show Sequencer View'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '7',
+        keybinding: 'q',
     };
     export const SHOW_INSTRUMENTS_VIEW: EditorCommand = {
         id: 'editors.soundEditor.showInstrumentsView',
         label: nls.localize('vuengine/editors/sound/commands/showInstrumentsView', 'Show Instruments View'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '8',
+        keybinding: 'w',
     };
     export const SHOW_SETTINGS_VIEW: EditorCommand = {
         id: 'editors.soundEditor.showSettingsView',
         label: nls.localize('vuengine/editors/sound/commands/showSettingsView', 'Show Settings View'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '9',
+        keybinding: 'e',
     };
     export const ADD_PATTERN: EditorCommand = {
         id: 'editors.soundEditor.addPattern',

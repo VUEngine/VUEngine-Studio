@@ -41,6 +41,7 @@ interface AdvancedSelectProps {
     onChange: (options: string[]) => void
     onCreateOption?: (value: string) => void
     commands?: string[]
+    containerStyle?: object
     style?: object
     width?: number
     title?: string
@@ -48,7 +49,7 @@ interface AdvancedSelectProps {
 
 export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.Element {
     const {
-        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, style, onChange, onCreateOption, title
+        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, containerStyle, style, onChange, onCreateOption, title
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
@@ -76,7 +77,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         : 'react-select-container';
 
     const SelectType = onCreateOption ? CreatableSelect : Select;
-    return <div title={title ?? undefined}>
+    return <div title={title ?? undefined} style={containerStyle}>
         <SelectType
             value={value}
             onChange={multi

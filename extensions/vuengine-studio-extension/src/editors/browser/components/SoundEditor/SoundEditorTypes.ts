@@ -237,7 +237,8 @@ export const NOTES: { [note: string]: number } = {
 export const NOTES_SPECTRUM = Object.keys(NOTES).length;
 export const NOTES_PER_OCTAVE = 12;
 export const NOTE_RESOLUTION = 16; // 1/16 note
-export const CYCLES_PER_NOTE = 64;
+export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
+export const BAR_NOTE_RESOLUTION = NOTE_RESOLUTION * SUB_NOTE_RESOLUTION;
 
 export const PATTERN_HEIGHT = 32;
 export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
@@ -248,19 +249,18 @@ export const SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT = 16;
 
 export const PIANO_ROLL_GRID_METER_HEIGHT = 18;
 export const PIANO_ROLL_NOTE_HEIGHT = 12;
-export const PIANO_ROLL_NOTE_WIDTH = 16;
+export const PIANO_ROLL_NOTE_WIDTH = 20;
 export const PIANO_ROLL_KEY_WIDTH = 75;
 
-export const MIN_TICK_DURATION = 1;
-export const MAX_TICK_DURATION = 128;
+export const MIN_TICK_DURATION = 5;
+export const MAX_TICK_DURATION = 256;
 
 export const VOLUME_STEPS = 16;
 
 export const MIN_PATTERN_SIZE = 1;
 export const MAX_PATTERN_SIZE = 16;
 
-export const EFFECTS_PANEL_HEADER_HEIGHT = 24;
-export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 24;
-export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128 + EFFECTS_PANEL_HEADER_HEIGHT;
+export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
+export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
 
 export const SINGLE_NOTE_TESTING_DURATION = 500;

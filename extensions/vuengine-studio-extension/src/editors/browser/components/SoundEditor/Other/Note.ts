@@ -1,7 +1,6 @@
-import { EventsMap, NOTE_RESOLUTION, SoundEvent } from '../SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, EventsMap, SoundEvent } from '../SoundEditorTypes';
 
-export const getMaxNoteDuration = (events: EventsMap, note: number, patternSize: number) => {
-    const patternLength = patternSize * NOTE_RESOLUTION;
+export const getMaxNoteDuration = (events: EventsMap, step: number, patternSize: number) => {
     const allEventKeys = Object.keys(events);
     const noteEventKeys: string[] = [];
     allEventKeys.forEach(key => {
@@ -10,9 +9,9 @@ export const getMaxNoteDuration = (events: EventsMap, note: number, patternSize:
             noteEventKeys.push(key);
         }
     });
-    const noteIndex = noteEventKeys.indexOf(note.toString());
+    const noteIndex = noteEventKeys.indexOf(step.toString());
 
     return noteEventKeys[noteIndex + 1] !== undefined
-        ? parseInt(noteEventKeys[noteIndex + 1]) - note
-        : patternLength - note;
+        ? parseInt(noteEventKeys[noteIndex + 1]) - step
+        : patternSize * BAR_NOTE_RESOLUTION - step;
 };

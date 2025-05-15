@@ -7,6 +7,7 @@ import {
     PIANO_ROLL_NOTE_WIDTH,
     SoundData
 } from '../SoundEditorTypes';
+import { drawGrid } from './NotePropertiesGridOverview';
 
 interface NotePropertiesGridProps {
     soundData: SoundData
@@ -15,8 +16,8 @@ interface NotePropertiesGridProps {
     setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
-    currentTick: number
-    setCurrentTick: (currentTick: number) => void
+    noteCursor: number
+    setNoteCursor: (noteCursor: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
 }
 
@@ -26,7 +27,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         currentChannelId,
         currentPatternId, // setCurrentPatternId,
         currentSequenceIndex, // setCurrentSequenceIndex,
-        currentTick, setCurrentTick,
+        noteCursor, setNoteCursor,
         // setNote,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -44,39 +45,10 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         if (!context) {
             return;
         }
+        const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-
-        const themeType = services.themeService.getCurrentTheme().type;
-        const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
-        const c = ['light', 'hcLight'].includes(themeType) ? 0 : 255;
-        const lowColor = highContrastTheme
-            ? `rgba(${c}, ${c}, ${c}, 0)`
-            : `rgba(${c}, ${c}, ${c}, .1)`;
-        const medColor = highContrastTheme
-            ? `rgba(${c}, ${c}, ${c}, 1)`
-            : `rgba(${c}, ${c}, ${c}, .2)`;
-        const hiColor = highContrastTheme
-            ? `rgba(${c}, ${c}, ${c}, 1)`
-            : `rgba(${c}, ${c}, ${c}, .4)`;
-
-        context.strokeStyle = lowColor;
-        context.lineWidth = 1;
-        const h = canvas.height;
-
-        // vertical lines
-        for (let x = 1; x <= soundData.size * NOTE_RESOLUTION; x++) {
-            const offset = x * PIANO_ROLL_NOTE_WIDTH - 0.5;
-            context.beginPath();
-            context.moveTo(offset, 0);
-            context.lineTo(offset, h);
-            context.strokeStyle = x % NOTE_RESOLUTION === 0
-                ? hiColor
-                : x % 4 === 0
-                    ? medColor
-                    : lowColor;
-            context.stroke();
-        }
+        drawGrid(canvas, context, themeType, soundData.size);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -87,7 +59,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         if (e.button === 0) {
             // TODO
         } else if (e.button === 2) {
-            setCurrentTick(step);
+            setNoteCursor(step);
         }
     };
 
@@ -103,7 +75,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         currentChannelId,
         currentPatternId,
         currentSequenceIndex,
-        currentTick,
+        noteCursor,
     ]);
 
     return (
