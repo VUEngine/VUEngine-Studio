@@ -6,6 +6,7 @@ import { WithContributor, WithFileUri } from '../../../../../project/browser/ves
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
@@ -56,7 +57,7 @@ interface InstrumentProps {
 }
 
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
-    const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         currentInstrument, setCurrentInstrument,
@@ -349,20 +350,16 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     {nls.localizeByDefault('Name')}
                 </label>
                 <InputWithAction>
-                    <input
-                        className='theia-input'
+                    <Input
                         value={instrument?.name}
-                        onChange={e => setName(e.target.value)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={v => setName(v as string)}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
                         onClick={cloneInstrument}
                         disabled={!instrument}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <Copy size={16} />
                     </InputWithActionButton>
@@ -371,8 +368,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         title={nls.localizeByDefault('Remove')}
                         onClick={removeCurrentInstrument}
                         disabled={!instrument}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>
@@ -528,8 +523,6 @@ a pre-configured value and repeat the grow/decay process. '
                                     type="checkbox"
                                     checked={instrument?.envelope.repeat}
                                     onChange={toggleEnvelopeRepeat}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                             </VContainer>
                         </HContainer>
@@ -676,8 +669,6 @@ from the first modulation value. '
                                 type="checkbox"
                                 checked={instrument?.sweepMod.repeat}
                                 onChange={toggleSweepModulationRepeat}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                     </HContainer>

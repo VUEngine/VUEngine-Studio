@@ -28,8 +28,14 @@ const StyledChannelHeader = styled.div`
     }
 
     &.current {
-        background-color: var(--theia-focusBorder) !important;
-        color: #fff;
+    /*
+        background-color: rgba(255, 255, 255, .1) !important;
+
+        body.theia-light &,
+        body.theia-hc & {
+            background-color: rgba(0, 0, 0, .1) !important;
+        }
+    */
     }
 
     ${StyledChannelHeaderContainer} &:last-child {

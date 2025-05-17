@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useMemo } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
+import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
@@ -15,23 +16,17 @@ import {
     PatternConfig,
     PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_GRID_WIDTH,
     SoundData,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
 } from '../SoundEditorTypes';
-import styled from 'styled-components';
 
 const StyledPattern = styled.div`
-    align-items: center;
     background-color: var(--theia-secondaryButton-background);
-    border-right: 1px solid rgba(255, 255, 255, .1);
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
     box-sizing: border-box;
     cursor: move;
-    display: flex;
-    height: ${PATTERN_HEIGHT}px;
-    justify-content: center;
-    margin-right: 1px;
+    height: ${PATTERN_HEIGHT - SEQUENCER_GRID_WIDTH}px;
     overflow: hidden;
     position: absolute;
     z-index: 10;
@@ -39,13 +34,13 @@ const StyledPattern = styled.div`
     &:hover,
     &.current {
         outline: 1px solid var(--theia-focusBorder);
-        outline-offset: -1px;
         z-index: 11;
     }
         
     &.selected {
-        background-color: var(--theia-focusBorder);
-        color: #fff;
+        border-radius: 1px;
+        outline: 3px solid var(--theia-focusBorder);
+        z-index: 11;
     }
 
     &.dragging {
@@ -72,15 +67,14 @@ const StyledPattern = styled.div`
 `;
 
 const StyledPatternName = styled.div`
-    align-items: center;
     display: flex;
     font-size: 9px;
     height: 100%;
-    justify-content: center;
     overflow: hidden;
     padding: 0 3px;
     position: relative;
     text-overflow: ellipsis;
+    white-space: nowrap;
     z-index: 1;
 `;
 
@@ -88,7 +82,7 @@ interface PatternProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
     patternIndex: number
-    bar: number
+    step: number
     pattern: PatternConfig
     patternSize: number
     channelId: number
@@ -105,7 +99,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
         patternIndex,
-        bar,
+        step,
         channelId,
         pattern, patternSize, patternId,
         currentChannelId, currentPatternId,
@@ -120,15 +114,16 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     // TODO: color _each note_ by instrument instead of whole channel
 
     const classNames = ['placedPattern'];
-    if (currentChannelId === channelId && currentSequenceIndex === bar) {
+    if (currentChannelId === channelId && currentSequenceIndex === step) {
         classNames.push('current selected');
     } else if (isCurrent) {
         classNames.push('current');
     }
 
-    const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
-
     const patternNoteWidth = 1;
+    const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
+    const width = patternSize * patternNoteWidth - SEQUENCER_GRID_WIDTH;
+
     const patternPixels: number[][][] = useMemo(() => {
         const result: number[][] = [[]];
 
@@ -145,7 +140,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         };
 
         // init array
-        const emptyLine = [...Array(patternSize * patternNoteWidth)].map(v => 0);
+        const emptyLine = [...Array(width)].map(v => 0);
         [...Array(PATTERN_HEIGHT)].map(v => result.push([...emptyLine]));
 
         // find set notes
@@ -181,7 +176,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.REMOVE_CURRENT_PATTERN.id:
-                removeFromSequence(currentChannelId, bar);
+                removeFromSequence(currentChannelId, step);
                 break;
         }
     };
@@ -202,14 +197,23 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newChannelId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / PATTERN_HEIGHT);
-        const newBar = Math.ceil((data.x - PIANO_ROLL_KEY_WIDTH) / NOTE_RESOLUTION);
-        if (newChannelId === channelId && newBar === bar) {
+        const newBar = Math.floor((data.x - PIANO_ROLL_KEY_WIDTH) / NOTE_RESOLUTION);
+        if (newChannelId === channelId && newBar === step) {
             return;
         }
 
-        const updatedChannels = [...soundData.channels];
-        updatedChannels[newChannelId].sequence[newBar] = updatedChannels[channelId].sequence[bar];
-        delete (updatedChannels[channelId].sequence[bar]);
+        const updatedChannels = [
+            ...soundData.channels.slice(0, newChannelId),
+            {
+                ...soundData.channels[newChannelId],
+                sequence: {
+                    ...soundData.channels[newChannelId].sequence,
+                    [newBar]: soundData.channels[channelId].sequence[step],
+                },
+            },
+            ...soundData.channels.slice(newChannelId + 1)
+        ];
+        delete (updatedChannels[channelId].sequence[step]);
 
         updateSoundData({
             ...soundData,
@@ -220,9 +224,9 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 0) {
-            setCurrentSequenceIndex(channelId, bar);
+            setCurrentSequenceIndex(channelId, step);
         } else if (e.buttons === 2) {
-            removeFromSequence(channelId, bar);
+            removeFromSequence(channelId, step);
         }
     };
 
@@ -248,7 +252,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             cancel=".react-resizable-handle"
             onStop={onDragStop}
             position={{
-                x: PIANO_ROLL_KEY_WIDTH + bar * NOTE_RESOLUTION,
+                x: 2 + PIANO_ROLL_KEY_WIDTH + step * NOTE_RESOLUTION,
                 y: SEQUENCER_GRID_METER_HEIGHT + channelId * PATTERN_HEIGHT,
             }}
             bounds={{
@@ -261,15 +265,14 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             <StyledPattern
                 className={classNames.join(' ')}
                 data-channel={channelId}
-                data-position={bar}
+                data-position={step}
                 onClick={onClick}
                 onContextMenu={onClick}
                 onDoubleClick={onDblClick}
                 title={patternName}
             >
                 <ResizableBox
-                    width={patternSize * patternNoteWidth}
-                    height={PATTERN_HEIGHT}
+                    width={width}
                     draggableOpts={{
                         grid: [NOTE_RESOLUTION, PATTERN_HEIGHT]
                     }}
@@ -281,18 +284,18 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                 >
                     <>
                         <CanvasImage
-                            height={PATTERN_HEIGHT + 1}
+                            height={PATTERN_HEIGHT - 1}
                             palette={'00000000'}
                             pixelData={patternPixels}
                             colorOverride={noteColor}
-                            width={patternSize * patternNoteWidth}
+                            width={width}
                             displayMode={DisplayMode.Mono}
                             colorMode={ColorMode.Default}
                             style={{
                                 left: 0,
                                 position: 'absolute',
                                 top: 0,
-                                width: patternSize * patternNoteWidth,
+                                width: width,
                             }}
                         />
                         <StyledPatternName>

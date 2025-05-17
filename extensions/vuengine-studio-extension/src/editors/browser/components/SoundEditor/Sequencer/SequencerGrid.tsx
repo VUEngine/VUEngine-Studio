@@ -1,10 +1,8 @@
-import { nls, QuickPickItem } from '@theia/core';
 import React, { SyntheticEvent, useContext, useEffect, useRef } from 'react';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { nanoid, scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { SoundEditorCommands } from '../SoundEditorCommands';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     ChannelConfig,
     MAX_SEQUENCE_SIZE,
@@ -15,8 +13,6 @@ import {
     SEQUENCER_GRID_METER_HEIGHT,
     SoundData
 } from '../SoundEditorTypes';
-
-const NEW_PATTERN_ID = '+';
 
 const StyledGridContainer = styled.div`
     position: relative;
@@ -97,6 +93,7 @@ interface SequencerGridProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    addPattern: (channelId: number, step: number) => void
 }
 
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
@@ -104,9 +101,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         soundData, updateSoundData,
         currentChannelId,
         // currentPatternId,
-        setCurrentPatternId,
+        // setCurrentPatternId,
         // currentSequenceIndex, setCurrentSequenceIndex,
-        setChannel,
+        // setChannel,
+        addPattern,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
@@ -158,7 +156,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .1)`;
         context.lineWidth = 1;
         context.font = '9px monospace';
-        context.textAlign = 'right';
         const w = canvas.width;
         const h = canvas.height;
 
@@ -187,8 +184,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             context.stroke();
 
             // meter numbers
-            if (x % 4 === 0) {
-                context.fillText(x.toString(), offset - 4, 12);
+            if ((x - 1) % 4 === 0) {
+                context.fillText(x.toString(), offset - 12, 10);
             }
         }
 
@@ -234,88 +231,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     } else if (soundData.size === MAX_SEQUENCE_SIZE) {
         classNames.push('max');
     }
-
-    const addPatternToSequence = async (channelId: number, step: number, patternId: string): Promise<void> => {
-        const channel = soundData.channels[channelId];
-        // create if it's a new pattern
-        if (patternId === NEW_PATTERN_ID) {
-            const newPatternId = nanoid();
-            const type = services.vesProjectService.getProjectDataType('Sound');
-            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-            // @ts-ignore
-            const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
-
-            const updatedChannels = [...soundData.channels];
-            updatedChannels[channelId].sequence = {
-                ...channel.sequence,
-                [step.toString()]: newPatternId,
-            };
-
-            updateSoundData({
-                ...soundData,
-                channels: updatedChannels,
-                patterns: {
-                    ...soundData.patterns,
-                    [newPatternId]: {
-                        ...newPattern,
-                        size: 4,
-                    }
-                }
-            });
-            setCurrentPatternId(channelId, newPatternId);
-        } else {
-            setChannel(channelId, {
-                ...channel,
-                sequence: {
-                    ...channel.sequence,
-                    [step.toString()]: patternId,
-                },
-            });
-            setCurrentPatternId(channelId, patternId);
-        }
-    };
-
-    const showPatternSelection = async (channelId: number): Promise<QuickPickItem | undefined> =>
-        services.quickPickService.show(
-            [
-                {
-                    id: NEW_PATTERN_ID,
-                    label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
-                },
-                ...Object.keys(soundData.patterns).map((p, i) => ({
-                    id: p,
-                    label: soundData.patterns[p].name.length
-                        ? soundData.patterns[p].name
-                        : (i + 1).toString(),
-                })),
-            ],
-            {
-                title: nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern'),
-                placeholder: nls.localize('vuengine/editors/sound/selectPatternToAdd', 'Select a pattern to add...'),
-            }
-        );
-
-    const addPattern = async (channelId: number, step: number): Promise<void> => {
-        const patternToAdd = await showPatternSelection(channelId);
-        if (patternToAdd && patternToAdd.id) {
-            addPatternToSequence(channelId, step, patternToAdd.id);
-        }
-    };
-
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
-            case SoundEditorCommands.ADD_PATTERN.id:
-                // addPattern();
-                break;
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
-    }, []);
 
     useEffect(() => {
         services.themeService.onDidColorThemeChange(() => draw());

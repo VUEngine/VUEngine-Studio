@@ -1,6 +1,5 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
@@ -16,7 +15,6 @@ interface SongProps {
 
 export default function Song(props: SongProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setName = (n: string): void => {
         updateSoundData({ ...soundData, name: n });
@@ -89,8 +87,6 @@ export default function Song(props: SongProps): React.JSX.Element {
                     type="checkbox"
                     checked={soundData.loop}
                     onChange={() => toggleLoop()}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             {soundData.loop &&
@@ -109,8 +105,6 @@ export default function Song(props: SongProps): React.JSX.Element {
         <SectionSelect
             value={soundData.section}
             setValue={setSection}
-            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
         />
     </VContainer >;
 }

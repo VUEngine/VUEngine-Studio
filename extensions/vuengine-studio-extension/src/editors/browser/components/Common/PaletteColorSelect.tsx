@@ -17,7 +17,7 @@ const ColorSquare = styled.div`
 
     &.active {
         border-radius: 1px;
-        outline: 3px solid var(--theia-focusBorder);
+        outline: 2px solid var(--theia-focusBorder);
         outline-offset: 1px;
         position: relative;
         z-index: 1;

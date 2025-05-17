@@ -3,26 +3,23 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
-import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
+import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     ChannelConfig,
-    INPUT_BLOCKING_COMMANDS,
-    MAX_PATTERN_SIZE,
     NOTE_RESOLUTION,
     PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
-    SoundData,
+    SoundData
 } from '../SoundEditorTypes';
 import ChannelHeader from './ChannelHeader';
 import LoopIndicator from './LoopIndicator';
 import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
 import StepIndicator from './StepIndicator';
-import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 
 export const StyledSequencer = styled.div`
     display: flex;
@@ -101,16 +98,16 @@ interface SequencerProps {
     setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
-    currentStep: number
+    currentPlayerPosition: number
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
     toggleChannelSeeThrough: (channelId: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    newPatternSize: number
-    setNewPatternSize: Dispatch<SetStateAction<number>>
+    addPattern: (channelId: number, step: number) => void
     setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerHidden: boolean
+    effectsPanelHidden: boolean
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -119,14 +116,15 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentChannelId, setCurrentChannelId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        currentStep,
+        currentPlayerPosition,
         toggleChannelMuted,
         toggleChannelSolo,
         toggleChannelSeeThrough,
         setChannel,
-        newPatternSize, setNewPatternSize,
+        addPattern,
         setChannelDialogOpen, setPatternDialogOpen,
         sequencerHidden,
+        effectsPanelHidden,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -250,9 +248,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         >
             <StepIndicator
                 soundData={soundData}
-                currentStep={currentStep}
+                currentPlayerPosition={currentPlayerPosition}
                 isPianoRoll={false}
-                hidden={currentStep === -1}
+                hidden={currentPlayerPosition === -1}
+                effectsPanelHidden={effectsPanelHidden}
             />
             <LoopIndicator
                 position={soundData.loopPoint}
@@ -261,17 +260,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             <HContainer gap={0} grow={1}>
                 <StyledChannelHeaderContainer>
                     <StyledChannelsHeader>
-                        <Input
-                            title={nls.localize('vuengine/editors/sound/defaultPatternLength', 'Default Pattern Length')}
-                            type='number'
-                            size='small'
-                            value={newPatternSize}
-                            setValue={v => setNewPatternSize(v as number)}
-                            min={1}
-                            max={MAX_PATTERN_SIZE}
-                            width={47}
-                            commands={INPUT_BLOCKING_COMMANDS}
-                        />
                     </StyledChannelsHeader>
                     {channels}
                 </StyledChannelHeaderContainer>
@@ -289,7 +277,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             soundData={soundData}
                             updateSoundData={updateSoundData}
                             patternIndex={patternIndex}
-                            bar={step}
+                            step={step}
                             channelId={index}
                             pattern={pattern}
                             patternSize={pattern.size * NOTE_RESOLUTION}
@@ -312,6 +300,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     currentSequenceIndex={currentSequenceIndex}
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setChannel={setChannel}
+                    addPattern={addPattern}
                 />
             </HContainer>
             {soundData.channels.length < VSU_NUMBER_OF_CHANNELS &&

@@ -1,8 +1,7 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React from 'react';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -24,7 +23,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         currentPatternId, setCurrentPatternId,
         setPattern,
     } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const pattern = soundData.patterns[currentPatternId];
 
@@ -104,8 +102,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                         title={nls.localizeByDefault('Remove')}
                         onClick={removeCurrentPattern}
                         disabled={!pattern}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>
@@ -114,8 +110,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                         title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
                         onClick={clonePattern}
                         disabled={!pattern}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <Copy size={16} />
                     </InputWithActionButton>
@@ -123,8 +117,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Add')}
                         onClick={addPattern}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <i className='codicon codicon-plus' />
                     </InputWithActionButton>

@@ -1,16 +1,16 @@
+import { Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import { ChannelConfig, INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorChannelType } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import { Trash } from '@phosphor-icons/react';
-import { SoundEditorCommands } from '../SoundEditorCommands';
-import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 
 interface CurrentChannelProps {
     soundData: SoundData
@@ -22,7 +22,7 @@ interface CurrentChannelProps {
 }
 
 export default function CurrentChannel(props: CurrentChannelProps): React.JSX.Element {
-    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         currentChannelId, setCurrentChannelId,
@@ -98,8 +98,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Remove')}
                         onClick={removeChannel}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>
@@ -107,8 +105,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Add')}
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         disabled={soundData.channels.length === VSU_NUMBER_OF_CHANNELS}
                     >
                         <i className='codicon codicon-plus' />
@@ -140,8 +136,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         className='theia-button secondary'
                         title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                         onClick={() => editInstrument(channel.instrument)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <i className='codicon codicon-settings-gear' />
                     </InputWithActionButton>
@@ -160,8 +154,6 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     type="checkbox"
                     checked={channel.allowSkip}
                     onChange={() => toggleChannelAllowSkip()}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
         </VContainer>

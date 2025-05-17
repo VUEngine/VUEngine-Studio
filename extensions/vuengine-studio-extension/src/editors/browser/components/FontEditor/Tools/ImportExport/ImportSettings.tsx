@@ -50,7 +50,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         setImportOffset,
         setImportCharacterCount,
     } = props;
-    const { disableCommands, enableCommands, fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const [sourceImagePath, setSourceImagePath] = useState<string>();
     const [sourceImageHeight, setSourceImageHeight] = useState<number>(0);
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
@@ -312,8 +312,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         type="checkbox"
                         checked={invert}
                         onChange={() => setInvert(!invert)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>

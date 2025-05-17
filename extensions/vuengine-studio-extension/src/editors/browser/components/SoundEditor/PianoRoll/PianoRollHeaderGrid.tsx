@@ -5,32 +5,35 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
+    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
+    PIANO_ROLL_GRID_WIDTH,
     PIANO_ROLL_NOTE_WIDTH,
-    SoundData
+    SoundData,
 } from '../SoundEditorTypes';
 
 const StyledPianoRollHeaderGridContainer = styled.div`
-    height: ${PIANO_ROLL_GRID_METER_HEIGHT}px;
+    height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT}px;
     position: relative;
 `;
 
 interface PianoRollHeaderGridProps {
     soundData: SoundData
-    currentPatternNoteOffset: number
-    setCurrentStep: Dispatch<SetStateAction<number>>
+    currentChannelId: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
     const {
         soundData,
-        currentPatternNoteOffset,
-        setCurrentStep,
+        currentChannelId,
+        setCurrentPlayerPosition,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const height = PIANO_ROLL_GRID_METER_HEIGHT;
+    const channel = soundData.channels[currentChannelId];
+    const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
     const width = soundData.size * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH;
 
     const draw = (): void => {
@@ -63,14 +66,40 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             context.stroke();
 
             // meter numbers
-            context.fillText(x.toString(), offset - (NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH) + 4, 12);
+            context.fillText(x.toString(), offset - (NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH) + 4, 11);
         }
 
-        // bottom line
+        // middle line
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .6)`;
         context.beginPath();
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
         context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
+        context.stroke();
+
+        // patterns
+        const patternBackground = services.colorRegistry.getCurrentColor('secondaryButton.background')!;
+        const patternForeground = services.colorRegistry.getCurrentColor('editor.foreground')!;
+        Object.keys(channel.sequence).forEach(key => {
+            const step = parseInt(key);
+            const patternId = channel.sequence[step];
+            const pattern = soundData.patterns[patternId];
+            const xOffset = step * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH;
+            context.fillStyle = patternBackground;
+            context.fillRect(
+                xOffset,
+                PIANO_ROLL_GRID_METER_HEIGHT,
+                pattern.size * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH - PIANO_ROLL_GRID_WIDTH,
+                PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
+            );
+            context.fillStyle = patternForeground;
+            context.fillText(pattern.name ?? (step + 1).toString(), xOffset + 3, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 5);
+        });
+
+        // bottom line
+        context.fillStyle = `rgba(${c}, ${c}, ${c}, .6)`;
+        context.beginPath();
+        context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
+        context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.stroke();
     };
 
@@ -132,9 +161,9 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         const step = Math.floor(x / PIANO_ROLL_NOTE_WIDTH);
 
         if (e.button === 0) {
-            setCurrentStep(prev => prev === currentPatternNoteOffset + step
+            setCurrentPlayerPosition(prev => prev === step
                 ? -1
-                : currentPatternNoteOffset + step
+                : step
             );
         } else if (e.button === 2) {
             // TODO
@@ -148,6 +177,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     useEffect(() => {
         draw();
     }, [
+        soundData.channels[currentChannelId],
         soundData.size,
     ]);
 

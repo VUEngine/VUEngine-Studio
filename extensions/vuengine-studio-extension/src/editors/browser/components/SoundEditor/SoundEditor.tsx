@@ -1,6 +1,6 @@
 import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { TabPanel, Tabs } from 'react-tabs';
+import { nanoid } from 'nanoid';
+import React, { useContext, useEffect, useState } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
@@ -21,6 +21,7 @@ import SoundEditorToolbar from './SoundEditorToolbar';
 import {
     BAR_NOTE_RESOLUTION,
     ChannelConfig,
+    DEFAULT_NEW_NOTE_DURATION,
     EventsMap,
     InstrumentMap,
     NOTES,
@@ -33,6 +34,8 @@ import {
     SUB_NOTE_RESOLUTION
 } from './SoundEditorTypes';
 import WaveformSelect from './WaveformSelect';
+
+const NEW_PATTERN_ID = '+';
 
 interface SoundEditorProps {
     soundData: SoundData
@@ -52,9 +55,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
-    const [newPatternSize, setNewPatternSize] = useState<number>(4);
-    const [newNoteDuration, setNewNoteDuration] = useState<number>(4 * SUB_NOTE_RESOLUTION);
-    const [currentStep, setCurrentStep] = useState<number>(-1);
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
+    const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.channels[0]
         ? Object.values(soundData.channels[0].sequence)[0] ?? '' : '');
@@ -72,8 +74,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
 
     const updatePlayRangeStart = (value: number) => {
-        if (currentStep > -1) {
-            setCurrentStep(value);
+        if (currentPlayerPosition > -1) {
+            setCurrentPlayerPosition(value);
         }
         setPlayRangeStart(value);
     };
@@ -120,34 +122,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentChannelId(id);
         setCurrentPatternId(Object.values(soundData.channels[id].sequence)[0] ?? '');
         setCurrentSequenceIndex(parseInt(Object.keys(soundData.channels[id].sequence)[0]) ?? -1);
-        // setNoteCursor(soundData.channels[id].sequence.length ? 0 : -1);
-        setPlayRangeStart(-1);
-        setPlayRangeEnd(-1);
-        setTab(0);
     };
 
     const updateCurrentSequenceIndex = (channel: number, sequenceIndex: number): void => {
         setCurrentChannelId(channel);
         setCurrentSequenceIndex(sequenceIndex);
         setCurrentPatternId(soundData.channels[channel].sequence[sequenceIndex]);
-        setNoteCursor(0);
-        setPlayRangeStart(-1);
-        setPlayRangeEnd(-1);
-        setTab(0);
     };
 
     const updateCurrentPatternId = (channelId: number, patternId: string): void => {
         setCurrentChannelId(channelId);
         setCurrentPatternId(patternId);
-        setNoteCursor(0);
-        setPlayRangeStart(-1);
-        setPlayRangeEnd(-1);
-        setTab(0);
-    };
-
-    const updateNoteCursor = (note: number): void => {
-        setTab(0);
-        setNoteCursor(note);
     };
 
     const showChannelTypeSelection = async (): Promise<QuickPickItem | undefined> => {
@@ -219,8 +204,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const togglePlaying = (): void => {
-        if (currentStep === -1) {
-            setCurrentStep(playRangeStart);
+        if (currentPlayerPosition === -1) {
+            setCurrentPlayerPosition(playRangeStart);
         }
         setPlaying(!playing);
         setTesting(false);
@@ -228,7 +213,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const stopPlaying = (): void => {
         setPlaying(false);
-        setCurrentStep(-1);
+        setCurrentPlayerPosition(-1);
     };
 
     const toggleChannelMuted = (channelId: number): void => {
@@ -269,7 +254,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         const updatedEvents: EventsMap = {
             ...currentPattern.events,
             [step]: {
-                ...(currentPattern.events[step] ?? {}),
+                ...(currentPattern.events[prevStep ?? step] ?? {}),
                 [SoundEvent.Note]: note,
             }
         };
@@ -297,25 +282,18 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
             // cap note's duration
             if (updatedEvents[step][SoundEvent.Duration] === undefined) {
-                const effectiveDuration = newNoteDuration;
                 let cappedDuration = 0;
-                if (effectiveDuration > 0) {
-                    stop = false;
-                    eventKeys.forEach(key => {
-                        const nextEventStep = parseInt(key);
-                        const event = currentPatternEvents[nextEventStep];
-                        if (!stop && nextEventStep > step &&
-                            event[SoundEvent.Note] !== undefined
-                        ) {
-                            stop = true;
-                            cappedDuration = Math.min(effectiveDuration, nextEventStep - step);
-                        }
-                    });
-                    if (cappedDuration === 0) {
-                        cappedDuration = Math.min(effectiveDuration, currentPattern.size * BAR_NOTE_RESOLUTION - step);
+                stop = false;
+                eventKeys.forEach(key => {
+                    const nextEventStep = parseInt(key);
+                    const event = currentPatternEvents[nextEventStep];
+                    if (!stop && nextEventStep > step && event[SoundEvent.Note] !== undefined) {
+                        stop = true;
+                        cappedDuration = Math.min(newNoteDuration, nextEventStep - step);
                     }
-                } else {
-                    cappedDuration = 1;
+                });
+                if (cappedDuration === 0) {
+                    cappedDuration = Math.min(newNoteDuration, currentPattern.size * BAR_NOTE_RESOLUTION - step);
                 }
 
                 updatedEvents[step][SoundEvent.Duration] = cappedDuration;
@@ -403,26 +381,72 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setTab(1);
     };
 
-    // the starting note index of the current pattern
-    const currentPatternNoteOffset = useMemo(() => {
-        const result = 0;
-        /*
-        const currentChannel = soundData.channels[currentChannelId];
-        currentChannel.sequence.forEach((s, sequenceIndex) => {
-            if (currentSequenceIndex > sequenceIndex) {
-                const pattern = soundData.patterns[s];
-                const patternSize = pattern.size * BAR_NOTE_RESOLUTION;
-                result += patternSize;
-            }
-        });
-        */
+    const addPatternToSequence = async (channelId: number, step: number, patternId: string): Promise<void> => {
+        const channel = soundData.channels[channelId];
+        // create if it's a new pattern
+        if (patternId === NEW_PATTERN_ID) {
+            const newPatternId = nanoid();
+            const type = services.vesProjectService.getProjectDataType('Sound');
+            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+            // @ts-ignore
+            const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
 
-        return result;
-    }, [
-        soundData.channels,
-        currentChannelId,
-        currentSequenceIndex,
-    ]);
+            const updatedChannels = [...soundData.channels];
+            updatedChannels[channelId].sequence = {
+                ...channel.sequence,
+                [step.toString()]: newPatternId,
+            };
+
+            updateSoundData({
+                ...soundData,
+                channels: updatedChannels,
+                patterns: {
+                    ...soundData.patterns,
+                    [newPatternId]: {
+                        ...newPattern,
+                        size: 4,
+                    }
+                }
+            });
+            updateCurrentPatternId(channelId, newPatternId);
+        } else {
+            setChannel(channelId, {
+                ...channel,
+                sequence: {
+                    ...channel.sequence,
+                    [step.toString()]: patternId,
+                },
+            });
+            updateCurrentPatternId(channelId, patternId);
+        }
+    };
+
+    const showPatternSelection = async (channelId: number): Promise<QuickPickItem | undefined> =>
+        services.quickPickService.show(
+            [
+                {
+                    id: NEW_PATTERN_ID,
+                    label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
+                },
+                ...Object.keys(soundData.patterns).map((p, i) => ({
+                    id: p,
+                    label: soundData.patterns[p].name.length
+                        ? soundData.patterns[p].name
+                        : (i + 1).toString(),
+                })),
+            ],
+            {
+                title: nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern'),
+                placeholder: nls.localize('vuengine/editors/sound/selectPatternToAdd', 'Select a pattern to add...'),
+            }
+        );
+
+    const addPattern = async (channelId: number, bar: number): Promise<void> => {
+        const patternToAdd = await showPatternSelection(channelId);
+        if (patternToAdd && patternToAdd.id) {
+            addPatternToSequence(channelId, bar, patternToAdd.id);
+        }
+    };
 
     const sequencerTabCommand = SoundEditorCommands.SHOW_SEQUENCER_VIEW;
     const instrumentsTabCommand = SoundEditorCommands.SHOW_INSTRUMENTS_VIEW;
@@ -457,8 +481,14 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             case SoundEditorCommands.ADD_NOTE.id:
                 // TODO
                 break;
+            case SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id:
+                setNoteSnapping(prev => !prev);
+                break;
             case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
                 setSequencerHidden(prev => !prev);
+                break;
+            case SoundEditorCommands.ADD_PATTERN.id:
+                // TODO
                 break;
         }
     };
@@ -485,8 +515,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             <Emulator
                 playing={playing}
                 setEmulatorInitialized={setEmulatorInitialized}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
+                currentPlayerPosition={currentPlayerPosition}
+                setCurrentPlayerPosition={setCurrentPlayerPosition}
                 soundData={soundData}
                 setPlaying={setPlaying}
                 testing={testing}
@@ -504,21 +534,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     <SoundEditorToolbar
                         soundData={soundData}
                         tab={tab}
-                        currentStep={currentStep}
+                        currentPlayerPosition={currentPlayerPosition}
                         playing={playing}
-                        togglePlaying={togglePlaying}
-                        stopPlaying={stopPlaying}
                         tool={tool}
-                        setTool={setTool}
                         emulatorInitialized={emulatorInitialized}
                         noteSnapping={noteSnapping}
-                        setNoteSnapping={setNoteSnapping}
                         newNoteDuration={newNoteDuration}
                         setNewNoteDuration={setNewNoteDuration}
                     />
                 </HContainer>
-                <Tabs selectedIndex={tab}>
-                    <TabPanel>
+                {tab === 0 &&
+                    <>
                         {soundData.channels.length === 0
                             ? <EmptyContainer
                                 title={nls.localize('vuengine/editors/sound/songIsEmpty', 'This song is empty')}
@@ -532,9 +558,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 <Sequencer
                                     soundData={soundData}
                                     updateSoundData={updateSoundData}
-                                    newPatternSize={newPatternSize}
-                                    setNewPatternSize={setNewPatternSize}
-                                    currentStep={currentStep}
+                                    currentPlayerPosition={currentPlayerPosition}
                                     currentPatternId={currentPatternId}
                                     setCurrentPatternId={updateCurrentPatternId}
                                     currentChannelId={currentChannelId}
@@ -545,19 +569,20 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     toggleChannelSolo={toggleChannelSolo}
                                     toggleChannelSeeThrough={toggleChannelSeeThrough}
                                     setChannel={setChannel}
+                                    addPattern={addPattern}
                                     setChannelDialogOpen={setChannelDialogOpen}
                                     setPatternDialogOpen={setPatternDialogOpen}
                                     sequencerHidden={sequencerHidden}
+                                    effectsPanelHidden={effectsPanelHidden}
                                 />
                                 <PianoRoll
                                     soundData={soundData}
-                                    currentStep={currentStep}
-                                    setCurrentStep={setCurrentStep}
+                                    currentPlayerPosition={currentPlayerPosition}
+                                    setCurrentPlayerPosition={setCurrentPlayerPosition}
                                     noteCursor={noteCursor}
-                                    setNoteCursor={updateNoteCursor}
+                                    setNoteCursor={setNoteCursor}
                                     currentPatternId={currentPatternId}
                                     setCurrentPatternId={updateCurrentPatternId}
-                                    currentPatternNoteOffset={currentPatternNoteOffset}
                                     currentChannelId={currentChannelId}
                                     currentSequenceIndex={currentSequenceIndex}
                                     setCurrentSequenceIndex={updateCurrentSequenceIndex}
@@ -568,6 +593,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     playNote={playNote}
                                     setNote={setNote}
                                     setNoteEvent={setNoteEvent}
+                                    addPattern={addPattern}
                                     sequencerHidden={sequencerHidden}
                                     setSequencerHidden={setSequencerHidden}
                                     effectsPanelHidden={effectsPanelHidden}
@@ -575,36 +601,36 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     noteSnapping={noteSnapping}
                                 />
                             </>}
-                    </TabPanel>
-                    <TabPanel>
-                        <Instruments
+                    </>
+                }
+                {tab === 1 &&
+                    <Instruments
+                        soundData={soundData}
+                        currentInstrument={currentInstrument}
+                        setCurrentInstrument={setCurrentInstrument}
+                        setInstruments={setInstruments}
+                        setWaveformDialogOpen={setWaveformDialogOpen}
+                        setModulationDataDialogOpen={setModulationDataDialogOpen}
+                        playing={playing}
+                        testing={testing}
+                        setTesting={setTesting}
+                        setTestingDuration={setTestingDuration}
+                        setTestingNote={setTestingNote}
+                        setTestingInstrument={setTestingInstrument}
+                        setTestingChannel={setTestingChannel}
+                        emulatorInitialized={emulatorInitialized}
+                    />
+                }
+                {tab === 2 &&
+                    <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
+                        <Song
                             soundData={soundData}
-                            currentInstrument={currentInstrument}
-                            setCurrentInstrument={setCurrentInstrument}
-                            setInstruments={setInstruments}
-                            setWaveformDialogOpen={setWaveformDialogOpen}
-                            setModulationDataDialogOpen={setModulationDataDialogOpen}
-                            playing={playing}
-                            testing={testing}
-                            setTesting={setTesting}
-                            setTestingDuration={setTestingDuration}
-                            setTestingNote={setTestingNote}
-                            setTestingInstrument={setTestingInstrument}
-                            setTestingChannel={setTestingChannel}
-                            emulatorInitialized={emulatorInitialized}
+                            updateSoundData={updateSoundData}
                         />
-                    </TabPanel>
-                    <TabPanel>
-                        <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
-                            <Song
-                                soundData={soundData}
-                                updateSoundData={updateSoundData}
-                            />
-                            <hr />
-                            <ImportExport />
-                        </VContainer>
-                    </TabPanel>
-                </Tabs>
+                        <hr />
+                        <ImportExport />
+                    </VContainer>
+                }
             </VContainer >
             {channelDialogOpen &&
                 <PopUpDialog

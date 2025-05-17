@@ -51,7 +51,7 @@ export const StyledInstrument = styled.button`
     white-space: nowrap;
 
     &.current {
-        outline: 3px solid var(--theia-focusBorder);
+        outline: 1px solid var(--theia-focusBorder);
         outline-offset: 1px;
         z-index: 1;
     }
@@ -120,6 +120,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     const instrumentColor = COLOR_PALETTE[instr?.color ?? DEFAULT_COLOR_INDEX];
                     const name = instr.name.length ? instr.name : (i + 1).toString();
                     return <StyledInstrument
+                        key={i}
                         className={currentInstrument === instrumentId ? 'current' : undefined}
                         onClick={() => setCurrentInstrument(instrumentId)}
                         style={{

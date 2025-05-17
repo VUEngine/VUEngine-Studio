@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import { SoundEditorCommands } from './SoundEditorCommands';
-import { BAR_NOTE_RESOLUTION, INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTool, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, SoundData, SoundEditorTool, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -67,33 +67,28 @@ export const SidebarCollapseButton = styled.button`
 interface SoundEditorToolbarProps {
     soundData: SoundData
     tab: number
-    currentStep: number
+    currentPlayerPosition: number
     playing: boolean
-    togglePlaying: () => void
-    stopPlaying: () => void
     noteSnapping: boolean
-    setNoteSnapping: Dispatch<SetStateAction<boolean>>
     tool: SoundEditorTool
-    setTool: Dispatch<SetStateAction<SoundEditorTool>>
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
-    const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         tab,
-        currentStep,
-        playing, togglePlaying, stopPlaying,
-        tool, setTool,
-        noteSnapping, setNoteSnapping,
+        currentPlayerPosition,
+        playing,
+        tool,
+        noteSnapping,
         newNoteDuration, setNewNoteDuration,
         emulatorInitialized,
     } = props;
 
-    const playbackElapsedTime = currentStep;
     const totalTicks = soundData.size * BAR_NOTE_RESOLUTION;
     const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
     const totalLengthSecs = totalTicks * tickDurationUs / 1000 / 1000;
@@ -109,8 +104,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     className={`theia-button ${tab === 0 ? 'primary' : 'secondary'}`}
                     title={`${sequencerTabCommand.label}${services.vesCommonService.getKeybindingLabel(sequencerTabCommand.id, true)}`}
                     onClick={() => services.commandService.executeCommand(sequencerTabCommand.id)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <PianoKeys size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -118,8 +111,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     className={`theia-button ${tab === 1 ? 'primary' : 'secondary'}`}
                     title={`${instrumentsTabCommand.label}${services.vesCommonService.getKeybindingLabel(instrumentsTabCommand.id, true)}`}
                     onClick={() => services.commandService.executeCommand(instrumentsTabCommand.id)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <Guitar size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -127,8 +118,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     className={`theia-button ${tab === 2 ? 'primary' : 'secondary'}`}
                     title={`${settingsTabCommand.label}${services.vesCommonService.getKeybindingLabel(settingsTabCommand.id, true)}`}
                     onClick={() => services.commandService.executeCommand(settingsTabCommand.id)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <FadersHorizontal size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -141,9 +130,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         : nls.localize('vuengine/editors/sound/play', 'Play')) +
                         services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
                     }
-                    onClick={togglePlaying}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.PLAY_PAUSE.id)}
                     style={{ outlineWidth: playing ? 1 : 0 }}
                     disabled={!emulatorInitialized}
                 >
@@ -154,22 +141,20 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
                         services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
                     }
-                    onClick={stopPlaying}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    disabled={!emulatorInitialized || currentStep < 0}
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.STOP.id)}
+                    disabled={!emulatorInitialized || currentPlayerPosition < 0}
                 >
                     <i className="fa fa-fast-backward" />
                 </StyledSoundEditorToolbarButton>
                 <StyledSoundEditorToolbarTime>
-                    {currentStep + 1}
+                    {currentPlayerPosition + 1}
                 </StyledSoundEditorToolbarTime>
                 <StyledSoundEditorToolbarTime>
                     <span>
-                        {currentStep > -1
-                            ? Math.floor(playbackElapsedTime / 1000 / 60) + ':' +
-                            Math.floor((playbackElapsedTime / 1000) % 60).toString().padStart(2, '0') + ',' +
-                            Math.floor((playbackElapsedTime / 100) % 10)
+                        {currentPlayerPosition > -1
+                            ? Math.floor(currentPlayerPosition / 1000 / 60) + ':' +
+                            Math.floor((currentPlayerPosition / 1000) % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((currentPlayerPosition / 100) % 10)
                             : '0:00,0'
                         }
                     </span>
@@ -188,9 +173,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
                         services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
                     }
-                    onClick={() => setTool(SoundEditorTool.DEFAULT)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_PENCIL.id)}
                 >
                     <PencilSimple size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -199,9 +182,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
                         services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
                     }
-                    // onClick={() => setTool(SoundEditorTool.MARQUEE)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    // onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
                     disabled={true}
                     // TODO
                     onClick={() => alert('Not yet implemented')}
@@ -214,9 +195,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     disabled={true}
                     // TODO
                     onClick={() => alert('Not yet implemented')}
-                    // onClick={() => setState({ recording: !recording })}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                // onClick={() => setState({ recording: !recording })}
                 >
                     <i className='fa fa-circle' />
                 </StyledSoundEditorToolbarButton>
@@ -224,10 +203,11 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarButton
                     className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
-                    title='Note Snapping'
-                    onClick={() => setNoteSnapping(prev => !prev)}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    title={`${SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label}${services.vesCommonService.getKeybindingLabel(
+                        SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
+                        true
+                    )}`}
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id)}
                 >
                     <Magnet size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -251,7 +231,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         label: '1/16',
                         value: `${1 * SUB_NOTE_RESOLUTION}`
                     }]}
-                    width={47}
+                    width={56}
                 />
             </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbar>

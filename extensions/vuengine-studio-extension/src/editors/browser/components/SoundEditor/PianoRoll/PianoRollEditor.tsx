@@ -28,9 +28,7 @@ interface PianoRollEditorProps {
     soundData: SoundData
     currentChannelId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     noteCursor: number
     setNoteCursor: (note: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
@@ -43,8 +41,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     const {
         soundData,
         currentChannelId,
-        currentPatternId, setCurrentPatternId,
-        currentSequenceIndex, setCurrentSequenceIndex,
+        currentPatternId,
+        currentSequenceIndex,
         noteCursor, setNoteCursor,
         setNote,
         setNoteEvent,
@@ -111,9 +109,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 noteCursor={noteCursor}
                 currentChannelId={currentChannelId}
                 currentPatternId={currentPatternId}
-                setCurrentPatternId={setCurrentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
                 setNoteCursor={setNoteCursor}
                 setNote={setNote}
             />

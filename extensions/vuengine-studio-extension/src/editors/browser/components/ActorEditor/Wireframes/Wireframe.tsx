@@ -197,8 +197,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         type="checkbox"
                         checked={wireframe.interlaced}
                         onChange={toggleInterlaced}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>
@@ -304,8 +302,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             type="checkbox"
                             checked={wireframe.drawCenter}
                             onChange={toggleDrawCenter}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                 </HContainer>

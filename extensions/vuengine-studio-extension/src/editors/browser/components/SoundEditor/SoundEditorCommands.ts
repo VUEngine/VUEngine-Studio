@@ -151,35 +151,47 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+left',
     };
-    export const PIANO_ROLL_NOTE_UP: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollNoteUp',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteUp', 'Piano Roll: Move Note Up'),
+    export const NOTE_UP: EditorCommand = {
+        id: 'editors.soundEditor.noteUp',
+        label: nls.localize('vuengine/editors/sound/commands/noteUp', 'Move Note Up'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'up',
     };
-    export const PIANO_ROLL_NOTE_DOWN: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollNoteDown',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteDown', 'Piano Roll: Move Note Down'),
+    export const NOTE_DOWN: EditorCommand = {
+        id: 'editors.soundEditor.noteDown',
+        label: nls.localize('vuengine/editors/sound/commands/noteDown', 'Move Note Down'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'down',
     };
-    export const PIANO_ROLL_NOTE_UP_AN_OCTAVE: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollNoteUpAnOctave',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteUpAnOctave', 'Piano Roll: Move Note Up 1 Octave'),
+    export const CURSOR_UP_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.cursorUpAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/cursorUpAnOctave', 'Move Cursor Up 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+up',
     };
-    export const PIANO_ROLL_NOTE_DOWN_AN_OCTAVE: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollNoteDownAnOctave',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollNoteDownAnOctave', 'Piano Roll: Move Note Down 1 Octave'),
+    export const CURSOR_DOWN_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.cursorDownAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/cursorDownAnOctave', 'Move Note Down 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+down',
+    };
+    export const SELECT_PATTERN_AT_CURSOR_POSITION: EditorCommand = {
+        id: 'editors.soundEditor.selectPatternAtCursorPosition',
+        label: nls.localize('vuengine/editors/sound/commands/selectPatternAtCursorPosition', 'Select Pattern At Cursor Position'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'enter',
     };
     export const REMOVE_CURRENT_NOTE: EditorCommand = {
         id: 'editors.soundEditor.removeCurrentNote',
         label: nls.localize('vuengine/editors/sound/commands/removeCurrentNote', 'Remove Current Note'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'del',
+    };
+    export const TOGGLE_NOTE_SNAPPING: EditorCommand = {
+        id: 'editors.soundEditor.toggleNoteSnapping',
+        label: nls.localize('vuengine/editors/sound/commands/toggleNoteSnapping', 'Toggle Note Snapping'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 's',
     };
     export const TOGGLE_SEQUENCER_VISIBILITY: EditorCommand = {
         id: 'editors.soundEditor.toggleSequencerVisibility',

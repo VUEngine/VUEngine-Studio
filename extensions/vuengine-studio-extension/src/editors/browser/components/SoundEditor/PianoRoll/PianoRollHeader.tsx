@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { PIANO_ROLL_GRID_METER_HEIGHT, PIANO_ROLL_KEY_WIDTH, SoundData } from '../SoundEditorTypes';
+import { PIANO_ROLL_GRID_METER_HEIGHT, PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT, PIANO_ROLL_KEY_WIDTH, SoundData } from '../SoundEditorTypes';
 import PianoRollHeaderGrid from './PianoRollHeaderGrid';
 
 export const MetaLine = styled.div`
@@ -54,7 +54,7 @@ const StyledToggleButton = styled.button`
     display: flex;
     font-size: 10px;
     justify-content: center;
-    min-height: ${PIANO_ROLL_GRID_METER_HEIGHT - 2}px !important;
+    min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
     outline-offset: -1px;
 
     &:hover {
@@ -67,12 +67,11 @@ interface PianoRollHeaderProps {
     soundData: SoundData
     currentChannelId: number
     currentPatternId: string
-    currentPatternNoteOffset: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setCurrentStep: Dispatch<SetStateAction<number>>
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     sequencerHidden: boolean,
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
@@ -80,17 +79,14 @@ interface PianoRollHeaderProps {
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
-        // currentChannelId,
+        currentChannelId,
         // currentPatternId,
-        currentPatternNoteOffset,
         // playRangeStart, setPlayRangeStart,
         // playRangeEnd, setPlayRangeEnd,
-        setCurrentStep,
+        setCurrentPlayerPosition,
         sequencerHidden, setSequencerHidden,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-
-    const sequencerToggleCommand = SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY;
 
     return <MetaLine
         style={{
@@ -103,17 +99,18 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         >
             <StyledToggleButton
                 onClick={() => setSequencerHidden(prev => !prev)}
-                title={
-                    `${sequencerToggleCommand.label}${services.vesCommonService.getKeybindingLabel(sequencerToggleCommand.id, true)}`
-                }
+                title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
+                    true
+                )}`}
             >
                 <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
             </StyledToggleButton>
         </MetaLineHeader>
         <PianoRollHeaderGrid
             soundData={soundData}
-            currentPatternNoteOffset={currentPatternNoteOffset}
-            setCurrentStep={setCurrentStep}
+            currentChannelId={currentChannelId}
+            setCurrentPlayerPosition={setCurrentPlayerPosition}
         />
     </MetaLine>;
 };

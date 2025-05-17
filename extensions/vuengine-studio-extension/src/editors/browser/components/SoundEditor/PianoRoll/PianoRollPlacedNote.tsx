@@ -7,8 +7,10 @@ import { getMaxNoteDuration } from '../Other/Note';
 import {
     BAR_NOTE_RESOLUTION,
     EventsMap,
+    NOTE_RESOLUTION,
     NOTES,
     NOTES_SPECTRUM,
+    PIANO_ROLL_GRID_WIDTH,
     PIANO_ROLL_NOTE_HEIGHT,
     PIANO_ROLL_NOTE_WIDTH,
     SoundEvent,
@@ -16,22 +18,19 @@ import {
 } from '../SoundEditorTypes';
 
 const StyledPianoRollPlacedNote = styled.div`
-    border-radius: 1px;
     box-sizing: border-box;
     color: #fff;
     cursor: move;
-    font-size: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
-    line-height: ${PIANO_ROLL_NOTE_HEIGHT - 2}px;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    outline-offset: 1px;
-    padding-left: 1px;
+    font-size: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH - 2}px;
+    line-height: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH}px;
+    height: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH}px;
     position: absolute;
     text-align: center;
     text-overflow: ellipsis;
     z-index: 10;
 
     &.selected {
+        border-radius: 1px;
         outline: 3px solid var(--theia-focusBorder);
         z-index: 11;
     }
@@ -111,7 +110,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const left = step * PIANO_ROLL_NOTE_WIDTH / SUB_NOTE_RESOLUTION;
     const top = note * PIANO_ROLL_NOTE_HEIGHT;
-    const width = duration * (PIANO_ROLL_NOTE_WIDTH / SUB_NOTE_RESOLUTION);
+    const width = duration * (PIANO_ROLL_NOTE_WIDTH / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
 
     const classNames = ['placedNote'];
     if (noteCursor === step) {
@@ -127,7 +126,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const maxWidth = PIANO_ROLL_NOTE_WIDTH * maxDuration / SUB_NOTE_RESOLUTION;
 
     const getNoteSlide = () => {
-        const event = events[step];
+        const event = events[localStep];
         if (event) {
             const noteSlide = event[SoundEvent.NoteSlide];
             if (noteSlide > 1) {
@@ -150,24 +149,24 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const newDuration = noteSnapping
             ? Math.ceil(data.size.width / PIANO_ROLL_NOTE_WIDTH) * SUB_NOTE_RESOLUTION
             : Math.ceil(data.size.width * SUB_NOTE_RESOLUTION / PIANO_ROLL_NOTE_WIDTH);
-        setNoteEvent(step, SoundEvent.Duration, newDuration);
+        setNoteEvent(localStep, SoundEvent.Duration, newDuration);
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const slideStep = Math.ceil(data.size.height / PIANO_ROLL_NOTE_HEIGHT);
-        setNoteEvent(step, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
+        setNoteEvent(localStep, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
     };
 
     const onNoteSlideDownResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const slideStep = -1 * Math.ceil(data.size.height / PIANO_ROLL_NOTE_HEIGHT);
-        setNoteEvent(step, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
+        setNoteEvent(localStep, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newStep = (noteSnapping
             ? Math.ceil((data.x / PIANO_ROLL_NOTE_WIDTH)) * SUB_NOTE_RESOLUTION
             : Math.ceil((data.x * SUB_NOTE_RESOLUTION / PIANO_ROLL_NOTE_WIDTH))
-        ) - currentSequenceIndex * SUB_NOTE_RESOLUTION;
+        ) - currentSequenceIndex * BAR_NOTE_RESOLUTION;
         const newNoteId = Math.floor(data.y / PIANO_ROLL_NOTE_HEIGHT);
         setNote(newStep, newNoteId, localStep);
     };
@@ -192,8 +191,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             }}
             bounds={{
                 bottom: (NOTES_SPECTRUM - 1) * PIANO_ROLL_NOTE_HEIGHT,
-                left: currentSequenceIndex * BAR_NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH,
-                right: ((currentSequenceIndex + patternSize) * BAR_NOTE_RESOLUTION - duration) * PIANO_ROLL_NOTE_WIDTH,
+                left: currentSequenceIndex * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH,
+                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH - (duration / SUB_NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH),
                 top: 0,
             }}
         >
@@ -263,7 +262,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
                         />
-                        {width >= PIANO_ROLL_NOTE_WIDTH &&
+                        {width > PIANO_ROLL_NOTE_WIDTH &&
                             Object.keys(NOTES)[note]
                         }
                     </>
