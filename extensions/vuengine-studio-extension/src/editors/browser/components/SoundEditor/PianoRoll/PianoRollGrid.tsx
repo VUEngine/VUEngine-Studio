@@ -187,14 +187,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         if (e.button === 0) {
             const currentPattern = soundData.patterns[currentPatternId];
             const currentStep = currentSequenceIndex * NOTE_RESOLUTION;
-            if (!currentPattern) {
-                return;
-            }
+            setNoteCursor(step * SUB_NOTE_RESOLUTION);
             // if inside current pattern
-            if (step >= currentStep && step < currentStep + currentPattern.size * NOTE_RESOLUTION) {
+            if (currentPattern && step >= currentStep && step < currentStep + currentPattern.size * NOTE_RESOLUTION) {
                 setNote((step - currentStep) * SUB_NOTE_RESOLUTION, noteId);
             } else {
-                setNoteCursor(step * SUB_NOTE_RESOLUTION);
                 services.commandService.executeCommand(SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id);
             }
         } else if (e.button === 2) {
@@ -206,8 +203,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         services.themeService.onDidColorThemeChange(() => draw());
     }, []);
 
+    /*
     useEffect(() => {
-        draw();
+    */
+    draw();
+    /*
     }, [
         soundData.channels,
         soundData.size,
@@ -218,6 +218,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollNoteHeight,
         pianoRollNoteWidth,
     ]);
+    */
 
     return (
         <canvas

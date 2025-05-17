@@ -144,7 +144,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     const setPatternAtCursorPosition = () => {
         const bar = Math.floor(noteCursor / BAR_NOTE_RESOLUTION);
-        console.log('bar', bar);
         let barToSelect = -1;
         let patternIdToSelect = '';
         const currentChannel = soundData.channels[currentChannelId];
@@ -162,6 +161,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentSequenceIndex(currentChannelId, barToSelect);
             setCurrentPatternId(currentChannelId, patternIdToSelect);
         } else {
+            setCurrentSequenceIndex(currentChannelId, bar);
             addPattern(currentChannelId, bar);
         }
     };
