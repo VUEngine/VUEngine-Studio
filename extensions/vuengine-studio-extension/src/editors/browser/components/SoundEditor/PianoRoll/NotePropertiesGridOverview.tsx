@@ -4,11 +4,10 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
     NOTE_RESOLUTION,
-    PIANO_ROLL_NOTE_WIDTH,
     SoundData
 } from '../SoundEditorTypes';
 
-export const drawGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, themeType: string, bars: number) => {
+export const drawGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, themeType: string, bars: number, noteWidth: number) => {
     const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
     const c = ['light', 'hcLight'].includes(themeType) ? 0 : 255;
     const lowColor = highContrastTheme
@@ -27,7 +26,7 @@ export const drawGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
     // vertical lines
     for (let x = 1; x <= bars * NOTE_RESOLUTION; x++) {
-        const offset = x * PIANO_ROLL_NOTE_WIDTH - 0.5;
+        const offset = x * noteWidth - 0.5;
         context.beginPath();
         context.moveTo(offset, 0);
         context.lineTo(offset, h);
@@ -43,18 +42,20 @@ export const drawGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingCont
 interface NotePropertiesGridOverviewProps {
     soundData: SoundData
     expandPanel: () => void
+    pianoRollNoteWidth: number
 }
 
 export default function NotePropertiesGridOverview(props: NotePropertiesGridOverviewProps): React.JSX.Element {
     const {
         soundData,
         expandPanel,
+        pianoRollNoteWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const width = soundData.size * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH;
+    const width = soundData.size * NOTE_RESOLUTION * pianoRollNoteWidth;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -68,7 +69,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_COLLAPSED_HEIGHT);
-        drawGrid(canvas, context, themeType, soundData.size);
+        drawGrid(canvas, context, themeType, soundData.size, pianoRollNoteWidth);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -84,6 +85,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     }, [
         soundData.channels,
         soundData.size,
+        pianoRollNoteWidth,
     ]);
 
     return (

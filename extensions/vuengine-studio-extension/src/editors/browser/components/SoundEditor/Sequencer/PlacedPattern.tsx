@@ -11,8 +11,7 @@ import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     ChannelConfig,
     NOTE_RESOLUTION,
-    PATTERN_HEIGHT,
-    PATTERN_MAPPING_FACTOR,
+    NOTES_SPECTRUM,
     PatternConfig,
     PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_GRID_METER_HEIGHT,
@@ -26,7 +25,6 @@ const StyledPattern = styled.div`
     background-color: var(--theia-secondaryButton-background);
     box-sizing: border-box;
     cursor: move;
-    height: ${PATTERN_HEIGHT - SEQUENCER_GRID_WIDTH}px;
     overflow: hidden;
     position: absolute;
     z-index: 10;
@@ -51,7 +49,6 @@ const StyledPattern = styled.div`
 
     canvas {
         box-sizing: border-box;
-        height: ${PATTERN_HEIGHT}px;
     }
 
     .react-resizable-handle {
@@ -84,7 +81,6 @@ interface PatternProps {
     patternIndex: number
     step: number
     pattern: PatternConfig
-    patternSize: number
     channelId: number
     patternId: string
     currentChannelId: number
@@ -93,6 +89,8 @@ interface PatternProps {
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    sequencerPatternHeight: number
+    sequencerPatternWidth: number
 }
 
 export default function PlacedPattern(props: PatternProps): React.JSX.Element {
@@ -101,11 +99,12 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         patternIndex,
         step,
         channelId,
-        pattern, patternSize, patternId,
+        pattern, patternId,
         currentChannelId, currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
         setPatternDialogOpen,
+        sequencerPatternHeight, sequencerPatternWidth,
     } = props;
     const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
     const channel = soundData.channels[channelId];
@@ -120,28 +119,29 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         classNames.push('current');
     }
 
-    const patternNoteWidth = 1;
+    const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
     const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
-    const width = patternSize * patternNoteWidth - SEQUENCER_GRID_WIDTH;
+    const width = pattern.size * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
 
     const patternPixels: number[][][] = useMemo(() => {
         const result: number[][] = [[]];
 
         const placePixel = (x: number, y: number) => {
             for (let k = 0; k < patternNoteWidth; k++) {
-                result[y][x * patternNoteWidth + k] = 1;
+                const xPos = Math.round(x * patternNoteWidth + k);
+                result[y][xPos] = 1;
                 if (result[y - 1]) {
-                    result[y - 1][x * patternNoteWidth + k] = 1;
+                    result[y - 1][xPos] = 1;
                 }
                 if (result[y + 1]) {
-                    result[y + 1][x * patternNoteWidth + k] = 1;
+                    result[y + 1][xPos] = 1;
                 }
             }
         };
 
         // init array
         const emptyLine = [...Array(width)].map(v => 0);
-        [...Array(PATTERN_HEIGHT)].map(v => result.push([...emptyLine]));
+        [...Array(sequencerPatternHeight)].map(v => result.push([...emptyLine]));
 
         // find set notes
         Object.keys(pattern.events).forEach((key: string) => {
@@ -153,7 +153,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                     ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
                     : 1;
                 const startXPosition = Math.floor(s / SUB_NOTE_RESOLUTION);
-                const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
+                const noteYPosition = Math.round(sequencerPatternHeight / NOTES_SPECTRUM * note);
                 for (let k = 0; k < duration; k++) {
                     placePixel(startXPosition + k, noteYPosition);
                 }
@@ -163,6 +163,8 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         return [result];
     }, [
         pattern.events,
+        sequencerPatternHeight,
+        sequencerPatternWidth,
     ]);
 
     const removeFromSequence = (cId: number, i: number): void => {
@@ -182,7 +184,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newSize = Math.floor(data.size.width / NOTE_RESOLUTION);
+        const newSize = Math.floor(data.size.width / sequencerPatternWidth);
         updateSoundData({
             ...soundData,
             patterns: {
@@ -196,8 +198,8 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
-        const newChannelId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / PATTERN_HEIGHT);
-        const newBar = Math.floor((data.x - PIANO_ROLL_KEY_WIDTH) / NOTE_RESOLUTION);
+        const newChannelId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
+        const newBar = Math.floor((data.x - PIANO_ROLL_KEY_WIDTH) / sequencerPatternWidth);
         if (newChannelId === channelId && newBar === step) {
             return;
         }
@@ -247,18 +249,18 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
 
     return (
         <Draggable
-            grid={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
+            grid={[sequencerPatternWidth, sequencerPatternHeight]}
             handle=".placedPattern"
             cancel=".react-resizable-handle"
             onStop={onDragStop}
             position={{
-                x: 2 + PIANO_ROLL_KEY_WIDTH + step * NOTE_RESOLUTION,
-                y: SEQUENCER_GRID_METER_HEIGHT + channelId * PATTERN_HEIGHT,
+                x: 2 + PIANO_ROLL_KEY_WIDTH + step * sequencerPatternWidth,
+                y: SEQUENCER_GRID_METER_HEIGHT + channelId * sequencerPatternHeight,
             }}
             bounds={{
-                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.channels.length - 1) * PATTERN_HEIGHT,
+                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.channels.length - 1) * sequencerPatternHeight,
                 left: PIANO_ROLL_KEY_WIDTH,
-                right: PIANO_ROLL_KEY_WIDTH + soundData.size * NOTE_RESOLUTION - patternSize,
+                right: PIANO_ROLL_KEY_WIDTH + soundData.size * sequencerPatternWidth - pattern.size * sequencerPatternWidth,
                 top: SEQUENCER_GRID_METER_HEIGHT,
             }}
         >
@@ -270,21 +272,24 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                 onContextMenu={onClick}
                 onDoubleClick={onDblClick}
                 title={patternName}
+                style={{
+                    height: sequencerPatternHeight - SEQUENCER_GRID_WIDTH,
+                }}
             >
                 <ResizableBox
                     width={width}
                     draggableOpts={{
-                        grid: [NOTE_RESOLUTION, PATTERN_HEIGHT]
+                        grid: [sequencerPatternWidth, sequencerPatternHeight]
                     }}
                     axis="x"
-                    minConstraints={[NOTE_RESOLUTION, PATTERN_HEIGHT]}
-                    maxConstraints={[NOTE_RESOLUTION * soundData.size, PATTERN_HEIGHT]}
+                    minConstraints={[sequencerPatternWidth, sequencerPatternHeight]}
+                    maxConstraints={[sequencerPatternWidth * soundData.size, sequencerPatternHeight]}
                     resizeHandles={channelId === currentChannelId ? ['e'] : []}
                     onResizeStop={onResize}
                 >
                     <>
                         <CanvasImage
-                            height={PATTERN_HEIGHT - 1}
+                            height={sequencerPatternHeight - 1}
                             palette={'00000000'}
                             pixelData={patternPixels}
                             colorOverride={noteColor}
@@ -292,6 +297,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                             displayMode={DisplayMode.Mono}
                             colorMode={ColorMode.Default}
                             style={{
+                                height: sequencerPatternHeight,
                                 left: 0,
                                 position: 'absolute',
                                 top: 0,

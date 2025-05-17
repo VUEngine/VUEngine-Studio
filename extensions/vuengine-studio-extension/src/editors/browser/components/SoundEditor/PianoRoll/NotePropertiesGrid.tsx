@@ -4,7 +4,6 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_EXPANDED_HEIGHT,
     NOTE_RESOLUTION,
-    PIANO_ROLL_NOTE_WIDTH,
     SoundData
 } from '../SoundEditorTypes';
 import { drawGrid } from './NotePropertiesGridOverview';
@@ -19,6 +18,7 @@ interface NotePropertiesGridProps {
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
+    pianoRollNoteWidth: number
 }
 
 export default function NotePropertiesGrid(props: NotePropertiesGridProps): React.JSX.Element {
@@ -29,12 +29,13 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         currentSequenceIndex, // setCurrentSequenceIndex,
         noteCursor, setNoteCursor,
         // setNote,
+        pianoRollNoteWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const width = soundData.size * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH;
+    const width = soundData.size * NOTE_RESOLUTION * pianoRollNoteWidth;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -48,13 +49,13 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-        drawGrid(canvas, context, themeType, soundData.size);
+        drawGrid(canvas, context, themeType, soundData.size, pianoRollNoteWidth);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
-        const step = Math.floor(x / PIANO_ROLL_NOTE_WIDTH);
+        const step = Math.floor(x / pianoRollNoteWidth);
 
         if (e.button === 0) {
             // TODO

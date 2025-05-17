@@ -122,118 +122,123 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <FadersHorizontal size={17} />
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
-            <StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarWideButton
-                    className={`theia-button ${playing ? 'primary' : 'secondary'}`}
-                    title={(playing
-                        ? nls.localize('vuengine/editors/sound/pause', 'Pause')
-                        : nls.localize('vuengine/editors/sound/play', 'Play')) +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
-                    }
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.PLAY_PAUSE.id)}
-                    style={{ outlineWidth: playing ? 1 : 0 }}
-                    disabled={!emulatorInitialized}
-                >
-                    <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
-                </StyledSoundEditorToolbarWideButton>
-                <StyledSoundEditorToolbarButton
-                    className='theia-button secondary'
-                    title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
-                    }
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.STOP.id)}
-                    disabled={!emulatorInitialized || currentPlayerPosition < 0}
-                >
-                    <i className="fa fa-fast-backward" />
-                </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarTime>
-                    {currentPlayerPosition + 1}
-                </StyledSoundEditorToolbarTime>
-                <StyledSoundEditorToolbarTime>
-                    <span>
-                        {currentPlayerPosition > -1
-                            ? Math.floor(currentPlayerPosition / 1000 / 60) + ':' +
-                            Math.floor((currentPlayerPosition / 1000) % 60).toString().padStart(2, '0') + ',' +
-                            Math.floor((currentPlayerPosition / 100) % 10)
-                            : '0:00,0'
-                        }
-                    </span>
-                    <span>
-                        {
-                            Math.floor(totalLengthSecs / 60) + ':' +
-                            Math.floor(totalLengthSecs % 60).toString().padStart(2, '0') + ',' +
-                            Math.floor((totalLengthSecs * 10) % 10)
-                        }
-                    </span>
-                </StyledSoundEditorToolbarTime>
-            </StyledSoundEditorToolbarGroup>
-            <StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${tool === SoundEditorTool.DEFAULT ? 'primary' : 'secondary'}`}
-                    title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
-                    }
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_PENCIL.id)}
-                >
-                    <PencilSimple size={17} />
-                </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${tool === SoundEditorTool.MARQUEE ? 'primary' : 'secondary'}`}
-                    title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
-                    }
-                    // onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
-                    disabled={true}
-                    // TODO
-                    onClick={() => alert('Not yet implemented')}
-                >
-                    <Selection size={17} />
-                </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${/* recording */false ? 'primary' : 'secondary'} recordButton`}
-                    title='Recording Mode'
-                    disabled={true}
-                    // TODO
-                    onClick={() => alert('Not yet implemented')}
-                // onClick={() => setState({ recording: !recording })}
-                >
-                    <i className='fa fa-circle' />
-                </StyledSoundEditorToolbarButton>
-            </StyledSoundEditorToolbarGroup>
-            <StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
-                    title={`${SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label}${services.vesCommonService.getKeybindingLabel(
-                        SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
-                        true
-                    )}`}
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id)}
-                >
-                    <Magnet size={17} />
-                </StyledSoundEditorToolbarButton>
-                <AdvancedSelect
-                    title={nls.localize('vuengine/editors/sound/defaultNoteLength', 'Default Note Length')}
-                    defaultValue={newNoteDuration.toString()}
-                    onChange={options => setNewNoteDuration(parseInt(options[0]))}
-                    options={[{
-                        label: '1',
-                        value: `${16 * SUB_NOTE_RESOLUTION}`
-                    }, {
-                        label: '1/2',
-                        value: `${8 * SUB_NOTE_RESOLUTION}`
-                    }, {
-                        label: '1/4',
-                        value: `${4 * SUB_NOTE_RESOLUTION}`
-                    }, {
-                        label: '1/8',
-                        value: `${2 * SUB_NOTE_RESOLUTION}`
-                    }, {
-                        label: '1/16',
-                        value: `${1 * SUB_NOTE_RESOLUTION}`
-                    }]}
-                    width={56}
-                />
-            </StyledSoundEditorToolbarGroup>
+
+            {soundData.channels.length > 0 &&
+                <>
+                    <StyledSoundEditorToolbarGroup>
+                        <StyledSoundEditorToolbarWideButton
+                            className={`theia-button ${playing ? 'primary' : 'secondary'}`}
+                            title={(playing
+                                ? nls.localize('vuengine/editors/sound/pause', 'Pause')
+                                : nls.localize('vuengine/editors/sound/play', 'Play')) +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
+                            }
+                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.PLAY_PAUSE.id)}
+                            style={{ outlineWidth: playing ? 1 : 0 }}
+                            disabled={!emulatorInitialized}
+                        >
+                            <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
+                        </StyledSoundEditorToolbarWideButton>
+                        <StyledSoundEditorToolbarButton
+                            className='theia-button secondary'
+                            title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
+                            }
+                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.STOP.id)}
+                            disabled={!emulatorInitialized || currentPlayerPosition < 0}
+                        >
+                            <i className="fa fa-fast-backward" />
+                        </StyledSoundEditorToolbarButton>
+                        <StyledSoundEditorToolbarTime>
+                            {currentPlayerPosition + 1}
+                        </StyledSoundEditorToolbarTime>
+                        <StyledSoundEditorToolbarTime>
+                            <span>
+                                {currentPlayerPosition > -1
+                                    ? Math.floor(currentPlayerPosition / 1000 / 60) + ':' +
+                                    Math.floor((currentPlayerPosition / 1000) % 60).toString().padStart(2, '0') + ',' +
+                                    Math.floor((currentPlayerPosition / 100) % 10)
+                                    : '0:00,0'
+                                }
+                            </span>
+                            <span>
+                                {
+                                    Math.floor(totalLengthSecs / 60) + ':' +
+                                    Math.floor(totalLengthSecs % 60).toString().padStart(2, '0') + ',' +
+                                    Math.floor((totalLengthSecs * 10) % 10)
+                                }
+                            </span>
+                        </StyledSoundEditorToolbarTime>
+                    </StyledSoundEditorToolbarGroup>
+                    <StyledSoundEditorToolbarGroup>
+                        <StyledSoundEditorToolbarButton
+                            className={`theia-button ${tool === SoundEditorTool.DEFAULT ? 'primary' : 'secondary'}`}
+                            title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
+                            }
+                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_PENCIL.id)}
+                        >
+                            <PencilSimple size={17} />
+                        </StyledSoundEditorToolbarButton>
+                        <StyledSoundEditorToolbarButton
+                            className={`theia-button ${tool === SoundEditorTool.MARQUEE ? 'primary' : 'secondary'}`}
+                            title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
+                            }
+                            // onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
+                            disabled={true}
+                            // TODO
+                            onClick={() => alert('Not yet implemented')}
+                        >
+                            <Selection size={17} />
+                        </StyledSoundEditorToolbarButton>
+                        <StyledSoundEditorToolbarButton
+                            className={`theia-button ${/* recording */false ? 'primary' : 'secondary'} recordButton`}
+                            title='Recording Mode'
+                            disabled={true}
+                            // TODO
+                            onClick={() => alert('Not yet implemented')}
+                        // onClick={() => setState({ recording: !recording })}
+                        >
+                            <i className='fa fa-circle' />
+                        </StyledSoundEditorToolbarButton>
+                    </StyledSoundEditorToolbarGroup>
+                    <StyledSoundEditorToolbarGroup>
+                        <StyledSoundEditorToolbarButton
+                            className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
+                            title={`${SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
+                                true
+                            )}`}
+                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id)}
+                        >
+                            <Magnet size={17} />
+                        </StyledSoundEditorToolbarButton>
+                        <AdvancedSelect
+                            title={nls.localize('vuengine/editors/sound/defaultNoteLength', 'Default Note Length')}
+                            defaultValue={newNoteDuration.toString()}
+                            onChange={options => setNewNoteDuration(parseInt(options[0]))}
+                            options={[{
+                                label: '1',
+                                value: `${16 * SUB_NOTE_RESOLUTION}`
+                            }, {
+                                label: '1/2',
+                                value: `${8 * SUB_NOTE_RESOLUTION}`
+                            }, {
+                                label: '1/4',
+                                value: `${4 * SUB_NOTE_RESOLUTION}`
+                            }, {
+                                label: '1/8',
+                                value: `${2 * SUB_NOTE_RESOLUTION}`
+                            }, {
+                                label: '1/16',
+                                value: `${1 * SUB_NOTE_RESOLUTION}`
+                            }]}
+                            width={56}
+                        />
+                    </StyledSoundEditorToolbarGroup>
+                </>
+            }
         </StyledSoundEditorToolbar>
     );
 }

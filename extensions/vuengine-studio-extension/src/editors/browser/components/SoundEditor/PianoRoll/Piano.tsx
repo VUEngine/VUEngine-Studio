@@ -23,12 +23,11 @@ const StyledPiano = styled.div`
 
 interface PianoProps {
     playNote: (note: number) => void
+    pianoRollNoteHeight: number
 }
 
 export default function Piano(props: PianoProps): React.JSX.Element {
-    const {
-        playNote,
-    } = props;
+    const { playNote, pianoRollNoteHeight } = props;
 
     return <StyledPiano>
         {Object.keys(NOTES).map((note, index) =>
@@ -37,6 +36,7 @@ export default function Piano(props: PianoProps): React.JSX.Element {
                 noteId={index}
                 note={note}
                 playNote={playNote}
+                pianoRollNoteHeight={pianoRollNoteHeight}
             />
         )}
     </StyledPiano>;

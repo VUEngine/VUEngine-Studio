@@ -26,6 +26,10 @@ import {
     InstrumentMap,
     NOTES,
     PatternConfig,
+    PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
+    PIANO_ROLL_NOTE_WIDTH_DEFAULT,
+    SEQUENCER_PATTERN_HEIGHT_DEFAULT,
+    SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SINGLE_NOTE_TESTING_DURATION,
     SoundData,
     SoundEditorChannelType,
@@ -66,6 +70,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentInstrument, setCurrentInstrument] = useState<string>('');
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
+    const [pianoRollNoteHeight, setPianoRollNoteHeight] = useState<number>(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
+    const [pianoRollNoteWidth, setPianoRollNoteWidth] = useState<number>(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
+    const [sequencerPatternHeight, setSequencerPatternHeight] = useState<number>(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
+    const [sequencerPatternWidth, setSequencerPatternWidth] = useState<number>(SEQUENCER_PATTERN_WIDTH_DEFAULT);
     const [tab, setTab] = useState<number>(0);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [channelDialogOpen, setChannelDialogOpen] = useState<boolean>(false);
@@ -92,6 +100,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 ...soundData.channels.slice(channelId + 1)
             ]
         });
+    };
+
+    const removeChannel = (channelId: number): void => {
+        const newChannelCount = soundData.channels.length - 2;
+        if (currentChannelId >= newChannelCount) {
+            setCurrentChannelId(newChannelCount);
+        }
+        updateSoundData({
+            ...soundData,
+            channels: [
+                ...soundData.channels.slice(0, channelId),
+                ...soundData.channels.slice(channelId + 1)
+            ]
+        });
+        setChannelDialogOpen(false);
     };
 
     const setPattern = (patternId: string, pattern: Partial<PatternConfig>): void => {
@@ -201,6 +224,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ...soundData,
             channels: updatedChannels,
         });
+        setChannelDialogOpen(false);
     };
 
     const togglePlaying = (): void => {
@@ -529,7 +553,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 playRangeEnd={playRangeEnd}
             />
             <VContainer gap={0} grow={1} overflow="hidden">
-
                 <HContainer justifyContent='space-between'>
                     <SoundEditorToolbar
                         soundData={soundData}
@@ -546,14 +569,16 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 {tab === 0 &&
                     <>
                         {soundData.channels.length === 0
-                            ? <EmptyContainer
-                                title={nls.localize('vuengine/editors/sound/songIsEmpty', 'This song is empty')}
-                                description={nls.localize(
-                                    'vuengine/editors/sound/clickBelowToAddFirstChannel',
-                                    'Click below to add the first channel',
-                                )}
-                                onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
-                            />
+                            ? <VContainer grow={1} style={{ position: 'relative' }}>
+                                <EmptyContainer
+                                    title={nls.localize('vuengine/editors/sound/songIsEmpty', 'This song is empty')}
+                                    description={nls.localize(
+                                        'vuengine/editors/sound/clickBelowToAddFirstChannel',
+                                        'Click below to add the first channel',
+                                    )}
+                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
+                                />
+                            </VContainer>
                             : <>
                                 <Sequencer
                                     soundData={soundData}
@@ -574,6 +599,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     setPatternDialogOpen={setPatternDialogOpen}
                                     sequencerHidden={sequencerHidden}
                                     effectsPanelHidden={effectsPanelHidden}
+                                    pianoRollNoteHeight={pianoRollNoteHeight}
+                                    pianoRollNoteWidth={pianoRollNoteWidth}
+                                    sequencerPatternHeight={sequencerPatternHeight}
+                                    setSequencerPatternHeight={setSequencerPatternHeight}
+                                    sequencerPatternWidth={sequencerPatternWidth}
+                                    setSequencerPatternWidth={setSequencerPatternWidth}
                                 />
                                 <PianoRoll
                                     soundData={soundData}
@@ -599,6 +630,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     effectsPanelHidden={effectsPanelHidden}
                                     setEffectsPanelHidden={setEffectsPanelHidden}
                                     noteSnapping={noteSnapping}
+                                    pianoRollNoteHeight={pianoRollNoteHeight}
+                                    pianoRollNoteWidth={pianoRollNoteWidth}
+                                    sequencerPatternHeight={sequencerPatternHeight}
+                                    setPianoRollNoteHeight={setPianoRollNoteHeight}
+                                    setPianoRollNoteWidth={setPianoRollNoteWidth}
                                 />
                             </>}
                     </>
@@ -648,11 +684,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         setCurrentChannelId={setCurrentChannelId}
                         setCurrentPatternId={setCurrentPatternId}
                         setChannel={setChannel}
+                        removeChannel={removeChannel}
                         editInstrument={editInstrument}
                     />
                 </PopUpDialog>
             }
-            {patternDialogOpen &&
+            {patternDialogOpen && soundData.channels[currentChannelId] !== undefined &&
                 <PopUpDialog
                     open={patternDialogOpen}
                     onClose={() => setPatternDialogOpen(false)}

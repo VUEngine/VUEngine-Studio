@@ -7,16 +7,18 @@ interface PianoKeysProps {
     noteId: number
     channel: number
     setFrequency: (channel: number, frequency: number) => void
+    pianoRollNoteHeight: number
 }
 
 export default function PianoKeys(props: PianoKeysProps): React.JSX.Element {
-    const { note, noteId, channel, setFrequency } = props;
+    const { note, noteId, channel, setFrequency, pianoRollNoteHeight } = props;
 
     return <div>
         <PianoRollKey
             noteId={noteId}
             note={note}
             playNote={() => setFrequency(channel - 1, NOTES[note])}
+            pianoRollNoteHeight={pianoRollNoteHeight}
         />
     </div>;
 }

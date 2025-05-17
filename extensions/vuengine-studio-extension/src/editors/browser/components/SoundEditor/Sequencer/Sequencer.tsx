@@ -3,16 +3,19 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
-import VContainer from '../../Common/Base/VContainer';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     ChannelConfig,
-    NOTE_RESOLUTION,
-    PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_PATTERN_HEIGHT_DEFAULT,
+    SEQUENCER_PATTERN_HEIGHT_MAX,
+    SEQUENCER_PATTERN_HEIGHT_MIN,
+    SEQUENCER_PATTERN_WIDTH_DEFAULT,
+    SEQUENCER_PATTERN_WIDTH_MAX,
+    SEQUENCER_PATTERN_WIDTH_MIN,
     SoundData
 } from '../SoundEditorTypes';
 import ChannelHeader from './ChannelHeader';
@@ -20,16 +23,21 @@ import LoopIndicator from './LoopIndicator';
 import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
 import StepIndicator from './StepIndicator';
+import { ScaleControls } from '../PianoRoll/PianoRoll';
+
+export const StyledSequencerContainer = styled.div`
+    margin: 0 var(--padding);
+    padding-right: 10px;
+    position: relative;
+`;
 
 export const StyledSequencer = styled.div`
     display: flex;
     flex-direction: column;
-    margin: 0 var(--padding);
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 11px;
     position: relative;
-    transition: all .2s;
     user-select: none;
 
     &.hidden {
@@ -108,6 +116,12 @@ interface SequencerProps {
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerHidden: boolean
     effectsPanelHidden: boolean
+    pianoRollNoteHeight: number
+    pianoRollNoteWidth: number
+    sequencerPatternHeight: number
+    setSequencerPatternHeight: Dispatch<SetStateAction<number>>
+    sequencerPatternWidth: number
+    setSequencerPatternWidth: Dispatch<SetStateAction<number>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -125,6 +139,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setChannelDialogOpen, setPatternDialogOpen,
         sequencerHidden,
         effectsPanelHidden,
+        pianoRollNoteHeight, pianoRollNoteWidth,
+        sequencerPatternHeight, setSequencerPatternHeight,
+        sequencerPatternWidth, setSequencerPatternWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -135,29 +152,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         ]
     );
 
-    const channels = useMemo(() => (
-        soundData.channels.map((channel, index) =>
-            <ChannelHeader
-                key={index}
-                channel={channel}
-                channelId={index}
-                currentChannelId={currentChannelId}
-                setCurrentChannelId={setCurrentChannelId}
-                toggleChannelMuted={toggleChannelMuted}
-                toggleChannelSolo={toggleChannelSolo}
-                toggleChannelSeeThrough={toggleChannelSeeThrough}
-                otherSolo={soloChannel > -1 && soloChannel !== index}
-                setChannelDialogOpen={setChannelDialogOpen}
-            />
-        )
-    ), [
-        soloChannel,
-        soundData,
-        currentChannelId,
-        currentPatternId,
-        currentSequenceIndex,
-    ]);
-
     const mapVerticalToHorizontalScroll = (e: React.WheelEvent): void => {
         if (e.deltaY === 0) {
             return;
@@ -165,6 +159,34 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         e.currentTarget.scrollTo({
             left: e.currentTarget.scrollLeft + e.deltaY
         });
+    };
+
+    const onWheel = (e: React.WheelEvent): void => {
+        if (e.ctrlKey) {
+            if (e.shiftKey) {
+                let newPatternWidth = Math.round(sequencerPatternWidth - (e.deltaX / 8));
+
+                if (newPatternWidth > SEQUENCER_PATTERN_WIDTH_MAX) {
+                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MAX;
+                } else if (newPatternWidth < SEQUENCER_PATTERN_WIDTH_MIN) {
+                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MIN;
+                }
+
+                setSequencerPatternWidth(newPatternWidth);
+            } else {
+                let newPatternHeight = Math.round(sequencerPatternHeight - (e.deltaY / 4));
+
+                if (newPatternHeight > SEQUENCER_PATTERN_HEIGHT_MAX) {
+                    newPatternHeight = SEQUENCER_PATTERN_HEIGHT_MAX;
+                } else if (newPatternHeight < SEQUENCER_PATTERN_HEIGHT_MIN) {
+                    newPatternHeight = SEQUENCER_PATTERN_HEIGHT_MIN;
+                }
+
+                setSequencerPatternHeight(newPatternHeight);
+            }
+
+            e.stopPropagation();
+        }
     };
 
     const commandListener = (e: CustomEvent): void => {
@@ -237,12 +259,44 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         soundData,
     ]);
 
-    return <VContainer gap={0}>
+    return <StyledSequencerContainer
+        onWheel={onWheel}
+    >
+        <ScaleControls className="vertical">
+            <button onClick={() => setSequencerPatternHeight(prev =>
+                prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
+            )}>
+                <i className="codicon codicon-plus" />
+            </button>
+            <button onClick={() => setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT)}>
+                <i className="codicon codicon-circle-large" />
+            </button>
+            <button onClick={() => setSequencerPatternHeight(prev =>
+                prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
+            )}>
+                <i className="codicon codicon-chrome-minimize" />
+            </button>
+        </ScaleControls>
+        <ScaleControls>
+            <button onClick={() => setSequencerPatternWidth(prev =>
+                prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
+            )}>
+                <i className="codicon codicon-chrome-minimize" />
+            </button>
+            <button onClick={() => setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT)}>
+                <i className="codicon codicon-circle-large" />
+            </button>
+            <button onClick={() => setSequencerPatternWidth(prev =>
+                prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
+            )}>
+                <i className="codicon codicon-plus" />
+            </button>
+        </ScaleControls>
         <StyledSequencer
             className={sequencerHidden ? 'hidden' : undefined}
             onWheel={mapVerticalToHorizontalScroll}
             style={{
-                height: soundData.channels.length * PATTERN_HEIGHT + SEQUENCER_GRID_METER_HEIGHT +
+                height: soundData.channels.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT +
                     (soundData.channels.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT + 2 : 0),
             }}
         >
@@ -252,6 +306,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 isPianoRoll={false}
                 hidden={currentPlayerPosition === -1}
                 effectsPanelHidden={effectsPanelHidden}
+                pianoRollNoteHeight={pianoRollNoteHeight}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+                sequencerPatternHeight={sequencerPatternHeight}
             />
             <LoopIndicator
                 position={soundData.loopPoint}
@@ -261,7 +318,21 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <StyledChannelHeaderContainer>
                     <StyledChannelsHeader>
                     </StyledChannelsHeader>
-                    {channels}
+                    {soundData.channels.map((channel, index) =>
+                        <ChannelHeader
+                            key={index}
+                            channel={channel}
+                            channelId={index}
+                            currentChannelId={currentChannelId}
+                            setCurrentChannelId={setCurrentChannelId}
+                            toggleChannelMuted={toggleChannelMuted}
+                            toggleChannelSolo={toggleChannelSolo}
+                            toggleChannelSeeThrough={toggleChannelSeeThrough}
+                            otherSolo={soloChannel > -1 && soloChannel !== index}
+                            setChannelDialogOpen={setChannelDialogOpen}
+                            sequencerPatternHeight={sequencerPatternHeight}
+                        />
+                    )}
                 </StyledChannelHeaderContainer>
                 {soundData.channels.map((channel, index) =>
                     Object.keys(channel.sequence).map(key => {
@@ -280,7 +351,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             step={step}
                             channelId={index}
                             pattern={pattern}
-                            patternSize={pattern.size * NOTE_RESOLUTION}
                             patternId={patternId}
                             currentChannelId={currentChannelId}
                             currentPatternId={currentPatternId}
@@ -288,6 +358,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             setCurrentSequenceIndex={setCurrentSequenceIndex}
                             setChannel={setChannel}
                             setPatternDialogOpen={setPatternDialogOpen}
+                            sequencerPatternHeight={sequencerPatternHeight}
+                            sequencerPatternWidth={sequencerPatternWidth}
                         />;
                     })
                 )}
@@ -301,6 +373,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setChannel={setChannel}
                     addPattern={addPattern}
+                    sequencerPatternHeight={sequencerPatternHeight}
+                    sequencerPatternWidth={sequencerPatternWidth}
                 />
             </HContainer>
             {soundData.channels.length < VSU_NUMBER_OF_CHANNELS &&
@@ -312,5 +386,5 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 </StyledAddChannelButton>
             }
         </StyledSequencer>
-    </VContainer>;
+    </StyledSequencerContainer>;
 }

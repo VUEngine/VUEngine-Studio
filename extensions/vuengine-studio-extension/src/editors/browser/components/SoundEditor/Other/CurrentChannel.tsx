@@ -18,6 +18,7 @@ interface CurrentChannelProps {
     setCurrentChannelId: Dispatch<SetStateAction<number>>
     setCurrentPatternId: Dispatch<SetStateAction<string>>
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    removeChannel: (channelId: number) => void
     editInstrument: (instrument: string) => void
 }
 
@@ -27,7 +28,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         soundData,
         currentChannelId, setCurrentChannelId,
         setCurrentPatternId,
-        setChannel,
+        setChannel, removeChannel,
         editInstrument,
     } = props;
 
@@ -44,15 +45,14 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         });
     };
 
-    const removeChannel = async () => {
+    const promptRemoveChannel = async () => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/sound/deleteChannelQuestion', 'Delete Channel?'),
-            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDeleteChannel', 'Are you sure you want to completely delete this channel?'),
+            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDeleteChannel', 'Are you sure you want to delete this channel?'),
         });
         const remove = await dialog.open();
         if (remove) {
-            // TODO
-            alert('not yet implemented');
+            removeChannel(currentChannelId);
         }
     };
 
@@ -97,7 +97,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Remove')}
-                        onClick={removeChannel}
+                        onClick={promptRemoveChannel}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>

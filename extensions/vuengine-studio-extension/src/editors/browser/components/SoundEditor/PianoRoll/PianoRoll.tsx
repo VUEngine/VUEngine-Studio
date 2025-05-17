@@ -3,19 +3,85 @@ import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { BAR_NOTE_RESOLUTION, NOTES_PER_OCTAVE, NOTES_SPECTRUM, SoundData, SoundEvent, SUB_NOTE_RESOLUTION } from '../SoundEditorTypes';
+import {
+    BAR_NOTE_RESOLUTION,
+    NOTES_PER_OCTAVE,
+    NOTES_SPECTRUM,
+    PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
+    PIANO_ROLL_NOTE_HEIGHT_MAX,
+    PIANO_ROLL_NOTE_HEIGHT_MIN,
+    PIANO_ROLL_NOTE_WIDTH_DEFAULT,
+    PIANO_ROLL_NOTE_WIDTH_MAX,
+    PIANO_ROLL_NOTE_WIDTH_MIN,
+    SoundData,
+    SoundEvent,
+    SUB_NOTE_RESOLUTION,
+} from '../SoundEditorTypes';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 
-const StyledPianoRoll = styled.div`
-    align-items: start;
+const StyledPianoRollContainer = styled.div`
     display: flex;
-    flex-direction: column;
-    font-size: 10px;
-    overflow: auto;
+    flex-grow: 1;
+    height: 1px;
     margin: 1px var(--padding) var(--padding);
     position: relative;
+`;
+
+const StyledPianoRoll = styled.div`
+    flex-grow: 1;
+    font-size: 10px;
+    overflow: scroll;
+    position: relative;
+`;
+
+export const ScaleControls = styled.div`
+    background-color: var(--theia-editor-background);
+    bottom: 0;
+    display: flex;
+    right: 10px;
+    padding: 0 0 0 1px;
+    position: absolute;
+    z-index: 9000;
+
+    button {
+        background-color: var(--theia-secondaryButton-background);
+        border: none;
+        border-radius: 0;
+        color: var(--theia-secondaryButton-foreground);
+        cursor: pointer;
+        line-height: 8px;
+        min-height: 10px;
+        max-height: 10px;
+        min-width: 16px;
+        max-width: 16px;
+        outline: none;
+        padding: 0;
+
+        &:hover {
+            background-color: var(--theia-focusBorder);
+        }
+
+        .codicon {
+            font-size: 8px;
+        }
+    }
+
+    &.vertical {
+        bottom: 10px;
+        flex-direction: column;
+        padding: 1px 0 0 0;
+        right: 0;
+
+        button {
+            line-height: 14px;
+            min-height: 16px;
+            max-height: 16px;
+            min-width: 10px;
+            max-width: 10px;
+        }
+    }
 `;
 
 interface PianoRollProps {
@@ -42,6 +108,11 @@ interface PianoRollProps {
     playNote: (note: number) => void
     noteSnapping: boolean
     addPattern: (channelId: number, step: number) => void
+    pianoRollNoteHeight: number
+    setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
+    pianoRollNoteWidth: number
+    setPianoRollNoteWidth: Dispatch<SetStateAction<number>>
+    sequencerPatternHeight: number
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -61,6 +132,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playNote,
         noteSnapping,
         addPattern,
+        pianoRollNoteHeight, setPianoRollNoteHeight,
+        pianoRollNoteWidth, setPianoRollNoteWidth,
+        sequencerPatternHeight,
     } = props;
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
@@ -89,6 +163,34 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentPatternId(currentChannelId, patternIdToSelect);
         } else {
             addPattern(currentChannelId, bar);
+        }
+    };
+
+    const onWheel = (e: React.WheelEvent): void => {
+        if (e.ctrlKey) {
+            if (e.shiftKey) {
+                let newNoteWidth = Math.round(pianoRollNoteWidth - (e.deltaX / 8));
+
+                if (newNoteWidth > PIANO_ROLL_NOTE_WIDTH_MAX) {
+                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MAX;
+                } else if (newNoteWidth < PIANO_ROLL_NOTE_WIDTH_MIN) {
+                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MIN;
+                }
+
+                setPianoRollNoteWidth(newNoteWidth);
+            } else {
+                let newNoteHeight = Math.round(pianoRollNoteHeight - (e.deltaY / 4));
+
+                if (newNoteHeight > PIANO_ROLL_NOTE_HEIGHT_MAX) {
+                    newNoteHeight = PIANO_ROLL_NOTE_HEIGHT_MAX;
+                } else if (newNoteHeight < PIANO_ROLL_NOTE_HEIGHT_MIN) {
+                    newNoteHeight = PIANO_ROLL_NOTE_HEIGHT_MIN;
+                }
+
+                setPianoRollNoteHeight(newNoteHeight);
+            }
+
+            e.stopPropagation();
         }
     };
 
@@ -162,7 +264,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         // auto scroll to current pattern in piano roll
         /*
         pianoRollRef.current?.scrollTo({
-            left: currentSequenceIndex * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH,
+            left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth,
             behavior: 'smooth',
         });
         */
@@ -170,52 +272,93 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentPatternId,
     ]);
 
-    return <StyledPianoRoll
-        ref={pianoRollRef}
+    return <StyledPianoRollContainer
+        onWheel={onWheel}
     >
-        {<StepIndicator
-            soundData={soundData}
-            currentPlayerPosition={currentPlayerPosition}
-            isPianoRoll={true}
-            hidden={currentPlayerPosition === -1}
-            effectsPanelHidden={effectsPanelHidden}
-        />}
-        <PianoRollHeader
-            soundData={soundData}
-            currentChannelId={currentChannelId}
-            currentPatternId={currentPatternId}
-            playRangeStart={playRangeStart}
-            setPlayRangeStart={setPlayRangeStart}
-            playRangeEnd={playRangeEnd}
-            setPlayRangeEnd={setPlayRangeEnd}
-            setCurrentPlayerPosition={setCurrentPlayerPosition}
-            sequencerHidden={sequencerHidden}
-            setSequencerHidden={setSequencerHidden}
-        />
-        <PianoRollEditor
-            soundData={soundData}
-            currentChannelId={currentChannelId}
-            currentPatternId={currentPatternId}
-            currentSequenceIndex={currentSequenceIndex}
-            noteCursor={noteCursor}
-            setNoteCursor={setNoteCursor}
-            setNote={setNote}
-            setNoteEvent={setNoteEvent}
-            playNote={playNote}
-            noteSnapping={noteSnapping}
-        />
-        <NoteProperties
-            soundData={soundData}
-            noteCursor={noteCursor}
-            setNoteCursor={setNoteCursor}
-            currentChannelId={currentChannelId}
-            currentPatternId={currentPatternId}
-            setCurrentPatternId={setCurrentPatternId}
-            currentSequenceIndex={currentSequenceIndex}
-            setCurrentSequenceIndex={setCurrentSequenceIndex}
-            effectsPanelHidden={effectsPanelHidden}
-            setEffectsPanelHidden={setEffectsPanelHidden}
-            setNote={setNote}
-        />
-    </StyledPianoRoll>;
+        <ScaleControls className="vertical">
+            <button onClick={() => setPianoRollNoteHeight(prev =>
+                prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
+            )}>
+                <i className="codicon codicon-plus" />
+            </button>
+            <button onClick={() => setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT)}>
+                <i className="codicon codicon-circle-large" />
+            </button>
+            <button onClick={() => setPianoRollNoteHeight(prev =>
+                prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
+            )}>
+                <i className="codicon codicon-chrome-minimize" />
+            </button>
+        </ScaleControls>
+        <ScaleControls>
+            <button onClick={() => setPianoRollNoteWidth(prev =>
+                prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev - 1 : prev
+            )}>
+                <i className="codicon codicon-chrome-minimize" />
+            </button>
+            <button onClick={() => setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT)}>
+                <i className="codicon codicon-circle-large" />
+            </button>
+            <button onClick={() => setPianoRollNoteWidth(prev =>
+                prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev + 1 : prev
+            )}>
+                <i className="codicon codicon-plus" />
+            </button>
+        </ScaleControls>
+        <StyledPianoRoll
+            ref={pianoRollRef}
+        >
+            {<StepIndicator
+                soundData={soundData}
+                currentPlayerPosition={currentPlayerPosition}
+                isPianoRoll={true}
+                hidden={currentPlayerPosition === -1}
+                effectsPanelHidden={effectsPanelHidden}
+                pianoRollNoteHeight={pianoRollNoteHeight}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+                sequencerPatternHeight={sequencerPatternHeight}
+            />}
+            <PianoRollHeader
+                soundData={soundData}
+                currentChannelId={currentChannelId}
+                currentPatternId={currentPatternId}
+                playRangeStart={playRangeStart}
+                setPlayRangeStart={setPlayRangeStart}
+                playRangeEnd={playRangeEnd}
+                setPlayRangeEnd={setPlayRangeEnd}
+                setCurrentPlayerPosition={setCurrentPlayerPosition}
+                sequencerHidden={sequencerHidden}
+                setSequencerHidden={setSequencerHidden}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+            />
+            <PianoRollEditor
+                soundData={soundData}
+                currentChannelId={currentChannelId}
+                currentPatternId={currentPatternId}
+                currentSequenceIndex={currentSequenceIndex}
+                noteCursor={noteCursor}
+                setNoteCursor={setNoteCursor}
+                setNote={setNote}
+                setNoteEvent={setNoteEvent}
+                playNote={playNote}
+                noteSnapping={noteSnapping}
+                pianoRollNoteHeight={pianoRollNoteHeight}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+            />
+            <NoteProperties
+                soundData={soundData}
+                noteCursor={noteCursor}
+                setNoteCursor={setNoteCursor}
+                currentChannelId={currentChannelId}
+                currentPatternId={currentPatternId}
+                setCurrentPatternId={setCurrentPatternId}
+                currentSequenceIndex={currentSequenceIndex}
+                setCurrentSequenceIndex={setCurrentSequenceIndex}
+                effectsPanelHidden={effectsPanelHidden}
+                setEffectsPanelHidden={setEffectsPanelHidden}
+                setNote={setNote}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+            />
+        </StyledPianoRoll>
+    </StyledPianoRollContainer>;
 }

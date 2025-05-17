@@ -100,7 +100,11 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
             </TabList>
             <TabPanel key="tabpanel-channels">
                 <HContainer gap={10} overflow='hidden'>
-                    <Piano channel={pianoChannel} setFrequency={setFrequency} />
+                    <Piano
+                        channel={pianoChannel}
+                        setFrequency={setFrequency}
+                        pianoRollNoteHeight={12}
+                    />
                     <VContainer gap={15} grow={1} overflow='auto'>
                         {([...Array(VSU_NUMBER_OF_CHANNELS)].map((v, x) =>
                             <React.Fragment key={x}>

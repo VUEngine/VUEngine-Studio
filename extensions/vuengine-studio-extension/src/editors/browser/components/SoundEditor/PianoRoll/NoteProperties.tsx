@@ -63,6 +63,7 @@ interface NotePropertiesProps {
     setNote: (step: number, note?: number, prevStep?: number) => void
     effectsPanelHidden: boolean,
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
+    pianoRollNoteWidth: number,
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -74,6 +75,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         currentSequenceIndex, setCurrentSequenceIndex,
         effectsPanelHidden, setEffectsPanelHidden,
         setNote,
+        pianoRollNoteWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
@@ -95,6 +97,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         grid = <NotePropertiesGridOverview
             soundData={soundData}
             expandPanel={toggleEffectsPanel}
+            pianoRollNoteWidth={pianoRollNoteWidth}
         />;
     } else {
         switch (tab) {
@@ -110,6 +113,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setNoteCursor={setNoteCursor}
                     setNote={setNote}
+                    pianoRollNoteWidth={pianoRollNoteWidth}
                 />;
                 break;
         }

@@ -14,7 +14,6 @@ export const MetaLine = styled.div`
     flex-grow: 1;
     left: 0;
     position: sticky;
-    transition: all .2s;
     z-index: 200;
 
     body.theia-light &,
@@ -72,8 +71,9 @@ interface PianoRollHeaderProps {
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    sequencerHidden: boolean,
+    sequencerHidden: boolean
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
+    pianoRollNoteWidth: number
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -85,6 +85,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         // playRangeEnd, setPlayRangeEnd,
         setCurrentPlayerPosition,
         sequencerHidden, setSequencerHidden,
+        pianoRollNoteWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -111,6 +112,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             soundData={soundData}
             currentChannelId={currentChannelId}
             setCurrentPlayerPosition={setCurrentPlayerPosition}
+            pianoRollNoteWidth={pianoRollNoteWidth}
         />
     </MetaLine>;
 };

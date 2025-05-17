@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, PIANO_ROLL_NOTE_HEIGHT, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, SoundData, SoundEvent } from '../SoundEditorTypes';
 import Piano from './Piano';
 import PianoRollGrid from './PianoRollGrid';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
@@ -14,7 +14,6 @@ const StyledPianoRollEditor = styled.div`
 
 const StyledPianoRollGridContainer = styled.div`
     cursor: crosshair;
-    height: ${NOTES_SPECTRUM * PIANO_ROLL_NOTE_HEIGHT}px; 
     position: relative;
     z-index: 10;
 
@@ -35,6 +34,8 @@ interface PianoRollEditorProps {
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
+    pianoRollNoteHeight: number
+    pianoRollNoteWidth: number
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -48,6 +49,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         setNoteEvent,
         playNote,
         noteSnapping,
+        pianoRollNoteHeight, pianoRollNoteWidth,
     } = props;
 
     const placedNotesCurrentPattern = useMemo(() => {
@@ -82,6 +84,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                         events={pattern.events}
                         patternSize={pattern.size}
                         noteSnapping={noteSnapping}
+                        pianoRollNoteHeight={pianoRollNoteHeight}
+                        pianoRollNoteWidth={pianoRollNoteWidth}
                     />
                 );
             }
@@ -101,8 +105,13 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     return <StyledPianoRollEditor>
         <Piano
             playNote={playNote}
+            pianoRollNoteHeight={pianoRollNoteHeight}
         />
-        <StyledPianoRollGridContainer>
+        <StyledPianoRollGridContainer
+            style={{
+                height: NOTES_SPECTRUM * pianoRollNoteHeight
+            }}
+        >
             {placedNotesCurrentPattern}
             <PianoRollGrid
                 soundData={soundData}
@@ -112,6 +121,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 currentSequenceIndex={currentSequenceIndex}
                 setNoteCursor={setNoteCursor}
                 setNote={setNote}
+                pianoRollNoteHeight={pianoRollNoteHeight}
+                pianoRollNoteWidth={pianoRollNoteWidth}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

@@ -11,19 +11,16 @@ import {
     NOTES,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_WIDTH,
-    PIANO_ROLL_NOTE_HEIGHT,
-    PIANO_ROLL_NOTE_WIDTH,
     SoundEvent,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
+
+const MAX_FONT_SIZE = 13;
 
 const StyledPianoRollPlacedNote = styled.div`
     box-sizing: border-box;
     color: #fff;
     cursor: move;
-    font-size: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH - 2}px;
-    line-height: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH}px;
-    height: ${PIANO_ROLL_NOTE_HEIGHT - PIANO_ROLL_GRID_WIDTH}px;
     position: absolute;
     text-align: center;
     text-overflow: ellipsis;
@@ -52,13 +49,6 @@ const StyledPianoRollPlacedNote = styled.div`
         position: absolute;
         width: 100% !important;
         z-index: -1;
-
-        &.up {
-            bottom: ${PIANO_ROLL_NOTE_HEIGHT}px;
-        }
-        &.down {
-            top: ${PIANO_ROLL_NOTE_HEIGHT}px;
-        }
 
         .react-resizable-handle {
             cursor: ns-resize;
@@ -91,6 +81,8 @@ interface PianoRollPlacedNoteProps {
     events: EventsMap
     patternSize: number
     noteSnapping: boolean
+    pianoRollNoteHeight: number
+    pianoRollNoteWidth: number
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -105,32 +97,36 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         events,
         patternSize,
         noteSnapping,
+        pianoRollNoteHeight, pianoRollNoteWidth,
     } = props;
+
     const localStep = step - currentSequenceIndex * BAR_NOTE_RESOLUTION;
 
-    const left = step * PIANO_ROLL_NOTE_WIDTH / SUB_NOTE_RESOLUTION;
-    const top = note * PIANO_ROLL_NOTE_HEIGHT;
-    const width = duration * (PIANO_ROLL_NOTE_WIDTH / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
+    const left = step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
+    const top = note * pianoRollNoteHeight;
+    const width = duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
 
     const classNames = ['placedNote'];
     if (noteCursor === step) {
         classNames.push('selected');
     }
 
+    const fontSize = pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH - 2;
+
     const maxDuration = useMemo(() =>
         getMaxNoteDuration(events, localStep, patternSize),
         [events, step, currentSequenceIndex, patternSize]
     );
 
-    const minWidth = noteSnapping ? PIANO_ROLL_NOTE_WIDTH : 1;
-    const maxWidth = PIANO_ROLL_NOTE_WIDTH * maxDuration / SUB_NOTE_RESOLUTION;
+    const minWidth = noteSnapping ? pianoRollNoteWidth : 1;
+    const maxWidth = pianoRollNoteWidth * maxDuration / SUB_NOTE_RESOLUTION;
 
     const getNoteSlide = () => {
         const event = events[localStep];
         if (event) {
             const noteSlide = event[SoundEvent.NoteSlide];
             if (noteSlide > 1) {
-                return noteSlide * PIANO_ROLL_NOTE_HEIGHT;
+                return noteSlide * pianoRollNoteHeight;
             }
         }
 
@@ -147,27 +143,27 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newDuration = noteSnapping
-            ? Math.ceil(data.size.width / PIANO_ROLL_NOTE_WIDTH) * SUB_NOTE_RESOLUTION
-            : Math.ceil(data.size.width * SUB_NOTE_RESOLUTION / PIANO_ROLL_NOTE_WIDTH);
+            ? Math.ceil(data.size.width / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
+            : Math.ceil(data.size.width * SUB_NOTE_RESOLUTION / pianoRollNoteWidth);
         setNoteEvent(localStep, SoundEvent.Duration, newDuration);
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const slideStep = Math.ceil(data.size.height / PIANO_ROLL_NOTE_HEIGHT);
+        const slideStep = Math.ceil(data.size.height / pianoRollNoteHeight);
         setNoteEvent(localStep, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
     };
 
     const onNoteSlideDownResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const slideStep = -1 * Math.ceil(data.size.height / PIANO_ROLL_NOTE_HEIGHT);
+        const slideStep = -1 * Math.ceil(data.size.height / pianoRollNoteHeight);
         setNoteEvent(localStep, SoundEvent.NoteSlide, slideStep !== 0 ? slideStep : undefined);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newStep = (noteSnapping
-            ? Math.ceil((data.x / PIANO_ROLL_NOTE_WIDTH)) * SUB_NOTE_RESOLUTION
-            : Math.ceil((data.x * SUB_NOTE_RESOLUTION / PIANO_ROLL_NOTE_WIDTH))
+            ? Math.ceil((data.x / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
+            : Math.ceil((data.x * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION;
-        const newNoteId = Math.floor(data.y / PIANO_ROLL_NOTE_HEIGHT);
+        const newNoteId = Math.floor(data.y / pianoRollNoteHeight);
         setNote(newStep, newNoteId, localStep);
     };
 
@@ -181,7 +177,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     return (
         <Draggable
-            grid={[minWidth, PIANO_ROLL_NOTE_HEIGHT]}
+            grid={[minWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
             onStop={onDragStop}
@@ -190,9 +186,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 y: top,
             }}
             bounds={{
-                bottom: (NOTES_SPECTRUM - 1) * PIANO_ROLL_NOTE_HEIGHT,
-                left: currentSequenceIndex * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH,
-                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH - (duration / SUB_NOTE_RESOLUTION * PIANO_ROLL_NOTE_WIDTH),
+                bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
+                left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth,
+                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * pianoRollNoteWidth - (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
                 top: 0,
             }}
         >
@@ -201,19 +197,22 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 style={{
                     backgroundColor: instrumentColor,
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
+                    fontSize: Math.min(fontSize, MAX_FONT_SIZE),
+                    lineHeight: `${pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH}px`,
+                    height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                 }}
                 onClick={onClick}
                 onContextMenu={onClick}
             >
                 <ResizableBox
                     width={width}
-                    height={PIANO_ROLL_NOTE_HEIGHT}
+                    height={pianoRollNoteHeight}
                     draggableOpts={{
-                        grid: [minWidth, PIANO_ROLL_NOTE_HEIGHT]
+                        grid: [minWidth, pianoRollNoteHeight]
                     }}
                     axis="x"
-                    minConstraints={[minWidth, PIANO_ROLL_NOTE_HEIGHT]}
-                    maxConstraints={[maxWidth, PIANO_ROLL_NOTE_HEIGHT]}
+                    minConstraints={[minWidth, pianoRollNoteHeight]}
+                    maxConstraints={[maxWidth, pianoRollNoteHeight]}
                     resizeHandles={['e']}
                     onResizeStop={onResize}
                 >
@@ -227,16 +226,17 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                                     transparent 50%, 
                                     ${instrumentColor} 50%, 
                                     ${instrumentColor} 100%
-                                )`
+                                )`,
+                                bottom: pianoRollNoteHeight,
                             }}
                             width={width}
                             height={slideUpHeight}
                             draggableOpts={{
-                                grid: [minWidth, PIANO_ROLL_NOTE_HEIGHT]
+                                grid: [minWidth, pianoRollNoteHeight]
                             }}
                             axis="y"
                             minConstraints={[minWidth, 0]}
-                            maxConstraints={[maxWidth, PIANO_ROLL_NOTE_HEIGHT * NOTES_SPECTRUM]}
+                            maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
                             resizeHandles={['n']}
                             onResizeStop={onNoteSlideUpResize}
                         />
@@ -249,20 +249,21 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                                     transparent 50%, 
                                     ${instrumentColor} 50%, 
                                     ${instrumentColor} 100%
-                                )`
+                                )`,
+                                top: pianoRollNoteHeight,
                             }}
                             width={width}
                             height={slideDownHeight}
                             draggableOpts={{
-                                grid: [minWidth, PIANO_ROLL_NOTE_HEIGHT]
+                                grid: [minWidth, pianoRollNoteHeight]
                             }}
                             axis="y"
                             minConstraints={[minWidth, 0]}
-                            maxConstraints={[maxWidth, PIANO_ROLL_NOTE_HEIGHT * NOTES_SPECTRUM]}
+                            maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
                         />
-                        {width > PIANO_ROLL_NOTE_WIDTH &&
+                        {width > pianoRollNoteWidth &&
                             Object.keys(NOTES)[note]
                         }
                     </>

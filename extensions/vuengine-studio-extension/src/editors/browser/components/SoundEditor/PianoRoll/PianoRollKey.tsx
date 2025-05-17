@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PIANO_ROLL_KEY_WIDTH, PIANO_ROLL_NOTE_HEIGHT } from '../SoundEditorTypes';
+import { PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
 export const StyledPianoKey = styled.div`
     align-items: center;
@@ -13,8 +13,6 @@ export const StyledPianoKey = styled.div`
     font-size: 9px;
     left: 0;
     line-height: 6px;
-    min-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
-    max-height: ${PIANO_ROLL_NOTE_HEIGHT}px;
     min-width: ${PIANO_ROLL_KEY_WIDTH}px;
     padding-left: 3px;
     position: sticky;
@@ -66,10 +64,11 @@ interface PianoRollKeyProps {
     noteId: number
     note: string
     playNote: (note: number) => void
+    pianoRollNoteHeight: number
 }
 
 export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Element {
-    const { noteId, note, playNote } = props;
+    const { noteId, note, playNote, pianoRollNoteHeight } = props;
 
     const classNames = [];
     if (note.includes('#')) {
@@ -93,6 +92,10 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
         onClick={onClick}
         onMouseDown={onMouse}
         onMouseOver={onMouse}
+        style={{
+            minHeight: pianoRollNoteHeight,
+            maxHeight: pianoRollNoteHeight,
+        }}
     >
         <StyledPianoRollKeyName>
             {note}

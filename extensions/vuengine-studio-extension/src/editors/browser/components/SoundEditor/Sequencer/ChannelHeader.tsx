@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, PATTERN_HEIGHT, PIANO_ROLL_KEY_WIDTH, SoundEditorChannelType } from '../SoundEditorTypes';
+import { ChannelConfig, PIANO_ROLL_KEY_WIDTH, SoundEditorChannelType } from '../SoundEditorTypes';
 import { StyledChannelHeaderContainer } from './Sequencer';
 
 const StyledChannelHeader = styled.div`
@@ -15,7 +15,6 @@ const StyledChannelHeader = styled.div`
     display: flex;
     flex-direction: column;
     font-size: 10px;
-    height: ${PATTERN_HEIGHT}px;
     min-width: ${PIANO_ROLL_KEY_WIDTH}px;
     overflow: hidden;
     width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
@@ -49,12 +48,8 @@ const StyledChannelHeader = styled.div`
 `;
 
 const StyledChannelHeaderInfo = styled.div`
-    align-items: start;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
     flex-grow: 1;
-    justify-content: center;
     padding: 3px 3px 1px;
 `;
 
@@ -117,6 +112,7 @@ interface ChannelHeaderProps {
     toggleChannelSeeThrough: (channelId: number) => void
     otherSolo: boolean
     setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
+    sequencerPatternHeight: number
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
@@ -127,6 +123,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
         toggleChannelMuted, toggleChannelSolo, toggleChannelSeeThrough,
         otherSolo,
         setChannelDialogOpen,
+        sequencerPatternHeight,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -148,6 +145,9 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
         className={classNames.join(' ')}
         onClick={() => setCurrentChannelId(channelId)}
         title={`${channelCommand.label}${services.vesCommonService.getKeybindingLabel(channelCommand.id, true)}`}
+        style={{
+            height: sequencerPatternHeight,
+        }}
     >
         <StyledChannelHeaderInfo>
             <div className='channelName'>
