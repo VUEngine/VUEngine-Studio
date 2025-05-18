@@ -65,7 +65,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
             : PIANO_ROLL_KEY_WIDTH + currentPlayerPosition * Math.max(0, 16 / NOTE_RESOLUTION) + 1,
         height: isPianoRoll
             ? PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + NOTES_SPECTRUM * pianoRollNoteHeight + effectsPanelHeight
-            : soundData.channels.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,
+            : soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,
     };
 
     return <StyledStepIndicator style={style} />;

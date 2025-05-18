@@ -123,7 +123,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
 
-            {soundData.channels.length > 0 &&
+            {soundData.tracks.length > 0 &&
                 <>
                     <StyledSoundEditorToolbarGroup>
                         <StyledSoundEditorToolbarWideButton

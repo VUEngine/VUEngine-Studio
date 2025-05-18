@@ -19,7 +19,7 @@ interface EmulatorProps {
     testingDuration: number;
     testingNote: number;
     testingInstrument: string;
-    testingChannel: number;
+    testingTrack: number;
     playRangeStart: number;
     playRangeEnd: number;
 }

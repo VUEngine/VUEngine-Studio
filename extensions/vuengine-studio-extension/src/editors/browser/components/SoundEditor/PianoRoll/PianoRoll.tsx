@@ -24,9 +24,9 @@ import PianoRollHeader from './PianoRollHeader';
 const StyledPianoRollContainer = styled.div`
     display: flex;
     flex-grow: 1;
-    height: 1px;
-    margin: 1px var(--padding) var(--padding);
+    height: 100%;
     position: relative;
+    width: 1px;
 `;
 
 const StyledPianoRoll = styled.div`
@@ -87,12 +87,12 @@ export const ScaleControls = styled.div`
 interface PianoRollProps {
     soundData: SoundData
     noteCursor: number
-    setNoteCursor: (noteCursor: number) => void
-    currentChannelId: number
+    setNoteCursor: Dispatch<SetStateAction<number>>
+    currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     playRangeStart: number
@@ -103,11 +103,13 @@ interface PianoRollProps {
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
     sequencerHidden: boolean,
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
+    eventListHidden: boolean,
+    setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNote: (step: number, note?: number, prevStep?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
-    addPattern: (channelId: number, step: number) => void
+    addPattern: (trackId: number, step: number) => void
     pianoRollNoteHeight: number
     setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
@@ -119,7 +121,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const {
         soundData,
         noteCursor, setNoteCursor,
-        currentChannelId,
+        currentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
@@ -127,6 +129,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
         effectsPanelHidden, setEffectsPanelHidden,
+        eventListHidden, setEventListHidden,
         setNote,
         setNoteEvent,
         playNote,
@@ -146,10 +149,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         const bar = Math.floor(noteCursor / BAR_NOTE_RESOLUTION);
         let barToSelect = -1;
         let patternIdToSelect = '';
-        const currentChannel = soundData.channels[currentChannelId];
-        Object.keys(currentChannel.sequence).reverse().map(bStr => {
+        const currentTrack = soundData.tracks[currentTrackId];
+        Object.keys(currentTrack.sequence).reverse().map(bStr => {
             const b = parseInt(bStr);
-            const pId = currentChannel.sequence[b];
+            const pId = currentTrack.sequence[b];
             const p = soundData.patterns[pId];
             if (barToSelect === -1 && b <= bar && b + p.size > bar) {
                 barToSelect = b;
@@ -158,11 +161,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
 
         if (barToSelect > -1) {
-            setCurrentSequenceIndex(currentChannelId, barToSelect);
-            setCurrentPatternId(currentChannelId, patternIdToSelect);
+            setCurrentSequenceIndex(currentTrackId, barToSelect);
+            setCurrentPatternId(currentTrackId, patternIdToSelect);
         } else {
-            setCurrentSequenceIndex(currentChannelId, bar);
-            addPattern(currentChannelId, bar);
+            setCurrentSequenceIndex(currentTrackId, bar);
+            addPattern(currentTrackId, bar);
         }
     };
 
@@ -320,7 +323,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             />}
             <PianoRollHeader
                 soundData={soundData}
-                currentChannelId={currentChannelId}
+                currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
@@ -329,11 +332,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                 sequencerHidden={sequencerHidden}
                 setSequencerHidden={setSequencerHidden}
+                eventListHidden={eventListHidden}
+                setEventListHidden={setEventListHidden}
                 pianoRollNoteWidth={pianoRollNoteWidth}
             />
             <PianoRollEditor
                 soundData={soundData}
-                currentChannelId={currentChannelId}
+                currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 noteCursor={noteCursor}
@@ -349,7 +354,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 soundData={soundData}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}
-                currentChannelId={currentChannelId}
+                currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 setCurrentPatternId={setCurrentPatternId}
                 currentSequenceIndex={currentSequenceIndex}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { NOTES } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 
-// TODO: only show box-shadow if horizontal scroll position is > 0. Also add to sequencer channel headers.
+// TODO: only show box-shadow if horizontal scroll position is > 0. Also add to sequencer track headers.
 const StyledPiano = styled.div`
     border-left: 1px solid rgba(255, 255, 255, .6);
     border-right: 1px solid rgba(255, 255, 255, .6); 

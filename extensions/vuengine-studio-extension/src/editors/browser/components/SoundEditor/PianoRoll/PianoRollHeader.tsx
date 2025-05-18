@@ -29,7 +29,6 @@ export const MetaLineHeader = styled.div`
     border-top: 1px solid transparent;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column;
     left: 0;
     max-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
@@ -55,6 +54,7 @@ const StyledToggleButton = styled.button`
     justify-content: center;
     min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
     outline-offset: -1px;
+    width: 50%;
 
     &:hover {
         background-color: var(--theia-focusBorder);
@@ -64,7 +64,7 @@ const StyledToggleButton = styled.button`
 
 interface PianoRollHeaderProps {
     soundData: SoundData
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -73,18 +73,21 @@ interface PianoRollHeaderProps {
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     sequencerHidden: boolean
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
+    eventListHidden: boolean,
+    setEventListHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
-        currentChannelId,
+        currentTrackId,
         // currentPatternId,
         // playRangeStart, setPlayRangeStart,
         // playRangeEnd, setPlayRangeEnd,
         setCurrentPlayerPosition,
         sequencerHidden, setSequencerHidden,
+        eventListHidden, setEventListHidden,
         pianoRollNoteWidth,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -99,18 +102,29 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             style={{ minHeight: 18 }}
         >
             <StyledToggleButton
+                onClick={() => setEventListHidden(prev => !prev)}
+                title={`${SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
+                    true
+                )}`}
+            >
+                <i className="codicon codicon-list-unordered" />
+                <i className={eventListHidden ? 'codicon codicon-chevron-right' : 'codicon codicon-chevron-left'} />
+            </StyledToggleButton>
+            <StyledToggleButton
                 onClick={() => setSequencerHidden(prev => !prev)}
                 title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
                     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
                     true
                 )}`}
             >
-                <i className={sequencerHidden ? 'fa fa-chevron-down' : 'fa fa-chevron-up'} />
+                <i className="codicon codicon-layers" />
+                <i className={sequencerHidden ? 'codicon codicon-chevron-down' : 'codicon codicon-chevron-up'} />
             </StyledToggleButton>
         </MetaLineHeader>
         <PianoRollHeaderGrid
             soundData={soundData}
-            currentChannelId={currentChannelId}
+            currentTrackId={currentTrackId}
             setCurrentPlayerPosition={setCurrentPlayerPosition}
             pianoRollNoteWidth={pianoRollNoteWidth}
         />

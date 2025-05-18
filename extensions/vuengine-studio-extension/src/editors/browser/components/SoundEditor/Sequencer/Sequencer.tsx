@@ -6,9 +6,9 @@ import HContainer from '../../Common/Base/HContainer';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    ChannelConfig,
+    TrackConfig,
     PIANO_ROLL_KEY_WIDTH,
-    SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT,
+    SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_HEIGHT_MAX,
@@ -18,7 +18,7 @@ import {
     SEQUENCER_PATTERN_WIDTH_MIN,
     SoundData
 } from '../SoundEditorTypes';
-import ChannelHeader from './ChannelHeader';
+import TrackHeader from './TrackHeader';
 import LoopIndicator from './LoopIndicator';
 import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
@@ -39,14 +39,9 @@ export const StyledSequencer = styled.div`
     padding-bottom: 11px;
     position: relative;
     user-select: none;
-
-    &.hidden {
-        height: 0 !important;
-        padding-bottom: 0;
-    }
 `;
 
-export const StyledChannelHeaderContainer = styled.div`
+export const StyledTrackHeaderContainer = styled.div`
     border-right: 1px solid rgba(255, 255, 255, .6);
     display: flex;
     flex-direction: column;
@@ -60,7 +55,7 @@ export const StyledChannelHeaderContainer = styled.div`
     }
 `;
 
-const StyledChannelsHeader = styled.div`
+const StyledTracksHeader = styled.div`
     background-color: var(--theia-editor-background);
     border-bottom: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
@@ -72,7 +67,7 @@ const StyledChannelsHeader = styled.div`
     }
 `;
 
-const StyledAddChannelButton = styled.button`
+const StyledAddTrackButton = styled.button`
     align-items: center;
     background-color: var(--theia-editor-background);
     border: 1px solid var(--theia-dropdown-border);
@@ -83,7 +78,7 @@ const StyledAddChannelButton = styled.button`
     justify-content: center;
     left: 0;
     margin-top: 2px;
-    min-height: ${SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT}px !important;
+    min-height: ${SEQUENCER_ADD_TRACK_BUTTON_HEIGHT}px !important;
     position: sticky;
     width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
 
@@ -100,21 +95,20 @@ const StyledAddChannelButton = styled.button`
 interface SequencerProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    currentChannelId: number
-    setCurrentChannelId: Dispatch<SetStateAction<number>>
+    currentTrackId: number
+    setCurrentTrackId: Dispatch<SetStateAction<number>>
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
-    toggleChannelMuted: (channelId: number) => void
-    toggleChannelSolo: (channelId: number) => void
-    toggleChannelSeeThrough: (channelId: number) => void
-    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    addPattern: (channelId: number, step: number) => void
-    setChannelDialogOpen: Dispatch<SetStateAction<boolean>>
+    toggleTrackMuted: (trackId: number) => void
+    toggleTrackSolo: (trackId: number) => void
+    toggleTrackSeeThrough: (trackId: number) => void
+    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
+    addPattern: (trackId: number, step: number) => void
+    setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    sequencerHidden: boolean
     effectsPanelHidden: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
@@ -127,17 +121,16 @@ interface SequencerProps {
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        currentChannelId, setCurrentChannelId,
+        currentTrackId, setCurrentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition,
-        toggleChannelMuted,
-        toggleChannelSolo,
-        toggleChannelSeeThrough,
-        setChannel,
+        toggleTrackMuted,
+        toggleTrackSolo,
+        toggleTrackSeeThrough,
+        setTrack,
         addPattern,
-        setChannelDialogOpen, setPatternDialogOpen,
-        sequencerHidden,
+        setTrackDialogOpen, setPatternDialogOpen,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
@@ -145,10 +138,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const soloChannel = useMemo(() =>
-        soundData.channels.filter(c => c.solo).map((c, i) => i).pop() ?? -1,
+    const soloTrack = useMemo(() =>
+        soundData.tracks.filter(c => c.solo).map((c, i) => i).pop() ?? -1,
         [
-            soundData.channels,
+            soundData.tracks,
         ]
     );
 
@@ -191,57 +184,57 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case SoundEditorCommands.SELECT_CHANNEL_1.id:
-                if (soundData.channels.length > 0) {
-                    setCurrentChannelId(0);
+            case SoundEditorCommands.SELECT_TRACK_1.id:
+                if (soundData.tracks.length > 0) {
+                    setCurrentTrackId(0);
                 }
                 break;
-            case SoundEditorCommands.SELECT_CHANNEL_2.id:
-                if (soundData.channels.length > 1) {
-                    setCurrentChannelId(1);
+            case SoundEditorCommands.SELECT_TRACK_2.id:
+                if (soundData.tracks.length > 1) {
+                    setCurrentTrackId(1);
                 }
                 break;
-            case SoundEditorCommands.SELECT_CHANNEL_3.id:
-                if (soundData.channels.length > 2) {
-                    setCurrentChannelId(2);
+            case SoundEditorCommands.SELECT_TRACK_3.id:
+                if (soundData.tracks.length > 2) {
+                    setCurrentTrackId(2);
                 }
                 break;
-            case SoundEditorCommands.SELECT_CHANNEL_4.id:
-                if (soundData.channels.length > 3) {
-                    setCurrentChannelId(3);
+            case SoundEditorCommands.SELECT_TRACK_4.id:
+                if (soundData.tracks.length > 3) {
+                    setCurrentTrackId(3);
                 }
                 break;
-            case SoundEditorCommands.SELECT_CHANNEL_5.id:
-                if (soundData.channels.length > 4) {
-                    setCurrentChannelId(4);
+            case SoundEditorCommands.SELECT_TRACK_5.id:
+                if (soundData.tracks.length > 4) {
+                    setCurrentTrackId(4);
                 }
                 break;
-            case SoundEditorCommands.SELECT_CHANNEL_6.id:
-                if (soundData.channels.length > 5) {
-                    setCurrentChannelId(5);
+            case SoundEditorCommands.SELECT_TRACK_6.id:
+                if (soundData.tracks.length > 5) {
+                    setCurrentTrackId(5);
                 }
                 break;
-            case SoundEditorCommands.SELECT_NEXT_CHANNEL.id:
-                if (currentChannelId < soundData.channels.length - 1) {
-                    setCurrentChannelId(currentChannelId + 1);
+            case SoundEditorCommands.SELECT_NEXT_TRACK.id:
+                if (currentTrackId < soundData.tracks.length - 1) {
+                    setCurrentTrackId(currentTrackId + 1);
                 }
                 break;
-            case SoundEditorCommands.SELECT_PREVIOUS_CHANNEL.id:
-                if (currentChannelId > 0) {
-                    setCurrentChannelId(currentChannelId - 1);
+            case SoundEditorCommands.SELECT_PREVIOUS_TRACK.id:
+                if (currentTrackId > 0) {
+                    setCurrentTrackId(currentTrackId - 1);
                 }
                 break;
             case SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id:
                 /*
-                if (currentSequenceIndex < soundData.channels[currentChannelId].sequence.length - 1) {
-                    setCurrentSequenceIndex(currentChannelId, currentSequenceIndex + 1);
+                if (currentSequenceIndex < soundData.channels[currentTrackId].sequence.length - 1) {
+                    setCurrentSequenceIndex(currentTrackId, currentSequenceIndex + 1);
                 }
                 */
                 break;
             case SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX.id:
                 /*
                 if (currentSequenceIndex > 0) {
-                    setCurrentSequenceIndex(currentChannelId, currentSequenceIndex - 1);
+                    setCurrentSequenceIndex(currentTrackId, currentSequenceIndex - 1);
                 }
                 */
                 break;
@@ -254,7 +247,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
     }, [
-        currentChannelId,
+        currentTrackId,
         currentSequenceIndex,
         soundData,
     ]);
@@ -293,12 +286,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             </button>
         </ScaleControls>
         <StyledSequencer
-            className={sequencerHidden ? 'hidden' : undefined}
             onWheel={mapVerticalToHorizontalScroll}
-            style={{
-                height: soundData.channels.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT +
-                    (soundData.channels.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT + 2 : 0),
-            }}
         >
             <StepIndicator
                 soundData={soundData}
@@ -315,29 +303,29 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 hidden={!soundData.loop}
             />
             <HContainer gap={0} grow={1}>
-                <StyledChannelHeaderContainer>
-                    <StyledChannelsHeader>
-                    </StyledChannelsHeader>
-                    {soundData.channels.map((channel, index) =>
-                        <ChannelHeader
+                <StyledTrackHeaderContainer>
+                    <StyledTracksHeader>
+                    </StyledTracksHeader>
+                    {soundData.tracks.map((track, index) =>
+                        <TrackHeader
                             key={index}
-                            channel={channel}
-                            channelId={index}
-                            currentChannelId={currentChannelId}
-                            setCurrentChannelId={setCurrentChannelId}
-                            toggleChannelMuted={toggleChannelMuted}
-                            toggleChannelSolo={toggleChannelSolo}
-                            toggleChannelSeeThrough={toggleChannelSeeThrough}
-                            otherSolo={soloChannel > -1 && soloChannel !== index}
-                            setChannelDialogOpen={setChannelDialogOpen}
+                            track={track}
+                            trackId={index}
+                            currentTrackId={currentTrackId}
+                            setCurrentTrackId={setCurrentTrackId}
+                            toggleTrackMuted={toggleTrackMuted}
+                            toggleTrackSolo={toggleTrackSolo}
+                            toggleTrackSeeThrough={toggleTrackSeeThrough}
+                            otherSolo={soloTrack > -1 && soloTrack !== index}
+                            setTrackDialogOpen={setTrackDialogOpen}
                             sequencerPatternHeight={sequencerPatternHeight}
                         />
                     )}
-                </StyledChannelHeaderContainer>
-                {soundData.channels.map((channel, index) =>
-                    Object.keys(channel.sequence).map(key => {
+                </StyledTrackHeaderContainer>
+                {soundData.tracks.map((track, index) =>
+                    Object.keys(track.sequence).map(key => {
                         const step = parseInt(key);
-                        const patternId = channel.sequence[step];
+                        const patternId = track.sequence[step];
                         const pattern = soundData.patterns[patternId];
                         const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
                         if (!pattern) {
@@ -349,14 +337,14 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                             updateSoundData={updateSoundData}
                             patternIndex={patternIndex}
                             step={step}
-                            channelId={index}
+                            trackId={index}
                             pattern={pattern}
                             patternId={patternId}
-                            currentChannelId={currentChannelId}
+                            currentTrackId={currentTrackId}
                             currentPatternId={currentPatternId}
                             currentSequenceIndex={currentSequenceIndex}
                             setCurrentSequenceIndex={setCurrentSequenceIndex}
-                            setChannel={setChannel}
+                            setTrack={setTrack}
                             setPatternDialogOpen={setPatternDialogOpen}
                             sequencerPatternHeight={sequencerPatternHeight}
                             sequencerPatternWidth={sequencerPatternWidth}
@@ -366,24 +354,24 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <SequencerGrid
                     soundData={soundData}
                     updateSoundData={updateSoundData}
-                    currentChannelId={currentChannelId}
+                    currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
                     setCurrentPatternId={setCurrentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
-                    setChannel={setChannel}
+                    setTrack={setTrack}
                     addPattern={addPattern}
                     sequencerPatternHeight={sequencerPatternHeight}
                     sequencerPatternWidth={sequencerPatternWidth}
                 />
             </HContainer>
-            {soundData.channels.length < VSU_NUMBER_OF_CHANNELS &&
-                <StyledAddChannelButton
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
+            {soundData.tracks.length < VSU_NUMBER_OF_CHANNELS &&
+                <StyledAddTrackButton
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
                     title={nls.localizeByDefault('Add')}
                 >
                     <i className='codicon codicon-plus' />
-                </StyledAddChannelButton>
+                </StyledAddTrackButton>
             }
         </StyledSequencer>
     </StyledSequencerContainer>;

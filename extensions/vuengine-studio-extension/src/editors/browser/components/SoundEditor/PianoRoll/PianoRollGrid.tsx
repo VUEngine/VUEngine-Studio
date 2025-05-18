@@ -16,7 +16,7 @@ import {
 
 interface PianoRollGridProps {
     soundData: SoundData
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
     noteCursor: number
@@ -29,7 +29,7 @@ interface PianoRollGridProps {
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
     const {
         soundData,
-        currentChannelId,
+        currentTrackId,
         currentPatternId,
         currentSequenceIndex,
         noteCursor, setNoteCursor,
@@ -144,15 +144,15 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // non-current pattern notes
-        soundData.channels.map((channel, channelId) => {
-            Object.keys(channel.sequence).forEach(key => {
-                if ((channelId === currentChannelId && currentSequenceIndex === parseInt(key)) ||
-                    (channelId !== currentChannelId && !channel.seeThrough)
+        soundData.tracks.map((track, trackId) => {
+            Object.keys(track.sequence).forEach(key => {
+                if ((trackId === currentTrackId && currentSequenceIndex === parseInt(key)) ||
+                    (trackId !== currentTrackId && !track.seeThrough)
                 ) {
                     return;
                 }
                 const patternOffset = parseInt(key);
-                const patternId = channel.sequence[patternOffset];
+                const patternId = track.sequence[patternOffset];
                 const pattern = soundData.patterns[patternId];
                 if (!pattern) {
                     return;
@@ -163,7 +163,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     const noteDuration = pattern.events[step][SoundEvent.Duration] ?? 1;
                     // eslint-disable-next-line no-null/no-null
                     if (note !== undefined && note !== null && note > -1) {
-                        context.fillStyle = channelId === currentChannelId ? fullColor : medColor;
+                        context.fillStyle = trackId === currentTrackId ? fullColor : medColor;
                         context.fillRect(
                             (patternOffset * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth,
                             note * pianoRollNoteHeight,
@@ -203,22 +203,18 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         services.themeService.onDidColorThemeChange(() => draw());
     }, []);
 
-    /*
     useEffect(() => {
-    */
-    draw();
-    /*
+        draw();
     }, [
-        soundData.channels,
+        soundData.tracks,
         soundData.size,
-        currentChannelId,
+        currentTrackId,
         currentPatternId,
         currentSequenceIndex,
         noteCursor,
         pianoRollNoteHeight,
         pianoRollNoteWidth,
     ]);
-    */
 
     return (
         <canvas

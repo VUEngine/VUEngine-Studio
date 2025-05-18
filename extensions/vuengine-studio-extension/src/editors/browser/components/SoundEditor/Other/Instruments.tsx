@@ -70,7 +70,7 @@ interface InstrumentsProps {
     setTestingDuration: (note: number) => void
     setTestingNote: (note: number) => void
     setTestingInstrument: (note: string) => void
-    setTestingChannel: (channel: number) => void
+    setTestingTrack: (track: number) => void
     emulatorInitialized: boolean
 }
 
@@ -81,7 +81,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen,
         playing,
-        testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
+        testing, setTesting, setTestingDuration, setTestingTrack, setTestingNote, setTestingInstrument,
         emulatorInitialized,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -153,7 +153,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 setTestingDuration={setTestingDuration}
                 setTestingNote={setTestingNote}
                 setTestingInstrument={setTestingInstrument}
-                setTestingChannel={setTestingChannel}
+                setTestingTrack={setTestingTrack}
                 emulatorInitialized={emulatorInitialized}
             />
         </VContainer>

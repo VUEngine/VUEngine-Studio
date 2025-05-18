@@ -9,7 +9,7 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    ChannelConfig,
+    TrackConfig,
     NOTE_RESOLUTION,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -81,13 +81,13 @@ interface PatternProps {
     patternIndex: number
     step: number
     pattern: PatternConfig
-    channelId: number
+    trackId: number
     patternId: string
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
-    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
+    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
     sequencerPatternWidth: number
@@ -98,22 +98,22 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         soundData, updateSoundData,
         patternIndex,
         step,
-        channelId,
+        trackId,
         pattern, patternId,
-        currentChannelId, currentPatternId,
+        currentTrackId, currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        setChannel,
+        setTrack,
         setPatternDialogOpen,
         sequencerPatternHeight, sequencerPatternWidth,
     } = props;
-    const isCurrent = currentChannelId === channelId && currentPatternId === patternId;
-    const channel = soundData.channels[channelId];
-    const instrument = soundData.instruments[channel.instrument];
+    const isCurrent = currentTrackId === trackId && currentPatternId === patternId;
+    const track = soundData.tracks[trackId];
+    const instrument = soundData.instruments[track.instrument];
     const noteColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
-    // TODO: color _each note_ by instrument instead of whole channel
+    // TODO: color _each note_ by instrument instead of whole track
 
     const classNames = ['placedPattern'];
-    if (currentChannelId === channelId && currentSequenceIndex === step) {
+    if (currentTrackId === trackId && currentSequenceIndex === step) {
         classNames.push('current selected');
     } else if (isCurrent) {
         classNames.push('current');
@@ -168,9 +168,9 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     ]);
 
     const removeFromSequence = (cId: number, i: number): void => {
-        const updatedSequence = { ...soundData.channels[cId].sequence };
+        const updatedSequence = { ...soundData.tracks[cId].sequence };
         delete (updatedSequence[i]);
-        setChannel(cId, {
+        setTrack(cId, {
             sequence: updatedSequence,
         });
     };
@@ -178,7 +178,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.REMOVE_CURRENT_PATTERN.id:
-                removeFromSequence(currentChannelId, step);
+                removeFromSequence(currentTrackId, step);
                 break;
         }
     };
@@ -198,37 +198,37 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
-        const newChannelId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
+        const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
         const newBar = Math.floor((data.x - PIANO_ROLL_KEY_WIDTH) / sequencerPatternWidth);
-        if (newChannelId === channelId && newBar === step) {
+        if (newTrackId === trackId && newBar === step) {
             return;
         }
 
-        const updatedChannels = [
-            ...soundData.channels.slice(0, newChannelId),
+        const updatedTracks = [
+            ...soundData.tracks.slice(0, newTrackId),
             {
-                ...soundData.channels[newChannelId],
+                ...soundData.tracks[newTrackId],
                 sequence: {
-                    ...soundData.channels[newChannelId].sequence,
-                    [newBar]: soundData.channels[channelId].sequence[step],
+                    ...soundData.tracks[newTrackId].sequence,
+                    [newBar]: soundData.tracks[trackId].sequence[step],
                 },
             },
-            ...soundData.channels.slice(newChannelId + 1)
+            ...soundData.tracks.slice(newTrackId + 1)
         ];
-        delete (updatedChannels[channelId].sequence[step]);
+        delete (updatedTracks[trackId].sequence[step]);
 
         updateSoundData({
             ...soundData,
-            channels: updatedChannels,
+            tracks: updatedTracks,
         });
-        setCurrentSequenceIndex(newChannelId, newBar);
+        setCurrentSequenceIndex(newTrackId, newBar);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 0) {
-            setCurrentSequenceIndex(channelId, step);
+            setCurrentSequenceIndex(trackId, step);
         } else if (e.buttons === 2) {
-            removeFromSequence(channelId, step);
+            removeFromSequence(trackId, step);
         }
     };
 
@@ -242,7 +242,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
     }, [
-        currentChannelId,
+        currentTrackId,
         currentSequenceIndex,
         soundData,
     ]);
@@ -255,10 +255,10 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             onStop={onDragStop}
             position={{
                 x: 2 + PIANO_ROLL_KEY_WIDTH + step * sequencerPatternWidth,
-                y: SEQUENCER_GRID_METER_HEIGHT + channelId * sequencerPatternHeight,
+                y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
-                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.channels.length - 1) * sequencerPatternHeight,
+                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight,
                 left: PIANO_ROLL_KEY_WIDTH,
                 right: PIANO_ROLL_KEY_WIDTH + soundData.size * sequencerPatternWidth - pattern.size * sequencerPatternWidth,
                 top: SEQUENCER_GRID_METER_HEIGHT,
@@ -266,7 +266,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
         >
             <StyledPattern
                 className={classNames.join(' ')}
-                data-channel={channelId}
+                data-channel={trackId}
                 data-position={step}
                 onClick={onClick}
                 onContextMenu={onClick}
@@ -284,7 +284,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
                     axis="x"
                     minConstraints={[sequencerPatternWidth, sequencerPatternHeight]}
                     maxConstraints={[sequencerPatternWidth * soundData.size, sequencerPatternHeight]}
-                    resizeHandles={channelId === currentChannelId ? ['e'] : []}
+                    resizeHandles={trackId === currentTrackId ? ['e'] : []}
                     onResizeStop={onResize}
                 >
                     <>

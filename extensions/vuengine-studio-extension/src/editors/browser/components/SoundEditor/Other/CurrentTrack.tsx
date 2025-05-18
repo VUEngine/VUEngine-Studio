@@ -9,56 +9,56 @@ import InfoLabel from '../../Common/InfoLabel';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { ChannelConfig, INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorChannelType } from '../SoundEditorTypes';
+import { TrackConfig, INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
-interface CurrentChannelProps {
+interface CurrentTrackProps {
     soundData: SoundData
-    currentChannelId: number
-    setCurrentChannelId: Dispatch<SetStateAction<number>>
+    currentTrackId: number
+    setCurrentTrackId: Dispatch<SetStateAction<number>>
     setCurrentPatternId: Dispatch<SetStateAction<string>>
-    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    removeChannel: (channelId: number) => void
+    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
+    removeTrack: (trackId: number) => void
     editInstrument: (instrument: string) => void
 }
 
-export default function CurrentChannel(props: CurrentChannelProps): React.JSX.Element {
+export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
-        currentChannelId, setCurrentChannelId,
+        currentTrackId, setCurrentTrackId,
         setCurrentPatternId,
-        setChannel, removeChannel,
+        setTrack, removeTrack,
         editInstrument,
     } = props;
 
-    const channel = soundData.channels[currentChannelId];
+    const track = soundData.tracks[currentTrackId];
 
-    const onSelectChannel = (channelId: number): void => {
-        setCurrentChannelId(channelId);
-        setCurrentPatternId(Object.values(soundData.channels[channelId].sequence)[0] ?? '');
+    const onSelectTrack = (trackId: number): void => {
+        setCurrentTrackId(trackId);
+        setCurrentPatternId(Object.values(soundData.tracks[trackId].sequence)[0] ?? '');
     };
 
-    const setChannelInstrument = (instrumentId: string): void => {
-        setChannel(currentChannelId, {
+    const setTrackInstrument = (instrumentId: string): void => {
+        setTrack(currentTrackId, {
             instrument: instrumentId,
         });
     };
 
-    const promptRemoveChannel = async () => {
+    const promptRemoveTrack = async () => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/sound/deleteChannelQuestion', 'Delete Channel?'),
-            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDeleteChannel', 'Are you sure you want to delete this channel?'),
+            title: nls.localize('vuengine/editors/sound/deleteTrackQuestion', 'Delete Track?'),
+            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDeleteTrack', 'Are you sure you want to delete this track?'),
         });
         const remove = await dialog.open();
         if (remove) {
-            removeChannel(currentChannelId);
+            removeTrack(currentTrackId);
         }
     };
 
-    const toggleChannelAllowSkip = (): void => {
-        setChannel(currentChannelId, {
-            allowSkip: !soundData.channels[currentChannelId].allowSkip,
+    const toggleTrackAllowSkip = (): void => {
+        setTrack(currentTrackId, {
+            allowSkip: !soundData.tracks[currentTrackId].allowSkip,
         });
     };
 
@@ -66,46 +66,46 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/editors/sound/currentChannel', 'Current Channel')}
+                    {nls.localize('vuengine/editors/sound/currentTrack', 'Current Track')}
                 </label>
                 <InputWithAction>
                     <AdvancedSelect
-                        options={[...soundData.channels.map((c, i) => {
+                        options={[...soundData.tracks.map((c, i) => {
                             switch (c.type) {
                                 default:
-                                case SoundEditorChannelType.WAVE:
+                                case SoundEditorTrackType.WAVE:
                                     return {
                                         label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`,
                                         value: i.toString(),
                                     };
-                                case SoundEditorChannelType.SWEEPMOD:
+                                case SoundEditorTrackType.SWEEPMOD:
                                     return {
                                         label: nls.localize('vuengine/editors/sound/waveSm', 'Wave (Sweep / Modulation)'),
                                         value: i.toString(),
                                     };
-                                case SoundEditorChannelType.NOISE:
+                                case SoundEditorTrackType.NOISE:
                                     return {
                                         label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
                                         value: i.toString(),
                                     };
                             }
                         })]}
-                        defaultValue={`${currentChannelId}`}
-                        onChange={options => onSelectChannel(parseInt(options[0]))}
+                        defaultValue={`${currentTrackId}`}
+                        onChange={options => onSelectTrack(parseInt(options[0]))}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Remove')}
-                        onClick={promptRemoveChannel}
+                        onClick={promptRemoveTrack}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Add')}
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_CHANNEL.id)}
-                        disabled={soundData.channels.length === VSU_NUMBER_OF_CHANNELS}
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
+                        disabled={soundData.tracks.length === VSU_NUMBER_OF_CHANNELS}
                     >
                         <i className='codicon codicon-plus' />
                     </InputWithActionButton>
@@ -128,14 +128,14 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                     backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
                                 };
                             })}
-                        defaultValue={`${channel.instrument}`}
-                        onChange={options => setChannelInstrument(options[0])}
+                        defaultValue={`${track.instrument}`}
+                        onChange={options => setTrackInstrument(options[0])}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
-                        onClick={() => editInstrument(channel.instrument)}
+                        onClick={() => editInstrument(track.instrument)}
                     >
                         <i className='codicon codicon-settings-gear' />
                     </InputWithActionButton>
@@ -152,8 +152,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                 />
                 <input
                     type="checkbox"
-                    checked={channel.allowSkip}
-                    onChange={() => toggleChannelAllowSkip()}
+                    checked={track.allowSkip}
+                    onChange={() => toggleTrackAllowSkip()}
                 />
             </VContainer>
         </VContainer>

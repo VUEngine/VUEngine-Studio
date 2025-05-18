@@ -90,7 +90,7 @@ export const AVAILABLE_EVENTS: EventMap = {
         label: nls.localize('vuengine/editors/sound/effects/setVolume', 'Set Volume'),
         description: nls.localize(
             'vuengine/editors/sound/effects/setVolumeDescription',
-            'Change left and right volume levels for the current channel.'
+            'Change left and right volume levels for the current track.'
         ),
         category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
         defaultValue: 0xFF,

@@ -83,7 +83,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     useEffect(() => {
         draw();
     }, [
-        soundData.channels,
+        soundData.tracks,
         soundData.size,
         pianoRollNoteWidth,
     ]);

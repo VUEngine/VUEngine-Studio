@@ -52,7 +52,7 @@ interface InstrumentProps {
     setTestingDuration: Dispatch<SetStateAction<number>>
     setTestingNote: Dispatch<SetStateAction<number>>
     setTestingInstrument: Dispatch<SetStateAction<string>>
-    setTestingChannel: Dispatch<SetStateAction<number>>
+    setTestingTrack: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
 }
 
@@ -65,7 +65,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setWaveformDialogOpen, setModulationDataDialogOpen,
         /*
         playing,
-        testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
+        testing, setTesting, setTestingDuration, setTestingTrack, setTestingNote, setTestingInstrument,
         emulatorInitialized,
         */
     } = props;
@@ -296,7 +296,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             delete updatedInstruments[currentInstrument];
 
             setCurrentInstrument((Object.keys(soundData.instruments) ?? [''])[0]);
-            // TODO: update references in channels
+            // TODO: update references in tracks
 
             setInstruments(updatedInstruments);
         }
@@ -417,7 +417,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
-                        subLabel='ONLY RELEVANT ON WAVE CHANNELS'
+                        subLabel='ONLY RELEVANT ON WAVE TRACKS'
                     />
                     { /* @ts-ignore */}
                     {waveform?._fileUri.path.name}
@@ -446,7 +446,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         'vuengine/editors/sound/noteDurationDescription',
                         'Specifies how long the current note should play before automatically being shut off. \
 These are the durations that are natively supported by the Virtual Boy\'s sound chip. \
-Longer durations can be achieved by manually manipulating the channel volume.'
+Longer durations can be achieved by manually manipulating the track volume.'
                     )}
                 />
                 <Range
@@ -560,7 +560,7 @@ a pre-configured value and repeat the grow/decay process. '
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/sound/tap', 'Tap')}
-                    subLabel='ONLY RELEVANT ON NOISE CHANNEL'
+                    subLabel='ONLY RELEVANT ON NOISE TRACK'
                     tooltip={nls.localize(
                         'vuengine/editors/sound/tapDescription',
                         'Specifies the bit within the shift register to use as the feedback source in noise generation. \
@@ -582,7 +582,7 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
             <VContainer>
                 <InfoLabel
                     label={nls.localizeByDefault('Mode')}
-                    subLabel='ONLY RELEVANT ON SWEEP/MOD. CHANNEL'
+                    subLabel='ONLY RELEVANT ON SWEEP/MOD. TRACK'
                     tooltip={<>
                         {nls.localize('vuengine/editors/sound/sweepModDescription',
                             "The VSU's channel 5 has, in addition to all of the features of channels 1-4, \

@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { DataSection } from '../Common/CommonTypes';
 import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -6,7 +7,7 @@ export type InstrumentMap = Record<string, InstrumentConfig>;
 
 export interface SoundData {
     name: string
-    channels: ChannelConfig[]
+    tracks: TrackConfig[]
     patterns: PatternMap
     instruments: InstrumentMap
     size: number
@@ -24,8 +25,16 @@ export enum SoundEvent {
     Volume = 'volume',
 }
 
+export const SOUND_EVENT_LABELS = {
+    [SoundEvent.Duration]: nls.localize('vuengine/editors/sound/duration', 'Duration'),
+    [SoundEvent.Instrument]: nls.localize('vuengine/editors/sound/instrument', 'Instrument'),
+    [SoundEvent.Note]: nls.localize('vuengine/editors/sound/note', 'Note'),
+    [SoundEvent.NoteSlide]: nls.localize('vuengine/editors/sound/noteSlide', 'Note Slide'),
+    [SoundEvent.Volume]: nls.localize('vuengine/editors/sound/volume', 'Volume'),
+};
+
 export const INPUT_BLOCKING_COMMANDS = [
-    SoundEditorCommands.ADD_CHANNEL.id,
+    SoundEditorCommands.ADD_TRACK.id,
     SoundEditorCommands.ADD_NOTE.id,
     SoundEditorCommands.ADD_PATTERN.id,
     SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id,
@@ -40,14 +49,14 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.REMOVE_CURRENT_NOTE.id,
     SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id,
     SoundEditorCommands.REMOVE_CURRENT_PATTERN.id,
-    SoundEditorCommands.SELECT_CHANNEL_1.id,
-    SoundEditorCommands.SELECT_CHANNEL_2.id,
-    SoundEditorCommands.SELECT_CHANNEL_3.id,
-    SoundEditorCommands.SELECT_CHANNEL_4.id,
-    SoundEditorCommands.SELECT_CHANNEL_5.id,
-    SoundEditorCommands.SELECT_CHANNEL_6.id,
-    SoundEditorCommands.SELECT_NEXT_CHANNEL.id,
-    SoundEditorCommands.SELECT_PREVIOUS_CHANNEL.id,
+    SoundEditorCommands.SELECT_TRACK_1.id,
+    SoundEditorCommands.SELECT_TRACK_2.id,
+    SoundEditorCommands.SELECT_TRACK_3.id,
+    SoundEditorCommands.SELECT_TRACK_4.id,
+    SoundEditorCommands.SELECT_TRACK_5.id,
+    SoundEditorCommands.SELECT_TRACK_6.id,
+    SoundEditorCommands.SELECT_NEXT_TRACK.id,
+    SoundEditorCommands.SELECT_PREVIOUS_TRACK.id,
     SoundEditorCommands.SHOW_SEQUENCER_VIEW.id,
     SoundEditorCommands.SHOW_INSTRUMENTS_VIEW.id,
     SoundEditorCommands.SHOW_SETTINGS_VIEW.id,
@@ -55,6 +64,7 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.TOOL_MARQUEE.id,
     SoundEditorCommands.TOOL_PENCIL.id,
     SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
+    SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id,
 ];
@@ -76,8 +86,8 @@ export interface PatternConfig {
     events: EventsMap
 }
 
-export interface ChannelConfig {
-    type: SoundEditorChannelType
+export interface TrackConfig {
+    type: SoundEditorTrackType
     instrument: string
     sequence: SequenceMap
     allowSkip: boolean
@@ -98,7 +108,7 @@ export interface InstrumentConfig {
     tap: number
 }
 
-export enum SoundEditorChannelType {
+export enum SoundEditorTrackType {
     WAVE = 'wave',
     SWEEPMOD = 'sweepMod',
     NOISE = 'noise',
@@ -252,7 +262,7 @@ export const MIN_SEQUENCE_SIZE = 1;
 export const MAX_SEQUENCE_SIZE = 512;
 export const SEQUENCER_GRID_METER_HEIGHT = 14;
 export const SEQUENCER_GRID_WIDTH = 1;
-export const SEQUENCER_ADD_CHANNEL_BUTTON_HEIGHT = 16;
+export const SEQUENCER_ADD_TRACK_BUTTON_HEIGHT = 16;
 
 export const PIANO_ROLL_GRID_METER_HEIGHT = 16;
 export const PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT = 16;

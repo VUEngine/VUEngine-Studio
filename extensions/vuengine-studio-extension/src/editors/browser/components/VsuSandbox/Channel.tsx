@@ -35,13 +35,13 @@ interface ChannelProps {
     supportSweepAndModulation: boolean
     isNoiseChannel: boolean
     channel: VsuChannelData
-    setChannel: (channel: VsuChannelData) => void
+    setTrack: (channel: VsuChannelData) => void
     waveForms: number[][]
-    setPianoChannel: (channel: number) => void
+    setPianoChannel: (trackId: number) => void
 }
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
-    const { index, supportSweepAndModulation, isNoiseChannel, channel, setChannel, waveForms, setPianoChannel } = props;
+    const { index, supportSweepAndModulation, isNoiseChannel, channel, setTrack, waveForms, setPianoChannel } = props;
     const [note, setNote] = useState<string>('');
 
     const frequencyToHertz = (frequency: number): number =>
@@ -56,21 +56,21 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         500000 / (2048 - frequency);
 
     const toggleEnabled = () => {
-        setChannel({
+        setTrack({
             ...channel,
             enabled: !channel?.enabled,
         });
     };
 
     const setWaveform = (waveform: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             waveform,
         });
     };
 
     const toggleIntervalEnabled = () => {
-        setChannel({
+        setTrack({
             ...channel,
             interval: {
                 ...channel?.interval,
@@ -80,14 +80,14 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setTap = (tap: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             tap,
         });
     };
 
     const setInterval = (interval: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             interval: {
                 ...channel?.interval,
@@ -97,7 +97,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const toggleEnvelopeEnabled = () => {
-        setChannel({
+        setTrack({
             ...channel,
             envelope: {
                 ...channel?.envelope,
@@ -107,7 +107,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const toggleEnvelopeRepeat = () => {
-        setChannel({
+        setTrack({
             ...channel,
             envelope: {
                 ...channel?.envelope,
@@ -117,7 +117,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setEnvelopeDirection = (direction: VsuEnvelopeDirection) => {
-        setChannel({
+        setTrack({
             ...channel,
             envelope: {
                 ...channel?.envelope,
@@ -127,7 +127,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setEnvelopeStepTime = (stepTime: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             envelope: {
                 ...channel?.envelope,
@@ -137,7 +137,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setEnvelopeInitialValue = (initialValue: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             envelope: {
                 ...channel?.envelope,
@@ -147,7 +147,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const toggleSweepModulationEnabled = () => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -157,7 +157,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const toggleSweepModulationRepeat = () => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -167,7 +167,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setSweepModulationFunction = (fnc: VsuSweepModulationFunction) => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -177,7 +177,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setSweepModulationFrequency = (frequency: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -187,7 +187,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setSweepModulationInterval = (interval: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -197,7 +197,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setSweepDirection = (direction: VsuSweepDirection) => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -207,7 +207,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setSweepModulationShift = (shift: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
@@ -217,7 +217,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setStereoLevel = (side: 'left' | 'right', value: number) => {
-        setChannel({
+        setTrack({
             ...channel,
             stereoLevels: {
                 ...channel?.stereoLevels,
@@ -227,7 +227,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     };
 
     const setFrequency = (frequency: number): void => {
-        setChannel({
+        setTrack({
             ...channel,
             frequency: clamp(frequency, VSU_FREQUENCY_MIN, VSU_FREQUENCY_MAX),
         });

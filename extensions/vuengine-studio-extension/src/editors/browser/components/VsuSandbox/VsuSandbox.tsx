@@ -49,7 +49,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
         });
     };
 
-    const setChannelData = (index: number, channelData: VsuChannelData): void => {
+    const setTrackData = (index: number, channelData: VsuChannelData): void => {
         const channels = [...data.channels];
         channels[index] = channelData;
 
@@ -64,7 +64,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
             return;
         }
 
-        setChannelData(channel, {
+        setTrackData(channel, {
             ...data.channels[channel],
             frequency: clamp(frequency, VSU_FREQUENCY_MIN, VSU_FREQUENCY_MAX),
         });
@@ -101,7 +101,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
             <TabPanel key="tabpanel-channels">
                 <HContainer gap={10} overflow='hidden'>
                     <Piano
-                        channel={pianoChannel}
+                        trackId={pianoChannel}
                         setFrequency={setFrequency}
                         pianoRollNoteHeight={12}
                     />
@@ -113,7 +113,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                                     supportSweepAndModulation={x === 4}
                                     isNoiseChannel={x === 5}
                                     channel={data.channels[x]}
-                                    setChannel={(channelData: VsuChannelData) => setChannelData(x, channelData)}
+                                    setTrack={(channelData: VsuChannelData) => setTrackData(x, channelData)}
                                     waveForms={data.waveforms}
                                     setPianoChannel={setPianoChannel}
                                 />

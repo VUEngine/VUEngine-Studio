@@ -25,7 +25,7 @@ const StyledPianoRollGridContainer = styled.div`
 
 interface PianoRollEditorProps {
     soundData: SoundData
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
     noteCursor: number
@@ -41,7 +41,7 @@ interface PianoRollEditorProps {
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
     const {
         soundData,
-        currentChannelId,
+        currentTrackId,
         currentPatternId,
         currentSequenceIndex,
         noteCursor, setNoteCursor,
@@ -53,8 +53,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     } = props;
 
     const placedNotesCurrentPattern = useMemo(() => {
-        const channel = soundData.channels[currentChannelId];
-        const patternId = channel?.sequence[currentSequenceIndex];
+        const track = soundData.tracks[currentTrackId];
+        const patternId = track?.sequence[currentSequenceIndex];
         const pattern = soundData.patterns[patternId];
         if (!pattern) {
             return;
@@ -66,7 +66,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
             const noteDuration = pattern.events[step][SoundEvent.Duration] ?? 1;
             // eslint-disable-next-line no-null/no-null
             if (note !== undefined && note !== null && note > -1) {
-                const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? channel.instrument;
+                const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
                 const instrument = soundData.instruments[instrumentId];
                 const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
                 result.push(
@@ -93,8 +93,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
 
         return result;
     }, [
-        soundData.channels[currentChannelId],
-        currentChannelId,
+        soundData.tracks[currentTrackId],
+        currentTrackId,
         currentPatternId, // TODO
         currentSequenceIndex, // TODO
         noteCursor,
@@ -116,7 +116,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
             <PianoRollGrid
                 soundData={soundData}
                 noteCursor={noteCursor}
-                currentChannelId={currentChannelId}
+                currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 setNoteCursor={setNoteCursor}

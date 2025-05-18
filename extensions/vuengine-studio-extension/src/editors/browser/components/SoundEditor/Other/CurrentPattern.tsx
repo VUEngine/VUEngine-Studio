@@ -10,16 +10,16 @@ import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentPatternProps {
     soundData: SoundData
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
     const {
         soundData,
-        currentChannelId,
+        currentTrackId,
         currentPatternId, setCurrentPatternId,
         setPattern,
     } = props;
@@ -94,7 +94,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                             value: n,
                         }))}
                         defaultValue={currentPatternId.toString()}
-                        onChange={options => setCurrentPatternId(currentChannelId, options[0])}
+                        onChange={options => setCurrentPatternId(currentTrackId, options[0])}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton

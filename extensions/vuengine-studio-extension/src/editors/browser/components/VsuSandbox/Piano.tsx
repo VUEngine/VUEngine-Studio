@@ -3,17 +3,17 @@ import { NOTES } from '../SoundEditor/SoundEditorTypes';
 import PianoKeys from './PianoKeys';
 
 interface PianoProps {
-    channel: number
-    setFrequency: (channel: number, frequency: number) => void
+    trackId: number
+    setFrequency: (trackId: number, frequency: number) => void
     pianoRollNoteHeight: number
 }
 
 export default function Piano(props: PianoProps): React.JSX.Element {
-    const { channel, setFrequency, pianoRollNoteHeight } = props;
+    const { trackId, setFrequency, pianoRollNoteHeight } = props;
 
     return <div className="pianoRollEditor" style={{
         minWidth: 85,
-        opacity: channel === 0 ? .3 : 1,
+        opacity: trackId === 0 ? .3 : 1,
         overflowY: 'auto',
         width: 85,
     }}>
@@ -22,7 +22,7 @@ export default function Piano(props: PianoProps): React.JSX.Element {
                 key={`pianoroll-row-${index}`}
                 note={note}
                 noteId={index}
-                channel={channel}
+                trackId={trackId}
                 setFrequency={setFrequency}
                 pianoRollNoteHeight={pianoRollNoteHeight}
             />)}

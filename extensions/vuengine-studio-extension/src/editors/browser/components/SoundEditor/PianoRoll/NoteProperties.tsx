@@ -46,7 +46,7 @@ const StyledTabList = styled(TabList)`
 
 const NotePropertiesTabs = [
     nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
-    nls.localize('vuengine/editors/sound/channelVolume', 'Channel Volume'),
+    nls.localize('vuengine/editors/sound/trackVolume', 'Track Volume'),
     nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
     nls.localize('vuengine/editors/sound/pitch', 'Pitch'),
 ];
@@ -55,11 +55,11 @@ interface NotePropertiesProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
     effectsPanelHidden: boolean,
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
@@ -70,7 +70,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     const {
         soundData,
         noteCursor: noteCursor, setNoteCursor,
-        currentChannelId,
+        currentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         effectsPanelHidden, setEffectsPanelHidden,
@@ -106,7 +106,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 grid = <NotePropertiesGrid
                     soundData={soundData}
                     noteCursor={noteCursor}
-                    currentChannelId={currentChannelId}
+                    currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
                     setCurrentPatternId={setCurrentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
@@ -141,8 +141,12 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 title={
                     `${SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id, true)}`
                 }
+                style={{
+                    width: '100%',
+                }}
             >
-                <i className={effectsPanelHidden ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} />
+                <i className="codicon codicon-wand" />
+                <i className={effectsPanelHidden ? 'codicon codicon-chevron-up' : 'codicon codicon-chevron-down'} />
             </StyledToggleButton>
         </MetaLineHeader>
 

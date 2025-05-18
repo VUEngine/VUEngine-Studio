@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
-    ChannelConfig,
+    TrackConfig,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
     SequenceMap,
@@ -85,13 +85,13 @@ const StyledGridContainer = styled.div`
 interface SequencerGridProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
-    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    addPattern: (channelId: number, step: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
+    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
+    addPattern: (trackId: number, step: number) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
 }
@@ -99,11 +99,11 @@ interface SequencerGridProps {
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        currentChannelId,
+        currentTrackId,
         // currentPatternId,
         // setCurrentPatternId,
         // currentSequenceIndex, setCurrentSequenceIndex,
-        // setChannel,
+        // setTrack,
         addPattern,
         sequencerPatternHeight, sequencerPatternWidth,
     } = props;
@@ -111,15 +111,15 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const height = soundData.channels.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
+    const height = soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
     const width = MAX_SEQUENCE_SIZE * sequencerPatternWidth;
 
     const setSize = (size: number): void => {
         if (size <= MAX_SEQUENCE_SIZE && size >= MIN_SEQUENCE_SIZE) {
             updateSoundData({
                 ...soundData,
-                channels: [
-                    ...soundData.channels.map(c => {
+                tracks: [
+                    ...soundData.tracks.map(c => {
                         const updatedSequence: SequenceMap = {};
                         Object.keys(c.sequence).map(k => {
                             const step = parseInt(k);
@@ -160,10 +160,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const w = canvas.width;
         const h = canvas.height;
 
-        // highlight current channel
+        // highlight current track
         context.rect(
             0,
-            SEQUENCER_GRID_METER_HEIGHT + currentChannelId * sequencerPatternHeight,
+            SEQUENCER_GRID_METER_HEIGHT + currentTrackId * sequencerPatternHeight,
             MAX_SEQUENCE_SIZE * sequencerPatternWidth,
             sequencerPatternHeight - 1
         );
@@ -191,12 +191,12 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
 
         // horizontal lines
-        for (let y = 0; y <= soundData.channels.length; y++) {
+        for (let y = 0; y <= soundData.tracks.length; y++) {
             const offset = SEQUENCER_GRID_METER_HEIGHT + y * sequencerPatternHeight - 0.5;
             context.beginPath();
             context.moveTo(0, offset);
             context.lineTo(w, offset);
-            context.strokeStyle = y % soundData.channels.length === 0
+            context.strokeStyle = y % soundData.tracks.length === 0
                 ? `rgba(${c}, ${c}, ${c}, .4)`
                 : `rgba(${c}, ${c}, ${c}, .2)`;
             context.stroke();
@@ -216,11 +216,11 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             return;
         }
 
-        const channelId = Math.floor(y / sequencerPatternHeight);
+        const trackId = Math.floor(y / sequencerPatternHeight);
         const step = Math.floor(x / sequencerPatternWidth);
 
         if (e.buttons === 0) {
-            addPattern(channelId, step);
+            addPattern(trackId, step);
         } else if (e.buttons === 2) {
             // TODO
         }
@@ -240,8 +240,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     useEffect(() => {
         draw();
     }, [
-        soundData.channels.length,
-        currentChannelId,
+        soundData.tracks.length,
+        currentTrackId,
         sequencerPatternHeight,
         sequencerPatternWidth,
     ]);
@@ -250,7 +250,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         <StyledGridContainer
             className={classNames.join(' ')}
             style={{
-                height: soundData.channels.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,
+                height: soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,
             }}>
             <ResizableBox
                 width={soundData.size * sequencerPatternWidth}

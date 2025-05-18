@@ -10,11 +10,11 @@ import { drawGrid } from './NotePropertiesGridOverview';
 
 interface NotePropertiesGridProps {
     soundData: SoundData
-    currentChannelId: number
+    currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (channelId: number, patternId: string) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
     setNote: (step: number, note?: number, prevStep?: number) => void
@@ -24,7 +24,7 @@ interface NotePropertiesGridProps {
 export default function NotePropertiesGrid(props: NotePropertiesGridProps): React.JSX.Element {
     const {
         soundData,
-        currentChannelId,
+        currentTrackId,
         currentPatternId, // setCurrentPatternId,
         currentSequenceIndex, // setCurrentSequenceIndex,
         noteCursor, setNoteCursor,
@@ -71,9 +71,9 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
     useEffect(() => {
         draw();
     }, [
-        soundData.channels,
+        soundData.tracks,
         soundData.size,
-        currentChannelId,
+        currentTrackId,
         currentPatternId,
         currentSequenceIndex,
         noteCursor,
