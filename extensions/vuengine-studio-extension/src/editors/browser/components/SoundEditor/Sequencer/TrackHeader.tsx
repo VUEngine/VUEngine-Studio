@@ -3,38 +3,47 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundEditorTrackType } from '../SoundEditorTypes';
+import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundEditorTrackType, SoundData } from '../SoundEditorTypes';
 import { StyledTrackHeaderContainer } from './Sequencer';
 
 const StyledTrackHeader = styled.div`
     background-color: var(--theia-editor-background);
     border-bottom: 1px solid rgba(255, 255, 255, .2);
     border-left: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     font-size: 10px;
-    min-width: ${PIANO_ROLL_KEY_WIDTH}px;
+    min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     overflow: hidden;
-    width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
+    width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     z-index: 100;
 
     body.theia-light &,
     body.theia-hc & {
         border-bottom-color: rgba(0, 0, 0, .2);
         border-left-color: rgba(0, 0, 0, .6);
+        border-right-color: rgba(0, 0, 0, .6);
     }
 
     &.current {
-    /*
         background-color: rgba(255, 255, 255, .1) !important;
 
         body.theia-light &,
         body.theia-hc & {
             background-color: rgba(0, 0, 0, .1) !important;
         }
-    */
+    }
+
+    &.last {
+        border-bottom-color: rgba(255, 255, 255, .6);
+
+        body.theia-light &,
+        body.theia-hc & {
+            border-bottom-color: rgba(0, 0, 0, .6);
+        }
     }
 
     ${StyledTrackHeaderContainer} &:last-child {
@@ -103,6 +112,7 @@ const getTrackName = (type: SoundEditorTrackType, i: number): string => {
 };
 
 interface TrackHeaderProps {
+    soundData: SoundData
     track: TrackConfig
     trackId: number
     currentTrackId: number
@@ -117,6 +127,7 @@ interface TrackHeaderProps {
 
 export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element {
     const {
+        soundData,
         track,
         trackId,
         currentTrackId, setCurrentTrackId,
@@ -137,6 +148,9 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
     if (currentTrackId === trackId) {
         classNames.push('current');
     }
+    if (trackId === soundData.tracks.length - 1) {
+        classNames.push('last');
+    }
 
     const trackName = getTrackName(track.type, trackId);
     const trackCommand = getTrackCommand(trackId);
@@ -146,7 +160,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         onClick={() => setCurrentTrackId(trackId)}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
-            height: sequencerPatternHeight,
+            minHeight: sequencerPatternHeight,
         }}
     >
         <StyledTrackHeaderInfo>

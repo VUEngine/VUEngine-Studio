@@ -8,7 +8,7 @@ import {
     BAR_NOTE_RESOLUTION,
     EventsMap,
     NOTE_RESOLUTION,
-    NOTES,
+    NOTES_LABELS,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_WIDTH,
     SoundEvent,
@@ -25,6 +25,12 @@ const StyledPianoRollPlacedNote = styled.div`
     text-align: center;
     text-overflow: ellipsis;
     z-index: 10;
+
+    &:hover {
+        border-radius: 1px;
+        outline: 1px solid var(--theia-focusBorder);
+        z-index: 11;
+    }
 
     &.selected {
         border-radius: 1px;
@@ -264,7 +270,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             onResizeStop={onNoteSlideDownResize}
                         />
                         {width > pianoRollNoteWidth &&
-                            Object.keys(NOTES)[note]
+                            NOTES_LABELS[note]
                         }
                     </>
                 </ResizableBox>

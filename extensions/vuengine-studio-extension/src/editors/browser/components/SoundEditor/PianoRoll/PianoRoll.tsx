@@ -30,10 +30,16 @@ const StyledPianoRollContainer = styled.div`
 `;
 
 const StyledPianoRoll = styled.div`
+    border-left: 1px solid rgba(255, 255, 255, .6);
     flex-grow: 1;
     font-size: 10px;
     overflow: scroll;
     position: relative;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-left-color: rgba(0, 0, 0, .6);
+    }
 `;
 
 export const ScaleControls = styled.div`
@@ -61,6 +67,7 @@ export const ScaleControls = styled.div`
 
         &:hover {
             background-color: var(--theia-focusBorder);
+            color: #fff;
         }
 
         .codicon {

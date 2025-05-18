@@ -46,7 +46,6 @@ const NEW_PATTERN_ID = '+';
 const StyledLowerContainer = styled.div` 
     display: flex;
     flex-flow: row;
-    gap: 5px;
     height: 100%;
     margin: 1px var(--padding) var(--padding);
     overflow: hidden;

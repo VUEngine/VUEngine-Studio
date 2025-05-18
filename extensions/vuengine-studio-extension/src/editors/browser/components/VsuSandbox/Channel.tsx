@@ -5,7 +5,7 @@ import RadioSelect from '../Common/Base/RadioSelect';
 import Range from '../Common/Base/Range';
 import VContainer from '../Common/Base/VContainer';
 import { clamp } from '../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS, NOTES } from '../SoundEditor/SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, NOTES, NOTES_LABELS } from '../SoundEditor/SoundEditorTypes';
 import WaveformSelect from './WaveformSelect';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import {
@@ -235,9 +235,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
 
     const findNoteByFrequency = (): void => {
         const frequency = channel?.frequency ?? 0;
-        const notesList = Object.keys(NOTES);
-        for (let i = 0; i < notesList.length; i++) {
-            const n = notesList[i];
+        for (let i = 0; i < NOTES_LABELS.length; i++) {
+            const n = NOTES_LABELS[i];
             const noteFrequency = NOTES[n];
             if (noteFrequency > 0) {
                 if (frequency === noteFrequency) {

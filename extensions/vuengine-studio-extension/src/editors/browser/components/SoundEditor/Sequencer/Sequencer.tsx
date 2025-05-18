@@ -2,7 +2,6 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/Base/HContainer';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
@@ -26,44 +25,38 @@ import StepIndicator from './StepIndicator';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 
 export const StyledSequencerContainer = styled.div`
+    display: flex;
     margin: 0 var(--padding);
-    padding-right: 10px;
+    overflow: hidden;
     position: relative;
 `;
 
-export const StyledSequencer = styled.div`
+export const StyledSequencerGridContainer = styled.div`
     display: flex;
     flex-direction: column;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 11px;
+    flex-grow: 1;
+    overflow: scroll;
     position: relative;
     user-select: none;
 `;
 
 export const StyledTrackHeaderContainer = styled.div`
-    border-right: 1px solid rgba(255, 255, 255, .6);
     display: flex;
     flex-direction: column;
     left: 0;
-    position: sticky;
-    z-index: 100;
-
-    body.theia-light &,
-    body.theia-hc & {
-        border-right-color: rgba(0, 0, 0, .6);
-    }
 `;
 
 const StyledTracksHeader = styled.div`
     background-color: var(--theia-editor-background);
     border-bottom: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
-    height: ${SEQUENCER_GRID_METER_HEIGHT}px;
+    min-height: ${SEQUENCER_GRID_METER_HEIGHT}px;
 
     body.theia-light &,
     body.theia-hc & {
         border-bottom-color: rgba(0, 0, 0, .6);
+        border-right-color: rgba(0, 0, 0, .6);
     }
 `;
 
@@ -79,8 +72,7 @@ const StyledAddTrackButton = styled.button`
     left: 0;
     margin-top: 2px;
     min-height: ${SEQUENCER_ADD_TRACK_BUTTON_HEIGHT}px !important;
-    position: sticky;
-    width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
 
     &:hover {
         background-color: var(--theia-focusBorder);
@@ -253,6 +245,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     ]);
 
     return <StyledSequencerContainer
+        style={{
+            minHeight: sequencerPatternHeight * soundData.tracks.length + SEQUENCER_GRID_METER_HEIGHT +
+                (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 2 : 10),
+        }}
         onWheel={onWheel}
     >
         <ScaleControls className="vertical">
@@ -285,86 +281,39 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
-        <StyledSequencer
-            onWheel={mapVerticalToHorizontalScroll}
-        >
-            <StepIndicator
-                soundData={soundData}
-                currentPlayerPosition={currentPlayerPosition}
-                isPianoRoll={false}
-                hidden={currentPlayerPosition === -1}
-                effectsPanelHidden={effectsPanelHidden}
-                pianoRollNoteHeight={pianoRollNoteHeight}
-                pianoRollNoteWidth={pianoRollNoteWidth}
-                sequencerPatternHeight={sequencerPatternHeight}
-            />
-            <LoopIndicator
-                position={soundData.loopPoint}
-                hidden={!soundData.loop}
-            />
-            <HContainer gap={0} grow={1}>
-                <StyledTrackHeaderContainer>
-                    <StyledTracksHeader>
-                    </StyledTracksHeader>
-                    {soundData.tracks.map((track, index) =>
-                        <TrackHeader
-                            key={index}
-                            track={track}
-                            trackId={index}
-                            currentTrackId={currentTrackId}
-                            setCurrentTrackId={setCurrentTrackId}
-                            toggleTrackMuted={toggleTrackMuted}
-                            toggleTrackSolo={toggleTrackSolo}
-                            toggleTrackSeeThrough={toggleTrackSeeThrough}
-                            otherSolo={soloTrack > -1 && soloTrack !== index}
-                            setTrackDialogOpen={setTrackDialogOpen}
-                            sequencerPatternHeight={sequencerPatternHeight}
-                        />
-                    )}
-                </StyledTrackHeaderContainer>
-                {soundData.tracks.map((track, index) =>
-                    Object.keys(track.sequence).map(key => {
-                        const step = parseInt(key);
-                        const patternId = track.sequence[step];
-                        const pattern = soundData.patterns[patternId];
-                        const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
-                        if (!pattern) {
-                            return;
-                        }
-                        return <PlacedPattern
-                            key={`${index}-${step}`}
-                            soundData={soundData}
-                            updateSoundData={updateSoundData}
-                            patternIndex={patternIndex}
-                            step={step}
-                            trackId={index}
-                            pattern={pattern}
-                            patternId={patternId}
-                            currentTrackId={currentTrackId}
-                            currentPatternId={currentPatternId}
-                            currentSequenceIndex={currentSequenceIndex}
-                            setCurrentSequenceIndex={setCurrentSequenceIndex}
-                            setTrack={setTrack}
-                            setPatternDialogOpen={setPatternDialogOpen}
-                            sequencerPatternHeight={sequencerPatternHeight}
-                            sequencerPatternWidth={sequencerPatternWidth}
-                        />;
-                    })
-                )}
-                <SequencerGrid
+        <StepIndicator
+            soundData={soundData}
+            currentPlayerPosition={currentPlayerPosition}
+            isPianoRoll={false}
+            hidden={currentPlayerPosition === -1}
+            effectsPanelHidden={effectsPanelHidden}
+            pianoRollNoteHeight={pianoRollNoteHeight}
+            pianoRollNoteWidth={pianoRollNoteWidth}
+            sequencerPatternHeight={sequencerPatternHeight}
+        />
+        <LoopIndicator
+            position={soundData.loopPoint}
+            hidden={!soundData.loop}
+        />
+        <StyledTrackHeaderContainer>
+            <StyledTracksHeader>
+            </StyledTracksHeader>
+            {soundData.tracks.map((track, index) =>
+                <TrackHeader
+                    key={index}
                     soundData={soundData}
-                    updateSoundData={updateSoundData}
+                    track={track}
+                    trackId={index}
                     currentTrackId={currentTrackId}
-                    currentPatternId={currentPatternId}
-                    setCurrentPatternId={setCurrentPatternId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    setCurrentSequenceIndex={setCurrentSequenceIndex}
-                    setTrack={setTrack}
-                    addPattern={addPattern}
+                    setCurrentTrackId={setCurrentTrackId}
+                    toggleTrackMuted={toggleTrackMuted}
+                    toggleTrackSolo={toggleTrackSolo}
+                    toggleTrackSeeThrough={toggleTrackSeeThrough}
+                    otherSolo={soloTrack > -1 && soloTrack !== index}
+                    setTrackDialogOpen={setTrackDialogOpen}
                     sequencerPatternHeight={sequencerPatternHeight}
-                    sequencerPatternWidth={sequencerPatternWidth}
                 />
-            </HContainer>
+            )}
             {soundData.tracks.length < VSU_NUMBER_OF_CHANNELS &&
                 <StyledAddTrackButton
                     onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
@@ -373,6 +322,52 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     <i className='codicon codicon-plus' />
                 </StyledAddTrackButton>
             }
-        </StyledSequencer>
+        </StyledTrackHeaderContainer>
+        <StyledSequencerGridContainer
+            onWheel={mapVerticalToHorizontalScroll}
+        >
+            <SequencerGrid
+                soundData={soundData}
+                updateSoundData={updateSoundData}
+                currentTrackId={currentTrackId}
+                currentPatternId={currentPatternId}
+                setCurrentPatternId={setCurrentPatternId}
+                currentSequenceIndex={currentSequenceIndex}
+                setCurrentSequenceIndex={setCurrentSequenceIndex}
+                setTrack={setTrack}
+                addPattern={addPattern}
+                sequencerPatternHeight={sequencerPatternHeight}
+                sequencerPatternWidth={sequencerPatternWidth}
+            />
+            {soundData.tracks.map((track, index) =>
+                Object.keys(track.sequence).map(key => {
+                    const step = parseInt(key);
+                    const patternId = track.sequence[step];
+                    const pattern = soundData.patterns[patternId];
+                    const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
+                    if (!pattern) {
+                        return;
+                    }
+                    return <PlacedPattern
+                        key={`${index}-${step}`}
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        patternIndex={patternIndex}
+                        step={step}
+                        trackId={index}
+                        pattern={pattern}
+                        patternId={patternId}
+                        currentTrackId={currentTrackId}
+                        currentPatternId={currentPatternId}
+                        currentSequenceIndex={currentSequenceIndex}
+                        setCurrentSequenceIndex={setCurrentSequenceIndex}
+                        setTrack={setTrack}
+                        setPatternDialogOpen={setPatternDialogOpen}
+                        sequencerPatternHeight={sequencerPatternHeight}
+                        sequencerPatternWidth={sequencerPatternWidth}
+                    />;
+                })
+            )}
+        </StyledSequencerGridContainer>
     </StyledSequencerContainer>;
 }

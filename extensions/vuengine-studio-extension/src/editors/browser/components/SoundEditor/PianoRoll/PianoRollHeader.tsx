@@ -11,9 +11,9 @@ export const MetaLine = styled.div`
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
-    flex-grow: 1;
-    left: 0;
     position: sticky;
+    top: 0;
+    width: fit-content;
     z-index: 200;
 
     body.theia-light &,
@@ -24,22 +24,22 @@ export const MetaLine = styled.div`
 
 export const MetaLineHeader = styled.div`
     background: var(--theia-editor-background);
-    border-bottom: 1px solid rgba(255, 255, 255, .4);
-    border-right: 1px solid rgba(255, 255, 255, .4);
+    border-bottom: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6);
     border-top: 1px solid transparent;
     box-sizing: border-box;
     display: flex;
     left: 0;
-    max-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
-    min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    max-width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
+    min-width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
     overflow: hidden;
     position: sticky;
     z-index: 10;
 
     body.theia-light &,
     body.theia-hc & {
-        border-bottom-color: rgba(0, 0, 0, .4);
-        border-right-color: rgba(0, 0, 0, .4);
+        border-bottom-color: rgba(0, 0, 0, .6);
+        border-right-color: rgba(0, 0, 0, .6);
     }
 `;
 

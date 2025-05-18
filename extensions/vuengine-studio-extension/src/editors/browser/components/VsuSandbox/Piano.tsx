@@ -1,5 +1,5 @@
 import React from 'react';
-import { NOTES } from '../SoundEditor/SoundEditorTypes';
+import { NOTES_LABELS } from '../SoundEditor/SoundEditorTypes';
 import PianoKeys from './PianoKeys';
 
 interface PianoProps {
@@ -17,7 +17,7 @@ export default function Piano(props: PianoProps): React.JSX.Element {
         overflowY: 'auto',
         width: 85,
     }}>
-        {Object.keys(NOTES).map((note, index) =>
+        {NOTES_LABELS.map((note, index) =>
             <PianoKeys
                 key={`pianoroll-row-${index}`}
                 note={note}

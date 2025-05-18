@@ -9,16 +9,15 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    TrackConfig,
     NOTE_RESOLUTION,
     NOTES_SPECTRUM,
     PatternConfig,
-    PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
     SoundData,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
+    TrackConfig
 } from '../SoundEditorTypes';
 
 const StyledPattern = styled.div`
@@ -38,13 +37,7 @@ const StyledPattern = styled.div`
     &.selected {
         border-radius: 1px;
         outline: 3px solid var(--theia-focusBorder);
-        z-index: 11;
-    }
-
-    &.dragging {
-        border: 1px solid var(--theia-focusBorder);
-        cursor: grabbing;
-        outline: 0;
+        z-index: 12;
     }
 
     canvas {
@@ -184,7 +177,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newSize = Math.floor(data.size.width / sequencerPatternWidth);
+        const newSize = Math.ceil(data.size.width / sequencerPatternWidth);
         updateSoundData({
             ...soundData,
             patterns: {
@@ -199,7 +192,7 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-        const newBar = Math.floor((data.x - PIANO_ROLL_KEY_WIDTH) / sequencerPatternWidth);
+        const newBar = Math.floor((data.x) / sequencerPatternWidth);
         if (newTrackId === trackId && newBar === step) {
             return;
         }
@@ -254,13 +247,13 @@ export default function PlacedPattern(props: PatternProps): React.JSX.Element {
             cancel=".react-resizable-handle"
             onStop={onDragStop}
             position={{
-                x: 2 + PIANO_ROLL_KEY_WIDTH + step * sequencerPatternWidth,
+                x: step * sequencerPatternWidth,
                 y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
                 bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight,
-                left: PIANO_ROLL_KEY_WIDTH,
-                right: PIANO_ROLL_KEY_WIDTH + soundData.size * sequencerPatternWidth - pattern.size * sequencerPatternWidth,
+                left: 0,
+                right: soundData.size * sequencerPatternWidth - pattern.size * sequencerPatternWidth,
                 top: SEQUENCER_GRID_METER_HEIGHT,
             }}
         >

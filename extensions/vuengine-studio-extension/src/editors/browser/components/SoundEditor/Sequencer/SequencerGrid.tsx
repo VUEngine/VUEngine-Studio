@@ -13,12 +13,12 @@ import {
 } from '../SoundEditorTypes';
 
 const StyledGridContainer = styled.div`
+    margin-right: 80px;
     position: relative;
-    user-select: none;
+    width: fit-content;
 
     > .react-resizable {
         height: 100% !important;
-        margin-right: 80px;
         overflow: hidden;
 
         canvas {
@@ -34,7 +34,7 @@ const StyledGridContainer = styled.div`
         display: flex;
         justify-content: center;
         position: absolute;
-        right: 60px;
+        right: -18px;
         top: ${SEQUENCER_GRID_METER_HEIGHT - 1}px;
         width: 16px;
 
@@ -112,7 +112,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const height = soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
-    const width = MAX_SEQUENCE_SIZE * sequencerPatternWidth;
+    const width = soundData.size * sequencerPatternWidth;
 
     const setSize = (size: number): void => {
         if (size <= MAX_SEQUENCE_SIZE && size >= MIN_SEQUENCE_SIZE) {
@@ -240,6 +240,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     useEffect(() => {
         draw();
     }, [
+        soundData.size,
         soundData.tracks.length,
         currentTrackId,
         sequencerPatternHeight,

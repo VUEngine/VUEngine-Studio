@@ -8,8 +8,8 @@ import PianoRollPlacedNote from './PianoRollPlacedNote';
 
 const StyledPianoRollEditor = styled.div`
     display: flex;
-    flex-grow: 1;
     user-select: none;
+    width: fit-content;
 `;
 
 const StyledPianoRollGridContainer = styled.div`

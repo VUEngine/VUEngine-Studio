@@ -71,7 +71,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         }
 
         // middle line
-        context.fillStyle = `rgba(${c}, ${c}, ${c}, .6)`;
+        context.strokeStyle = `rgba(${c}, ${c}, ${c}, .2)`;
         context.beginPath();
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
         context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
@@ -99,7 +99,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         });
 
         // bottom line
-        context.fillStyle = `rgba(${c}, ${c}, ${c}, .6)`;
+        context.strokeStyle = `rgba(${c}, ${c}, ${c}, .6)`;
         context.beginPath();
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);

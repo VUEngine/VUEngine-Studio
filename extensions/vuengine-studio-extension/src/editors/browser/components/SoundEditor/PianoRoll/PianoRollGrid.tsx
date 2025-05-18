@@ -5,7 +5,7 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     NOTE_RESOLUTION,
-    NOTES,
+    NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_WIDTH,
@@ -70,8 +70,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             ? fullColor
             : `rgba(${c}, ${c}, ${c}, .4)`;
 
-        const noteKeys = Object.keys(NOTES);
-
         context.strokeStyle = lowColor;
         context.lineWidth = PIANO_ROLL_GRID_WIDTH;
         const w = canvas.width;
@@ -114,8 +112,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             context.stroke();
 
             // sharp note background
-            // TODO: precompute look-up table?
-            if (noteKeys[y].includes('#') && !highContrastTheme) {
+            if (NOTES_LABELS[y].includes('#') && !highContrastTheme) {
                 context.fillStyle = themeType === 'light'
                     ? `rgba(${c}, ${c}, ${c}, .05)`
                     : 'rgba(0, 0, 0, .2)';
