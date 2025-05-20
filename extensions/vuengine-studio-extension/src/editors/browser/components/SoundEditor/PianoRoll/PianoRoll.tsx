@@ -5,17 +5,23 @@ import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
+    NOTE_RESOLUTION,
+    NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
+    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
+    PIANO_ROLL_KEY_WIDTH,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
     PIANO_ROLL_NOTE_HEIGHT_MAX,
     PIANO_ROLL_NOTE_HEIGHT_MIN,
     PIANO_ROLL_NOTE_WIDTH_DEFAULT,
     PIANO_ROLL_NOTE_WIDTH_MAX,
     PIANO_ROLL_NOTE_WIDTH_MIN,
+    ScrollWindow,
+    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEvent,
-    SUB_NOTE_RESOLUTION,
+    SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
@@ -112,16 +118,18 @@ interface PianoRollProps {
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
-    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
-    addPattern: (trackId: number, step: number) => void
+    addPattern: (trackId: number, bar: number, createNew?: boolean) => void
     pianoRollNoteHeight: number
     setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     setPianoRollNoteWidth: Dispatch<SetStateAction<number>>
     sequencerPatternHeight: number
+    sequencerPatternWidth: number
+    setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -144,35 +152,36 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         addPattern,
         pianoRollNoteHeight, setPianoRollNoteHeight,
         pianoRollNoteWidth, setPianoRollNoteWidth,
-        sequencerPatternHeight,
+        sequencerPatternHeight, sequencerPatternWidth,
+        setPianoRollScrollWindow,
     } = props;
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const pattern = soundData.patterns[currentPatternId];
-    const songSize = soundData.size * BAR_NOTE_RESOLUTION;
+    const songLength = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
 
-    const setPatternAtCursorPosition = () => {
-        const bar = Math.floor(noteCursor / BAR_NOTE_RESOLUTION);
-        let barToSelect = -1;
+    const setPatternAtCursorPosition = (cursor?: number, createNew?: boolean) => {
+        const noteCursorStep = Math.floor((cursor ?? noteCursor) / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
+        let stepToSelect = -1;
         let patternIdToSelect = '';
         const currentTrack = soundData.tracks[currentTrackId];
         Object.keys(currentTrack.sequence).reverse().map(bStr => {
             const b = parseInt(bStr);
             const pId = currentTrack.sequence[b];
             const p = soundData.patterns[pId];
-            if (barToSelect === -1 && b <= bar && b + p.size > bar) {
-                barToSelect = b;
+            if (stepToSelect === -1 && b <= noteCursorStep && b + p.size > noteCursorStep) {
+                stepToSelect = b;
                 patternIdToSelect = pId;
             }
         });
 
-        if (barToSelect > -1) {
-            setCurrentSequenceIndex(currentTrackId, barToSelect);
+        if (stepToSelect > -1) {
+            setCurrentSequenceIndex(currentTrackId, stepToSelect);
             setCurrentPatternId(currentTrackId, patternIdToSelect);
         } else {
-            setCurrentSequenceIndex(currentTrackId, bar);
-            addPattern(currentTrackId, bar);
+            setCurrentSequenceIndex(currentTrackId, noteCursorStep);
+            addPattern(currentTrackId, noteCursorStep, createNew);
         }
     };
 
@@ -204,10 +213,27 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         }
     };
 
+    const getScrollWindowCoords = () => {
+        if (!pianoRollRef.current) {
+            return;
+        }
+
+        const scaleFactor = sequencerPatternWidth / (pianoRollNoteWidth * NOTE_RESOLUTION);
+        const maxWidth = songLength * sequencerPatternWidth;
+
+        setPianoRollScrollWindow({
+            x: scaleFactor * pianoRollRef.current.scrollLeft,
+            w: Math.min(
+                maxWidth,
+                scaleFactor * (pianoRollRef.current.offsetWidth - PIANO_ROLL_KEY_WIDTH - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT)
+            ),
+        });
+    };
+
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
-                if (noteCursor < songSize - SUB_NOTE_RESOLUTION) {
+                if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
                     setNoteCursor(noteCursor + SUB_NOTE_RESOLUTION);
                 }
                 break;
@@ -217,7 +243,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id:
-                if (noteCursor < songSize - BAR_NOTE_RESOLUTION) {
+                if (noteCursor < songLength - BAR_NOTE_RESOLUTION) {
                     setNoteCursor(noteCursor + BAR_NOTE_RESOLUTION);
                 } /* else {
                     setNoteCursor(songSize - SUB_NOTE_RESOLUTION);
@@ -231,24 +257,39 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 } */
                 break;
             case SoundEditorCommands.NOTE_UP.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note] && pattern?.events[noteCursor][SoundEvent.Note] > 0) {
-                    setNote(noteCursor, pattern?.events[noteCursor][SoundEvent.Note] - 1);
+                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) - 1;
+                    if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                        const newNoteLabel = NOTES_LABELS[newNoteId];
+                        setNote(noteCursor, newNoteLabel);
+                    }
                 }
                 break;
             case SoundEditorCommands.NOTE_DOWN.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note] && pattern?.events[noteCursor][SoundEvent.Note] < NOTES_SPECTRUM - 1) {
-                    setNote(noteCursor, pattern?.events[noteCursor][SoundEvent.Note] + 1);
+                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) + 1;
+                    if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                        const newNoteLabel = NOTES_LABELS[newNoteId];
+                        setNote(noteCursor, newNoteLabel);
+                    }
                 }
                 break;
             case SoundEditorCommands.CURSOR_UP_AN_OCTAVE.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note] && pattern?.events[noteCursor][SoundEvent.Note] > NOTES_PER_OCTAVE) {
-                    setNote(noteCursor, pattern?.events[noteCursor][SoundEvent.Note] - NOTES_PER_OCTAVE);
+                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) - NOTES_PER_OCTAVE;
+                    if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                        const newNoteLabel = NOTES_LABELS[newNoteId];
+                        setNote(noteCursor, newNoteLabel);
+                    }
                 }
                 break;
             case SoundEditorCommands.CURSOR_DOWN_AN_OCTAVE.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note] &&
-                    pattern?.events[noteCursor][SoundEvent.Note] < NOTES_SPECTRUM - NOTES_PER_OCTAVE - 1) {
-                    setNote(noteCursor, pattern?.events[noteCursor][SoundEvent.Note] + NOTES_PER_OCTAVE);
+                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) + NOTES_PER_OCTAVE;
+                    if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                        const newNoteLabel = NOTES_LABELS[newNoteId];
+                        setNote(noteCursor, newNoteLabel);
+                    }
                 }
                 break;
             case SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id:
@@ -281,6 +322,24 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     }, [
         currentPatternId,
     ]);
+
+    useEffect(() => {
+        getScrollWindowCoords();
+    }, [
+        songLength,
+        effectsPanelHidden,
+        pianoRollNoteWidth,
+        sequencerPatternWidth,
+    ]);
+
+    useEffect(() => {
+        if (!pianoRollRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => getScrollWindowCoords());
+        resizeObserver.observe(pianoRollRef.current);
+        return () => resizeObserver.disconnect();
+    }, []);
 
     return <StyledPianoRollContainer
         onWheel={onWheel}
@@ -317,6 +376,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         </ScaleControls>
         <StyledPianoRoll
             ref={pianoRollRef}
+            onScroll={getScrollWindowCoords}
         >
             {<StepIndicator
                 soundData={soundData}
@@ -356,6 +416,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 noteSnapping={noteSnapping}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
+                setPatternAtCursorPosition={setPatternAtCursorPosition}
             />
             <NoteProperties
                 soundData={soundData}

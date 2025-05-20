@@ -26,7 +26,7 @@ export const MetaLineHeader = styled.div`
     background: var(--theia-editor-background);
     border-bottom: 1px solid rgba(255, 255, 255, .6);
     border-right: 1px solid rgba(255, 255, 255, .6);
-    border-top: 1px solid transparent;
+    border-top: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     display: flex;
     left: 0;
@@ -38,8 +38,7 @@ export const MetaLineHeader = styled.div`
 
     body.theia-light &,
     body.theia-hc & {
-        border-bottom-color: rgba(0, 0, 0, .6);
-        border-right-color: rgba(0, 0, 0, .6);
+        border-color: rgba(0, 0, 0, .6);
     }
 `;
 

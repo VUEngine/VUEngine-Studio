@@ -47,7 +47,6 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.CURSOR_DOWN_AN_OCTAVE.id,
     SoundEditorCommands.PLAY_PAUSE.id,
     SoundEditorCommands.REMOVE_CURRENT_NOTE.id,
-    SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id,
     SoundEditorCommands.REMOVE_CURRENT_PATTERN.id,
     SoundEditorCommands.SELECT_TRACK_1.id,
     SoundEditorCommands.SELECT_TRACK_2.id,
@@ -57,9 +56,6 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.SELECT_TRACK_6.id,
     SoundEditorCommands.SELECT_NEXT_TRACK.id,
     SoundEditorCommands.SELECT_PREVIOUS_TRACK.id,
-    SoundEditorCommands.SHOW_SEQUENCER_VIEW.id,
-    SoundEditorCommands.SHOW_INSTRUMENTS_VIEW.id,
-    SoundEditorCommands.SHOW_SETTINGS_VIEW.id,
     SoundEditorCommands.STOP.id,
     SoundEditorCommands.TOOL_MARQUEE.id,
     SoundEditorCommands.TOOL_PENCIL.id,
@@ -108,6 +104,11 @@ export interface InstrumentConfig {
     tap: number
 }
 
+export interface ScrollWindow {
+    x: number
+    w: number
+}
+
 export enum SoundEditorTrackType {
     WAVE = 'wave',
     SWEEPMOD = 'sweepMod',
@@ -121,19 +122,18 @@ export enum SoundEditorTool {
 
 export const NOTES: { [note: string]: number } = {
     /*
-        'B9': 0,
-        'A#9': 0,
-        'A9': 0,
-        'G#9': 0,
-        'G9': 0,
-        'F#9': 0,
-        'F9': 0,
-        'E9': 0,
-        'D#9': 0,
-        'D9': 0,
-        'C#9': 0,
-        'C9': 2029,
-    */
+    'B9': 0,
+    'A#9': 0,
+    'A9': 0,
+    'G#9': 0,
+    'G9': 0,
+    'F#9': 0,
+    'F9': 0,
+    'E9': 0,
+    'D#9': 0,
+    'D9': 0,
+    'C#9': 0,
+    'C9': 2029,
     'B8': 2028,
     'A#8': 2027,
     'A8': 2026,
@@ -142,6 +142,9 @@ export const NOTES: { [note: string]: number } = {
     'F#8': 2022,
     'F8': 2020,
     'E8': 2018,
+    */
+    // Upper end of audible range
+    // (Higher sounds are audible, but will not produce a pure, specific note)
     'D#8': 2017,
     'D8': 2015,
     'C#8': 2013,
@@ -215,34 +218,35 @@ export const NOTES: { [note: string]: number } = {
     'F2': 258,
     'E2': 152,
     'D#2': 39,
+    // Lower end of audible range
+    /*
     'D2': 0,
     'C#2': 0,
     'C2': 0,
-    /*
-        'B1': 0,
-        'A#1': 0,
-        'A1': 0,
-        'G#1': 0,
-        'G1': 0,
-        'F#1': 0,
-        'F1': 0,
-        'E1': 0,
-        'D#1': 0,
-        'D1': 0,
-        'C#1': 0,
-        'C1': 0,
-        'B0': 0,
-        'A#0': 0,
-        'A0': 0,
-        'G#0': 0,
-        'G0': 0,
-        'F#0': 0,
-        'F0': 0,
-        'E0': 0,
-        'D#0': 0,
-        'D0': 0,
-        'C#0': 0,
-        'C0': 0,
+    'B1': 0,
+    'A#1': 0,
+    'A1': 0,
+    'G#1': 0,
+    'G1': 0,
+    'F#1': 0,
+    'F1': 0,
+    'E1': 0,
+    'D#1': 0,
+    'D1': 0,
+    'C#1': 0,
+    'C1': 0,
+    'B0': 0,
+    'A#0': 0,
+    'A0': 0,
+    'G#0': 0,
+    'G0': 0,
+    'F#0': 0,
+    'F0': 0,
+    'E0': 0,
+    'D#0': 0,
+    'D0': 0,
+    'C#0': 0,
+    'C0': 0,
     */
 };
 
@@ -253,14 +257,17 @@ export const NOTE_RESOLUTION = 16; // 1/16 note
 export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 export const BAR_NOTE_RESOLUTION = NOTE_RESOLUTION * SUB_NOTE_RESOLUTION;
 
+export const SEQUENCER_RESOLUTION = 4;
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
 export const SEQUENCER_PATTERN_HEIGHT_MAX = 64;
 export const SEQUENCER_PATTERN_HEIGHT_DEFAULT = 40;
 export const SEQUENCER_PATTERN_WIDTH_MIN = 8;
 export const SEQUENCER_PATTERN_WIDTH_MAX = 120;
 export const SEQUENCER_PATTERN_WIDTH_DEFAULT = 32;
+export const MIN_PATTERN_SIZE = 1;
+export const MAX_PATTERN_SIZE = 16 * SEQUENCER_RESOLUTION;
 export const MIN_SEQUENCE_SIZE = 1;
-export const MAX_SEQUENCE_SIZE = 512;
+export const MAX_SEQUENCE_SIZE = 512 * SEQUENCER_RESOLUTION;
 export const SEQUENCER_GRID_METER_HEIGHT = 14;
 export const SEQUENCER_GRID_WIDTH = 1;
 export const SEQUENCER_ADD_TRACK_BUTTON_HEIGHT = 16;
@@ -281,12 +288,12 @@ export const MAX_TICK_DURATION = 256;
 
 export const VOLUME_STEPS = 16;
 
-export const MIN_PATTERN_SIZE = 1;
-export const MAX_PATTERN_SIZE = 16;
-
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
 export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
 
 export const SINGLE_NOTE_TESTING_DURATION = 500;
 
 export const DEFAULT_NEW_NOTE_DURATION = 1;
+
+export const NEW_PATTERN_ID = '+';
+export const TRACK_DEFAULT_INSTRUMENT_ID = 'trackDefault';

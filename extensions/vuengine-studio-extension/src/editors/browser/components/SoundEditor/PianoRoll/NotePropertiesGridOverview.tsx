@@ -4,6 +4,7 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
     NOTE_RESOLUTION,
+    SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
 
@@ -55,7 +56,8 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const width = soundData.size * NOTE_RESOLUTION * pianoRollNoteWidth;
+    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const width = songLength * NOTE_RESOLUTION * pianoRollNoteWidth;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -69,7 +71,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_COLLAPSED_HEIGHT);
-        drawGrid(canvas, context, themeType, soundData.size, pianoRollNoteWidth);
+        drawGrid(canvas, context, themeType, songLength, pianoRollNoteWidth);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -84,7 +86,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         draw();
     }, [
         soundData.tracks,
-        soundData.size,
+        songLength,
         pianoRollNoteWidth,
     ]);
 

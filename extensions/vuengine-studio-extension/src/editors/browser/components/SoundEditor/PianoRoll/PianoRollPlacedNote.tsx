@@ -11,6 +11,7 @@ import {
     NOTES_LABELS,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_WIDTH,
+    SEQUENCER_RESOLUTION,
     SoundEvent,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
@@ -40,12 +41,12 @@ const StyledPianoRollPlacedNote = styled.div`
 
     .react-resizable-handle-e {
         border-left: 1px solid;
-        bottom: 2px;
+        bottom: 0;
         cursor: col-resize;
-        opacity: .5;
+        opacity: .3;
         position: absolute;
         right: 0;
-        top: 2px;
+        top: 0;
         width: 3px;
     }
 
@@ -78,11 +79,11 @@ interface PianoRollPlacedNoteProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (playRangeEnd: number) => void
-    note: number
+    noteLabel: string
     duration: number
     step: number
     instrumentColor: string
-    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     events: EventsMap
     patternSize: number
@@ -94,8 +95,9 @@ interface PianoRollPlacedNoteProps {
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
     const {
         currentSequenceIndex,
-        noteCursor: noteCursor, setNoteCursor: setNoteCursor,
-        note, duration,
+        noteCursor, setNoteCursor: setNoteCursor,
+        noteLabel,
+        duration,
         step,
         instrumentColor,
         setNote,
@@ -106,10 +108,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         pianoRollNoteHeight, pianoRollNoteWidth,
     } = props;
 
-    const localStep = step - currentSequenceIndex * BAR_NOTE_RESOLUTION;
+    const noteId = NOTES_LABELS.indexOf(noteLabel);
+    const localStep = step - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
 
     const left = step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
-    const top = note * pianoRollNoteHeight;
+    const top = noteId * pianoRollNoteHeight;
     const width = duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
 
     const classNames = ['placedNote'];
@@ -168,9 +171,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const newStep = (noteSnapping
             ? Math.ceil((data.x / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
             : Math.ceil((data.x * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
-        ) - currentSequenceIndex * BAR_NOTE_RESOLUTION;
+        ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const newNoteId = Math.floor(data.y / pianoRollNoteHeight);
-        setNote(newStep, newNoteId, localStep);
+        const newNoteLabel = NOTES_LABELS[newNoteId];
+        setNote(newStep, newNoteLabel, localStep);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -193,8 +197,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             }}
             bounds={{
                 bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
-                left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth,
-                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * pianoRollNoteWidth - (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
+                left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
+                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION - (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
                 top: 0,
             }}
         >
@@ -270,7 +274,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             onResizeStop={onNoteSlideDownResize}
                         />
                         {width > pianoRollNoteWidth &&
-                            NOTES_LABELS[note]
+                            noteLabel
                         }
                     </>
                 </ResizableBox>

@@ -41,8 +41,8 @@ const ENVELOPE_PREVIEW_SIZE = 272;
 
 interface InstrumentProps {
     soundData: SoundData
-    currentInstrument: string
-    setCurrentInstrument: Dispatch<SetStateAction<string>>
+    currentInstrumentId: string
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
@@ -60,7 +60,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
-        currentInstrument, setCurrentInstrument,
+        currentInstrumentId, setCurrentInstrumentId,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen,
         /*
@@ -70,12 +70,12 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         */
     } = props;
 
-    const instrument = soundData.instruments[currentInstrument];
+    const instrument = soundData.instruments[currentInstrumentId];
 
     const setName = (name: string) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             name,
         };
 
@@ -84,8 +84,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setColor = (color: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             color,
         };
 
@@ -106,10 +106,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setVolume = (side: 'left' | 'right', value: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             volume: {
-                ...updatedInstruments[currentInstrument].volume,
+                ...updatedInstruments[currentInstrumentId].volume,
                 [side]: value,
             },
         };
@@ -119,8 +119,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const updateInterval = (interval: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             interval: {
                 ...instrument?.interval,
                 enabled: interval !== 0,
@@ -133,8 +133,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const toggleEnvelopeRepeat = () => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             envelope: {
                 ...instrument?.envelope,
                 repeat: !instrument?.envelope.repeat,
@@ -146,8 +146,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeType = (type: -1 | VsuEnvelopeDirection) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             envelope: {
                 ...instrument?.envelope,
                 enabled: type !== -1,
@@ -160,8 +160,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeStepTime = (stepTime: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             envelope: {
                 ...instrument?.envelope,
                 stepTime: clamp(stepTime, VSU_ENVELOPE_STEP_TIME_MIN, VSU_ENVELOPE_STEP_TIME_MAX),
@@ -173,8 +173,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeInitialValue = (initialValue: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             envelope: {
                 ...instrument?.envelope,
                 initialValue: clamp(initialValue, VSU_ENVELOPE_INITIAL_VALUE_MIN, VSU_ENVELOPE_INITIAL_VALUE_MAX),
@@ -186,8 +186,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const toggleSweepModulationRepeat = () => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 repeat: !instrument?.sweepMod.repeat,
@@ -199,8 +199,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const updateSweepModulationFunction = (fnc: -1 | VsuSweepModulationFunction) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 enabled: fnc !== -1,
@@ -213,8 +213,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepModulationFrequency = (frequency: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 frequency: clamp(frequency, VSU_SWEEP_MODULATION_FREQUENCY_MIN, VSU_SWEEP_MODULATION_FREQUENCY_MAX),
@@ -226,8 +226,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepModulationInterval = (interval: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 interval: clamp(interval, VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX),
@@ -239,8 +239,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepDirection = (direction: VsuSweepDirection) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 direction,
@@ -252,8 +252,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepModulationShift = (shift: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 shift: clamp(shift, VSU_SWEEP_MODULATION_SHIFT_MIN, VSU_SWEEP_MODULATION_SHIFT_MAX),
@@ -265,8 +265,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setTap = (tap: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
+        updatedInstruments[currentInstrumentId] = {
+            ...updatedInstruments[currentInstrumentId],
             tap,
         };
 
@@ -282,7 +282,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 name: `${instrument.name} ${nls.localize('vuengine/general/copy', 'copy')}`,
             },
         });
-        setCurrentInstrument(newId);
+        setCurrentInstrumentId(newId);
     };
 
     const removeCurrentInstrument = async () => {
@@ -293,9 +293,9 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         const remove = await dialog.open();
         if (remove) {
             const updatedInstruments = { ...soundData.instruments };
-            delete updatedInstruments[currentInstrument];
+            delete updatedInstruments[currentInstrumentId];
 
-            setCurrentInstrument((Object.keys(soundData.instruments) ?? [''])[0]);
+            setCurrentInstrumentId((Object.keys(soundData.instruments) ?? [''])[0]);
             // TODO: update references in tracks
 
             setInstruments(updatedInstruments);
@@ -429,7 +429,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             width={128}
                             maximum={64}
                             data={waveform ? waveform.values : [...Array(32)].map(v => 0)}
-                            onClick={() => setWaveformDialogOpen(currentInstrument)}
+                            onClick={() => setWaveformDialogOpen(currentInstrumentId)}
                         />
                         {!waveform &&
                             <div className='lightLabel' style={{ margin: '-42px auto 0' }}>
@@ -575,6 +575,7 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                     }))}
                     defaultValue={instrument?.tap?.toString()}
                     onChange={options => setTap(parseInt(options[0]))}
+                    menuPlacement='top'
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
@@ -716,7 +717,7 @@ from the first modulation value. '
                                 height={128}
                                 width={128}
                                 data={instrument?.modulationData}
-                                onClick={() => setModulationDataDialogOpen(currentInstrument)}
+                                onClick={() => setModulationDataDialogOpen(currentInstrumentId)}
                             />
                         </VContainer>
                     }

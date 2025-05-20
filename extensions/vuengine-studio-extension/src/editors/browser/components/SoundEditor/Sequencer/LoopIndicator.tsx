@@ -1,39 +1,43 @@
 import React from 'react';
-import { NOTE_RESOLUTION, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 import styled from 'styled-components';
+import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { PIANO_ROLL_KEY_WIDTH, SEQUENCER_RESOLUTION } from '../SoundEditorTypes';
 
 export const StyledLoopIndicator = styled.div`
     background-color: var(--theia-editor-foreground);
-    bottom: 12px;
     opacity: .5;
     position: absolute;
     top: 0;
     width: 1px;
-
-    i {
-        font-size: 9px;
-        margin-left: 1px;
-        position: absolute;
-        top: 4px;
-    }
+    z-index: 100;
 `;
 
 interface LoopIndicatorProps {
+    numberOfTracks: number
     position: number
     hidden: boolean
+    sequencerPatternWidth: number
 }
 
 export default function LoopIndicator(props: LoopIndicatorProps): React.JSX.Element {
-    const { position, hidden } = props;
+    const { numberOfTracks, position, hidden, sequencerPatternWidth } = props;
 
-    const offset = PIANO_ROLL_KEY_WIDTH + position * NOTE_RESOLUTION;
+    const offset = PIANO_ROLL_KEY_WIDTH + position * sequencerPatternWidth / SEQUENCER_RESOLUTION;
 
     const style = {
         display: hidden ? 'none' : undefined,
-        left: offset,
+        left: 1 + offset,
     };
 
-    return <StyledLoopIndicator style={style}>
-        <i className='fa fa-backward' />
+    return <StyledLoopIndicator style={{
+        ...style,
+        bottom: numberOfTracks === VSU_NUMBER_OF_CHANNELS ? 0 : 11,
+    }}>
+        <i className='fa fa-backward' style={{
+            bottom: -1,
+            fontSize: 9,
+            marginLeft: 2,
+            position: 'absolute',
+        }} />
     </StyledLoopIndicator>;
 }

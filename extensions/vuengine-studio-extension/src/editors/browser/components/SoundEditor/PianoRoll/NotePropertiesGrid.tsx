@@ -4,6 +4,7 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_EXPANDED_HEIGHT,
     NOTE_RESOLUTION,
+    SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
 import { drawGrid } from './NotePropertiesGridOverview';
@@ -17,7 +18,7 @@ interface NotePropertiesGridProps {
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number) => void
     pianoRollNoteWidth: number
 }
 
@@ -35,7 +36,8 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const width = soundData.size * NOTE_RESOLUTION * pianoRollNoteWidth;
+    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const width = songLength * NOTE_RESOLUTION * pianoRollNoteWidth;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -49,7 +51,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-        drawGrid(canvas, context, themeType, soundData.size, pianoRollNoteWidth);
+        drawGrid(canvas, context, themeType, songLength, pianoRollNoteWidth);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -72,7 +74,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         draw();
     }, [
         soundData.tracks,
-        soundData.size,
+        songLength,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,

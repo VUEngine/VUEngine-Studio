@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
+import { NOTES_LABELS, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
 export const StyledPianoKey = styled.div`
     align-items: center;
@@ -41,11 +41,11 @@ export const StyledPianoKey = styled.div`
         color: var(--theia-button-foreground)
     }
 
-    &:nth-child(12n) {
+    &.cNote {
         border-bottom-width: 1px;
     }
 
-    &:nth-child(84) {
+    &.last {
         border-bottom-width: 0;
     }
 `;
@@ -54,7 +54,7 @@ export const StyledPianoRollKeyName = styled.div`
     display: none;
     z-index: 1;
 
-    ${StyledPianoKey}:nth-child(12n) &,
+    ${StyledPianoKey}:nth-child(12n - 8) &,
     ${StyledPianoKey}:hover & {
         display: block;
     }
@@ -73,6 +73,12 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
     const classNames = [];
     if (note.includes('#')) {
         classNames.push('sharpNote');
+    }
+    if (note.startsWith('C') && note.length === 2) {
+        classNames.push('cNote');
+    }
+    if (noteId === NOTES_LABELS.length - 1) {
+        classNames.push('last');
     }
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {

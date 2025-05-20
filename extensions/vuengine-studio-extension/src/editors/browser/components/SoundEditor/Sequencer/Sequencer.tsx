@@ -3,10 +3,11 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo } from 
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    TrackConfig,
     PIANO_ROLL_KEY_WIDTH,
+    ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
@@ -15,20 +16,21 @@ import {
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_MAX,
     SEQUENCER_PATTERN_WIDTH_MIN,
-    SoundData
+    SoundData,
+    TrackConfig
 } from '../SoundEditorTypes';
-import TrackHeader from './TrackHeader';
 import LoopIndicator from './LoopIndicator';
 import PlacedPattern from './PlacedPattern';
 import SequencerGrid from './SequencerGrid';
 import StepIndicator from './StepIndicator';
-import { ScaleControls } from '../PianoRoll/PianoRoll';
+import TrackHeader from './TrackHeader';
 
 export const StyledSequencerContainer = styled.div`
     display: flex;
     margin: 0 var(--padding);
     overflow: hidden;
     position: relative;
+    user-select: none;
 `;
 
 export const StyledSequencerGridContainer = styled.div`
@@ -37,7 +39,6 @@ export const StyledSequencerGridContainer = styled.div`
     flex-grow: 1;
     overflow: scroll;
     position: relative;
-    user-select: none;
 `;
 
 export const StyledTrackHeaderContainer = styled.div`
@@ -84,6 +85,18 @@ const StyledAddTrackButton = styled.button`
     }
 `;
 
+const StyledScrollWindow = styled.div`
+    background-color: rgba(255, 255, 255, .1);
+    position: absolute;
+    top: 0;
+    z-index: -1;
+
+    body.theia-light &,
+    body.theia-hc & {
+        background-color: rgba(0, 0, 0, .1);
+    }
+`;
+
 interface SequencerProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
@@ -98,7 +111,9 @@ interface SequencerProps {
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
-    addPattern: (trackId: number, step: number) => void
+    removeTrack: (trackId: number) => void
+    addPattern: (trackId: number, bar: number, createNew?: boolean) => void
+    setPatternSize: (patternId: string, size: number) => void
     setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     effectsPanelHidden: boolean
@@ -108,6 +123,7 @@ interface SequencerProps {
     setSequencerPatternHeight: Dispatch<SetStateAction<number>>
     sequencerPatternWidth: number
     setSequencerPatternWidth: Dispatch<SetStateAction<number>>
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -120,22 +136,28 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleTrackMuted,
         toggleTrackSolo,
         toggleTrackSeeThrough,
-        setTrack,
-        addPattern,
+        setTrack, removeTrack,
+        addPattern, setPatternSize,
         setTrackDialogOpen, setPatternDialogOpen,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
         sequencerPatternWidth, setSequencerPatternWidth,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const soloTrack = useMemo(() =>
-        soundData.tracks.filter(c => c.solo).map((c, i) => i).pop() ?? -1,
-        [
-            soundData.tracks,
-        ]
-    );
+    const soloTrack = useMemo(() => {
+        let st = -1;
+        soundData.tracks.forEach((t, i) => {
+            if (t.solo) {
+                st = i;
+            }
+        });
+        return st;
+    }, [
+        soundData.tracks,
+    ]);
 
     const mapVerticalToHorizontalScroll = (e: React.WheelEvent): void => {
         if (e.deltaY === 0) {
@@ -247,7 +269,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     return <StyledSequencerContainer
         style={{
             minHeight: sequencerPatternHeight * soundData.tracks.length + SEQUENCER_GRID_METER_HEIGHT +
-                (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 2 : 10),
+                (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 3 : 10),
         }}
         onWheel={onWheel}
     >
@@ -292,8 +314,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             sequencerPatternHeight={sequencerPatternHeight}
         />
         <LoopIndicator
+            numberOfTracks={soundData.tracks.length}
             position={soundData.loopPoint}
-            hidden={!soundData.loop}
+            hidden={!soundData.loop || soundData.loopPoint === 0}
+            sequencerPatternWidth={sequencerPatternWidth}
         />
         <StyledTrackHeaderContainer>
             <StyledTracksHeader>
@@ -305,6 +329,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     track={track}
                     trackId={index}
                     currentTrackId={currentTrackId}
+                    removeTrack={removeTrack}
                     setCurrentTrackId={setCurrentTrackId}
                     toggleTrackMuted={toggleTrackMuted}
                     toggleTrackSolo={toggleTrackSolo}
@@ -339,6 +364,13 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
             />
+            <StyledScrollWindow
+                style={{
+                    bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 0 : 8,
+                    left: pianoRollScrollWindow.x,
+                    width: pianoRollScrollWindow.w,
+                }}
+            />
             {soundData.tracks.map((track, index) =>
                 Object.keys(track.sequence).map(key => {
                     const step = parseInt(key);
@@ -365,6 +397,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                         setPatternDialogOpen={setPatternDialogOpen}
                         sequencerPatternHeight={sequencerPatternHeight}
                         sequencerPatternWidth={sequencerPatternWidth}
+                        setPatternSize={setPatternSize}
                     />;
                 })
             )}

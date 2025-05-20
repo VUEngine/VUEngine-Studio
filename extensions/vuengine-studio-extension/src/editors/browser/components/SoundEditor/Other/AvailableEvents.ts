@@ -13,19 +13,6 @@ export interface EventMap {
 
 export const AVAILABLE_EVENTS: EventMap = {
     /*
-    // Note
-    [SoundEvent.NoteCut]: {
-        id: SoundEvent.NoteCut,
-        shortId: 'C',
-        label: nls.localize('vuengine/editors/sound/effects/noteCut', 'Note Cut'),
-        description: nls.localize(
-            'vuengine/editors/sound/effects/setVolumeDescription',
-            'Stops playing the current note after x ticks (0 means instantly) by setting the volume to 0.',
-        ),
-        category: nls.localize('vuengine/editors/sound/effects/note', 'Note'),
-        defaultValue: 0x00,
-    },
-
     // Pitch
     [SoundEvent.Arpeggio]: {
         id: SoundEvent.Arpeggio,
@@ -84,17 +71,6 @@ export const AVAILABLE_EVENTS: EventMap = {
     },
 
     // Volume
-    [SoundEvent.Volume]: {
-        id: SoundEvent.Volume,
-        shortId: 'V',
-        label: nls.localize('vuengine/editors/sound/effects/setVolume', 'Set Volume'),
-        description: nls.localize(
-            'vuengine/editors/sound/effects/setVolumeDescription',
-            'Change left and right volume levels for the current track.'
-        ),
-        category: nls.localize('vuengine/editors/sound/effects/volume', 'Volume'),
-        defaultValue: 0xFF,
-    },
     [SoundEvent.VolumeSlide]: {
         id: SoundEvent.VolumeSlide,
         shortId: 'A',

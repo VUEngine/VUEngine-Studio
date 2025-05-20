@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 import VContainer from '../Common/Base/VContainer';
-import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SOUND_EVENT_LABELS, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SEQUENCER_RESOLUTION, SOUND_EVENT_LABELS, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
 
 const StyledTableContainer = styled.table`
     display: flex;
@@ -92,7 +92,7 @@ interface EventListProps {
 export default function EventList(props: EventListProps): React.JSX.Element {
     const { currentSequenceIndex, pattern, noteCursor, setNoteCursor } = props;
 
-    const noteOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION;
+    const noteOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
     const eventsKeys = Object.keys(pattern?.events ?? {});
     const formatter = new Intl.NumberFormat(nls.locale);
 
@@ -157,11 +157,10 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             return;
                                                         }
                                                         let value = stepEvents[eventType];
-                                                        if (eventType === SoundEvent.Note) {
-                                                            value = NOTES_LABELS[value];
-                                                        } else if (eventType === SoundEvent.NoteSlide) {
+                                                        if (eventType === SoundEvent.NoteSlide) {
                                                             const directionLabel = value < 0 ? '↓' : '↑';
-                                                            const targetNoteLabel = NOTES_LABELS[(stepEvents[SoundEvent.Note] ?? 0) - value];
+                                                            const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note] ?? 0);
+                                                            const targetNoteLabel = NOTES_LABELS[noteId - value];
                                                             value = `${directionLabel}${targetNoteLabel}`;
                                                         }
                                                         return <div>{value}</div>;

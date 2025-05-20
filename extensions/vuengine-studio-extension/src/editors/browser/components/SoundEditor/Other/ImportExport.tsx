@@ -3,6 +3,7 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 
 export default function ImportExport(): React.JSX.Element {
@@ -10,6 +11,7 @@ export default function ImportExport(): React.JSX.Element {
 
     const exportRom = () => {
         // TODO
+        alert('not yet implemented');
     };
 
     const selectFileForImport = async (): Promise<void> => {
@@ -49,8 +51,9 @@ export default function ImportExport(): React.JSX.Element {
                 return;
             }
 
-            // ...
+            // TODO
             console.log('parsed', parsed);
+            alert('not yet implemented');
         }
     };
 
@@ -58,17 +61,19 @@ export default function ImportExport(): React.JSX.Element {
         <label>
             {nls.localize('vuengine/editors/sound/importExport', 'Import/Export')}
         </label>
-        <button
-            className='theia-button secondary'
-            onClick={selectFileForImport}
-        >
-            {nls.localize('vuengine/editors/sound/importMidi', 'Import MIDI')}
-        </button>
-        <button
-            className='theia-button secondary'
-            onClick={exportRom}
-        >
-            {nls.localize('vuengine/editors/sound/exportRom', 'Export ROM')}
-        </button>
+        <HContainer>
+            <button
+                className='theia-button secondary'
+                onClick={selectFileForImport}
+            >
+                {nls.localize('vuengine/editors/sound/importMidi', 'Import MIDI')}
+            </button>
+            <button
+                className='theia-button secondary'
+                onClick={exportRom}
+            >
+                {nls.localize('vuengine/editors/sound/exportRom', 'Export ROM')}
+            </button>
+        </HContainer>
     </VContainer>;
 }

@@ -9,7 +9,8 @@ import {
     MIN_SEQUENCE_SIZE,
     SequenceMap,
     SEQUENCER_GRID_METER_HEIGHT,
-    SoundData
+    SoundData,
+    SEQUENCER_RESOLUTION
 } from '../SoundEditorTypes';
 
 const StyledGridContainer = styled.div`
@@ -34,7 +35,7 @@ const StyledGridContainer = styled.div`
         display: flex;
         justify-content: center;
         position: absolute;
-        right: -18px;
+        right: -22px;
         top: ${SEQUENCER_GRID_METER_HEIGHT - 1}px;
         width: 16px;
 
@@ -91,7 +92,7 @@ interface SequencerGridProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
-    addPattern: (trackId: number, step: number) => void
+    addPattern: (trackId: number, bar: number, createNew?: boolean) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
 }
@@ -111,26 +112,28 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    const songLength = soundData.size / SEQUENCER_RESOLUTION;
     const height = soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
-    const width = soundData.size * sequencerPatternWidth;
+    const width = songLength * sequencerPatternWidth;
 
     const setSize = (size: number): void => {
         if (size <= MAX_SEQUENCE_SIZE && size >= MIN_SEQUENCE_SIZE) {
             updateSoundData({
                 ...soundData,
                 tracks: [
-                    ...soundData.tracks.map(c => {
+                    ...soundData.tracks.map(t => {
                         const updatedSequence: SequenceMap = {};
-                        Object.keys(c.sequence).map(k => {
+                        Object.keys(t.sequence).map(k => {
                             const step = parseInt(k);
-                            const patternId = c.sequence[step];
+                            const patternId = t.sequence[step];
                             const pattern = soundData.patterns[patternId];
-                            if (step + pattern.size <= size) {
+                            const patternSize = pattern.size / SEQUENCER_RESOLUTION;
+                            if (step + patternSize <= size) {
                                 updatedSequence[step] = patternId;
                             }
                         });
                         return {
-                            ...c,
+                            ...t,
                             sequence: updatedSequence
                         };
                     })
@@ -164,7 +167,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         context.rect(
             0,
             SEQUENCER_GRID_METER_HEIGHT + currentTrackId * sequencerPatternHeight,
-            MAX_SEQUENCE_SIZE * sequencerPatternWidth,
+            songLength * sequencerPatternWidth,
             sequencerPatternHeight - 1
         );
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .1)`;
@@ -172,16 +175,18 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
 
         // vertical lines
-        for (let x = 1; x <= MAX_SEQUENCE_SIZE; x++) {
+        for (let x = 0; x <= soundData.size; x += 0.25) {
             const offset = x * sequencerPatternWidth - 0.5;
             context.beginPath();
-            context.moveTo(offset, x % 4 ? SEQUENCER_GRID_METER_HEIGHT : 0);
+            context.moveTo(offset, x % 4 && x < soundData.size ? SEQUENCER_GRID_METER_HEIGHT : 0);
             context.lineTo(offset, h);
-            context.strokeStyle = x % MAX_SEQUENCE_SIZE === 0
-                ? `rgba(${c}, ${c}, ${c}, .4)`
+            context.strokeStyle = x === soundData.size
+                ? `rgba(${c}, ${c}, ${c}, .6)`
                 : x % 4 === 0
-                    ? `rgba(${c}, ${c}, ${c}, .2)`
-                    : `rgba(${c}, ${c}, ${c}, .1)`;
+                    ? `rgba(${c}, ${c}, ${c}, .4)`
+                    : x % 1 === 0
+                        ? `rgba(${c}, ${c}, ${c}, .2)`
+                        : `rgba(${c}, ${c}, ${c}, .1)`;
             context.stroke();
 
             // meter numbers
@@ -197,14 +202,14 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             context.moveTo(0, offset);
             context.lineTo(w, offset);
             context.strokeStyle = y % soundData.tracks.length === 0
-                ? `rgba(${c}, ${c}, ${c}, .4)`
-                : `rgba(${c}, ${c}, ${c}, .2)`;
+                ? `rgba(${c}, ${c}, ${c}, .6)`
+                : `rgba(${c}, ${c}, ${c}, .4)`;
             context.stroke();
         }
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newSize = Math.ceil(data.size.width / sequencerPatternWidth);
+        const newSize = Math.ceil(data.size.width / sequencerPatternWidth * SEQUENCER_RESOLUTION);
         setSize(newSize);
     };
 
@@ -219,11 +224,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const trackId = Math.floor(y / sequencerPatternHeight);
         const step = Math.floor(x / sequencerPatternWidth);
 
-        if (e.buttons === 0) {
-            addPattern(trackId, step);
-        } else if (e.buttons === 2) {
-            // TODO
-        }
+        addPattern(trackId, step, e.buttons === 0);
     };
 
     const classNames = [];
@@ -254,10 +255,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 height: soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,
             }}>
             <ResizableBox
-                width={soundData.size * sequencerPatternWidth}
+                width={songLength * sequencerPatternWidth}
                 height={height}
                 draggableOpts={{
-                    grid: [sequencerPatternWidth, sequencerPatternHeight]
+                    grid: [sequencerPatternWidth / SEQUENCER_RESOLUTION, sequencerPatternHeight]
                 }}
                 axis="x"
                 minConstraints={[sequencerPatternWidth * MIN_SEQUENCE_SIZE, sequencerPatternHeight]}

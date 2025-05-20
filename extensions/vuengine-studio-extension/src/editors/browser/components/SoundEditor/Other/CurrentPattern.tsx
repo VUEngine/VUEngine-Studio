@@ -4,8 +4,9 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { BAR_NOTE_RESOLUTION, EventsMap, INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SoundData } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentPatternProps {
@@ -14,6 +15,7 @@ interface CurrentPatternProps {
     currentPatternId: string
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
+    setPatternSize: (patternId: string, size: number) => void
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
@@ -21,7 +23,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         soundData,
         currentTrackId,
         currentPatternId, setCurrentPatternId,
-        setPattern,
+        setPattern, setPatternSize,
     } = props;
 
     const pattern = soundData.patterns[currentPatternId];
@@ -32,31 +34,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
 
     const setPatternName = (name: string): void => {
         setPattern(currentPatternId, { name });
-    };
-
-    const setSize = (size: number): void => {
-        // removed all events that are beyond the limits of the pattern
-        // this would come into play when resizing down
-        const updatedEvents: EventsMap = {};
-        const totalTicks = size * BAR_NOTE_RESOLUTION;
-        Object.keys(pattern.events).forEach(tickStr => {
-            const tick = parseInt(tickStr);
-            if (tick < totalTicks) {
-                updatedEvents[tick] = pattern.events[tick];
-
-                // cut note duration if it would reach beyond the pattern limits
-                if (updatedEvents[tick][SoundEvent.Duration] &&
-                    updatedEvents[tick][SoundEvent.Duration] + tick >= totalTicks
-                ) {
-                    updatedEvents[tick][SoundEvent.Duration] = totalTicks - tick;
-                }
-            }
-        });
-
-        setPattern(currentPatternId, {
-            events: updatedEvents,
-            size,
-        });
     };
 
     const addPattern = () => {
@@ -132,16 +109,18 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
-            <Input
-                label={nls.localize('vuengine/editors/sound/size', 'Size')}
-                value={pattern.size}
-                setValue={v => setSize(v as number)}
-                type='number'
-                min={MIN_PATTERN_SIZE}
-                max={MAX_PATTERN_SIZE}
-                width={64}
-                commands={INPUT_BLOCKING_COMMANDS}
-            />
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/size', 'Size')}
+                </label>
+                <Range
+                    value={pattern.size}
+                    setValue={v => setPatternSize(currentPatternId, v as number)}
+                    min={MIN_PATTERN_SIZE}
+                    max={MAX_PATTERN_SIZE}
+                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                />
+            </VContainer>
         </VContainer>
         : <></>;
 }

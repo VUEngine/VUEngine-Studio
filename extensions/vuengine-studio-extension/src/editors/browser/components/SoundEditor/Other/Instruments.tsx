@@ -59,8 +59,8 @@ export const StyledInstrument = styled.button`
 
 interface InstrumentsProps {
     soundData: SoundData
-    currentInstrument: string
-    setCurrentInstrument: Dispatch<SetStateAction<string>>
+    currentInstrumentId: string
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
@@ -77,7 +77,7 @@ interface InstrumentsProps {
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
     const {
         soundData,
-        currentInstrument, setCurrentInstrument,
+        currentInstrumentId, setCurrentInstrumentId,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen,
         playing,
@@ -103,7 +103,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 name: nls.localizeByDefault('New'),
             },
         });
-        setCurrentInstrument(newId);
+        setCurrentInstrumentId(newId);
     };
 
     return <HContainer
@@ -121,8 +121,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     const name = instr.name.length ? instr.name : (i + 1).toString();
                     return <StyledInstrument
                         key={i}
-                        className={currentInstrument === instrumentId ? 'current' : undefined}
-                        onClick={() => setCurrentInstrument(instrumentId)}
+                        className={currentInstrumentId === instrumentId ? 'current' : undefined}
+                        onClick={() => setCurrentInstrumentId(instrumentId)}
                         style={{
                             backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                             color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
@@ -142,8 +142,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         <VContainer grow={1}>
             <Instrument
                 soundData={soundData}
-                currentInstrument={currentInstrument}
-                setCurrentInstrument={setCurrentInstrument}
+                currentInstrumentId={currentInstrumentId}
+                setCurrentInstrumentId={setCurrentInstrumentId}
                 setInstruments={setInstruments}
                 setWaveformDialogOpen={setWaveformDialogOpen}
                 setModulationDataDialogOpen={setModulationDataDialogOpen}

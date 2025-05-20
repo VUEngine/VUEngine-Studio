@@ -3,8 +3,9 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundEditorTrackType, SoundData } from '../SoundEditorTypes';
+import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundData, SEQUENCER_PATTERN_HEIGHT_DEFAULT } from '../SoundEditorTypes';
 import { StyledTrackHeaderContainer } from './Sequencer';
+import { getTrackName } from '../SoundEditor';
 
 const StyledTrackHeader = styled.div`
     background-color: var(--theia-editor-background);
@@ -26,6 +27,15 @@ const StyledTrackHeader = styled.div`
         border-bottom-color: rgba(0, 0, 0, .2);
         border-left-color: rgba(0, 0, 0, .6);
         border-right-color: rgba(0, 0, 0, .6);
+    }
+
+    &.muted {
+        color: rgba(255, 255, 255, .3);
+
+        body.theia-light &,
+        body.theia-hc & {
+            background-color: rgba(0, 0, 0, .3);
+        }
     }
 
     &.current {
@@ -59,13 +69,22 @@ const StyledTrackHeader = styled.div`
 const StyledTrackHeaderInfo = styled.div`
     box-sizing: border-box;
     flex-grow: 1;
-    padding: 3px 3px 1px;
+    padding: 1px 3px;
+
+    div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:nth-child(2) {
+            font-size: 90%;
+        }
+    }
 `;
 
 const StyledTrackHeaderButtons = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 0 0 1px 1px;
 `;
 
 const StyledTrackHeaderButtonsGroup = styled.div`
@@ -77,13 +96,18 @@ const StyledTrackHeaderButton = styled.div`
     border-radius: 2px;
     cursor: pointer;
     display: flex;
-    height: 16px;
+    height: 14px;
     justify-content: center;
     flex-grow: 1;
     width: 16px;
 
     &:hover {
-        background: rgba(0, 0, 0, .2);
+        background-color: rgba(255, 255, 255, .2);
+
+        body.theia-light &,
+        body.theia-hc & {
+            background-color: rgba(0, 0, 0, .2);
+        }
     }
 `;
 
@@ -99,24 +123,13 @@ const getTrackCommand = (i: number): EditorCommand => {
     }
 };
 
-const getTrackName = (type: SoundEditorTrackType, i: number): string => {
-    switch (type) {
-        case SoundEditorTrackType.NOISE:
-            return nls.localize('vuengine/editors/sound/noise', 'Noise');
-        case SoundEditorTrackType.SWEEPMOD:
-            return nls.localize('vuengine/editors/sound/waveSmShort', 'Wave (SM)');
-        default:
-        case SoundEditorTrackType.WAVE:
-            return `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`;
-    }
-};
-
 interface TrackHeaderProps {
     soundData: SoundData
     track: TrackConfig
     trackId: number
     currentTrackId: number
     setCurrentTrackId: (currentTrackId: number) => void
+    removeTrack: (trackId: number) => void
     toggleTrackMuted: (trackId: number) => void
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
@@ -131,6 +144,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         track,
         trackId,
         currentTrackId, setCurrentTrackId,
+        removeTrack,
         toggleTrackMuted, toggleTrackSolo, toggleTrackSeeThrough,
         otherSolo,
         setTrackDialogOpen,
@@ -154,24 +168,32 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
 
     const trackName = getTrackName(track.type, trackId);
     const trackCommand = getTrackCommand(trackId);
+    const instrumentName = soundData.instruments[track.instrument]
+        ? soundData.instruments[track.instrument].name
+        : '-';
 
     return <StyledTrackHeader
         className={classNames.join(' ')}
         onClick={() => setCurrentTrackId(trackId)}
+        onDoubleClick={() => setTrackDialogOpen(true)}
+        onContextMenu={() => removeTrack(trackId)}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
             minHeight: sequencerPatternHeight,
         }}
     >
         <StyledTrackHeaderInfo>
-            <div>
-                {trackName}
-            </div>
+            <div>{trackName}</div>
+            {sequencerPatternHeight >= SEQUENCER_PATTERN_HEIGHT_DEFAULT &&
+                <div>{instrumentName}</div>
+            }
         </StyledTrackHeaderInfo>
         <StyledTrackHeaderButtons>
             <StyledTrackHeaderButtonsGroup>
                 <StyledTrackHeaderButton
                     className={track.seeThrough ? 'active' : undefined}
+                    title={nls.localize('vuengine/editors/sound/showNoteShadows', 'Show Note Shadows On Other Tracks')}
+                    onDoubleClick={e => e.stopPropagation()}
                     onClick={() => toggleTrackSeeThrough(trackId)}
                 >
                     <i
@@ -182,6 +204,8 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                     />
                 </StyledTrackHeaderButton>
                 <StyledTrackHeaderButton
+                    title={nls.localize('vuengine/editors/sound/muteTrack', 'Mute Track')}
+                    onDoubleClick={e => e.stopPropagation()}
                     onClick={() => toggleTrackMuted(trackId)}
                 >
                     <i
@@ -192,6 +216,8 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                     />
                 </StyledTrackHeaderButton>
                 <StyledTrackHeaderButton
+                    title={nls.localize('vuengine/editors/sound/soloTrack', 'Solo Track')}
+                    onDoubleClick={e => e.stopPropagation()}
                     onClick={() => toggleTrackSolo(trackId)}
                 >
                     <i
@@ -204,6 +230,8 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
             </StyledTrackHeaderButtonsGroup>
             <StyledTrackHeaderButtonsGroup>
                 <StyledTrackHeaderButton
+                    title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
+                    onDoubleClick={e => e.stopPropagation()}
                     onClick={() => setTrackDialogOpen(true)}
                 >
                     <i className="fa fa-cog" />

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, SoundData, SoundEvent } from '../SoundEditorTypes';
+import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, SEQUENCER_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
 import Piano from './Piano';
 import PianoRollGrid from './PianoRollGrid';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
@@ -30,12 +30,13 @@ interface PianoRollEditorProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (note: number) => void
-    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
+    setPatternAtCursorPosition: (cursor?: number, createNew?: boolean) => void
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -50,6 +51,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         playNote,
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
+        setPatternAtCursorPosition,
     } = props;
 
     const placedNotesCurrentPattern = useMemo(() => {
@@ -62,10 +64,10 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         const result: React.JSX.Element[] = [];
         Object.keys(pattern.events).map(stepStr => {
             const step = parseInt(stepStr);
-            const note = pattern.events[step][SoundEvent.Note] ?? -1;
+            const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
             const noteDuration = pattern.events[step][SoundEvent.Duration] ?? 1;
             // eslint-disable-next-line no-null/no-null
-            if (note !== undefined && note !== null && note > -1) {
+            if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                 const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
                 const instrument = soundData.instruments[instrumentId];
                 const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
@@ -73,8 +75,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     <PianoRollPlacedNote
                         key={step}
                         instrumentColor={instrumentColor}
-                        note={note}
-                        step={currentSequenceIndex * BAR_NOTE_RESOLUTION + step}
+                        noteLabel={noteLabel}
+                        step={currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION + step}
                         duration={noteDuration}
                         currentSequenceIndex={currentSequenceIndex}
                         noteCursor={noteCursor}
@@ -123,6 +125,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setNote={setNote}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
+                setPatternAtCursorPosition={setPatternAtCursorPosition}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

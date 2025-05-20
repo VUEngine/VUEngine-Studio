@@ -32,7 +32,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         setEmulatorInitialized,
         currentPlayerPosition,
         setCurrentPlayerPosition,
-        playRangeStart, playRangeEnd,
+        // playRangeStart, playRangeEnd,
     } = props;
     const [soundSpecTemplateString, setSoundSpecTemplateString] = useState<string>('');
     const [waveFormsTemplateString, setWaveFormsTemplateString] = useState<string>('');
@@ -129,8 +129,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 project: services.vesProjectService.getProjectData(),
                 itemUri: new URI('Dummy.sound'),
                 isSoundEditorPreview: true,
-                playRangeStart: playRangeStart > -1 ? playRangeStart : 0,
-                playRangeEnd: playRangeEnd > -1 ? playRangeEnd : 0,
+                // playRangeStart: playRangeStart > -1 ? playRangeStart : 0,
+                // playRangeEnd: playRangeEnd > -1 ? playRangeEnd : 0,
             },
             ProjectDataTemplateEncoding.utf8,
             true

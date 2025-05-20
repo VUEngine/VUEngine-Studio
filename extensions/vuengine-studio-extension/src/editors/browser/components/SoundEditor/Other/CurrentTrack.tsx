@@ -1,6 +1,5 @@
 import { Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -45,17 +44,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
         });
     };
 
-    const promptRemoveTrack = async () => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/sound/deleteTrackQuestion', 'Delete Track?'),
-            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDeleteTrack', 'Are you sure you want to delete this track?'),
-        });
-        const remove = await dialog.open();
-        if (remove) {
-            removeTrack(currentTrackId);
-        }
-    };
-
     const toggleTrackAllowSkip = (): void => {
         setTrack(currentTrackId, {
             allowSkip: !soundData.tracks[currentTrackId].allowSkip,
@@ -97,7 +85,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localizeByDefault('Remove')}
-                        onClick={promptRemoveTrack}
+                        onClick={() => removeTrack(currentTrackId)}
                     >
                         <Trash size={16} />
                     </InputWithActionButton>
@@ -144,10 +132,11 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
 
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/editors/sound/allowSkip', 'Allow Skip')}
+                    label={nls.localize('vuengine/editors/sound/lowPriority', 'Low Priority')}
                     tooltip={nls.localize(
                         'vuengine/editors/sound/allowSkipDescription',
-                        'Allow to skip notes during play back if no sound source is available when requested.'
+                        'Allow to skip notes of this track during play back, \
+if no other sound source is available when requested by e.g. a sound effect.'
                     )}
                 />
                 <input

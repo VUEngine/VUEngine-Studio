@@ -48,7 +48,6 @@ const NotePropertiesTabs = [
     nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
     nls.localize('vuengine/editors/sound/trackVolume', 'Track Volume'),
     nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
-    nls.localize('vuengine/editors/sound/pitch', 'Pitch'),
 ];
 
 interface NotePropertiesProps {
@@ -60,7 +59,7 @@ interface NotePropertiesProps {
     setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setNote: (step: number, note?: number, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number) => void
     effectsPanelHidden: boolean,
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number,
@@ -134,7 +133,10 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         }}
     >
         <MetaLineHeader
-            style={{ borderBottom: 'none' }}
+            style={{
+                borderBottomWidth: 0,
+                borderTopWidth: 0,
+            }}
         >
             <StyledToggleButton
                 onClick={toggleEffectsPanel}

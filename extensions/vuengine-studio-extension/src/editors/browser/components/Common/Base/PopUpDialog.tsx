@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import HContainer from './HContainer';
 
 interface PopUpDialogProps {
@@ -12,10 +12,27 @@ interface PopUpDialogProps {
     height?: string
     width?: string
     cancelButton?: boolean
+    overflow?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, onClose, onOk, okLabel, title, error, height, width, cancelButton, children } = props;
+    const { open, onClose, onOk, okLabel, title, error, height, width, cancelButton, children, overflow } = props;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+            case 'Escape':
+                return onClose();
+            case 'Enter':
+                return onOk();
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, []);
 
     return <div
         className="p-Widget dialogOverlay"
@@ -24,11 +41,6 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
             height: '100%',
             position: 'absolute',
             width: '100%',
-        }}
-        onKeyDown={e => {
-            if (e.key === 'Escape') {
-                onClose();
-            };
         }}
     >
         <div className="dialogBlock" style={{
@@ -47,7 +59,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 >
                 </i>
             </div>
-            <div className="dialogContent" style={{ flexGrow: 1, maxHeight: 'unset' }}>
+            <div className="dialogContent" style={{ flexGrow: 1, maxHeight: 'unset', overflow }}>
                 {children}
             </div>
             <HContainer className="dialogControl">
