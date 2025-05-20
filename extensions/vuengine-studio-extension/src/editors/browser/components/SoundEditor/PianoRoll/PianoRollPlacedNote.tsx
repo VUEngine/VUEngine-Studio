@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { SyntheticEvent, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -13,7 +13,8 @@ import {
     PIANO_ROLL_GRID_WIDTH,
     SEQUENCER_RESOLUTION,
     SoundEvent,
-    SUB_NOTE_RESOLUTION
+    SUB_NOTE_RESOLUTION,
+    TRACK_DEFAULT_INSTRUMENT_ID
 } from '../SoundEditorTypes';
 
 const MAX_FONT_SIZE = 13;
@@ -90,6 +91,7 @@ interface PianoRollPlacedNoteProps {
     noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -106,6 +108,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         patternSize,
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
+        setCurrentInstrumentId,
     } = props;
 
     const noteId = NOTES_LABELS.indexOf(noteLabel);
@@ -154,6 +157,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const newDuration = noteSnapping
             ? Math.ceil(data.size.width / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
             : Math.ceil(data.size.width * SUB_NOTE_RESOLUTION / pianoRollNoteWidth);
+        if (newDuration === duration) {
+            return;
+        }
         setNoteEvent(localStep, SoundEvent.Duration, newDuration);
     };
 
@@ -174,11 +180,19 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const newNoteId = Math.floor(data.y / pianoRollNoteHeight);
         const newNoteLabel = NOTES_LABELS[newNoteId];
+        if (newStep === localStep) {
+            return;
+        }
         setNote(newStep, newNoteLabel, localStep);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 0) {
+            const event = events[localStep];
+            if (event) {
+                const instrumentId = event[SoundEvent.Instrument];
+                setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+            }
             setNoteCursor(step);
         } else if (e.buttons === 2) {
             setNote(localStep);

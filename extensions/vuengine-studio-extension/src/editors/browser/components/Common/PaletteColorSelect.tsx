@@ -12,7 +12,7 @@ export const DEFAULT_COLOR_INDEX = 4;
 
 const ColorSquare = styled.div`
     cursor: pointer;
-    height: 16px;
+    height: 32px;
     width: calc(12.5% - 1px);
 
     &.active {
@@ -36,8 +36,17 @@ export default function PaletteColorSelect(props: PaletteColorSelectProps): Reac
         {COLOR_PALETTE.map((l, i) =>
             <ColorSquare
                 key={i}
-                style={{ backgroundColor: l }}
                 className={i === color ? 'active' : undefined}
+                style={{
+                    backgroundColor: l,
+                    /*
+                    order: i < 8
+                        ? (i + 1) * 10 + 1
+                        : i < 16
+                            ? (i - 8 + 1) * 10 + 2
+                            : (i - 16 + 1) * 10 + 3,
+                    */
+                }}
                 onClick={() => updateColor(i)}
             />
         )}

@@ -2,7 +2,8 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 import VContainer from '../Common/Base/VContainer';
-import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SEQUENCER_RESOLUTION, SOUND_EVENT_LABELS, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
+import { getInstrumentName } from './SoundEditor';
+import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SEQUENCER_RESOLUTION, SOUND_EVENT_LABELS, SoundData, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
 
 const StyledTableContainer = styled.table`
     display: flex;
@@ -83,6 +84,7 @@ const StyledTable = styled.table`
 `;
 
 interface EventListProps {
+    soundData: SoundData
     currentSequenceIndex: number
     pattern: PatternConfig
     noteCursor: number
@@ -90,7 +92,7 @@ interface EventListProps {
 }
 
 export default function EventList(props: EventListProps): React.JSX.Element {
-    const { currentSequenceIndex, pattern, noteCursor, setNoteCursor } = props;
+    const { soundData, currentSequenceIndex, pattern, noteCursor, setNoteCursor } = props;
 
     const noteOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
     const eventsKeys = Object.keys(pattern?.events ?? {});
@@ -162,6 +164,13 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note] ?? 0);
                                                             const targetNoteLabel = NOTES_LABELS[noteId - value];
                                                             value = `${directionLabel}${targetNoteLabel}`;
+                                                        }
+                                                        if (eventType === SoundEvent.Instrument) {
+                                                            const instrument = soundData.instruments[stepEvents[SoundEvent.Instrument]];
+                                                            const instrumentIndex = Object.keys(soundData.instruments)
+                                                                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
+                                                                .indexOf(stepEvents[SoundEvent.Instrument]);
+                                                            value = getInstrumentName(instrument, instrumentIndex);
                                                         }
                                                         return <div>{value}</div>;
                                                     })}

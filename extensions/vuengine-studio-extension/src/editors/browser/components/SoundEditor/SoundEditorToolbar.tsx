@@ -14,6 +14,7 @@ import {
     SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTool,
+    SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
 } from './SoundEditorTypes';
@@ -77,7 +78,10 @@ export const SidebarCollapseButton = styled.button`
 
 interface SoundEditorToolbarProps {
     soundData: SoundData
+    currentPatternId: string
     currentPlayerPosition: number
+    currentSequenceIndex: number
+    noteCursor: number
     playing: boolean
     noteSnapping: boolean
     tool: SoundEditorTool
@@ -89,13 +93,17 @@ interface SoundEditorToolbarProps {
     editInstrument: (instrument: string) => void
     songSettingsDialogOpen: boolean
     setSongSettingsDialogOpen: Dispatch<SetStateAction<boolean>>
+    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
+        currentPatternId,
         currentPlayerPosition,
+        currentSequenceIndex,
+        noteCursor,
         playing,
         tool,
         noteSnapping,
@@ -104,7 +112,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         editInstrument,
         currentInstrumentId, setCurrentInstrumentId,
         songSettingsDialogOpen, setSongSettingsDialogOpen,
+        setNoteEvent,
     } = props;
+
+    const instrument = soundData.instruments[currentInstrumentId];
 
     const totalTicks = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
     const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
@@ -230,22 +241,35 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         options={[
                             {
                                 value: TRACK_DEFAULT_INSTRUMENT_ID,
-                                label: nls.localize('vuengine/editors/sound/trackDefault', 'Track Default'),
+                                label: nls.localize('vuengine/editors/sound/trackDefaultInstrument', 'Track Default Instrument'),
                             },
                             ...Object.keys(soundData.instruments)
                                 .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                                 .map((instrumentId, i) => {
-                                    const instrument = soundData.instruments[instrumentId];
+                                    const instr = soundData.instruments[instrumentId];
                                     return {
                                         value: `${instrumentId}`,
-                                        label: instrument.name.length ? instrument.name : (i + 1).toString(),
-                                        backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
+                                        label: instr.name.length ? instr.name : (i + 1).toString(),
+                                        backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                                     };
                                 })
                         ]}
                         defaultValue={currentInstrumentId}
-                        onChange={v => setCurrentInstrumentId(v[0] as string)}
-                        width={140}
+                        onChange={v => {
+                            const instrumentId = v[0] as string;
+                            setCurrentInstrumentId(instrumentId);
+
+                            const currentPattern = soundData.patterns[currentPatternId];
+                            if (currentPattern === undefined) {
+                                return;
+                            }
+                            const localStep = noteCursor - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+                            if (currentPattern.events[localStep] && currentPattern.events[localStep][SoundEvent.Note]) {
+                                setNoteEvent(localStep, SoundEvent.Instrument, instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined);
+                            }
+                        }}
+                        backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}
+                        width={180}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton

@@ -35,7 +35,7 @@ export const StyledInstrumentsContainer = styled.div`
     gap: 4px;
     overflow: auto;
     padding: 3px;
-    width: 200px;
+    width: 260px;
 `;
 
 export const StyledInstrument = styled.button`

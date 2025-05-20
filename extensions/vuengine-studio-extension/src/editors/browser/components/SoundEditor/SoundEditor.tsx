@@ -24,6 +24,7 @@ import {
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
     EventsMap,
+    InstrumentConfig,
     InstrumentMap,
     NEW_PATTERN_ID,
     NOTES,
@@ -65,6 +66,9 @@ export const getTrackName = (type: SoundEditorTrackType, i: number): string => {
             return `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`;
     }
 };
+
+export const getInstrumentName = (instrument: InstrumentConfig, instrumentIndex: number): string =>
+    instrument.name.length ? instrument.name : (instrumentIndex + 1).toString();
 
 interface SoundEditorProps {
     soundData: SoundData
@@ -184,17 +188,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         // removed all events that are beyond the limits of the pattern
         // this would come into play when resizing down
         const updatedEvents: EventsMap = {};
-        const totalTicks = size * BAR_NOTE_RESOLUTION;
-        Object.keys(pattern.events).forEach(tickStr => {
-            const tick = parseInt(tickStr);
-            if (tick < totalTicks) {
-                updatedEvents[tick] = pattern.events[tick];
+        const patternSteps = size * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        Object.keys(pattern.events).forEach(stepStr => {
+            const step = parseInt(stepStr);
+            if (step < patternSteps) {
+                updatedEvents[step] = pattern.events[step];
 
                 // cut note duration if it would reach beyond the pattern limits
-                if (updatedEvents[tick][SoundEvent.Duration] &&
-                    updatedEvents[tick][SoundEvent.Duration] + tick >= totalTicks
+                if (updatedEvents[step][SoundEvent.Duration] &&
+                    updatedEvents[step][SoundEvent.Duration] + step >= patternSteps
                 ) {
-                    updatedEvents[tick][SoundEvent.Duration] = totalTicks - tick;
+                    updatedEvents[step][SoundEvent.Duration] = patternSteps - step;
                 }
             }
         });
@@ -366,14 +370,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        const updatedEvents: EventsMap = {
-            ...currentPattern.events,
-            [step]: {
-                ...(currentPattern.events[prevStep ?? step] ?? {}),
-                [SoundEvent.Note]: note,
-            }
-        };
-
         const removeNoteFromEvents = (stepToRemove: number) => {
             delete updatedEvents[stepToRemove][SoundEvent.Note];
             if (updatedEvents[stepToRemove][SoundEvent.Duration] !== undefined) {
@@ -381,6 +377,14 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             }
             if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
                 delete updatedEvents[stepToRemove];
+            }
+        };
+
+        const updatedEvents: EventsMap = {
+            ...currentPattern.events,
+            [step]: {
+                ...(currentPattern.events[prevStep ?? step] ?? {}),
+                [SoundEvent.Note]: note,
             }
         };
 
@@ -429,6 +433,14 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     }
                 }
             });
+
+            if (currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID) {
+                if (updatedEvents[step][SoundEvent.Instrument] !== undefined) {
+                    delete (updatedEvents[step][SoundEvent.Instrument]);
+                }
+            } else {
+                updatedEvents[step][SoundEvent.Instrument] = currentInstrumentId;
+            }
 
             // ensure clean key order
             updatedEvents[step] = sortObjectByKeys(updatedEvents[step]);
@@ -639,7 +651,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 <HContainer justifyContent='space-between'>
                     <SoundEditorToolbar
                         soundData={soundData}
+                        currentPatternId={currentPatternId}
                         currentPlayerPosition={currentPlayerPosition}
+                        currentSequenceIndex={currentSequenceIndex}
+                        noteCursor={noteCursor}
                         playing={playing}
                         tool={tool}
                         emulatorInitialized={emulatorInitialized}
@@ -651,6 +666,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         setCurrentInstrumentId={setCurrentInstrumentId}
                         songSettingsDialogOpen={songSettingsDialogOpen}
                         setSongSettingsDialogOpen={setSongSettingsDialogOpen}
+                        setNoteEvent={setNoteEvent}
                     />
                 </HContainer>
                 {soundData.tracks.length === 0
@@ -698,6 +714,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         <StyledLowerContainer>
                             {!eventListHidden &&
                                 <EventList
+                                    soundData={soundData}
                                     currentSequenceIndex={currentSequenceIndex}
                                     pattern={soundData.patterns[currentPatternId]}
                                     noteCursor={noteCursor}
@@ -737,6 +754,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 setPianoRollNoteHeight={setPianoRollNoteHeight}
                                 setPianoRollNoteWidth={setPianoRollNoteWidth}
                                 setPianoRollScrollWindow={setPianoRollScrollWindow}
+                                setCurrentInstrumentId={setCurrentInstrumentId}
                             />
                         </StyledLowerContainer>
                     </>}
@@ -749,7 +767,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
                     width='100%'
-                    overflow='visible'
                 >
                     <Instruments
                         soundData={soundData}

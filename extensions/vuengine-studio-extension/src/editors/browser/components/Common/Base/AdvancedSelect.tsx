@@ -45,11 +45,12 @@ interface AdvancedSelectProps {
     style?: object
     width?: number
     title?: string
+    backgroundColor?: string
 }
 
 export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.Element {
     const {
-        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, containerStyle, style, onChange, onCreateOption, title
+        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, containerStyle, style, onChange, onCreateOption, title, backgroundColor
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
@@ -112,19 +113,25 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
                 control: styles => ({
                     ...styles,
                     width,
+                    backgroundColor,
+                    color: !backgroundColor
+                        ? undefined
+                        : chroma.contrast(backgroundColor, 'white') > 2
+                            ? 'white'
+                            : 'black',
                 }),
                 option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-                    const backgroundColor = chroma(data.backgroundColor ?? '#000');
+                    const bg = chroma(data.backgroundColor ?? '#000');
                     return {
                         ...styles,
                         backgroundColor: !data.backgroundColor
                             ? undefined
                             : isSelected || isFocused || isDisabled
                                 ? data.backgroundColor
-                                : backgroundColor.darken(0.25).css(),
+                                : bg.darken(0.25).css(),
                         color: !data.backgroundColor
                             ? undefined
-                            : chroma.contrast(backgroundColor, 'white') > 2
+                            : chroma.contrast(bg, 'white') > 2
                                 ? 'white'
                                 : 'black',
                     };

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import styled from 'styled-components';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, SEQUENCER_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
@@ -37,6 +37,7 @@ interface PianoRollEditorProps {
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, createNew?: boolean) => void
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -52,6 +53,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
+        setCurrentInstrumentId,
     } = props;
 
     const placedNotesCurrentPattern = useMemo(() => {
@@ -88,6 +90,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                         noteSnapping={noteSnapping}
                         pianoRollNoteHeight={pianoRollNoteHeight}
                         pianoRollNoteWidth={pianoRollNoteWidth}
+                        setCurrentInstrumentId={setCurrentInstrumentId}
                     />
                 );
             }

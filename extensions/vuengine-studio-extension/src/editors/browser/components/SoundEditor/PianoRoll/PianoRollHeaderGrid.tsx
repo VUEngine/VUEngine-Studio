@@ -88,6 +88,9 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             const step = parseInt(key);
             const patternId = track.sequence[step];
             const pattern = soundData.patterns[patternId];
+            if (!pattern) {
+                return;
+            }
             const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
             const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
             const xOffset = step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;

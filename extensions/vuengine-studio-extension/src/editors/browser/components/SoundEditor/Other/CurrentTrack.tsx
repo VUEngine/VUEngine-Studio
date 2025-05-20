@@ -7,8 +7,9 @@ import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { TrackConfig, INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType, TrackConfig } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentTrackProps {
@@ -112,7 +113,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                 const instrument = soundData.instruments[instrumentId];
                                 return {
                                     value: `${instrumentId}`,
-                                    label: instrument.name.length ? instrument.name : (i + 1).toString(),
+                                    label: getInstrumentName(instrument, i),
                                     backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
                                 };
                             })}

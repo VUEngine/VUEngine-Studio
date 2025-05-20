@@ -55,7 +55,7 @@ export const ScaleControls = styled.div`
     right: 10px;
     padding: 0 0 0 1px;
     position: absolute;
-    z-index: 9000;
+    z-index: 900;
 
     button {
         background-color: var(--theia-secondaryButton-background);
@@ -130,6 +130,7 @@ interface PianoRollProps {
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -154,6 +155,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollNoteWidth, setPianoRollNoteWidth,
         sequencerPatternHeight, sequencerPatternWidth,
         setPianoRollScrollWindow,
+        setCurrentInstrumentId,
     } = props;
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
@@ -417,6 +419,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
+                setCurrentInstrumentId={setCurrentInstrumentId}
             />
             <NoteProperties
                 soundData={soundData}
