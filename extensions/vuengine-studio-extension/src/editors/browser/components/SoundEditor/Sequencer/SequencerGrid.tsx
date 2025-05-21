@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef } from 'react';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -17,6 +17,7 @@ const StyledGridContainer = styled.div`
     margin-right: 80px;
     position: relative;
     width: fit-content;
+    z-index: 1;
 
     > .react-resizable {
         height: 100% !important;
@@ -92,9 +93,15 @@ interface SequencerGridProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
-    addPattern: (trackId: number, bar: number, createNew?: boolean) => void
+    addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
+    dragStartTrackId: number
+    dragStartStep: number
+    dragEndStep: number
+    setDragStartTrackId: Dispatch<SetStateAction<number>>
+    setDragStartStep: Dispatch<SetStateAction<number>>
+    setDragEndStep: Dispatch<SetStateAction<number>>
 }
 
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
@@ -107,6 +114,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         // setTrack,
         addPattern,
         sequencerPatternHeight, sequencerPatternWidth,
+        dragStartTrackId, setDragStartTrackId,
+        dragStartStep, setDragStartStep,
+        dragEndStep, setDragEndStep,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
@@ -175,23 +185,23 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
 
         // vertical lines
-        for (let x = 0; x <= soundData.size; x += 0.25) {
-            const offset = x * sequencerPatternWidth - 0.5;
+        for (let x = 0; x <= soundData.size; x++) {
+            const offset = x * sequencerPatternWidth / SEQUENCER_RESOLUTION - 0.5;
             context.beginPath();
-            context.moveTo(offset, x % 4 && x < soundData.size ? SEQUENCER_GRID_METER_HEIGHT : 0);
+            context.moveTo(offset, x % (4 * SEQUENCER_RESOLUTION) ? SEQUENCER_GRID_METER_HEIGHT : 0);
             context.lineTo(offset, h);
             context.strokeStyle = x === soundData.size
                 ? `rgba(${c}, ${c}, ${c}, .6)`
-                : x % 4 === 0
+                : x % (4 * SEQUENCER_RESOLUTION) === 0
                     ? `rgba(${c}, ${c}, ${c}, .4)`
-                    : x % 1 === 0
+                    : x % SEQUENCER_RESOLUTION === 0
                         ? `rgba(${c}, ${c}, ${c}, .2)`
                         : `rgba(${c}, ${c}, ${c}, .1)`;
             context.stroke();
 
             // meter numbers
-            if ((x - 1) % 4 === 0) {
-                context.fillText(x.toString(), offset - sequencerPatternWidth + 4, 10);
+            if ((x / SEQUENCER_RESOLUTION) % 4 === 0) {
+                context.fillText((x / SEQUENCER_RESOLUTION + 1).toString(), offset + 3, 10);
             }
         }
 
@@ -213,18 +223,48 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         setSize(newSize);
     };
 
-    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
-        if (y < 0) {
+
+        const trackId = Math.floor(y / sequencerPatternHeight);
+        const step = Math.floor(x / sequencerPatternWidth) * SEQUENCER_RESOLUTION;
+
+        setDragStartTrackId(trackId);
+        setDragStartStep(step);
+        setDragEndStep(step);
+    };
+
+    const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
+        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
             return;
         }
 
-        const trackId = Math.floor(y / sequencerPatternHeight);
-        const step = Math.floor(x / sequencerPatternWidth);
+        const newPatternStep = Math.min(dragStartStep, dragEndStep);
+        const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
 
-        addPattern(trackId, step, e.buttons === 0);
+        addPattern(dragStartTrackId, newPatternStep, newPatternSize, e.button === 0);
+
+        // reset
+        setDragStartTrackId(-1);
+        setDragStartStep(-1);
+        setDragEndStep(-1);
+    };
+
+    const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+            return;
+        }
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+
+        if (step !== dragEndStep) {
+            console.log('onMouseMove', x, sequencerPatternWidth, SEQUENCER_RESOLUTION, step);
+            setDragEndStep(step);
+        }
     };
 
     const classNames = [];
@@ -269,8 +309,14 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 <canvas
                     height={height}
                     width={width}
-                    onClick={onClick}
-                    onContextMenu={onClick}
+                    onMouseDown={onMouseDown}
+                    onMouseUp={onMouseUp}
+                    onMouseMove={onMouseMove}
+                    onMouseOut={() => {
+                        setDragStartTrackId(-1);
+                        setDragStartStep(-1);
+                        setDragEndStep(-1);
+                    }}
                     ref={canvasRef}
                 />
             </ResizableBox>

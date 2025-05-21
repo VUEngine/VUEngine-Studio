@@ -59,7 +59,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
     };
 
     return pattern
-        ? <VContainer gap={15}>
+        ? <VContainer gap={15} style={{ userSelect: 'none' }}>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}

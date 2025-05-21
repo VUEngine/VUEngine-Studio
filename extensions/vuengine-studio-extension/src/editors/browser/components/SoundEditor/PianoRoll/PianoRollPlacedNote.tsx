@@ -84,7 +84,7 @@ interface PianoRollPlacedNoteProps {
     duration: number
     step: number
     instrumentColor: string
-    setNote: (step: number, note?: string, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     events: EventsMap
     patternSize: number

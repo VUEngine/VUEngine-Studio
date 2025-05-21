@@ -36,7 +36,6 @@ const StyledPianoRollContainer = styled.div`
 `;
 
 const StyledPianoRoll = styled.div`
-    border-left: 1px solid rgba(255, 255, 255, .6);
     flex-grow: 1;
     font-size: 10px;
     overflow: scroll;
@@ -118,19 +117,22 @@ interface PianoRollProps {
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
-    setNote: (step: number, note?: string, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
-    addPattern: (trackId: number, bar: number, createNew?: boolean) => void
+    addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
     pianoRollNoteHeight: number
     setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     setPianoRollNoteWidth: Dispatch<SetStateAction<number>>
     sequencerPatternHeight: number
     sequencerPatternWidth: number
+    pianoRollScrollWindow: ScrollWindow
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    removePatternFromSequence: (trackId: number, step: number) => void
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -154,8 +156,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollNoteHeight, setPianoRollNoteHeight,
         pianoRollNoteWidth, setPianoRollNoteWidth,
         sequencerPatternHeight, sequencerPatternWidth,
-        setPianoRollScrollWindow,
+        pianoRollScrollWindow, setPianoRollScrollWindow,
         setCurrentInstrumentId,
+        setPatternDialogOpen,
+        removePatternFromSequence,
     } = props;
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
@@ -163,7 +167,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const pattern = soundData.patterns[currentPatternId];
     const songLength = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
 
-    const setPatternAtCursorPosition = (cursor?: number, createNew?: boolean) => {
+    const setPatternAtCursorPosition = (cursor?: number, size?: number, createNew?: boolean) => {
         const noteCursorStep = Math.floor((cursor ?? noteCursor) / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
         let stepToSelect = -1;
         let patternIdToSelect = '';
@@ -183,7 +187,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentPatternId(currentTrackId, patternIdToSelect);
         } else {
             setCurrentSequenceIndex(currentTrackId, noteCursorStep);
-            addPattern(currentTrackId, noteCursorStep, createNew);
+            addPattern(currentTrackId, noteCursorStep, size, createNew);
         }
     };
 
@@ -394,6 +398,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 soundData={soundData}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
+                setCurrentPatternId={setCurrentPatternId}
+                currentSequenceIndex={currentSequenceIndex}
+                setCurrentSequenceIndex={setCurrentSequenceIndex}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}
@@ -404,6 +411,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 eventListHidden={eventListHidden}
                 setEventListHidden={setEventListHidden}
                 pianoRollNoteWidth={pianoRollNoteWidth}
+                setPatternDialogOpen={setPatternDialogOpen}
+                removePatternFromSequence={removePatternFromSequence}
+                setPatternAtCursorPosition={setPatternAtCursorPosition}
             />
             <PianoRollEditor
                 soundData={soundData}
@@ -420,6 +430,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 setCurrentInstrumentId={setCurrentInstrumentId}
+                pianoRollScrollWindow={pianoRollScrollWindow}
             />
             <NoteProperties
                 soundData={soundData}

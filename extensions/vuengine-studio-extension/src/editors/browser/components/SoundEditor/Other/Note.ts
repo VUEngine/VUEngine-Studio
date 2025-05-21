@@ -11,7 +11,7 @@ export const getMaxNoteDuration = (events: EventsMap, step: number, patternSize:
     });
     const noteIndex = noteEventKeys.indexOf(step.toString());
 
-    return noteEventKeys[noteIndex + 1] !== undefined
+    return noteIndex > -1 && noteEventKeys[noteIndex + 1] !== undefined
         ? parseInt(noteEventKeys[noteIndex + 1]) - step
         : patternSize * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION - step;
 };

@@ -193,4 +193,14 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'y',
     };
+    export const REMOVE_UNUSED_PATTERNS: EditorCommand = {
+        id: 'editors.soundEditor.removeUnusedPatterns',
+        label: nls.localize('vuengine/editors/sound/commands/removeUnusedPatterns', 'Remove Unused Patterns'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
+    export const REMOVE_UNUSED_INSTRUMENTS: EditorCommand = {
+        id: 'editors.soundEditor.removeUnusedInstruments',
+        label: nls.localize('vuengine/editors/sound/commands/removeUnusedInstruments', 'Remove Unused Instruments'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
 };

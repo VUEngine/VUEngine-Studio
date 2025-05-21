@@ -63,6 +63,8 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id,
+    SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id,
+    SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id,
 ];
 
 export const EXCLUDED_SOUND_EVENTS = [

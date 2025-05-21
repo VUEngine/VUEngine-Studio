@@ -1,4 +1,4 @@
-import { FadersHorizontal, Magnet, PencilSimple, Selection } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Magnet, PencilSimple, Selection } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -17,6 +17,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TrackConfig,
 } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
@@ -78,6 +79,7 @@ export const SidebarCollapseButton = styled.button`
 
 interface SoundEditorToolbarProps {
     soundData: SoundData
+    currentTrackId: number
     currentPatternId: string
     currentPlayerPosition: number
     currentSequenceIndex: number
@@ -94,12 +96,14 @@ interface SoundEditorToolbarProps {
     songSettingsDialogOpen: boolean
     setSongSettingsDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
+    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
+        currentTrackId,
         currentPatternId,
         currentPlayerPosition,
         currentSequenceIndex,
@@ -113,8 +117,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentInstrumentId, setCurrentInstrumentId,
         songSettingsDialogOpen, setSongSettingsDialogOpen,
         setNoteEvent,
+        setTrack,
     } = props;
 
+    const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
 
     const totalTicks = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
@@ -278,6 +284,14 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         onClick={() => editInstrument(currentInstrumentId)}
                     >
                         <i className='codicon codicon-settings-gear' />
+                    </InputWithActionButton>
+                    <InputWithActionButton
+                        className='theia-button secondary'
+                        title={nls.localize('vuengine/editors/sound/setAsTrackDefaultInstrument', 'Set As Default Instrument For Current Track')}
+                        disabled={currentTrack.instrument === currentInstrumentId || currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID}
+                        onClick={() => setTrack(currentTrackId, { instrument: currentInstrumentId })}
+                    >
+                        <Guitar size={17} />
                     </InputWithActionButton>
                 </InputWithAction>
             </StyledSoundEditorToolbarGroup>

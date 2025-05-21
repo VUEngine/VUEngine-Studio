@@ -19,7 +19,7 @@ const StyledTable = styled.table`
         td {
             background-color: var(--theia-editor-background);
             border-bottom: 1px solid rgba(255, 255, 255, .6);
-            padding: 14px 4px 2px;
+            padding: 13px 4px 2px;
             position: sticky;
             top: 0;
 
@@ -120,13 +120,14 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                             ? eventsKeys.length > 0
                                 ?
                                 <>
-                                    {eventsKeys.map(k => {
+                                    {eventsKeys.map((k, i) => {
                                         const localStep = parseInt(k);
                                         const globalStep = noteOffset + localStep;
                                         const stepEvents = pattern.events[localStep];
                                         const stepEventsKeys = Object.keys(stepEvents);
                                         return (
                                             <tr
+                                                key={i}
                                                 className={noteCursor === globalStep ? 'selected' : undefined}
                                                 onClick={() => setNoteCursor(globalStep)}
                                             >

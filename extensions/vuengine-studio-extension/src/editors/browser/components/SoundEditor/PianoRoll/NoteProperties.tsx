@@ -59,7 +59,7 @@ interface NotePropertiesProps {
     setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setNote: (step: number, note?: string, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     effectsPanelHidden: boolean,
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number,

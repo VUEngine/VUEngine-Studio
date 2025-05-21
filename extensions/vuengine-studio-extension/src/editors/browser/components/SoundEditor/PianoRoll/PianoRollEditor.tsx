@@ -1,7 +1,14 @@
-import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { BAR_NOTE_RESOLUTION, NOTES_SPECTRUM, SEQUENCER_RESOLUTION, SoundData, SoundEvent } from '../SoundEditorTypes';
+import {
+    BAR_NOTE_RESOLUTION,
+    NOTES_SPECTRUM,
+    ScrollWindow,
+    SEQUENCER_RESOLUTION,
+    SoundData,
+    SoundEvent
+} from '../SoundEditorTypes';
 import Piano from './Piano';
 import PianoRollGrid from './PianoRollGrid';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
@@ -23,6 +30,12 @@ const StyledPianoRollGridContainer = styled.div`
     }
 `;
 
+const CurrentlyPlacingNote = styled.div`
+    border: 1px dashed var(--theia-focusBorder);
+    box-sizing: border-box;
+    position: absolute;
+`;
+
 interface PianoRollEditorProps {
     soundData: SoundData
     currentTrackId: number
@@ -30,14 +43,15 @@ interface PianoRollEditorProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (note: number) => void
-    setNote: (step: number, note?: string, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
     noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
-    setPatternAtCursorPosition: (cursor?: number, createNew?: boolean) => void
+    setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -54,7 +68,11 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
         setCurrentInstrumentId,
+        pianoRollScrollWindow,
     } = props;
+    const [dragStartNoteId, setDragStartNoteId] = useState<number>(-1);
+    const [dragStartStep, setDragStartStep] = useState<number>(-1);
+    const [dragEndStep, setDragEndStep] = useState<number>(-1);
 
     const placedNotesCurrentPattern = useMemo(() => {
         const track = soundData.tracks[currentTrackId];
@@ -107,10 +125,17 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         setNote,
     ]);
 
-    return <StyledPianoRollEditor>
+    return <StyledPianoRollEditor
+        onMouseOut={() => {
+            setDragStartNoteId(-1);
+            setDragStartStep(-1);
+            setDragEndStep(-1);
+        }}
+    >
         <Piano
             playNote={playNote}
             pianoRollNoteHeight={pianoRollNoteHeight}
+            pianoRollScrollWindow={pianoRollScrollWindow}
         />
         <StyledPianoRollGridContainer
             style={{
@@ -118,6 +143,16 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
             }}
         >
             {placedNotesCurrentPattern}
+            {dragStartNoteId > -1 &&
+                <CurrentlyPlacingNote
+                    style={{
+                        height: pianoRollNoteHeight,
+                        left: Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth,
+                        top: dragStartNoteId * pianoRollNoteHeight,
+                        width: pianoRollNoteWidth * (Math.abs(dragStartStep - dragEndStep) + 1),
+                    }}
+                />
+            }
             <PianoRollGrid
                 soundData={soundData}
                 noteCursor={noteCursor}
@@ -129,6 +164,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
+                dragStartNoteId={dragStartNoteId}
+                dragStartStep={dragStartStep}
+                dragEndStep={dragEndStep}
+                setDragStartNoteId={setDragStartNoteId}
+                setDragStartStep={setDragStartStep}
+                setDragEndStep={setDragEndStep}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

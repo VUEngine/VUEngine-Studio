@@ -14,7 +14,7 @@ interface CanvasImageProps {
     style?: object
     repeatX?: boolean
     repeatY?: boolean
-    colorOverride?: string
+    colorOverride?: string | string[][]
     drawBlack?: boolean
 }
 
@@ -75,7 +75,11 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                     return;
                 }
 
-                const fillColor = colorOverride ?? getColor(effectiveColorByPalette);
+                const fillColor = colorOverride
+                    ? Array.isArray(colorOverride) && Array.isArray(colorOverride[0])
+                        ? colorOverride[y][x]
+                        : colorOverride as string
+                    : getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
@@ -172,6 +176,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         palette,
         parallaxDisplacement,
         pixelData,
+        colorOverride,
         totalHeight,
         totalWidth,
     ]);

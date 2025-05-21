@@ -46,6 +46,7 @@ import {
 } from './SoundEditorTypes';
 import WaveformSelect from './WaveformSelect';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import { getMaxNoteDuration } from './Other/Note';
 
 const StyledLowerContainer = styled.div` 
     display: flex;
@@ -285,6 +286,27 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         );
     };
 
+    const removePatternFromSequence = (trackId: number, step: number): void => {
+        const updatedSequence = { ...soundData.tracks[trackId].sequence };
+
+        // Select previous (or none) pattern
+        const sequenceSteps = Object.keys(updatedSequence);
+        const stepSequenceIndex = sequenceSteps.indexOf(step.toString());
+        if (stepSequenceIndex > 0) {
+            const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
+            setCurrentPatternId(updatedSequence[prevStep]);
+            setCurrentSequenceIndex(prevStep);
+        } else {
+            setCurrentSequenceIndex(-1);
+        }
+
+        // Remove pattern
+        delete (updatedSequence[step]);
+        setTrack(trackId, {
+            sequence: updatedSequence,
+        });
+    };
+
     const addTrack = async (): Promise<void> => {
         const trackType = await showTrackTypeSelection();
         if (trackType && trackType.id) {
@@ -320,6 +342,36 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             tracks: updatedTracks,
         });
         setTrackDialogOpen(false);
+    };
+
+    const removeUnusedPatterns = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label,
+            msg: nls.localize(
+                'vuengine/editors/sound/confirmRemoveUnusedPatterns',
+                'This will delete all patterns that are not currently placed on any track.\nAre you sure you want to do this?'
+            ),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            // TODO
+            alert('not yet implemented');
+        }
+    };
+
+    const removeUnusedInstruments = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label,
+            msg: nls.localize(
+                'vuengine/editors/sound/confirmRemoveUnusedInstruments',
+                'This will delete all instruments that are not currently used in any pattern that is used on a track.\nAre you sure you want to do this?'
+            ),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            // TODO
+            alert('not yet implemented');
+        }
     };
 
     const togglePlaying = (): void => {
@@ -362,7 +414,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const setNote = (step: number, note?: string, prevStep?: number): void => {
+    const setNote = (step: number, note?: string, prevStep?: number, duration?: number): void => {
         const currentPattern = soundData.patterns[currentPatternId];
         const currentPatternEvents = currentPattern.events;
 
@@ -399,7 +451,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 removeNoteFromEvents(prevStep);
             }
 
-            // cap note's duration
+            // set duration
+            if (duration) {
+                updatedEvents[step][SoundEvent.Duration] = Math.min(
+                    getMaxNoteDuration(currentPattern.events, step, currentPattern.size),
+                    duration * SUB_NOTE_RESOLUTION
+                );
+            }
+
+            // set and cap new note's duration
             if (updatedEvents[step][SoundEvent.Duration] === undefined) {
                 let cappedDuration = 0;
                 stop = false;
@@ -434,6 +494,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 }
             });
 
+            // set instrument
             if (currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID) {
                 if (updatedEvents[step][SoundEvent.Instrument] !== undefined) {
                     delete (updatedEvents[step][SoundEvent.Instrument]);
@@ -471,7 +532,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             updatedEvents[step][event] = value;
         }
 
-        // TODO: remove step, if empty
+        // remove step, if empty
+        if (Object.keys(updatedEvents[step]).length === 0) {
+            delete (updatedEvents[step]);
+        }
 
         setPattern(currentPatternId, {
             events: updatedEvents,
@@ -508,7 +572,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setInstrumentDialogOpen(true);
     };
 
-    const addPatternToSequence = async (trackId: number, step: number, patternId: string): Promise<void> => {
+    const addPatternToSequence = async (trackId: number, step: number, patternId: string, size: number): Promise<void> => {
         const track = soundData.tracks[trackId];
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
@@ -531,7 +595,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     ...soundData.patterns,
                     [newPatternId]: {
                         ...newPattern,
-                        size: 4,
+                        size,
                     }
                 }
             });
@@ -568,12 +632,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             }
         );
 
-    const addPattern = async (trackId: number, bar: number, createNew: boolean = false): Promise<void> => {
+    const addPattern = async (trackId: number, step: number, size?: number, createNew: boolean = false): Promise<void> => {
         const patternToAdd = createNew
             ? { id: NEW_PATTERN_ID }
+            // TODO: if size > 1 is given, show only pattern of that size
             : await showPatternSelection(trackId);
         if (patternToAdd && patternToAdd.id) {
-            addPatternToSequence(trackId, bar, patternToAdd.id);
+            addPatternToSequence(trackId, step, patternToAdd.id, size ?? 4);
         }
     };
 
@@ -596,6 +661,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 break;
             case SoundEditorCommands.ADD_NOTE.id:
                 // TODO
+                alert('not yet implemented');
                 break;
             case SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id:
                 setNoteSnapping(prev => !prev);
@@ -608,6 +674,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 break;
             case SoundEditorCommands.ADD_PATTERN.id:
                 // TODO
+                alert('not yet implemented');
+                break;
+            case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
+                removeUnusedPatterns();
+                break;
+            case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
+                removeUnusedInstruments();
                 break;
         }
     };
@@ -651,6 +724,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 <HContainer justifyContent='space-between'>
                     <SoundEditorToolbar
                         soundData={soundData}
+                        currentTrackId={currentTrackId}
                         currentPatternId={currentPatternId}
                         currentPlayerPosition={currentPlayerPosition}
                         currentSequenceIndex={currentSequenceIndex}
@@ -667,6 +741,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         songSettingsDialogOpen={songSettingsDialogOpen}
                         setSongSettingsDialogOpen={setSongSettingsDialogOpen}
                         setNoteEvent={setNoteEvent}
+                        setTrack={setTrack}
                     />
                 </HContainer>
                 {soundData.tracks.length === 0
@@ -709,6 +784,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 setSequencerPatternWidth={setSequencerPatternWidth}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternSize={setPatternSize}
+                                removePatternFromSequence={removePatternFromSequence}
                             />
                         }
                         <StyledLowerContainer>
@@ -755,6 +831,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 setPianoRollNoteWidth={setPianoRollNoteWidth}
                                 setPianoRollScrollWindow={setPianoRollScrollWindow}
                                 setCurrentInstrumentId={setCurrentInstrumentId}
+                                pianoRollScrollWindow={pianoRollScrollWindow}
+                                setPatternDialogOpen={setPatternDialogOpen}
+                                removePatternFromSequence={removePatternFromSequence}
                             />
                         </StyledLowerContainer>
                     </>}
@@ -809,15 +888,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             <HContainer>
                                 <button
                                     className='theia-button secondary'
-                                    onClick={() => alert('not yet implemented')}
+                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id)}
                                 >
-                                    {nls.localize('vuengine/editors/sound/removeUnusedPatterns', 'Remove Unused Patterns')}
+                                    {SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label}
                                 </button>
                                 <button
                                     className='theia-button secondary'
-                                    onClick={() => alert('not yet implemented')}
+                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id)}
                                 >
-                                    {nls.localize('vuengine/editors/sound/removeUnusedInstruments', 'Remove Unused Instruments')}
+                                    {SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label}
                                 </button>
                             </HContainer>
                         </VContainer>

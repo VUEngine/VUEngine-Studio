@@ -18,7 +18,7 @@ interface NotePropertiesGridProps {
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    setNote: (step: number, note?: string, prevStep?: number) => void
+    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     pianoRollNoteWidth: number
 }
 

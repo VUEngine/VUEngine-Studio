@@ -6,6 +6,7 @@ import { SoundEditorCommands } from '../SoundEditorCommands';
 import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundData, SEQUENCER_PATTERN_HEIGHT_DEFAULT } from '../SoundEditorTypes';
 import { StyledTrackHeaderContainer } from './Sequencer';
 import { getTrackName } from '../SoundEditor';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 
 const StyledTrackHeader = styled.div`
     background-color: var(--theia-editor-background);
@@ -171,6 +172,9 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
     const instrumentName = soundData.instruments[track.instrument]
         ? soundData.instruments[track.instrument].name
         : '-';
+    const instrumentColor = soundData.instruments[track.instrument]
+        ? soundData.instruments[track.instrument].color
+        : DEFAULT_COLOR_INDEX;
 
     return <StyledTrackHeader
         className={classNames.join(' ')}
@@ -185,7 +189,12 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         <StyledTrackHeaderInfo>
             <div>{trackName}</div>
             {sequencerPatternHeight >= SEQUENCER_PATTERN_HEIGHT_DEFAULT &&
-                <div>{instrumentName}</div>
+                <div style={{ color: COLOR_PALETTE[instrumentColor] }}>
+                    { /* }
+                    <span style={{ color: COLOR_PALETTE[instrumentColor] }}>●</span>
+                    { */ }
+                    {instrumentName}
+                </div>
             }
         </StyledTrackHeaderInfo>
         <StyledTrackHeaderButtons>
