@@ -167,11 +167,8 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             value = `${directionLabel}${targetNoteLabel}`;
                                                         }
                                                         if (eventType === SoundEvent.Instrument) {
-                                                            const instrument = soundData.instruments[stepEvents[SoundEvent.Instrument]];
-                                                            const instrumentIndex = Object.keys(soundData.instruments)
-                                                                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
-                                                                .indexOf(stepEvents[SoundEvent.Instrument]);
-                                                            value = getInstrumentName(instrument, instrumentIndex);
+                                                            const instrumentId = stepEvents[SoundEvent.Instrument];
+                                                            value = getInstrumentName(soundData, instrumentId);
                                                         }
                                                         return <div>{value}</div>;
                                                     })}

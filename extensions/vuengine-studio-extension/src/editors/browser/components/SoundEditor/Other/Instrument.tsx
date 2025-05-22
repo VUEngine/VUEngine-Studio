@@ -14,7 +14,7 @@ import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
 import PaletteColorSelect, { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp, nanoid } from '../../Common/Utils';
-import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
+import { WAVEFORM_MAX, WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,
@@ -36,6 +36,7 @@ import {
 } from '../Emulator/VsuTypes';
 import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import { getInstrumentName } from '../SoundEditor';
 
 const ENVELOPE_PREVIEW_SIZE = 272;
 
@@ -288,7 +289,11 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     const removeCurrentInstrument = async () => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/sound/deleteInstrumentQuestion', 'Delete Instrument?'),
-            msg: nls.localize('vuengine/editors/sound/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', instrument.name),
+            msg: nls.localize(
+                'vuengine/editors/sound/areYouSureYouWantToDelete',
+                'Are you sure you want to delete {0}?',
+                getInstrumentName(soundData, currentInstrumentId)
+            ),
         });
         const remove = await dialog.open();
         if (remove) {
@@ -563,9 +568,9 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                 <NumberArrayPreview
                                     active={true}
                                     color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
-                                    height={128}
-                                    width={128}
-                                    maximum={64}
+                                    height={WAVEFORM_MAX * 2}
+                                    width={WAVEFORM_MAX * 2}
+                                    maximum={WAVEFORM_MAX}
                                     data={waveform ? waveform.values : [...Array(32)].map(v => 0)}
                                     onClick={() => setWaveformDialogOpen(currentInstrumentId)}
                                 />
@@ -722,9 +727,9 @@ from the first modulation value. '
                                         <NumberArrayPreview
                                             active={true}
                                             color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
-                                            maximum={256}
-                                            height={128}
-                                            width={128}
+                                            maximum={255}
+                                            height={127}
+                                            width={127}
                                             data={instrument?.modulationData}
                                             onClick={() => setModulationDataDialogOpen(currentInstrumentId)}
                                         />

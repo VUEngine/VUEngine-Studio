@@ -386,7 +386,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 style={{
                     bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 0 : 8,
                     left: pianoRollScrollWindow.x,
-                    width: pianoRollScrollWindow.w,
+                    // cap to song size as maximum width
+                    width: Math.min(pianoRollScrollWindow.w, soundData.size * sequencerPatternWidth / SEQUENCER_RESOLUTION),
                 }}
             />
             {dragStartTrackId > -1 &&
@@ -412,7 +413,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                         key={`${index}-${step}`}
                         soundData={soundData}
                         updateSoundData={updateSoundData}
-                        patternIndex={patternIndex}
                         step={step}
                         trackId={index}
                         pattern={pattern}

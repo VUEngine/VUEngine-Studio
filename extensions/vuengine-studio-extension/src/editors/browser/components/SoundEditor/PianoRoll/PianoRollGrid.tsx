@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from '
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
+    DEFAULT_PATTERN_SIZE,
     NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
@@ -221,7 +222,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 setNote((newNoteStep - localStep) * SUB_NOTE_RESOLUTION, newNoteLabel, undefined, newNoteDuration);
             }
         } else {
-            const newPatternSize = newNoteDuration * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
+            const newPatternSize = dragStartStep === dragEndStep
+                ? DEFAULT_PATTERN_SIZE
+                : newNoteDuration * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
             setPatternAtCursorPosition(newNoteCursor, newPatternSize, e.button === 0);
         }
 

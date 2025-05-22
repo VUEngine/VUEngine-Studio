@@ -5,7 +5,7 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
-import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
+import { WAVEFORM_MAX, WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 import { InputWithActionButton } from './Other/Instruments';
 
 interface WaveformSelectProps {
@@ -43,10 +43,10 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
             }}
         >
             <NumberArrayPreview
-                maximum={64}
+                maximum={WAVEFORM_MAX}
                 data={waveform.values}
-                height={128}
-                width={128}
+                height={WAVEFORM_MAX * 2}
+                width={WAVEFORM_MAX * 2}
                 active={waveform._id === value}
                 onClick={() => setValue(waveform._id)}
             />
@@ -81,10 +81,10 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
                         {!templates &&
                             <VContainer style={{ position: 'relative' }}>
                                 <NumberArrayPreview
-                                    maximum={64}
+                                    maximum={WAVEFORM_MAX}
                                     data={[...Array(32)].map(v => 0)}
-                                    height={128}
-                                    width={128}
+                                    height={WAVEFORM_MAX * 2}
+                                    width={WAVEFORM_MAX * 2}
                                     onClick={() => newWaveform()}
                                 />
                                 <i

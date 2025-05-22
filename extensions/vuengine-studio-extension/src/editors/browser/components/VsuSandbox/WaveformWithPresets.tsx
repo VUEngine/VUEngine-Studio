@@ -3,10 +3,10 @@ import React, { useContext } from 'react';
 import { WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
-import NumberArrayPreview from '../Common/NumberArrayPreview';
 import VContainer from '../Common/Base/VContainer';
+import NumberArrayPreview from '../Common/NumberArrayPreview';
 import WaveForm from '../WaveFormEditor/WaveForm';
-import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
+import { WAVEFORM_MAX, WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 
 interface WaveformWithPresetsProps {
     value: number[]
@@ -29,7 +29,7 @@ export default function WaveformWithPresets(props: WaveformWithPresetsProps): Re
                     {(Object.values(waveForms).map((w, i) =>
                         <NumberArrayPreview
                             key={i}
-                            maximum={64}
+                            maximum={WAVEFORM_MAX}
                             data={w.values}
                             onClick={() => setValue(w.values)}
                             onMouseEnter={event => {

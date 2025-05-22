@@ -113,12 +113,13 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                 const instrument = soundData.instruments[instrumentId];
                                 return {
                                     value: `${instrumentId}`,
-                                    label: getInstrumentName(instrument, i),
+                                    label: getInstrumentName(soundData, instrumentId),
                                     backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
                                 };
                             })}
                         defaultValue={`${track.instrument}`}
                         onChange={options => setTrackInstrument(options[0])}
+                        backgroundColor={soundData.instruments[track.instrument] ? COLOR_PALETTE[soundData.instruments[track.instrument].color] : undefined}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton

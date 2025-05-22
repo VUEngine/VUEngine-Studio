@@ -6,6 +6,7 @@ import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import { getPatternName } from '../SoundEditor';
 import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SoundData } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
@@ -28,17 +29,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
 
     const pattern = soundData.patterns[currentPatternId];
 
-    const getName = (patternId: string, i: number): string => soundData.patterns[patternId] && soundData.patterns[patternId].name?.length
-        ? soundData.patterns[patternId].name
-        : (i + 1).toString();
-
     const setPatternName = (name: string): void => {
         setPattern(currentPatternId, { name });
-    };
-
-    const addPattern = () => {
-        // TODO
-        alert('not yet implemented');
     };
 
     const clonePattern = () => {
@@ -66,22 +58,14 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </label>
                 <InputWithAction>
                     <AdvancedSelect
-                        options={Object.keys(soundData.patterns).map((n, i) => ({
-                            label: getName(n, i),
-                            value: n,
+                        options={Object.keys(soundData.patterns).map((patternId, i) => ({
+                            label: getPatternName(soundData, patternId),
+                            value: patternId,
                         }))}
                         defaultValue={currentPatternId.toString()}
                         onChange={options => setCurrentPatternId(currentTrackId, options[0])}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localizeByDefault('Remove')}
-                        onClick={removeCurrentPattern}
-                        disabled={!pattern}
-                    >
-                        <Trash size={16} />
-                    </InputWithActionButton>
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
@@ -92,10 +76,11 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     </InputWithActionButton>
                     <InputWithActionButton
                         className='theia-button secondary'
-                        title={nls.localizeByDefault('Add')}
-                        onClick={addPattern}
+                        title={nls.localizeByDefault('Remove')}
+                        onClick={removeCurrentPattern}
+                        disabled={!pattern}
                     >
-                        <i className='codicon codicon-plus' />
+                        <Trash size={16} />
                     </InputWithActionButton>
                 </InputWithAction>
             </VContainer>

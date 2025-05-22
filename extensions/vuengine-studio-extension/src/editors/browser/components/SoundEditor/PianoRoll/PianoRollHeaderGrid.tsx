@@ -75,7 +75,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             context.stroke();
 
             // meter numbers
-            context.fillText((x + 1).toString(), offset - (NOTE_RESOLUTION * pianoRollNoteWidth) + 4, 11);
+            context.fillText(x.toString(), offset - (NOTE_RESOLUTION * pianoRollNoteWidth) + 4, 11);
         }
 
         // middle line
@@ -100,8 +100,6 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             if (!pattern) {
                 return;
             }
-            const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
-            const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
             const xOffset = step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
             const isSelected = patternId === currentPatternId && step === currentSequenceIndex;
             context.fillStyle = isSelected ? patternBackgroundHighlight : patternBackground;
@@ -112,7 +110,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH - 1,
             );
             context.fillStyle = isSelected ? patternForegroundHighlight : patternForeground;
-            context.fillText(patternName, xOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
+            context.fillText(getPatternName(soundData, patternId), xOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
         });
         */
 

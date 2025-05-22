@@ -121,13 +121,11 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             if (!pattern) {
                 return;
             }
-            const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
-            const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
             const xOffset = PIANO_ROLL_KEY_WIDTH + 2 + step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
             const isSelected = patternId === currentPatternId && step === currentSequenceIndex;
             patterns.push(<PianoRollHeaderPlacedPattern
+                soundData={soundData}
                 step={step}
-                patternName={patternName}
                 patternId={patternId}
                 patternSize={pattern.size}
                 current={isSelected}

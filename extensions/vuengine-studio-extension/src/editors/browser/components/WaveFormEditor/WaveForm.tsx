@@ -1,5 +1,6 @@
 import React from 'react';
 import VerticalRangeInput from '../Common/Base/VerticalRangeInput';
+import { WAVEFORM_MAX, WAVEFORM_MIN } from './WaveFormEditorTypes';
 
 interface WaveFormProps {
     value: number[]
@@ -18,12 +19,12 @@ export default function WaveForm(props: WaveFormProps): React.JSX.Element {
     return <div className='waveform'>
         <div>
             {[...Array(32)].map((h, y) => {
-                const v = value[y] ?? 64;
+                const v = value[y] ?? WAVEFORM_MAX;
                 return <VerticalRangeInput
                     key={y}
                     index={y}
-                    min={1}
-                    max={64}
+                    min={WAVEFORM_MIN}
+                    max={WAVEFORM_MAX}
                     value={v}
                     setValue={(x: number) => setIndividualValue(y, x)}
                 />;

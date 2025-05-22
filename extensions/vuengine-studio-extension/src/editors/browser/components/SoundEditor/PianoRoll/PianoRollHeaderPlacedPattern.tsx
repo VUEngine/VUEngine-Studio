@@ -1,11 +1,13 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
+import { getPatternName } from '../SoundEditor';
 import {
     NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
     SEQUENCER_RESOLUTION,
+    SoundData,
 } from '../SoundEditorTypes';
 
 const StyledPattern = styled.div`
@@ -18,13 +20,13 @@ const StyledPattern = styled.div`
 `;
 
 interface PianoRollHeaderPlacedPatternProps {
+    soundData: SoundData
     current: boolean
     step: number
     currentTrackId: number
     left: number
     patternSize: number
     patternId: string
-    patternName: string
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
@@ -34,12 +36,13 @@ interface PianoRollHeaderPlacedPatternProps {
 
 export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlacedPatternProps): React.JSX.Element {
     const {
+        soundData,
         step,
         left,
         current,
         currentTrackId,
         setCurrentPatternId,
-        patternSize, patternId, patternName,
+        patternSize, patternId,
         pianoRollNoteWidth,
         setCurrentSequenceIndex,
         setPatternDialogOpen,
@@ -72,7 +75,7 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
             onDoubleClick={onDoubleClick}
             onContextMenu={onContextMenu}
         >
-            {patternName}
+            {getPatternName(soundData, patternId)}
         </StyledPattern>
     );
 }

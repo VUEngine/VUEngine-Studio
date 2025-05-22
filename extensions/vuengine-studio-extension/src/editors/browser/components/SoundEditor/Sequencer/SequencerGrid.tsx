@@ -4,13 +4,14 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
-    TrackConfig,
+    DEFAULT_PATTERN_SIZE,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
     SequenceMap,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_RESOLUTION,
     SoundData,
-    SEQUENCER_RESOLUTION
+    TrackConfig
 } from '../SoundEditorTypes';
 
 const StyledGridContainer = styled.div`
@@ -127,30 +128,35 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const width = songLength * sequencerPatternWidth;
 
     const setSize = (size: number): void => {
-        if (size <= MAX_SEQUENCE_SIZE && size >= MIN_SEQUENCE_SIZE) {
-            updateSoundData({
-                ...soundData,
-                tracks: [
-                    ...soundData.tracks.map(t => {
-                        const updatedSequence: SequenceMap = {};
-                        Object.keys(t.sequence).map(k => {
-                            const step = parseInt(k);
-                            const patternId = t.sequence[step];
-                            const pattern = soundData.patterns[patternId];
-                            const patternSize = pattern.size / SEQUENCER_RESOLUTION;
-                            if (step + patternSize <= size) {
-                                updatedSequence[step] = patternId;
-                            }
-                        });
-                        return {
-                            ...t,
-                            sequence: updatedSequence
-                        };
-                    })
-                ],
-                size,
-            });
+        if (size > MAX_SEQUENCE_SIZE || size < MIN_SEQUENCE_SIZE) {
+            return;
         }
+
+        updateSoundData({
+            ...soundData,
+            tracks: [
+                ...soundData.tracks.map(t => {
+                    const updatedSequence: SequenceMap = {};
+                    Object.keys(t.sequence).map(k => {
+                        const step = parseInt(k);
+                        const patternId = t.sequence[step];
+                        const pattern = soundData.patterns[patternId];
+                        if (!pattern) {
+                            return;
+                        }
+                        const patternSize = pattern.size / SEQUENCER_RESOLUTION;
+                        if (step + patternSize <= size) {
+                            updatedSequence[step] = patternId;
+                        }
+                    });
+                    return {
+                        ...t,
+                        sequence: updatedSequence
+                    };
+                })
+            ],
+            size,
+        });
     };
 
     const draw = (): void => {
@@ -201,7 +207,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
             // meter numbers
             if ((x / SEQUENCER_RESOLUTION) % 4 === 0) {
-                context.fillText((x / SEQUENCER_RESOLUTION + 1).toString(), offset + 3, 10);
+                context.fillText((x / SEQUENCER_RESOLUTION).toString(), offset + 3, 10);
             }
         }
 
@@ -242,7 +248,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
 
         const newPatternStep = Math.min(dragStartStep, dragEndStep);
-        const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
+        const newPatternSize = dragStartStep === dragEndStep
+            ? DEFAULT_PATTERN_SIZE
+            : Math.abs(dragStartStep - dragEndStep) + 1;
 
         addPattern(dragStartTrackId, newPatternStep, newPatternSize, e.button === 0);
 
@@ -262,7 +270,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
 
         if (step !== dragEndStep) {
-            console.log('onMouseMove', x, sequencerPatternWidth, SEQUENCER_RESOLUTION, step);
             setDragEndStep(step);
         }
     };

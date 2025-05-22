@@ -7,6 +7,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types'
 import CanvasImage from '../../Common/CanvasImage';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { DisplayMode } from '../../Common/VUEngineTypes';
+import { getPatternName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     NOTE_RESOLUTION,
@@ -72,7 +73,6 @@ const StyledPatternName = styled.div`
 interface SequencerPlacedPatternProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    patternIndex: number
     step: number
     pattern: PatternConfig
     trackId: number
@@ -91,7 +91,6 @@ interface SequencerPlacedPatternProps {
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        patternIndex,
         step,
         trackId,
         pattern, patternId,
@@ -119,7 +118,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     }
 
     const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
-    const patternName = pattern.name.length ? pattern.name : (patternIndex + 1).toString();
+    const patternName = getPatternName(soundData, patternId);
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
     const widthCeil = Math.ceil(width);
 

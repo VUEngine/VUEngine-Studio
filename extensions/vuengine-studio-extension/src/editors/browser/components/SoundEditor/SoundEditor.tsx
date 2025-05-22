@@ -24,7 +24,6 @@ import {
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
     EventsMap,
-    InstrumentConfig,
     InstrumentMap,
     NEW_PATTERN_ID,
     NOTES,
@@ -68,8 +67,15 @@ export const getTrackName = (type: SoundEditorTrackType, i: number): string => {
     }
 };
 
-export const getInstrumentName = (instrument: InstrumentConfig, instrumentIndex: number): string =>
-    instrument.name.length ? instrument.name : (instrumentIndex + 1).toString();
+export const getPatternName = (soundData: SoundData, patternId: string): string =>
+    soundData.patterns[patternId].name.length
+        ? soundData.patterns[patternId].name
+        : `(${patternId.slice(0, 4)})`;
+
+export const getInstrumentName = (soundData: SoundData, instrumentId: string): string =>
+    soundData.instruments[instrumentId].name.length
+        ? soundData.instruments[instrumentId].name
+        : `(${instrumentId.slice(0, 4)})`;
 
 interface SoundEditorProps {
     soundData: SoundData
@@ -345,17 +351,65 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const removeUnusedPatterns = async (): Promise<void> => {
+        // find all unused patterns
+        const unusedPatterns: Record<string, string> = {};
+        Object.keys(soundData.patterns).forEach(patternId => {
+            let found = false;
+            soundData.tracks.forEach(track => {
+                if (Object.values(track.sequence).includes(patternId)) {
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                unusedPatterns[patternId] = getPatternName(soundData, patternId);
+            }
+        });
+        const unusedPatternsNames = Object.values(unusedPatterns);
+
+        // stop if no unused patterns found
+        if (unusedPatternsNames.length === 0) {
+            services.messageService.info(nls.localize(
+                'vuengine/editors/sound/noUnusedPatternsFound',
+                'No unused patterns could be found.'
+            ));
+            return;
+        }
+
+        // prompt
+        const ellipsis = unusedPatternsNames.length > 15 ? '\n[…]' : '';
+        const patternList = `• ${unusedPatternsNames.slice(0, 15).join('\n• ')}${ellipsis}`;
+
         const dialog = new ConfirmDialog({
             title: SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label,
-            msg: nls.localize(
+            msg: `${nls.localize(
                 'vuengine/editors/sound/confirmRemoveUnusedPatterns',
-                'This will delete all patterns that are not currently placed on any track.\nAre you sure you want to do this?'
-            ),
+                'This will delete all patterns that are not currently placed on any track.\n\
+Are you sure you want to do this?\n\n\
+A total of {0} patterns will be deleted.',
+                unusedPatternsNames.length
+            )}\n\n${patternList}`,
         });
+
         const confirmed = await dialog.open();
         if (confirmed) {
-            // TODO
-            alert('not yet implemented');
+            const updatedPatterns = { ...soundData.patterns };
+
+            const unusedPatternsIds = Object.keys(unusedPatterns);
+            unusedPatternsIds.forEach(patternId => {
+                delete updatedPatterns[patternId];
+            });
+
+            updateSoundData({
+                ...soundData,
+                patterns: updatedPatterns,
+            });
+
+            services.messageService.info(nls.localize(
+                'vuengine/editors/sound/unusedPatternsDeleted',
+                'Successfully deleted {0} unused patterns.',
+                unusedPatternsNames.length
+            ));
         }
     };
 
@@ -364,7 +418,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             title: SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label,
             msg: nls.localize(
                 'vuengine/editors/sound/confirmRemoveUnusedInstruments',
-                'This will delete all instruments that are not currently used in any pattern that is used on a track.\nAre you sure you want to do this?'
+                'This will delete all instruments that are not currently used in any pattern that is placed on a track.\nAre you sure you want to do this?'
             ),
         });
         const confirmed = await dialog.open();
@@ -588,6 +642,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 [step.toString()]: newPatternId,
             };
 
+            const newNameLabel = nls.localizeByDefault('New');
+            let newNameNumber = 1;
+            const patterns = Object.values(soundData.patterns);
+            while (patterns.filter(i => i.name === `${newNameLabel} ${newNameNumber}`).length) {
+                newNameNumber++;
+            }
+
             updateSoundData({
                 ...soundData,
                 tracks: updatedTracks,
@@ -595,6 +656,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     ...soundData.patterns,
                     [newPatternId]: {
                         ...newPattern,
+                        name: `${newNameLabel} ${newNameNumber}`,
                         size,
                     }
                 }
@@ -619,11 +681,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     id: NEW_PATTERN_ID,
                     label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
                 },
-                ...Object.keys(soundData.patterns).map((p, i) => ({
-                    id: p,
-                    label: soundData.patterns[p].name.length
-                        ? soundData.patterns[p].name
-                        : (i + 1).toString(),
+                ...Object.keys(soundData.patterns).map((patternId, i) => ({
+                    id: patternId,
+                    label: getPatternName(soundData, patternId),
                 })),
             ],
             {
@@ -699,7 +759,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     }, [
         playing,
         setPlaying,
-        soundData.tracks,
+        soundData,
     ]);
 
     return (

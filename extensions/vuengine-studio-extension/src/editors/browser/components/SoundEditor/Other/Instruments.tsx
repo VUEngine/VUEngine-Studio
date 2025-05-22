@@ -9,6 +9,7 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import { nanoid } from '../../Common/Utils';
 import { InstrumentMap, SoundData } from '../SoundEditorTypes';
 import Instrument from './Instrument';
+import { getInstrumentName } from '../SoundEditor';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -96,11 +97,18 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         }
 
         const newId = nanoid();
+        const newNameLabel = nls.localizeByDefault('New');
+        let newNameNumber = 1;
+        const instruments = Object.values(soundData.instruments);
+        while (instruments.filter(i => i.name === `${newNameLabel} ${newNameNumber}`).length) {
+            newNameNumber++;
+        }
+
         setInstruments({
             ...soundData.instruments,
             [newId]: {
                 ...newInstrument,
-                name: nls.localizeByDefault('New'),
+                name: `${newNameLabel} ${newNameNumber}`,
             },
         });
         setCurrentInstrumentId(newId);
@@ -114,11 +122,13 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     >
         <StyledInstrumentsContainer>
             {Object.keys(soundData.instruments)
-                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
+                // sort alphabetically, empty names to end
+                .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
+                    (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')
+                ))
                 .map((instrumentId, i) => {
                     const instr = soundData.instruments[instrumentId];
                     const instrumentColor = COLOR_PALETTE[instr?.color ?? DEFAULT_COLOR_INDEX];
-                    const name = instr.name.length ? instr.name : (i + 1).toString();
                     return <StyledInstrument
                         key={i}
                         className={currentInstrumentId === instrumentId ? 'current' : undefined}
@@ -128,7 +138,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                             color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                         }}
                     >
-                        {name}
+                        {getInstrumentName(soundData, instrumentId)}
                     </StyledInstrument>;
                 })}
             <button

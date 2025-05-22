@@ -19,6 +19,7 @@ import {
     TRACK_DEFAULT_INSTRUMENT_ID,
     TrackConfig,
 } from './SoundEditorTypes';
+import { getInstrumentName } from './SoundEditor';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -250,12 +251,14 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                 label: nls.localize('vuengine/editors/sound/trackDefaultInstrument', 'Track Default Instrument'),
                             },
                             ...Object.keys(soundData.instruments)
-                                .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
+                                .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
+                                    (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')
+                                ))
                                 .map((instrumentId, i) => {
                                     const instr = soundData.instruments[instrumentId];
                                     return {
                                         value: `${instrumentId}`,
-                                        label: instr.name.length ? instr.name : (i + 1).toString(),
+                                        label: getInstrumentName(soundData, instrumentId),
                                         backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                                     };
                                 })

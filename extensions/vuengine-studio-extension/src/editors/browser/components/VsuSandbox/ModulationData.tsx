@@ -18,12 +18,12 @@ export default function ModulationData(props: ModulationDataProps): React.JSX.El
     return <div className='waveform'>
         <div>
             {[...Array(32)].map((h, y) => {
-                const v = value[y] ?? 256;
+                const v = value[y] ?? 255;
                 return <VerticalRangeInput
                     key={y}
                     index={y}
-                    min={1}
-                    max={256}
+                    min={0}
+                    max={255}
                     value={v}
                     setValue={(x: number) => setIndividualValue(y, x)}
                 />;
