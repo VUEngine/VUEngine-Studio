@@ -6,6 +6,7 @@ import {
     NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
+    ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
     SUB_NOTE_RESOLUTION,
@@ -24,6 +25,7 @@ interface PianoRollHeaderGridProps {
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
@@ -35,6 +37,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         setCurrentPlayerPosition,
         pianoRollNoteWidth,
         setPatternAtCursorPosition,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
@@ -43,7 +46,10 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
     // const track = soundData.tracks[currentTrackId];
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
-    const width = songLength * NOTE_RESOLUTION * pianoRollNoteWidth;
+    const width = Math.min(
+        pianoRollScrollWindow.w,
+        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+    );
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -68,14 +74,21 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         // vertical lines
         for (let x = 0; x < songLength; x++) {
-            const offset = (x + 1) * NOTE_RESOLUTION * pianoRollNoteWidth - 0.5;
+            const offsetElement = x * NOTE_RESOLUTION * pianoRollNoteWidth;
+            if (offsetElement < pianoRollScrollWindow.x) {
+                continue;
+            }
+            if (offsetElement > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
+                break;
+            }
+            const offset = offsetElement - 0.5 - pianoRollScrollWindow.x;
             context.beginPath();
             context.moveTo(offset, 0);
             context.lineTo(offset, h);
             context.stroke();
 
             // meter numbers
-            context.fillText(x.toString(), offset - (NOTE_RESOLUTION * pianoRollNoteWidth) + 4, 11);
+            context.fillText(x.toString(), offset + 4, 11);
         }
 
         // middle line
@@ -196,10 +209,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     };
 
     useEffect(() => {
-        services.themeService.onDidColorThemeChange(() => draw());
-    }, []);
-
-    useEffect(() => {
+        // TODO: wrap in disposable
+        // services.themeService.onDidColorThemeChange(() => draw());
         draw();
     }, [
         // currentTrackId,
@@ -207,6 +218,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         // currentSequenceIndex,
         soundData,
         pianoRollNoteWidth,
+        pianoRollScrollWindow.x,
+        pianoRollScrollWindow.w,
     ]);
 
     return (

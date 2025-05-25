@@ -58,7 +58,7 @@ export default function Scalable(props: PropsWithChildren<ScalableProps>): React
     const [offsetY, setOffsetY] = useState<number>(0);
 
     const onWheel = (e: React.WheelEvent): void => {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
             let z = zoom - e.deltaY / wheelSensitivity;
 
             if (z > maxZoom) {

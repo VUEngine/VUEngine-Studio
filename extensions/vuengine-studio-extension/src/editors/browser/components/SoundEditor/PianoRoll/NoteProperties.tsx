@@ -4,10 +4,18 @@ import { Tab, TabList, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { EFFECTS_PANEL_COLLAPSED_HEIGHT, EFFECTS_PANEL_EXPANDED_HEIGHT, SoundData } from '../SoundEditorTypes';
+import {
+    EFFECTS_PANEL_COLLAPSED_HEIGHT,
+    EFFECTS_PANEL_EXPANDED_HEIGHT,
+    NOTE_RESOLUTION,
+    PIANO_ROLL_KEY_WIDTH,
+    ScrollWindow,
+    SEQUENCER_RESOLUTION,
+    SoundData
+} from '../SoundEditorTypes';
 import NotePropertiesGrid from './NotePropertiesGrid';
-import { MetaLine, MetaLineHeader } from './PianoRollHeader';
 import NotePropertiesGridOverview from './NotePropertiesGridOverview';
+import { MetaLine, MetaLineHeader } from './PianoRollHeader';
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -60,9 +68,10 @@ interface NotePropertiesProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
-    effectsPanelHidden: boolean,
+    effectsPanelHidden: boolean
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
-    pianoRollNoteWidth: number,
+    pianoRollNoteWidth: number
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -75,9 +84,16 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         effectsPanelHidden, setEffectsPanelHidden,
         setNote,
         pianoRollNoteWidth,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
+
+    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const width = Math.min(
+        pianoRollScrollWindow.w,
+        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+    );
 
     const toggleEffectsPanel = () => {
         setEffectsPanelHidden(prev => !prev);
@@ -97,6 +113,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
             soundData={soundData}
             expandPanel={toggleEffectsPanel}
             pianoRollNoteWidth={pianoRollNoteWidth}
+            pianoRollScrollWindow={pianoRollScrollWindow}
         />;
     } else {
         switch (tab) {
@@ -113,6 +130,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     setNoteCursor={setNoteCursor}
                     setNote={setNote}
                     pianoRollNoteWidth={pianoRollNoteWidth}
+                    pianoRollScrollWindow={pianoRollScrollWindow}
                 />;
                 break;
         }
@@ -130,6 +148,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
             bottom: 0,
             borderTopWidth: 1,
             minHeight: effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT,
+            width: width + PIANO_ROLL_KEY_WIDTH + 2,
         }}
     >
         <MetaLineHeader

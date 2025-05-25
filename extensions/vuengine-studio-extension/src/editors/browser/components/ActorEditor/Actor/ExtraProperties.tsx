@@ -36,7 +36,7 @@ export default function ExtraProperties(): React.JSX.Element {
             <Input
                 label={nls.localize('vuengine/editors/actor/extraInfo', 'Extra Info')}
                 value={data.extraProperties.extraInfo}
-                setValue={v => setExtraInfo(v as string)}
+                setValue={setExtraInfo}
                 commands={INPUT_BLOCKING_COMMANDS}
             />
             <VContainer>

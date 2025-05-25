@@ -10,7 +10,10 @@ import {
     NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
+    PIANO_ROLL_GRID_METER_HEIGHT,
+    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
+    PIANO_ROLL_KEY_WIDTH,
     SEQUENCER_RESOLUTION,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
@@ -26,7 +29,7 @@ const StyledPianoRollPlacedNote = styled.div`
     position: absolute;
     text-align: center;
     text-overflow: ellipsis;
-    z-index: 10;
+    z-index: 100;
 
     &:hover {
         border-radius: 1px;
@@ -114,8 +117,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const noteId = NOTES_LABELS.indexOf(noteLabel);
     const localStep = step - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
 
-    const left = step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
-    const top = noteId * pianoRollNoteHeight;
+    const left = PIANO_ROLL_KEY_WIDTH + 2 + step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
+    const top = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + noteId * pianoRollNoteHeight;
     const width = duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
 
     const classNames = ['placedNote'];
@@ -175,10 +178,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newStep = (noteSnapping
-            ? Math.ceil((data.x / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
-            : Math.ceil((data.x * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
+            ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
+            : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-        const newNoteId = Math.floor(data.y / pianoRollNoteHeight);
+        const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
         const newNoteLabel = NOTES_LABELS[newNoteId];
         if (newStep === localStep) {
             return;
@@ -211,7 +214,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             }}
             bounds={{
                 bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
-                left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
+                left: PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
                 right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION - (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
                 top: 0,
             }}

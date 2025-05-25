@@ -41,7 +41,7 @@ export default function WaveFormEditor(props: WaveFormEditorProps): React.JSX.El
             <Input
                 label={nls.localizeByDefault('Name')}
                 value={data.name}
-                setValue={(v => setName(v as string))}
+                setValue={setName}
             />
             <VContainer gap={2} grow={1}>
                 <label>

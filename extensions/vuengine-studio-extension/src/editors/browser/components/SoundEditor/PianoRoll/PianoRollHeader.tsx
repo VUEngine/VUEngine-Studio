@@ -1,17 +1,15 @@
-import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
-    SEQUENCER_RESOLUTION,
+    ScrollWindow,
     SoundData
 } from '../SoundEditorTypes';
 import PianoRollHeaderGrid from './PianoRollHeaderGrid';
-import PianoRollHeaderPlacedPattern from './PianoRollHeaderPlacedPattern';
 
 export const MetaLine = styled.div`
     background: var(--theia-editor-background);
@@ -20,9 +18,9 @@ export const MetaLine = styled.div`
     cursor: crosshair;
     display: flex;
     flex-direction: row;
+    left: 0;
     position: sticky;
     top: 0;
-    width: fit-content;
     z-index: 200;
 
     body.theia-light &,
@@ -37,11 +35,9 @@ export const MetaLineHeader = styled.div`
     border-right: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     display: flex;
-    left: 0;
     max-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     overflow: hidden;
-    position: sticky;
     z-index: 10;
 
     body.theia-light &,
@@ -73,9 +69,7 @@ interface PianoRollHeaderProps {
     soundData: SoundData
     currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -86,67 +80,26 @@ interface PianoRollHeaderProps {
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    removePatternFromSequence: (trackId: number, step: number) => void
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
         currentTrackId,
-        currentPatternId, setCurrentPatternId,
+        currentPatternId,
         // playRangeStart, setPlayRangeStart,
         // playRangeEnd, setPlayRangeEnd,
-        currentSequenceIndex, setCurrentSequenceIndex,
+        currentSequenceIndex,
         setCurrentPlayerPosition,
         sequencerHidden, setSequencerHidden,
         eventListHidden, setEventListHidden,
         pianoRollNoteWidth,
-        setPatternDialogOpen,
-        removePatternFromSequence,
         setPatternAtCursorPosition,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-
-    const placedPatterns = useMemo(() => {
-        const patterns: React.JSX.Element[] = [];
-
-        const track = soundData.tracks[currentTrackId];
-
-        Object.keys(track.sequence).forEach(key => {
-            const step = parseInt(key);
-            const patternId = track.sequence[step];
-            const pattern = soundData.patterns[patternId];
-            if (!pattern) {
-                return;
-            }
-            const xOffset = PIANO_ROLL_KEY_WIDTH + 2 + step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
-            const isSelected = patternId === currentPatternId && step === currentSequenceIndex;
-            patterns.push(<PianoRollHeaderPlacedPattern
-                soundData={soundData}
-                step={step}
-                patternId={patternId}
-                patternSize={pattern.size}
-                current={isSelected}
-                currentTrackId={currentTrackId}
-                left={xOffset}
-                pianoRollNoteWidth={pianoRollNoteWidth}
-                setCurrentPatternId={setCurrentPatternId}
-                removePatternFromSequence={removePatternFromSequence}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
-                setPatternDialogOpen={setPatternDialogOpen}
-            />);
-        });
-
-        return patterns;
-    }, [
-        soundData,
-        currentTrackId,
-        currentPatternId,
-        currentSequenceIndex,
-        pianoRollNoteWidth,
-    ]);
 
     return <MetaLine
         style={{
@@ -178,7 +131,6 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
                 <i className={sequencerHidden ? 'codicon codicon-chevron-down' : 'codicon codicon-chevron-up'} />
             </StyledToggleButton>
         </MetaLineHeader>
-        {placedPatterns}
         <PianoRollHeaderGrid
             soundData={soundData}
             currentTrackId={currentTrackId}
@@ -187,6 +139,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             setCurrentPlayerPosition={setCurrentPlayerPosition}
             pianoRollNoteWidth={pianoRollNoteWidth}
             setPatternAtCursorPosition={setPatternAtCursorPosition}
+            pianoRollScrollWindow={pianoRollScrollWindow}
         />
     </MetaLine>;
 };

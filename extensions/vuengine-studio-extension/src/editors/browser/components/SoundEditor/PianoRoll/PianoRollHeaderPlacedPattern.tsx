@@ -14,9 +14,10 @@ const StyledPattern = styled.div`
     box-sizing: border-box;
     cursor: pointer;
     height: ${PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT}px;
+    margin-bottom: -16px;
     padding: 1px 3px;
-    position: absolute;
-    z-index: 1;
+    position: sticky;
+    z-index: 201;
 `;
 
 interface PianoRollHeaderPlacedPatternProps {
@@ -67,7 +68,7 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
             style={{
                 backgroundColor: current ? 'var(--theia-focusBorder)' : 'var(--theia-secondaryButton-background)',
                 color: current ? '#fff' : 'var(--theia-secondaryButton-foreground)',
-                left,
+                translate: `${left}px 0`,
                 top: PIANO_ROLL_GRID_METER_HEIGHT - 1,
                 width: patternSize / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
             }}

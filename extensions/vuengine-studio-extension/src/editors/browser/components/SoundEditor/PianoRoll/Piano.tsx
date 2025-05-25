@@ -5,7 +5,7 @@ import PianoRollKey from './PianoRollKey';
 
 // TODO: also add '.scrolled' behavior to sequencer track headers
 const StyledPiano = styled.div`
-    border-left: 1px solid transparent; 
+    border-left: 1px solid rgba(255, 255, 255, .6); 
     border-right: 1px solid rgba(255, 255, 255, .6); 
     display: flex;
     flex-direction: column;

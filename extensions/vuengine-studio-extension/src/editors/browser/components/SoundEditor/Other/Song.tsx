@@ -42,7 +42,7 @@ export default function Song(props: SongProps): React.JSX.Element {
         <Input
             label={nls.localize('vuengine/editors/sound/songName', 'Song Name')}
             value={soundData.name}
-            setValue={v => setName(v as string)}
+            setValue={setName}
             commands={INPUT_BLOCKING_COMMANDS}
         />
 
@@ -54,7 +54,7 @@ export default function Song(props: SongProps): React.JSX.Element {
                 value={soundData.speed}
                 max={MAX_TICK_DURATION}
                 min={MIN_TICK_DURATION}
-                setValue={(v: number) => setSpeed(v)}
+                setValue={setSpeed}
                 commandsToDisable={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
@@ -74,7 +74,7 @@ export default function Song(props: SongProps): React.JSX.Element {
                 <Input
                     label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}
                     value={soundData.loopPoint}
-                    setValue={v => setLoopPoint(v as number)}
+                    setValue={setLoopPoint}
                     type='number'
                     min={0}
                     max={MAX_SEQUENCE_SIZE - 1}

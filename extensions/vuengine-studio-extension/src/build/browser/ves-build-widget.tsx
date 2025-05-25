@@ -410,7 +410,7 @@ export class VesBuildWidget extends ReactWidget {
               <Input
                 placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
                 value={this.state.searchTerm}
-                setValue={v => this.setSearchTerm(v as string)}
+                setValue={this.setSearchTerm}
                 grow={1}
               />
               <button

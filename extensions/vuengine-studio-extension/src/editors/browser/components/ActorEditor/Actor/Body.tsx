@@ -59,7 +59,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                 <Input
                     label={nls.localize('vuengine/editors/actor/mass', 'Mass')}
                     value={body.mass}
-                    setValue={v => setMass(v as number)}
+                    setValue={setMass}
                     type='number'
                     min={0}
                     max={511}
@@ -99,7 +99,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                 <Input
                     label={nls.localize('vuengine/editors/actor/friction', 'Friction')}
                     value={body.friction}
-                    setValue={v => setFriction(v as number)}
+                    setValue={setFriction}
                     type='number'
                     min={0}
                     max={511}
@@ -110,7 +110,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                 <Input
                     label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
                     value={body.bounciness}
-                    setValue={v => setBounciness(v as number)}
+                    setValue={setBounciness}
                     type='number'
                     min={0}
                     max={511}
@@ -121,7 +121,7 @@ export default function Body(props: BodyProps): React.JSX.Element {
                 <Input
                     label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
                     value={body.maximumSpeed}
-                    setValue={v => setMaximumSpeed(v as number)}
+                    setValue={setMaximumSpeed}
                     type='number'
                     min={0}
                     max={511}

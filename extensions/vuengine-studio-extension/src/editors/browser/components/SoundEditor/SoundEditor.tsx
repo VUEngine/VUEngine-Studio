@@ -104,7 +104,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [noteCursor, setNoteCursor] = useState<number>(0);
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
-    const [pianoRollScrollWindow, setPianoRollScrollWindow] = useState<ScrollWindow>({ x: 0, w: 0 });
+    const [pianoRollScrollWindow, setPianoRollScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const [pianoRollNoteHeight, setPianoRollNoteHeight] = useState<number>(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
     const [pianoRollNoteWidth, setPianoRollNoteWidth] = useState<number>(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
     const [sequencerPatternHeight, setSequencerPatternHeight] = useState<number>(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
@@ -781,29 +781,28 @@ A total of {0} patterns will be deleted.',
                 playRangeEnd={playRangeEnd}
             />
             <VContainer gap={0} grow={1} overflow="hidden">
-                <HContainer justifyContent='space-between'>
-                    <SoundEditorToolbar
-                        soundData={soundData}
-                        currentTrackId={currentTrackId}
-                        currentPatternId={currentPatternId}
-                        currentPlayerPosition={currentPlayerPosition}
-                        currentSequenceIndex={currentSequenceIndex}
-                        noteCursor={noteCursor}
-                        playing={playing}
-                        tool={tool}
-                        emulatorInitialized={emulatorInitialized}
-                        noteSnapping={noteSnapping}
-                        newNoteDuration={newNoteDuration}
-                        setNewNoteDuration={setNewNoteDuration}
-                        editInstrument={editInstrument}
-                        currentInstrumentId={currentInstrumentId}
-                        setCurrentInstrumentId={setCurrentInstrumentId}
-                        songSettingsDialogOpen={songSettingsDialogOpen}
-                        setSongSettingsDialogOpen={setSongSettingsDialogOpen}
-                        setNoteEvent={setNoteEvent}
-                        setTrack={setTrack}
-                    />
-                </HContainer>
+                <SoundEditorToolbar
+                    soundData={soundData}
+                    updateSoundData={updateSoundData}
+                    currentTrackId={currentTrackId}
+                    currentPatternId={currentPatternId}
+                    currentPlayerPosition={currentPlayerPosition}
+                    currentSequenceIndex={currentSequenceIndex}
+                    noteCursor={noteCursor}
+                    playing={playing}
+                    tool={tool}
+                    emulatorInitialized={emulatorInitialized}
+                    noteSnapping={noteSnapping}
+                    newNoteDuration={newNoteDuration}
+                    setNewNoteDuration={setNewNoteDuration}
+                    editInstrument={editInstrument}
+                    currentInstrumentId={currentInstrumentId}
+                    setCurrentInstrumentId={setCurrentInstrumentId}
+                    songSettingsDialogOpen={songSettingsDialogOpen}
+                    setSongSettingsDialogOpen={setSongSettingsDialogOpen}
+                    setNoteEvent={setNoteEvent}
+                    setTrack={setTrack}
+                />
                 {soundData.tracks.length === 0
                     ? <VContainer grow={1} style={{ position: 'relative' }}>
                         <EmptyContainer

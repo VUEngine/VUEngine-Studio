@@ -1,17 +1,15 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import {
-    BAR_NOTE_RESOLUTION,
+    NOTE_RESOLUTION,
     NOTES_SPECTRUM,
+    PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_RESOLUTION,
-    SoundData,
-    SoundEvent
+    SoundData
 } from '../SoundEditorTypes';
 import Piano from './Piano';
 import PianoRollGrid from './PianoRollGrid';
-import PianoRollPlacedNote from './PianoRollPlacedNote';
 
 const StyledPianoRollEditor = styled.div`
     display: flex;
@@ -21,7 +19,8 @@ const StyledPianoRollEditor = styled.div`
 
 const StyledPianoRollGridContainer = styled.div`
     cursor: crosshair;
-    position: relative;
+    left: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    position: sticky;
     z-index: 10;
 
     canvas {
@@ -44,13 +43,10 @@ interface PianoRollEditorProps {
     noteCursor: number
     setNoteCursor: (note: number) => void
     setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
-    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     playNote: (note: number) => void
-    noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     pianoRollScrollWindow: ScrollWindow
 }
 
@@ -62,74 +58,23 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentSequenceIndex,
         noteCursor, setNoteCursor,
         setNote,
-        setNoteEvent,
         playNote,
-        noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
-        setCurrentInstrumentId,
         pianoRollScrollWindow,
     } = props;
     const [dragStartNoteId, setDragStartNoteId] = useState<number>(-1);
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
     const [dragEndStep, setDragEndStep] = useState<number>(-1);
 
-    const placedNotesCurrentPattern = useMemo(() => {
-        const track = soundData.tracks[currentTrackId];
-        const patternId = track?.sequence[currentSequenceIndex];
-        const pattern = soundData.patterns[patternId];
-        if (!pattern) {
-            return;
-        }
-        const result: React.JSX.Element[] = [];
-        Object.keys(pattern.events).map(stepStr => {
-            const step = parseInt(stepStr);
-            const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
-            const noteDuration = pattern.events[step][SoundEvent.Duration] ?? 1;
-            // eslint-disable-next-line no-null/no-null
-            if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
-                const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
-                const instrument = soundData.instruments[instrumentId];
-                const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
-                result.push(
-                    <PianoRollPlacedNote
-                        key={step}
-                        instrumentColor={instrumentColor}
-                        noteLabel={noteLabel}
-                        step={currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION + step}
-                        duration={noteDuration}
-                        currentSequenceIndex={currentSequenceIndex}
-                        noteCursor={noteCursor}
-                        setNoteCursor={setNoteCursor}
-                        setNote={setNote}
-                        setNoteEvent={setNoteEvent}
-                        events={pattern.events}
-                        patternSize={pattern.size}
-                        noteSnapping={noteSnapping}
-                        pianoRollNoteHeight={pianoRollNoteHeight}
-                        pianoRollNoteWidth={pianoRollNoteWidth}
-                        setCurrentInstrumentId={setCurrentInstrumentId}
-                    />
-                );
-            }
-        });
-
-        return result;
-    }, [
-        soundData.tracks[currentTrackId],
-        currentTrackId,
-        currentPatternId, // TODO
-        currentSequenceIndex, // TODO
-        noteCursor,
-        soundData.instruments,
-        setNote,
-    ]);
-
     return <StyledPianoRollEditor
         onMouseOut={() => {
             setDragStartNoteId(-1);
             setDragStartStep(-1);
             setDragEndStep(-1);
+        }}
+        style={{
+            width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
         }}
     >
         <Piano
@@ -142,7 +87,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 height: NOTES_SPECTRUM * pianoRollNoteHeight
             }}
         >
-            {placedNotesCurrentPattern}
             {dragStartNoteId > -1 &&
                 <CurrentlyPlacingNote
                     style={{
@@ -170,6 +114,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setDragStartNoteId={setDragStartNoteId}
                 setDragStartStep={setDragStartStep}
                 setDragEndStep={setDragEndStep}
+                pianoRollScrollWindow={pianoRollScrollWindow}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

@@ -288,7 +288,7 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
     const [dragContainerWidth, setDragContainerWidth] = useState<number>(0);
 
     const onWheel = (e: React.WheelEvent): void => {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
             let z = scale - e.deltaY / WHEEL_SENSITIVITY;
 
             if (z > ZOOM_MAX) {

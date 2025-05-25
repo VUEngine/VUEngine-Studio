@@ -93,7 +93,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   };
 
   const onWheel = (e: React.WheelEvent): void => {
-    if (e.ctrlKey) {
+    if (e.ctrlKey || e.metaKey) {
       let zoom = Math.round((previewZoom - e.deltaY / WHEEL_SENSITIVITY) * 100) / 100;
 
       if (zoom > MAX_PREVIEW_SPRITE_ZOOM) {

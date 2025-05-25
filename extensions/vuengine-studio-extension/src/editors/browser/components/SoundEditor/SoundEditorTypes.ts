@@ -108,7 +108,9 @@ export interface InstrumentConfig {
 
 export interface ScrollWindow {
     x: number
+    y: number
     w: number
+    h: number
 }
 
 export enum SoundEditorTrackType {
@@ -300,3 +302,5 @@ export const DEFAULT_NEW_NOTE_DURATION = 1;
 
 export const NEW_PATTERN_ID = '+';
 export const TRACK_DEFAULT_INSTRUMENT_ID = 'trackDefault';
+
+export const SCROLL_BAR_WIDTH = 10;

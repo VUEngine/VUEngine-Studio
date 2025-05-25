@@ -357,7 +357,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 <InputWithAction>
                     <Input
                         value={instrument?.name}
-                        setValue={v => setName(v as string)}
+                        setValue={setName}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton

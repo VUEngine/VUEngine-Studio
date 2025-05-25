@@ -112,7 +112,7 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
             min={min}
             max={max}
             value={value ?? min}
-            setValue={v => setValue(v as number)}
+            setValue={setValue}
             onClick={handleSelectInput}
         />
     </Column>;

@@ -9,6 +9,7 @@ import {
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_WIDTH,
+    ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
     SoundEvent,
@@ -32,6 +33,7 @@ interface PianoRollGridProps {
     setDragStartStep: Dispatch<SetStateAction<number>>
     setDragEndStep: Dispatch<SetStateAction<number>>
     setDragStartNoteId: Dispatch<SetStateAction<number>>
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
@@ -47,6 +49,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         dragStartStep, setDragStartStep,
         dragEndStep, setDragEndStep,
         dragStartNoteId, setDragStartNoteId,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
@@ -54,7 +57,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
-    const width = songLength * NOTE_RESOLUTION * pianoRollNoteWidth;
+    const width = Math.min(
+        pianoRollScrollWindow.w,
+        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+    );
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -67,7 +73,24 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
-        // context.clearRect(0, 0, canvas.width, canvas.height);
+
+        /*
+        context.resetTransform();
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(
+            // Scale x
+            1,
+            0,
+
+            // Scale y
+            0,
+            1,
+
+            // Translation
+            -1 * scrollX,
+            0,
+        );
+        */
 
         const themeType = services.themeService.getCurrentTheme().type;
         const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
@@ -92,7 +115,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         if (!highContrastTheme) {
             context.fillStyle = lowColor;
             context.fillRect(
-                noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth,
+                noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
                 0,
                 pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
                 NOTES_SPECTRUM * pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
@@ -101,7 +124,14 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
         // vertical lines
         for (let x = 1; x <= songLength * NOTE_RESOLUTION; x++) {
-            const offset = x * pianoRollNoteWidth - 0.5;
+            const offsetElement = x * pianoRollNoteWidth;
+            if (offsetElement < pianoRollScrollWindow.x) {
+                continue;
+            }
+            if (offsetElement > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
+                break;
+            }
+            const offset = offsetElement - pianoRollScrollWindow.x - 0.5;
             context.beginPath();
             context.moveTo(offset, 0);
             context.lineTo(offset, h);
@@ -146,7 +176,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const mutedHighlightColor = chroma(highlightColor).alpha(0.1).toString();
             context.fillStyle = mutedHighlightColor;
             context.fillRect(
-                currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION * pianoRollNoteWidth - 0.5,
+                currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
                 0,
                 currentPatternSize * NOTE_RESOLUTION * pianoRollNoteWidth - 0.5,
                 h,
@@ -172,13 +202,18 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
                     // eslint-disable-next-line no-null/no-null
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
+                        const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
+                        if (patternOffset + noteDurationPx < pianoRollScrollWindow.x || patternOffset > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
+                            return;
+                        }
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
-                        const noteDuration = pattern.events[step][SoundEvent.Duration] ?? 1;
+                        const offset = (patternOffset / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5;
+                        const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
                         context.fillStyle = trackId === currentTrackId ? fullColor : medColor;
                         context.fillRect(
-                            (patternOffset / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth,
+                            offset,
                             noteId * pianoRollNoteHeight,
-                            noteDuration * pianoRollNoteWidth / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH,
+                            offsetWidth,
                             pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                         );
                     }
@@ -249,10 +284,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     useEffect(() => {
-        services.themeService.onDidColorThemeChange(() => draw());
-    }, []);
+        // TODO: wrap in disposable
+        // services.themeService.onDidColorThemeChange(() => draw());
 
-    useEffect(() => {
         draw();
     }, [
         soundData,
@@ -262,6 +296,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         noteCursor,
         pianoRollNoteHeight,
         pianoRollNoteWidth,
+        pianoRollScrollWindow.x,
+        pianoRollScrollWindow.w,
     ]);
 
     return (

@@ -1,11 +1,12 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
@@ -98,7 +99,7 @@ const StyledScrollWindow = styled.div`
     }
 `;
 
-const CurrentlyPlacingPattern = styled.div`
+const StyledCurrentlyPlacingPattern = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
@@ -158,6 +159,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [dragStartTrackId, setDragStartTrackId] = useState<number>(-1);
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
     const [dragEndStep, setDragEndStep] = useState<number>(-1);
+    const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
+    // eslint-disable-next-line no-null/no-null
+    const sequencerContainerRef = useRef<HTMLDivElement>(null);
+
+    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const width = songLength * sequencerPatternWidth;
 
     const soloTrack = useMemo(() => {
         let st = -1;
@@ -180,8 +187,21 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         });
     };
 
+    const getScrollWindowCoords = () => {
+        if (!sequencerContainerRef.current) {
+            return;
+        }
+
+        setSequencerScrollWindow({
+            x: sequencerContainerRef.current.scrollLeft,
+            y: sequencerContainerRef.current.scrollTop,
+            w: sequencerContainerRef.current.offsetWidth,
+            h: sequencerContainerRef.current.offsetHeight,
+        });
+    };
+
     const onWheel = (e: React.WheelEvent): void => {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
             if (e.shiftKey) {
                 let newPatternWidth = Math.round(sequencerPatternWidth - (e.deltaX / 8));
 
@@ -206,6 +226,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
 
             e.stopPropagation();
         }
+    };
+
+    const onMouseOut = (e: React.MouseEvent<HTMLElement>) => {
+        setDragStartTrackId(-1);
+        setDragStartStep(-1);
+        setDragEndStep(-1);
     };
 
     const commandListener = (e: CustomEvent): void => {
@@ -268,6 +294,22 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     };
 
     useEffect(() => {
+        getScrollWindowCoords();
+    }, [
+        songLength,
+        sequencerPatternWidth,
+    ]);
+
+    useEffect(() => {
+        if (!sequencerContainerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => getScrollWindowCoords());
+        resizeObserver.observe(sequencerContainerRef.current);
+        return () => resizeObserver.disconnect();
+    }, []);
+
+    useEffect(() => {
         document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         return () => {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
@@ -284,6 +326,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 3 : 10),
         }}
         onWheel={onWheel}
+        onMouseOut={onMouseOut}
     >
         <ScaleControls className="vertical">
             <button onClick={() => setSequencerPatternHeight(prev =>
@@ -361,11 +404,17 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             }
         </StyledTrackHeaderContainer>
         <StyledSequencerGridContainer
+            ref={sequencerContainerRef}
             onWheel={mapVerticalToHorizontalScroll}
+            onScroll={getScrollWindowCoords}
         >
+            <div
+                style={{
+                    width: width,
+                }}
+            />
             <SequencerGrid
                 soundData={soundData}
-                updateSoundData={updateSoundData}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 setCurrentPatternId={setCurrentPatternId}
@@ -381,17 +430,21 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setDragStartTrackId={setDragStartTrackId}
                 setDragStartStep={setDragStartStep}
                 setDragEndStep={setDragEndStep}
+                sequencerScrollWindow={sequencerScrollWindow}
             />
             <StyledScrollWindow
                 style={{
                     bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 0 : 8,
-                    left: pianoRollScrollWindow.x,
-                    // cap to song size as maximum width
-                    width: Math.min(pianoRollScrollWindow.w, soundData.size * sequencerPatternWidth / SEQUENCER_RESOLUTION),
+                    left: sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.x,
+                    width: Math.min(
+                        sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.w,
+                        // cap to song size as maximum width
+                        soundData.size * sequencerPatternWidth / SEQUENCER_RESOLUTION
+                    ),
                 }}
             />
             {dragStartTrackId > -1 &&
-                <CurrentlyPlacingPattern
+                <StyledCurrentlyPlacingPattern
                     style={{
                         height: sequencerPatternHeight,
                         left: Math.min(dragStartStep, dragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION,
@@ -405,7 +458,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     const step = parseInt(key);
                     const patternId = track.sequence[step];
                     const pattern = soundData.patterns[patternId];
-                    const patternIndex = Object.keys(soundData.patterns).indexOf(patternId);
                     if (!pattern) {
                         return;
                     }

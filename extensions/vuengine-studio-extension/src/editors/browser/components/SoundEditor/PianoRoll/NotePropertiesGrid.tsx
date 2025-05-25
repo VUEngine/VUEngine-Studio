@@ -4,6 +4,7 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_EXPANDED_HEIGHT,
     NOTE_RESOLUTION,
+    ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
@@ -20,6 +21,7 @@ interface NotePropertiesGridProps {
     setNoteCursor: (noteCursor: number) => void
     setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     pianoRollNoteWidth: number
+    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function NotePropertiesGrid(props: NotePropertiesGridProps): React.JSX.Element {
@@ -31,13 +33,17 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         noteCursor, setNoteCursor,
         // setNote,
         pianoRollNoteWidth,
+        pianoRollScrollWindow,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
-    const width = songLength * NOTE_RESOLUTION * pianoRollNoteWidth;
+    const width = Math.min(
+        pianoRollScrollWindow.w,
+        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+    );
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -51,7 +57,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-        drawGrid(canvas, context, themeType, songLength, pianoRollNoteWidth);
+        drawGrid(canvas, context, themeType, songLength, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -67,10 +73,9 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
     };
 
     useEffect(() => {
-        services.themeService.onDidColorThemeChange(() => draw());
-    }, []);
+        // TODO: wrap in disposable
+        // services.themeService.onDidColorThemeChange(() => draw());
 
-    useEffect(() => {
         draw();
     }, [
         soundData.tracks,
@@ -79,6 +84,9 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         currentPatternId,
         currentSequenceIndex,
         noteCursor,
+        pianoRollNoteWidth,
+        pianoRollScrollWindow.x,
+        pianoRollScrollWindow.w,
     ]);
 
     return (
