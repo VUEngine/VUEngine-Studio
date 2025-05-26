@@ -1047,12 +1047,6 @@ A total of {0} patterns will be deleted.',
                         value={soundData.instruments[waveformDialogOpen].waveform}
                         setValue={setInstrumentWaveForm}
                     />
-                    {/*
-                    <WaveformWithPresets
-                        value={soundData.waveforms[Math.max(0, waveformDialogOpen)]}
-                        setValue={setWaveform}
-                    />
-                    */}
                 </PopUpDialog>
             }
             {modulationDataDialogOpen !== '' &&

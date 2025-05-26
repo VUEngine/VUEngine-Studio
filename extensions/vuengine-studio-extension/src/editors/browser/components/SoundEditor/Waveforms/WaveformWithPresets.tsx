@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import { WAVEFORM_MAX } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, WAVEFORM_MAX } from '../SoundEditorTypes';
 import WaveForm from './WaveForm';
 import { WAVEFORM_PRESETS } from './WaveFormPresets';
 import styled from 'styled-components';
@@ -57,9 +57,8 @@ export default function WaveformWithPresets(props: WaveformWithPresetsProps): Re
                     onWheel={mapVerticalToHorizontalScroll}
                 >
                     {(WAVEFORM_PRESETS.map((w, i) =>
-                        <StyledWaveform>
+                        <StyledWaveform key={i}>
                             <NumberArrayPreview
-                                key={i}
                                 maximum={WAVEFORM_MAX}
                                 data={w.values}
                                 height={WAVEFORM_MAX}
@@ -88,6 +87,7 @@ export default function WaveformWithPresets(props: WaveformWithPresetsProps): Re
             <WaveForm
                 value={value}
                 setValue={setValue}
+                commands={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
     );

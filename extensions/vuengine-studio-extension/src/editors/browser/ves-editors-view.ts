@@ -152,13 +152,13 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                         const w = widget instanceof VesEditorsWidget
                             ? widget
                             : this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands[command.id] === true;
+                        return w?.commands !== undefined && w?.commands[command.id] === true;
                     },
                     isVisible: widget => {
                         const w = widget instanceof VesEditorsWidget
                             ? widget
                             : this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands[command.id] === true;
+                        return w?.commands !== undefined && w?.commands[command.id] === true;
                     },
                     execute: widget => {
                         const w = widget instanceof VesEditorsWidget

@@ -18,7 +18,7 @@ export const StyledStepIndicator = styled.div`
     position: absolute;
     top: 0;
     width: 1px;
-    z-index: 250;
+    z-index: 150;
 
     &:before {
         border-left: 4px solid transparent;
@@ -61,8 +61,8 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
     const style = {
         display: hidden ? 'none' : undefined,
         left: isPianoRoll
-            ? PIANO_ROLL_KEY_WIDTH + currentPlayerPosition * pianoRollNoteWidth + 1
-            : PIANO_ROLL_KEY_WIDTH + currentPlayerPosition * Math.max(0, 16 / NOTE_RESOLUTION) + 1,
+            ? PIANO_ROLL_KEY_WIDTH + 2 + currentPlayerPosition * pianoRollNoteWidth
+            : currentPlayerPosition * Math.max(0, 16 / NOTE_RESOLUTION),
         height: isPianoRoll
             ? PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + NOTES_SPECTRUM * pianoRollNoteHeight + effectsPanelHeight
             : soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT,

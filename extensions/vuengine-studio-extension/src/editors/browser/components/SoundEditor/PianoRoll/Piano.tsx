@@ -11,7 +11,7 @@ const StyledPiano = styled.div`
     flex-direction: column;
     left: 0;
     position: sticky;
-    z-index: 100;
+    z-index: 150;
 
     body.theia-light &,
     body.theia-hc & {

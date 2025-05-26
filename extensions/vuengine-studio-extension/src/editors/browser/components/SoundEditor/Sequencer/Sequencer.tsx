@@ -362,22 +362,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
-        <StepIndicator
-            soundData={soundData}
-            currentPlayerPosition={currentPlayerPosition}
-            isPianoRoll={false}
-            hidden={currentPlayerPosition === -1}
-            effectsPanelHidden={effectsPanelHidden}
-            pianoRollNoteHeight={pianoRollNoteHeight}
-            pianoRollNoteWidth={pianoRollNoteWidth}
-            sequencerPatternHeight={sequencerPatternHeight}
-        />
-        <LoopIndicator
-            numberOfTracks={soundData.tracks.length}
-            position={soundData.loopPoint}
-            hidden={!soundData.loop || soundData.loopPoint === 0}
-            sequencerPatternWidth={sequencerPatternWidth}
-        />
         <StyledTrackHeaderContainer>
             <StyledTracksHeader>
             </StyledTracksHeader>
@@ -417,6 +401,21 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 style={{
                     width: width,
                 }}
+            />
+            <StepIndicator
+                soundData={soundData}
+                currentPlayerPosition={currentPlayerPosition}
+                isPianoRoll={false}
+                hidden={currentPlayerPosition === -1}
+                effectsPanelHidden={effectsPanelHidden}
+                pianoRollNoteHeight={pianoRollNoteHeight}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+                sequencerPatternHeight={sequencerPatternHeight}
+            />
+            <LoopIndicator
+                position={soundData.loopPoint}
+                hidden={!soundData.loop || soundData.loopPoint === 0}
+                sequencerPatternWidth={sequencerPatternWidth}
             />
             <SequencerGrid
                 soundData={soundData}
