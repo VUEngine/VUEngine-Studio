@@ -18,7 +18,6 @@
 @import "sprite-editor/index.css";
 @import "translations-editor/index.css";
 @import "ves-tree.css";
-@import "waveform-editor/index.css";
 
 .theia-ApplicationShell.hide-text-editor-status-bar-items #status-bar-editor-language-status-items,
 .theia-ApplicationShell.hide-text-editor-status-bar-items #status-bar-editor-status-cursor-position,

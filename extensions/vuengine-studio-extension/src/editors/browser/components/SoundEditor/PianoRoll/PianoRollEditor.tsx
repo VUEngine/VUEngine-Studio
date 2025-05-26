@@ -6,7 +6,8 @@ import {
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_RESOLUTION,
-    SoundData
+    SoundData,
+    TrackSettings
 } from '../SoundEditorTypes';
 import Piano from './Piano';
 import PianoRollGrid from './PianoRollGrid';
@@ -48,6 +49,7 @@ interface PianoRollEditorProps {
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
     pianoRollScrollWindow: ScrollWindow
+    trackSettings: TrackSettings[]
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -62,6 +64,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
+        trackSettings,
     } = props;
     const [dragStartNoteId, setDragStartNoteId] = useState<number>(-1);
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
@@ -115,6 +118,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setDragStartStep={setDragStartStep}
                 setDragEndStep={setDragEndStep}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                trackSettings={trackSettings}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

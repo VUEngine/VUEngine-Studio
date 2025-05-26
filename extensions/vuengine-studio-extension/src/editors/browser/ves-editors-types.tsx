@@ -100,6 +100,4 @@ export const TYPE_LABELS: { [typeId: string]: string } = {
     'Sound': nls.localize('vuengine/editors/general/typeLabels/sound', 'Sound'),
     'Stage': nls.localize('vuengine/editors/general/typeLabels/stage', 'Stage'),
     'Translations': nls.localize('vuengine/editors/general/typeLabels/translations', 'Translations'),
-    'VsuSandbox': nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),
-    'WaveForm': nls.localize('vuengine/editors/general/typeLabels/waveForm', 'Wave Form'),
 };

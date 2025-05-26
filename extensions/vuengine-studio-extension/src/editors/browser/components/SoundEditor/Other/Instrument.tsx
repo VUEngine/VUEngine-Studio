@@ -1,9 +1,7 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
-import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
@@ -14,7 +12,6 @@ import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
 import PaletteColorSelect, { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp, nanoid } from '../../Common/Utils';
-import { WAVEFORM_MAX, WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,
@@ -34,9 +31,9 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction,
 } from '../Emulator/VsuTypes';
-import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from './Instruments';
 import { getInstrumentName } from '../SoundEditor';
+import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, WAVEFORM_MAX } from '../SoundEditorTypes';
+import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ENVELOPE_PREVIEW_SIZE = 272;
 
@@ -58,7 +55,6 @@ interface InstrumentProps {
 }
 
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         currentInstrumentId, setCurrentInstrumentId,
@@ -307,12 +303,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         }
     };
 
-    const waveform = instrument !== undefined
-        ? services.vesProjectService.getProjectDataItemById(instrument?.waveform, 'WaveForm') as WaveFormData & WithFileUri & WithContributor
-        : {
-            values: [],
-        };
-
     const envelopePreviewData = useMemo(() => {
         let result: number[] = [];
 
@@ -559,10 +549,6 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                     {nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
                                 </div>
                             </label>
-                            <div>
-                                { /* @ts-ignore */}
-                                {waveform?._fileUri.path.name}
-                            </div>
                             <VContainer>
                                 { /* TODO: switch to canvas */}
                                 <NumberArrayPreview
@@ -571,14 +557,9 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                     height={WAVEFORM_MAX * 2}
                                     width={WAVEFORM_MAX * 2}
                                     maximum={WAVEFORM_MAX}
-                                    data={waveform ? waveform.values : [...Array(32)].map(v => 0)}
+                                    data={soundData.instruments[currentInstrumentId].waveform}
                                     onClick={() => setWaveformDialogOpen(currentInstrumentId)}
                                 />
-                                {!waveform &&
-                                    <div className='lightLabel' style={{ margin: '-42px auto 0' }}>
-                                        {nls.localize('vuengine/editors/sound/none', 'None')}
-                                    </div>
-                                }
                             </VContainer>
                         </VContainer>
                         <VContainer grow={1}>

@@ -33,6 +33,18 @@ export const SOUND_EVENT_LABELS = {
     [SoundEvent.Volume]: nls.localize('vuengine/editors/sound/volume', 'Volume'),
 };
 
+export interface TrackSettings {
+    muted: boolean
+    solo: boolean
+    seeThrough: boolean
+}
+
+export const DEFAULT_TRACK_SETTINGS = {
+    muted: false,
+    solo: false,
+    seeThrough: true,
+};
+
 export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.ADD_TRACK.id,
     SoundEditorCommands.ADD_NOTE.id,
@@ -89,15 +101,12 @@ export interface TrackConfig {
     instrument: string
     sequence: SequenceMap
     allowSkip: boolean
-    muted: boolean
-    solo: boolean
-    seeThrough: boolean
 }
 
 export interface InstrumentConfig {
     name: string
     color: number
-    waveform: string
+    waveform: number[]
     volume: VsuChannelStereoLevelsData
     interval: VsuChannelIntervalData
     envelope: VsuChannelEnvelopeData
@@ -304,3 +313,6 @@ export const NEW_PATTERN_ID = '+';
 export const TRACK_DEFAULT_INSTRUMENT_ID = 'trackDefault';
 
 export const SCROLL_BAR_WIDTH = 10;
+
+export const WAVEFORM_MIN = 0;
+export const WAVEFORM_MAX = 63;

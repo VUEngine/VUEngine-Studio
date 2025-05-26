@@ -13,7 +13,8 @@ import {
     SEQUENCER_RESOLUTION,
     SoundData,
     SoundEvent,
-    SUB_NOTE_RESOLUTION
+    SUB_NOTE_RESOLUTION,
+    TrackSettings
 } from '../SoundEditorTypes';
 
 interface PianoRollGridProps {
@@ -34,6 +35,7 @@ interface PianoRollGridProps {
     setDragEndStep: Dispatch<SetStateAction<number>>
     setDragStartNoteId: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
+    trackSettings: TrackSettings[]
 }
 
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
@@ -50,6 +52,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         dragEndStep, setDragEndStep,
         dragStartNoteId, setDragStartNoteId,
         pianoRollScrollWindow,
+        trackSettings,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     // eslint-disable-next-line no-null/no-null
@@ -73,24 +76,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
-
-        /*
-        context.resetTransform();
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.setTransform(
-            // Scale x
-            1,
-            0,
-
-            // Scale y
-            0,
-            1,
-
-            // Translation
-            -1 * scrollX,
-            0,
-        );
-        */
 
         const themeType = services.themeService.getCurrentTheme().type;
         const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
@@ -187,7 +172,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         soundData.tracks.map((track, trackId) => {
             Object.keys(track.sequence).forEach(key => {
                 if ((trackId === currentTrackId && currentSequenceIndex === parseInt(key)) ||
-                    (trackId !== currentTrackId && !track.seeThrough)
+                    (trackId !== currentTrackId && !trackSettings[trackId].seeThrough)
                 ) {
                     return;
                 }
@@ -298,6 +283,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,
         pianoRollScrollWindow.w,
+        trackSettings,
     ]);
 
     return (

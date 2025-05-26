@@ -47,6 +47,8 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
         style={{
             borderColor: active ? 'var(--theia-editor-foreground)' : undefined,
             height,
+            minHeight: height ? height : undefined,
+            minWidth: width ? width : undefined,
             width,
         }}
         title={title}

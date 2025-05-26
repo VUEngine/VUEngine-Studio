@@ -34,8 +34,6 @@ import VesTranslationsEditorControl from './translations-editor/ves-translations
 import VesTranslationsEditorControlTester from './translations-editor/ves-translations-editor-control-tester';
 import vesVsuSandboxControl from './vsu-sandbox/ves-vsu-sandbox-control';
 import vesVsuSandboxControlTester from './vsu-sandbox/ves-vsu-sandbox-control-tester';
-import VesWaveFormEditorControl from './waveform-editor/ves-waveform-editor-control';
-import VesWaveFormEditorControlTester from './waveform-editor/ves-waveform-editor-control-tester';
 
 export const VES_RENDERERS = [
     { tester: VesActorEditorControlTester, renderer: VesActorEditorControl },
@@ -56,5 +54,4 @@ export const VES_RENDERERS = [
     { tester: vesStageEditorControlTester, renderer: vesStageEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
     { tester: vesVsuSandboxControlTester, renderer: vesVsuSandboxControl },
-    { tester: VesWaveFormEditorControlTester, renderer: VesWaveFormEditorControl },
 ];

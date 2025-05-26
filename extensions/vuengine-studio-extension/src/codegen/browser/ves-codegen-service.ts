@@ -6,6 +6,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
+import crc32 from 'crc/crc32';
 import * as iconv from 'iconv-lite';
 import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
@@ -614,7 +615,7 @@ export class VesCodeGenService {
       return base;
     });
 
-    env.addFilter('crc32', (value: object) => require('crc-32').str(JSON.stringify(value)));
+    env.addFilter('crc32', (value: object) => crc32(JSON.stringify(value)));
 
     env.addFilter('keys', (value: object) => Object.keys(value));
     env.addFilter('values', (value: object) => Object.values(value));

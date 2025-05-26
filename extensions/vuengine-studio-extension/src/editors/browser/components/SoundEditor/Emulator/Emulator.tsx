@@ -5,7 +5,7 @@ import { VesProcessType } from '../../../../../process/common/ves-process-servic
 import { ProjectDataTemplateEncoding } from '../../../../../project/browser/ves-project-types.js';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
 import { nanoid } from '../../Common/Utils.js';
-import { SoundData } from '../SoundEditorTypes.js';
+import { SoundData, TrackSettings } from '../SoundEditorTypes.js';
 
 interface EmulatorProps {
     soundData: SoundData
@@ -22,6 +22,7 @@ interface EmulatorProps {
     testingTrack: number;
     playRangeStart: number;
     playRangeEnd: number;
+    trackSettings: TrackSettings[]
 }
 
 export default function Emulator(props: EmulatorProps): React.JSX.Element {
@@ -33,9 +34,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         currentPlayerPosition,
         setCurrentPlayerPosition,
         // playRangeStart, playRangeEnd,
+        trackSettings,
     } = props;
     const [soundSpecTemplateString, setSoundSpecTemplateString] = useState<string>('');
-    const [waveFormsTemplateString, setWaveFormsTemplateString] = useState<string>('');
     const [core, setCore] = useState<any>();
     const [sim, setSim] = useState<any>();
     const [tempBaseDir, setTempBaseDir] = useState<URI>();
@@ -71,16 +72,6 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             return;
         }
         setSoundSpecTemplateString(await services.vesCodeGenService.getTemplateString(soundSpecTemplate));
-
-        const resourcesUri = await services.vesCommonService.getResourcesUri();
-        const waveFormsFileUri = resourcesUri.resolve('binaries/vuengine-studio-tools/vb/sound/WaveForms.h.njk');
-        const waveFormsFileContent = await services.fileService.readFile(waveFormsFileUri);
-        const waveFormsTemplate = services.vesProjectService.getProjectDataTemplate('SoundSpec');
-        if (!waveFormsTemplate) {
-            console.error('could not find WaveForms template');
-            return;
-        }
-        setWaveFormsTemplateString(waveFormsFileContent.value.toString());
 
         const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
         const randomDirName = nanoid();
@@ -129,20 +120,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 project: services.vesProjectService.getProjectData(),
                 itemUri: new URI('Dummy.sound'),
                 isSoundEditorPreview: true,
+                trackSettings,
                 // playRangeStart: playRangeStart > -1 ? playRangeStart : 0,
                 // playRangeEnd: playRangeEnd > -1 ? playRangeEnd : 0,
-            },
-            ProjectDataTemplateEncoding.utf8,
-            true
-        );
-
-        const waveFormsFileUri = tempBaseDir?.resolve('WaveForms.h');
-        await services.vesCodeGenService.renderTemplateToFile(
-            'WaveForms',
-            waveFormsFileUri!,
-            waveFormsTemplateString,
-            {
-                project: services.vesProjectService.getProjectData(),
             },
             ProjectDataTemplateEncoding.utf8,
             true

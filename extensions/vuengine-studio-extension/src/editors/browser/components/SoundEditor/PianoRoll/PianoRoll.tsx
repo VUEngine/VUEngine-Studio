@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
@@ -23,13 +24,13 @@ import {
     SEQUENCER_RESOLUTION,
     SoundData,
     SoundEvent,
-    SUB_NOTE_RESOLUTION
+    SUB_NOTE_RESOLUTION,
+    TrackSettings
 } from '../SoundEditorTypes';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 import PianoRollHeaderPlacedPattern from './PianoRollHeaderPlacedPattern';
-import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
 
 const StyledPianoRollContainer = styled.div`
@@ -138,6 +139,7 @@ interface PianoRollProps {
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void
+    trackSettings: TrackSettings[]
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -165,6 +167,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setCurrentInstrumentId,
         setPatternDialogOpen,
         removePatternFromSequence,
+        trackSettings,
     } = props;
     // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
@@ -519,6 +522,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                trackSettings={trackSettings}
             />
             <NoteProperties
                 soundData={soundData}

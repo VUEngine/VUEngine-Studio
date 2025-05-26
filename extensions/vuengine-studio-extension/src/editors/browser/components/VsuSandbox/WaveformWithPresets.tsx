@@ -5,8 +5,12 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
-import WaveForm from '../WaveFormEditor/WaveForm';
-import { WAVEFORM_MAX, WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
+import WaveForm from '../SoundEditor/Waveforms/WaveForm';
+import { WAVEFORM_MAX } from '../SoundEditor/SoundEditorTypes';
+
+export interface WaveFormData {
+    values: number[]
+}
 
 interface WaveformWithPresetsProps {
     value: number[]
@@ -42,7 +46,6 @@ export default function WaveformWithPresets(props: WaveformWithPresetsProps): Re
                             onMouseLeave={event => {
                                 services.hoverService.cancelHover();
                             }}
-
                         />
                     ))}
                 </HContainer>

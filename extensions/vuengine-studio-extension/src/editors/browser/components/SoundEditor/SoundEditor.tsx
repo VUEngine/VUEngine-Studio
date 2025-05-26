@@ -1,4 +1,5 @@
 import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import { nanoid } from 'nanoid';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -15,6 +16,7 @@ import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
 import ImportExport from './Other/ImportExport';
 import Instruments from './Other/Instruments';
+import { getMaxNoteDuration } from './Other/Note';
 import Song from './Other/Song';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -23,6 +25,7 @@ import SoundEditorToolbar from './SoundEditorToolbar';
 import {
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
+    DEFAULT_TRACK_SETTINGS,
     EventsMap,
     InstrumentMap,
     NEW_PATTERN_ID,
@@ -41,11 +44,10 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
-    TrackConfig
+    TrackConfig,
+    TrackSettings
 } from './SoundEditorTypes';
-import WaveformSelect from './WaveformSelect';
-import { ConfirmDialog } from '@theia/core/lib/browser';
-import { getMaxNoteDuration } from './Other/Note';
+import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
 const StyledLowerContainer = styled.div` 
     display: flex;
@@ -88,6 +90,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
     const [testing, setTesting] = useState<boolean>(false);
+    const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
     const [testingDuration, setTestingDuration] = useState<number>(0);
     const [testingNote, setTestingNote] = useState<number>(0);
     const [testingInstrument, setTestingInstrument] = useState<string>('');
@@ -162,6 +165,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (currentTrackId >= newTrackCount) {
             setCurrentTrackId(newTrackCount);
         }
+        setTrackSettings(prev => ([
+            ...prev.slice(0, trackId),
+            ...prev.slice(trackId + 1)
+        ]));
         updateSoundData({
             ...soundData,
             tracks: [
@@ -333,6 +340,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (!newTrackData) {
             return;
         }
+
+        setTrackSettings(prev =>
+            [
+                ...prev.map((track, trackId) => ({
+                    ...track,
+                    type: soundData.tracks[trackId].type,
+                })),
+                {
+                    ...DEFAULT_TRACK_SETTINGS,
+                    type: trackType,
+                }
+            ]
+                .sort((a, b) => b.type.localeCompare(a.type))
+        );
+
         const newTrackConfig = {
             ...newTrackData,
             type: trackType
@@ -347,6 +369,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ...soundData,
             tracks: updatedTracks,
         });
+
         setTrackDialogOpen(false);
     };
 
@@ -442,30 +465,33 @@ A total of {0} patterns will be deleted.',
     };
 
     const toggleTrackMuted = (trackId: number): void => {
-        setTrack(trackId, {
-            muted: !soundData.tracks[trackId].muted,
-            solo: false
-        });
-    };
-
-    const toggleTrackSeeThrough = (trackId: number): void => {
-        setTrack(trackId, {
-            seeThrough: !soundData.tracks[trackId].seeThrough,
-        });
+        setTrackSettings(prev => prev.map((track, index) => (index === trackId ? {
+            ...track,
+            muted: !track.muted,
+            solo: false,
+        } : track)));
     };
 
     const toggleTrackSolo = (trackId: number): void => {
-        updateSoundData({
-            ...soundData,
-            tracks: soundData.tracks.map((track, index) => (index === trackId ? {
-                ...track,
-                solo: !track.solo,
-                muted: false,
-            } : {
-                ...track,
-                solo: false,
-            }))
-        });
+        setTrackSettings(prev => prev.map((track, index) => (index === trackId ? {
+            ...track,
+            solo: !track.solo,
+            muted: false,
+        } : {
+            ...track,
+            solo: false,
+        })));
+    };
+
+    const toggleTrackSeeThrough = (trackId: number): void => {
+        setTrackSettings(prev => [
+            ...prev.slice(0, trackId),
+            {
+                ...prev[trackId],
+                seeThrough: !prev[trackId].seeThrough,
+            },
+            ...prev.slice(trackId + 1)
+        ]);
     };
 
     const setNote = (step: number, note?: string, prevStep?: number, duration?: number): void => {
@@ -600,7 +626,7 @@ A total of {0} patterns will be deleted.',
         updateSoundData({ ...soundData, instruments });
     };
 
-    const setInstrumentWaveForm = (waveform: string) => {
+    const setInstrumentWaveForm = (waveform: number[]) => {
         const updatedInstruments = { ...soundData.instruments };
         updatedInstruments[currentInstrumentId] = {
             ...updatedInstruments[currentInstrumentId],
@@ -779,6 +805,7 @@ A total of {0} patterns will be deleted.',
                 testingTrack={testingTrack}
                 playRangeStart={playRangeStart}
                 playRangeEnd={playRangeEnd}
+                trackSettings={trackSettings}
             />
             <VContainer gap={0} grow={1} overflow="hidden">
                 <SoundEditorToolbar
@@ -844,6 +871,7 @@ A total of {0} patterns will be deleted.',
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternSize={setPatternSize}
                                 removePatternFromSequence={removePatternFromSequence}
+                                trackSettings={trackSettings}
                             />
                         }
                         <StyledLowerContainer>
@@ -893,6 +921,7 @@ A total of {0} patterns will be deleted.',
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternDialogOpen={setPatternDialogOpen}
                                 removePatternFromSequence={removePatternFromSequence}
+                                trackSettings={trackSettings}
                             />
                         </StyledLowerContainer>
                     </>}
@@ -1014,8 +1043,8 @@ A total of {0} patterns will be deleted.',
                     height='100%'
                     width='100%'
                 >
-                    <WaveformSelect
-                        value={soundData.instruments[waveformDialogOpen]?.waveform ?? 0}
+                    <WaveformWithPresets
+                        value={soundData.instruments[waveformDialogOpen].waveform}
                         setValue={setInstrumentWaveForm}
                     />
                     {/*

@@ -2,11 +2,11 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { SoundEditorCommands } from '../SoundEditorCommands';
-import { TrackConfig, PIANO_ROLL_KEY_WIDTH, SoundData, SEQUENCER_PATTERN_HEIGHT_DEFAULT } from '../SoundEditorTypes';
-import { StyledTrackHeaderContainer } from './Sequencer';
-import { getTrackName } from '../SoundEditor';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import { getTrackName } from '../SoundEditor';
+import { SoundEditorCommands } from '../SoundEditorCommands';
+import { DEFAULT_TRACK_SETTINGS, PIANO_ROLL_KEY_WIDTH, SEQUENCER_PATTERN_HEIGHT_DEFAULT, SoundData, TrackConfig, TrackSettings } from '../SoundEditorTypes';
+import { StyledTrackHeaderContainer } from './Sequencer';
 
 const StyledTrackHeader = styled.div`
     background-color: var(--theia-editor-background);
@@ -137,6 +137,7 @@ interface TrackHeaderProps {
     otherSolo: boolean
     setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
+    trackSettings: TrackSettings[]
 }
 
 export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element {
@@ -150,14 +151,17 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         otherSolo,
         setTrackDialogOpen,
         sequencerPatternHeight,
+        trackSettings,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
+    const thisTrackSettings = trackSettings[trackId] ?? DEFAULT_TRACK_SETTINGS;
+
     const classNames = [];
-    if (track.muted || otherSolo) {
+    if (thisTrackSettings.muted || otherSolo) {
         classNames.push('muted');
     }
-    if (track.solo) {
+    if (thisTrackSettings.solo) {
         classNames.push('solo');
     }
     if (currentTrackId === trackId) {
@@ -200,15 +204,15 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         <StyledTrackHeaderButtons>
             <StyledTrackHeaderButtonsGroup>
                 <StyledTrackHeaderButton
-                    className={track.seeThrough ? 'active' : undefined}
+                    className={thisTrackSettings.seeThrough ? 'active' : undefined}
                     title={nls.localize('vuengine/editors/sound/showNoteShadows', 'Show Note Shadows On Other Tracks')}
                     onDoubleClick={e => e.stopPropagation()}
                     onClick={() => toggleTrackSeeThrough(trackId)}
                 >
                     <i
-                        className={`fa fa-${track.seeThrough ? 'eye' : 'eye-slash'}`}
+                        className={`fa fa-${thisTrackSettings.seeThrough ? 'eye' : 'eye-slash'}`}
                         style={{
-                            opacity: track.seeThrough ? 1 : .3,
+                            opacity: thisTrackSettings.seeThrough ? 1 : .3,
                         }}
                     />
                 </StyledTrackHeaderButton>
@@ -218,9 +222,9 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                     onClick={() => toggleTrackMuted(trackId)}
                 >
                     <i
-                        className={`fa fa-volume-${track.muted ? 'off' : 'up'}`}
+                        className={`fa fa-volume-${thisTrackSettings.muted ? 'off' : 'up'}`}
                         style={{
-                            opacity: track.muted ? .3 : 1,
+                            opacity: thisTrackSettings.muted ? .3 : 1,
                         }}
                     />
                 </StyledTrackHeaderButton>
@@ -230,9 +234,9 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                     onClick={() => toggleTrackSolo(trackId)}
                 >
                     <i
-                        className={`fa fa-star${track.solo ? '' : '-o'}`}
+                        className={`fa fa-star${thisTrackSettings.solo ? '' : '-o'}`}
                         style={{
-                            opacity: track.solo ? 1 : .3,
+                            opacity: thisTrackSettings.solo ? 1 : .3,
                         }}
                     />
                 </StyledTrackHeaderButton>
