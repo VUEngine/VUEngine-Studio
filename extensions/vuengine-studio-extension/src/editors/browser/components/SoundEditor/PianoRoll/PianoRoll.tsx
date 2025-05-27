@@ -222,7 +222,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const setPatternAtCursorPosition = (cursor?: number, size?: number, createNew?: boolean) => {
         const noteCursorStep = Math.floor((cursor ?? noteCursor) / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
         let stepToSelect = -1;
-        let patternIdToSelect = '';
         const currentTrack = soundData.tracks[currentTrackId];
         Object.keys(currentTrack.sequence).reverse().map(bStr => {
             const b = parseInt(bStr);
@@ -230,7 +229,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             const p = soundData.patterns[pId];
             if (stepToSelect === -1 && b <= noteCursorStep && b + p.size > noteCursorStep) {
                 stepToSelect = b;
-                patternIdToSelect = pId;
             }
         });
 

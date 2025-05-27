@@ -39,10 +39,9 @@ export class VesPreferenceLayoutProvider extends PreferenceLayoutProvider {
                         id: `${VesEditorsPreferenceIds.CATEGORY}.${textEditorNode.id}`,
                     },
                     {
-
-                        id: `${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_VSU_SANDBOX}`,
-                        label: nls.localize('vuengine/editors/general/typeLabels/vsuSandbox', 'VSU Sandbox'),
-                        settings: [`${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_VSU_SANDBOX}.*`],
+                        id: `${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_SOUND}`,
+                        label: nls.localize('vuengine/editors/sound/preferences/category', 'Sound Editor'),
+                        settings: [`${VesEditorsPreferenceIds.CATEGORY}.${VesEditorsPreferenceIds.CATEGORY_SOUND}.*`],
                     },
                 ]
             },

@@ -1,5 +1,5 @@
 import React from 'react';
-import VerticalRangeInput from '../Common/Base/VerticalRangeInput';
+import VerticalRangeInput from '../../Common/Base/VerticalRangeInput';
 
 interface ModulationDataProps {
     value: number[]

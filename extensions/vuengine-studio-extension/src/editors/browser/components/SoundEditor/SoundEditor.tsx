@@ -9,7 +9,6 @@ import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
 import EmptyContainer from '../Common/EmptyContainer';
 import { sortObjectByKeys } from '../Common/Utils';
-import ModulationData from '../VsuSandbox/ModulationData';
 import Emulator from './Emulator/Emulator';
 import EventList from './EventList';
 import CurrentPattern from './Other/CurrentPattern';
@@ -47,6 +46,7 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
+import ModulationData from './Waveforms/ModulationData';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
 const StyledLowerContainer = styled.div` 
