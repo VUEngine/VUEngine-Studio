@@ -8,8 +8,7 @@ import {
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_RESOLUTION,
-    SoundData,
-    TrackConfig
+    SoundData
 } from '../SoundEditorTypes';
 
 const StyledCanvas = styled.canvas`
@@ -22,11 +21,6 @@ const StyledCanvas = styled.canvas`
 interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
-    currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
-    currentSequenceIndex: number
-    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
@@ -43,10 +37,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const {
         soundData,
         currentTrackId,
-        // currentPatternId,
-        // setCurrentPatternId,
-        // currentSequenceIndex, setCurrentSequenceIndex,
-        // setTrack,
         addPattern,
         sequencerPatternHeight, sequencerPatternWidth,
         dragStartTrackId, setDragStartTrackId,

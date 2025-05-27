@@ -5,7 +5,7 @@ import VContainer from '../Common/Base/VContainer';
 import { getInstrumentName } from './SoundEditor';
 import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SEQUENCER_RESOLUTION, SOUND_EVENT_LABELS, SoundData, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
 
-const StyledTableContainer = styled.table`
+const StyledTableContainer = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -135,15 +135,17 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                     {formatter.format(localStep)}
                                                 </td>
                                                 <td>
-                                                    {stepEventsKeys.map(eventType => {
+                                                    {stepEventsKeys.map((eventType, j) => {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
                                                         }
-                                                        return <div>{SOUND_EVENT_LABELS[eventType as SoundEvent]}</div>;
+                                                        return <div key={j}>
+                                                            {SOUND_EVENT_LABELS[eventType as SoundEvent]}
+                                                        </div>;
                                                     })}
                                                 </td>
                                                 <td>
-                                                    {stepEventsKeys.map(eventType => {
+                                                    {stepEventsKeys.map((eventType, j) => {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
                                                         }
@@ -151,11 +153,13 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         if (eventType === SoundEvent.Note || eventType === SoundEvent.NoteSlide) {
                                                             duration = stepEvents[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
                                                         }
-                                                        return <div>{duration}</div>;
+                                                        return <div key={j}>
+                                                            {duration}
+                                                        </div>;
                                                     })}
                                                 </td>
                                                 <td>
-                                                    {stepEventsKeys.map(eventType => {
+                                                    {stepEventsKeys.map((eventType, j) => {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
                                                         }
@@ -170,7 +174,9 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             const instrumentId = stepEvents[SoundEvent.Instrument];
                                                             value = getInstrumentName(soundData, instrumentId);
                                                         }
-                                                        return <div>{value}</div>;
+                                                        return <div key={j}>
+                                                            {value}
+                                                        </div>;
                                                     })}
                                                 </td>
                                             </tr>

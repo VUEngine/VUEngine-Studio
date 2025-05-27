@@ -632,7 +632,7 @@ export const defaultProjectData: ProjectData = {
       templates: ['RomInfo']
     },
     VsuSandbox: {
-      enabled: false,
+      enabled: true,
       file: '.vsu',
       schema: {
         title: 'VSU Sandbox',

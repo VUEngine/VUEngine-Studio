@@ -1,10 +1,6 @@
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    PIANO_ROLL_GRID_METER_HEIGHT,
-    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SoundData
@@ -46,25 +42,6 @@ export const MetaLineHeader = styled.div`
     }
 `;
 
-const StyledToggleButton = styled.button`
-    align-items: center;
-    background-color: transparent;
-    border: none;
-    color: var(--theia-editor-foreground);
-    cursor: pointer;
-    display: flex;
-    font-size: 10px;
-    justify-content: center;
-    min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
-    outline-offset: -1px;
-    width: 50%;
-
-    &:hover {
-        background-color: var(--theia-focusBorder);
-        color: #fff;
-    }
-`;
-
 interface PianoRollHeaderProps {
     soundData: SoundData
     currentTrackId: number
@@ -75,10 +52,6 @@ interface PianoRollHeaderProps {
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    sequencerHidden: boolean
-    setSequencerHidden: Dispatch<SetStateAction<boolean>>
-    eventListHidden: boolean,
-    setEventListHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
     pianoRollScrollWindow: ScrollWindow
@@ -93,44 +66,18 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         // playRangeEnd, setPlayRangeEnd,
         currentSequenceIndex,
         setCurrentPlayerPosition,
-        sequencerHidden, setSequencerHidden,
-        eventListHidden, setEventListHidden,
         pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     return <MetaLine
         style={{
             borderTopWidth: 0,
+            paddingLeft: PIANO_ROLL_KEY_WIDTH + 2,
             top: 0,
         }}
     >
-        <MetaLineHeader
-            style={{ minHeight: 18 }}
-        >
-            <StyledToggleButton
-                onClick={() => setEventListHidden(prev => !prev)}
-                title={`${SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
-                    SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
-                    true
-                )}`}
-            >
-                <i className="codicon codicon-list-unordered" />
-                <i className={eventListHidden ? 'codicon codicon-chevron-right' : 'codicon codicon-chevron-left'} />
-            </StyledToggleButton>
-            <StyledToggleButton
-                onClick={() => setSequencerHidden(prev => !prev)}
-                title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
-                    SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
-                    true
-                )}`}
-            >
-                <i className="codicon codicon-layers" />
-                <i className={sequencerHidden ? 'codicon codicon-chevron-down' : 'codicon codicon-chevron-up'} />
-            </StyledToggleButton>
-        </MetaLineHeader>
         <PianoRollHeaderGrid
             soundData={soundData}
             currentTrackId={currentTrackId}

@@ -11,24 +11,37 @@ import {
 } from '../SoundEditorTypes';
 
 const StyledPattern = styled.div`
+    background-color: var(--theia-secondaryButton-background);
     box-sizing: border-box;
+    color: var(--theia-secondaryButton-foreground);
     cursor: pointer;
     height: ${PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT}px;
     margin-bottom: -16px;
+    outline-offset: -1px;
     padding: 1px 3px;
     position: sticky;
+    top: ${PIANO_ROLL_GRID_METER_HEIGHT - 1}px;
     z-index: 201;
+
+    &.selected {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
+    }
+
+    &.current {
+        outline: 1px solid var(--theia-focusBorder);
+    }
 `;
 
 interface PianoRollHeaderPlacedPatternProps {
     soundData: SoundData
+    selected: boolean
     current: boolean
     step: number
     currentTrackId: number
     left: number
     patternSize: number
     patternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
@@ -40,9 +53,8 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
         soundData,
         step,
         left,
-        current,
+        selected, current,
         currentTrackId,
-        setCurrentPatternId,
         patternSize, patternId,
         pianoRollNoteWidth,
         setCurrentSequenceIndex,
@@ -50,8 +62,15 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
         removePatternFromSequence,
     } = props;
 
+    const classNames = [];
+    if (selected) {
+        classNames.push('selected');
+    }
+    if (current) {
+        classNames.push('current');
+    }
+
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        setCurrentPatternId(currentTrackId, patternId);
         setCurrentSequenceIndex(currentTrackId, step);
     };
 
@@ -65,11 +84,9 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
 
     return (
         <StyledPattern
+            className={classNames.join(' ')}
             style={{
-                backgroundColor: current ? 'var(--theia-focusBorder)' : 'var(--theia-secondaryButton-background)',
-                color: current ? '#fff' : 'var(--theia-secondaryButton-foreground)',
                 translate: `${left}px 0`,
-                top: PIANO_ROLL_GRID_METER_HEIGHT - 1,
                 width: patternSize / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
             }}
             onClick={onClick}

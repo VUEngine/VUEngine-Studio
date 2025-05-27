@@ -16,7 +16,6 @@ interface CurrentTrackProps {
     soundData: SoundData
     currentTrackId: number
     setCurrentTrackId: Dispatch<SetStateAction<number>>
-    setCurrentPatternId: Dispatch<SetStateAction<string>>
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     removeTrack: (trackId: number) => void
     editInstrument: (instrument: string) => void
@@ -27,7 +26,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
     const {
         soundData,
         currentTrackId, setCurrentTrackId,
-        setCurrentPatternId,
         setTrack, removeTrack,
         editInstrument,
     } = props;
@@ -36,7 +34,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
 
     const onSelectTrack = (trackId: number): void => {
         setCurrentTrackId(trackId);
-        setCurrentPatternId(Object.values(soundData.tracks[trackId].sequence)[0] ?? '');
     };
 
     const setTrackInstrument = (instrumentId: string): void => {

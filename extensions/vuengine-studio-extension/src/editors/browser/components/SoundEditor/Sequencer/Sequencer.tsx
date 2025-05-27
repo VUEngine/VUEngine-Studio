@@ -19,7 +19,6 @@ import {
     SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
     SoundData,
-    TrackConfig,
     TrackSettings
 } from '../SoundEditorTypes';
 import LoopIndicator from './LoopIndicator';
@@ -56,6 +55,8 @@ const StyledTracksHeader = styled.div`
     border-right: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     min-height: ${SEQUENCER_GRID_METER_HEIGHT}px;
+    position: relative;
+    z-index: 10;
 
     body.theia-light &,
     body.theia-hc & {
@@ -112,14 +113,12 @@ interface SequencerProps {
     currentTrackId: number
     setCurrentTrackId: Dispatch<SetStateAction<number>>
     currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
     toggleTrackMuted: (trackId: number) => void
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
-    setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     removeTrack: (trackId: number) => void
     addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
     setPatternSize: (patternId: string, size: number) => void
@@ -141,13 +140,13 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
         currentTrackId, setCurrentTrackId,
-        currentPatternId, setCurrentPatternId,
+        currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition,
         toggleTrackMuted,
         toggleTrackSolo,
         toggleTrackSeeThrough,
-        setTrack, removeTrack,
+        removeTrack,
         addPattern, setPatternSize,
         setTrackDialogOpen, setPatternDialogOpen,
         effectsPanelHidden,
@@ -420,11 +419,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             <SequencerGrid
                 soundData={soundData}
                 currentTrackId={currentTrackId}
-                currentPatternId={currentPatternId}
-                setCurrentPatternId={setCurrentPatternId}
-                currentSequenceIndex={currentSequenceIndex}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
-                setTrack={setTrack}
                 addPattern={addPattern}
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}

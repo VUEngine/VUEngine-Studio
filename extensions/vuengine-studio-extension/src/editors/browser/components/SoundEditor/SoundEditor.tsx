@@ -256,15 +256,23 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentSequenceIndex(newSequenceIndex);
     };
 
-    const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
-        setCurrentTrackId(trackId);
-        setCurrentSequenceIndex(sequenceIndex);
-        setCurrentPatternId(soundData.tracks[trackId].sequence[sequenceIndex]);
-    };
-
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
         setCurrentTrackId(trackId);
         setCurrentPatternId(patternId);
+        let sequenceIndex = -1;
+        for (const [step, pId] of Object.entries(soundData.tracks[trackId].sequence)) {
+            if (pId === patternId) {
+                sequenceIndex = parseInt(step);
+                break;
+            }
+        }
+        setCurrentSequenceIndex(sequenceIndex);
+    };
+
+    const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
+        setCurrentTrackId(trackId);
+        setCurrentPatternId(soundData.tracks[trackId].sequence[sequenceIndex]);
+        setCurrentSequenceIndex(sequenceIndex);
     };
 
     const showTrackTypeSelection = async (): Promise<QuickPickItem | undefined> => {
@@ -848,7 +856,6 @@ A total of {0} patterns will be deleted.',
                                 updateSoundData={updateSoundData}
                                 currentPlayerPosition={currentPlayerPosition}
                                 currentPatternId={currentPatternId}
-                                setCurrentPatternId={updateCurrentPatternId}
                                 currentTrackId={currentTrackId}
                                 setCurrentTrackId={updateCurrentTrackId}
                                 currentSequenceIndex={currentSequenceIndex}
@@ -856,7 +863,6 @@ A total of {0} patterns will be deleted.',
                                 toggleTrackMuted={toggleTrackMuted}
                                 toggleTrackSolo={toggleTrackSolo}
                                 toggleTrackSeeThrough={toggleTrackSeeThrough}
-                                setTrack={setTrack}
                                 removeTrack={removeTrack}
                                 addPattern={addPattern}
                                 setTrackDialogOpen={setTrackDialogOpen}
@@ -891,7 +897,6 @@ A total of {0} patterns will be deleted.',
                                 noteCursor={noteCursor}
                                 setNoteCursor={setNoteCursor}
                                 currentPatternId={currentPatternId}
-                                setCurrentPatternId={updateCurrentPatternId}
                                 currentTrackId={currentTrackId}
                                 currentSequenceIndex={currentSequenceIndex}
                                 setCurrentSequenceIndex={updateCurrentSequenceIndex}
@@ -1004,8 +1009,7 @@ A total of {0} patterns will be deleted.',
                     <CurrentTrack
                         soundData={soundData}
                         currentTrackId={currentTrackId}
-                        setCurrentTrackId={setCurrentTrackId}
-                        setCurrentPatternId={setCurrentPatternId}
+                        setCurrentTrackId={updateCurrentTrackId}
                         setTrack={setTrack}
                         removeTrack={removeTrack}
                         editInstrument={editInstrument}

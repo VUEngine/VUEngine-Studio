@@ -64,10 +64,7 @@ interface NotePropertiesProps {
     setNoteCursor: (noteCursor: number) => void
     currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     effectsPanelHidden: boolean
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
@@ -79,10 +76,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         soundData,
         noteCursor: noteCursor, setNoteCursor,
         currentTrackId,
-        currentPatternId, setCurrentPatternId,
-        currentSequenceIndex, setCurrentSequenceIndex,
+        currentPatternId,
+        currentSequenceIndex,
         effectsPanelHidden, setEffectsPanelHidden,
-        setNote,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
     } = props;
@@ -124,11 +120,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     noteCursor={noteCursor}
                     currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
-                    setCurrentPatternId={setCurrentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
-                    setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setNoteCursor={setNoteCursor}
-                    setNote={setNote}
                     pianoRollNoteWidth={pianoRollNoteWidth}
                     pianoRollScrollWindow={pianoRollScrollWindow}
                 />;

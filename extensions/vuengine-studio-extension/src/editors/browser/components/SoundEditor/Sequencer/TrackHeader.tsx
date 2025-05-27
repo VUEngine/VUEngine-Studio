@@ -35,7 +35,7 @@ const StyledTrackHeader = styled.div`
 
         body.theia-light &,
         body.theia-hc & {
-            background-color: rgba(0, 0, 0, .3);
+            color: rgba(0, 0, 0, .3);
         }
     }
 

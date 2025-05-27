@@ -1,6 +1,6 @@
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
@@ -54,7 +54,6 @@ const StyledPianoRoll = styled.div`
 `;
 
 export const ScaleControls = styled.div`
-    background-color: var(--theia-editor-background);
     bottom: 0;
     display: flex;
     right: 10px;
@@ -63,7 +62,7 @@ export const ScaleControls = styled.div`
     z-index: 900;
 
     button {
-        background-color: var(--theia-secondaryButton-background);
+        background-color: rgba(255, 255, 255, .1);
         border: none;
         border-radius: 0;
         color: var(--theia-secondaryButton-foreground);
@@ -75,6 +74,11 @@ export const ScaleControls = styled.div`
         max-width: 16px;
         outline: none;
         padding: 0;
+
+        body.theia-light &,
+        body.theia-hc & {
+            background-color: rgba(0, 0, 0, .1);
+        }
 
         &:hover {
             background-color: var(--theia-focusBorder);
@@ -102,13 +106,52 @@ export const ScaleControls = styled.div`
     }
 `;
 
+export const StyledToggleButtonContainer = styled.div`
+    background: var(--theia-editor-background);
+    border-bottom: 1px solid rgba(255, 255, 255, .6);
+    border-right: 1px solid rgba(255, 255, 255, .6);
+    box-sizing: border-box;
+    display: flex;
+    left: 0;
+    margin-bottom: -${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 1}px;
+    max-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    min-width: ${PIANO_ROLL_KEY_WIDTH + 2}px;
+    overflow: hidden;
+    position: sticky;
+    top: 1px;
+    z-index: 250;
+
+    body.theia-light &,
+    body.theia-hc & {
+        border-color: rgba(0, 0, 0, .6);
+    }
+`;
+
+const StyledToggleButton = styled.button`
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    color: var(--theia-editor-foreground);
+    cursor: pointer;
+    display: flex;
+    font-size: 10px;
+    justify-content: center;
+    min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
+    outline-offset: -1px;
+    width: 50%;
+
+    &:hover {
+        background-color: var(--theia-focusBorder);
+        color: #fff;
+    }
+`;
+
 interface PianoRollProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: Dispatch<SetStateAction<number>>
     currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
@@ -143,11 +186,12 @@ interface PianoRollProps {
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         noteCursor, setNoteCursor,
         currentTrackId,
-        currentPatternId, setCurrentPatternId,
+        currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
         playRangeStart, setPlayRangeStart,
@@ -192,7 +236,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
         if (stepToSelect > -1) {
             setCurrentSequenceIndex(currentTrackId, stepToSelect);
-            setCurrentPatternId(currentTrackId, patternIdToSelect);
         } else {
             setCurrentSequenceIndex(currentTrackId, noteCursorStep);
             addPattern(currentTrackId, noteCursorStep, size, createNew);
@@ -253,18 +296,17 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 return;
             }
             const xOffset = PIANO_ROLL_KEY_WIDTH + 2 + step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
-            const isSelected = patternId === currentPatternId && step === currentSequenceIndex;
             patterns.push(<PianoRollHeaderPlacedPattern
                 key={key}
                 soundData={soundData}
                 step={step}
                 patternId={patternId}
                 patternSize={p.size}
-                current={isSelected}
+                selected={patternId === currentPatternId && step === currentSequenceIndex}
+                current={patternId === currentPatternId}
                 currentTrackId={currentTrackId}
                 left={xOffset}
                 pianoRollNoteWidth={pianoRollNoteWidth}
-                setCurrentPatternId={setCurrentPatternId}
                 removePatternFromSequence={removePatternFromSequence}
                 setCurrentSequenceIndex={setCurrentSequenceIndex}
                 setPatternDialogOpen={setPatternDialogOpen}
@@ -491,6 +533,28 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             />}
             {placedPatterns}
             {placedNotesCurrentPattern}
+            <StyledToggleButtonContainer>
+                <StyledToggleButton
+                    onClick={() => setEventListHidden(prev => !prev)}
+                    title={`${SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                        SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
+                        true
+                    )}`}
+                >
+                    <i className="codicon codicon-list-unordered" />
+                    <i className={eventListHidden ? 'codicon codicon-chevron-right' : 'codicon codicon-chevron-left'} />
+                </StyledToggleButton>
+                <StyledToggleButton
+                    onClick={() => setSequencerHidden(prev => !prev)}
+                    title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                        SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
+                        true
+                    )}`}
+                >
+                    <i className="codicon codicon-layers" />
+                    <i className={sequencerHidden ? 'codicon codicon-chevron-down' : 'codicon codicon-chevron-up'} />
+                </StyledToggleButton>
+            </StyledToggleButtonContainer>
             <PianoRollHeader
                 soundData={soundData}
                 currentTrackId={currentTrackId}
@@ -501,10 +565,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 playRangeEnd={playRangeEnd}
                 setPlayRangeEnd={setPlayRangeEnd}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
-                sequencerHidden={sequencerHidden}
-                setSequencerHidden={setSequencerHidden}
-                eventListHidden={eventListHidden}
-                setEventListHidden={setEventListHidden}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
@@ -530,12 +590,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNoteCursor={setNoteCursor}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
-                setCurrentPatternId={setCurrentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
                 effectsPanelHidden={effectsPanelHidden}
                 setEffectsPanelHidden={setEffectsPanelHidden}
-                setNote={setNote}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 pianoRollScrollWindow={pianoRollScrollWindow}
             />

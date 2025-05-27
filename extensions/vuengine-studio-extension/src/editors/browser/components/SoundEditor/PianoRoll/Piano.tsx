@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NOTES_LABELS, ScrollWindow } from '../SoundEditorTypes';
+import { NOTES_LABELS } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 
-// TODO: also add '.scrolled' behavior to sequencer track headers
 const StyledPiano = styled.div`
     border-left: 1px solid rgba(255, 255, 255, .6); 
     border-right: 1px solid rgba(255, 255, 255, .6); 
@@ -17,24 +16,17 @@ const StyledPiano = styled.div`
     body.theia-hc & {
         border-color: rgba(0, 0, 0, .6); 
     }
-
-    &.scrolled {
-        box-shadow: 0px 0 10px rgba(0, 0, 0, .3);
-    }
 `;
 
 interface PianoProps {
     playNote: (note: number) => void
     pianoRollNoteHeight: number
-    pianoRollScrollWindow: ScrollWindow
 }
 
 export default function Piano(props: PianoProps): React.JSX.Element {
-    const { playNote, pianoRollNoteHeight, pianoRollScrollWindow } = props;
+    const { playNote, pianoRollNoteHeight } = props;
 
-    return <StyledPiano
-        className={pianoRollScrollWindow.x > 0 ? 'scrolled' : undefined}
-    >
+    return <StyledPiano>
         {NOTES_LABELS.map((note, index) =>
             <PianoRollKey
                 key={index}

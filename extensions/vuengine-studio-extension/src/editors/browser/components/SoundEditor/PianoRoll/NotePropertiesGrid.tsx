@@ -14,12 +14,9 @@ interface NotePropertiesGridProps {
     soundData: SoundData
     currentTrackId: number
     currentPatternId: string
-    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
-    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
 }
@@ -28,10 +25,9 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
     const {
         soundData,
         currentTrackId,
-        currentPatternId, // setCurrentPatternId,
-        currentSequenceIndex, // setCurrentSequenceIndex,
+        currentPatternId,
+        currentSequenceIndex,
         noteCursor, setNoteCursor,
-        // setNote,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
     } = props;

@@ -83,7 +83,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         <Piano
             playNote={playNote}
             pianoRollNoteHeight={pianoRollNoteHeight}
-            pianoRollScrollWindow={pianoRollScrollWindow}
         />
         <StyledPianoRollGridContainer
             style={{
