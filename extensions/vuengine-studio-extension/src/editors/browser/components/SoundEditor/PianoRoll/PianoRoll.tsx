@@ -364,8 +364,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     }, [
         soundData.tracks[currentTrackId],
         currentTrackId,
-        currentPatternId, // TODO
-        currentSequenceIndex, // TODO
+        currentSequenceIndex,
         noteCursor,
         soundData.instruments,
         setNote,

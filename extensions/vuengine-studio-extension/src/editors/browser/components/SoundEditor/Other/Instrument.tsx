@@ -32,13 +32,14 @@ import {
     VsuSweepModulationFunction,
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
-import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, WAVEFORM_MAX } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, TRACK_DEFAULT_INSTRUMENT_ID, WAVEFORM_MAX } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ENVELOPE_PREVIEW_SIZE = 272;
 
 interface InstrumentProps {
     soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
@@ -56,7 +57,7 @@ interface InstrumentProps {
 
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
     const {
-        soundData,
+        soundData, updateSoundData,
         currentInstrumentId, setCurrentInstrumentId,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen,
@@ -276,7 +277,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             ...soundData.instruments,
             [newId]: {
                 ...instrument,
-                name: `${instrument.name} ${nls.localize('vuengine/general/copy', 'copy')}`,
+                name: `${getInstrumentName(soundData, currentInstrumentId)} ${nls.localize('vuengine/general/copy', 'copy')}`,
             },
         });
         setCurrentInstrumentId(newId);
@@ -296,10 +297,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             const updatedInstruments = { ...soundData.instruments };
             delete updatedInstruments[currentInstrumentId];
 
-            setCurrentInstrumentId((Object.keys(soundData.instruments) ?? [''])[0]);
-            // TODO: update references in tracks
+            // TODO: update references in tracks and pattern events
+            updateSoundData({
+                ...soundData,
+                instruments: updatedInstruments,
+            });
 
-            setInstruments(updatedInstruments);
+            const firstInstrumentId = Object.keys(soundData.instruments)[0] ?? TRACK_DEFAULT_INSTRUMENT_ID;
+            setCurrentInstrumentId(firstInstrumentId);
         }
     };
 

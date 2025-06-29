@@ -30,10 +30,10 @@ interface PianoRollGridProps {
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
     dragStartStep: number
     dragEndStep: number
-    dragStartNoteId: number
+    dragNoteId: number
     setDragStartStep: Dispatch<SetStateAction<number>>
     setDragEndStep: Dispatch<SetStateAction<number>>
-    setDragStartNoteId: Dispatch<SetStateAction<number>>
+    setDragNoteId: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
     trackSettings: TrackSettings[]
 }
@@ -50,7 +50,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         setPatternAtCursorPosition,
         dragStartStep, setDragStartStep,
         dragEndStep, setDragEndStep,
-        dragStartNoteId, setDragStartNoteId,
+        dragNoteId, setDragNoteId,
         pianoRollScrollWindow,
         trackSettings,
     } = props;
@@ -215,17 +215,17 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         const noteId = Math.floor(y / pianoRollNoteHeight);
         const step = Math.floor(x / pianoRollNoteWidth);
 
-        setDragStartNoteId(noteId);
+        setDragNoteId(noteId);
         setDragStartStep(step);
         setDragEndStep(step);
     };
 
     const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+        if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
             return;
         }
 
-        const newNoteId = dragStartNoteId;
+        const newNoteId = dragNoteId;
         const newNoteStep = Math.min(dragStartStep, dragEndStep);
         const newNoteDuration = Math.abs(dragStartStep - dragEndStep) + 1;
         const newNoteLabel = NOTES_LABELS[newNoteId];
@@ -249,20 +249,26 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // reset
-        setDragStartNoteId(-1);
+        setDragNoteId(-1);
         setDragStartStep(-1);
         setDragEndStep(-1);
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+        if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
             return;
         }
 
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const noteId = Math.floor(y / pianoRollNoteHeight);
         const step = Math.floor(x / pianoRollNoteWidth);
 
+        if (noteId !== dragNoteId) {
+            setDragNoteId(noteId);
+        }
         if (step !== dragEndStep) {
             setDragEndStep(step);
         }

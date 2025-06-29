@@ -942,6 +942,7 @@ A total of {0} patterns will be deleted.',
                 >
                     <Instruments
                         soundData={soundData}
+                        updateSoundData={updateSoundData}
                         currentInstrumentId={currentInstrumentId}
                         setCurrentInstrumentId={setCurrentInstrumentId}
                         setInstruments={setInstruments}
@@ -1029,11 +1030,13 @@ A total of {0} patterns will be deleted.',
                 >
                     <CurrentPattern
                         soundData={soundData}
+                        updateSoundData={updateSoundData}
                         currentTrackId={currentTrackId}
                         currentPatternId={currentPatternId}
                         setCurrentPatternId={updateCurrentPatternId}
                         setPattern={setPattern}
                         setPatternSize={setPatternSize}
+                        setPatternDialogOpen={setPatternDialogOpen}
                     />
                 </PopUpDialog>
             }

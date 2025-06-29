@@ -1,30 +1,34 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import { nanoid } from '../../Common/Utils';
 import { getPatternName } from '../SoundEditor';
-import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SoundData } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SequenceMap, SoundData, TrackConfig } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentPatternProps {
     soundData: SoundData
+    updateSoundData: (soundData: SoundData) => void
     currentTrackId: number
     currentPatternId: string
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
     setPatternSize: (patternId: string, size: number) => void
+    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
     const {
-        soundData,
+        soundData, updateSoundData,
         currentTrackId,
         currentPatternId, setCurrentPatternId,
         setPattern, setPatternSize,
+        setPatternDialogOpen,
     } = props;
 
     const pattern = soundData.patterns[currentPatternId];
@@ -33,9 +37,19 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         setPattern(currentPatternId, { name });
     };
 
-    const clonePattern = () => {
-        // TODO
-        alert('not yet implemented');
+    const cloneCurrentPattern = () => {
+        const newPatternId = nanoid();
+        updateSoundData({
+            ...soundData,
+            patterns: {
+                ...soundData.patterns,
+                [newPatternId]: {
+                    ...soundData.patterns[currentPatternId],
+                    name: `${getPatternName(soundData, currentPatternId)} ${nls.localize('vuengine/general/copy', 'copy')}`,
+                }
+            },
+        });
+        setCurrentPatternId(currentTrackId, newPatternId);
     };
 
     const removeCurrentPattern = async () => {
@@ -45,8 +59,28 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         });
         const remove = await dialog.open();
         if (remove) {
-            // TODO
-            alert('not yet implemented');
+            const updatedSoundData = { ...soundData };
+            delete updatedSoundData.patterns[currentPatternId];
+            const cleanedTracks: TrackConfig[] = [];
+            soundData.tracks.forEach(t => {
+                const cleanedSequence: SequenceMap = {};
+                Object.keys(t.sequence).forEach(s => {
+                    const step = parseInt(s);
+                    if (t.sequence[step] !== currentPatternId) {
+                        cleanedSequence[step] = t.sequence[step];
+                    }
+                });
+                cleanedTracks.push({
+                    ...t,
+                    sequence: cleanedSequence,
+                });
+            });
+            updateSoundData(updatedSoundData);
+            const firstPatternId = Object.keys(soundData.patterns)[0] ?? '';
+            setCurrentPatternId(currentTrackId, firstPatternId);
+            if (firstPatternId === '') {
+                setPatternDialogOpen(false);
+            }
         }
     };
 
@@ -69,7 +103,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     <InputWithActionButton
                         className='theia-button secondary'
                         title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
-                        onClick={clonePattern}
+                        onClick={cloneCurrentPattern}
                         disabled={!pattern}
                     >
                         <Copy size={16} />

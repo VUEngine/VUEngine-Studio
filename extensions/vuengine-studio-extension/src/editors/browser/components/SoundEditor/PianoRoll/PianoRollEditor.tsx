@@ -66,13 +66,13 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollScrollWindow,
         trackSettings,
     } = props;
-    const [dragStartNoteId, setDragStartNoteId] = useState<number>(-1);
+    const [dragNoteId, setDragNoteId] = useState<number>(-1);
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
     const [dragEndStep, setDragEndStep] = useState<number>(-1);
 
     return <StyledPianoRollEditor
         onMouseOut={() => {
-            setDragStartNoteId(-1);
+            setDragNoteId(-1);
             setDragStartStep(-1);
             setDragEndStep(-1);
         }}
@@ -89,12 +89,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 height: NOTES_SPECTRUM * pianoRollNoteHeight
             }}
         >
-            {dragStartNoteId > -1 &&
+            {dragNoteId > -1 &&
                 <CurrentlyPlacingNote
                     style={{
                         height: pianoRollNoteHeight,
                         left: Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth,
-                        top: dragStartNoteId * pianoRollNoteHeight,
+                        top: dragNoteId * pianoRollNoteHeight,
                         width: pianoRollNoteWidth * (Math.abs(dragStartStep - dragEndStep) + 1),
                     }}
                 />
@@ -110,10 +110,10 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
-                dragStartNoteId={dragStartNoteId}
+                dragNoteId={dragNoteId}
                 dragStartStep={dragStartStep}
                 dragEndStep={dragEndStep}
-                setDragStartNoteId={setDragStartNoteId}
+                setDragNoteId={setDragNoteId}
                 setDragStartStep={setDragStartStep}
                 setDragEndStep={setDragEndStep}
                 pianoRollScrollWindow={pianoRollScrollWindow}
