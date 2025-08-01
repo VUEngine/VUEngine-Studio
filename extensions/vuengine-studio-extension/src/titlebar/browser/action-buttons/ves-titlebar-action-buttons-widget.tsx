@@ -39,10 +39,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
 
         this.update();
 
-        this.applicationShell.mainPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.bottomPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.leftPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.rightPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
+        this.applicationShell.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
     }
 
     protected handleToggleMaximized(widget: Widget): void {

@@ -17,16 +17,16 @@
   z-index: 1;
 }
 
-#theia-top-panel .p-MenuBar-content {
+#theia-top-panel .lm-MenuBar-content {
   -webkit-app-region: no-drag;
   z-index: 1;
 }
 
-#theia-top-panel .p-MenuBar-item {
+#theia-top-panel .lm-MenuBar-item {
   line-height: calc(var(--theia-private-menubar-height) - 10px);
 }
 
-#theia-top-panel .p-MenuBar-item.p-mod-active {
+#theia-top-panel .lm-MenuBar-item.lm-mod-active {
   background: rgba(255, 255, 255, .3);
 }
 

@@ -169,6 +169,7 @@ export class VesPlugin implements VesPluginData, TreeElement {
     handleContextMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
         e.preventDefault();
         this.contextMenuRenderer.render({
+            context: window.document.body,
             menuPath: PLUGINS_CONTEXT_MENU,
             anchor: {
                 x: e.clientX,

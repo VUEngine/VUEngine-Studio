@@ -1,4 +1,4 @@
 #theia-main-content-panel,
-#theia-main-content-panel .p-Widget.p-DockPanel-widget {
+#theia-main-content-panel .lm-Widget.lm-DockPanel-widget {
     background: transparent;
 }
