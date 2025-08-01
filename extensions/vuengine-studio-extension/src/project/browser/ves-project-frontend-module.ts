@@ -1,5 +1,4 @@
 import { bindViewContribution, FrontendApplicationContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
@@ -22,7 +21,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
     bind(VesProjectContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesProjectContribution);
-    bind(TabBarToolbarContribution).toService(VesProjectContribution);
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectPreferenceSchema });
