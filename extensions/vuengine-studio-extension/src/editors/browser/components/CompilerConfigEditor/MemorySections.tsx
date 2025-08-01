@@ -64,7 +64,7 @@ The reserved space will be unavailable for BGMAP data.'
                 </td>
             </tr>
             {(['dram'] as MemorySectionsDataKeys[]).map(section =>
-                <tr>
+                <tr key={section}>
                     <td>
                         {section.toUpperCase()}
                     </td>
