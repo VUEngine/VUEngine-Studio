@@ -34,10 +34,10 @@ Documentation on how to use VUEngine Studio can be found at https://www.vuengine
 
 Download node.js and install. Preferrably use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
 
-Make sure you're using at least node 20.
+Make sure you're using at least node 22.
 
-    nvm install 20
-    nvm use 20
+    nvm install 22
+    nvm use 22
 
 Install yarn.
 

@@ -13,7 +13,7 @@
   },
   "engines": {
     "yarn": ">=1.7.0 <2",
-    "node": ">=20"
+    "node": ">=22"
   },
   "devDependencies": {
     "@theia/cli": "1.63.0",
