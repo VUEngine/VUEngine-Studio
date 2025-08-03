@@ -35,7 +35,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
     }, []);
 
     return <div
-        className="p-Widget dialogOverlay"
+        className="lm-Widget dialogOverlay"
         style={{
             display: open ? 'flex' : 'none',
             height: '100%',

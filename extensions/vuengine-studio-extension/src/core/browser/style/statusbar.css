@@ -2,6 +2,10 @@
   --theia-statusBar-height: 29px;
 }
 
+#theia-statusBar .area.left {
+  padding-left: 0;
+}
+
 #theia-statusBar .area.left .element,
 #theia-statusBar .area.right .element {
   margin: 0;

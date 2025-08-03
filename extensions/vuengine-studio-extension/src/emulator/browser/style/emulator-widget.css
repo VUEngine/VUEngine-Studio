@@ -77,8 +77,6 @@ iframe.emulator-iframe {
   border: none;
   border-radius: 2px;
   overflow: hidden;
-  z-index: -1;
-  /* prevent focus on iframe to intercept key presses */
 }
 
 #vesEmulatorWidget .controlsOverlay {
