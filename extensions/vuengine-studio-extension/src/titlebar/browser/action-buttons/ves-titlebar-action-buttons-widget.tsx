@@ -38,28 +38,18 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.onDidChangeIsMaximized(() => this.update());
 
         this.update();
-
-        this.applicationShell.mainPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.bottomPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.leftPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-        this.applicationShell.rightPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-    }
-
-    protected handleToggleMaximized(widget: Widget): void {
-        this.isMaximized = !this.isMaximized && widget;
     }
 
     protected render(): React.ReactNode {
-        return <>
-            {this.isMaximized &&
-                <div
-                    className="titlebar-action-button"
-                    title={`${CommonCommands.TOGGLE_MAXIMIZED.label}${this.vesCommonService.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`}
-                    onClick={this.collapse}
-                >
-                    <i className="fa fa-compress"></i>
-                </div>}
-        </>;
+        return (
+            <div
+                className="titlebar-action-button"
+                title={`${CommonCommands.TOGGLE_MAXIMIZED.label}${this.vesCommonService.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`}
+                onClick={this.collapse}
+            >
+                <i className="fa fa-compress"></i>
+            </div>
+        );
     }
 
     protected collapse = async () => this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id, this.isMaximized);

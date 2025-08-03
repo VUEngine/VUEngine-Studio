@@ -1,10 +1,10 @@
 #ves-titlebar-application-title .applicationTitle,
-#theia-left-content-panel .p-TabBar-tabIcon,
+#theia-left-content-panel .lm-TabBar-tabIcon,
 #theia-left-content-panel .theia-sidebar-menu,
-#theia-right-content-panel .p-TabBar-tabIcon,
+#theia-right-content-panel .lm-TabBar-tabIcon,
 #theia-statusBar .area > div,
 #main-toolbar .toolbar-column > div,
-.p-TabBar-toolbar .item {
+.lm-TabBar-toolbar .item {
     animation-name: fadeIn;
     animation-duration: .3s;
     animation-timing-function: ease-in-out;

@@ -1,13 +1,13 @@
-.p-Widget.p-MenuBar {
+.lm-Widget.lm-MenuBar {
     padding-left: 0;
 }
 
 /* do not drag main menu popups 4px to the top */
-.p-MenuBar-menu {
+.lm-MenuBar-menu {
     transform: none;
 }
 
-.p-MenuBar-item,
-.p-Menu-item {
+.lm-MenuBar-item,
+.lm-Menu-item {
     cursor: pointer;
 }

@@ -83,7 +83,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
 
     // enable main menu
-    bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
+    rebind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
 
