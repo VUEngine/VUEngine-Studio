@@ -13,10 +13,8 @@
     "inputOption.activeBorder": "#d31422",
     "inputValidation.infoBorder": "#d31422",
     "list.activeSelectionBackground": "#d3142240",
-    "sideBar.background": "#333",
-    "mainToolbar.background": "#1e1e1e",
+    "mainToolbar.background": "#111111",
     "mainToolbar.foreground": "#d4d4d4",
-    "toolbar.hoverBackground": "#333",
     "menu.selectionBackground": "#d3142240",
     "menu.separatorBackground": "#555555",
     "minimap.selectionHighlight": "#d3142240",
@@ -29,16 +27,15 @@
     "settings.modifiedItemIndicator": "#d31422",
     "selection.background": "#d3142240",
     "sideBarSectionHeader.border": "#00000000",
-    "statusBar.background": "#1e1e1e",
+    "statusBar.background": "#111111",
     "statusBar.foreground": "#d4d4d4",
-    "statusBar.border": "#333",
-    "statusBar.noFolderBackground": "#1e1e1e",
-    "statusBarItem.hoverBackground": "#333",
+    "statusBar.border": "#111",
+    "statusBar.noFolderBackground": "#111111",
     "textBlockQuote.border": "#d3142280",
     "textLink.activeForeground": "#d3142280",
     "textLink.foreground": "#d31422",
     "titleBar.activeBackground": "#d31422",
     "titleBar.activeForeground": "#ffffff",
-    "titleBar.border": "#1e1e1e"
+    "titleBar.border": "#111"
   }
 }

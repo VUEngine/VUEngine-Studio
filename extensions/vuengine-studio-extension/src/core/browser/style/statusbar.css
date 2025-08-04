@@ -2,6 +2,10 @@
   --theia-statusBar-height: 29px;
 }
 
+#theia-statusBar .area {
+  gap: 0;
+}
+
 #theia-statusBar .area.left {
   padding-left: 0;
 }
@@ -51,4 +55,9 @@
 
 #theia-statusBar .area.right {
   padding-right: 0;
+}
+
+#theia-statusBar .area.right .element:last-child {
+  box-sizing: border-box;
+  min-width: var(--theia-private-sidebar-tab-width);
 }

@@ -17,20 +17,15 @@
 
 #main-toolbar .toolbar-item .codicon,
 #main-toolbar .toolbar-item .fa {
+  border-radius: 0;
+  box-sizing: border-box;
   height: var(--theia-toolbar-height);
-  line-height: var(--theia-toolbar-height);
+  line-height: calc(var(--theia-toolbar-height) - 2px);
   min-width: var(--theia-toolbar-height);
 }
 
 #main-toolbar .separator {
   background-color: var(--theia-mainToolbar-foreground);
-  margin: 5px;
+  margin: var(--theia-ui-padding);
   opacity: 0.3;
-}
-
-#main-toolbar .toolbar-column.left .toolbar-item:first-child {
-  padding-left: var(--theia-ui-padding);
-}
-#main-toolbar .toolbar-column.right .toolbar-item:last-child {
-  padding-right: var(--theia-ui-padding);
 }

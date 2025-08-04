@@ -8,12 +8,6 @@
 .lm-TabBar.theia-app-sides .lm-TabBar-tab:hover {
     background-color: var(--theia-activityBar-hoverBackground);
 }
-.lm-TabBar.theia-app-sides.theia-app-left .lm-TabBar-tab {
-    border-radius: 0 8px 8px 0;
-}
-.lm-TabBar.theia-app-sides.theia-app-right .lm-TabBar-tab {
-    border-radius: 8px 0 0 8px;
-}
 
 .lm-Widget .theia-sidebar-menu-item i:hover {
     background-color: var(--theia-activityBar-hoverBackground);

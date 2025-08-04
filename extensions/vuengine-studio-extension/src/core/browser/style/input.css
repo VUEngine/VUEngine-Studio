@@ -4,6 +4,8 @@
 
 .theia-input {
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    min-height: 26px;
+    padding: 0 0 0 5px;
 }
 
 .theia-input.small {
