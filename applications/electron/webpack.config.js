@@ -3,6 +3,7 @@
  * To reset delete this file and rerun theia build again.
  */
 // @ts-check
+const path = require('path');
 const configs = require('./gen-webpack.config.js');
 const nodeConfig = require('./gen-webpack.node.config.js');
 
@@ -14,6 +15,10 @@ configs[0].module.rules.push({
     test: /\.js$/,
     loader: require.resolve('@theia/application-manager/lib/expose-loader')
 }); */
+
+const shroomsPath = path.resolve(__dirname, 'binaries/vuengine-studio-tools/web/shrooms-vb-core');
+configs[0].entry['shrooms.audio'] = shroomsPath + '/Audio.js';
+configs[0].entry['shrooms.core'] = shroomsPath + '/Core.js';
 
 module.exports = [
     ...configs,

@@ -1017,9 +1017,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1346,27 +1346,27 @@
   resolved "https://registry.yarnpkg.com/@jsdevtools/ono/-/ono-7.1.3.tgz#9df03bbd7c696a5c58885c34aa06da41c8543796"
   integrity sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==
 
-"@jsonforms/core@^3.1.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/core/-/core-3.4.0.tgz#00e280b6280c868fe00cb71a9bcd7daa86188b90"
-  integrity sha512-jeU98XLru6G2WVGmJqG19W2rmSLX4im/gOWbptTzQJYj8tS38cqDoYcIRuBmAQYASj2ogJDHQnDgIXARSL8vJA==
+"@jsonforms/core@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/core/-/core-3.6.0.tgz#3b03db6d15899decfea4d82631083d59e275bccc"
+  integrity sha512-Qz7qJPf/yP4ybqknZ500zggIDZRJfcufu+3efp/xNWf05mpXvxN9TdfmA++BdXi5Nr4UAgjos2kFmQpZpQaCDw==
   dependencies:
     "@types/json-schema" "^7.0.3"
     ajv "^8.6.1"
     ajv-formats "^2.1.0"
     lodash "^4.17.21"
 
-"@jsonforms/react@^3.1.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/react/-/react-3.4.0.tgz#f15cb67314b927a597ce2afae14c35041b4b6846"
-  integrity sha512-uDL1fptUxkemXGLUFaCTPUA3iMvEMUs2g8pQ8da0kPNiH6D1n7oEq3+rsVKMJ1lQLVJZT2MxUJl71DdGJ5OOmA==
+"@jsonforms/react@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/react/-/react-3.6.0.tgz#d43db626c2c7809ce73fdd7114ba6158192b5c85"
+  integrity sha512-dor7FYltCkNkAM+SVZGtabjpUhGlj0/coAqx7GIZ8h+leET+d1sLEAc8kfxxh6gZBq9C4KAErb0Pj3uHedOs9Q==
   dependencies:
     lodash "^4.17.21"
 
-"@jsonforms/vanilla-renderers@^3.1.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/vanilla-renderers/-/vanilla-renderers-3.4.0.tgz#77800aa9aaf3685db6ba4944cdaa5cd71a51b6c6"
-  integrity sha512-mq0/7LamMrmW9P0H/3J0+aVc6Jwtddghz1Tez7ZJv6fuX1hqsg51C/+aXVYbAvnM9oCdsho7h7iY5HphQ9cT2g==
+"@jsonforms/vanilla-renderers@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/vanilla-renderers/-/vanilla-renderers-3.6.0.tgz#ac541f0cc047e4bfe5300ff6eae30ed30a55eb94"
+  integrity sha512-KAEoUSv/Jdj+3W9P6T+HJADY61xJXXcngBELlicEfkelJHBjs+YfhPP09g1AEMdU2MOeCq/QDkXIX2HMN6qmGQ==
   dependencies:
     lodash "^4.17.21"
 
