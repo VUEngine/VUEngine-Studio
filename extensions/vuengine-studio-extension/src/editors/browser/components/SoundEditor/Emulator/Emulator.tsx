@@ -91,8 +91,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         }
 
         const newCore = await VB.create({
-            audioUrl: new Endpoint({ path: '/shrooms/Audio.js' }).getRestUrl().toString(),
-            coreUrl: new Endpoint({ path: '/shrooms/Core.js' }).getRestUrl().toString(),
+            audioUrl: './shrooms.audio.js',
+            coreUrl: './shrooms.core.js',
             wasmUrl: new Endpoint({ path: '/shrooms/core.wasm' }).getRestUrl().toString(),
         });
         const newSim = await newCore.create();
