@@ -37,6 +37,7 @@
     right: 0;
     top: 0;
     width: 32px;
+    z-index: 10;
 }
 .jsonforms-container .item:hover > .remove-button {
     color: var(--theia-button-hoverBackground);

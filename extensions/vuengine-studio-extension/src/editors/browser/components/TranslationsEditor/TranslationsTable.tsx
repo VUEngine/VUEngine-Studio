@@ -65,7 +65,7 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
                     {removeable && <button
                         className='theia-button secondary'
                         onClick={e => removeTranslation(s)}
-                        title={nls.localize('vuengine/translationsEditor/deleteTranslation', 'Delete Translation')}
+                        title={nls.localize('vuengine/editors/translations/deleteTranslation', 'Delete Translation')}
                     >
                         <i className='codicon codicon-x' />
                     </button>}

@@ -53,7 +53,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
             <VContainer gap={15} style={{ maxWidth: 500 }}>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/columnTableEditor/description', 'Description')}
+                        {nls.localizeByDefault('Description')}
                     </label>
                     <ReactTextareaAutosize
                         className="theia-input"
@@ -70,7 +70,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
                         checked={data.mirror}
                         onChange={this.onChangeMirror.bind(this)}
                     />
-                    {nls.localize('vuengine/columnTableEditor/mirror', 'Mirror')}
+                    {nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
                 </label>
             </VContainer>
 

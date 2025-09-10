@@ -3,18 +3,30 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
+import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/Base/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
-    AnimationData,
     ActorEditorContext,
     ActorEditorContextType,
+    AnimationData,
     MAX_ANIMATION_CYLCES,
     MIN_ANIMATION_CYLCES
 } from '../ActorEditorTypes';
 import AnimationsSettings from './AnimationsSettings';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import styled from 'styled-components';
+
+export const RemoveFrameButton = styled.button`
+    min-width: 0 !important;
+    padding: 0;
+    width: 16px;
+
+    .codicon {
+        font-size: 90%;
+    }
+`;
 
 interface AnimationProps {
     index: number
@@ -25,13 +37,13 @@ interface AnimationProps {
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData, currentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { data, setData, currentAnimationStep, setCurrentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
     const getEngineSettings = async (): Promise<void> => {
-        await services.vesProjectService.projectItemsReady;
+        await services.vesProjectService.projectDataReady;
         const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
         // @ts-ignore
         setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
@@ -47,15 +59,17 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const setCycles = (cycles: number): void => {
-        updateAnimation({
-            cycles: clamp(cycles, MIN_ANIMATION_CYLCES, MAX_ANIMATION_CYLCES),
-        });
+        updateAnimation({ cycles });
     };
 
     const toggleLoop = (): void => {
         updateAnimation({
             loop: !animation.loop
         });
+    };
+
+    const setName = (name: string): void => {
+        updateAnimation({ name });
     };
 
     const setCallback = (callback: string): void => {
@@ -92,12 +106,19 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     return <div>
         <VContainer gap={15}>
-            <HContainer alignItems='start' gap={15} wrap='wrap'>
+            <HContainer alignItems='start' gap={15}>
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    value={animation.name}
+                    setValue={setName}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    grow={1}
+                />
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/default', 'Default')}
+                        label={nls.localize('vuengine/editors/actor/default', 'Default')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/defaultAnimationDescription',
+                            'vuengine/editors/actor/defaultAnimationDescription',
                             'Play this animation as the default when the actor is created.'
                         )}
                     />
@@ -109,96 +130,103 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
-                <VContainer grow={1}>
+            </HContainer>
+            <HContainer alignItems='start' gap={15}>
+                <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/cycles', 'Cycles')}
+                        label={nls.localize('vuengine/editors/actor/cycles', 'Cycles')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/animationCyclesDescription',
-                            'Each frame of this animation Number is display the fiven amount of CPU cycles.'
+                            'vuengine/editors/actor/animationCyclesDescription',
+                            'Each frame of this animation is displayed the given amount of CPU cycles.'
                         )}
                     />
-                    <input
-                        className='theia-input'
+                    <Input
                         type='number'
+                        value={animation.cycles}
+                        setValue={setCycles}
                         min={MIN_ANIMATION_CYLCES}
                         max={MAX_ANIMATION_CYLCES}
-                        value={animation.cycles}
-                        onChange={e => setCycles(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        width={64}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/loop', 'Loop')}
+                        label={nls.localize('vuengine/editors/actor/loop', 'Loop')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/animationLoopDescription',
+                            'vuengine/editors/actor/loopDescription',
                             'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
                         )}
                     />
-                    <input
-                        type="checkbox"
-                        checked={animation.loop}
-                        onChange={toggleLoop}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                </VContainer>
-                {!animation.loop &&
-                    <VContainer grow={1}>
-                        <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/callback', 'Callback')}
-                            tooltip={nls.localize(
-                                'vuengine/actorEditor/animationCallbackDescription',
-                                'Provide the name of the method to call on animation completion.'
-                            )}
-                        />
+                    <HContainer>
                         <input
-                            className='theia-input'
-                            value={animation.callback}
-                            onChange={e => setCallback(e.target.value)}
+                            type="checkbox"
+                            checked={animation.loop}
+                            onChange={toggleLoop}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
-                    </VContainer>
-                }
+                        <i
+                            className="codicon codicon-debug-restart"
+                            onClick={() => setCurrentAnimationStep(0)}
+                            title={nls.localizeByDefault('Restart')}
+                            style={{
+                                fontSize: 18,
+                                cursor: 'pointer',
+                            }}
+                        />
+                    </HContainer>
+                </VContainer>
             </HContainer>
+            {!animation.loop &&
+                <Input
+                    label={nls.localize('vuengine/editors/actor/callback', 'Callback')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/animationCallbackDescription',
+                        'Provide the name of the method to call on animation completion.'
+                    )}
+                    value={animation.callback}
+                    setValue={setCallback}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+            }
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
+                    {nls.localize('vuengine/editors/actor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
                 </label>
                 <HContainer alignItems='start' wrap='wrap'>
                     {animation.frames.map((f, i) =>
-                        <HContainer key={`frame-${i}`} gap={1}>
-                            <input
-                                key={`frame-${i}`}
-                                className={i === currentAnimationStep ? 'theia-input current' : 'theia-input'}
-                                style={{ width: 40 }}
+                        <HContainer key={i} gap={1}>
+                            <Input
                                 type='number'
-                                min={0}
-                                max={totalFrames - 1}
+                                className={i === currentAnimationStep ? 'current' : undefined}
                                 value={animation.frames[i] + 1}
-                                onChange={e => setFrame(i, e.target.value === '' ? 0 : parseInt(e.target.value) - 1)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setFrame(i, v as number - 1)}
+                                min={1}
+                                max={totalFrames}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={52}
+                                tabIndex={i + 1}
                             />
-                            <button
+                            <RemoveFrameButton
                                 className="theia-button secondary"
                                 onClick={() => removeFrame(i)}
-                                title={nls.localize('vuengine/actorEditor/removeFrame', 'Remove Frame')}
+                                title={nls.localizeByDefault('Remove')}
                             >
                                 <i className='codicon codicon-x' />
-                            </button>
+                            </RemoveFrameButton>
                         </HContainer>
                     )}
                     {animation.frames.length < maxAnimationFrames
                         ? <button
                             className='theia-button add-button'
                             onClick={addFrame}
-                            title={nls.localize('vuengine/actorEditor/addFrame', 'Add Frame')}
+                            title={nls.localizeByDefault('Add')}
                         >
                             <i className='codicon codicon-plus' />
                         </button>
                         : <div>
-                            {nls.localize('vuengine/actorEditor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
+                            {nls.localize('vuengine/editors/actor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
                         </div>
                     }
                 </HContainer>

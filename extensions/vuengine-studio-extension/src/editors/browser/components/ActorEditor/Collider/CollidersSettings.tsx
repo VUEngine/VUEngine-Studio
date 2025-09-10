@@ -17,7 +17,7 @@ export default function CollidersSettings(): React.JSX.Element {
 
     const options: SelectOption[] = [{
         value: '',
-        label: nls.localize('vuengine/actorEditor/inGameTypeNone', 'None'),
+        label: nls.localize('vuengine/editors/actor/inGameTypeNone', 'None'),
     }];
     let inGameTypesFileUri: URI | undefined;
     const inGameTypes = services.vesProjectService.getProjectDataItemsForType('InGameTypes');
@@ -58,7 +58,7 @@ export default function CollidersSettings(): React.JSX.Element {
         <HContainer alignItems='end'>
             <VContainer grow={1}>
                 <label>
-                    {nls.localize('vuengine/actorEditor/actorsInGameType', "Actor's In-Game Type")}
+                    {nls.localize('vuengine/editors/actor/actorsInGameType', "Actor's In-Game Type")}
                 </label>
                 <SelectComponent
                     options={options}
@@ -69,7 +69,7 @@ export default function CollidersSettings(): React.JSX.Element {
             <button
                 className='theia-button secondary'
                 onClick={openEditor}
-                title={nls.localize('vuengine/actorEditor/manageInGameTypes', 'Manage In-Game Types')}
+                title={nls.localize('vuengine/editors/actor/manageInGameTypes', 'Manage In-Game Types')}
             >
                 <i className='codicon codicon-settings-gear' />
             </button>

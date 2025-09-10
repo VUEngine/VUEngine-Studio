@@ -1,3 +1,4 @@
+/* eslint-disable no-null/no-null */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ColorMode, PALETTE_BIT_INDEX_MAP, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { DisplayMode } from './VUEngineTypes';
@@ -5,7 +6,7 @@ import { DisplayMode } from './VUEngineTypes';
 interface CanvasImageProps {
     height: number
     palette: string
-    pixelData: number[][][]
+    pixelData: (number | null)[][][]
     displayMode: DisplayMode
     parallaxDisplacement?: number
     width: number
@@ -13,7 +14,8 @@ interface CanvasImageProps {
     style?: object
     repeatX?: boolean
     repeatY?: boolean
-    textColor?: string
+    colorOverride?: string | string[][]
+    drawBlack?: boolean
 }
 
 export default function CanvasImage(props: CanvasImageProps): React.JSX.Element {
@@ -28,14 +30,14 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         style,
         repeatX,
         repeatY,
-        textColor
+        colorOverride,
+        drawBlack
     } = props;
-    // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? (parallaxDisplacement ?? 0) : 0;
 
-    const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
+    const drawToCanvas = (context: CanvasRenderingContext2D, pixels: (number | null)[][]) => {
         if (pixels === undefined) {
             return;
         }
@@ -52,6 +54,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                 if (
                     pixels[y] === undefined ||
                     pixels[y][x] === undefined ||
+                    pixels[y][x] === null ||
                     (colorMode === ColorMode.FrameBlend && (
                         pixels[height + y] === undefined ||
                         pixels[height + y][x] === undefined
@@ -64,15 +67,19 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                 let effectiveColorByPalette = getEffectiveColorByPalette(originalColorIndex ?? 0);
                 if (colorMode === ColorMode.FrameBlend) {
                     // for HiColor, find middle value of the two images (both are combined in one, over/under)
-                    effectiveColorByPalette = (effectiveColorByPalette * 2 + getEffectiveColorByPalette(pixels[height + y][x]) * 2) / 2;
+                    effectiveColorByPalette = (effectiveColorByPalette * 2 + getEffectiveColorByPalette(pixels[height + y][x]!) * 2) / 2;
                 }
 
                 // don't draw index 0; neither does the VB
-                if (originalColorIndex === 0) {
+                if (originalColorIndex === 0 && !drawBlack) {
                     return;
                 }
 
-                const fillColor = textColor ?? getColor(effectiveColorByPalette);
+                const fillColor = colorOverride
+                    ? Array.isArray(colorOverride) && Array.isArray(colorOverride[0])
+                        ? colorOverride[y][x]
+                        : colorOverride as string
+                    : getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
@@ -169,6 +176,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         palette,
         parallaxDisplacement,
         pixelData,
+        colorOverride,
         totalHeight,
         totalWidth,
     ]);

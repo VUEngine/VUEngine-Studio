@@ -9,7 +9,7 @@ import cropImageData from 'crop-image-data';
 import * as iq from 'image-q';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP, PALETTE_VALUE_INVERSION_MAP } from '../../core/browser/ves-common-types';
-import { roundToNextMultipleOf8 } from '../../editors/browser/components/Common/Utils';
+import { nanoid, roundToNextMultipleOf8 } from '../../editors/browser/components/Common/Utils';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { compressTiles, decompressTiles } from './ves-images-compressor';
@@ -86,7 +86,7 @@ export class VesImagesService {
     const gritUri = await this.getGritUri();
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
-    const tempDirName = `grit-${this.vesCommonService.nanoid()}`;
+    const tempDirName = `grit-${nanoid()}`;
     const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
     const tempDirUri = tempDirBaseUri.resolve(tempDirName);
     if (!(await this.fileService.exists(tempDirUri))) {

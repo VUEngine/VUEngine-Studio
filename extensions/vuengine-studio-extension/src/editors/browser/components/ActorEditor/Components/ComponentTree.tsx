@@ -1,14 +1,15 @@
+/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Tree } from 'react-arborist';
 import { WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
-import { ComponentKey, ActorData, ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
+import { ActorData, ActorEditorContext, ActorEditorContextType, ComponentKey } from '../ActorEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
-    key: ComponentKey | 'extraProperties' | 'physics'
+    key: ComponentKey
     componentKey?: ComponentKey
     labelSingular: string
     labelPlural: string
@@ -25,6 +26,9 @@ export default function ComponentTree(): React.JSX.Element {
     const { currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const treeContainerRef = useRef<HTMLDivElement>(null);
+    const [treeHeight, setTreeHeight] = useState<number>(300);
+    const [treeWidth, setTreeWidth] = useState<number>(300);
 
     const moveComponent = (
         dragIds: string[],
@@ -55,63 +59,51 @@ export default function ComponentTree(): React.JSX.Element {
         {
             key: 'sprites',
             componentKey: 'sprites',
-            labelSingular: nls.localize('vuengine/actorEditor/sprite', 'Sprite'),
-            labelPlural: nls.localize('vuengine/actorEditor/sprites', 'Sprites'),
+            labelSingular: nls.localize('vuengine/editors/actor/sprite', 'Sprite'),
+            labelPlural: nls.localize('vuengine/editors/actor/sprites', 'Sprites'),
             hasContent: data.components?.sprites?.length > 0,
         },
         {
             key: 'animations',
             componentKey: 'animations',
-            labelSingular: nls.localize('vuengine/actorEditor/animation', 'Animation'),
-            labelPlural: nls.localize('vuengine/actorEditor/animations', 'Animations'),
+            labelSingular: nls.localize('vuengine/editors/actor/animation', 'Animation'),
+            labelPlural: nls.localize('vuengine/editors/actor/animations', 'Animations'),
             hasContent: data.components?.animations?.length > 0,
         },
         {
             key: 'colliders',
             componentKey: 'colliders',
-            labelSingular: nls.localize('vuengine/actorEditor/collider', 'Collider'),
-            labelPlural: nls.localize('vuengine/actorEditor/colliders', 'Colliders'),
+            labelSingular: nls.localize('vuengine/editors/actor/collider', 'Collider'),
+            labelPlural: nls.localize('vuengine/editors/actor/colliders', 'Colliders'),
             hasContent: data.components?.colliders?.length > 0,
         },
         {
             key: 'wireframes',
             componentKey: 'wireframes',
-            labelSingular: nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'),
-            labelPlural: nls.localize('vuengine/actorEditor/wireframes', 'Wireframes'),
+            labelSingular: nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'),
+            labelPlural: nls.localize('vuengine/editors/actor/wireframes', 'Wireframes'),
             hasContent: data.components?.wireframes?.length > 0,
         },
         {
-            key: 'behaviors',
-            componentKey: 'behaviors',
-            labelSingular: nls.localize('vuengine/actorEditor/behavior', 'Behavior'),
-            labelPlural: nls.localize('vuengine/actorEditor/behaviors', 'Behaviors'),
-            hasContent: data.components?.behaviors?.length > 0,
+            key: 'mutators',
+            componentKey: 'mutators',
+            labelSingular: nls.localize('vuengine/editors/actor/mutator', 'Mutator'),
+            labelPlural: nls.localize('vuengine/editors/actor/mutators', 'Mutators'),
+            hasContent: data.components?.mutators?.length > 0,
         },
         {
             key: 'children',
             componentKey: 'children',
-            labelSingular: nls.localize('vuengine/actorEditor/child', 'Child'),
-            labelPlural: nls.localize('vuengine/actorEditor/children', 'Children'),
+            labelSingular: nls.localize('vuengine/editors/actor/child', 'Child'),
+            labelPlural: nls.localize('vuengine/editors/actor/children', 'Children'),
             hasContent: data.components?.children?.length > 0,
         },
         {
-            key: 'scripts',
-            componentKey: 'scripts',
-            labelSingular: nls.localize('vuengine/actorEditor/script', 'Script'),
-            labelPlural: nls.localize('vuengine/actorEditor/scripts', 'Scripts'),
-            hasContent: data.components?.scripts?.length > 0,
-        },
-        {
-            key: 'physics',
-            labelSingular: nls.localize('vuengine/actorEditor/physics', 'Physical Properties'),
-            labelPlural: nls.localize('vuengine/actorEditor/physics', 'Physical Properties'),
-            hasContent: data.physics.enabled,
-        },
-        {
-            key: 'extraProperties',
-            labelSingular: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
-            labelPlural: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
-            hasContent: data.extraProperties.enabled,
+            key: 'bodies',
+            componentKey: 'bodies',
+            labelSingular: nls.localize('vuengine/editors/actor/body', 'Body'),
+            labelPlural: nls.localize('vuengine/editors/actor/bodies', 'Bodies'),
+            hasContent: data.components?.bodies?.length > 0,
         },
     ];
 
@@ -151,8 +143,20 @@ export default function ComponentTree(): React.JSX.Element {
 
     treeData.push({
         id: 'addComponent',
-        name: nls.localize('vuengine/editors/addComponent', 'Add Component'),
+        name: nls.localize('vuengine/editors/general/addComponent', 'Add Component'),
     });
+
+    useEffect(() => {
+        if (!treeContainerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            setTreeWidth(treeContainerRef.current?.clientWidth ?? treeHeight);
+            setTreeHeight(treeContainerRef.current?.clientHeight ?? treeWidth);
+        });
+        resizeObserver.observe(treeContainerRef.current);
+        return () => resizeObserver.disconnect();
+    }, []);
 
     return (
         <VContainer
@@ -162,26 +166,34 @@ export default function ComponentTree(): React.JSX.Element {
             }}
         >
             <label style={{
-                padding: 'var(--padding) var(--padding) 0',
+                padding: '0 var(--padding)',
             }}>
-                {nls.localize('vuengine/actorEditor/components', 'Components')}
+                {nls.localize('vuengine/editors/actor/components', 'Components')}
             </label>
-            <div className='ves-tree' style={{
-                overflow: 'auto',
-                paddingBottom: 'var(--padding)',
-            }}>
-                <Tree
-                    data={treeData}
-                    indent={24}
-                    rowHeight={24}
-                    openByDefault={true}
-                    width='100%'
-                    onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
-                    selection={currentComponent.split('-', 2).join('-')} // ignore sub selections
+            <VContainer
+                style={{
+                    overflow: 'auto',
+                    paddingBottom: 'var(--padding)',
+                }}
+            >
+                <div
+                    className='ves-tree'
+                    ref={treeContainerRef}
                 >
-                    {ComponentTreeNode}
-                </Tree>
-            </div>
+                    <Tree
+                        data={treeData}
+                        indent={24}
+                        rowHeight={24}
+                        openByDefault={true}
+                        onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
+                        selection={currentComponent.split('-', 2).join('-')} // ignore sub selections
+                        height={treeHeight}
+                        width={treeWidth}
+                    >
+                        {ComponentTreeNode}
+                    </Tree>
+                </div>
+            </VContainer>
         </VContainer>
     );
 }

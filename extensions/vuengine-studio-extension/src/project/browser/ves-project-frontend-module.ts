@@ -1,5 +1,4 @@
-import { FrontendApplicationContribution, PreferenceContribution } from '@theia/core/lib/browser';
-import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { bindViewContribution, FrontendApplicationContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
@@ -9,6 +8,9 @@ import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
+import { VesProjectDashboardOpenHandler } from './ves-project-dashboard-open-handler';
+import { VesProjectDashboardViewContribution } from './ves-project-dashboard-view';
+import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
@@ -19,7 +21,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
     bind(VesProjectContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesProjectContribution);
-    bind(TabBarToolbarContribution).toService(VesProjectContribution);
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectPreferenceSchema });
@@ -42,4 +43,15 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // custom project file name
     bind(VesWorkspaceFileService).toSelf().inSingletonScope();
     rebind(WorkspaceFileService).to(VesWorkspaceFileService);
+
+    // build view
+    bindViewContribution(bind, VesProjectDashboardViewContribution);
+    bind(FrontendApplicationContribution).toService(VesProjectDashboardViewContribution);
+    bind(CommandContribution).toService(VesProjectDashboardViewContribution);
+    bind(OpenHandler).to(VesProjectDashboardOpenHandler).inSingletonScope();
+    bind(VesProjectDashboardWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesProjectDashboardWidget.ID,
+        createWidget: () => ctx.container.get<VesProjectDashboardWidget>(VesProjectDashboardWidget)
+    })).inSingletonScope();
 });

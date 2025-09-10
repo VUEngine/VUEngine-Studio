@@ -1,6 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../../core/browser/ves-common-types';
-import { WIREFRAME_CANVAS_PADDING, WireframeData } from '../../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType, WIREFRAME_CANVAS_PADDING, WireframeData } from '../../ActorEditorTypes';
+
+const HIGHLIGHT_COLOR = '#00ff00';
+const HIGHLIGHT_END_POINT_COLOR = '#008000';
 
 export interface MeshWireframeProps {
     wireframe: WireframeData
@@ -9,7 +12,7 @@ export interface MeshWireframeProps {
 }
 
 // bresenham line algorithm
-const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, interlaced: boolean): void => {
+const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, interlaced: boolean, color: string): void => {
     const dx = Math.abs(x1 - x0);
     const sx = x0 < x1 ? 1 : -1;
     const dy = -Math.abs(y1 - y0);
@@ -20,11 +23,16 @@ const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1:
 
     for (; ;) {
         if (!interlaced || !lastPixelPlotted) {
+            context.fillStyle = color;
             context.fillRect(x0, y0, 1, 1);
         }
         lastPixelPlotted = !lastPixelPlotted;
 
         if (x0 === x1 && y0 === y1) {
+            if (color === HIGHLIGHT_COLOR) {
+                context.fillStyle = HIGHLIGHT_END_POINT_COLOR;
+                context.fillRect(x0, y0, 1, 1);
+            }
             break;
         };
 
@@ -43,6 +51,7 @@ const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1:
 
 export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Element {
     const { wireframe, style, onClick } = props;
+    const { previewCurrentMeshSegment } = useContext(ActorEditorContext) as ActorEditorContextType;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -72,9 +81,8 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
             `${wireframe.displacement.z * -1}px`;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = PALETTE_COLORS[ColorMode.Default][wireframe.color];
 
-        projectedSegments.map(s => {
+        projectedSegments.map((s, i) => {
             plotLine(
                 context,
                 s[0] + halfWidth - offsetX,
@@ -82,6 +90,9 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
                 s[2] + halfWidth - offsetX,
                 s[3] + halfHeight - offsetY,
                 wireframe.interlaced,
+                (i === previewCurrentMeshSegment)
+                    ? HIGHLIGHT_COLOR
+                    : PALETTE_COLORS[ColorMode.Default][wireframe.color]
             );
         });
     };
@@ -109,6 +120,7 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
             Math.max(...yValues),
         );
     }, [
+        previewCurrentMeshSegment,
         wireframe.color,
         wireframe.displacement,
         wireframe.interlaced,

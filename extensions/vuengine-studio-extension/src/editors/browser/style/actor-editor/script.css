@@ -1,22 +1,3 @@
-.script-container {
-    align-items: center;
-    background-image: radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0);
-    background-size: 16px 16px;
-    cursor: grab;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    inset: 0;
-    overflow: auto;
-    padding: var(--padding);
-    position: absolute;
-    user-select: none;
-}
-
-.script-container.dragging {
-    cursor: grabbing;
-}
-
 .scripted-action-container {
     align-items: center;
     display: flex;

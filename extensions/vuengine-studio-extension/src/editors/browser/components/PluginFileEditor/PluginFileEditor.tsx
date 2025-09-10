@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { PluginConfigurationDataType } from '../../../../plugins/browser/ves-plugins-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
-import MultiSelect from '../Common/Base/MultiSelect';
+import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import VContainer from '../Common/Base/VContainer';
 import PluginConfiguration from './PluginConfiguration';
 import { PluginConfigurationData, PluginFileData, PluginFileTranslatedField } from './PluginFileEditorTypes';
@@ -30,7 +30,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
     };
 
     const initPlugins = async (): Promise<void> => {
-        await context.services.vesProjectService.projectItemsReady;
+        await context.services.vesProjectService.projectDataReady;
         const pluginsMap = context.services.vesProjectService.getProjectDataAllKnownPlugins();
         if (pluginsMap !== undefined) {
             setAvailablePlugins(Object.keys(pluginsMap));
@@ -99,8 +99,8 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
 
     const removeTag = async (index: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/pluginFileEditor/removeTag', 'Remove Tag'),
-            msg: nls.localize('vuengine/pluginFileEditor/areYouSureYouWantToRemoveTag', 'Are you sure you want to remove this tag?'),
+            title: nls.localize('vuengine/editors/pluginFile/removeTag', 'Remove Tag'),
+            msg: nls.localize('vuengine/editors/pluginFile/areYouSureYouWantToRemoveTag', 'Are you sure you want to remove this tag?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -131,8 +131,8 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
 
     const removeConfiguration = async (index: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/pluginFileEditor/removeConfiguration', 'Remove Configuration'),
-            msg: nls.localize('vuengine/pluginFileEditor/areYouSureYouWantToRemoveConfiguration', 'Are you sure you want to remove this configuration?'),
+            title: nls.localize('vuengine/editors/pluginFile/removeConfiguration', 'Remove Configuration'),
+            msg: nls.localize('vuengine/editors/pluginFile/areYouSureYouWantToRemoveConfiguration', 'Are you sure you want to remove this configuration?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -151,7 +151,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
             <VContainer gap={15} grow={1}>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/displayName', 'Display Name')}
+                        {nls.localize('vuengine/editors/pluginFile/displayName', 'Display Name')}
                     </label>
                     <TranslatedValue
                         data={data.displayName}
@@ -160,7 +160,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/author', 'Author')}
+                        {nls.localize('vuengine/editors/pluginFile/author', 'Author')}
                     </label>
                     <input
                         className='theia-input'
@@ -170,7 +170,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/description', 'Description')}
+                        {nls.localizeByDefault('Description')}
                     </label>
                     <TranslatedValue
                         data={data.description}
@@ -179,7 +179,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/repository', 'Repository')}
+                        {nls.localize('vuengine/editors/pluginFile/repository', 'Repository')}
                     </label>
                     <HContainer alignItems='center'>
                         <input
@@ -197,7 +197,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                             </button>
                             : <button
                                 className='theia-button secondary'
-                                title={nls.localize('vuengine/pluginFileEditor/noValidUrl', 'Not a valid URL')}
+                                title={nls.localize('vuengine/editors/pluginFile/noValidUrl', 'Not a valid URL')}
                                 disabled
                             >
                                 <i className='codicon codicon-warning' />
@@ -207,7 +207,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/pluginFileEditor/license', 'License')}
+                        {nls.localizeByDefault('License')}
                     </label>
                     <input
                         className='theia-input'
@@ -218,7 +218,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/pluginFileEditor/icon', 'Icon')}
+                    {nls.localize('vuengine/editors/pluginFile/icon', 'Icon')}
                 </label>
                 {iconPath
                     ? <img
@@ -226,14 +226,14 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                         width={128}
                     />
                     : <div className='noIcon'>
-                        {nls.localize('vuengine/pluginFileEditor/noIcon', 'No Icon')}
+                        {nls.localize('vuengine/editors/pluginFile/noIcon', 'No Icon')}
                     </div>
                 }
 
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/pluginFileEditor/previewImage', 'Preview Image')}
+                    {nls.localize('vuengine/editors/pluginFile/previewImage', 'Preview Image')}
                 </label>
                 {previewPath
                     ? <img
@@ -241,14 +241,14 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                         style={{ maxWidth: 384 }}
                     />
                     : <div className='noPreview'>
-                        {nls.localize('vuengine/pluginFileEditor/noPreviewImage', 'No Preview Image')}
+                        {nls.localize('vuengine/editors/pluginFile/noPreviewImage', 'No Preview Image')}
                     </div>
                 }
             </VContainer>
         </HContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/pluginFileEditor/tags', 'Tags')}
+                {nls.localize('vuengine/editors/pluginFile/tags', 'Tags')}
             </label>
             <HContainer gap={10} wrap='wrap'>
                 {data.tags?.map((t, i) =>
@@ -256,7 +256,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                         <button
                             className="remove-button"
                             onClick={() => removeTag(i)}
-                            title={nls.localize('vuengine/editors/remove', 'Remove')}
+                            title={nls.localizeByDefault('Remove')}
                         >
                             <i className='codicon codicon-x' />
                         </button>
@@ -269,7 +269,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 <button
                     className='theia-button add-button'
                     onClick={addTag}
-                    title={nls.localize('vuengine/pluginFileEditor/addTag', 'Add Tag')}
+                    title={nls.localizeByDefault('Add')}
                 >
                     <i className='codicon codicon-plus' />
                 </button>
@@ -277,9 +277,9 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
         </VContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/pluginFileEditor/dependencies', 'Dependencies')}
+                {nls.localizeByDefault('Dependencies')}
             </label>
-            <MultiSelect
+            <AdvancedSelect
                 options={availablePlugins?.map(d => ({
                     label: d,
                     value: d,
@@ -287,18 +287,19 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
                 defaultValue={data.dependencies}
                 onChange={options => setDependencies(options)}
                 placeholder='No dependencies'
+                multi
             />
         </VContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/pluginFileEditor/configuration', 'Configuration')}
+                {nls.localize('vuengine/editors/general/configuration', 'Configuration')}
             </label>
             {data.configuration?.map((c, i) =>
                 <VContainer key={i} className='item'>
                     <button
                         className="remove-button"
                         onClick={() => removeConfiguration(i)}
-                        title={nls.localize('vuengine/editors/remove', 'Remove')}
+                        title={nls.localizeByDefault('Remove')}
                     >
                         <i className='codicon codicon-x' />
                     </button>
@@ -312,7 +313,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
             <button
                 className='theia-button add-button full-width'
                 onClick={addConfiguration}
-                title={nls.localize('vuengine/pluginFileEditor/addConfiguration', 'Add Configuration')}
+                title={nls.localizeByDefault('Add')}
             >
                 <i className='codicon codicon-plus' />
             </button>

@@ -68,7 +68,7 @@ export default function PositionedActors(props: PositionedActorsProps): React.JS
         <button
             className='theia-button add-button full-width'
             onClick={addPositionedActor}
-            title={nls.localize('vuengine/editors/addActor', 'Add Actor')}
+            title={nls.localize('vuengine/editors/general/addActor', 'Add Actor')}
         >
             <i className='codicon codicon-plus' />
         </button>

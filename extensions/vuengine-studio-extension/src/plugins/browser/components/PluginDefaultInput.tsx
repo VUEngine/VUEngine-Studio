@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
+import Input from '../../../editors/browser/components/Common/Base/Input';
 import { VesProjectService } from '../../../project/browser/ves-project-service';
 import { ProjectDataItemsByTypeWithContributor } from '../../../project/browser/ves-project-types';
 import { PluginConfiguration, PluginConfigurationDataType } from '../ves-plugins-types';
@@ -18,7 +19,7 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
     const [items, setItems] = useState<ProjectDataItemsByTypeWithContributor>({});
 
     const initItems = async (): Promise<void> => {
-        await vesProjectService.projectItemsReady;
+        await vesProjectService.projectDataReady;
         const t = vesProjectService.getProjectDataItems();
         if (t !== undefined) {
             setItems(t);
@@ -41,32 +42,29 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
             />
         }
         {config.dataType === PluginConfigurationDataType.integer &&
-            <input
-                className='theia-input'
+            <Input
                 type='number'
-                style={{ flexGrow: 1 }}
                 value={value}
-                min={config.min}
-                max={config.max}
+                setValue={setValue}
+                min={config.min ?? 0}
+                max={config.max ?? Number.MAX_SAFE_INTEGER}
                 step={config.step}
                 readOnly={disabled}
                 disabled={disabled}
-                onBlur={e => setValue(e.target.value, true)}
-                onChange={e => setValue(e.target.value)}
+                grow={1}
+                onBlur={e => setValue(e.target.value === '' ? 0 : parseInt(e.target.value), true)}
             />
         }
         {(config.dataType === PluginConfigurationDataType.string
             || config.dataType === PluginConfigurationDataType.constant
             || config.dataType === PluginConfigurationDataType.hex) &&
-            <input
-                className='theia-input'
-                type='string'
-                style={{ flexGrow: 1 }}
+            <Input
                 value={value}
+                setValue={setValue}
                 readOnly={disabled}
                 disabled={disabled}
+                grow={1}
                 onBlur={e => setValue(e.target.value, true)}
-                onChange={e => setValue(e.target.value)}
             />
         }
         {config.dataType === 'type' && <>
@@ -88,11 +86,9 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
                             </option>
                         )}
                 </select>
-                : <input
-                    className='theia-input'
-                    type='string'
-                    style={{ flexGrow: 1 }}
+                : <Input
                     value={value}
+                    grow={1}
                     readOnly
                     disabled
                 />}

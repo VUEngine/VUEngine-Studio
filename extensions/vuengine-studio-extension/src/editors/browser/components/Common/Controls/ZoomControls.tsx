@@ -24,7 +24,7 @@ export default function ZoomControls(props: ZoomControlsProps): React.JSX.Elemen
                 e.stopPropagation();
                 applyZoom(roundZoomSteps ? Math.round(zoom - step) : zoom - step);
             }}
-            title={nls.localize('vuengine/editors/zoomOut', 'Zoom Out')}
+            title={nls.localize('vuengine/editors/general/zoomOut', 'Zoom Out')}
         >
             <i className='codicon codicon-zoom-out' />
         </button>
@@ -37,7 +37,7 @@ export default function ZoomControls(props: ZoomControlsProps): React.JSX.Elemen
             style={{
                 cursor: 'pointer',
             }}
-            title={nls.localize('vuengine/editors/resetZoom', 'Reset Zoom')}
+            title={nls.localize('vuengine/editors/general/resetZoom', 'Reset Zoom')}
         >
             {Math.round((displayZoom ?? zoom) * 100) / 100}
         </div>
@@ -48,7 +48,7 @@ export default function ZoomControls(props: ZoomControlsProps): React.JSX.Elemen
                 e.stopPropagation();
                 applyZoom(roundZoomSteps ? Math.round(zoom + step) : zoom + step);
             }}
-            title={nls.localize('vuengine/editors/zoomIn', 'Zoom In')}
+            title={nls.localize('vuengine/editors/general/zoomIn', 'Zoom In')}
         >
             <i className='codicon codicon-zoom-in' />
         </button>

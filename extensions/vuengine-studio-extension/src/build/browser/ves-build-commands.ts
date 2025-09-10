@@ -73,10 +73,10 @@ export namespace VesBuildCommands {
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'build.showHelp',
-      label: 'Show Handbook Page',
+      label: 'Show Documentation',
       iconClass: 'codicon codicon-book',
     },
-    'vuengine/build/commands/showHelp',
+    'vuengine/build/commands/showDocumentation',
     'vuengine/build/commands/category'
   );
 

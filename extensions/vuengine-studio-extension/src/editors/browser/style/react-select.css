@@ -1,3 +1,7 @@
+.react-select-container {
+    flex-grow: 1;
+}
+
 .react-select__control {
     background-color: var(--theia-input-background);
     border-radius: 2px;
@@ -25,7 +29,7 @@
 }
 
 .react-select__input-container {
-    padding: 0 4px;
+    padding: 0;
 }
 
 .react-select__input {
@@ -43,7 +47,7 @@
 }
 
 .react-select__indicator {
-    padding: 0px 4px;
+    padding: 0px 2px;
 }
 
 .react-select__clear-indicator {
@@ -67,6 +71,7 @@
     border-radius: 0 0 2px 2px;
     outline: 1px solid var(--theia-button-background);
     outline-offset: -1px;
+    z-index: 1000 !important;
 }
 
 .react-select__option {
@@ -78,7 +83,25 @@
     background-color: var(--theia-list-activeSelectionBackground);
 }
 
+.react-select__option--is-disabled {
+    opacity: .2;
+}
+
 .react-select__menu-notice {
     opacity: .5;
     padding: 6px;
+}
+
+.react-select-container.small .react-select__control {
+    min-height: 16px !important;
+    max-height: 16px;
+    padding: 0 3px;
+}
+.react-select-container.small .react-select__indicators {
+    margin-top: -4px;
+    padding-top: 0;
+}
+.react-select-container.small .react-select__indicators i {
+    bottom: -3px;
+    position: relative;
 }

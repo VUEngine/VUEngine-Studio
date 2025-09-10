@@ -1,8 +1,8 @@
-.p-Widget.dialogOverlay {
-    padding: var(--theia-private-menubar-height);
+.lm-Widget.dialogOverlay {
+    padding: 20px;
 }
 
-.p-Widget.dialogOverlay .dialogTitle {
+.lm-Widget.dialogOverlay .dialogTitle {
     background-color: var(--theia-titleBar-activeBackground);
     color: #fff;
 }

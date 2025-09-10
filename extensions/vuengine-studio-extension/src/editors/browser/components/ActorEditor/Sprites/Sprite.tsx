@@ -14,10 +14,11 @@ import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { ActorEditorSaveDataOptions, INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import {
     ActorEditorContext,
     ActorEditorContextType,
+    INPUT_BLOCKING_COMMANDS,
     MAX_SPRITE_REPEAT_SIZE,
     MAX_SPRITE_TEXTURE_DISPLACEMENT,
     MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,
@@ -32,6 +33,7 @@ import {
 import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
 import TransparencySelect from '../../Common/TransparencySelect';
+import Input from '../../Common/Base/Input';
 
 interface SpriteProps {
     sprite: SpriteData
@@ -47,9 +49,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const [dimensions, setDimensions] = useState<number[][]>([[], []]);
     const [filename, setFilename] = useState<string[]>([]);
 
+    const isAnimated = sprite.isAnimated && (data.components?.animations?.length > 0);
+
     const allowFrameBlendMode = data.sprites.type === SpriteType.Bgmap &&
         // No HiColor support for animated sprites
-        !data.components?.animations?.length &&
+        !isAnimated &&
         // No HiColor support for repeated sprites
         !sprite.texture?.repeat?.x &&
         !sprite.texture?.repeat?.y &&
@@ -105,7 +109,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         if (imageData.images[i].animation?.largestFrame) {
                             tileCount += imageData.images[i].animation?.largestFrame ?? 0;
                         } else if (imageData.images[i].tiles?.count) {
-                            tileCount += data.components?.animations?.length > 0 && !data.animations.multiframe
+                            tileCount += isAnimated && !data.animations.multiframe
                                 ? (imageData.images[i].tiles?.count ?? 0) / (data.animations?.totalFrames ?? 1)
                                 : imageData.images[i].tiles?.count ?? 0;
                         }
@@ -201,6 +205,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const resetDisplacement = (): void => {
+        updateSprite({
+            displacement: {
+                ...sprite.displacement,
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+        });
+    };
+
     const setDisplacement = (axis: 'x' | 'y' | 'z', value: number): void => {
         updateSprite({
             displacement: {
@@ -216,6 +231,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 ...sprite.displacement,
                 parallax: clamp(value, MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX, MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX),
             },
+        });
+    };
+
+    const toggleIsAnimated = (): void => {
+        updateSprite({
+            isAnimated: !!!sprite.isAnimated,
         });
     };
 
@@ -263,6 +284,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             optimizeTiles: !!!sprite.optimizeTiles,
         }, {
             appendImageData: true,
+        });
+    };
+
+    const toggleShareTiles = (): void => {
+        updateSprite({
+            shareTiles: !!!sprite.shareTiles,
         });
     };
 
@@ -332,7 +359,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     useEffect(() => {
         getMetaData();
     }, [
-        data.components?.animations?.length,
+        isAnimated,
         data.animations?.totalFrames,
         isMultiFileAnimation,
         sprite.texture?.files,
@@ -349,44 +376,44 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <VContainer>
                     {/*
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/spriteSource', 'Source')}
+                        label={nls.localize('vuengine/editors/actor/spriteSource', 'Source')}
                         tooltipPosition='bottom'
                         tooltip={<>
                             <div>
                                 {nls.localize(
-                                    'vuengine/actorEditor/spriteSourceDescription',
+                                    'vuengine/editors/actor/spriteSourceDescription',
                                     "The type of source to retrieve image data from for this sprite's texture."
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/actorEditor/spriteSourceModeImage', 'Image')}: </b>
+                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModeImage', 'Image')}: </b>
                                 {nls.localize(
-                                    'vuengine/actorEditor/spriteSourceModeImageDescription',
-                                    'PNG image file. When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                                    'or multiple files, where each represents one animation frame.'
+                                    'vuengine/editors/actor/spriteSourceModeImageDescription',
+                                    'PNG image file. When animations are enabled, select either a single file containing a vertical spritesheet, \
+or multiple files, where each represents one animation frame.'
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/actorEditor/spriteSourceModeSprite', 'Sprite')}: </b>
+                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModePixel', 'Pixel')}: </b>
                                 {nls.localize(
-                                    'vuengine/actorEditor/spriteSourceModeSpriteDescription',
+                                    'vuengine/editors/actor/spriteSourceModePixelDescription',
                                     "VUEngine Studio's native image format that supports layers and animations."
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/actorEditor/spriteSourceModeTileMap', 'Tile Map')}: </b>
+                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModeTileMap', 'Tile Map')}: </b>
                                 {nls.localize(
-                                    'vuengine/actorEditor/spriteSourceModeTileMapDescription',
-                                    'A tile map that can be edited in-line in the editor. ' +
-                                    'Select a PNG file containing a tileset as the source, then copy into the editor.'
+                                    'vuengine/editors/actor/spriteSourceModeTileMapDescription',
+                                    'A tile map that can be edited in-line in the editor. \
+Select a PNG file containing a tileset as the source, then copy into the editor.'
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/actorEditor/spriteSourceModeModel', 'Model')}: </b>
+                                <b>{nls.localize('vuengine/editors/actor/spriteSourceModeModel', 'Model')}: </b>
                                 {nls.localize(
-                                    'vuengine/actorEditor/spriteSourceModeModelDescription',
-                                    'A 3D model file to render to a mono or stereo. ' +
-                                    'Supported file types are [...].'
+                                    'vuengine/editors/actor/spriteSourceModeModelDescription',
+                                    'A 3D model file to render to a mono or stereo. \
+Supported file types are [...].'
                                 )}
                             </div><br />
                         </>}
@@ -394,16 +421,16 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <RadioSelect
                         options={[{
                             value: SpriteSourceType.Image,
-                            label: nls.localize('vuengine/actorEditor/spriteSourceModeImage', 'Image'),
+                            label: nls.localize('vuengine/editors/actor/spriteSourceModeImage', 'Image'),
                         }, {
-                            value: SpriteSourceType.Sprite,
-                            label: nls.localize('vuengine/actorEditor/spriteSourceModeSprite', 'Sprite'),
+                            value: SpriteSourceType.Pixel,
+                            label: nls.localize('vuengine/editors/actor/spriteSourceModePixel', 'Pixel'),
                         }, {
                             value: SpriteSourceType.TileMap,
-                            label: nls.localize('vuengine/actorEditor/spriteSourceModeTileMap', 'Tile Map'),
+                            label: nls.localize('vuengine/editors/actor/spriteSourceModeTileMap', 'Tile Map'),
                         }, {
                             value: SpriteSourceType.Model,
-                            label: nls.localize('vuengine/actorEditor/spriteSourceModeModel', 'Model'),
+                            label: nls.localize('vuengine/editors/actor/spriteSourceModeModel', 'Model'),
                         }]}
                         defaultValue={sprite.sourceType}
                         onChange={options => setSourceType(options[0].value as SpriteSourceType)}
@@ -412,12 +439,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     />
                     */}
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/sourceImage', 'Source Image')}
+                        label={nls.localize('vuengine/editors/actor/sourceImage', 'Source Image')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/spriteSourceModeImageDescription',
-                            'PNG image file to use as image data source. ' +
-                            'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                            'or multiple files, where each represents one animation frame.'
+                            'vuengine/editors/actor/spriteSourceModeImageDescription',
+                            'PNG image file to use as image data source. \
+When animations are enabled, select either a single file containing a vertical spritesheet, \
+or multiple files, where each represents one animation frame.'
                         )}
                     />
                     {sprite.sourceType === SpriteSourceType.Image &&
@@ -428,7 +455,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         data={sprite.texture?.files || []}
                                         updateData={setFiles}
                                         allInFolderAsFallback={false}
-                                        canSelectMany={data.components?.animations.length > 0}
+                                        canSelectMany={isAnimated}
                                         stack={true}
                                         showMetaData={false}
                                         containerHeight='80px'
@@ -441,13 +468,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         ? <div className="lightLabel">
                                             {sprite.displayMode !== DisplayMode.Stereo &&
                                                 nls.localize(
-                                                    'vuengine/actorEditor/noImageFileSelected',
+                                                    'vuengine/editors/actor/noImageFileSelected',
                                                     'No Image File Selected'
                                                 )
                                             }
                                             {sprite.displayMode === DisplayMode.Stereo &&
                                                 nls.localize(
-                                                    'vuengine/actorEditor/noImageFileSelectedForLeftEye',
+                                                    'vuengine/editors/actor/noImageFileSelectedForLeftEye',
                                                     'No Image File Selected For The Left Eye'
                                                 )
                                             }
@@ -477,7 +504,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                                     (→ {dimensions[0][2]} × {dimensions[0][3]} px)
                                                                 </div>
                                                             }
-                                                            {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                                            {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                                 <div>
                                                                     (
                                                                     {dimensions[0][0]} × {Math.round(dimensions[0][1] /
@@ -493,21 +520,21 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                             className={invalidTilesCount ? ' error' : undefined}
                                                             style={{ opacity: .6 }}
                                                         >
-                                                            {invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount} {nls.localize('vuengine/actorEditor/tiles', 'Tiles')}
+                                                            {invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount} {nls.localize('vuengine/editors/actor/tiles', 'Tiles')}
                                                         </div>
                                                     }
                                                 </VContainer>
                                                 <VContainer alignItems="end" justifyContent="end">
                                                     <button
                                                         className="theia-button secondary"
-                                                        title={nls.localize('vuengine/actorEditor/imageProcessingSettings', 'Image Processing Settings')}
+                                                        title={nls.localize('vuengine/editors/actor/imageProcessingSettings', 'Image Processing Settings')}
                                                         onClick={() => setProcessingDialogOpen(true)}
                                                     >
                                                         <i className="codicon codicon-settings" />
                                                     </button>
                                                     <button
                                                         className="theia-button secondary"
-                                                        title={nls.localize('vuengine/actorEditor/reconvertImage', 'Reconvert Image')}
+                                                        title={nls.localize('vuengine/editors/actor/reconvertImage', 'Reconvert Image')}
                                                         onClick={reconvertImage}
                                                     >
                                                         <i className="codicon codicon-sync" />
@@ -526,7 +553,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             data={sprite.texture?.files2 || []}
                                             updateData={setFiles2}
                                             allInFolderAsFallback={false}
-                                            canSelectMany={data.components?.animations.length > 0}
+                                            canSelectMany={isAnimated}
                                             stack={true}
                                             showMetaData={false}
                                             containerHeight='80px'
@@ -537,7 +564,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         {(sprite.texture?.files2 || []).length === 0
                                             ? <div className="lightLabel">
                                                 {nls.localize(
-                                                    'vuengine/actorEditor/noImageFileSelectedForRightEye',
+                                                    'vuengine/editors/actor/noImageFileSelectedForRightEye',
                                                     'No Image File Selected For The Right Eye'
                                                 )}
                                             </div>
@@ -564,7 +591,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                                 <i className="codicon codicon-arrow-right"></i> {dimensions[1][2]} × {dimensions[1][3]} px
                                                             </div>
                                                         }
-                                                        {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                                        {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                             <div>
                                                                 {dimensions[1][0]}
                                                                 {' × '}
@@ -582,7 +609,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             }
                         </>
                     }
-                    {sprite.sourceType === SpriteSourceType.Sprite &&
+                    {sprite.sourceType === SpriteSourceType.Pixel &&
                         <>This source type is not yet supported</>
                     }
                     {sprite.sourceType === SpriteSourceType.TileMap &&
@@ -595,21 +622,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/displayMode', 'Display Mode')}
+                            label={nls.localize('vuengine/editors/actor/displayMode', 'Display Mode')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/displayModeDescription',
-                                'Select either a single image that is the same on both eyes, ' +
-                                'or two separate images, one for each eye. ' +
-                                'Stereo sprites require more system ressources.'
+                                'vuengine/editors/actor/displayModeDescription',
+                                'Select either a single image that is the same on both eyes, \
+or two separate images, one for each eye. Stereo sprites require more system ressources.'
                             )}
                         />
                         <RadioSelect
                             options={[{
                                 value: DisplayMode.Mono,
-                                label: nls.localize('vuengine/actorEditor/displayModeMono', 'Mono'),
+                                label: nls.localize('vuengine/editors/actor/displayModeMono', 'Mono'),
                             }, {
                                 value: DisplayMode.Stereo,
-                                label: nls.localize('vuengine/actorEditor/displayModeStereo', 'Stereo'),
+                                label: nls.localize('vuengine/editors/actor/displayModeStereo', 'Stereo'),
                             }]}
                             defaultValue={sprite.displayMode}
                             onChange={options => setDisplayMode(options[0].value as DisplayMode)}
@@ -620,18 +646,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     {sprite.displayMode === DisplayMode.Mono &&
                         <VContainer>
                             <InfoLabel
-                                label={nls.localize('vuengine/actorEditor/displays', 'Displays')}
+                                label={nls.localize('vuengine/editors/actor/displays', 'Displays')}
                                 tooltip={nls.localize(
-                                    'vuengine/actorEditor/displaysDescription',
-                                    'Select which screens the sprite should be visible on. ' +
-                                    'Use with care! It can be very uncomfortable for the viewer ' +
-                                    "if left and right eye images don't match."
+                                    'vuengine/editors/actor/displaysDescription',
+                                    "Select which screens the sprite should be visible on. \
+Use with care! It can be very uncomfortable for the viewer if left and right eye images don't match."
                                 )}
                             />
                             <RadioSelect
                                 options={[
-                                    { value: Displays.Left, label: nls.localize('vuengine/actorEditor/displayModeLeft', 'Left') },
-                                    { value: Displays.Right, label: nls.localize('vuengine/actorEditor/displayModeRight', 'Right') },
+                                    { value: Displays.Left, label: nls.localize('vuengine/editors/actor/displayModeLeft', 'Left') },
+                                    { value: Displays.Right, label: nls.localize('vuengine/editors/actor/displayModeRight', 'Right') },
                                 ]}
                                 canSelectMany={true}
                                 allowBlank={false}
@@ -652,7 +677,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/actorEditor/palette', 'Palette')}
+                            {nls.localize('vuengine/editors/actor/palette', 'Palette')}
                         </label>
                         <RadioSelect
                             options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
@@ -671,58 +696,58 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/actorEditor/displacement', 'Displacement (x, y, z, parallax)')}
+                        label={nls.localize('vuengine/editors/actor/displacement', 'Displacement (x, y, z, parallax)')}
                         tooltip={nls.localize(
-                            'vuengine/actorEditor/displacementDescription',
-                            'Offset this sprite by the given amount of pixels from the actor\'s center. ' +
-                            'The parallax value controls the depth, while the z value is used for fine tuning. ' +
-                            'Positive z (and parallax) values go into the screen, negative stick out.'
+                            'vuengine/editors/actor/displacementDescription',
+                            "Offset this sprite by the given amount of pixels from the actor's center. \
+The parallax value controls the depth, while the z value is used for fine tuning. \
+Positive z (and parallax) values go into the screen, negative stick out."
                         )}
                     />
-                    <HContainer wrap='wrap'>
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                    <HContainer alignItems="center">
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.x}
-                            onChange={e => setDisplacement('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('x', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.y}
-                            onChange={e => setDisplacement('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('y', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.z}
-                            onChange={e => setDisplacement('z', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={v => setDisplacement('z', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             value={sprite.displacement.parallax}
-                            onChange={e => setDisplacementParallax(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            setValue={setDisplacementParallax}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
+                        />
+                        <i
+                            className='codicon codicon-issues'
+                            title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                            onClick={resetDisplacement}
+                            style={{
+                                cursor: 'pointer'
+                            }}
                         />
                     </HContainer>
                 </VContainer>
@@ -730,26 +755,26 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <HContainer gap={15} wrap='wrap'>
                         <VContainer>
                             <InfoLabel
-                                label={nls.localize('vuengine/actorEditor/bgmapMode', 'Bgmap Mode')}
+                                label={nls.localize('vuengine/editors/actor/bgmapMode', 'Bgmap Mode')}
                                 tooltip={<>
                                     <div>
-                                        <b>{nls.localize('vuengine/actorEditor/bgmapModeBgmap', 'Bgmap')}: </b>
+                                        <b>{nls.localize('vuengine/editors/actor/bgmapModeBgmap', 'Bgmap')}: </b>
                                         {nls.localize(
-                                            'vuengine/actorEditor/bgmapModeBgmapDescription',
+                                            'vuengine/editors/actor/bgmapModeBgmapDescription',
                                             'A regular sprite with no effects applied.'
                                         )}
                                     </div><br />
                                     <div>
-                                        <b>{nls.localize('vuengine/actorEditor/bgmapModeAffine', 'Affine')}: </b>
+                                        <b>{nls.localize('vuengine/editors/actor/bgmapModeAffine', 'Affine')}: </b>
                                         {nls.localize(
-                                            'vuengine/actorEditor/bgmapModeAffineDescription',
+                                            'vuengine/editors/actor/bgmapModeAffineDescription',
                                             'The sprite can be scaled and rotated. This mode needs a lot of CPU resources and should be used sparsely.'
                                         )}
                                     </div><br />
                                     <div>
-                                        <b>{nls.localize('vuengine/actorEditor/bgmapModeHBias', 'HBias')}: </b>
+                                        <b>{nls.localize('vuengine/editors/actor/bgmapModeHBias', 'HBias')}: </b>
                                         {nls.localize(
-                                            'vuengine/actorEditor/bgmapModeHBiasDescription',
+                                            'vuengine/editors/actor/bgmapModeHBiasDescription',
                                             'Each row of pixels of the sprite can be manipulated independently. This mode is slightly heavier on the CPU than regular Bgmap mode.'
                                         )}
                                     </div>
@@ -759,15 +784,15 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 options={[
                                     {
                                         value: BgmapMode.Bgmap,
-                                        label: nls.localize('vuengine/actorEditor/bgmapModeBgmap', 'Bgmap'),
+                                        label: nls.localize('vuengine/editors/actor/bgmapModeBgmap', 'Bgmap'),
                                     },
                                     {
                                         value: BgmapMode.Affine,
-                                        label: nls.localize('vuengine/actorEditor/bgmapModeAffine', 'Affine'),
+                                        label: nls.localize('vuengine/editors/actor/bgmapModeAffine', 'Affine'),
                                     },
                                     {
                                         value: BgmapMode.HBias,
-                                        label: nls.localize('vuengine/actorEditor/bgmapModeHBias', 'HBias'),
+                                        label: nls.localize('vuengine/editors/actor/bgmapModeHBias', 'HBias'),
                                     },
                                 ]}
                                 defaultValue={sprite.bgmapMode}
@@ -776,6 +801,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
+                        {data.components?.animations?.length > 0 &&
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/editors/actor/animate', 'Animate')}
+                                </label>
+                                <input
+                                    type="checkbox"
+                                    checked={sprite.isAnimated ?? false}
+                                    onChange={() => toggleIsAnimated()}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                />
+                            </VContainer>
+                        }
                     </HContainer>
                 }
                 {
@@ -783,60 +822,49 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <HContainer gap={15} wrap='wrap'>
                         <VContainer>
                             <InfoLabel
-                                label={nls.localize('vuengine/actorEditor/padding', 'Padding (X, Y)')}
+                                label={nls.localize('vuengine/editors/actor/padding', 'Padding (X, Y)')}
                                 tooltip={nls.localize(
-                                    'vuengine/actorEditor/paddingDescription',
-                                    // eslint-disable-next-line max-len
-                                    'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of surrounding textures to appear at the outer edges.'
+                                    'vuengine/editors/actor/paddingDescription',
+                                    'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of \
+surrounding textures to appear at the outer edges.'
                                 )}
                             />
                             <HContainer>
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 48 }}
+                                <Input
                                     type='number'
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.x}
-                                    onChange={e => setPadding('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    setValue={v => setPadding('x', v as number)}
+                                    commands={INPUT_BLOCKING_COMMANDS}
+                                    width={54}
                                 />
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 48 }}
+                                <Input
                                     type='number'
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.y}
-                                    onChange={e => setPadding('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    setValue={v => setPadding('y', v as number)}
+                                    commands={INPUT_BLOCKING_COMMANDS}
+                                    width={54}
                                 />
                             </HContainer>
                         </VContainer>
-                        <VContainer grow={1}>
-                            <InfoLabel
-                                label={nls.localize('vuengine/actorEditor/manipulationFunction', 'Manipulation Function')}
-                                tooltip={nls.localize(
-                                    'vuengine/actorEditor/manipulationFunctionDescription',
-                                    'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
-                                )}
-                            />
-                            <input
-                                className='theia-input'
-                                type='string'
-                                value={sprite.manipulationFunction}
-                                onChange={e => setManipulationFunction(e.target.value)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                        </VContainer>
+                        <Input
+                            label={nls.localize('vuengine/editors/actor/manipulationFunction', 'Manipulation Function')}
+                            tooltip={nls.localize(
+                                'vuengine/editors/actor/manipulationFunctionDescription',
+                                'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
+                            )}
+                            value={sprite.manipulationFunction}
+                            setValue={setManipulationFunction}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
                     </HContainer>
                 }
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/texture', 'Texture')}
+                        {nls.localize('vuengine/editors/actor/texture', 'Texture')}
                     </label>
                     <HContainer wrap='wrap'>
                         <VContainer grow={1}>
@@ -848,7 +876,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
-                                <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/actorEditor/flip', 'Flip')}
+                                <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
                             </label>
                             <label>
                                 <input
@@ -858,7 +886,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
-                                <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/actorEditor/flip', 'Flip')}
+                                <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
                             </label>
                         </VContainer>
                         {data.sprites.type === SpriteType.Bgmap &&
@@ -871,7 +899,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
-                                    <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/actorEditor/repeat', 'Repeat')}
+                                    <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
                                 </label>
                                 <label>
                                     <input
@@ -881,7 +909,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
-                                    <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/actorEditor/repeat', 'Repeat')}
+                                    <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
                                 </label>
                             </VContainer>
                         }
@@ -894,79 +922,93 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
-                        {nls.localize('vuengine/actorEditor/recycleable', 'Recycleable')}
+                        {nls.localize('vuengine/editors/actor/recycleable', 'Recycleable')}
                     </label>
                 </VContainer>
                 {
                     data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y) &&
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/repeatSize', 'Size (x, y)')}
+                            label={nls.localize('vuengine/editors/actor/repeatSize', 'Size (x, y)')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/repeatSizeDescription',
-                                'Overrides the sprite\'s size to provide culling for repeated textures. ' +
-                                'If 0, the value is inferred from the texture.'
+                                'vuengine/editors/actor/repeatSizeDescription',
+                                'Overrides the sprite\'s size to provide culling for repeated textures. \
+If 0, the value is inferred from the texture.'
                             )}
                         />
                         <HContainer wrap='wrap'>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
+                            <Input
                                 type='number'
                                 min={MIN_SPRITE_REPEAT_SIZE}
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.x ?? 0}
-                                onChange={e => setRepeatSize('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setRepeatSize('x', v as number)}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={48}
                             />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
+                            <Input
                                 type='number'
                                 min={MIN_SPRITE_REPEAT_SIZE}
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.y ?? 0}
-                                onChange={e => setRepeatSize('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setRepeatSize('y', v as number)}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                                width={48}
                             />
                         </HContainer>
                     </VContainer>
                 }
-                {/* this setting is implicitly handled for animations */}
-                {data.components?.animations.length === 0 && <VContainer>
+                <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/tiles', 'Tiles')}
+                        {nls.localize('vuengine/editors/actor/tiles', 'Tiles')}
                     </label>
-                    <label>
+                    {/* this setting is implicitly handled for animations */}
+                    {!isAnimated &&
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={sprite.optimizeTiles}
+                                onChange={toggleOptimizeTiles}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            />
+                            {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
+                        </label>
+                    }
+                    <HContainer gap={0}>
                         <input
                             type="checkbox"
-                            checked={sprite.optimizeTiles}
-                            onChange={toggleOptimizeTiles}
+                            checked={sprite.shareTiles}
+                            onChange={toggleShareTiles}
                             onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
-                        {nls.localize('vuengine/actorEditor/optimize', 'Optimize')}
-                    </label>
-                </VContainer>}
+                        <InfoLabel
+                            label={nls.localize('vuengine/editors/actor/share', 'Share')}
+                            tooltip={nls.localize(
+                                'vuengine/editors/actor/shareDescription',
+                                "When enabled, this Sprite's CharSet will be shared with other instances using the same CharSet."
+                            )}
+                        />
+                    </HContainer>
+                </VContainer>
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/compression', 'Compression')}
+                            label={nls.localize('vuengine/editors/actor/compression', 'Compression')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/compressionDescription',
-                                'Image data can be stored in a compressed format to save ROM space. '
-                                + 'Comes at the cost of a slightly higher CPU load when loading data into memory. '
-                                + 'Will be skipped if compressed data is not smaller than source data . '
+                                'vuengine/editors/actor/compressionDescription',
+                                'Image data can be stored in a compressed format to save ROM space. \
+                                    Comes at the cost of a slightly higher CPU load when loading data into memory. \
+                                    Will be skipped if compressed data is not smaller than source data .'
                             )}
                         />
                         <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/actorEditor/compression/none', 'None'),
+                                label: nls.localize('vuengine/editors/actor/compressionType/none', 'None'),
                                 value: ImageCompressionType.NONE,
                             }, {
-                                label: nls.localize('vuengine/actorEditor/compression/rle', 'RLE'),
+                                label: 'RLE',
                                 value: ImageCompressionType.RLE,
                             }]}
                             defaultValue={sprite.compression}
@@ -989,7 +1031,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 open={processingDialogOpen}
                 onClose={() => setProcessingDialogOpen(false)}
                 onOk={() => setProcessingDialogOpen(false)}
-                title={nls.localize('vuengine/editors/imageProcessingSettings', 'Image Processing Settings')}
+                title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
                 height='100%'
                 width='100%'
             >

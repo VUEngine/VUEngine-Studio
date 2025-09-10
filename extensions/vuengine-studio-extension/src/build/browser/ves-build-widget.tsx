@@ -8,6 +8,7 @@ import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import Input from '../../editors/browser/components/Common/Base/Input';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
@@ -277,7 +278,7 @@ export class VesBuildWidget extends ReactWidget {
                 <div>
                   <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
                     'Please consider installing WSL to massively improve build times.')} (
-                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/documentation/documentation',
+                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/general/documentation',
                     'Documentation')}</a>
                   )
                 </div>
@@ -406,11 +407,11 @@ export class VesBuildWidget extends ReactWidget {
                 <i className='fa fa-times-circle-o'></i>{' '}
                 {this.vesBuildService.getNumberOfErrors()}
               </button>
-              <input
-                className='theia-input full-width'
+              <Input
                 placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
                 value={this.state.searchTerm}
-                onChange={e => this.setSearchTerm(e.target.value)}
+                setValue={this.setSearchTerm}
+                grow={1}
               />
               <button
                 className='theia-button secondary'
@@ -528,5 +529,5 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
   };
 
-  protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times-on-windows', false);
+  protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times', false);
 }

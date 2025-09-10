@@ -14,13 +14,6 @@
     cursor: grabbing;
 }
 
-.jsonforms-container .preview-container .current-frame {
-    left: var(--padding);
-    position: absolute;
-    top: var(--padding);
-    z-index: 10;
-}
-
 .jsonforms-container .preview-container-world {
     align-items: center;
     background: repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
@@ -51,6 +44,51 @@
     opacity: .2;
     position: absolute;
     width: 2px;
+}
+
+.jsonforms-container .preview-container-screen-frame {
+    z-index: 99999999;
+    position: relative;
+}
+
+.preview-container-screen-frame div {
+    background: var(--theia-editor-foreground);
+    opacity: .5;
+    position: absolute;
+}
+
+.preview-container-screen-frame div:nth-child(1),
+.preview-container-screen-frame div:nth-child(2) {
+    height: 226px;
+    top: -113px;
+    width: 1px;
+}
+
+.preview-container-screen-frame div:nth-child(3),
+.preview-container-screen-frame div:nth-child(4) {
+    height: 1px;
+    left: -192px;
+    width: 384px;
+}
+
+.preview-container-screen-frame div:nth-child(1) {
+    border-bottom-left-radius: 2px;
+    border-top-left-radius: 2px;
+    right: 192px;
+}
+
+.preview-container-screen-frame div:nth-child(2) {
+    border-bottom-right-radius: 2px;
+    border-top-right-radius: 2px;
+    left: 192px;
+}
+
+.preview-container-screen-frame div:nth-child(3) {
+    bottom: 112px;
+}
+
+.preview-container-screen-frame div:nth-child(4) {
+    top: 112px;
 }
 
 .jsonforms-container .preview-container-world.background-color-0 {

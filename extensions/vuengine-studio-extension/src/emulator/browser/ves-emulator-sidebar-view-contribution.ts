@@ -28,10 +28,10 @@ export namespace VesEmulatorSidebarCommands {
     export const WIDGET_HELP: Command = Command.toLocalizedCommand(
         {
             id: 'emulatorSidebar.showHelp',
-            label: 'Show Handbook Page',
+            label: 'Show Documentation',
             iconClass: 'codicon codicon-book',
         },
-        'vuengine/emulator/sidebar/commands/showHelp',
+        'vuengine/emulator/sidebar/commands/showDocumentation',
         'vuengine/emulator/sidebar/commands/category'
     );
 };
@@ -78,7 +78,7 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesEmulatorSidebarWidget.ID,
-            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
+            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
         });
     }
 

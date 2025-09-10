@@ -30,13 +30,14 @@ interface NumberArrayPreviewProps {
     height?: number
     width?: number
     title?: string
+    color?: string
     onClick?: () => void
     onMouseEnter?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
     onMouseLeave?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 export default function NumberArrayPreview(props: NumberArrayPreviewProps): React.JSX.Element {
-    const { active, maximum, data, height, width, title, onClick, onMouseEnter, onMouseLeave } = props;
+    const { active, maximum, data, height, width, title, color, onClick, onMouseEnter, onMouseLeave } = props;
 
     return <ColumnContainer
         className={onClick ? 'editable' : undefined}
@@ -46,6 +47,8 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
         style={{
             borderColor: active ? 'var(--theia-editor-foreground)' : undefined,
             height,
+            minHeight: height ? height : undefined,
+            minWidth: width ? width : undefined,
             width,
         }}
         title={title}
@@ -56,7 +59,11 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
                 key={y}
                 style={{
                     height: `${v * 100 / maximum}%`,
-                    backgroundColor: active ? 'var(--theia-editor-foreground)' : 'var(--theia-dropdown-border)',
+                    backgroundColor: active
+                        ? color
+                            ? color
+                            : 'var(--theia-editor-foreground)'
+                        : 'var(--theia-dropdown-border)',
                     width: (width ?? 32) / data.length,
                 }}
             />;

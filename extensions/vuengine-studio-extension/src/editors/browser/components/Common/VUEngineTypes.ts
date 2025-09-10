@@ -34,7 +34,7 @@ export enum BgmapMode {
 
 export enum SpriteSourceType {
     Image = 'image',
-    Sprite = 'sprite',
+    Pixel = 'pixel',
     TileMap = 'tilemap',
     Model = 'model',
 }

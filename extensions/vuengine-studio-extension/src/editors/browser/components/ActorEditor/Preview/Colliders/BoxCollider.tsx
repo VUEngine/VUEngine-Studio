@@ -48,7 +48,6 @@ const CuboidFaceBottom = styled(CuboidFace)`
     width: var(--width);
 `;
 
-/*
 const CuboidFaceLeft = styled(CuboidFace)`
     height: var(--height);
     transform: rotateY(90deg);
@@ -62,7 +61,6 @@ const CuboidFaceRight = styled(CuboidFace)`
     translate: calc(-1 * var(--half-w) - var(--half-d)) calc(-1 * var(--half-h)) 0;
     width: var(--depth);
 `;
-*/
 
 export interface BoxColliderProps {
     index: number
@@ -83,40 +81,42 @@ export default function BoxCollider(props: BoxColliderProps): React.JSX.Element 
     const height = collider.pixelSize.y * collider.scale.y;
     const depth = collider.pixelSize.z * collider.scale.z;
     const isRotated = collider.rotation.x > 0 || collider.rotation.y > 0 || collider.rotation.z > 0;
+    const highlightedStyle = { backgroundColor: highlighted ? 'rgba(0, 255, 0, .3)' : undefined };
 
-    return <div
-        onClick={handleClick}
-        style={{
-            alignItems: 'center',
-            borderRadius: highlighted ? .25 : undefined,
-            cursor: 'pointer',
-            display: 'flex',
-            height: isRotated ? height * 1.66 : height,
-            justifyContent: 'center',
-            outline: highlighted ? '1px solid #0f0' : undefined,
-            translate: `${collider.displacement.x}px ${collider.displacement.y}px ${-1 * collider.displacement.parallax}px`,
-            width: isRotated ? width * 1.66 : width,
-            zIndex: highlighted ? 999999 : 120000,
-        }}
-    >
-        <Cuboid
+    return (
+        <div
             onClick={handleClick}
             style={{
-                // @ts-ignore
-                '--depth': `${depth}px`,
-                '--height': `${height}px`,
-                '--width': `${width}px`,
-                transform: `rotateX(${collider.rotation.x * ROTATION_RATIO}deg) 
-                    rotateY(${collider.rotation.y * ROTATION_RATIO}deg) 
-                    rotateZ(${collider.rotation.z * ROTATION_RATIO}deg)`,
+                alignItems: 'center',
+                borderRadius: highlighted ? .25 : undefined,
+                cursor: 'pointer',
+                display: 'flex',
+                height: isRotated ? height * 1.66 : height,
+                justifyContent: 'center',
+                translate: `${collider.displacement.x}px ${collider.displacement.y}px ${-1 * collider.displacement.parallax}px`,
+                width: isRotated ? width * 1.66 : width,
+                zIndex: highlighted ? 999999 : 120000,
             }}
         >
-            <CuboidFaceFront />
-            <CuboidFaceBack />
-            <CuboidFaceTop />
-            <CuboidFaceBottom />
-            {/* <CuboidFaceLeft /> */}
-            {/* <CuboidFaceRight /> */}
-        </Cuboid>
-    </div>;
+            <Cuboid
+                onClick={handleClick}
+                style={{
+                    // @ts-ignore
+                    '--depth': `${depth}px`,
+                    '--height': `${height}px`,
+                    '--width': `${width}px`,
+                    transform: `rotateX(${collider.rotation.x * ROTATION_RATIO}deg) 
+                    rotateY(${collider.rotation.y * ROTATION_RATIO}deg) 
+                    rotateZ(${collider.rotation.z * ROTATION_RATIO}deg)`,
+                }}
+            >
+                <CuboidFaceFront style={highlightedStyle} />
+                <CuboidFaceBack style={highlightedStyle} />
+                <CuboidFaceTop style={highlightedStyle} />
+                <CuboidFaceBottom style={highlightedStyle} />
+                <CuboidFaceLeft style={highlightedStyle} />
+                <CuboidFaceRight style={highlightedStyle} />
+            </Cuboid>
+        </div>
+    );
 }

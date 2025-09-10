@@ -17,6 +17,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangesEvent, FileChangeType, FileStat } from '@theia/filesystem/lib/common/files';
 import { isLinux } from '@theia/monaco-editor-core/esm/vs/base/common/platform';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
@@ -210,6 +211,15 @@ export class VesBuildService {
 
   pushBuildLogLine(buildLogLine: BuildLogLine): void {
     this._buildStatus.log.push(buildLogLine);
+    this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
+  }
+
+  appendBuildLogLine(partialBuildLogLine: Partial<BuildLogLine>): void {
+    this._buildStatus.log[this._buildStatus.log.length - 1] = {
+      ...this._buildStatus.log[this._buildStatus.log.length - 1],
+      ...partialBuildLogLine,
+      text: this._buildStatus.log[this._buildStatus.log.length - 1].text + (partialBuildLogLine.text ?? '')
+    };
     this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
   }
 
@@ -433,7 +443,96 @@ export class VesBuildService {
         }
       }
     });
+
+    // remove transpiled files from build folder if a .c or .h file gets moved
+    // to prevent duplicate symbol build errors
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      fileChangesEvent.changes.map(change => {
+        if (change.resource.scheme === 'file' &&
+          (change.resource.path.ext === '.c' || change.resource.path.ext === '.h') &&
+          change.type === FileChangeType.DELETED) {
+          this.removeTranspiledObjectFile(change.resource);
+        }
+      });
+    });
   }
+
+  protected async removeTranspiledObjectFile(fileUri: URI): Promise<void> {
+    await this.workspaceService.ready;
+
+    const roots = this.workspaceService.tryGetRoots();
+    const workspaceRootUri = roots[0].resource;
+
+    let parentFileStat: FileStat | undefined;
+    roots.forEach(r => {
+      if (r.resource.isEqualOrParent(fileUri)) {
+        parentFileStat = r;
+      }
+    });
+
+    if (parentFileStat === undefined) {
+      return;
+    }
+
+    const relativePath = parentFileStat.resource.relative(fileUri);
+    if (relativePath === undefined) {
+      return;
+    }
+
+    const parentFolderName = parentFileStat.name;
+
+    const buildFolderWorkingUri = workspaceRootUri
+      .resolve('build')
+      .resolve('working');
+
+    const subFolder = relativePath.fsPath().split(isWindows ? '\\' : '/')[0];
+    const buildModeLc = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode).toLowerCase();
+
+    let buildFolderBaseUri = buildFolderWorkingUri.resolve(subFolder);
+    const toDeleteBaseUris: URI[] = [];
+
+    if ((subFolder === 'source')) {
+      buildFolderBaseUri = buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(buildModeLc);
+
+      Object.values(BuildMode).forEach(bm => toDeleteBaseUris.push(buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(bm.toLowerCase())));
+    } else {
+      toDeleteBaseUris.push(buildFolderBaseUri);
+    }
+
+    const buildFolderFileUri = buildFolderBaseUri
+      .resolve(parentFolderName)
+      .resolve(relativePath.dir.fsPath())
+      .resolve(`${relativePath.name}.o`);
+
+    const adjustPath = (p: string) => isWindows ? p.replace(/\\/g, '\/') : p;
+
+    const buildFolderFileRelativeUri = workspaceRootUri.relative(buildFolderFileUri);
+    if (!buildFolderFileRelativeUri) {
+      return;
+    }
+
+    const buildFolderFileRelativePath = `${adjustPath(buildFolderFileRelativeUri.fsPath())}\n`;
+
+    const shasum = window.electronVesCore.sha1(buildFolderFileRelativePath);
+
+    await Promise.all(toDeleteBaseUris.map(async u => {
+      const hashFileUri = (subFolder === 'source')
+        ? u.resolve('hashes')
+          .resolve(parentFolderName)
+          .resolve(`${shasum}.o`)
+        : u.resolve(parentFolderName)
+          .resolve('hashes')
+          .resolve(`${shasum}.o`);
+
+      if (await this.fileService.exists(hashFileUri)) {
+        await this.fileService.delete(hashFileUri);
+      }
+    }));
+  };
 
   // get number of all libraries for which there are no lib*.a files in build folder
   protected async getNumberOfLibrariesToBuild(allPluginNames: string[]): Promise<number> {
@@ -549,6 +648,11 @@ export class VesBuildService {
       compilerUri.resolve('libexec').resolve('gcc').resolve('v810').resolve('4.7.4'),
       makeUri,
     ];
+
+    if (isOSX) {
+      const sedUri = await this.vesBuildPathsService.getSedUri(isWslInstalled);
+      pathUris.push(sedUri);
+    }
 
     if (isWindows) {
       const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(isWslInstalled, p)));
@@ -794,12 +898,16 @@ export class VesBuildService {
     const gameMakefileUri = workspaceRootUri.resolve('makefile');
     let makefileUri = gameMakefileUri;
     if (!(await this.fileService.exists(makefileUri))) {
-      const engineMakefileUri = engineCoreUri.resolve('makefile-game');
+      const engineMakefileUri = engineCoreUri
+        .resolve('lib')
+        .resolve('compiler')
+        .resolve('make')
+        .resolve('makefile-game');
       makefileUri = engineMakefileUri;
       if (!(await this.fileService.exists(makefileUri))) {
         throw new Error(`${nls.localize('vuengine/build/errorCouldNotFindMakefile', 'Error: Could not find a makefile. Tried the following locations:')}\n` +
           `1) ${this.labelProvider.getLongName(gameMakefileUri)}\n` +
-          `2) ${this.labelProvider.getLongName(engineMakefileUri)}`);
+          `2) [core]/${this.labelProvider.getLongName(engineMakefileUri)}`);
       }
     }
 
@@ -892,8 +1000,8 @@ export class VesBuildService {
     container.appendChild(assetsCheckboxExplanationElement);
     assetsCheckboxExplanationElement.textContent = nls.localize(
       'vuengine/build/clean/fullCleanExplanation',
-      // eslint-disable-next-line max-len
-      'Checking this will delete the entire build folder, including object files for all build modes and assets. Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
+      'Checking this will delete the entire build folder, including object files for all build modes and assets. \
+Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
     );
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -924,11 +1032,16 @@ export class VesBuildService {
       });
     }
 
-    await this.commandService.executeCommand(commandName);
-
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
-      text: nls.localize('vuengine/build/commandCompleted', 'Command {0} completed.', command?.label),
+      text: nls.localize('vuengine/build/runningCommandX', 'Running command "{0}"...', command?.label) + ' ',
+      timestamp: Date.now(),
+    });
+
+    await this.commandService.executeCommand(commandName);
+
+    this.appendBuildLogLine({
+      text: nls.localize('vuengine/build/completed', 'completed.'),
       timestamp: Date.now(),
     });
   }
@@ -947,6 +1060,12 @@ export class VesBuildService {
       });
     }
 
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: nls.localize('vuengine/build/runningTaskX', 'Running task "{0}"...', taskName) + ' ',
+      timestamp: Date.now(),
+    });
+
     const getExitCodePromise: Promise<TaskEndedInfo> = this.taskService.getExitCode(taskInfo.taskId).then(result =>
       ({ taskEndedType: TaskEndedTypes.TaskExited, value: result }));
     const isBackgroundTaskEndedPromise: Promise<TaskEndedInfo> = this.taskService.isBackgroundTaskEnded(taskInfo.taskId).then(result =>
@@ -957,36 +1076,34 @@ export class VesBuildService {
     const taskEndedInfo: TaskEndedInfo = await Promise.race([getExitCodePromise, isBackgroundTaskEndedPromise]);
 
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.BackgroundTaskEnded && taskEndedInfo.value) {
-      return this.pushBuildLogLine({
-        type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
+      return this.appendBuildLogLine({
+        text: nls.localize('vuengine/build/completed', 'completed.'),
         timestamp: Date.now(),
       });
     }
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value === 0) {
-      return this.pushBuildLogLine({
-        type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
+      return this.appendBuildLogLine({
+        text: nls.localize('vuengine/build/completed', 'completed.'),
         timestamp: Date.now(),
       });
     } else if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value !== undefined) {
-      return this.pushBuildLogLine({
+      return this.appendBuildLogLine({
         type: BuildLogLineType.Error,
-        text: nls.localize('vuengine/build/taskTerminatedWithExitCode', 'Task {0} terminated with exit code {1}.', taskName, taskEndedInfo.value),
+        text: nls.localize('vuengine/build/terminatedWithExitCode', 'terminated with exit code {1}.', taskEndedInfo.value),
         timestamp: Date.now(),
       });
     } else {
       const signal = await this.taskService.getTerminateSignal(taskInfo.taskId);
       if (signal !== undefined) {
-        return this.pushBuildLogLine({
+        return this.appendBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedBySignal', 'Task {0} terminated by signal {1}.', taskName, signal),
+          text: nls.localize('vuengine/build/terminatedBySignal', 'terminated by signal {1}.', signal),
           timestamp: Date.now(),
         });
       } else {
-        return this.pushBuildLogLine({
+        return this.appendBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedForUnknownReason', 'Task {0} terminated for unknown reason.', taskName),
+          text: nls.localize('vuengine/build/terminatedForUnknownReason', 'terminated for unknown reason.'),
           timestamp: Date.now(),
         });
       }
@@ -1044,11 +1161,11 @@ export class VesBuildService {
   protected async runPreBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: `${nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks')}...`,
+      step: nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks'),
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: `${nls.localize('vuengine/build/runningPreBuildTasks', 'Running pre-build tasks')}...`,
+      text: nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks'),
       timestamp: Date.now(),
     });
 
@@ -1065,7 +1182,7 @@ export class VesBuildService {
   protected async runPostBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: `${nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks')}...`,
+      step: nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks'),
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
@@ -1075,7 +1192,7 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: `${nls.localize('vuengine/build/runningPostBuildTasks', 'Running post-build tasks')}...`,
+      text: nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks'),
       timestamp: Date.now(),
     });
 
@@ -1181,6 +1298,40 @@ export class VesBuildService {
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
     }
   }
+
+  // removes build cache for core to force rebuild
+  /*
+  async cleanCore(): Promise<void> {
+    const roots = this.workspaceService.tryGetRoots();
+    const workspaceRootUri = roots[0].resource;
+    const buildFolderUri = workspaceRootUri.resolve('build');
+    const buildFolderWorkingUri = buildFolderUri.resolve('working');
+
+    const toDelete = [
+      buildFolderUri.resolve('libcore.a'),
+      buildFolderWorkingUri.resolve('assets').resolve('core').resolve('hashes'),
+    ];
+
+    Object.values(BuildMode).forEach(bm => {
+      toDelete.push(buildFolderWorkingUri
+        .resolve('libraries')
+        .resolve(bm.toLowerCase())
+        .resolve(`libcore-${bm.toLowerCase()}.a`));
+      toDelete.push(buildFolderWorkingUri
+        .resolve('objects')
+        .resolve(bm.toLowerCase())
+        .resolve('hashes'));
+    });
+
+    await Promise.all(toDelete.map(async u => {
+      if (await this.fileService.exists(u)) {
+        await this.fileService.delete(u, {
+          recursive: true
+        });
+      }
+    }));
+  }
+  */
 
   protected async deleteLibraryFiles(): Promise<void> {
     const buildPathUri = await this.getBuildPathUri();

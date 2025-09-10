@@ -6,7 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface ColorModeSelectProps {
     value: ColorMode
@@ -21,24 +21,30 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
 
     return <VContainer>
         <InfoLabel
-            label={nls.localize('vuengine/actorEditor/colorMode', 'Color Mode')}
+            label={nls.localize('vuengine/editors/actor/colorMode', 'Color Mode')}
             tooltip={<>
                 <div>
                     {nls.localize(
-                        'vuengine/actorEditor/colorModeDescription',
-                        'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
-                        'which simulates 7 colors by blending together adjacent frames to create mix colors. '
+                        'vuengine/editors/actor/colorModeDescription',
+                        "Whether to use the system's default 4 color palette or HiColor mode, \
+which simulates 7 colors by blending together adjacent frames to create mix colors."
                     )}
                 </div>
                 <div>
                     {nls.localize(
-                        'vuengine/actorEditor/colorModeHiColorFlickerNote',
+                        'vuengine/editors/actor/colorModeHiColorMemoryNote',
+                        'Note: HiColor sprites consume more video memory space than regular sprites.'
+                    )}
+                </div>
+                <div>
+                    {nls.localize(
+                        'vuengine/editors/actor/colorModeHiColorFlickerNote',
                         'Note: Mixed colors look fine on hardware, but flicker on emulators.'
                     )}
                 </div>
                 <div>
                     {nls.localize(
-                        'vuengine/actorEditor/colorModeHiColorMaxHeightNote',
+                        'vuengine/editors/actor/colorModeHiColorMaxHeightNote',
                         'Note: HiColor sprites can be 256 pixels high max.'
                     )}
                 </div>
@@ -48,10 +54,10 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
         <RadioSelect
             options={[{
                 value: ColorMode.Default,
-                label: nls.localize('vuengine/actorEditor/colorModeDefault', 'Default'),
+                label: nls.localize('vuengine/editors/actor/colorModeDefault', 'Default'),
             }, {
                 value: ColorMode.FrameBlend,
-                label: nls.localize('vuengine/actorEditor/colorModeHiColor', 'HiColor'),
+                label: nls.localize('vuengine/editors/actor/colorModeHiColor', 'HiColor'),
             }]}
             defaultValue={value}
             onChange={options => setValue(options[0].value as ColorMode)}

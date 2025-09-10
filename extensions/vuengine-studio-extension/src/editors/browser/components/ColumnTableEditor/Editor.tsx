@@ -19,10 +19,10 @@ export default function Editor(props: EditorProps): React.JSX.Element {
             >
                 <div className='editorRowHeader'>
                     <div>
-                        {nls.localize('vuengine/columnTableEditor/repeat', 'Repeat')}
+                        {nls.localize('vuengine/editors/columnTable/repeat', 'Repeat')}
                     </div>
                     <div>
-                        {nls.localize('vuengine/columnTableEditor/duration', 'Duration')}
+                        {nls.localize('vuengine/editors/columnTable/duration', 'Duration')}
                     </div>
                 </div>
                 {[...Array(32)].map((h, y) => {

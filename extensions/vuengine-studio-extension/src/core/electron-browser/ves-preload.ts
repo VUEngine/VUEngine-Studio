@@ -13,11 +13,13 @@ import {
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_KAITAI_PARSE,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
+    VES_CHANNEL_SHA1,
     VES_CHANNEL_SORT_JSON,
     VES_CHANNEL_ZLIB_DEFLATE,
     VesCoreAPI
@@ -50,6 +52,9 @@ const api: VesCoreAPI = {
     zlibDeflate: function (data: Buffer): Buffer {
         return ipcRenderer.sendSync(VES_CHANNEL_ZLIB_DEFLATE, data);
     },
+    kaitaiParse: function (data: ArrayBuffer, format: string): object {
+        return ipcRenderer.sendSync(VES_CHANNEL_KAITAI_PARSE, data, format);
+    },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
     },
@@ -58,6 +63,9 @@ const api: VesCoreAPI = {
     },
     getCpuInformation: function (): Promise<Systeminformation.CpuData> {
         return ipcRenderer.invoke(VES_CHANNEL_GET_CPU_INFORMATION);
+    },
+    sha1: function (data: any): string {
+        return ipcRenderer.sendSync(VES_CHANNEL_SHA1, data);
     },
     onUsbDeviceChange: function (handler: () => void): Disposable {
         const h = (_event: unknown) => {

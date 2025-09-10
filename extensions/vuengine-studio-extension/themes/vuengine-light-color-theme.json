@@ -10,7 +10,6 @@
     "activityBarBadge.background": "#d31422",
     "button.background": "#d31422",
     "button.foreground": "#ffffff",
-    "sideBar.background": "#ececec",
     "secondaryButton.background": "#cecece",
     "secondaryButton.hoverBackground": "#bebebe",
     "editor.selectionBackground": "#d3142240",
@@ -23,7 +22,6 @@
     "list.activeSelectionForeground": "#333",
     "mainToolbar.background": "#cecece",
     "mainToolbar.foreground": "#333",
-    "toolbar.hoverBackground": "#ececec",
     "menu.selectionBackground": "#d3142240",
     "menu.separatorBackground": "#dddddd",
     "minimap.selectionHighlight": "#d3142240",
@@ -38,15 +36,15 @@
     "sideBarSectionHeader.border": "#ffffff00",
     "statusBar.background": "#cecece",
     "statusBar.foreground": "#333",
-    "statusBar.border": "#ececec",
+    "statusBar.border": "#cecece",
     "statusBar.noFolderBackground": "#cecece",
-    "statusBarItem.hoverBackground": "#ececec",
+    "statusBarItem.hoverBackground": "#b8b8b84f",
     "tab.inactiveBackground": "#d3d3d3",
     "textBlockQuote.border": "#d3142280",
     "textLink.activeForeground": "#d3142280",
     "textLink.foreground": "#d31422",
     "titleBar.activeBackground": "#d31422",
     "titleBar.activeForeground": "#ffffff",
-    "titleBar.border": "#d31422"
+    "titleBar.border": "#cecece"
   }
 }

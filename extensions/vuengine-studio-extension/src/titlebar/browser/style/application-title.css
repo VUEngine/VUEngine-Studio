@@ -20,7 +20,7 @@
   left: 35%;
   line-height: calc(var(--theia-private-menubar-height) - 10px);
   overflow: hidden;
-  padding: 0 20px 0 10px;
+  padding: 0 10px;
   position: fixed;
   text-overflow: ellipsis;
   top: 5px;

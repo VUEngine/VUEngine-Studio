@@ -18,25 +18,25 @@ export default function TransparencySelect(props: TransparencySelectProps): Reac
     return (
         <VContainer>
             <InfoLabel
-                label={nls.localize('vuengine/editors/transparency', 'Transparency')}
+                label={nls.localize('vuengine/editors/general/transparency', 'Transparency')}
                 tooltip={nls.localize(
-                    'vuengine/editors/transparencyDescription',
-                    'With transparency enabled, this component will only be shown on every even or odd frame, ' +
-                    'resulting in it appearing transparent (and slightly dimmer). ' +
-                    'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+                    'vuengine/editors/general/transparencyDescription',
+                    'With transparency enabled, this component will only be shown on every even or odd frame, \
+resulting in it appearing transparent (and slightly dimmer). \
+This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
                 )}
             />
             <RadioSelect
                 defaultValue={value}
                 options={[{
                     value: Transparency.None,
-                    label: nls.localize('vuengine/editors/transparencyNone', 'None'),
+                    label: nls.localize('vuengine/editors/general/transparencyNone', 'None'),
                 }, {
                     value: Transparency.Odd,
-                    label: nls.localize('vuengine/editors/transparencyOdd', 'Odd'),
+                    label: nls.localize('vuengine/editors/general/transparencyOdd', 'Odd'),
                 }, {
                     value: Transparency.Even,
-                    label: nls.localize('vuengine/editors/transparencyEven', 'Even'),
+                    label: nls.localize('vuengine/editors/general/transparencyEven', 'Even'),
                 }]}
                 onChange={options => setValue(options[0].value as Transparency)}
                 onFocus={onFocus}

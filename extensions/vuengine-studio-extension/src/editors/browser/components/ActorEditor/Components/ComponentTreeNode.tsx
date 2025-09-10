@@ -4,7 +4,6 @@ import {
     Circle,
     CircleDashed,
     DotsThreeOutline,
-    FadersHorizontal,
     File,
     FilmStrip,
     Hexagon,
@@ -14,8 +13,7 @@ import {
     Selection,
     SelectionInverse,
     SneakerMove,
-    TreeStructure,
-    UserFocus,
+    UserFocus
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
@@ -24,20 +22,19 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ColliderType, DisplayMode, WireframeType } from '../../Common/VUEngineTypes';
 import { ActorEditorCommands } from '../ActorEditorCommands';
 import {
+    ActorEditorContext,
+    ActorEditorContextType,
     ADDABLE_COMPONENT_TYPES,
     CLONABLE_COMPONENT_TYPES,
     ComponentKey,
-    ActorEditorContext,
-    ActorEditorContextType,
     HIDEABLE_COMPONENT_TYPES,
     HideableComponent,
 } from '../ActorEditorTypes';
-import { ScriptType } from '../Scripts/ScriptTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const {
-        removeComponent,
+        addComponent, removeComponent,
         setCurrentComponent,
         previewShowChildren, setPreviewShowChildren,
         previewShowColliders, setPreviewShowColliders,
@@ -49,7 +46,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     const [dragging, setDragging] = useState<boolean>(false);
 
     const nodeParts = node.id.split('-');
-    const type = nodeParts[0] as ComponentKey | 'physics' | 'extraProperties';
+    const type = nodeParts[0] as ComponentKey;
     const index = parseInt(nodeParts[1] || '-1');
 
     const showPreview = useMemo(() => {
@@ -104,8 +101,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     return <File size={16} />;
                 case 'animations':
                     return <FilmStrip size={16} />;
-                case 'behaviors':
-                    return <SneakerMove size={16} />;
+                case 'bodies':
+                    return <Atom size={16} />;
                 case 'children':
                     return <UserFocus size={16} />;
                 case 'colliders':
@@ -120,12 +117,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                         case ColliderType.LineField:
                             return <DotsThreeOutline size={16} />;
                     }
-                case 'extraProperties':
-                    return <FadersHorizontal size={16} />;
-                case 'physics':
-                    return <Atom size={16} />;
-                case 'scripts':
-                    return <TreeStructure size={16} />;
+                case 'mutators':
+                    return <SneakerMove size={16} />;
                 case 'sprites':
                     if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
                         ((data.components.sprites[index].texture?.files?.length ?? 0) +
@@ -189,10 +182,6 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             ...data.components[type][index],
             name,
         };
-
-        if (type === 'scripts') {
-            updatedComponent.type = ScriptType.Custom;
-        }
 
         const components = {
             ...data.components,
@@ -274,35 +263,35 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     <i
                         className={showPreview === false ? 'fa fa-eye-slash' : 'fa fa-eye'}
                         onClick={toggleComponentVisibility}
-                        title={nls.localize('vuengine/actorEditor/toggleComponentVisibility', 'Toggle Component Visibility')}
+                        title={nls.localize('vuengine/editors/actor/toggleComponentVisibility', 'Toggle Component Visibility')}
                     />
                 }
                 {!node.isLeaf && node.parent?.isRoot && ADDABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-plus'
-                        onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
-                        title={nls.localize('vuengine/actorEditor/addComponent', 'Add Component')}
+                        onClick={() => addComponent(type as ComponentKey)}
+                        title={nls.localizeByDefault('Add')}
                     />
                 }
                 {node.isLeaf && !node.parent?.isRoot && type !== 'children' &&
                     <i
                         className='codicon codicon-edit'
                         onClick={() => node.edit()}
-                        title={nls.localize('vuengine/actorEditor/editName', 'Edit Name')}
+                        title={nls.localize('vuengine/editors/actor/editName', 'Edit Name')}
                     />
                 }
                 {node.isLeaf && CLONABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-copy'
                         onClick={cloneComponent}
-                        title={nls.localize('vuengine/actorEditor/cloneComponent', 'Clone Component')}
+                        title={nls.localize('vuengine/editors/actor/clone', 'Clone')}
                     />
                 }
                 {node.isLeaf && node.id !== 'addComponent' &&
                     <i
                         className='codicon codicon-trash'
                         onClick={() => removeComponent(type, index)}
-                        title={nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component')}
+                        title={nls.localizeByDefault('Remove')}
                     />
                 }
             </div>

@@ -1,30 +1,30 @@
-import React, { useContext } from 'react';
-import HContainer from '../Common/Base/HContainer';
-import VContainer from '../Common/Base/VContainer';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import React from 'react';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
+import { nanoid } from '../Common/Utils';
 
 interface SimpleListEditorProps {
     data: Record<string, string>
     updateData: (data: Record<string, string>) => void
+    sort?: boolean
 }
 
 export default function SimpleListEditor(props: SimpleListEditorProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, updateData } = props;
+    const { data, updateData, sort } = props;
 
     const addItem = (): void => {
         updateData({
             ...data,
-            [services.vesCommonService.nanoid()]: ''
+            [nanoid()]: ''
         });
     };
 
     const removeItem = async (key: string): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/simpleListEditor/removeItem', 'Remove Item'),
-            msg: nls.localize('vuengine/simpleListEditor/areYouSureYouWantToRemoveItem', 'Are you sure you want to remove this item?'),
+            title: nls.localize('vuengine/editors/simpleList/removeItem', 'Remove Item'),
+            msg: nls.localize('vuengine/editors/simpleList/areYouSureYouWantToRemoveItem', 'Are you sure you want to remove this item?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -45,9 +45,13 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
 
     const dataKeys = Object.keys(data);
 
+    const preparedData = Object.entries(data);
+    if (sort !== false) {
+        preparedData.sort(([, a], [, b]) => a.localeCompare(b));
+    }
+
     return <VContainer>
-        {dataKeys.length > 0 && Object.entries(data)
-            .sort(([, a], [, b]) => a.localeCompare(b))
+        {dataKeys.length > 0 && preparedData
             .map(([key, value]: string[]) => (
                 <HContainer key={key}>
                     <input
@@ -60,7 +64,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
                     <button
                         className='theia-button secondary'
                         onClick={() => removeItem(key)}
-                        title={nls.localize('vuengine/simpleListEditor/removeItem', 'Remove Item')}
+                        title={nls.localizeByDefault('Remove')}
                     >
                         <i className='codicon codicon-x' />
                     </button>
@@ -69,7 +73,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
         <button
             className='theia-button add-button full-width'
             onClick={addItem}
-            title={nls.localize('vuengine/simpleListEditor/addItem', 'Add Item')}
+            title={nls.localizeByDefault('Add')}
         >
             <i className='codicon codicon-plus' />
         </button>

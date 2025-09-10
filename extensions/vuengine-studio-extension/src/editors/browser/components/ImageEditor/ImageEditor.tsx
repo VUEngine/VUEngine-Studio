@@ -45,14 +45,14 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                     </HContainer>
                     <VContainer overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/imageEditor/files', 'Image Files')}
+                            {nls.localize('vuengine/editors/image/files', 'Image Files')}
                             {' '}<span className='count'>{data.files.length}</span>
                         </label>
                         {data.files.length === 0 &&
                             <div style={{ fontStyle: 'italic' }}>
                                 <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
                                 {nls.localize(
-                                    'vuengine/imageEditor/noFilesSelected',
+                                    'vuengine/editors/image/noFilesSelected',
                                     'No images selected. All images in this folder will be converted.'
                                 )}
                             </div>

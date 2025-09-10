@@ -1,7 +1,10 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
-import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
-import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
+import { ControlPosition } from 'react-draggable';
+import { nanoid } from '../../editors/browser/components/Common/Utils';
+import { Displays } from '../../editors/browser/components/Common/VUEngineTypes';
+import { createEmptyPixelData } from '../../editors/browser/components/PixelEditor/PixelEditor';
+import { DEFAULT_IMAGE_SIZE } from '../../editors/browser/components/PixelEditor/PixelEditorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
@@ -52,12 +55,12 @@ export interface ProjectDataTypesWithContributor extends ProjectDataTypes {
 export interface ProjectDataType {
   enabled?: boolean
   file: string
+  excludeFromDashboard?: boolean
   icon?: string
   schema: any
   uiSchema?: any
   templates?: string[]
   forFiles?: string[]
-  delete?: string[]
 };
 
 export interface ProjectDataTemplates {
@@ -137,6 +140,26 @@ export enum ProjectContributor {
   Studio = 'studio',
 }
 
+export enum ProjectUpdateMode {
+  All = 'all',
+  LowerVersionOnly = 'lowerVersionOnly',
+}
+
+export interface DashboardConfigPositionMap {
+  [id: string]: ControlPosition
+};
+
+export interface DashboardConfig {
+  positions: DashboardConfigPositionMap
+}
+
+export interface GameConfig {
+  projectTitle: string
+  projectAuthor: string
+  plugins: { [id: string]: object }
+  dashboard: DashboardConfig
+}
+
 export const defaultProjectData: ProjectData = {
   templates: {
     'Image': {
@@ -195,14 +218,16 @@ export const defaultProjectData: ProjectData = {
         path: 'headers/Config.h',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.h.njk'
+      template: 'PluginConfig.h.njk',
+      itemSpecific: 'PluginFile'
     },
     'PluginConfigMake': {
       targets: [{
         path: 'config.make',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.make.njk'
+      template: 'PluginConfig.make.njk',
+      itemSpecific: 'PluginFile'
     },
     'PluginsConfig': {
       targets: [{
@@ -223,29 +248,35 @@ export const defaultProjectData: ProjectData = {
   types: {
     GameConfig: {
       file: 'GameConfig',
+      excludeFromDashboard: true,
       schema: {
         title: 'Game Config',
         properties: {
+          dashboard: {
+            type: 'object',
+            properties: {
+              positions: {
+                type: 'object',
+                properties: {},
+                additionalProperties: true,
+              },
+            },
+            additionalProperties: false,
+          },
           plugins: {
             type: 'object',
             properties: {},
             additionalProperties: true,
           },
+          projectAuthor: {
+            type: 'string'
+          },
           projectTitle: {
             type: 'string'
-          }
+          },
+          additionalProperties: false,
         },
         required: []
-      },
-      uiSchema: {
-        type: 'VerticalLayout',
-        elements: [
-          {
-            type: 'Control',
-            label: 'Project Title',
-            scope: '#/properties/projectTitle'
-          }
-        ]
       },
       icon: 'codicon codicon-gear',
       templates: ['PluginsConfig']
@@ -373,7 +404,7 @@ export const defaultProjectData: ProjectData = {
             },
             additionalProperties: false,
           },
-          'colorMode': {
+          colorMode: {
             type: 'number',
             default: 0,
             min: 0,
@@ -390,8 +421,72 @@ export const defaultProjectData: ProjectData = {
       templates: ['Image'],
       forFiles: ['.png']
     },
+    Pixel: {
+      enabled: true,
+      file: '.pixel',
+      schema: {
+        properties: {
+          colorMode: {
+            type: 'number'
+          },
+          frames: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'string'
+                  },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'number',
+                      }
+                    }
+                  },
+                  isVisible: {
+                    type: 'boolean',
+                    default: true,
+                  },
+                  name: {
+                    type: 'string'
+                  },
+                  parallax: {
+                    type: 'number'
+                  },
+                  displays: {
+                    type: 'string',
+                    default: 'ON'
+                  },
+                },
+                additionalProperties: false,
+              }
+            },
+            default: [[{
+              data: createEmptyPixelData(DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE),
+              displays: Displays.Both,
+              id: nanoid(),
+              isVisible: true,
+              name: '',
+              parallax: 0,
+            }]]
+          },
+        },
+        required: []
+      },
+      uiSchema: {
+        type: 'PixelEditor',
+        scope: '#'
+      },
+      icon: 'codicon codicon-symbol-color'
+    },
     PluginFile: {
       file: 'vuengine.plugin',
+      excludeFromDashboard: true,
       schema: {
         title: 'Plugin File',
         properties: {
@@ -462,6 +557,8 @@ export const defaultProjectData: ProjectData = {
                 },
                 step: {
                   type: 'integer',
+                  minimum: 1,
+                  default: 1,
                 },
                 default: {
                   type: 'integer',
@@ -477,7 +574,7 @@ export const defaultProjectData: ProjectData = {
         type: 'PluginFileEditor',
         scope: '#'
       },
-      icon: 'ves-codicon-file-icon codicon codicon-plug medium-purple',
+      icon: 'codicon codicon-plug',
       templates: [
         'PluginConfig',
         'PluginConfigMake',
@@ -486,7 +583,6 @@ export const defaultProjectData: ProjectData = {
     RomInfo: {
       file: 'RomInfo',
       schema: {
-        title: 'ROM Info',
         properties: {
           gameTitle: {
             type: 'string',
@@ -495,351 +591,44 @@ export const defaultProjectData: ProjectData = {
             maxLength: 20,
             default: 'VUENGINE PROJECT'
           },
-          'gameCodeSystem': {
+          gameCodeSystem: {
             type: 'string',
-            description: 'Always \'V\' for \'VUE\'',
             minLength: 1,
             maxLength: 1,
             default: 'V'
           },
-          'gameCodeId': {
+          gameCodeId: {
             type: 'string',
-            description: 'Unique game identifier',
             minLength: 2,
             maxLength: 2,
             default: 'VU'
           },
-          'gameCodeLanguage': {
+          gameCodeLanguage: {
             type: 'string',
-            description: 'In-game language',
             minLength: 1,
             maxLength: 1,
             default: 'E'
           },
-          'makerCode': {
+          makerCode: {
             type: 'string',
-            description: "Unique identifier of the game's developer",
             minLength: 2,
             maxLength: 2,
-            default: ''
+            default: '  '
           },
-          'revision': {
+          revision: {
             type: 'integer',
-            description: 'Version of the game, should be counted up with every release',
             minimum: 0,
             maximum: 9,
             default: 0
           }
-        },
-        required: [
-          'gameTitle',
-          'gameCodeSystem',
-          'gameCodeId',
-          'gameCodeLanguage',
-          'makerCode',
-          'revision'
-        ]
+        }
       },
       uiSchema: {
-        type: 'VerticalLayout',
-        elements: [
-          {
-            type: 'Control',
-            label: 'Game Title',
-            scope: '#/properties/gameTitle'
-          },
-          {
-            type: 'Group',
-            label: 'Game Code',
-            elements: [
-              {
-                type: 'HorizontalLayout',
-                elements: [
-                  {
-                    type: 'Control',
-                    label: 'System',
-                    scope: '#/properties/gameCodeSystem'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'ID',
-                    scope: '#/properties/gameCodeId'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'Language',
-                    scope: '#/properties/gameCodeLanguage'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'Control',
-            label: 'Maker Code',
-            scope: '#/properties/makerCode'
-          },
-          {
-            type: 'Control',
-            label: 'Revision',
-            scope: '#/properties/revision',
-            options: {
-              inputPrefix: '1.'
-            }
-          }
-        ]
+        type: 'RomInfoEditor',
+        scope: '#'
       },
-      icon: 'fa fa-microchip',
+      icon: 'codicon codicon-chip',
       templates: ['RomInfo']
-    },
-    Sprite: {
-      enabled: false,
-      file: '.sprite',
-      schema: {
-        title: 'Sprite',
-        properties: {
-          colorMode: {
-            type: 'number'
-          },
-          dimensions: {
-            type: 'object',
-            properties: {
-              x: {
-                type: 'number',
-                default: DEFAULT_SPRITE_SIZE
-              },
-              y: {
-                type: 'number',
-                default: DEFAULT_SPRITE_SIZE
-              }
-            },
-            additionalProperties: false,
-          },
-          layers: {
-            type: 'object',
-            properties: {},
-            additionalProperties: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'string'
-                },
-                isVisible: {
-                  type: 'boolean'
-                },
-                data: {
-                  type: 'array',
-                  items: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        rowIndex: {
-                          type: 'integer'
-                        },
-                        columnIndex: {
-                          type: 'integer'
-                        },
-                        color: {
-                          type: 'string'
-                        }
-                      },
-                      additionalProperties: false,
-                    }
-                  }
-                },
-                name: {
-                  type: 'string'
-                },
-                parallax: {
-                  type: 'number'
-                },
-                displayMode: {
-                  type: 'string',
-                  default: 'ON'
-                }
-              },
-              additionalProperties: false,
-            }
-          }
-        },
-        required: []
-      },
-      uiSchema: {
-        type: 'SpriteEditor',
-        scope: '#'
-      },
-      icon: 'codicon codicon-circuit-board'
-    },
-    VsuSandbox: {
-      file: '.vsu',
-      schema: {
-        title: 'VSU Sandbox',
-        properties: {
-          channels: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                enabled: {
-                  type: 'boolean',
-                  default: false
-                },
-                interval: {
-                  type: 'object',
-                  properties: {
-                    enabled: {
-                      type: 'boolean',
-                      default: false
-                    },
-                    value: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 31
-                    }
-                  },
-                  additionalProperties: false,
-                },
-                frequency: {
-                  type: 'integer',
-                  minimum: 0,
-                  maximum: 2047
-                },
-                waveform: {
-                  type: 'integer',
-                  minimum: 0,
-                  maximum: 4
-                },
-                stereoLevels: {
-                  type: 'object',
-                  properties: {
-                    left: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 15,
-                      default: 15,
-                    },
-                    right: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 15,
-                      default: 15,
-                    }
-                  },
-                  additionalProperties: false,
-                },
-                envelope: {
-                  type: 'object',
-                  properties: {
-                    enabled: {
-                      type: 'boolean',
-                      default: false
-                    },
-                    repeat: {
-                      type: 'boolean',
-                      default: false
-                    },
-                    direction: {
-                      type: 'boolean',
-                      default: VsuEnvelopeDirection.Decay
-                    },
-                    initialValue: {
-                      type: 'integer',
-                      default: 15,
-                      minimum: 0,
-                      maximum: 15
-                    },
-                    stepTime: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 7
-                    },
-                  },
-                  additionalProperties: false,
-                },
-                sweepMod: {
-                  type: 'object',
-                  properties: {
-                    enabled: {
-                      type: 'boolean',
-                      default: false
-                    },
-                    repeat: {
-                      type: 'boolean',
-                      default: true
-                    },
-                    function: {
-                      type: 'boolean',
-                      default: VsuSweepModulationFunction.Sweep
-                    },
-                    frequency: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 1
-                    },
-                    interval: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 7
-                    },
-                    direction: {
-                      type: 'boolean',
-                      default: VsuSweepDirection.Up
-                    },
-                    shift: {
-                      type: 'integer',
-                      minimum: 0,
-                      maximum: 7
-                    }
-                  },
-                  additionalProperties: false,
-                },
-                tap: {
-                  type: 'integer',
-                  minimum: 0,
-                  maximum: 7
-                }
-              },
-              additionalProperties: false,
-            },
-            minItems: 6,
-            maxItems: 6,
-          },
-          waveforms: {
-            type: 'array',
-            items: {
-              type: 'array',
-              items: {
-                type: 'integer',
-                minimum: 1,
-                maximum: 64,
-                default: 1,
-              },
-              minItems: 32,
-              maxItems: 32
-            },
-            minItems: 5,
-            maxItems: 5
-          },
-          modulation: {
-            type: 'array',
-            items: {
-              type: 'integer',
-              minimum: 1,
-              maximum: 256,
-              default: 1,
-            },
-            minItems: 32,
-            maxItems: 32
-          }
-        },
-        required: []
-      },
-      uiSchema: {
-        type: 'VsuSandbox',
-        scope: '#'
-      },
-      icon: 'codicon codicon-graph'
     }
   }
 };

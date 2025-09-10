@@ -44,6 +44,15 @@ export class VesBuildPathsService {
       .resolve('make');
   }
 
+  async getSedUri(isWslInstalled: boolean = false): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
+      .resolve('gnu-sed');
+  }
+
   async getCompilerUri(isWslInstalled: boolean = false): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     return resourcesUri

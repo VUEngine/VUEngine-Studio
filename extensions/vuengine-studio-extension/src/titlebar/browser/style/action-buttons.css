@@ -8,13 +8,17 @@
 .titlebar-action-button {
   -webkit-app-region: no-drag;
   cursor: pointer;
-  display: inline-block;
+  display: none;
   fill: var(--theia-titleBar-activeForeground);
   font-size: 18px;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
   text-align: center;
   width: 46px;
+}
+
+.theia-maximized .titlebar-action-button {
+  display: inline-block;
 }
 
 

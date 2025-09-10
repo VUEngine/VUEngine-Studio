@@ -16,16 +16,16 @@ import {
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/Base/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/Base/HContainer';
 import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import ColorModeSelect from './ColorModeSelect';
 import Range from '../../Common/Base/Range';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 
 const ReconvertButton = styled.button`
     background-color: transparent;
@@ -98,11 +98,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         if (!imageData?.maps) {
             return;
         }
-        const uncompressedTileData = await services.vesCommonService.uncompressJson(imageData?.tiles?.data) as string[];
+        const uncompressedTileData = await services.vesCommonService.unzipJson(imageData?.tiles?.data) as string[];
         if (!uncompressedTileData) {
             return;
         }
-        const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
+        const uncompressedMapData = await services.vesCommonService.unzipJson(imageData.maps[0]?.data) as string[];
 
         const actualCompression = compression === ImageCompressionType.RLE && imageData.tiles?.compressionRatio && imageData.tiles?.compressionRatio < 0
             ? ImageCompressionType.RLE
@@ -172,7 +172,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         <VContainer style={{ width: '50%' }}>
                             <HContainer justifyContent='space-between'>
                                 <label>
-                                    {nls.localize('vuengine/editors/source', 'Source')}
+                                    {nls.localize('vuengine/editors/general/source', 'Source')}
                                 </label>
                                 <VContainer style={{ opacity: .6 }}>
                                     {height
@@ -198,7 +198,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             {convertImage &&
                                 <ReconvertButton
                                     className="theia-button"
-                                    title={nls.localize('vuengine/actorEditor/reconvertImage', 'Reconvert Image')}
+                                    title={nls.localize('vuengine/editors/actor/reconvertImage', 'Reconvert Image')}
                                     onClick={convertImage}
                                 >
                                     <i className="codicon codicon-arrow-right"></i>
@@ -211,17 +211,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         <VContainer style={{ width: '50%' }}>
                             <HContainer justifyContent='space-between'>
                                 <label>
-                                    {nls.localize('vuengine/editors/result', 'Result')}
+                                    {nls.localize('vuengine/editors/general/result', 'Result')}
                                 </label>
                                 {height > 0 && width > 0 &&
                                     <VContainer style={{ opacity: .6 }}>
                                         {
                                             isPadded && isCropped
-                                                ? <>{nls.localize('vuengine/editors/paddedAndCroppedTo', 'Padded and cropped to')}</>
+                                                ? <>{nls.localize('vuengine/editors/general/paddedAndCroppedTo', 'Padded and cropped to')}</>
                                                 : isPadded
-                                                    ? <>{nls.localize('vuengine/editors/paddedTo', 'Padded to')}</>
+                                                    ? <>{nls.localize('vuengine/editors/general/paddedTo', 'Padded to')}</>
                                                     : isCropped
-                                                        ? <>{nls.localize('vuengine/editors/croppedTo', 'Cropped to')}</>
+                                                        ? <>{nls.localize('vuengine/editors/general/croppedTo', 'Cropped to')}</>
                                                         : <></>
                                         }
                                         {' '}{finalWidth} × {finalHeight} px
@@ -299,7 +299,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                     <HContainer gap={10} style={{ minHeight: 64 }}>
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/editors/dither', 'Dither')}
+                                {nls.localize('vuengine/editors/general/dither', 'Dither')}
                             </label>
                             <label>
                                 <input
@@ -313,7 +313,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
-                                {nls.localize('vuengine/editors/enable', 'Enable')}
+                                {nls.localize('vuengine/editors/general/enable', 'Enable')}
                             </label>
                             {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
                                 <label>
@@ -328,7 +328,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
-                                    {nls.localize('vuengine/editors/serpentine', 'Serpentine')}
+                                    {nls.localize('vuengine/editors/general/serpentine', 'Serpentine')}
                                 </label>
                             }
                         </VContainer>
@@ -336,20 +336,21 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             <>
                                 <VContainer style={{ minWidth: 200 }}>
                                     <label>
-                                        {nls.localize('vuengine/editors/quantizationAlgorithm', 'Quantization Algorithm')}
+                                        {nls.localize('vuengine/editors/general/quantizationAlgorithm', 'Quantization Algorithm')}
                                     </label>
-                                    <BasicSelect
+                                    <AdvancedSelect
                                         options={IMAGE_QUANTIZATION_ALGORITHM_OPTIONS}
-                                        value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                                        onChange={e => updateProcessingSettings({
-                                            imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
+                                        defaultValue={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                                        onChange={options => updateProcessingSettings({
+                                            imageQuantizationAlgorithm: options[0] as iq.ImageQuantization,
                                         })}
                                         disabled={!image}
+                                        menuPlacement="top"
                                     />
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/editors/minimumColorDistance', 'Minimum Color Distance')}
+                                        {nls.localize('vuengine/editors/general/minimumColorDistance', 'Minimum Color Distance')}
                                     </label>
                                     <Range
                                         value={processingSettings?.minimumColorDistanceToDither ?? DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER}
@@ -365,15 +366,16 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                 {processingSettings?.minimumColorDistanceToDither > 0 &&
                                     <VContainer style={{ minWidth: 200 }}>
                                         <label>
-                                            {nls.localize('vuengine/editors/colorDistanceCalculator', 'Color Distance Calculator')}
+                                            {nls.localize('vuengine/editors/general/colorDistanceCalculator', 'Color Distance Calculator')}
                                         </label>
-                                        <BasicSelect
+                                        <AdvancedSelect
                                             options={DISTANCE_CALCULATOR_OPTIONS}
-                                            value={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
-                                            onChange={e => updateProcessingSettings({
-                                                distanceCalculator: e.target.value as iq.ColorDistanceFormula,
+                                            defaultValue={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
+                                            onChange={options => updateProcessingSettings({
+                                                distanceCalculator: options[0] as iq.ColorDistanceFormula,
                                             })}
                                             disabled={!image}
+                                            menuPlacement="top"
                                         />
                                     </VContainer>
                                 }

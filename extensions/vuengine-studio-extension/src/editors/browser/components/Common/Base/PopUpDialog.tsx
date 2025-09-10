@@ -1,4 +1,6 @@
-import React, { PropsWithChildren } from 'react';
+import { nls } from '@theia/core';
+import React, { PropsWithChildren, useEffect } from 'react';
+import HContainer from './HContainer';
 
 interface PopUpDialogProps {
     open: boolean
@@ -9,28 +11,42 @@ interface PopUpDialogProps {
     error?: string
     height?: string
     width?: string
+    cancelButton?: boolean
+    overflow?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, onClose, onOk, okLabel, title, error, height, width, children } = props;
+    const { open, onClose, onOk, okLabel, title, error, height, width, cancelButton, children, overflow } = props;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+            case 'Escape':
+                return onClose();
+            case 'Enter':
+                return onOk();
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, []);
 
     return <div
-        className="p-Widget dialogOverlay"
+        className="lm-Widget dialogOverlay"
         style={{
             display: open ? 'flex' : 'none',
             height: '100%',
             position: 'absolute',
             width: '100%',
         }}
-        onKeyDown={e => {
-            if (e.key === 'Escape') {
-                onClose();
-            };
-        }}
     >
         <div className="dialogBlock" style={{
             height,
             maxWidth: '100%',
+            minWidth: '100px',
             overflow: 'hidden',
             width,
         }}
@@ -43,13 +59,21 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 >
                 </i>
             </div>
-            <div className="dialogContent" style={{ flexGrow: 1, maxHeight: 'unset' }}>
+            <div className="dialogContent" style={{ flexGrow: 1, maxHeight: 'unset', overflow }}>
                 {children}
             </div>
-            <div className="dialogControl">
+            <HContainer className="dialogControl">
                 <div className="error" style={{ flex: 2 }}>
                     {error}
                 </div>
+                {cancelButton &&
+                    <button
+                        className="theia-button secondary"
+                        onClick={onClose}
+                    >
+                        {nls.localizeByDefault('Cancel')}
+                    </button>
+                }
                 <button
                     className="theia-button main"
                     onClick={onOk}
@@ -59,7 +83,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 >
                     {okLabel ? okLabel : 'OK'}
                 </button>
-            </div>
+            </HContainer>
         </div>
     </div>;
 }

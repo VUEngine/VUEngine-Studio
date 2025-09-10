@@ -7,19 +7,21 @@ import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/Base/HContainer';
-import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/Base/RadioSelect';
-import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/Base/VContainer';
-import PaletteSelect from '../SpriteEditor/PaletteSelect';
-import SpriteEditorCurrentToolSettings from '../SpriteEditor/SpriteEditorCurrentToolSettings';
-import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';
-import SpriteEditorTools from '../SpriteEditor/SpriteEditorTools';
+import { DataSection } from '../Common/CommonTypes';
+import InfoLabel from '../Common/InfoLabel';
+import SectionSelect from '../Common/SectionSelect';
+import { PixelEditorCommands } from '../PixelEditor/PixelEditorCommands';
+import PixelEditorStatus from '../PixelEditor/PixelEditorStatus';
+import PaletteSelect from '../PixelEditor/Sidebar/PaletteSelect';
+import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCurrentToolSettings';
+import PixelEditorTools from '../PixelEditor/Sidebar/PixelEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharSettings from './Alphabet/CharSettings';
+import { FontEditorCommands } from './FontEditorCommands';
 import {
     CHAR_PIXEL_SIZE,
     FontData,
@@ -29,7 +31,6 @@ import {
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
 import ImportExportTools from './Tools/ImportExport/ImportExportTools';
-import { FontEditorCommands } from './FontEditorCommands';
 
 interface FontEditorProps {
     data: FontData
@@ -55,20 +56,6 @@ const EditorSidebar = styled.div`
     background-color: rgba(236, 236, 236, .9);
   }
 `;
-
-export const INPUT_BLOCKING_COMMANDS = [
-    FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_LINE_UP.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id,
-    FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_1.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_2.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_3.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_4.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_5.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_6.id,
-    FontEditorCommands.PALETTE_SELECT_INDEX_7.id,
-];
 
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { data, updateData } = props;
@@ -234,7 +221,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             if (updatedCharacter[mp.rowIndex] === null || updatedCharacter[mp.rowIndex] === undefined) {
                 updatedCharacter[mp.rowIndex] = [];
             }
-            updatedCharacter[mp.rowIndex][mp.columnIndex] = PALETTE_INDICES[mp.color];
+            updatedCharacter[mp.rowIndex][mp.columnIndex] = PALETTE_INDICES[0][mp.color];
         });
         setCurrentCharacterData(updatedCharacter);
     };
@@ -267,7 +254,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     useEffect(() => {
         enableCommands([
-            ...Object.values(FontEditorCommands).map(c => c.id)
+            ...Object.values(FontEditorCommands).map(c => c.id),
+            ...Object.values(PixelEditorCommands).map(c => c.id),
         ]);
     }, []);
 
@@ -299,8 +287,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         <div
             ref={canvasContainerRef}
             style={{
-                backgroundImage: 'radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0)',
-                backgroundSize: '16px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 inset: 0,
@@ -310,20 +296,11 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 position: 'absolute',
             }}
         >
-            <SpriteEditorStatus
-                dottingRef={dottingRef}
-                style={{
-                    bottom: 'var(--padding)',
-                    left: 'var(--padding)',
-                    position: 'absolute',
-                    zIndex: 100,
-                }}
-            />
             <Dotting
                 backgroundColor='transparent'
                 brushColor={PALETTE_COLORS[ColorMode.Default][primaryColorIndex]}
                 defaultPixelColor={PALETTE_COLORS[ColorMode.Default][0]}
-                gridStrokeColor={'#333'}
+                gridStrokeColor="#222"
                 height={canvasHeight}
                 initLayers={[{
                     id: 'layer1',
@@ -359,13 +336,14 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     setPrimaryColorIndex={setPrimaryColorIndex}
                     secondaryColorIndex={secondaryColorIndex}
                     setSecondaryColorIndex={setSecondaryColorIndex}
+                    includeTransparent={false}
                     dottingRef={dottingRef}
                 />
                 <VContainer gap={10} overflow='auto'>
-                    <SpriteEditorTools
+                    <PixelEditorTools
                         dottingRef={dottingRef}
                     />
-                    <SpriteEditorCurrentToolSettings
+                    <PixelEditorCurrentToolSettings
                         dottingRef={dottingRef}
                     />
                     <Actions
@@ -385,7 +363,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 </VContainer>
             </VContainer>
             <EditorSidebar>
-                <VContainer overflow='hidden'>
+                <VContainer gap={15} overflow='hidden'>
                     <HContainer justifyContent='space-between'>
                         <CharSettings
                             currentCharacter={currentCharacterIndex}
@@ -401,9 +379,9 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     </HContainer>
                     <VContainer grow={1} overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
+                            {nls.localize('vuengine/editors/font/alphabet', 'Alphabet')}{' '}
                             <span className="secondaryText">
-                                ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Arrow Keys To Navigate')})
+                                ({nls.localize('vuengine/editors/font/alphabetNavigationDescription', 'Arrow Keys To Navigate')})
                             </span>
                         </label>
                         <Alphabet
@@ -432,20 +410,21 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 <HContainer gap={15} justifyContent="space-between">
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/actorEditor/compression', 'Compression')}
+                            label={nls.localize('vuengine/editors/actor/compression', 'Compression')}
                             tooltip={nls.localize(
-                                'vuengine/actorEditor/compressionDescription',
-                                // eslint-disable-next-line max-len
-                                'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                                'vuengine/editors/actor/compressionDescription',
+                                'Image data can be stored in a compressed format to save ROM space. \
+Comes at the cost of a slightly higher CPU load when loading data into memory. \
+Will be skipped if compressed data is not smaller than source data.'
                             )}
                             tooltipPosition='bottom'
                         />
                         <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/actorEditor/none', 'None'),
+                                label: nls.localize('vuengine/editors/actor/compressionType/none', 'None'),
                                 value: ImageCompressionType.NONE,
                             }, {
-                                label: nls.localize('vuengine/actorEditor/rle', 'RLE'),
+                                label: 'RLE',
                                 value: ImageCompressionType.RLE,
                             }]}
                             defaultValue={data.compression}
@@ -458,6 +437,11 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     />
                 </HContainer>
             </EditorSidebar>
-        </HContainer >
-    </div >;
+        </HContainer>
+        <PixelEditorStatus
+            gridSize={1}
+            setGridSize={() => { }}
+            dottingRef={dottingRef}
+        />
+    </div>;
 }

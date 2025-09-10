@@ -286,7 +286,7 @@ export class VesEmulatorService {
 
       if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         this.messageService.error(
-          nls.localize('vuengine/emulator/emulatorPathDoesNotExist', `Emulator Path "${emulatorPath}" does not exist.`)
+          nls.localize('vuengine/emulator/emulatorPathDoesNotExist', 'Emulator Path "{0}" does not exist.', emulatorPath)
         );
         return;
       }

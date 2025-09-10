@@ -9,21 +9,37 @@ export const PALETTE_COLORS: string[][] = [[
   '#a00',
   '#f00',
 ], [
-  '#000000',
+  '#000',
   '#2a0000',
-  '#550000',
+  '#500',
   '#7f0000',
-  '#aa0000',
+  '#a00',
   '#d40000',
-  '#ff0000',
+  '#f00',
 ]];
 
-export const PALETTE_INDICES: { [rgb: string]: number } = {
+export const PALETTE_INDICES: { [rgb: string]: number }[] = [{
   '#000': 0,
+  '#000000': 0,
   '#500': 1,
+  '#550000': 1,
   '#a00': 2,
+  '#aa0000': 2,
   '#f00': 3,
-};
+  '#ff0000': 3,
+}, {
+  '#000': 0,
+  '#000000': 0,
+  '#2a0000': 1,
+  '#500': 2,
+  '#550000': 2,
+  '#7f0000': 3,
+  '#a00': 4,
+  '#aa0000': 4,
+  '#d40000': 5,
+  '#f00': 6,
+  '#ff0000': 6,
+}];
 
 export const PALETTE_R_VALUES: number[][] = [
   [0, 85, 170, 255],
@@ -90,4 +106,4 @@ export const WINDOWS_EXECUTABLE_EXTENSIONS = [
   'ps1',
 ];
 
-export const VES_VERSION = '1.0.0';
+export const VES_VERSION = '0.6.0';

@@ -1,20 +1,21 @@
-import { ArrowCounterClockwise } from "@phosphor-icons/react";
-import { URI, nls } from "@theia/core";
-import { BinaryBuffer } from "@theia/core/lib/common/buffer";
-import DOMPurify from "dompurify";
-import React from "react";
+import { ArrowCounterClockwise } from '@phosphor-icons/react';
+import { URI, nls } from '@theia/core';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import DOMPurify from 'dompurify';
+import React from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import sanitize from 'sanitize-html';
 import * as showdown from 'showdown';
-import { BuildMode } from "../../../build/browser/ves-build-types";
-import HContainer from "../../../editors/browser/components/Common/Base/HContainer";
-import InfoLabel from "../../../editors/browser/components/Common/InfoLabel";
-import VContainer from "../../../editors/browser/components/Common/Base/VContainer";
-import { VesPlugin } from "../ves-plugin";
-import { VesPluginsCommands } from "../ves-plugins-commands";
-import { PluginConfiguration, PluginConfigurationDataType, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from "../ves-plugins-types";
-import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
-import PluginDefaultInput from "./PluginDefaultInput";
+import { BuildMode } from '../../../build/browser/ves-build-types';
+import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
+import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
+import InfoLabel from '../../../editors/browser/components/Common/InfoLabel';
+import { stringify } from '../../../editors/browser/components/Common/Utils';
+import { VesPlugin } from '../ves-plugin';
+import { VesPluginsCommands } from '../ves-plugins-commands';
+import { PluginConfiguration, PluginConfigurationDataType, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../ves-plugins-types';
+import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from './AbstractVesPluginComponent';
+import PluginDefaultInput from './PluginDefaultInput';
 
 export default class VesPluginEditorComponent extends AbstractVesPluginComponent {
     constructor(props: AbstractVesPluginComponentProps) {
@@ -79,7 +80,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
 
     async componentDidMount() {
         const renderedReadme = await this.renderReadme(this.props.plugin);
-        await this.props.vesProjectService?.projectItemsReady;
+        await this.props.vesProjectService?.projectDataReady;
 
         const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
         const gameConfigFileUri = workspaceRootUri.resolve('config').resolve('GameConfig');
@@ -163,10 +164,10 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                 // persist to GameConfig file
                 await this.props.fileService?.writeFile(
                     gameConfigFileUri,
-                    BinaryBuffer.fromString(JSON.stringify(gameConfig, undefined, 4)),
+                    BinaryBuffer.fromString(stringify(gameConfig)),
                 );
 
-                // remove library file to force rebuild
+                // remove library file in build folder to force rebuild
                 await this.props.workspaceService.ready;
                 const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
                 const buildPathUri = workspaceRootUri.resolve('build');
@@ -180,9 +181,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         buildPathUri.resolve(`working/libraries/${modeLc}/lib${pluginName}-${modeLc}.a`)
                     );
                 })
-                console.log('libraryFileUris', libraryFileUris);
                 await Promise.all(libraryFileUris.map(async libraryFile => {
-                    console.log('libraryFile', libraryFile);
                     if (await this.props.fileService?.exists(libraryFile)) {
                         await this.props.fileService?.delete(libraryFile);
                     }
@@ -213,7 +212,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
             <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)}>
                 {icon ?
                     <img className='icon-container' src={icon} /> :
-                    <div className='icon-container vesPlaceholder'><i className="codicon codicon-plug" /></div>}
+                    <div className='icon-container vesPlaceholder'><i className='codicon codicon-plug' /></div>}
                 <div className='details'>
                     <div className='title'>
                         <span title='Plugin name' className='name'>{displayName}</span>
@@ -227,7 +226,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         {license && <span className='license'>{license}</span>}
                         {tags && <span className='noWrapInfo vesPluginTags'>{
                             // @ts-ignore
-                            Object.keys(tags).map(key => <span className='vesTag' onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
+                            Object.keys(tags).map(key => <span className='vesTag' onClick={() => this.searchTag(tags[key])} key={key}>{tags[key]}</span>)
                         }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>
@@ -254,7 +253,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                                     {' '}<span className='count'>{dependencies?.length || 0}</span>
                                 </Tab>
                                 <Tab>
-                                    {nls.localize('vuengine/plugins/configuration', 'Configuration')}
+                                    {nls.localize('vuengine/general/configuration', 'Configuration')}
                                     {' '}<span className='count'>{configuration?.length || 0}</span>
                                 </Tab>
                             </TabList>
@@ -317,7 +316,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                                                         <div style={{ textAlign: 'right', width: 20 }}>
                                                             {this.state.configuration[c.name] !== undefined && this.state.configuration[c.name] != c.default &&
                                                                 <div
-                                                                    className="vesPluginConfigReset"
+                                                                    className='vesPluginConfigReset'
                                                                     title={nls.localize('vuengine/plugins/resetToDefault', 'Reset To Default')}
                                                                     onClick={() => this.updateConfiguration(c, c.default, true)}
                                                                 >

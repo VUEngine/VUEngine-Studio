@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { clamp } from '../Utils';
+import Input from './Input';
 
 const Column = styled.div`
     display: flex;
@@ -12,11 +13,11 @@ const Column = styled.div`
 
 const Index = styled.div`
     align-items: center;
-    color: var(--theia-input-background);
     display: flex;
-    font-size: 8px;
+    font-size: 10px;
     justify-content: center;
     line-height: 14px;
+    opacity: .5;
 `;
 
 const BarContainer = styled.div`
@@ -44,7 +45,7 @@ const Bar = styled.div`
     transition: height .1s;
 `;
 
-const Input = styled.input`
+const StyledInput = styled(Input)`
     box-sizing: border-box;
     font-size: 12px;
     min-width: 24px !important;
@@ -70,10 +71,11 @@ interface VerticalRangeInputProps {
     barHeight?: number
     value: number
     setValue: (value: number) => void
+    commands?: string[]
 }
 
 export default function VerticalRangeInput(props: VerticalRangeInputProps): React.JSX.Element {
-    const { index, min, max, maxWidth, barHeight, value, setValue } = props;
+    const { index, min, max, maxWidth, barHeight, value, setValue, commands } = props;
 
     const handleSelectInput = (event: React.MouseEvent) =>
         // @ts-ignore
@@ -84,7 +86,7 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
             const step = rect.height / max;
-            const v = clamp(Math.ceil(max - (y / step)), min, max);
+            const v = clamp(Math.round(max - (y / step)), min, max);
             setValue(v);
         }
     };
@@ -105,17 +107,14 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
                 style={{ height: `${value / max * 100}%` }}
             />
         </BarContainer>
-        <Input
-            className='theia-input'
-            type='number'
-            step='1'
+        <StyledInput
+            type="number"
             min={min}
             max={max}
             value={value ?? min}
+            setValue={setValue}
             onClick={handleSelectInput}
-            onChange={e => setValue(
-                clamp(parseInt(e.target.value === '' ? `${min}` : e.target.value), min, max)
-            )}
+            commands={commands}
         />
     </Column>;
 }

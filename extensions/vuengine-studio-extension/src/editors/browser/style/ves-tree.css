@@ -3,26 +3,26 @@
     height: auto !important;
 }
 
-.ves-tree [role=tree] [role=treeitem] {
+.ves-tree [role=treeitem] {
     box-sizing: border-box;
     display: flex;
     line-height: var(--theia-content-line-height);
     padding: 0 var(--padding);
 }
 
-.ves-tree [role=tree] [role=treeitem][aria-selected=true] {
+.ves-tree [role=treeitem][aria-selected=true] {
     background: var(--theia-list-inactiveSelectionBackground);
     color: var(--theia-list-inactiveSelectionForeground);
 }
 
-.ves-tree [role=tree] [role=treeitem]:focus::after,
-.ves-tree [role=tree] [role=treeitem]:hover {
+.ves-tree [role=treeitem]:focus::after,
+.ves-tree [role=treeitem]:hover {
     background: var(--theia-list-hoverBackground);
     color: var(--theia-list-hoverForeground);
     cursor: pointer;
 }
 
-.ves-tree [role=tree] [role=treeitem][aria-selected=true]:focus {
+.ves-tree [role=treeitem][aria-selected=true]:focus {
     background: var(--theia-list-activeSelectionBackground);
     color: var(--theia-list-activeSelectionForeground) !important;
     outline: var(--theia-focusBorder) solid 1px;

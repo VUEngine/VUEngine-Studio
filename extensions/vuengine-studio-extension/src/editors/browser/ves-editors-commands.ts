@@ -1,7 +1,9 @@
 import { Command } from '@theia/core';
 import { ActorEditorCommands } from './components/ActorEditor/ActorEditorCommands';
+import { CommonEditorCommands } from './components/Common/Editor/CommonEditorCommands';
 import { FontEditorCommands } from './components/FontEditor/FontEditorCommands';
-import { MusicEditorCommands } from './components/MusicEditor/MusicEditorCommands';
+import { SoundEditorCommands } from './components/SoundEditor/SoundEditorCommands';
+import { PixelEditorCommands } from './components/PixelEditor/PixelEditorCommands';
 import { EditorCommands } from './ves-editors-types';
 
 export namespace VesEditorsCommands {
@@ -35,7 +37,16 @@ export namespace VesEditorsCommands {
         'vuengine/editors/commands/showSource',
         'vuengine/editors/commands/category'
     );
-
+    export const OPEN_GENERATED_FILES: Command = Command.toLocalizedCommand(
+        {
+            id: 'editors.openGeneratedFiles',
+            label: 'Open Generated File(s)',
+            category: 'Editor',
+            iconClass: 'codicon codicon-file-symlink-file',
+        },
+        'vuengine/editors/commands/openGeneratedFiles',
+        'vuengine/editors/commands/category'
+    );
     export const GENERATE_ID: Command = Command.toLocalizedCommand(
         {
             id: 'editors.generateId',
@@ -50,6 +61,8 @@ export namespace VesEditorsCommands {
 
 export const EditorsCommands: EditorCommands[] = [
     ActorEditorCommands,
+    CommonEditorCommands,
     FontEditorCommands,
-    MusicEditorCommands,
+    SoundEditorCommands,
+    PixelEditorCommands,
 ];

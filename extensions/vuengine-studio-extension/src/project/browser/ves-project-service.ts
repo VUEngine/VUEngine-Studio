@@ -1,4 +1,4 @@
-import { CommandService, Emitter, MessageService, QuickInputService, isWindows, nls } from '@theia/core';
+import { CommandService, Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, isObject, isWindows, nls } from '@theia/core';
 import { OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -16,6 +16,8 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import { nanoid, sortObjectByKeys, stringify } from '../../editors/browser/components/Common/Utils';
+import { PluginFileTranslatedField } from '../../editors/browser/components/PluginFileEditor/PluginFileEditorTypes';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { ItemData } from '../../editors/browser/ves-editors-widget';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
@@ -23,9 +25,9 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
-import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectPreferenceIds } from './ves-project-preferences';
 import {
+  GameConfig,
   PROJECT_CHANNEL_NAME,
   ProjectContributor,
   ProjectData,
@@ -37,6 +39,7 @@ import {
   ProjectDataType,
   ProjectDataTypesWithContributor,
   ProjectDataWithContributor,
+  ProjectUpdateMode,
   VUENGINE_WORKSPACE_EXT,
   WithContributor,
   WithFileUri,
@@ -63,6 +66,8 @@ export class VesProjectService {
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(QuickPickService)
+  protected readonly quickPickService: QuickPickService;
   @inject(VesBuildPathsService)
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -79,10 +84,6 @@ export class VesProjectService {
   protected readonly _projectDataReady = new Deferred<void>();
   get projectDataReady(): Promise<void> {
     return this._projectDataReady.promise;
-  }
-  protected readonly _projectItemsReady = new Deferred<void>();
-  get projectItemsReady(): Promise<void> {
-    return this._projectItemsReady.promise;
   }
 
   protected _isUpdatingFiles: boolean = false;
@@ -188,7 +189,7 @@ export class VesProjectService {
     if (type.schema.properties && needsId) {
       type.schema.properties['_id'] = {
         type: 'string',
-        default: this.vesCommonService.nanoid(),
+        default: nanoid(),
       };
     }
     type.schema.properties['_version'] = {
@@ -288,7 +289,10 @@ export class VesProjectService {
         if (schema.additionalProperties !== false) {
           resultObject = deepmerge(resultObject, data ?? {});
         }
-        return resultObject;
+        if (Object.keys(resultObject).length === 0 && schema.default) {
+          resultObject = schema.default;
+        }
+        return sortObjectByKeys(resultObject);
 
       case 'string':
         return getValue('');
@@ -301,7 +305,7 @@ export class VesProjectService {
       return;
     }
 
-    const defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+    const defaultName = nls.localize('vuengine/editors/general/newFileDialog/untitled', 'Untitled');
     const filename = await this.quickInputService.input({
       value: defaultName,
       title: nls.localize('vuengine/projects/newFileName', 'New File Name'),
@@ -322,7 +326,7 @@ export class VesProjectService {
     let fileValue;
     if (type) {
       const data = await this.getSchemaDefaults(type);
-      fileValue = JSON.stringify(data, undefined, 4);
+      fileValue = stringify(data);
     }
     await this.fileService.create(fileUri, fileValue);
 
@@ -385,14 +389,6 @@ export class VesProjectService {
 
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
       this.logLine(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.items[typeId][itemId]._contributor}.`);
-    }
-
-    // check version
-    const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
-    if (checkForOutdatedFiles) {
-      if (data._version !== VES_VERSION) {
-        this.promptForFilesUpdate(1);
-      }
     }
 
     return true;
@@ -463,10 +459,10 @@ export class VesProjectService {
       this.justWroteGameConfigFile = true;
       await this.fileService.writeFile(
         this.gameConfigFileUri!,
-        BinaryBuffer.fromString(JSON.stringify({
+        BinaryBuffer.fromString(stringify({
           ...gameConfig,
           plugins: sortedPlugins
-        }, undefined, 4)),
+        })),
       );
 
       // fire event
@@ -511,6 +507,11 @@ export class VesProjectService {
       }
 
       fileChangesEvent.changes.map(change => {
+        // ignore files changes by git, etc
+        if (change.resource.scheme !== 'file') {
+          return;
+        }
+
         // update project data when files of registered types change
         switch (change.type) {
           case FileChangeType.DELETED:
@@ -546,7 +547,7 @@ export class VesProjectService {
     });
   }
 
-  protected handleFileUpdate(fileUri: URI): void {
+  protected async handleFileUpdate(fileUri: URI): Promise<void> {
     if (this.gameConfigFileUri && fileUri.isEqual(this.gameConfigFileUri)) {
       if (this.justWroteGameConfigFile) {
         this.justWroteGameConfigFile = false;
@@ -554,7 +555,8 @@ export class VesProjectService {
       }
       this.enableFileChangeEventLock();
       this.updateWindowTitle();
-      this.readProjectData();
+      await this.readProjectData();
+      this.onDidUpdateProjectItemEmitter.fire(fileUri);
     } else {
       const types = this.getProjectDataTypes() || {};
       Object.keys(types).map(async typeId => {
@@ -593,9 +595,6 @@ export class VesProjectService {
     if (!this.workspaceService.opened) {
       if (this._projectDataReady.state === 'unresolved') {
         this._projectDataReady.resolve();
-      }
-      if (this._projectItemsReady.state === 'unresolved') {
-        this._projectItemsReady.resolve();
       }
 
       return;
@@ -717,10 +716,6 @@ export class VesProjectService {
       ...combinedProjectData,
     };
 
-    if (this._projectDataReady.state === 'unresolved') {
-      this._projectDataReady.resolve();
-    }
-
     // add items to project data
     const filePatterns = Object.values(combinedProjectData.types).map((t: ProjectDataType) => t.file?.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
     await Promise.all(projectDataWithContributors.map(async projectDataWithContributor => {
@@ -834,12 +829,12 @@ export class VesProjectService {
       ...combinedProjectData,
     };
 
-    if (this._projectItemsReady.state === 'unresolved') {
-      this._projectItemsReady.resolve();
-    }
-
     const duration = performance.now() - startTime;
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
+
+    if (this._projectDataReady.state === 'unresolved') {
+      this._projectDataReady.resolve();
+    }
 
     // check for outdated items
     const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
@@ -850,6 +845,44 @@ export class VesProjectService {
         await this.promptForFilesUpdate(outdatedItems.length);
       }
     }
+  }
+
+  async getGameConfig(): Promise<GameConfig> {
+    await this.projectDataReady;
+
+    let gameConfig = this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfig;
+    if (!gameConfig) {
+      gameConfig = this.generateDataFromJsonSchema(defaultProjectData!.types!['GameConfig'].schema?.properties) as GameConfig;
+    }
+
+    return gameConfig;
+  }
+
+  async setGameConfig(data: Partial<GameConfig>): Promise<void> {
+    await this.projectDataReady;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+
+    const gameConfig = await this.getGameConfig() as unknown as ProjectDataItem & WithFileUri;
+    const gameConfigFileUri = (gameConfig && gameConfig._fileUri)
+      ? gameConfig._fileUri
+      : workspaceRootUri.resolve('config').resolve('GameConfig');
+
+    await this.fileService.writeFile(
+      gameConfigFileUri,
+      BinaryBuffer.fromString(
+        JSON.stringify(
+          sortObjectByKeys({
+            ...gameConfig,
+            ...data,
+            _fileUri: undefined,
+            _contributor: undefined,
+            _contributorUri: undefined,
+          }),
+          undefined,
+          4
+        )
+      ),
+    );
   }
 
   protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {
@@ -865,7 +898,7 @@ export class VesProjectService {
       disableChecks,
     );
     if (answer === yes) {
-      this.commandService.executeCommand(VesProjectCommands.UPDATE_FILES.id);
+      this.updateFiles(ProjectUpdateMode.LowerVersionOnly);
     } else if (answer === disableChecks) {
       this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);
     }
@@ -890,14 +923,13 @@ export class VesProjectService {
         const fileContent = await this.fileService.readFile(pluginFileUri);
         try {
           const fileContentJson = JSON.parse(fileContent.value.toString());
-          const localeKey = nls.locale || 'en';
+          const localeKey = nls.locale ?? 'en';
           const pluginId = `${prefix}/${pluginRelativeUri.path.fsPath().replace(/\\/g, '/')}`;
           const iconUri = pluginFileUri.parent.resolve('icon.png');
-          const tagsObject = {};
+          const tagsObject = {} as PluginFileTranslatedField;
           if (Array.isArray(fileContentJson.tags)) {
             fileContentJson.tags.map((tag: any) => {
-              // @ts-ignore
-              tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
+              tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, localeKey);
             });
           }
           const configuration: PluginConfiguration[] = [];
@@ -941,13 +973,12 @@ export class VesProjectService {
     return pluginsData;
   }
 
-  protected translatePluginField(field: Object | string, locale: string): string {
-    if (field instanceof Object) {
-      // @ts-ignore
-      return field[locale] || field.en || '';
+  protected translatePluginField(field: PluginFileTranslatedField | string, locale: string): string {
+    if (isObject(field)) {
+      return field[locale] ?? field.en ?? Object.values(field)[0];
     }
 
-    return field;
+    return field as string;
   }
 
   protected async findContributions(root: URI): Promise<ProjectData> {
@@ -1086,7 +1117,7 @@ export class VesProjectService {
       await Promise.all(template.labels['authors']?.map(async (value: string) => {
         await this.replaceInProject(projectsBaseUri, value, author);
       }));
-      await this.replaceInProject(projectsBaseUri, template.labels['description'], 'Description');
+      await this.replaceInProject(projectsBaseUri, template.labels['description'], nls.localizeByDefault('Description'));
     } catch (e) {
       return e;
     }
@@ -1131,7 +1162,7 @@ export class VesProjectService {
     });
   }
 
-  async getOutdatedProjectItems(): Promise<(unknown & WithContributor & WithFileUri & WithVersion & WithType)[]> {
+  async getOutdatedProjectItems(updateMode: ProjectUpdateMode = ProjectUpdateMode.LowerVersionOnly): Promise<(unknown & WithContributor & WithFileUri & WithVersion & WithType)[]> {
     const outdatedItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
 
     // find all items
@@ -1144,7 +1175,7 @@ export class VesProjectService {
     const projectItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
     Object.keys(itemsByType).map(typeId => {
       const type = this.getProjectDataType(typeId);
-      Object.values(itemsByType[typeId]).map((item: unknown & WithContributor & WithFileUri & WithVersion) => {
+      Object.values(itemsByType[typeId]).map((item: ProjectDataItem & WithContributor & WithFileUri & WithVersion) => {
         if (item._contributor === ProjectContributor.Project) {
           projectItems.push({
             ...item,
@@ -1159,7 +1190,7 @@ export class VesProjectService {
 
     // find outdated items
     projectItems.map(item => {
-      if (item._version !== VES_VERSION) {
+      if (item._version !== VES_VERSION || updateMode === ProjectUpdateMode.All) {
         outdatedItems.push(item);
       }
     });
@@ -1167,11 +1198,38 @@ export class VesProjectService {
     return outdatedItems;
   }
 
-  async updateFiles(): Promise<void> {
+  async showUpdateModeSelection(): Promise<void> {
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+      title: nls.localize('vuengine/projects/commands/updateFiles', 'Update Files...'),
+      description: nls.localize(
+        'vuengine/codegen/allOrLowerVersionOnly',
+        'Do you want to update all files or only those with a lower version number stamp?'
+      ),
+      placeholder: nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list'),
+      hideInput: true,
+    };
+
+    const items: QuickPickItem[] = [{
+      id: ProjectUpdateMode.All,
+      label: nls.localize('vuengine/projects/allFiles', 'All files'),
+    }, {
+      id: ProjectUpdateMode.LowerVersionOnly,
+      label: nls.localize('vuengine/projects/lowerVersionOnly', 'Lower Version Only'),
+    }];
+
+    const selection = await this.quickPickService.show(items, quickPickOptions);
+    if (!selection) {
+      return;
+    }
+
+    return this.updateFiles(selection.id as ProjectUpdateMode);
+  }
+
+  async updateFiles(updateMode: ProjectUpdateMode): Promise<void> {
     this.isUpdatingFiles = true;
 
     // get outdated files
-    const outdatedItems = await this.getOutdatedProjectItems();
+    const outdatedItems = await this.getOutdatedProjectItems(updateMode);
     if (!outdatedItems.length) {
       this.isUpdatingFiles = false;
       await this.messageService.info(
@@ -1186,7 +1244,7 @@ export class VesProjectService {
         const fileContent = await this.fileService.readFile(itemtoUpdate._fileUri);
         const fileContentJson = JSON.parse(fileContent.value.buffer.toString()) as ItemData;
         const updatedFileContentJson = await this.getSchemaDefaults(itemtoUpdate.type, fileContentJson);
-        const updatedFileContentBuffer = BinaryBuffer.fromString(JSON.stringify(updatedFileContentJson, undefined, 4));
+        const updatedFileContentBuffer = BinaryBuffer.fromString(stringify(updatedFileContentJson));
         await this.fileService.writeFile(itemtoUpdate._fileUri, updatedFileContentBuffer);
         this.logLine(`Updated item file ${this.workspaceProjectFolderUri?.relative(itemtoUpdate._fileUri)!.fsPath()}.`);
       } catch (error) {

@@ -123,7 +123,7 @@ export class VesPluginsService {
     return field;
   }
 
-  searchPluginsData(query: string): Array<VesPluginData> {
+  searchPluginsData(query: string): VesPluginData[] {
     const searchResult = [];
 
     // TODO: weighted search through all fields, then order by score desc
@@ -136,12 +136,12 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  searchPluginsByTag(tag: string): Array<VesPluginData> {
+  searchPluginsByTag(tag: string): VesPluginData[] {
     const searchResult = [];
 
     for (const pluginData of Object.values(this.pluginsData)) {
       if (pluginData.tags) {
-        if (Object.keys(pluginData.tags).map(tag => tag.toLowerCase()).includes(tag.toLowerCase()) && pluginData.name) {
+        if (Object.values(pluginData.tags).map(tag => tag.toLowerCase()).includes(tag.toLowerCase()) && pluginData.name) {
           searchResult.push(pluginData);
         }
       }
@@ -150,7 +150,7 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  searchPluginsByAuthor(author: string): Array<VesPluginData> {
+  searchPluginsByAuthor(author: string): VesPluginData[] {
     const searchResult = [];
 
     for (const pluginData of Object.values(this.pluginsData)) {

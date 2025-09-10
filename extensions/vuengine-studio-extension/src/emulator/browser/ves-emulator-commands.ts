@@ -324,11 +324,11 @@ export namespace VesEmulatorCommands {
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'emulator.showHelp',
-      label: 'Show Handbook Page',
+      label: 'Show Documentation',
       category: 'Emulator',
       iconClass: 'codicon codicon-book',
     },
-    'vuengine/emulator/showHelp',
+    'vuengine/emulator/showDocumentation',
     'vuengine/emulator/commands/category'
   );
 

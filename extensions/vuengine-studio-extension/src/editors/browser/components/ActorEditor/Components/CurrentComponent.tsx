@@ -1,26 +1,27 @@
 import React, { useContext } from 'react';
-import PositionedActor from '../../Common/PositionedActors/PositionedActor';
 import VContainer from '../../Common/Base/VContainer';
-import Animation from '../Animation/Animation';
-import AnimationsSettings from '../Animation/AnimationsSettings';
-import Behavior from '../Behavior/Behavior';
-import Collider from '../Collider/Collider';
-import CollidersSettings from '../Collider/CollidersSettings';
+import PositionedActor from '../../Common/PositionedActors/PositionedActor';
+import Body from '../Actor/Body';
 import ExtraProperties from '../Actor/ExtraProperties';
-import Physics from '../Actor/Physics';
+import Logic from '../Actor/Logic';
 import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import {
+    ActorEditorContext,
+    ActorEditorContextType,
     AnimationData,
-    BehaviorData,
+    BodyData,
     ColliderData,
     ComponentData,
     ComponentKey,
-    ActorEditorContext,
-    ActorEditorContextType,
+    MutatorData,
     SpriteData,
     WireframeData,
 } from '../ActorEditorTypes';
-import ScriptedActionDetail from '../Scripts/ScriptedActionDetail';
+import Animation from '../Animation/Animation';
+import AnimationsSettings from '../Animation/AnimationsSettings';
+import Collider from '../Collider/Collider';
+import CollidersSettings from '../Collider/CollidersSettings';
+import Mutator from '../Mutator/Mutator';
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
@@ -47,10 +48,15 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         totalFrames={data.animations.totalFrames}
                         isMultiFileAnimation={isMultiFileAnimation}
                     />;
-                case 'behaviors':
-                    return <Behavior
-                        behavior={data.components.behaviors[index]}
-                        updateBehavior={(partialData: Partial<BehaviorData>) => updateComponent('behaviors', index, partialData)}
+                case 'bodies':
+                    return <Body
+                        body={data.components.bodies[index]}
+                        updateBody={(partialData: Partial<BodyData>) => updateComponent('bodies', index, partialData)}
+                    />;
+                case 'mutators':
+                    return <Mutator
+                        mutator={data.components.mutators[index]}
+                        updateMutator={(partialData: Partial<MutatorData>) => updateComponent('mutators', index, partialData)}
                     />;
                 case 'children':
                     return <PositionedActor
@@ -62,8 +68,6 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         collider={data.components.colliders[index]}
                         updateCollider={(partialData: Partial<ColliderData>) => updateComponent('colliders', index, partialData)}
                     />;
-                case 'scripts':
-                    return <ScriptedActionDetail />;
                 case 'sprites':
                     return <Sprite
                         sprite={data.components.sprites[index]}
@@ -80,13 +84,13 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
             switch (type) {
                 case 'extraProperties':
                     return <ExtraProperties />;
-                case 'physics':
-                    return <Physics />;
+                case 'logic':
+                    return <Logic />;
                 /*
                 default:
                     return <div className="lightLabel">
                         {nls.localize(
-                            'vuengine/actorEditor/noComponentSelected',
+                            'vuengine/editors/actor/noComponentSelected',
                             'No component selected. Select any component to edit its properties.',
                         )}
                     </div>;

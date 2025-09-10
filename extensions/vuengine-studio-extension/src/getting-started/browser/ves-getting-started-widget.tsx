@@ -89,12 +89,12 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 </div>
                 <div className='flex-grid'>
                     <div className='col'>
-                        {this.renderLinks()}
+                        {this.renderHelp()}
                     </div>
                 </div>
                 <div className='flex-grid'>
                     <div className='col'>
-                        {this.renderHelp()}
+                        {this.renderLinks()}
                     </div>
                 </div>
             </div>
@@ -165,32 +165,50 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     }
 
     protected renderOpen(): React.ReactNode {
-        const newProject = (
-            <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="codicon codicon-add"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
+        const openWorkspace = (
+            <button
+                className="theia-button large"
+                onClick={this.doOpenWorkspace}
+            >
+                <i className="codicon codicon-folder-library"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
             </button>
         );
 
-        const openWorkspace = <button
-            className="theia-button large"
-            tabIndex={0}
-            onClick={this.doOpenWorkspace}
-            onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="codicon codicon-folder-library"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
-        </button>;
+        const openFolder = (
+            <button
+                className="theia-button large"
+                onClick={this.doOpenFolder}
+            >
+                <i className="codicon codicon-folder"></i> {nls.localize('vuengine/projects/commands/openFolder', 'Open Folder...')}
+            </button>
+        );
 
-        const openFolder = <button
-            className="theia-button large"
-            tabIndex={0}
-            onClick={this.doOpenFolder}
-            onKeyDown={this.doOpenFolderEnter}>
-            <i className="codicon codicon-folder"></i> {nls.localize('vuengine/projects/commands/openFolder', 'Open Folder...')}
-        </button>;
+        const newProject = (
+            <button
+                className="theia-button large"
+                onClick={this.createNewProject}
+            >
+                <i className="codicon codicon-add"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
+            </button>
+        );
+        const documentation = (
+            <button
+                className="theia-button secondary large"
+                onClick={() => this.doOpenExternalLink(VesCoreContribution.DOCUMENTATION_URL)}
+                style={{
+                    minWidth: 'unset',
+                    width: 52,
+                }}
+            >
+                <i className="codicon codicon-book"></i>
+            </button>
+        );
 
         return <div className="gs-section">
             {openWorkspace}
             {openFolder}
             {newProject}
+            {documentation}
             <br />
             <br />
         </div>;
@@ -208,6 +226,15 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 <i className={codicon('question')}></i>
                 {nls.localizeByDefault('Help')}
             </h3>
+            <div className="gs-action-container">
+                <a
+                    role={'button'}
+                    tabIndex={0}
+                    onClick={() => this.doOpenExternalLink(VesCoreContribution.TUTORIAL_URL)}
+                    onKeyDown={(e: React.KeyboardEvent) => this.doOpenExternalLinkEnter(e, VesCoreContribution.TUTORIAL_URL)}>
+                    {nls.localize('vuengine/gettingStarted/tutorial', 'Tutorial')}
+                </a>
+            </div>
             <div className='gs-action-container'>
                 <a
                     role={'button'}
@@ -228,10 +255,14 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             </h3>
             <div className="gs-action-container">
                 {nls.localize(
-                    'vuengine/gettingStarted/showcaseIntroduction',
-                    // eslint-disable-next-line max-len
-                    'New to VUEngine? Create a new project based on VUEngine Showcase and dig into the sources to learn about the engine\'s concepts and capabilities. Various sample states expose you to key aspects of the engine step by step through cleanly written and properly commented code.'
+                    'vuengine/gettingStarted/learnIntroduction',
+                    "New to VUEngine? Check out our step-by-step tutorial (link on the left) that implements a simple game with VUEngine Studio. \
+To dive deeper, check out the documentation's user guide, \
+create a new project based on VUEngine Showcase and dig into the sources to learn about the engine's concepts and capabilities. \
+Various sample states expose you to key aspects of the engine step by step through cleanly written and properly commented code."
                 )}
+            </div>
+            <div className="gs-action-container">
                 <div className="gs-learn-screenshot"></div>
             </div>
         </div>;

@@ -36,7 +36,7 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
     return <HContainer gap={15} wrap='wrap'>
         <VContainer grow={1}>
             <label>
-                {nls.localize('vuengine/compilerConfigEditor/optimization', 'Optimization')}
+                {nls.localize('vuengine/editors/compilerConfig/optimization', 'Optimization')}
             </label>
             <select
                 className='theia-select'
@@ -44,28 +44,28 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
                 value={data.optimization}
             >
                 <option value={CompilerOptimization.O0}>
-                    {CompilerOptimization.O0} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/O0', 'No optimization')})
+                    {CompilerOptimization.O0} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/O0', 'No optimization')})
                 </option>
                 <option value={CompilerOptimization.O1}>
-                    {CompilerOptimization.O1} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/O1', 'Optimize minimally')})
+                    {CompilerOptimization.O1} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/O1', 'Optimize minimally')})
                 </option>
                 <option value={CompilerOptimization.O2}>
-                    {CompilerOptimization.O2} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/O2', 'Optimize more')})
+                    {CompilerOptimization.O2} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/O2', 'Optimize more')})
                 </option>
                 <option value={CompilerOptimization.O3}>
-                    {CompilerOptimization.O3} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/O3', 'Optimize even more')})
+                    {CompilerOptimization.O3} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/O3', 'Optimize even more')})
                 </option>
                 <option value={CompilerOptimization.Ofast}>
-                    {CompilerOptimization.Ofast} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/Ofast', 'Optimize very aggressively')})
+                    {CompilerOptimization.Ofast} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/Ofast', 'Optimize very aggressively')})
                 </option>
                 <option value={CompilerOptimization.Os}>
-                    {CompilerOptimization.Os} ({nls.localize('vuengine/compilerConfigEditor/optimizationOptions/Os', 'Optimize for code size')})
+                    {CompilerOptimization.Os} ({nls.localize('vuengine/editors/compilerConfig/optimizationOptions/Os', 'Optimize for code size')})
                 </option>
             </select>
         </VContainer>
         <VContainer grow={1}>
             <label>
-                {nls.localize('vuengine/compilerConfigEditor/options', 'Options')}
+                {nls.localize('vuengine/editors/compilerConfig/options', 'Options')}
             </label>
             <HContainer gap={15}>
                 <VContainer>
@@ -75,7 +75,7 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
                             checked={data.framePointer}
                             onChange={toggleFramePointer}
                         />
-                        {nls.localize('vuengine/compilerConfigEditor/useFramePointer', 'Use Frame Pointer')}
+                        {nls.localize('vuengine/editors/compilerConfig/useFramePointer', 'Use Frame Pointer')}
                     </label>
                 </VContainer>
                 <VContainer>
@@ -85,7 +85,7 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
                             checked={data.prologFunctions}
                             onChange={togglePrologFunctions}
                         />
-                        {nls.localize('vuengine/compilerConfigEditor/usePrologFunctions', 'Use Prolog Functions')}
+                        {nls.localize('vuengine/editors/compilerConfig/usePrologFunctions', 'Use Prolog Functions')}
                     </label>
                 </VContainer>
             </HContainer>

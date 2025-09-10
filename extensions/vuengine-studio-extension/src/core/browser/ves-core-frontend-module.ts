@@ -26,6 +26,7 @@ import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/fi
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
+import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
@@ -52,6 +53,7 @@ import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-con
 import { VesFilterContribution } from './ves-filter-contribution';
 import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
+import { VesOutlineViewContribution } from './ves-outline-view-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
@@ -81,7 +83,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
 
     // enable main menu
-    bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
+    rebind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
 
@@ -162,6 +164,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // initially hide extensions widget
     rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
+
+    // initially hide outline view
+    rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
 
     // initially open file explorer for workspaces
     rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();

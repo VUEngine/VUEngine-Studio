@@ -72,8 +72,8 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     repository: 'https://github.com/VUEngine/VUEngine-Showcase',
     description: nls.localize(
         'vuengine/projects/templates/showcaseDescription',
-        // eslint-disable-next-line max-len
-        'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities step by step through cleanly written and properly commented code.'
+        'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities step by step \
+through cleanly written and properly commented code.'
     ),
     labels: {
         name: [
@@ -165,7 +165,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             <HContainer gap={10}>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/projects/name', 'Name')}
+                        {nls.localizeByDefault('Name')}
                     </label>
                     <input
                         type="text"
@@ -229,7 +229,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             </HContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/projects/path', 'Path')}
+                    {nls.localizeByDefault('Path')}
                 </label>
                 <HContainer>
                     <input
@@ -303,8 +303,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     <div style={{ fontStyle: 'italic', minHeight: 40 }}>
                         {!this.state.useTagged && nls.localize(
                             'vuengine/projects/useTaggedWarning',
-                            // eslint-disable-next-line max-len
-                            'Warning: unchecking this will download the latest version of the template. Compatibility with your version of VUEngine is not guaranteed.'
+                            'Warning: unchecking this will download the latest version of the template. \
+Compatibility with your version of VUEngine is not guaranteed.'
                         )}
                     </div>
                 </VContainer>

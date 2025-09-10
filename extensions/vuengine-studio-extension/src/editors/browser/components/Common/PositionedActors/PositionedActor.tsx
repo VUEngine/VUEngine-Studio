@@ -2,12 +2,13 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { ActorData, MAX_SCALE, MIN_SCALE, PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
+import { ActorData, INPUT_BLOCKING_COMMANDS, MAX_SCALE, MIN_SCALE, PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
 import HContainer from '../Base/HContainer';
 import Rotation from '../Rotation';
 import { clamp } from '../Utils';
 import VContainer from '../Base/VContainer';
 import { PixelVector } from '../VUEngineTypes';
+import Input from '../Base/Input';
 
 interface PositionedActorProps {
     positionedActor: PositionedActorData
@@ -29,6 +30,17 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
     const setExtraInfo = (extraInfo: string): void => {
         updatePositionedActor({
             extraInfo,
+        });
+    };
+
+    const resetPosition = (): void => {
+        updatePositionedActor({
+            onScreenPosition: {
+                ...positionedActor.onScreenPosition,
+                x: 0,
+                y: 0,
+                z: 0,
+            },
         });
     };
 
@@ -73,48 +85,52 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
         <VContainer gap={15}>
             {actor ? <>
                 <HContainer alignItems='end' grow={1}>
-                    <VContainer grow={1}>
-                        <label>
-                            {nls.localize('vuengine/actorEditor/actor', 'Actor')}
-                        </label>
-                        <input
-                            className='theia-input'
-                            value={actor._fileUri.path.name}
-                            title={actor._contributorUri.parent.path.relative(actor._fileUri.path)?.fsPath()}
-                            disabled
-                        />
-                    </VContainer>
+                    <Input
+                        label={nls.localize('vuengine/editors/actor/actor', 'Actor')}
+                        title={actor._contributorUri.parent.path.relative(actor._fileUri.path)?.fsPath()}
+                        value={actor._fileUri.path.name}
+                        grow={1}
+                        disabled
+                    />
                     <button
                         className='theia-button secondary'
                         onClick={openEditor}
-                        title={nls.localize('vuengine/actorEditor/editActor', 'Edit Actor')}
+                        title={nls.localize('vuengine/editors/actor/editActor', 'Edit Actor')}
                     >
                         <i className='codicon codicon-edit' />
                     </button>
                 </HContainer>
                 <VContainer>
                     <label>Position (x, y, z)</label>
-                    <HContainer>
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                    <HContainer alignItems="center">
+                        <Input
+                            type="number"
                             value={positionedActor.onScreenPosition.x}
-                            onChange={e => setPosition('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                            setValue={v => setPosition('x', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             value={positionedActor.onScreenPosition.y}
-                            onChange={e => setPosition('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                            setValue={v => setPosition('y', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
+                        <Input
+                            type="number"
                             value={positionedActor.onScreenPosition.z}
-                            onChange={e => setPosition('z', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                            setValue={v => setPosition('z', v as number)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={64}
+                        />
+                        <i
+                            className='codicon codicon-issues'
+                            title={nls.localize('vuengine/editors/actor/center', 'Center')}
+                            onClick={resetPosition}
+                            style={{
+                                cursor: 'pointer'
+                            }}
                         />
                     </HContainer>
                 </VContainer>
@@ -124,80 +140,70 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                 />
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/scale', 'Scale (x, y, z)')}
+                        {nls.localize('vuengine/editors/actor/scale', 'Scale (x, y, z)')}
                     </label>
                     <HContainer>
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SCALE}
                             max={MAX_SCALE}
                             step={0.5}
                             value={positionedActor.onScreenScale?.x ?? 0}
-                            onChange={e => setScale('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                            setValue={v => setScale('x', v as number)}
+                            width={64}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SCALE}
                             max={MAX_SCALE}
                             step={0.5}
                             value={positionedActor.onScreenScale?.y ?? 0}
-                            onChange={e => setScale('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                            setValue={v => setScale('y', v as number)}
+                            width={64}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
+                        <Input
+                            type="number"
                             min={MIN_SCALE}
                             max={MAX_SCALE}
                             step={0.1}
                             value={positionedActor.onScreenScale?.z ?? 0}
-                            onChange={e => setScale('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                            setValue={v => setScale('z', v as number)}
+                            width={64}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
-
-                <HContainer gap={15} wrap='wrap'>
-                    <VContainer>
-                        <label>Name</label>
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                value={positionedActor.name}
-                                onChange={e => setName(e.target.value)}
-                            />
-                        </HContainer>
-                    </VContainer>
-                    <VContainer>
-                        <label>Extra Info</label>
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                value={positionedActor.extraInfo}
-                                onChange={e => setExtraInfo(e.target.value)}
-                            />
-                        </HContainer>
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/loadRegardlessOfPosition', 'Always load')}
-                        </label>
-                        <input
-                            type="checkbox"
-                            checked={positionedActor.loadRegardlessOfPosition}
-                            onChange={toggleLoadRegardlessOfPosition}
-                        />
-                    </VContainer>
-                </HContainer>
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    value={positionedActor.name}
+                    setValue={setName}
+                    width={202}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <Input
+                    label={nls.localize('vuengine/editors/general/extraInfo', 'Extra Info')}
+                    value={positionedActor.extraInfo}
+                    setValue={setExtraInfo}
+                    width={202}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={positionedActor.loadRegardlessOfPosition}
+                        onChange={toggleLoadRegardlessOfPosition}
+                    />
+                </VContainer>
             </>
                 : <VContainer className='error'>
-                    {nls.localize('vuengine/editors/actorNotFound', 'Actor could not be found')}
-                </VContainer>}
-        </VContainer>
+                    {nls.localize('vuengine/editors/general/actorNotFound', 'Actor could not be found')}
+                </VContainer>
+            }
+        </VContainer >
     );
 }

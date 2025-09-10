@@ -1,0 +1,9 @@
+#shell-tab-vesProjectDashboardWidget .lm-TabBar-tabIcon {
+    font-size: 160%;
+    margin-top: 3px;
+    padding-right: 5px;
+}
+
+#shell-tab-vesProjectDashboardWidget .lm-TabBar-tabLabel {
+    display: none;
+}

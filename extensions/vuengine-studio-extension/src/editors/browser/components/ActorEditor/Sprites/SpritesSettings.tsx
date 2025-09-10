@@ -5,7 +5,7 @@ import HContainer from '../../Common/Base/HContainer';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { SpriteType } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
 export default function SpritesSettings(): React.JSX.Element {
@@ -32,13 +32,13 @@ export default function SpritesSettings(): React.JSX.Element {
 
     return <VContainer gap={10}>
         <label>
-            {nls.localize('vuengine/actorEditor/generalSpritesSettings', 'General Sprites Settings')}
+            {nls.localize('vuengine/editors/actor/generalSpritesSettings', 'General Sprites Settings')}
         </label>
         <HContainer gap={15} wrap='wrap'>
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/actorEditor/spriteType', 'Type')}
+                        {nls.localizeByDefault('Type')}
                     </label>
                     <RadioSelect
                         options={[{
@@ -55,17 +55,15 @@ export default function SpritesSettings(): React.JSX.Element {
             </HContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/projection', 'Projection')}
+                    {nls.localize('vuengine/editors/actor/projection', 'Projection')}
                 </label>
                 <label>
                     <input
                         type="checkbox"
                         checked={data.sprites.useZDisplacementInProjection}
                         onChange={toggleUseZDisplacementInProjection}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
-                    {nls.localize('vuengine/actorEditor/useZDisplacement', 'Use Z Displacement')}
+                    {nls.localize('vuengine/editors/actor/useZDisplacement', 'Use Z Displacement')}
                 </label>
             </VContainer>
         </HContainer>

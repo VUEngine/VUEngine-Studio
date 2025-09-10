@@ -56,11 +56,11 @@ export default abstract class AbstractVesPluginComponent extends React.Component
         const { installed } = plugin;
         if (installed) {
             return <button className="theia-button action" onClick={this.uninstall}>
-                {nls.localize('vuengine/plugins/remove', 'Remove')}
+                {nls.localizeByDefault('Remove')}
             </button>;
         }
         return <button className="theia-button prominent action" onClick={this.install}>
-            {nls.localize('vuengine/plugins/add', 'Add')}
+            {nls.localizeByDefault('Add')}
         </button>;
     }
 

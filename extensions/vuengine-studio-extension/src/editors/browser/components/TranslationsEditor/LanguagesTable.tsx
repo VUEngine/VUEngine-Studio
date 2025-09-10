@@ -98,7 +98,7 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
                                 value={code}
                                 disabled={existingLanguageCodes.includes(code) && lang.code !== code}
                             >
-                                {nls.localize(`vuengine/general/languages/${code}`, LANGUAGES[code])}
+                                {LANGUAGES[code]}
                             </option>
                         )}
                     </select>
@@ -127,14 +127,14 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
                 <div className='languageActions'>
                     <button
                         className='theia-button secondary'
-                        title={nls.localize('vuengine/translationsEditor/reorderLanguage', 'Drag to reorder')}
+                        title={nls.localize('vuengine/editors/translations/reorderLanguage', 'Drag to reorder')}
                     >
                         <i className='codicon codicon-grabber' />
                     </button>
                     <button
                         className='theia-button secondary'
                         onClick={e => removeLanguage(lang.code)}
-                        title={nls.localize('vuengine/translationsEditor/deleteLanguage', 'Delete Language')}
+                        title={nls.localize('vuengine/editors/translations/deleteLanguage', 'Delete Language')}
                     >
                         <i className='codicon codicon-x' />
                     </button>

@@ -1,18 +1,19 @@
-import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
+import EmptyContainer from '../../Common/EmptyContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import { ActorEditorCommands } from '../ActorEditorCommands';
+import ActorEditorStatus from '../ActorEditorStatus';
 import {
+  ActorEditorContext,
+  ActorEditorContextType,
   AnimationData,
   ComponentData,
   ComponentKey,
-  ActorEditorContext,
-  ActorEditorContextType,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
   WHEEL_SENSITIVITY
@@ -20,7 +21,6 @@ import {
 import BallCollider from './Colliders/BallCollider';
 import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
-import PreviewOptions from './PreviewOptions';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
 
@@ -36,6 +36,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     currentComponent, setCurrentComponent,
     currentAnimationStep, setCurrentAnimationStep,
     previewBackgroundColor,
+    previewScreenFrame,
     previewPalettes,
     previewProjectionDepth,
     previewShowColliders,
@@ -92,7 +93,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   };
 
   const onWheel = (e: React.WheelEvent): void => {
-    if (e.ctrlKey) {
+    if (e.ctrlKey || e.metaKey) {
       let zoom = Math.round((previewZoom - e.deltaY / WHEEL_SENSITIVITY) * 100) / 100;
 
       if (zoom > MAX_PREVIEW_SPRITE_ZOOM) {
@@ -151,26 +152,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       onMouseMove={onMouseMove}
       onWheel={onWheel}
     >
-      <PreviewOptions
-        enableBackground={true}
-        zoom={previewZoom}
-        setZoom={setPreviewZoom}
-        minZoom={MIN_PREVIEW_SPRITE_ZOOM}
-        maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
-        zoomStep={0.51}
-        roundZoomSteps
-        center={center}
-      />
-      {animate &&
-        <div className='current-frame'>
-          <div>
-            {nls.localize('vuengine/actorEditor/step', 'Step')} {currentAnimationStep + 1}
-          </div>
-          <div>
-            {nls.localize('vuengine/actorEditor/frame', 'Frame')} {actualCurrentFrame + 1}
-          </div>
-        </div>
-      }
       <div
         className={`preview-container-world background-color-${previewBackgroundColor}`}
         style={{
@@ -181,14 +162,19 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       >
         <div className="preview-container-world-center-vertical"></div>
         <div className="preview-container-world-center-horizontal"></div>
+        {previewScreenFrame &&
+          <div className="preview-container-screen-frame">
+            <div></div><div></div><div></div><div></div>
+          </div>
+        }
         {previewShowSprites && data.components?.sprites?.map((sprite, i) =>
           <SpritePreview
             key={i}
             index={i}
             sprite={sprite}
-            animate={animate}
+            animate={animate && sprite.isAnimated}
             dragging={isDragging}
-            frames={data.animations?.totalFrames || 1}
+            frames={sprite.isAnimated ? data.animations?.totalFrames || 1 : 1}
             currentAnimationFrame={actualCurrentFrame}
             highlighted={currentComponent === `sprites-${i}`}
             palette={previewPalettes[sprite.texture.palette]}
@@ -229,60 +215,36 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
         )}
       </div>
+      <ActorEditorStatus
+        center={center}
+      />
     </div>
     : <div className='preview-container'>
       <VContainer alignItems='center' style={{ color: 'var(--theia-dropdown-border)' }}>
         {!hasAnyComponent
-          ? <>
-            <PuzzlePiece size={32} />
-            <div
-              style={{
-                fontSize: '160%'
-              }}
-            >
-              {
-                nls.localize(
-                  'vuengine/actorEditor/actorIsEmpty',
-                  'This Actor is empty',
-                )
-              }
-            </div>
-            <div>
-              {nls.localize(
-                'vuengine/actorEditor/clickBelowToAddFirstComponent',
-                'Click below to add the first component',
-              )}
-            </div>
-            <button
-              className='theia-button secondary large'
-              onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
-              style={{
-                marginTop: 20
-              }}
-            >
-              <i className='codicon codicon-add' /> {nls.localize('vuengine/editors/addComponent', 'Add Component')}
-            </button>
-          </>
-          : <>
-            <PuzzlePiece size={32} />
-            <div
-              style={{
-                fontSize: '160%'
-              }}
-            >
-              {nls.localize(
-                'vuengine/actorEditor/noPreviewableComponents',
-                'This actor does not yet have any previewable components',
-              )}
-            </div>
-            <div>
-              {nls.localize(
-                'vuengine/actorEditor/previewableComponentsList',
-                'Add either a child, collider, sprite or wireframe',
-              )}
-            </div>
-          </>
+          ? <EmptyContainer
+            title={nls.localize(
+              'vuengine/editors/actor/actorIsEmpty',
+              'This Actor is empty',
+            )}
+            description={nls.localize(
+              'vuengine/editors/actor/clickBelowToAddFirstComponent',
+              'Click below to add the first component',
+            )}
+            onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
+          />
+          : <EmptyContainer
+            title={nls.localize(
+              'vuengine/editors/actor/noPreviewableComponents',
+              'This actor does not yet have any previewable components',
+            )}
+            description={nls.localize(
+              'vuengine/editors/actor/previewableComponentsList',
+              'Add either a child, collider, sprite or wireframe',
+            )}
+            onClick={() => services.commandService.executeCommand(ActorEditorCommands.ADD_COMPONENT.id)}
+          />
         }
       </VContainer>
-    </div >;
+    </div>;
 }

@@ -1,10 +1,11 @@
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
-import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
+import { CommandService, Emitter, Event, MessageService, nls, QuickPickService, Reference, UNTITLED_SCHEME, URI } from '@theia/core';
 import {
     CommonCommands,
     ExtractableWidget,
+    FrontendApplication,
     HoverService,
     LabelProvider,
     LocalStorageService,
@@ -13,12 +14,15 @@ import {
     OpenerService,
     PreferenceService,
     Saveable,
-    SaveableSource
+    SaveableSource,
+    StatusBar,
+    StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
-import { Message } from '@theia/core/shared/@phosphor/messaging';
+import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
@@ -28,11 +32,17 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
+import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
 
@@ -58,6 +68,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly fileDialogService: FileDialogService;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(FrontendApplication)
+    protected readonly app: FrontendApplication;
     @inject(HoverService)
     protected readonly hoverService: HoverService;
     @inject(LabelProvider)
@@ -74,14 +86,28 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly quickPickService: QuickPickService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(StatusBar)
+    protected readonly statusBar: StatusBar;
+    @inject(ThemeService)
+    protected readonly themeService: ThemeService;
     @inject(UndoRedoService)
     protected readonly undoRedoService: UndoRedoService;
+    @inject(VesBuildService)
+    protected readonly vesBuildService: VesBuildService;
+    @inject(VesBuildPathsService)
+    protected readonly vesBuildPathsService: VesBuildPathsService;
+    @inject(VesCodeGenService)
+    protected readonly vesCodeGenService: VesCodeGenService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesImagesService)
     protected readonly vesImagesService: VesImagesService;
+    @inject(VesProcessService)
+    protected readonly vesProcessService: VesProcessService;
+    @inject(VesProcessWatcher)
+    protected readonly vesProcessWatcher: VesProcessWatcher;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -103,6 +129,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected data: ItemData | undefined;
 
+    protected saveCallback: () => void | undefined;
+
     private onEditorContentHasChanged: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
 
     protected readonly onContentChangedEmitter = new Emitter<void>();
@@ -116,6 +144,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected isLoading: boolean;
     protected isGenerating: boolean;
     protected generatingProgress: number;
+
+    protected statusBarItems: { [id: string]: StatusBarEntry } = {};
 
     isExtractable: boolean = true;
     secondaryWindow: Window | undefined;
@@ -143,7 +173,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.initMembers();
 
         const path = (this.uri.scheme === UNTITLED_SCHEME)
-            ? `untitled-${this.options.typeId}-${this.vesCommonService.nanoid()}`
+            ? `untitled-${this.options.typeId}-${nanoid()}`
             : this.uri.path;
         this.id = `vesEditorsWidget:${path}`;
 
@@ -160,15 +190,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.uri = new URI(this.options.uri);
         this.typeId = this.options.typeId;
 
-        if (this.uri.scheme !== UNTITLED_SCHEME) {
-            const fileStats = await this.fileService.resolve(this.uri);
-            this.isReadOnly = fileStats.isReadonly;
-            if (this.isReadOnly) {
-                lock(this.title);
-            }
-        }
-
-        await this.vesProjectService.projectItemsReady;
+        await this.vesProjectService.projectDataReady;
 
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
         if (!type) {
@@ -190,6 +212,21 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.title.iconClass = type.icon;
         }
 
+        if (this.uri.scheme !== UNTITLED_SCHEME) {
+            if (await this.fileService.exists(this.uri)) {
+                const fileStats = await this.fileService.resolve(this.uri);
+                this.isReadOnly = fileStats.isReadonly;
+                if (this.isReadOnly) {
+                    lock(this.title);
+                }
+            } else {
+                console.error('File does not exists', this.uri.path.fsPath());
+                this.isLoading = false;
+                this.update();
+                return;
+            }
+        }
+
         await this.loadData(type);
 
         this.update();
@@ -204,15 +241,30 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.generatingProgress = -1;
     }
 
+    protected setSaveCallback(callback: () => void): void {
+        this.saveCallback = callback;
+    }
+
     protected setTitle(): void {
-        const name = this.labelProvider.getLongName(this.uri);
+        // const name = this.labelProvider.getLongName(this.uri);
+        const name = this.uri.path.name;
         this.title.label = name;
-        this.title.caption = name;
+        this.title.caption = this.uri.path.fsPath();
     }
 
     protected onActivateRequest(msg: Message): void {
         this.node.tabIndex = 0;
         this.node.focus();
+    }
+
+    protected setStatusBarItem(id: string, entry: StatusBarEntry): void {
+        this.statusBarItems[id] = entry;
+        this.statusBar.setElement(id, entry);
+    }
+
+    protected removeStatusBarItem(id: string): void {
+        delete (this.statusBarItems[id]);
+        this.statusBar.removeElement(id);
     }
 
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
@@ -263,6 +315,32 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }, 50);
         super.update();
     };
+
+    protected onAfterAttach(msg: Message): void {
+        this.setStatusBar();
+    }
+
+    protected onAfterDetach(msg: Message): void {
+        this.resetStatusBar();
+    }
+
+    protected onAfterShow(msg: Message): void {
+        this.setStatusBar();
+    }
+
+    protected onAfterHide(msg: Message): void {
+        this.resetStatusBar();
+    }
+
+    protected setStatusBar(): void {
+        this.app.shell.addClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.setElement(id, this.statusBarItems[id]));
+    }
+
+    protected resetStatusBar(): void {
+        this.app.shell.removeClass('hide-text-editor-status-bar-items');
+        Object.keys(this.statusBarItems).forEach(id => this.statusBar.removeElement(id));
+    }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
         let json = {};
@@ -322,6 +400,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                 console.error('Could not save');
             }
         }
+
+        if (this.saveCallback) {
+            this.saveCallback();
+        }
     }
 
     protected async load(): Promise<void> {
@@ -372,7 +454,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected updateModel(): void {
         this.justUpdatedModel = true;
         this.reference?.object.textEditorModel.pushStackElement();
-        this.reference?.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
+        this.reference?.object.textEditorModel.setValue(stringify(this.data));
     }
 
     protected enableCommands(commandIds: string[]): void {
@@ -397,10 +479,13 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         fileUri: this.uri,
                         isGenerating: this.isGenerating,
                         isReadonly: this.isReadOnly,
+                        setSaveCallback: this.setSaveCallback.bind(this),
                         setIsGenerating: this.setIsGenerating.bind(this),
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
+                        setStatusBarItem: this.setStatusBarItem.bind(this),
+                        removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
@@ -412,8 +497,14 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             openerService: this.openerService,
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,
+                            themeService: this.themeService,
+                            vesBuildPathsService: this.vesBuildPathsService,
+                            vesBuildService: this.vesBuildService,
+                            vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
+                            vesProcessService: this.vesProcessService,
+                            vesProcessWatcher: this.vesProcessWatcher,
                             vesProjectService: this.vesProjectService,
                             vesRumblePackService: this.vesRumblePackService,
                             windowService: this.windowService,
@@ -445,7 +536,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             }
             {!this.isLoading && !this.data &&
                 <div className='error'>
-                    {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
+                    {nls.localize('vuengine/editors/general/errorCouldNotLoadItem', 'Error: could not load item.')}
                 </div>
             }
         </div>;

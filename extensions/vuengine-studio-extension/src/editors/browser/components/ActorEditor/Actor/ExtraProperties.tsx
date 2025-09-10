@@ -1,25 +1,14 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
-import { clamp } from '../../Common/Utils';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import InfoLabel from '../../Common/InfoLabel';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType, MAX_ACTOR_PIXEL_SIZE, MIN_ACTOR_PIXEL_SIZE } from '../ActorEditorTypes';
 
 export default function ExtraProperties(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
-
-    const setAllocator = (customAllocator: string): void => {
-        setData({
-            extraProperties: {
-                ...data.extraProperties,
-                customAllocator,
-            }
-        });
-    };
 
     const setExtraInfo = (extraInfo: string): void => {
         setData({
@@ -36,7 +25,7 @@ export default function ExtraProperties(): React.JSX.Element {
                 ...data.extraProperties,
                 pixelSize: {
                     ...data.extraProperties.pixelSize,
-                    [a]: clamp(value, MIN_ACTOR_PIXEL_SIZE, MAX_ACTOR_PIXEL_SIZE),
+                    [a]: value,
                 },
             },
         });
@@ -44,71 +33,48 @@ export default function ExtraProperties(): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <VContainer grow={1}>
-                <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/customAllocator', 'Custom Allocator')}
-                    tooltip={nls.localize(
-                        'vuengine/actorEditor/customAllocatorDescription',
-                        'Define which class to use to attach custom logic to this actor. ' +
-                        'If left blank, it will be Actor.',
-                    )}
-                />
-                <input
-                    className='theia-input'
-                    value={data.extraProperties.customAllocator}
-                    onChange={e => setAllocator(e.target.value)}
-                />
-            </VContainer>
-            <VContainer grow={1}>
-                <label>
-                    {nls.localize('vuengine/actorEditor/extraInfo', 'Extra Info')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={data.extraProperties.extraInfo}
-                    onChange={e => setExtraInfo(e.target.value)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/actor/extraInfo', 'Extra Info')}
+                value={data.extraProperties.extraInfo}
+                setValue={setExtraInfo}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/actorSize', 'Size (x, y, z)')}
-                    tooltip={
-                        nls.localize(
-                            'vuengine/actorEditor/actorSizeDescription',
-                            'Size of the actor in pixels. Used by streaming to test if out of screen bounds. ' +
-                            'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
-                        )}
+                    label={nls.localize('vuengine/editors/actor/actorSize', 'Size (x, y, z)')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/actorSizeDescription',
+                        "Size of the actor in pixels. Used by streaming to test if out of screen bounds. \
+If 0, width and height will be inferred from the first sprite's texture size."
+                    )}
                 />
                 <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
-                        type='number'
+                    <Input
                         value={data.extraProperties.pixelSize.x}
-                        min={0}
-                        onChange={e => setPixelSize('x', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
+                        setValue={v => setPixelSize('x', v as number)}
                         type='number'
+                        min={MIN_ACTOR_PIXEL_SIZE}
+                        max={MAX_ACTOR_PIXEL_SIZE}
+                        width={64}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                    <Input
                         value={data.extraProperties.pixelSize.y}
-                        min={0}
-                        onChange={e => setPixelSize('y', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
+                        setValue={v => setPixelSize('y', v as number)}
                         type='number'
+                        min={MIN_ACTOR_PIXEL_SIZE}
+                        max={MAX_ACTOR_PIXEL_SIZE}
+                        width={64}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                    <Input
                         value={data.extraProperties.pixelSize.z}
-                        min={0}
-                        onChange={e => setPixelSize('z', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        setValue={v => setPixelSize('z', v as number)}
+                        type='number'
+                        min={MIN_ACTOR_PIXEL_SIZE}
+                        max={MAX_ACTOR_PIXEL_SIZE}
+                        width={64}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>
             </VContainer>

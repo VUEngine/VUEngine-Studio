@@ -1,5 +1,5 @@
 import React from 'react';
-import { clamp } from '../Common/Utils';
+import Input from '../Common/Base/Input';
 import { ColumnTableEntry } from './ColumnTableTypes';
 
 interface EditorColumnProps {
@@ -20,31 +20,29 @@ export default function EditorColumn(props: EditorColumnProps): React.JSX.Elemen
         <div className='index'>
             {index + 1}
         </div>
-        <input
-            className="theia-input"
+        <Input
             type="number"
-            step="1"
-            min="1"
-            max="16"
+            min={1}
+            max={16}
+            defaultValue={16}
             value={value.repeat ?? 16}
-            onClick={selectInput}
-            onChange={e => setValue(index, {
+            setValue={v => setValue(index, {
                 ...value,
-                repeat: clamp(parseInt(e.target.value === '' ? '16' : e.target.value), 1, 16),
+                repeat: v as number,
             })}
+            onClick={selectInput}
         />
-        <input
-            className="theia-input"
+        <Input
             type="number"
-            step="1"
-            min="1"
-            max="16"
+            min={1}
+            max={16}
+            defaultValue={16}
             value={value.time ?? 16}
-            onClick={selectInput}
-            onChange={e => setValue(index, {
+            setValue={v => setValue(index, {
                 ...value,
-                time: clamp(parseInt(e.target.value === '' ? '16' : e.target.value), 1, 16),
+                time: v as number,
             })}
+            onClick={selectInput}
         />
     </div>;
 }

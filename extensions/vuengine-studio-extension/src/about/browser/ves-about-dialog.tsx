@@ -74,7 +74,7 @@ export class VesAboutDialog extends AboutDialog {
             <div className="ves-about-paragraph">
                 © 2022-2025 <a href={'mailto:c.radke@posteo.de'}>
                     Christian Radke
-                </a> {nls.localize('vuengine/about/and', 'and')} <a href={'mailto:jorgech3@gmail.com'}>
+                </a> & <a href={'mailto:jorgech3@gmail.com'}>
                     Jorge Andres Eremiev
                 </a>
             </div>
@@ -85,8 +85,8 @@ export class VesAboutDialog extends AboutDialog {
                     </a>
                 </div>
                 <div>
-                    <i className="fa fa-github" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine/VUEngine-Studio')}>
-                        {'https://github.com/VUEngine/VUEngine-Studio'}
+                    <i className="fa fa-github" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine')}>
+                        {'https://github.com/VUEngine'}
                     </a>
                 </div>
             </div>
@@ -112,37 +112,36 @@ export class VesAboutDialog extends AboutDialog {
     protected renderPatrons(): React.ReactNode {
         return <div className="ves-about-paragraph">
             {/* 30 patrons with highest lifetime support */}
-            Adam Wannamaker,
-            Alec Kafka,
-            Benjamin Stevens,
-            Bnjmn Mrph,
-            Cameron Hollaway,
-            chairodactyl,
-            Christopher Garland,
-            David Baisley,
-            Domenic Umberto Raso,
-            Eric Freeman,
-            Gregory VanNostrand,
-            IanelGreenleaf,
-            Jose Zagal,
-            Luke Gerhardt,
-            Marten Reiß,
-            Michael Ortega,
-            NeGiZON,
-            norty,
-            Patrick Fenton,
-            Patrick-VB,
-            Randy Jeffery,
             RetroOnyx,
-            Richard Corlett,
+            Patrick Fenton,
+            Randy Jeffery,
+            Alec Kafka,
+            David Baisley,
+            Christopher Garland,
+            NeGiZON,
             Sean Machan,
+            Patrick-VB,
+            Eric Freeman,
+            Cameron Hollaway,
+            Adam Wannamaker,
+            Benjamin Stevens,
+            Gregory VanNostrand,
             Simon Gellis,
-            Steven Hagelgans,
+            Jose Zagal,
+            Michael Ortega,
+            tydyedsyko,
+            Richard Corlett,
+            Bnjmn Mrph,
             Studio Kerga,
+            chairodactyl,
+            Luke Gerhardt,
+            norty,
+            IanelGreenleaf,
+            Steven Hagelgans,
+            Jonathan Kade,
             Tony,
-            Troy Bonneau,
-            tydyedsyko
-
+            Tomaydo,
+            Griffin Robinson
             et al.
         </div>;
     }

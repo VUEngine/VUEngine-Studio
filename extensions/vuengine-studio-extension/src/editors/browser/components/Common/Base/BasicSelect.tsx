@@ -3,6 +3,7 @@ import React, { ChangeEventHandler, FocusEventHandler } from 'react';
 export interface BasicSelectOption {
     value: string | number | readonly string[] | undefined
     label?: string
+    disabled?: boolean
 }
 
 interface BasicSelectProps {
@@ -28,7 +29,7 @@ export default function BasicSelect(props: BasicSelectProps): React.JSX.Element 
         disabled={disabled}
     >
         {options.map((option, i) =>
-            <option value={option.value} key={i}>
+            <option value={option.value} key={i} disabled={option.disabled === true}>
                 {option.label ?? option.value}
             </option>
         )}

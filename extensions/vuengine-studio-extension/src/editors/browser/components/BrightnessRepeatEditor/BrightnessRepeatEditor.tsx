@@ -55,7 +55,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                 <VContainer grow={1} gap={15} style={{ maxWidth: 500 }}>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/brightnessRepeatEditor/description', 'Description')}
+                            {nls.localizeByDefault('Description')}
                         </label>
                         <ReactTextareaAutosize
                             className="theia-input"
@@ -72,7 +72,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                             checked={data.mirror}
                             onChange={this.onChangeMirror.bind(this)}
                         />
-                        {nls.localize('vuengine/brightnessRepeatEditor/mirror', 'Mirror')}
+                        {nls.localize('vuengine/editors/brightnessRepeat/mirror', 'Mirror')}
                     </label>
                 </VContainer>
                 <VContainer>

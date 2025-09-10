@@ -21,7 +21,7 @@ export class VesProjectContribution implements CommandContribution {
         });
         commandRegistry.registerCommand(VesProjectCommands.UPDATE_FILES, {
             isVisible: () => this.workspaceService.opened,
-            execute: () => this.vesProjectService.updateFiles(),
+            execute: () => this.vesProjectService.showUpdateModeSelection(),
         });
 
         /*

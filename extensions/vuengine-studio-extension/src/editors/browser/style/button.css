@@ -12,7 +12,7 @@
 .jsonforms-container .add-button:focus,
 .jsonforms-container .add-button:hover {
   background-color: var(--theia-button-hoverBackground);
-  color: var(--theia-button-foreground);
+  color: #fff;
   border-color: var(--theia-button-hoverBackground);
 }
 .jsonforms-container .add-button.large {

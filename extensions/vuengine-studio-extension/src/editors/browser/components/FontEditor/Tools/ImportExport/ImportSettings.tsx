@@ -11,12 +11,12 @@ import {
 } from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
+import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { clamp, roundToNextMultipleOf8 } from '../../../Common/Utils';
+import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
-import { INPUT_BLOCKING_COMMANDS } from '../../FontEditor';
-import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
 interface ImportSettingsProps {
@@ -50,7 +50,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         setImportOffset,
         setImportCharacterCount,
     } = props;
-    const { disableCommands, enableCommands, fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const [sourceImagePath, setSourceImagePath] = useState<string>();
     const [sourceImageHeight, setSourceImageHeight] = useState<number>(0);
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
@@ -132,7 +132,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
 
     const selectImageFileToImport = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/fontEditor/selectImageToImport', 'Select image file to import'),
+            title: nls.localize('vuengine/editors/font/selectImageToImport', 'Select image file to import'),
             canSelectFolders: false,
             canSelectFiles: true,
             filters: { 'PNG': ['png'] }
@@ -169,7 +169,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             setImportedCharacters(imageDataToCharacters(imgData));
         } else {
             services.messageService.error(
-                nls.localize('vuengine/fontEditor/errorImporting', 'There was an error importing the PNG file.')
+                nls.localize('vuengine/editors/font/errorImporting', 'There was an error importing the PNG file.')
             );
         }
     };
@@ -199,7 +199,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <HContainer justifyContent='space-between'>
                             <label>
-                                {nls.localize('vuengine/editors/source', 'Source')}
+                                {nls.localize('vuengine/editors/general/source', 'Source')}
                             </label>
                             <VContainer style={{ opacity: .6 }}>
                                 {sourceImageHeight
@@ -224,7 +224,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         <label style={{ width: 34 }}>&nbsp;</label>
                         <ReconvertButton
                             className="theia-button"
-                            title={nls.localize('vuengine/editors/reconvertImage', 'Reconvert Image')}
+                            title={nls.localize('vuengine/editors/general/reconvertImage', 'Reconvert Image')}
                             onClick={sourceImageToCharacters}
                         >
                             <i className="codicon codicon-arrow-right"></i>
@@ -232,7 +232,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     </VContainer>
                     <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/editors/result', 'Result')}
+                            {nls.localize('vuengine/editors/general/result', 'Result')}
                         </label>
                         <VContainer
                             alignItems='center'
@@ -268,72 +268,50 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             <HContainer gap={20}>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                        {nls.localize('vuengine/editors/font/characterSize', 'Character Size')}
                     </label>
                     <HContainer alignItems='center'>
-                        <input
+                        <Input
                             type="number"
-                            className="theia-input"
-                            style={{ width: 48 }}
+                            value={importedCharWidth}
+                            setValue={v => setImportedCharWidth(roundToNextMultipleOf8(v as number))}
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            value={importedCharWidth}
-                            onChange={e => setImportedCharWidth(clamp(
-                                roundToNextMultipleOf8(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : CHAR_PIXEL_SIZE),
-                                MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
-                                MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
-                            ))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={48}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
-                        <input
+                        <Input
                             type="number"
-                            className="theia-input"
-                            style={{ width: 48 }}
+                            value={importedCharHeight}
+                            setValue={v => setImportedCharHeight(roundToNextMultipleOf8(v as number))}
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            value={importedCharHeight}
-                            onChange={e => setImportedCharHeight(clamp(
-                                roundToNextMultipleOf8(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : CHAR_PIXEL_SIZE),
-                                MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
-                                MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
-                            ))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                            width={48}
                         />
                     </HContainer>
                 </VContainer>
+                <Input
+                    label={nls.localize('vuengine/editors/font/offset', 'Offset')}
+                    type="number"
+                    value={importOffset}
+                    setValue={v => setImportOffset(v as number)}
+                    min={MIN_OFFSET}
+                    max={MAX_OFFSET}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    width={48}
+                />
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/fontEditor/offset', 'Offset')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        style={{ width: 48 }}
-                        min={MIN_OFFSET}
-                        max={MAX_OFFSET}
-                        value={importOffset}
-                        onChange={e => setImportOffset(
-                            clamp(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0, MIN_OFFSET, MAX_OFFSET)
-                        )}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                </VContainer>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/fontEditor/invertColors', 'Invert Colors')}
+                        {nls.localize('vuengine/editors/font/invertColors', 'Invert Colors')}
                     </label>
                     <input
                         type="checkbox"
                         checked={invert}
                         onChange={() => setInvert(!invert)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>

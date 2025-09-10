@@ -6,6 +6,7 @@ import { OutputChannelManager } from '@theia/output/lib/browser/output-channel';
 import { OutputContribution } from '@theia/output/lib/browser/output-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { nanoid } from '../../editors/browser/components/Common/Utils';
 import { VesMigrateFromPreviewTo100 } from './migrations/ves-migrate-preview-to-1-0-0';
 import { MigrationRegistry } from './ves-migrate-types';
 
@@ -46,7 +47,7 @@ export class VesMigrateService {
     const channel = this.outputChannelManager.getChannel(channelName);
 
     migrations.map(migration => {
-      const id = this.vesCommonService.nanoid();
+      const id = nanoid();
       this._migrations[id] = new migration(
         this.fileService,
         this.messageService,
@@ -68,8 +69,10 @@ export class VesMigrateService {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: nls.localize('vuengine/migrate/migrateProjectMigration', 'Migrate Project: Migration'),
       placeholder: nls.localize('vuengine/migrate/chooseMigration', 'Choose migration to apply'),
-      // eslint-disable-next-line max-len
-      description: nls.localize('vuengine/migrate/chooseMigrationWarning', 'Warning! Migrations will modify project files. It is strongly recommended to utilize source control to be able to roll back should something fail.'),
+      description: nls.localize(
+        'vuengine/migrate/chooseMigrationWarning',
+        'Warning! Migrations will modify project files. It is strongly recommended to utilize source control to be able to roll back should something fail.'
+      ),
       step: 3,
       totalSteps: 3,
     };

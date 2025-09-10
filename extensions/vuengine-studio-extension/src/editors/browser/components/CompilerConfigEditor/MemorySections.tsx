@@ -4,6 +4,7 @@ import HContainer from '../Common/Base/HContainer';
 import { CompilerConfigData, MemorySectionsDataKeys } from './CompilerConfigEditorTypes';
 import VContainer from '../Common/Base/VContainer';
 import InfoLabel from '../Common/InfoLabel';
+import Input from '../Common/Base/Input';
 
 interface MemorySectionsProps {
     data: CompilerConfigData
@@ -44,49 +45,47 @@ export default function MemorySections(props: MemorySectionsProps): React.JSX.El
             <tr>
                 <td style={{ width: 200 }}>
                     <InfoLabel
-                        label={nls.localize('vuengine/compilerConfigEditor/memorySection', 'Memory Section')}
+                        label={nls.localize('vuengine/editors/compilerConfig/memorySection', 'Memory Section')}
                         tooltip={nls.localize(
-                            'vuengine/compilerConfigEditor/memorySectionDramDescription',
-                            'At almost double the size of WRAM, there is a comparatively large amount of BGMAP memory available on the Virtual Boy, ' +
-                            'which is also almost as fast to access as WRAM. ' +
-                            'Therefore, you can reserve some memory at the end of it to use as additional working RAM. ' +
-                            'The engine will place everything assigned to .dram_data and .dram_bss here. ' +
-                            'The reserved space will be unavailable for BGMAP data.'
+                            'vuengine/editors/compilerConfig/memorySectionDramDescription',
+                            'At almost double the size of WRAM, there is a comparatively large amount of BGMAP memory available on the Virtual Boy, \
+which is also almost as fast to access as WRAM. \
+Therefore, you can reserve some memory at the end of it to use as additional working RAM. \
+The engine will place everything assigned to .dram_data and .dram_bss here. \
+The reserved space will be unavailable for BGMAP data.'
                         )}
                     />
                 </td>
                 <td style={{ width: 80 }}>
-                    {nls.localize('vuengine/compilerConfigEditor/size', 'Size')}
+                    {nls.localize('vuengine/editors/compilerConfig/size', 'Size')}
                 </td>
                 <td>
-                    {nls.localize('vuengine/compilerConfigEditor/endAddress', 'End Address')}
+                    {nls.localize('vuengine/editors/compilerConfig/endAddress', 'End Address')}
                 </td>
             </tr>
             {(['dram'] as MemorySectionsDataKeys[]).map(section =>
-                <tr>
+                <tr key={section}>
                     <td>
                         {section.toUpperCase()}
                     </td>
                     <td>
                         <HContainer alignItems='center'>
-                            <input
+                            <Input
                                 type="number"
-                                className="theia-input"
-                                style={{ width: 36 }}
-                                onChange={e => setLength(section, parseInt(e.target.value))}
                                 value={data.memorySections[section].length}
-                                min="0"
-                                max="114"
+                                setValue={v => setLength(section, v as number)}
+                                min={0}
+                                max={114}
+                                width={48}
                             />
                             KB
                         </HContainer>
                     </td>
                     <td>
-                        <input
-                            className="theia-input"
-                            style={{ width: 100 }}
-                            onChange={e => setOrigin(section, e.target.value)}
+                        <Input
+                            width={100}
                             value={data.memorySections[section].origin}
+                            setValue={v => setOrigin(section, v as string)}
                         />
                     </td>
                 </tr>
@@ -95,13 +94,13 @@ export default function MemorySections(props: MemorySectionsProps): React.JSX.El
         <table>
             <tr>
                 <td style={{ width: 200 }}>
-                    {nls.localize('vuengine/compilerConfigEditor/memorySection', 'Memory Section')}
+                    {nls.localize('vuengine/editors/compilerConfig/memorySection', 'Memory Section')}
                 </td>
                 <td style={{ width: 80 }}>
-                    {nls.localize('vuengine/compilerConfigEditor/size', 'Size')}
+                    {nls.localize('vuengine/editors/compilerConfig/size', 'Size')}
                 </td>
                 <td>
-                    {nls.localize('vuengine/compilerConfigEditor/startAddress', 'Start Address')}
+                    {nls.localize('vuengine/editors/compilerConfig/startAddress', 'Start Address')}
                 </td>
             </tr>
             {(['exp', 'wram', 'sram', 'rom'] as MemorySectionsDataKeys[]).map(section =>
@@ -111,23 +110,22 @@ export default function MemorySections(props: MemorySectionsProps): React.JSX.El
                     </td>
                     <td>
                         <HContainer alignItems='center'>
-                            <input
+                            <Input
                                 type="number"
-                                className="theia-input"
-                                style={{ width: 36 }}
-                                onChange={e => setLength(section, parseInt(e.target.value))}
                                 value={data.memorySections[section].length}
-                                min="0"
+                                setValue={v => setLength(section, v as number)}
+                                min={0}
+                                width={48}
                             />
                             {section === 'wram' ? 'KB' : 'MB'}
                         </HContainer>
                     </td>
                     <td>
-                        <input
-                            className="theia-input"
-                            style={{ width: 100 }}
-                            onChange={e => setOrigin(section, e.target.value)}
+                        <Input
+                            width={100}
                             value={data.memorySections[section].origin}
+                            setValue={v => setOrigin(section, v as string)}
+                            clearable={false}
                         />
                     </td>
                 </tr>

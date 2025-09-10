@@ -161,7 +161,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
             <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/effect', 'Effect')}
+                        {nls.localize('vuengine/editors/rumbleEffect/effect', 'Effect')}
                     </label>
                     <SelectComponent
                         defaultValue={data.effect >= 1 && data.effect <= BUILT_IN_RUMBLE_EFFECTS.length ? data.effect.toString() : DEFAULT_RUMBLE_EFFECT.toString()}
@@ -174,7 +174,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/frequency', 'Frequency')}
+                        {nls.localize('vuengine/editors/rumbleEffect/frequency', 'Frequency')}
                     </label>
                     <SelectComponent
                         defaultValue={RUMBLE_EFFECT_FREQUENCIES.includes(data.frequency) ? data.frequency.toString() : DEFAULT_RUMBLE_EFFECT_FREQUENCY.toString()}
@@ -189,12 +189,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
             <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/overdrive', 'Overdrive')}
+                        {nls.localize('vuengine/editors/rumbleEffect/overdrive', 'Overdrive')}
                     </label>
                     <input
                         type="number"
                         className="theia-input"
-                        title={nls.localize('vuengine/rumbleEffectEditor/overdrive', 'Overdrive')}
+                        title={nls.localize('vuengine/editors/rumbleEffect/overdrive', 'Overdrive')}
                         onChange={e => this.setStateOverdrive(parseInt(e.target.value))}
                         value={data.overdrive < MIN_RUMBLE_EFFECT_OVERDRIVE || data.overdrive > MAX_RUMBLE_EFFECT_OVERDRIVE
                             ? DEFAULT_RUMBLE_EFFECT_OVERDRIVE
@@ -205,12 +205,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 </VContainer>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/break', 'Break')}
+                        {nls.localize('vuengine/editors/rumbleEffect/break', 'Break')}
                     </label>
                     <input
                         type="number"
                         className="theia-input"
-                        title={nls.localize('vuengine/rumbleEffectEditor/break', 'Break')}
+                        title={nls.localize('vuengine/editors/rumbleEffect/break', 'Break')}
                         onChange={e => this.setStateBreak(parseInt(e.target.value))}
                         value={data.break < MIN_RUMBLE_EFFECT_BREAK || data.break > MAX_RUMBLE_EFFECT_BREAK
                             ? DEFAULT_RUMBLE_EFFECT_BREAK
@@ -221,12 +221,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 </VContainer>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/sustainPos', 'Sustain (Pos.)')}
+                        {nls.localize('vuengine/editors/rumbleEffect/sustainPos', 'Sustain (Pos.)')}
                     </label>
                     <input
                         type="number"
                         className="theia-input"
-                        title={nls.localize('vuengine/rumbleEffectEditor/positiveSustain', 'Positive Sustain')}
+                        title={nls.localize('vuengine/editors/rumbleEffect/positiveSustain', 'Positive Sustain')}
                         onChange={e => this.setStateSustainPositive(parseInt(e.target.value))}
                         value={data.sustainPositive < MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE || data.sustainPositive > MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE
                             ? DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE
@@ -237,12 +237,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 </VContainer>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/rumbleEffectEditor/sustainNeg', 'Sustain (Neg.)')}
+                        {nls.localize('vuengine/editors/rumbleEffect/sustainNeg', 'Sustain (Neg.)')}
                     </label>
                     <input
                         type="number"
                         className="theia-input"
-                        title={nls.localize('vuengine/rumbleEffectEditor/negativeSustain', 'Negative Sustain')}
+                        title={nls.localize('vuengine/editors/rumbleEffect/negativeSustain', 'Negative Sustain')}
                         onChange={e => this.setStateSustainNegative(parseInt(e.target.value))}
                         value={data.sustainNegative < MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE || data.sustainNegative > MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
                             ? DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
@@ -259,14 +259,14 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         checked={data.stopBeforeStarting}
                         onChange={this.toggleStopBeforeStarting}
                     />
-                    {nls.localize('vuengine/rumbleEffectEditor/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
+                    {nls.localize('vuengine/editors/rumbleEffect/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
                 </label>
             </VContainer>
             <VContainer className="connectionStatus">
-                {nls.localize('vuengine/rumbleEffectEditor/rumbleEffectEditorConnectionStatus', 'Rumble Pack connection status')}: {
+                {nls.localize('vuengine/editors/rumbleEffect/rumbleEffectEditorConnectionStatus', 'Rumble Pack connection status')}: {
                     rumblePackIsConnected
-                        ? <span className='connected'>{nls.localize('vuengine/rumbleEffectEditor/connected', 'Connected')}</span>
-                        : <span className='disconnected'>{nls.localize('vuengine/rumbleEffectEditor/disconnected', 'Disconnected')}</span>
+                        ? <span className='connected'>{nls.localize('vuengine/editors/rumbleEffect/connected', 'Connected')}</span>
+                        : <span className='disconnected'>{nls.localize('vuengine/editors/rumbleEffect/disconnected', 'Disconnected')}</span>
                 }
             </VContainer>
             {rumblePackIsConnected
@@ -274,12 +274,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                     <HContainer gap={15}>
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/rumbleEffectEditor/actions', 'Actions')}
+                                {nls.localize('vuengine/editors/rumbleEffect/actions', 'Actions')}
                             </label>
                             <HContainer>
                                 <button
                                     className="theia-button"
-                                    title={nls.localize('vuengine/rumbleEffectEditor/runEffect', 'Run effect')}
+                                    title={nls.localize('vuengine/editors/rumbleEffect/runEffect', 'Run effect')}
                                     onClick={this.playEffect}
                                     disabled={!rumblePackIsConnected}
                                 >
@@ -287,7 +287,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                                 </button>
                                 <button
                                     className="theia-button secondary"
-                                    title={nls.localize('vuengine/rumbleEffectEditor/reRunLastEffect', 'Re-run last effect')}
+                                    title={nls.localize('vuengine/editors/rumbleEffect/reRunLastEffect', 'Re-run last effect')}
                                     onClick={this.sendCommandPlayLastEffect}
                                     disabled={!rumblePackIsConnected}
                                 >
@@ -295,7 +295,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                                 </button>
                                 <button
                                     className="theia-button secondary"
-                                    title={nls.localize('vuengine/rumbleEffectEditor/stopCurrentEffect', 'Stop current effect')}
+                                    title={nls.localize('vuengine/editors/rumbleEffect/stopCurrentEffect', 'Stop current effect')}
                                     onClick={this.sendCommandStopCurrentEffect}
                                     disabled={!rumblePackIsConnected}
                                 >
@@ -305,7 +305,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         </VContainer>
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/rumbleEffectEditor/printCommands', 'Print Commands')}
+                                {nls.localize('vuengine/editors/rumbleEffect/printCommands', 'Print Commands')}
                             </label>
                             <HContainer>
                                 <button
@@ -313,20 +313,20 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                                     onClick={this.sendCommandPrintMenu}
                                     disabled={!rumblePackIsConnected}
                                 >
-                                    {nls.localize('vuengine/rumbleEffectEditor/menu', 'Menu')}
+                                    {nls.localize('vuengine/editors/rumbleEffect/menu', 'Menu')}
                                 </button>
                                 <button
                                     className="theia-button secondary"
                                     onClick={this.sendCommandPrintVersion}
                                     disabled={!rumblePackIsConnected}
                                 >
-                                    {nls.localize('vuengine/rumbleEffectEditor/version', 'Version')}
+                                    {nls.localize('vuengine/editors/rumbleEffect/version', 'Version')}
                                 </button>
                             </HContainer>
                         </VContainer>
                         <VContainer>
                             <label>
-                                {nls.localize('vuengine/rumbleEffectEditor/command', 'Command')}
+                                {nls.localize('vuengine/editors/rumbleEffect/command', 'Command')}
                             </label>
                             <HContainer>
                                 <input
@@ -339,14 +339,14 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                                     onClick={this.sendCommand}
                                     disabled={!rumblePackIsConnected}
                                 >
-                                    {nls.localize('vuengine/rumbleEffectEditor/send', 'Send')}
+                                    {nls.localize('vuengine/editors/rumbleEffect/send', 'Send')}
                                 </button>
                             </HContainer>
                         </VContainer>
                     </HContainer>
                     <VContainer className='log'>
                         <label>
-                            {nls.localize('vuengine/rumbleEffectEditor/log', 'Log')}
+                            {nls.localize('vuengine/editors/rumbleEffect/log', 'Log')}
                         </label>
                         <div className='rumblePakLog'>
                             <div>
@@ -361,18 +361,18 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         </div>
                         <button
                             className="theia-button secondary"
-                            title={nls.localize('vuengine/rumbleEffectEditor/clearLog', 'Clear Log')}
+                            title={nls.localize('vuengine/editors/rumbleEffect/clearLog', 'Clear Log')}
                             onClick={this.clearLog}
                             disabled={!services.vesRumblePackService.rumblePackLog.length}
                         >
-                            {nls.localize('vuengine/rumbleEffectEditor/clearLog', 'Clear Log')}
+                            {nls.localize('vuengine/editors/rumbleEffect/clearLog', 'Clear Log')}
                         </button>
                     </VContainer>
                 </>
                 : <button
                     className="theia-button secondary"
                     onClick={this.detect}>
-                    {nls.localize('vuengine/rumblePack/commands/detectConnected', 'Detect Connected Rumble Pack')}
+                    {nls.localize('vuengine/editors/rumbleEffect/commands/detectConnected', 'Detect Connected Rumble Pack')}
                 </button>}
         </VContainer>;
     }

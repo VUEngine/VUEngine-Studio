@@ -7,7 +7,7 @@ import React, { useContext, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
 import PopUpDialog from '../../../Common/Base/PopUpDialog';
-import { SpriteEditorTool } from '../../../SpriteEditor/SpriteEditorTool';
+import { PixelEditorTool } from '../../../PixelEditor/Sidebar/PixelEditorTool';
 import { CHAR_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
 import ExportSettings from './ExportSettings';
 import ImportSettings from './ImportSettings';
@@ -46,7 +46,7 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
         let overwrite: boolean = false;
         let selected: URI | undefined;
         const saveFilterDialogProps: SaveFileDialogProps = {
-            title: nls.localize('vuengine/fontEditor/exportFontPng', 'Export Font PNG'),
+            title: nls.localize('vuengine/editors/font/exportFontPng', 'Export Font PNG'),
             inputValue: `${exportFileName}.png`,
         };
         const exportDir = await services.fileService.resolve(fileUri.parent);
@@ -79,25 +79,25 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
             return true;
         }
         const confirmed = await new ConfirmDialog({
-            title: nls.localize('vuengine/fontEditor/overwrite', 'Overwrite'),
-            msg: nls.localize('vuengine/fontEditor/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.path.fsPath()),
+            title: nls.localize('vuengine/editors/font/overwrite', 'Overwrite'),
+            msg: nls.localize('vuengine/editors/font/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.path.fsPath()),
         }).open();
         return !!confirmed;
     };
 
     return <HContainer gap={2} wrap='wrap'>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/import', 'Import')}
+        <PixelEditorTool
+            title={nls.localize('vuengine/editors/font/actions/import', 'Import')}
             onClick={() => setImportDialogOpen(true)}
         >
             <FileArrowUp size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/export', 'Export')}
+        </PixelEditorTool>
+        <PixelEditorTool
+            title={nls.localize('vuengine/editors/font/actions/export', 'Export')}
             onClick={() => setExportDialogOpen(true)}
         >
             <FileArrowDown size={20} />
-        </SpriteEditorTool>
+        </PixelEditorTool>
         <PopUpDialog
             height='100%'
             width='100%'
@@ -118,8 +118,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 }
                 setImportDialogOpen(false);
             }}
-            okLabel={nls.localize('vuengine/fontEditor/import', 'Import')}
-            title={nls.localize('vuengine/fontEditor/importSettings', 'Import Settings')}
+            okLabel={nls.localize('vuengine/editors/font/import', 'Import')}
+            title={nls.localize('vuengine/editors/font/importSettings', 'Import Settings')}
         >
             <ImportSettings
                 open={importDialogOpen}
@@ -141,8 +141,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 await selectImageFileToExport();
                 setExportDialogOpen(false);
             }}
-            okLabel={nls.localize('vuengine/fontEditor/export', 'Export')}
-            title={nls.localize('vuengine/fontEditor/exportSettings', 'Export Settings')}
+            okLabel={nls.localize('vuengine/editors/font/export', 'Export')}
+            title={nls.localize('vuengine/editors/font/exportSettings', 'Export Settings')}
         >
             <ExportSettings
                 characters={characters}
@@ -156,5 +156,5 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 setExportFileName={setExportFileName}
             />
         </PopUpDialog>
-    </HContainer >;
+    </HContainer>;
 }

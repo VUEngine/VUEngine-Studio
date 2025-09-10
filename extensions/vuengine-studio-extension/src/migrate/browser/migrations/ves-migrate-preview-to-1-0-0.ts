@@ -1,4 +1,5 @@
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { stringify } from '../../../editors/browser/components/Common/Utils';
 import { Version } from '../ves-migrate-types';
 import { VesAbstractMigration } from './ves-abstract-migration';
 
@@ -51,7 +52,7 @@ export class VesMigrateFromPreviewTo100 extends VesAbstractMigration {
         try {
             await this.fileService.writeFile(
                 projectFileUri,
-                BinaryBuffer.fromString(JSON.stringify(workspaceConfig, undefined, 4))
+                BinaryBuffer.fromString(stringify(workspaceConfig))
             );
             await this.fileService.delete(workspaceFileUri);
 

@@ -53,7 +53,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             code: code,
-            localizedName: nls.localize(`vuengine/general/languages/${code}`, LANGUAGES[code]),
+            localizedName: LANGUAGES[code],
             name: LANGUAGES[code],
         };
 
@@ -73,7 +73,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         updatedLanguages.push({
             code: newLanguageCode,
             flag: '',
-            localizedName: nls.localize(`vuengine/general/languages/${newLanguageCode}`, LANGUAGES[newLanguageCode]),
+            localizedName: LANGUAGES[newLanguageCode],
             name: LANGUAGES[newLanguageCode],
         });
 
@@ -93,9 +93,9 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
 
     protected async removeLanguage(code: string): Promise<void> {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/translationsEditor/deleteLanguageQuestion', 'Delete Language?'),
+            title: nls.localize('vuengine/editors/translations/deleteLanguageQuestion', 'Delete Language?'),
             msg: nls.localize(
-                'vuengine/translationsEditor/areYouSureYouWantToDelete',
+                'vuengine/editors/translations/areYouSureYouWantToDelete',
                 'Are you sure you want to delete {0}?',
                 nls.localize(`vuengine/general/languages/${code}`, LANGUAGES[code])
             ),
@@ -174,8 +174,8 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
 
     protected async removeTranslation(id: string): Promise<void> {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/translationsEditor/deleteTranslationQuestion', 'Delete Translation?'),
-            msg: nls.localize('vuengine/translationsEditor/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', id),
+            title: nls.localize('vuengine/editors/translations/deleteTranslationQuestion', 'Delete Translation?'),
+            msg: nls.localize('vuengine/editors/translations/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', id),
         });
         const remove = await dialog.open();
         if (remove) {
@@ -211,7 +211,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         >
             <div>
                 <h3>
-                    {nls.localize('vuengine/translationsEditor/languages', 'Languages')}
+                    {nls.localize('vuengine/editors/translations/languages', 'Languages')}
                 </h3>
                 <LanguagesTable
                     languages={languages}
@@ -227,7 +227,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
             <br />
             <div>
                 <h3>
-                    {nls.localize('vuengine/translationsEditor/translations', 'Translations')}
+                    {nls.localize('vuengine/editors/translations/translations', 'Translations')}
                 </h3>
                 <TranslationsTable
                     languages={languages}

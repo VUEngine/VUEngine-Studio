@@ -12,7 +12,6 @@ export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsWidget> {
     protected typeId: string;
 
     readonly id = VesEditorsWidget.ID;
-    readonly label = 'Graphical Editor';
 
     async canHandle(uri: URI): Promise<number> {
         await this.vesProjectService.projectDataReady;

@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import { LabelProvider, NavigatableWidget } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import URI from '@theia/core/lib/common/uri';
-import { Message } from '@theia/core/shared/@phosphor/messaging';
+import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -30,7 +30,7 @@ export class VesMediaPreviewWidget extends ReactWidget implements NavigatableWid
   protected readonly options: VesMediaPreviewWidgetOptions;
 
   static readonly ID = 'vesMediaPreviewWidget';
-  static readonly LABEL = nls.localize('vuengine/mediaPreview/preview', 'Preview');
+  static readonly LABEL = nls.localizeByDefault('Preview');
 
   protected uri: URI;
   protected type: string;

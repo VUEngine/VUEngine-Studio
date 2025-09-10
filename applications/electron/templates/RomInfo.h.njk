@@ -1,18 +1,17 @@
+{%- set romInfo = project.items.RomInfo.project -%}
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
 #ifndef ROM_INFO_H_
 #define ROM_INFO_H_
 
-{{ macros.sectionHeader('ROM Info') }}
-
 // game title (20 chars) 	 ####################
-#define __GAME_TITLE		"{{ (item.gameTitle ~ '                    ') | truncate(20, true, '') }}"
+#define __GAME_TITLE		"{{ (romInfo.gameTitle ~ '                    ') | truncate(20, true, '') }}"
 // maker code (2 chars)		 ##
-#define __MAKER_CODE		"{{ (item.makerCode ~ '  ') | truncate(2, true, '') }}"
+#define __MAKER_CODE		"{{ (romInfo.makerCode ~ '  ') | truncate(2, true, '') }}"
 // game code (4 chars)		 ####
-#define __GAME_CODE			"{{ (item.gameCodeSystem ~ ' ') | truncate(1, true, '') }}{{ (item.gameCodeId ~ '  ') | truncate(2, true, '') }}{{ (item.gameCodeLanguage ~ ' ') | truncate(1, true, '') }}"
+#define __GAME_CODE			"{{ (romInfo.gameCodeSystem ~ ' ') | truncate(1, true, '') }}{{ (romInfo.gameCodeId ~ '  ') | truncate(2, true, '') }}{{ (romInfo.gameCodeLanguage ~ ' ') | truncate(1, true, '') }}"
 // revision (1.x)			 #
-#define __ROM_VERSION		 {{ (item.revision ~ '') | truncate(1, true, '') }}
+#define __ROM_VERSION		 {{ (romInfo.revision ~ '') | truncate(1, true, '') }}
 
 #endif

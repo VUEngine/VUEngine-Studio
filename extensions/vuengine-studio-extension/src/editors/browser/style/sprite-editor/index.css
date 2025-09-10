@@ -1,35 +1,22 @@
-.jsonforms-container > .spriteEditor {
+.jsonforms-container > .pixelEditor {
+    background-image: radial-gradient(rgba(0, 0, 0, .5) 1px, transparent 0);
+    background-size: 16px 16px;
     flex-grow: 1;
     justify-content: space-between;
     gap: 15px;
     overflow: hidden;
     position: relative;
+
+    body.theia-light & {
+        background-image: radial-gradient(rgba(0, 0, 0, .1) 1px, transparent 0);
+    }
 }
 
-.spriteEditor canvas {
+.pixelEditor canvas {
     border: none !important; 
 }
 
-.spriteEditor .frame {
-    box-sizing: border-box;
-    flex-grow: unset;
-    height: 75px;
-    min-height: 75px;
-    min-width: 75px;
-    width: 75px;
-}
-
-.spriteEditor .layer {
-    padding: var(--theia-ui-padding)
-}
-
-.spriteEditor .layer input {
-    width: 120px;
-}
-
-.spriteEditor .pixel-container {
-    background-image: radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0);
-    background-size: 16px 16px;
+.pixelEditor .pixel-container {
     flex-grow: 1;
     inset: 0;
     overflow: hidden;

@@ -6,6 +6,7 @@ import { VesCodeGenCommands } from '../../codegen/browser/ves-codegen-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
+import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 
 export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
     items: {
@@ -38,8 +39,20 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'command': CommonCommands.REDO.id,
                     'icon': 'codicon codicon-redo'
                 }
-            ],
+            ]
+        ],
+        [ToolbarAlignment.CENTER]: [
             [
+                {
+                    'id': VesProjectCommands.WIDGET_TOGGLE.id,
+                    'command': VesProjectCommands.WIDGET_TOGGLE.id,
+                    'icon': 'codicon codicon-home'
+                },
+                {
+                    'id': CommonCommands.OPEN_PREFERENCES.id,
+                    'command': CommonCommands.OPEN_PREFERENCES.id,
+                    'icon': 'codicon codicon-settings'
+                },
                 {
                     'id': quickCommand.id,
                     'command': quickCommand.id,
@@ -47,8 +60,6 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'tooltip': 'Command Palette'
                 }
             ]
-        ],
-        [ToolbarAlignment.CENTER]: [
         ],
         [ToolbarAlignment.RIGHT]: [
             [

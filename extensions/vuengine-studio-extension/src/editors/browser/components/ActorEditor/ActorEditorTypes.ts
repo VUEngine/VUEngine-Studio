@@ -23,7 +23,7 @@ import {
     WireframeType
 } from '../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from './ActorEditor';
-import { ScriptedActionData, ScriptType } from './Scripts/ScriptTypes';
+import { ActorEditorCommands } from './ActorEditorCommands';
 
 // @ts-ignore
 export const ActorEditorContext = createContext<ActorEditorContextType>({});
@@ -31,6 +31,7 @@ export const ActorEditorContext = createContext<ActorEditorContextType>({});
 export interface LocalStorageActorEditorState {
     previewAnaglyph: boolean
     previewBackgroundColor: number
+    previewScreenFrame: boolean
     previewShowChildren: boolean
     previewShowColliders: boolean
     previewShowSprites: boolean
@@ -41,7 +42,8 @@ export interface LocalStorageActorEditorState {
 export interface ActorEditorContextType {
     data: ActorData
     setData: (partialData: Partial<ActorData>, options?: ActorEditorSaveDataOptions) => Promise<void>
-    removeComponent: (key: ComponentKey | 'extraProperties' | 'physics', index: number) => void
+    addComponent: (key: ComponentKey) => void
+    removeComponent: (key: ComponentKey | 'body', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
     currentAnimationStep: number
@@ -50,6 +52,10 @@ export interface ActorEditorContextType {
     setPreviewAnaglyph: Dispatch<SetStateAction<boolean>>
     previewBackgroundColor: number
     setPreviewBackgroundColor: Dispatch<SetStateAction<number>>
+    previewCurrentMeshSegment: number
+    setPreviewCurrentMeshSegment: Dispatch<SetStateAction<number>>
+    previewScreenFrame: boolean
+    setPreviewScreenFrame: Dispatch<SetStateAction<boolean>>
     previewPalettes: string[]
     setPreviewPalettes: Dispatch<SetStateAction<string[]>>
     previewProjectionDepth: number
@@ -82,13 +88,14 @@ export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
 export const MIN_SPHERE_RADIUS = 0;
 export const MAX_SPHERE_RADIUS = 511;
 export const STEP_SPHERE_RADIUS = 1;
-export const MIN_PREVIEW_SPRITE_ZOOM = 1;
+export const MIN_PREVIEW_SPRITE_ZOOM = 0.5;
 export const MAX_PREVIEW_SPRITE_ZOOM = 20;
-export const MIN_PREVIEW_SCRIPT_ZOOM = 0.1;
-export const MAX_PREVIEW_SCRIPT_ZOOM = 1;
+export const PREVIEW_SPRITE_ZOOM_STEP = 0.5;
 export const WHEEL_SENSITIVITY = 50;
 export const WIREFRAME_CANVAS_PADDING = 1;
 
+export const MIN_COLLIDER_DIAMETER = 1;
+export const MAX_COLLIDER_DIAMETER = 511;
 export const MIN_COLLIDER_PIXEL_SIZE = 0;
 export const MAX_COLLIDER_PIXEL_SIZE = 511;
 export const MIN_COLLIDER_DISPLACEMENT = -256;
@@ -134,12 +141,6 @@ export interface WireframeData {
     drawCenter: boolean // only WireframeType.Sphere
 }
 
-export interface ScriptData {
-    name: string
-    type: ScriptType
-    script: ScriptedActionData[]
-}
-
 export interface AnimationData {
     name: string
     cycles: number
@@ -148,8 +149,20 @@ export interface AnimationData {
     frames: number[]
 }
 
-export interface BehaviorData {
+export interface BodyData {
     name: string
+    mass: number
+    friction: number
+    bounciness: number
+    maximumSpeed: number
+    maximumVelocity: Vector3D
+    gravityAxes: Axis[]
+    rotationAxes: Axis[]
+}
+
+export interface MutatorData {
+    name: string
+    mutationClass: string
 }
 
 export interface ColliderData {
@@ -177,10 +190,12 @@ export interface SpriteData {
     colorMode: ColorMode
     displayMode: DisplayMode
     displays: Displays
+    isAnimated: boolean
     transparency: Transparency
     displacement: PixelVector
     manipulationFunction: string
     optimizeTiles: boolean
+    shareTiles: boolean
     texture: {
         files: string[]
         files2: string[] // files for right eye in stereo mode
@@ -220,14 +235,13 @@ export interface PositionedActorData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'scripts' | 'sprites' | 'wireframes';
-export type ComponentData = AnimationData | BehaviorData | PositionedActorData | ColliderData | SpriteData | WireframeData | ScriptData;
+export type ComponentKey = 'animations' | 'bodies' | 'mutators' | 'children' | 'colliders' | 'sprites' | 'wireframes';
+export type ComponentData = AnimationData | MutatorData | PositionedActorData | ColliderData | SpriteData | WireframeData;
 
 export const CLONABLE_COMPONENT_TYPES = [
     'animations',
     'children',
     'colliders',
-    'scripts',
     'sprites',
     'wireframes',
 ];
@@ -244,39 +258,45 @@ export const HIDEABLE_COMPONENT_TYPES = [
 
 export interface ActorData {
     _id: string
-    extraProperties: {
-        enabled: boolean // flag just for the UI to be able to treat as component
-        extraInfo: string
-        pixelSize: PixelSize
-        customAllocator: string
-    }
     animations: {
         default: number
-        totalFrames: number
         multiframe: boolean
+        totalFrames: number
     }
     components: {
         animations: AnimationData[]
-        behaviors: BehaviorData[]
+        bodies: BodyData[]
         children: PositionedActorData[]
         colliders: ColliderData[]
+        mutators: MutatorData[]
         sprites: SpriteData[]
         wireframes: WireframeData[]
-        scripts: ScriptData[]
+    }
+    extraProperties: {
+        extraInfo: string
+        pixelSize: PixelSize
     }
     inGameType: string
-    physics: {
-        enabled: boolean
-        mass: number
-        friction: number
-        bounciness: number
-        maximumSpeed: number
-        maximumVelocity: Vector3D
-        gravityAxes: Axis[]
-        rotationAxes: Axis[]
+    logic: {
+        configuration: Record<string, string>
+        customAllocator: string
     }
     sprites: {
-        type: SpriteType
         useZDisplacementInProjection: boolean
+        type: SpriteType
     }
 }
+
+export const INPUT_BLOCKING_COMMANDS = [
+    ActorEditorCommands.CENTER_CURRENT_COMPONENT.id,
+    ActorEditorCommands.DELETE_CURRENT_COMPONENT.id,
+    ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id,
+    ActorEditorCommands.MOVE_COMPONENT_DOWN.id,
+    ActorEditorCommands.MOVE_COMPONENT_LEFT.id,
+    ActorEditorCommands.MOVE_COMPONENT_RIGHT.id,
+    ActorEditorCommands.MOVE_COMPONENT_UP.id,
+    ActorEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id,
+    ActorEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id,
+    ActorEditorCommands.INCREASE_COMPONENT_PARALLAX.id,
+    ActorEditorCommands.DECREASE_COMPONENT_PARALLAX.id,
+];

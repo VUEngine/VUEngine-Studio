@@ -60,8 +60,8 @@ export default function TranslatedValue(props: TranslatedValueProps): React.JSX.
 
     const removeTranslation = async (langCode: string): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/actorEditor/removeTranslation', 'Remove Translation'),
-            msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveTranslation', 'Are you sure you want to remove this translation?'),
+            title: nls.localize('vuengine/editors/actor/removeTranslation', 'Remove Translation'),
+            msg: nls.localize('vuengine/editors/actor/areYouSureYouWantToRemoveTranslation', 'Are you sure you want to remove this translation?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -92,13 +92,13 @@ export default function TranslatedValue(props: TranslatedValueProps): React.JSX.
                             value={code}
                             disabled={usedLangIds.includes(code) && code !== l}
                         >
-                            {nls.localize(`vuengine/general/languages/${code}`, LANGUAGES[code])}
+                            {LANGUAGES[code]}
                         </option>
                     )}
                 </select>
                 <button
                     className='theia-button secondary'
-                    title={nls.localize('vuengine/editors/removeTranslation', 'Remove Translation')}
+                    title={nls.localizeByDefault('Remove')}
                     onClick={() => removeTranslation(l)}
                 >
                     <i className='codicon codicon-x' />
@@ -108,7 +108,7 @@ export default function TranslatedValue(props: TranslatedValueProps): React.JSX.
         <button
             className='theia-button add-button full-width'
             onClick={addTranslation}
-            title={nls.localize('vuengine/editors/addTranslation', 'Add Translation')}
+            title={nls.localizeByDefault('Add')}
         >
             <i className='codicon codicon-plus' />
         </button>

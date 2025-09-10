@@ -1,5 +1,3 @@
-@import "animations.css";
-@import "application.css";
 @import "audio.css";
 @import "checkbox.css";
 @import "dialog.css";
@@ -15,7 +13,6 @@
 @import "preferences.css";
 @import "progress-bar.css";
 @import "quick-input.css";
-@import "rounded-editor-window.css";
 @import "select.css";
 @import "sidepanel.css";
 @import "statusbar.css";

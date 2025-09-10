@@ -85,7 +85,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
 
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerSubmenu(buildMenuPath, nls.localize('vuengine/build/build', 'Build'), {
-      order: '6'
+      sortString: '6'
     });
 
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {

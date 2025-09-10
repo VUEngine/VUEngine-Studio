@@ -1,10 +1,10 @@
+import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
-import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
+import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { nls } from '@theia/core';
-import { clamp } from '../../../Common/Utils';
+import { INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]
@@ -86,39 +86,32 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/fontEditor/fileName', 'File Name')}
+                    {nls.localize('vuengine/editors/font/fileName', 'File Name')}
                 </label>
                 <HContainer alignItems='center'>
-                    <input
-                        className="theia-input"
-                        style={{ width: 160 }}
+                    <Input
                         value={exportFileName}
-                        onChange={e => setExportFileName(e.target.value)}
+                        setValue={setExportFileName}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                        width={160}
                     />
                     .png
                 </HContainer>
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/fontEditor/charactersPerLine', 'Characters Per Line')}
-                </label>
-                <input
-                    type="number"
-                    className="theia-input"
-                    style={{ width: 48 }}
-                    step="1"
-                    min={MIN_CHARS_PER_LINE}
-                    max={MAX_CHARS_PER_LINE}
-                    value={charactersPerLine}
-                    onChange={e => setCharactersPerLine(
-                        clamp(parseInt(e.target.value), MIN_CHARS_PER_LINE, MAX_CHARS_PER_LINE)
-                    )}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/editors/font/charactersPerLine', 'Characters Per Line')}
+                type="number"
+                value={charactersPerLine}
+                setValue={v => setCharactersPerLine(v as number)}
+                min={MIN_CHARS_PER_LINE}
+                max={MAX_CHARS_PER_LINE}
+                commands={INPUT_BLOCKING_COMMANDS}
+                width={48}
+            />
         </VContainer>
         <VContainer grow={1} overflow='hidden'>
             <label>
-                {nls.localize('vuengine/fontEditor/result', 'Result')}
+                {nls.localize('vuengine/editors/font/result', 'Result')}
             </label>
             {exportPngData &&
                 <VContainer

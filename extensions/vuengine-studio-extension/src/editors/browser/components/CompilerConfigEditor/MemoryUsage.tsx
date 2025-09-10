@@ -22,46 +22,46 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
 
     const dataMemorySectionOptions = <>
         <option value={DataMemorySection.data}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/data', 'Initialized data')} ({DataMemorySection.data})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/data', 'Initialized data')} ({DataMemorySection.data})
         </option>
         <option value={DataMemorySection.sdata}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/sdata', 'Small initialized data')} ({DataMemorySection.sdata})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/sdata', 'Small initialized data')} ({DataMemorySection.sdata})
         </option>
         <option value={DataMemorySection.dramData}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/dramData', 'Initialized data in DRAM')} ({DataMemorySection.dramData})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/dramData', 'Initialized data in DRAM')} ({DataMemorySection.dramData})
         </option>
         <option value={DataMemorySection.sramData}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/sramData', 'Initialized data in SRAM')} ({DataMemorySection.sramData})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/sramData', 'Initialized data in SRAM')} ({DataMemorySection.sramData})
         </option>
     </>;
 
     const bssMemorySectionOptions = <>
         <option value={BssMemorySection.bss}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/data', 'Uninitialized data')} ({BssMemorySection.bss})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/data', 'Uninitialized data')} ({BssMemorySection.bss})
         </option>
         <option value={BssMemorySection.sbss}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/sdata', 'Small uninitialized data')} ({BssMemorySection.sbss})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/sdata', 'Small uninitialized data')} ({BssMemorySection.sbss})
         </option>
         <option value={BssMemorySection.dramBss}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/dramData', 'Uninitialized data in DRAM')} ({BssMemorySection.dramBss})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/dramData', 'Uninitialized data in DRAM')} ({BssMemorySection.dramBss})
         </option>
         <option value={BssMemorySection.sramBss}>
-            {nls.localize('vuengine/compilerConfigEditor/memorySectionsSelect/sramData', 'Uninitialized data in SRAM')} ({BssMemorySection.sramBss})
+            {nls.localize('vuengine/editors/compilerConfig/memorySectionsSelect/sramData', 'Uninitialized data in SRAM')} ({BssMemorySection.sramBss})
         </option>
     </>;
 
     return <table>
         <tr>
             <td style={{ width: 200 }}>
-                {nls.localize('vuengine/compilerConfigEditor/dataType', 'Data Type')}
+                {nls.localize('vuengine/editors/compilerConfig/dataType', 'Data Type')}
             </td>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/dataSection', 'Data Section')}
+                {nls.localize('vuengine/editors/compilerConfig/dataSection', 'Data Section')}
             </td>
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/initializedData', 'Initialized Global Data')}
+                {nls.localize('vuengine/editors/compilerConfig/initializedData', 'Initialized Global Data')}
             </td>
             <td>
                 <select
@@ -76,7 +76,7 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/memoryPools', 'Memory Pools')}
+                {nls.localize('vuengine/editors/compilerConfig/memoryPools', 'Memory Pools')}
             </td>
             <td>
                 <select
@@ -91,7 +91,7 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/staticSingletons', 'Static Singletons')}
+                {nls.localize('vuengine/editors/compilerConfig/staticSingletons', 'Static Singletons')}
             </td>
             <td>
                 <select
@@ -106,7 +106,7 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/uninitializedData', 'Uninitialized Global Data')}
+                {nls.localize('vuengine/editors/compilerConfig/uninitializedData', 'Uninitialized Global Data')}
             </td>
             <td>
                 <select
@@ -121,7 +121,7 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/compilerConfigEditor/virtualTables', 'Virtual Tables')}
+                {nls.localize('vuengine/editors/compilerConfig/virtualTables', 'Virtual Tables')}
             </td>
             <td>
                 <select

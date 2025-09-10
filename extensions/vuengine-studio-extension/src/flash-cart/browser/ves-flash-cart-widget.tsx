@@ -1,7 +1,7 @@
 import { CommandService, nls } from '@theia/core';
 import { LocalStorageService, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { Message } from '@theia/core/shared/@phosphor/messaging';
+import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';

@@ -43,10 +43,10 @@ export namespace VesFlashCartCommands {
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'flashCarts.showHelp',
-      label: 'Show Handbook Page',
+      label: 'Show Documentation',
       iconClass: 'codicon codicon-book',
     },
-    'vuengine/flashCarts/commands/showHelp',
+    'vuengine/flashCarts/commands/showDocumentation',
     'vuengine/flashCarts/commands/category'
   );
 

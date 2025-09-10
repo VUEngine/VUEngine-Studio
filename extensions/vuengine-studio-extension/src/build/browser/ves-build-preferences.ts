@@ -55,9 +55,9 @@ const properties: PreferenceSchemaProperties = {
         type: 'string',
         description: nls.localize(
             'vuengine/build/preferences/engineCorePathDescription',
-            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". ' +
-            'Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated ' +
-            'occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'
+            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". \
+Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated \
+occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'
         ),
         default: '',
         additionalProperties: {
@@ -111,7 +111,10 @@ const properties: PreferenceSchemaProperties = {
         default: [{
             'type': 'command',
             'name': 'core.saveAll',
-        }],
+        }, /* {
+            'type': 'command',
+            'name': VesCodeGenCommands.GENERATE_ALL_CHANGED.id,
+        } */],
         scope: PreferenceScope.Folder,
         overridable: true,
     },
@@ -201,7 +204,7 @@ if (isWindows) {
     properties[VesBuildPreferenceIds.USE_WSL] = {
         type: 'boolean',
         description: nls.localize('vuengine/build/preferences/useWsl', 'Automatically build through WSL if detected.'),
-        default: true,
+        default: false,
         scope: PreferenceScope.Folder,
         overridable: true,
     };

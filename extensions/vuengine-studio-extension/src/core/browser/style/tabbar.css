@@ -1,4 +1,4 @@
-.p-TabBar.theia-app-sides .p-TabBar-tabIcon.codicon-plug {
+.lm-TabBar.theia-app-sides .lm-TabBar-tabIcon.codicon-plug {
     font-size: 30px;
 }
 
@@ -7,7 +7,7 @@
 }
 
 /* Custom tabbar decorators */
-.p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);
     border: 3px solid var(--theia-activityBarBadge-background);
     border-radius: 20px;
@@ -23,839 +23,839 @@
     width: 14px;
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-queued:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-queued:after {
     animation: hourglass 6s infinite linear;
     content: "\f252";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress:after {
     animation: fa-spin 2s infinite linear;
     content: "\f013";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-info:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-info:after {
     content: "\f129";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-success:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-success:after {
     background-color: var(--theia-editorSuccess-foreground);
     border-color: var(--theia-editorSuccess-foreground);
     content: "\f00c";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-warning:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-warning:after {
     background-color: var(--theia-editorWarning-foreground);
     border-color: var(--theia-editorWarning-foreground);
     content: "\f071";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-error:after {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-error:after {
     background-color: var(--theia-editorError-foreground);
     border-color: var(--theia-editorError-foreground);
     content: "\f00d";
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress {
     background-repeat: no-repeat;
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-1 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-1 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 1%, transparent 1%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-2 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-2 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 2%, transparent 2%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-3 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-3 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 3%, transparent 3%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-4 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-4 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 4%, transparent 4%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-5 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-5 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 5%, transparent 5%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-6 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-6 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 6%, transparent 6%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-7 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-7 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 7%, transparent 7%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-8 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-8 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 8%, transparent 8%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-9 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-9 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 9%, transparent 9%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-10 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-10 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 10%, transparent 10%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-11 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-11 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 11%, transparent 11%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-12 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-12 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 12%, transparent 12%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-13 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-13 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 13%, transparent 13%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-14 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-14 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 14%, transparent 14%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-15 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-15 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 15%, transparent 15%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-16 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-16 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 16%, transparent 16%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-17 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-17 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 17%, transparent 17%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-18 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-18 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 18%, transparent 18%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-19 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-19 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 19%, transparent 19%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-20 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-20 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 20%, transparent 20%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-21 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-21 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 21%, transparent 21%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-22 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-22 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 22%, transparent 22%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-23 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-23 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 23%, transparent 23%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-24 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-24 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 24%, transparent 24%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-25 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-25 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 25%, transparent 25%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-26 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-26 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 26%, transparent 26%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-27 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-27 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 27%, transparent 27%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-28 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-28 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 28%, transparent 28%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-29 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-29 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 29%, transparent 29%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-30 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-30 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 30%, transparent 30%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-31 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-31 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 31%, transparent 31%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-32 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-32 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 32%, transparent 32%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-33 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-33 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 33%, transparent 33%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-34 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-34 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 34%, transparent 34%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-35 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-35 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 35%, transparent 35%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-36 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-36 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 36%, transparent 36%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-37 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-37 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 37%, transparent 37%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-38 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-38 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 38%, transparent 38%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-39 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-39 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 39%, transparent 39%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-40 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-40 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 40%, transparent 40%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-41 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-41 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 41%, transparent 41%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-42 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-42 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 42%, transparent 42%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-43 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-43 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 43%, transparent 43%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-44 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-44 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 44%, transparent 44%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-45 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-45 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 45%, transparent 45%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-46 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-46 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 46%, transparent 46%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-47 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-47 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 47%, transparent 47%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-48 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-48 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 48%, transparent 48%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-49 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-49 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 49%, transparent 49%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-50 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-50 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 50%, transparent 50%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-51 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-51 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 51%, transparent 51%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-52 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-52 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 52%, transparent 52%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-53 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-53 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 53%, transparent 53%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-54 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-54 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 54%, transparent 54%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-55 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-55 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 55%, transparent 55%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-56 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-56 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 56%, transparent 56%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-57 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-57 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 57%, transparent 57%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-58 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-58 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 58%, transparent 58%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-59 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-59 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 59%, transparent 59%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-60 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-60 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 60%, transparent 60%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-61 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-61 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 61%, transparent 61%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-62 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-62 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 62%, transparent 62%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-63 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-63 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 63%, transparent 63%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-64 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-64 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 64%, transparent 64%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-65 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-65 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 65%, transparent 65%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-66 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-66 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 66%, transparent 66%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-67 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-67 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 67%, transparent 67%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-68 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-68 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 68%, transparent 68%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-69 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-69 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 69%, transparent 69%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-70 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-70 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 70%, transparent 70%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-71 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-71 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 71%, transparent 71%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-72 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-72 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 72%, transparent 72%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-73 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-73 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 73%, transparent 73%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-74 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-74 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 74%, transparent 74%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-75 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-75 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 75%, transparent 75%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-76 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-76 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 76%, transparent 76%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-77 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-77 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 77%, transparent 77%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-78 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-78 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 78%, transparent 78%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-79 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-79 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 79%, transparent 79%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-80 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-80 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 80%, transparent 80%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-81 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-81 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 81%, transparent 81%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-82 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-82 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 82%, transparent 82%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-83 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-83 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 83%, transparent 83%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-84 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-84 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 84%, transparent 84%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-85 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-85 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 85%, transparent 85%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-86 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-86 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 86%, transparent 86%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-87 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-87 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 87%, transparent 87%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-88 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-88 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 88%, transparent 88%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-89 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-89 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 89%, transparent 89%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-90 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-90 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 90%, transparent 90%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-91 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-91 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 91%, transparent 91%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-92 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-92 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 92%, transparent 92%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-93 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-93 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 93%, transparent 93%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-94 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-94 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 94%, transparent 94%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-95 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-95 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 95%, transparent 95%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-96 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-96 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 96%, transparent 96%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-97 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-97 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 97%, transparent 97%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-98 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-98 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 98%, transparent 98%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-99 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-99 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 99%, transparent 99%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-100 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-100 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 100%, transparent 100%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-1 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-1 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 1%, transparent 1%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-2 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-2 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 2%, transparent 2%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-3 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-3 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 3%, transparent 3%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-4 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-4 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 4%, transparent 4%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-5 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-5 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 5%, transparent 5%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-6 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-6 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 6%, transparent 6%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-7 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-7 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 7%, transparent 7%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-8 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-8 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 8%, transparent 8%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-9 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-9 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 9%, transparent 9%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-10 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-10 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 10%, transparent 10%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-11 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-11 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 11%, transparent 11%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-12 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-12 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 12%, transparent 12%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-13 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-13 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 13%, transparent 13%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-14 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-14 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 14%, transparent 14%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-15 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-15 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 15%, transparent 15%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-16 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-16 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 16%, transparent 16%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-17 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-17 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 17%, transparent 17%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-18 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-18 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 18%, transparent 18%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-19 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-19 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 19%, transparent 19%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-20 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-20 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 20%, transparent 20%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-21 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-21 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 21%, transparent 21%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-22 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-22 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 22%, transparent 22%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-23 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-23 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 23%, transparent 23%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-24 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-24 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 24%, transparent 24%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-25 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-25 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 25%, transparent 25%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-26 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-26 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 26%, transparent 26%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-27 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-27 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 27%, transparent 27%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-28 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-28 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 28%, transparent 28%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-29 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-29 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 29%, transparent 29%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-30 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-30 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 30%, transparent 30%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-31 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-31 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 31%, transparent 31%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-32 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-32 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 32%, transparent 32%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-33 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-33 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 33%, transparent 33%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-34 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-34 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 34%, transparent 34%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-35 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-35 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 35%, transparent 35%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-36 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-36 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 36%, transparent 36%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-37 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-37 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 37%, transparent 37%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-38 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-38 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 38%, transparent 38%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-39 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-39 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 39%, transparent 39%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-40 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-40 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 40%, transparent 40%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-41 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-41 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 41%, transparent 41%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-42 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-42 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 42%, transparent 42%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-43 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-43 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 43%, transparent 43%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-44 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-44 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 44%, transparent 44%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-45 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-45 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 45%, transparent 45%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-46 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-46 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 46%, transparent 46%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-47 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-47 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 47%, transparent 47%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-48 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-48 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 48%, transparent 48%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-49 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-49 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 49%, transparent 49%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-50 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-50 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 50%, transparent 50%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-51 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-51 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 51%, transparent 51%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-52 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-52 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 52%, transparent 52%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-53 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-53 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 53%, transparent 53%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-54 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-54 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 54%, transparent 54%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-55 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-55 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 55%, transparent 55%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-56 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-56 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 56%, transparent 56%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-57 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-57 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 57%, transparent 57%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-58 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-58 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 58%, transparent 58%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-59 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-59 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 59%, transparent 59%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-60 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-60 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 60%, transparent 60%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-61 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-61 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 61%, transparent 61%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-62 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-62 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 62%, transparent 62%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-63 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-63 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 63%, transparent 63%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-64 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-64 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 64%, transparent 64%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-65 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-65 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 65%, transparent 65%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-66 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-66 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 66%, transparent 66%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-67 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-67 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 67%, transparent 67%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-68 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-68 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 68%, transparent 68%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-69 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-69 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 69%, transparent 69%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-70 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-70 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 70%, transparent 70%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-71 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-71 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 71%, transparent 71%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-72 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-72 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 72%, transparent 72%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-73 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-73 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 73%, transparent 73%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-74 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-74 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 74%, transparent 74%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-75 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-75 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 75%, transparent 75%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-76 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-76 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 76%, transparent 76%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-77 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-77 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 77%, transparent 77%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-78 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-78 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 78%, transparent 78%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-79 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-79 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 79%, transparent 79%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-80 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-80 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 80%, transparent 80%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-81 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-81 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 81%, transparent 81%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-82 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-82 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 82%, transparent 82%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-83 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-83 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 83%, transparent 83%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-84 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-84 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 84%, transparent 84%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-85 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-85 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 85%, transparent 85%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-86 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-86 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 86%, transparent 86%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-87 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-87 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 87%, transparent 87%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-88 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-88 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 88%, transparent 88%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-89 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-89 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 89%, transparent 89%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-90 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-90 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 90%, transparent 90%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-91 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-91 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 91%, transparent 91%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-92 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-92 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 92%, transparent 92%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-93 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-93 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 93%, transparent 93%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-94 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-94 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 94%, transparent 94%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-95 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-95 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 95%, transparent 95%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-96 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-96 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 96%, transparent 96%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-97 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-97 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 97%, transparent 97%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-98 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-98 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 98%, transparent 98%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-99 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-99 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 99%, transparent 99%);
 }
 
-.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-100 {
+.lm-TabBar.theia-app-sides .lm-TabBar-tab.ves-decorator-progress-with-warnings.ves-decorator-progress-100 {
     background-image: linear-gradient(90deg, var(--theia-editorWarning-foreground) 0%, var(--theia-editorWarning-foreground) 100%, transparent 100%);
 }
 

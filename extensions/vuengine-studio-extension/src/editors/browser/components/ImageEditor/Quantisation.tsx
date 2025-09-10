@@ -29,11 +29,11 @@ export default function Quantisation(): React.JSX.Element {
     return <>
         <VContainer gap={5}>
             <label>
-                {nls.localize('vuengine/imageEditor/quantisation', 'Quantisation')}
+                {nls.localize('vuengine/editors/image/quantisation', 'Quantisation')}
             </label>
             <button
                 className="theia-button secondary"
-                title={nls.localize('vuengine/actorEditor/imageProcessingSettings', 'Image Processing Settings')}
+                title={nls.localize('vuengine/editors/actor/imageProcessingSettings', 'Image Processing Settings')}
                 onClick={() => setProcessingDialogOpen(true)}
             >
                 <i className="codicon codicon-settings" />
@@ -43,7 +43,7 @@ export default function Quantisation(): React.JSX.Element {
             open={processingDialogOpen}
             onClose={() => setProcessingDialogOpen(false)}
             onOk={() => setProcessingDialogOpen(false)}
-            title={nls.localize('vuengine/editors/imageProcessingSettings', 'Image Processing Settings')}
+            title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
             height='100%'
             width='100%'
         >

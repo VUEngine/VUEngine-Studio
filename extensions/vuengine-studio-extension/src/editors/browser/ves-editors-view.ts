@@ -1,5 +1,11 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry, UntitledResourceResolver, URI } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
+import { CommandRegistry, CommandService, MenuModelRegistry, nls, UntitledResourceResolver, URI } from '@theia/core';
+import {
+    AbstractViewContribution,
+    CommonCommands,
+    KeybindingRegistry,
+    OpenerService,
+    Widget
+} from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -11,10 +17,13 @@ import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-con
 import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
+import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
+import { TYPE_LABELS } from './ves-editors-types';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
@@ -28,7 +37,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     @inject(FrontendApplicationStateService)
     protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(OpenerService)
-    protected openerService: OpenerService;
+    protected readonly openerService: OpenerService;
     @inject(UntitledResourceResolver)
     protected readonly untitledResourceResolver: UntitledResourceResolver;
     @inject(VesCodeGenService)
@@ -82,13 +91,27 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget,
-            execute: widget => this.generateFiles(widget),
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.generateFiles(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget,
-            execute: widget => this.openSource(widget),
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.openSource(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
+        });
+        commandRegistry.registerCommand(VesEditorsCommands.OPEN_GENERATED_FILES, {
+            isEnabled: () => true,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => this.openGeneratedFiles(widget instanceof VesEditorsWidget
+                ? widget
+                : this.shell.currentWidget as VesEditorsWidget
+            ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
             isEnabled: () => true,
@@ -97,27 +120,24 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => {
-                (this.shell.currentWidget as VesEditorsWidget)?.undo();
-                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.UNDO.id);
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => {
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.undo();
+                w?.dispatchCommandEvent(CommonCommands.UNDO.id);
             }
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => {
-                (this.shell.currentWidget as VesEditorsWidget)?.redo();
-                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.REDO.id);
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: widget => {
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.redo();
+                w?.dispatchCommandEvent(CommonCommands.REDO.id);
             }
-        });
-
-        commandRegistry.registerHandler(CommonCommands.COPY.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.COPY.id),
-        });
-        commandRegistry.registerHandler(CommonCommands.PASTE.id, {
-            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.PASTE.id),
         });
 
         EditorsCommands.map(editor => {
@@ -128,9 +148,24 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     category: command.category,
                 }, {
                     // enable and make visible only for the editors for which command is registered
-                    isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
-                    isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
-                    execute: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.dispatchCommandEvent(command.id),
+                    isEnabled: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands !== undefined && w?.commands[command.id] === true;
+                    },
+                    isVisible: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands !== undefined && w?.commands[command.id] === true;
+                    },
+                    execute: widget => {
+                        const w = widget instanceof VesEditorsWidget
+                            ? widget
+                            : this.shell.currentWidget as VesEditorsWidget;
+                        w?.dispatchCommandEvent(command.id);
+                    }
                 });
             });
         });
@@ -145,15 +180,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             // See also: line 256
             /*
             if (type.file?.startsWith('.')) {
-                commandRegistry.registerCommand(Command.toLocalizedCommand(
-                    {
-                        id: `editors.new-untitled.${typeId}`,
-                        label: `New ${type.schema.title || typeId} File`,
-                        category: CommonCommands.FILE_CATEGORY,
-                        iconClass: type.icon,
-                    },
-                    `vuengine/editors/newUntitled/${typeId}`
-                ), {
+                commandRegistry.registerCommand({
+                    id: `editors.new-untitled.${typeId}`,
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    category: CommonCommands.FILE_CATEGORY,
+                    iconClass: type.icon,
+                }, {
                     isEnabled: () => true,
                     isVisible: () => false,
                     execute: async () => {
@@ -166,15 +198,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             */
 
             if (type.forFiles?.length) {
-                commandRegistry.registerCommand(Command.toLocalizedCommand(
-                    {
-                        id: `editors.new-file.${typeId}`,
-                        label: `New ${type.schema.title || typeId} File...`,
-                        category: CommonCommands.FILE_CATEGORY,
-                    },
-                    `vuengine/editors/newFile/${typeId}`
-                ), {
-                    // hide "new xyz conversion file" commands from command palette
+                commandRegistry.registerCommand({
+                    id: `editors.new-file.${typeId}`,
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    category: CommonCommands.FILE_CATEGORY,
+                }, {
+                    // Show "new xyz conversion file" commands only in explorer, but hide from command palette
                     isVisible: widget => this.shell.currentWidget?.id === 'files',
                     execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
                 });
@@ -183,8 +212,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
             isEnabled: () => true,
-            isVisible: (widget: Widget) => {
-                const p = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri.path;
+            isVisible: () => {
+                const p = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri.path;
                 if (p) {
                     for (const t of Object.values(types || {})) {
                         if ([p.ext, p.base].includes(t.file)) {
@@ -194,8 +223,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }
                 return false;
             },
-            execute: async widget => {
-                const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
+            execute: async () => {
+                const u = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
@@ -233,6 +262,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             priority: 0,
         });
         toolbar.registerItem({
+            id: VesEditorsCommands.OPEN_GENERATED_FILES.id,
+            command: VesEditorsCommands.OPEN_GENERATED_FILES.id,
+            tooltip: VesEditorsCommands.OPEN_GENERATED_FILES.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
             id: VesEditorsCommands.OPEN_SOURCE.id,
             command: VesEditorsCommands.OPEN_SOURCE.id,
             tooltip: VesEditorsCommands.OPEN_SOURCE.label,
@@ -258,7 +293,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             // See also: line 144
             /*
             if (type.file?.startsWith('.')) {
-                const id = `editors.new-untitled.${typeId}`;
+                const id = `editors.new-untitled.${ typeId }`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
                     id,
                     sortString: typeId,
@@ -282,8 +317,20 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (!ref || !ref.uri) {
             return;
         }
-        this.editorManager.open(ref.uri, {
-            widgetOptions: { ref },
+        this.editorManager.open(ref.uri);
+    }
+
+    protected async openGeneratedFiles(widget: Widget): Promise<void> {
+        const ref = widget instanceof VesEditorsWidget && widget || undefined;
+        if (!ref || !ref.uri || !ref.typeId) {
+            return;
+        }
+
+        const uris = await this.vesCodeGenService.getGeneratedFileUris(ref.uri, ref.typeId);
+        uris.forEach(async u => {
+            if (await this.fileService.exists(u)) {
+                this.editorManager.open(u);
+            }
         });
     }
 
@@ -292,15 +339,15 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (!ref || !ref.uri) {
             return;
         }
-        this.vesCodeGenService.generate([ref.typeId], ref.uri);
+        this.vesCodeGenService.generate([ref.typeId], GenerationMode.All, ref.uri);
     }
 
     protected async generateId(fileUri: URI): Promise<void> {
         try {
             const fileContents = await this.fileService.readFile(fileUri);
             const fileContentsJson = JSON.parse(fileContents.value.toString());
-            fileContentsJson._id = this.vesCommonService.nanoid();
-            await this.fileService.writeFile(fileUri, BinaryBuffer.fromString(JSON.stringify(fileContentsJson, undefined, 4)));
+            fileContentsJson._id = nanoid();
+            await this.fileService.writeFile(fileUri, BinaryBuffer.fromString(stringify(fileContentsJson)));
         } catch (error) {
             console.error('Could not generate ID for file.', fileUri.path.fsPath());
         }

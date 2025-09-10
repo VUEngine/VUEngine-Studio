@@ -6,7 +6,7 @@ import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/Base/VContainer';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface AnimationsSettingsProps {
     isMultiFileAnimation: boolean
@@ -19,7 +19,7 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
     const getEngineSettings = async (): Promise<void> => {
-        await services.vesProjectService.projectItemsReady;
+        await services.vesProjectService.projectDataReady;
         const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
         // @ts-ignore
         setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
@@ -51,13 +51,18 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
 
     return <VContainer gap={10}>
         <label>
-            {nls.localize('vuengine/actorEditor/generalAnimationsSettings', 'General Animations Settings')}
+            {nls.localize('vuengine/editors/actor/generalAnimationsSettings', 'General Animations Settings')}
         </label>
         <HContainer gap={15} wrap='wrap'>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/totalFrames', ' Total Frames')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/actor/totalFrames', ' Total Frames')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/totalFramesDescription',
+                        'The total number of frames that sprites on this actor consist of. \
+The maximum value is specified in the engine config and can be changed in the engine config editor.'
+                    )}
+                />
                 <input
                     className='theia-input'
                     type='number'
@@ -68,15 +73,16 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
                     onChange={e => setAnimationFrames(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    width={64}
                 />
             </VContainer>
             {!isMultiFileAnimation && <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/multiframe', 'Multiframe')}
+                    label={nls.localize('vuengine/editors/actor/multiframe', 'Multiframe')}
                     tooltip={nls.localize(
-                        'vuengine/actorEditor/multiframeDescription',
-                        'With this enabled, tiles for all animation frames are loaded into video memory at the same time. ' +
-                        'This allows multiple sprites to use the same texture, but show a different frame for each.'
+                        'vuengine/editors/actor/multiframeDescription',
+                        'With this enabled, tiles for all animation frames are loaded into video memory at the same time. \
+This allows multiple sprites to use the same texture, but show a different frame for each.'
                     )}
                 />
                 <input

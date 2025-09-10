@@ -143,7 +143,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
             <HContainer alignItems='end'>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/flashCarts/configs/name', 'Name')}
+                        {nls.localizeByDefault('Name')}
                     </label>
                     <input
                         type="text"
@@ -157,7 +157,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
                 {!readOnly && <button
                     className='theia-button secondary'
                     onClick={() => props.removeFlashCartConfig(props.index)}
-                    title={nls.localize('vuengine/flashCarts/configs/removeFlashCartConfig', 'Remove Flash Cart Config')}
+                    title={nls.localizeByDefault('Remove')}
                 >
                     <i className='codicon codicon-x' />
                 </button>}
@@ -232,7 +232,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
         </VContainer>
         <VContainer className='deviceCodes'>
             <label>
-                {nls.localize('vuengine/flashCarts/configs/deviceCodes', 'DeviceCodes')}
+                {nls.localize('vuengine/flashCarts/configs/deviceCodes', 'Device Codes')}
             </label>
             <VContainer gap={15}>
                 {flashCartConfig.deviceCodes && flashCartConfig.deviceCodes.map((dc, i) =>
@@ -274,7 +274,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
                                     <label><br /></label>
                                     <button
                                         className='theia-button secondary'
-                                        title={nls.localize('vuengine/flashCarts/configs/removeDeviceCode', 'Remove Device Code')}
+                                        title={nls.localizeByDefault('Remove')}
                                         onClick={() => removeDeviceCode(i)}
                                     >
                                         <i className='codicon codicon-x' />
