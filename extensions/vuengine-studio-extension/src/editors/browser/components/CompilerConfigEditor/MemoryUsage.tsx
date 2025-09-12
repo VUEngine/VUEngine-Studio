@@ -100,7 +100,7 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
                     onChange={e => setMemoryUsage('staticSingletons', e.target.value as BssMemorySection)}
                     value={data.memoryUsage.staticSingletons}
                 >
-                    {dataMemorySectionOptions}
+                    {bssMemorySectionOptions}
                 </select>
             </td>
         </tr>
