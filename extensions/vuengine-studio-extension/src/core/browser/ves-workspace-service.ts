@@ -1,6 +1,5 @@
 import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
-import { Emitter } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { Emitter, PreferenceService } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { WorkspaceData } from '@theia/workspace/lib/browser';

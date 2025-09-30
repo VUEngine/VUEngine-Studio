@@ -1,6 +1,5 @@
-import { isWindows, nls } from '@theia/core';
-import { PreferenceScope } from '@theia/core/lib/browser';
-import { PreferenceSchema, PreferenceSchemaProperties } from '@theia/core/lib/common/preferences/preference-schema';
+import { isWindows, nls, PreferenceScope } from '@theia/core';
+import { IndexedAccess, PreferenceDataProperty, PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
 export namespace VesBuildPreferenceIds {
@@ -24,7 +23,7 @@ export namespace VesBuildPreferenceIds {
     export const USE_WSL = [CATEGORY, 'useWsl'].join('.');
 }
 
-const properties: PreferenceSchemaProperties = {
+const properties: IndexedAccess<PreferenceDataProperty> = {
     [VesBuildPreferenceIds.BUILD_MODE]: {
         type: 'string',
         default: DEFAULT_BUILD_MODE,
@@ -211,6 +210,5 @@ if (isWindows) {
 }
 
 export const VesBuildPreferenceSchema: PreferenceSchema = {
-    'type': 'object',
     'properties': properties,
 };

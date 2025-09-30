@@ -9,7 +9,6 @@ export namespace VesEditorsPreferenceIds {
 }
 
 export const VesEditorsPreferenceSchema: PreferenceSchema = {
-  type: 'object',
   properties: {
     // TODO
     /*

@@ -1,5 +1,4 @@
-import { isWindows, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { isWindows, nls, PreferenceService } from '@theia/core';
 import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { Message } from '@theia/core/lib/browser/widgets/widget';

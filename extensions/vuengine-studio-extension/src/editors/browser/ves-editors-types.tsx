@@ -1,9 +1,8 @@
-import { CommandService, MessageService, nls, QuickPickService, URI } from '@theia/core';
+import { CommandService, MessageService, nls, PreferenceService, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
     LocalStorageService,
     OpenerService,
-    PreferenceService,
     StatusBarEntry
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';

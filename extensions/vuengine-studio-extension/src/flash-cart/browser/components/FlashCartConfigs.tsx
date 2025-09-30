@@ -1,5 +1,5 @@
-import { nls } from '@theia/core';
-import { ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
+import { nls, PreferenceService } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
@@ -22,7 +22,7 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesFlashCartPreferenceIds.FLASH_CARTS) {
-                setFlashCartConfigs(change.newValue || []);
+                setFlashCartConfigs(change.newValue as unknown as FlashCartConfig[] || []);
             }
         });
         return () => preflistener.dispose();

@@ -1,5 +1,4 @@
-import { PreferenceService } from '@theia/core/lib/browser';
-import { CommandService, MessageService } from '@theia/core/lib/common';
+import { CommandService, MessageService, PreferenceService } from '@theia/core/lib/common';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';

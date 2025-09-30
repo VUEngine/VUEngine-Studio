@@ -1,5 +1,4 @@
-import { CommandService, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, nls, PreferenceService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';

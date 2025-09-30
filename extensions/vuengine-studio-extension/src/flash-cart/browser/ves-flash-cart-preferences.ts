@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceScope } from '@theia/core/lib/browser';
+import { nls, PreferenceScope } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesFlashCartPreferenceIds {
@@ -10,11 +9,13 @@ export namespace VesFlashCartPreferenceIds {
 }
 
 export const VesFlashCartPreferenceSchema: PreferenceSchema = {
-  type: 'object',
   properties: {
     [VesFlashCartPreferenceIds.FLASH_CARTS]: {
       type: 'array',
-      label: 'Custom Flash Cart Configurations',
+      title: nls.localize(
+        'vuengine/flashCarts/preferences/flashCartsTitle',
+        'Custom Flash Cart Configurations'
+      ),
       description: nls.localize(
         'vuengine/flashCarts/preferences/flashCartsDescription',
         'Configurations for flash cart auto-detection and flashing.'
@@ -84,9 +85,12 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
     },
     [VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE]: {
       type: 'boolean',
-      label: 'Auto Queue',
+      title: nls.localize(
+        'vuengine/flashCarts/preferences/flashCartsAutoQueueTitle',
+        'Auto Queue'
+      ),
       description: nls.localize(
-        'vuengine/flashCarts/preferences/automaticallyQueueWhenBuildStarted',
+        'vuengine/flashCarts/preferences/flashCartsAutoQueueDescription',
         'Automatically queue when a build is started.'
       ),
       default: false,

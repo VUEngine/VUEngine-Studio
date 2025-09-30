@@ -1,5 +1,4 @@
-import { PreferenceService } from '@theia/core/lib/browser';
-import { CommandService, MessageService, isOSX, isWindows, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, PreferenceService, isOSX, isWindows, nls } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';

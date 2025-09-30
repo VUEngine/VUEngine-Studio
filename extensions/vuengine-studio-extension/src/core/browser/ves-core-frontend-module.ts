@@ -1,9 +1,9 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import { CollaborationFrontendContribution } from '@theia/collaboration/lib/browser/collaboration-frontend-contribution';
 import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
-import { FilterContribution } from '@theia/core';
+import { CorePreferenceContribution, FilterContribution, PreferenceConfigurations } from '@theia/core';
 import {
-    ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
+    ApplicationShell, FrontendApplicationContribution,
     KeybindingContribution,
     LabelProviderContribution
 } from '@theia/core/lib/browser';
@@ -14,7 +14,6 @@ import {
     BrowserMainMenuFactory,
     BrowserMenuBarContribution
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
-import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';

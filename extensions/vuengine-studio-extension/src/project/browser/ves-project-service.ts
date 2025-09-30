@@ -1,5 +1,18 @@
-import { CommandService, Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, isObject, isWindows, nls } from '@theia/core';
-import { OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import {
+  CommandService,
+  Emitter,
+  MessageService,
+  PreferenceScope,
+  PreferenceService,
+  QuickInputService,
+  QuickPickItem,
+  QuickPickOptions,
+  QuickPickService,
+  isObject,
+  isWindows,
+  nls
+} from '@theia/core';
+import { OpenerService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';

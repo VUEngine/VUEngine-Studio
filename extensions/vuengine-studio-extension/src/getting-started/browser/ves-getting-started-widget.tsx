@@ -1,5 +1,5 @@
-import { Path, URI, nls } from '@theia/core';
-import { PreferenceService, codicon } from '@theia/core/lib/browser';
+import { Path, PreferenceService, URI, nls } from '@theia/core';
+import { codicon } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { GettingStartedWidget, PreferencesProps } from '@theia/getting-started/lib/browser/getting-started-widget';
@@ -312,7 +312,7 @@ function VesWelcomePreferences(props: PreferencesProps): React.JSX.Element {
         const prefListener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === 'workbench.startupEditor') {
                 const prefValue = change.newValue;
-                setStartupEditor(prefValue);
+                setStartupEditor(prefValue as string);
             }
         });
         return () => prefListener.dispose();

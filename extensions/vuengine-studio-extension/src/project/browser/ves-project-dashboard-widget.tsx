@@ -1,4 +1,4 @@
-import { CommandService, MessageService, nls, QuickPickService } from '@theia/core';
+import { CommandService, MessageService, nls, PreferenceService, QuickPickService } from '@theia/core';
 import {
     ExtractableWidget,
     FrontendApplication,
@@ -6,7 +6,6 @@ import {
     LocalStorageService,
     Message,
     OpenerService,
-    PreferenceService,
     StatusBar,
     StatusBarEntry
 } from '@theia/core/lib/browser';

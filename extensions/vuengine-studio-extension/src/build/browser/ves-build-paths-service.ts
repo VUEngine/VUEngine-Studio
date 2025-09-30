@@ -1,5 +1,4 @@
-import { isWindows } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { isWindows, PreferenceService } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';

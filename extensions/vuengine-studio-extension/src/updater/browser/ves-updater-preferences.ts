@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceScope } from '@theia/core/lib/browser';
+import { nls, PreferenceScope } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesUpdaterPreferenceIds {
@@ -9,7 +8,6 @@ export namespace VesUpdaterPreferenceIds {
 }
 
 export const VesUpdaterPreferenceSchema: PreferenceSchema = {
-    'type': 'object',
     'properties': {
         [VesUpdaterPreferenceIds.REPORT_ON_START]: {
             type: 'boolean',

@@ -1,5 +1,5 @@
-import { CommandService, isOSX } from '@theia/core';
-import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, isOSX, PreferenceScope, PreferenceService } from '@theia/core';
+import { FrontendApplication } from '@theia/core/lib/browser';
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';

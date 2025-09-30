@@ -1,5 +1,4 @@
-import { CommandService, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, nls, PreferenceService } from '@theia/core';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React from 'react';
 import { VesBuildService } from '../../../build/browser/ves-build-service';

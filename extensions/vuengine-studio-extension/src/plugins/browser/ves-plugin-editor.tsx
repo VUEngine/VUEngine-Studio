@@ -1,5 +1,5 @@
-import { CommandService, nls } from '@theia/core';
-import { HoverService, Message, PreferenceService, ReactWidget, Widget } from '@theia/core/lib/browser';
+import { CommandService, nls, PreferenceService } from '@theia/core';
+import { HoverService, Message, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';

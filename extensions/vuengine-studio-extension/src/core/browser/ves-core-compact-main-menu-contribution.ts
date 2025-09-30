@@ -1,5 +1,5 @@
-import { MAIN_MENU_BAR, nls } from '@theia/core';
-import { ApplicationShell, FrontendApplication, FrontendApplicationContribution, PreferenceService } from '@theia/core/lib/browser';
+import { MAIN_MENU_BAR, nls, PreferenceService } from '@theia/core';
+import { ApplicationShell, FrontendApplication, FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 
 @injectable()

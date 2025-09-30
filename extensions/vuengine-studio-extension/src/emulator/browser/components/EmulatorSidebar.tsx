@@ -1,5 +1,4 @@
-import { CommandService, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, nls, PreferenceService } from '@theia/core';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';

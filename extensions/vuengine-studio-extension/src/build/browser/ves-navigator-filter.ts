@@ -1,7 +1,7 @@
-import { PreferenceService } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileNavigatorFilter } from '@theia/navigator/lib/browser/navigator-filter';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { PreferenceService } from '@theia/core';
 
 @injectable()
 export class VesFileNavigatorFilter extends FileNavigatorFilter {

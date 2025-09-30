@@ -1,5 +1,4 @@
-import { PreferenceContribution } from '@theia/core/lib/browser';
-import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
+import { CommandContribution, MenuContribution, PreferenceContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { VesUpdaterFrontendContribution } from './ves-updater-frontend-contribution';
 import { VesUpdaterPreferenceSchema } from './ves-updater-preferences';

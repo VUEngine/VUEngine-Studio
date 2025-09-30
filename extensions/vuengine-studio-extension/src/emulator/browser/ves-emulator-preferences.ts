@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceScope } from '@theia/core/lib/browser';
+import { nls, PreferenceScope } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
   EMULATION_MODES,
@@ -24,11 +23,13 @@ export namespace VesEmulatorPreferenceIds {
 }
 
 export const VesEmulatorPreferenceSchema: PreferenceSchema = {
-  type: 'object',
   properties: {
     [VesEmulatorPreferenceIds.EMULATORS]: {
       type: 'array',
-      label: 'Custom Emulator Configurations',
+      title: nls.localize(
+        'vuengine/emulator/preferences/customConfigsTitle',
+        'Custom Emulator Configurations'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/customConfigsDescription',
         'User-defined emulator configurations for running compiled ROMs.'
@@ -61,7 +62,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.DEFAULT_EMULATOR]: {
       type: 'string',
-      label: 'Default Emulator',
+      title: nls.localize(
+        'vuengine/emulator/preferences/customDefaultTitle',
+        'Default Emulator'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/customDefaultDescription',
         'Emulator configuration that shall be used to run compiled ROMs. Uses built-in emulator if left blank.'
@@ -72,7 +76,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE]: {
       type: 'string',
-      label: 'Stereo Mode',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInStereoModeTitle',
+        'Stereo Mode',
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInStereoModeDescription',
         'Stereoscopy display mode of built-in emulator.'
@@ -85,7 +92,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE]: {
       type: 'string',
-      label: 'Emulation Mode',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInEmulationModeTitle',
+        'Emulation Mode'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInEmulationModeDescription',
         'Emulation mode of built-in emulator.'
@@ -98,7 +108,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE]: {
       type: 'string',
-      label: 'Scale',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInScalingModeTitle',
+        'Scale'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInScalingModeDescription',
         'Scaling mode of built-in emulator.'
@@ -111,9 +124,12 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE]: {
       type: 'boolean',
-      label: 'Auto Queue',
+      title: nls.localize(
+        'vuengine/emulator/preferences/autoQueueTitle',
+        'Auto Queue'
+      ),
       description: nls.localize(
-        'vuengine/emulator/preferences/automaticallyQueueWhenBuildStarted',
+        'vuengine/emulator/preferences/autoQueueDescription',
         'Automatically queue when a build is started.'
       ),
       default: false,
@@ -122,7 +138,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE]: {
       type: 'boolean',
-      label: 'Enable Rewind',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInEnableRewindTitle',
+        'Enable Rewind'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInEnableRewindDescription',
         'Enable rewinding. Will cause a performance hit when playing.'
@@ -133,7 +152,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY]: {
       type: 'number',
-      label: 'Rewind Granularity',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInRewindGranularityTitle',
+        'Rewind Granularity'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInRewindGranularityDescription',
         'Defines how many frames per step the rewind function should go back at a time.'
@@ -146,7 +168,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO]: {
       type: 'number',
-      label: 'Slow Motion Ratio',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInSlowMotionRatioTitle',
+        'Slow Motion Ratio'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInSlowMotionRatioDescription',
         'When using slowmotion, content will slow down by this factor. High values might render the emulator unresponsive. Keep key pressed to exit slow motion.'
@@ -160,7 +185,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO]: {
       type: 'number',
-      label: 'Fast Forward Ratio',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInFastForwardRatioTitle',
+        'Fast Forward Ratio'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInFastForwardRatioDescription',
         'The maximum rate at which content will be run when using fast forward. (E.g. 5.0 means 50 Hz * 5.0 = 250 fps cap). 0 means no FPS cap.'
@@ -174,7 +202,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
     },
     [VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS]: {
       type: 'string',
-      label: '3DS IP Address',
+      title: nls.localize(
+        'vuengine/emulator/preferences/redViper3dsIpAddressTitle',
+        '3DS IP Address'
+      ),
       description: nls.localize(
         'vuengine/emulator/preferences/redViper3dsIpAddressDescription',
         'The IP address of the Nintendo 3DS running Red Viper.'

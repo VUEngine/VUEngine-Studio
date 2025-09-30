@@ -1,5 +1,5 @@
-import { CommandContribution, ContributionFilterRegistry, FilterContribution, MenuContribution } from '@theia/core';
-import { FrontendApplicationContribution, KeybindingContribution, LabelProviderContribution, PreferenceContribution } from '@theia/core/lib/browser';
+import { CommandContribution, ContributionFilterRegistry, FilterContribution, MenuContribution, PreferenceContribution } from '@theia/core';
+import { FrontendApplicationContribution, KeybindingContribution, LabelProviderContribution } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { injectable } from '@theia/core/shared/inversify';
