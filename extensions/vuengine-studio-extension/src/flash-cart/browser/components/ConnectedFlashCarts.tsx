@@ -117,8 +117,11 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
                                 {connectedFlashCart.deviceCodes.vid}:
                                 {connectedFlashCart.deviceCodes.pid}<br />
                                 {connectedFlashCart.deviceCodes.manufacturer}<br />
-                                {connectedFlashCart.deviceCodes.product}<br />
+                                {connectedFlashCart.deviceCodes.product}
+                                {/* }
+                                <br />
                                 {connectedFlashCart.port}
+                                {*/ }
                             </div>
                             <div>
                                 <i className='fa fa-fw fa-terminal'></i>{' '}
