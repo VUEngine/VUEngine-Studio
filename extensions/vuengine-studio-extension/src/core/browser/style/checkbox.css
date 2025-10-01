@@ -10,9 +10,11 @@
     height: var(--theia-ui-font-size2);
     line-height: var(--theia-ui-font-size2);
     margin: 0 var(--theia-ui-padding) 0 0;
+    min-height: unset !important;
     outline: none !important;
     padding: 0;
     position: relative;
+    vertical-align: bottom;
     width: calc(2 * (var(--theia-ui-font-size2) + var(--theia-border-width))) !important;
 }
 
@@ -24,12 +26,13 @@
     background-color: var(--theia-input-background);
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 10px;
+    box-sizing: border-box;
     content: '';
     cursor: pointer;
     display: inline-block;
     height: var(--theia-ui-font-size2);
-    position: relative;
-    vertical-align: bottom;
+    left: 0;
+    position: absolute;
     width: calc(2 * var(--theia-ui-font-size2));
 }
 [type="checkbox"]:checked::before {
@@ -52,6 +55,7 @@
     aspect-ratio: 1;
     background: var(--theia-editor-foreground);
     border-radius: 50%;
+    box-sizing: border-box;
     content: '';
     cursor: pointer;
     height: var(--theia-ui-font-size2);
