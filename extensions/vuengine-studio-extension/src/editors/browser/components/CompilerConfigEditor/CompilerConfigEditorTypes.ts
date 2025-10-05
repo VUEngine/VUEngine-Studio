@@ -43,7 +43,7 @@ export interface CompilerConfigData {
     memorySections: MemorySectionsData
     memoryUsage: {
         initializedData: DataMemorySection
-        memoryPools: BssMemorySection
+        memoryPool: BssMemorySection
         staticSingletons: BssMemorySection
         uninitializedData: BssMemorySection
         virtualTables: BssMemorySection

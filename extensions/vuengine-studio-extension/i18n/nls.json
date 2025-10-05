@@ -1344,7 +1344,7 @@
       "dataType": "Data Type",
       "endAddress": "End Address",
       "initializedData": "Initialized Global Data",
-      "memoryPools": "Memory Pools",
+      "memoryPool": "Memory Pool",
       "memorySection": "Memory Section",
       "memorySectionDramDescription": "At almost double the size of WRAM, there is a comparatively large amount of BGMAP memory available on the Virtual Boy,                                 which is also almost as fast to access as WRAM.                                 Therefore, you can reserve some memory at the end of it to use as additional working RAM.                                 The engine will place everything assigned to .dram_data and .dram_bss here.                                 The reserved space will be unavailable for BGMAP data.",
       "memorySectionsSelect": {
