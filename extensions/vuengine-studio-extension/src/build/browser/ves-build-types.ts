@@ -1,6 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 
 export enum BuildMode {
+  Shipping = 'Shipping',
   Release = 'Release',
   Beta = 'Beta',
   Tools = 'Tools',

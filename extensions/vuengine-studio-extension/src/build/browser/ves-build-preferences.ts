@@ -29,6 +29,7 @@ const properties: PreferenceSchemaProperties = {
         type: 'string',
         default: DEFAULT_BUILD_MODE,
         enum: [
+            BuildMode.Shipping,
             BuildMode.Release,
             BuildMode.Beta,
             BuildMode.Tools,

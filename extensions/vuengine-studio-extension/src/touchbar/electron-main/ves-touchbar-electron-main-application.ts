@@ -152,6 +152,8 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         const buildModes = [{
+            label: BuildMode.Shipping,
+        }, {
             label: BuildMode.Release,
         }, {
             label: BuildMode.Beta,

@@ -1215,8 +1215,13 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     const buildTypes: QuickPickItem[] = [
       {
-        label: BuildMode.Release,
+        label: BuildMode.Shipping,
         description: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for shipping only.'),
+        iconClasses: ['codicon', (BuildMode.Shipping === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
+      },
+      {
+        label: BuildMode.Release,
+        description: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for testing on hardware.'),
         iconClasses: ['codicon', (BuildMode.Release === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {

@@ -90,7 +90,7 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
                 preferenceService={preferenceService}
             />
         </div>
-        {lastBuildMode && lastBuildMode !== 'Release' &&
+        {lastBuildMode && (lastBuildMode !== 'Release' && lastBuildMode !== 'Shipping') &&
             <div className="infoPanel warning">
                 <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
                 {nls.localize(
