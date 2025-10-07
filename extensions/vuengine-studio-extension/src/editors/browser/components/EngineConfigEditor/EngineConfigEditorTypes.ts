@@ -41,6 +41,7 @@ export enum Diagnostics {
 }
 
 export interface EngineConfigDataDebug {
+    alertGraphicsDepletion: boolean
     enableProfiler: boolean
     diagnostics: Diagnostics
     stackHeadroom: number
@@ -244,6 +245,7 @@ export const TIMER_RESOLUTION_MIN_VALUE = 1;
 export const TIMER_RESOLUTION_MAX_VALUE = 128;
 export const TIMER_RESOLUTION_DEFAULT_VALUE = 10;
 
+export const ENABLE_ALERT_GRAPHICS_MEMORY_DEPLETION_DEFAULT_VALUE = true;
 export const ENABLE_PROFILER_DEFAULT_VALUE = false;
 
 export const STACK_HEADROOM_MIN_VALUE = 1;

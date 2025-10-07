@@ -1695,7 +1695,7 @@
         "enabledDescription": "Enable communications at the start of the game, e.g. for link play."
       },
       "debug": {
-        "alertVipOvertime": "Alert VIP Overtime",
+        "alertGraphicsDepletion": "Throw an exception when WORLD, OBJECT, BGMAP or OBJECT memory is depleted.",
         "dimmForProfiling": "Dimm For Profiling",
         "dimmForProfilingDescription": "Dimm the screen to make it easier to read the profiling output.",
         "enableProfiler": "Enable Profiler",

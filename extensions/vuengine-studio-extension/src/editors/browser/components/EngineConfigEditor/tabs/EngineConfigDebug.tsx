@@ -8,6 +8,7 @@ import {
     Diagnostics,
     DIAGNOSTICS_LABELS,
     ENABLE_PROFILER_DEFAULT_VALUE,
+    ENABLE_ALERT_GRAPHICS_MEMORY_DEPLETION_DEFAULT_VALUE,
     EngineConfigData,
     STACK_HEADROOM_DEFAULT_VALUE,
     STACK_HEADROOM_MAX_VALUE,
@@ -22,6 +23,16 @@ interface EngineConfigDebugProps {
 
 export default function EngineConfigDebug(props: EngineConfigDebugProps): React.JSX.Element {
     const { data, updateData } = props;
+
+    const toggleAlertGraphicsDepletion = (): void => {
+        updateData({
+            ...data,
+            debug: {
+                ...(data.debug ?? {}),
+                alertGraphicsDepletion: !(data.debug?.alertGraphicsDepletion ?? ENABLE_ALERT_GRAPHICS_MEMORY_DEPLETION_DEFAULT_VALUE),
+            }
+        });
+    };
 
     const setDiagnostics = (diagnostics: Diagnostics): void => {
         updateData({
@@ -57,6 +68,14 @@ export default function EngineConfigDebug(props: EngineConfigDebugProps): React.
 
     return (
         <VContainer gap={15}>
+            <InfoLabel
+                label={nls.localize('vuengine/editors/engineConfig/debug/alertGraphicsDepletion', 'Enable graphics depletion asserts')}
+            />
+            <input
+                type="checkbox"
+                checked={(data.debug?.alertGraphicsDepletion ?? ENABLE_ALERT_GRAPHICS_MEMORY_DEPLETION_DEFAULT_VALUE)}
+                onChange={() => toggleAlertGraphicsDepletion()}
+            />
             <HContainer gap={25}>
                 <VContainer>
                     <label>

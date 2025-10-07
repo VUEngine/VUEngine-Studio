@@ -76,14 +76,14 @@ export default function MemoryUsage(props: MemoryUsageProps): React.JSX.Element 
         </tr>
         <tr>
             <td>
-                {nls.localize('vuengine/editors/compilerConfig/memoryPools', 'Memory Pools')}
+                {nls.localize('vuengine/editors/compilerConfig/memoryPool', 'Memory Pool')}
             </td>
             <td>
                 <select
                     className='theia-select'
                     style={{ width: '100%' }}
                     onChange={e => setMemoryUsage('memoryPools', e.target.value as BssMemorySection)}
-                    value={data.memoryUsage.memoryPools}
+                    value={data.memoryUsage.memoryPool}
                 >
                     {bssMemorySectionOptions}
                 </select>
