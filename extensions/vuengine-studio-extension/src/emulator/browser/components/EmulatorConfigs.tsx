@@ -1,5 +1,5 @@
-import { CommandService, URI, isWindows, nls } from '@theia/core';
-import { CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, PreferenceService, URI, isWindows, nls } from '@theia/core';
+import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
@@ -123,9 +123,9 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesEmulatorPreferenceIds.DEFAULT_EMULATOR) {
-                setDefaultEmulator(change.newValue);
+                setDefaultEmulator(change.newValue as string);
             } else if (change.preferenceName === VesEmulatorPreferenceIds.EMULATORS) {
-                setEmulatorConfigs(change.newValue || []);
+                setEmulatorConfigs(change.newValue as unknown as EmulatorConfig[] || []);
             }
         });
         return () => preflistener.dispose();

@@ -1,5 +1,4 @@
-import { CommandService, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, nls, PreferenceService } from '@theia/core';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React from 'react';
 import { VesBuildService } from '../../../build/browser/ves-build-service';
@@ -118,8 +117,11 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
                                 {connectedFlashCart.deviceCodes.vid}:
                                 {connectedFlashCart.deviceCodes.pid}<br />
                                 {connectedFlashCart.deviceCodes.manufacturer}<br />
-                                {connectedFlashCart.deviceCodes.product}<br />
+                                {connectedFlashCart.deviceCodes.product}
+                                {/* }
+                                <br />
                                 {connectedFlashCart.port}
+                                {*/ }
                             </div>
                             <div>
                                 <i className='fa fa-fw fa-terminal'></i>{' '}

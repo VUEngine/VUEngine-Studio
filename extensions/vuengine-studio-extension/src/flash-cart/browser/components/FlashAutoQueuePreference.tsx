@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { nls, PreferenceService } from '@theia/core';
 import React from 'react';
 import { VesFlashCartPreferenceIds } from '../ves-flash-cart-preferences';
 
@@ -14,8 +13,7 @@ export default function FlashAutoQueuePreference(props: FlashAutoQueuePreference
     React.useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE) {
-                const prefValue: boolean = change.newValue;
-                setAutoQueue(prefValue);
+                setAutoQueue(change.newValue as boolean);
             }
         });
         return () => preflistener.dispose();

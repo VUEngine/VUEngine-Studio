@@ -26,7 +26,7 @@ const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/gcc/libexec/gcc/v810/4.7.4',
     'binaries/vuengine-studio-tools/${os}/gcc/v810/bin',
     'binaries/vuengine-studio-tools/${os}/grit/grit',
-    'binaries/vuengine-studio-tools/${os}/hb-cli/hbcli',
+    'binaries/vuengine-studio-tools/${os}/hscli/hscli',
     'binaries/vuengine-studio-tools/${os}/hf-cli/hfcli',
     'binaries/vuengine-studio-tools/${os}/make/make',
     'binaries/vuengine-studio-tools/${os}/prog-vb/prog-vb',

@@ -1,5 +1,5 @@
-import { CommandService, isWindows, nls } from '@theia/core';
-import { Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
+import { Message } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -116,11 +116,11 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.LOG_LINE_WRAP:
           // TODO: this is not correctly initialized.
           // Good luck fixing this, as the goddamn preferenceservice is returning the wrong value.
-          this.state.lineWrap = newValue;
+          this.state.lineWrap = newValue as boolean;
           this.update();
           break;
         case VesBuildPreferenceIds.USE_WSL:
-          this.state.useWsl = newValue;
+          this.state.useWsl = newValue as boolean;
           this.update();
           break;
       }

@@ -1,5 +1,4 @@
-import { isWindows } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { isWindows, PreferenceService } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';

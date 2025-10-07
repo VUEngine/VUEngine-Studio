@@ -1,5 +1,5 @@
-import { URI, isWindows, nls } from '@theia/core';
-import { ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
+import { PreferenceService, URI, isWindows, nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';

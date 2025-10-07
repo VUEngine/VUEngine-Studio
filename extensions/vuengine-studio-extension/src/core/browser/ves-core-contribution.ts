@@ -1,5 +1,5 @@
-import { isOSX, URI } from '@theia/core';
-import { ApplicationShell, KeybindingContribution, KeybindingRegistry, OpenerService, PreferenceService } from '@theia/core/lib/browser';
+import { isOSX, PreferenceService, URI } from '@theia/core';
+import { ApplicationShell, KeybindingContribution, KeybindingRegistry, OpenerService } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';

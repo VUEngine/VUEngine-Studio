@@ -1,5 +1,5 @@
-import { CommandContribution, MenuContribution } from '@theia/core';
-import { FrontendApplicationContribution, KeybindingContribution, OpenHandler, PreferenceContribution, WidgetFactory, bindViewContribution } from '@theia/core/lib/browser';
+import { CommandContribution, MenuContribution, PreferenceContribution } from '@theia/core';
+import { FrontendApplicationContribution, KeybindingContribution, OpenHandler, WidgetFactory, bindViewContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import '../../../src/emulator/browser/style/index.css';

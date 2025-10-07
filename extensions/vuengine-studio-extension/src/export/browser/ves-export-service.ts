@@ -1,5 +1,5 @@
-import { CommandService, environment, nls } from '@theia/core';
-import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, environment, nls, PreferenceService } from '@theia/core';
+import { ApplicationShell, CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';

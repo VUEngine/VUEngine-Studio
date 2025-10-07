@@ -1,5 +1,4 @@
-import { Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { Emitter, MessageService, PreferenceService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';

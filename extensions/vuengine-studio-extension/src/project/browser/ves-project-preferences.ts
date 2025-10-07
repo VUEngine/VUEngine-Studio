@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceScope } from '@theia/core/lib/browser';
+import { nls, PreferenceScope } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesProjectPreferenceIds {

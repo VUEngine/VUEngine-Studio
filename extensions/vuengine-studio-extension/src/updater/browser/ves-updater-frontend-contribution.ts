@@ -1,6 +1,5 @@
 import { CommonMenus, LocalStorageService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { PreferenceScope, PreferenceService } from '@theia/core/lib/browser/preferences';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import {
     CommandContribution,
@@ -9,7 +8,9 @@ import {
     MenuModelRegistry,
     MenuPath,
     MessageService,
-    nls
+    nls,
+    PreferenceScope,
+    PreferenceService
 } from '@theia/core/lib/common';
 import { ApplicationServer } from '@theia/core/lib/common/application-protocol';
 import { FrontendApplicationState } from '@theia/core/lib/common/frontend-application-state';

@@ -1,4 +1,4 @@
-import { CommandService, isWindows, nls } from '@theia/core';
+import { CommandService, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
 import {
   Endpoint,
   ExtractableWidget,
@@ -6,8 +6,6 @@ import {
   LocalStorageService,
   Message,
   NavigatableWidget,
-  PreferenceScope,
-  PreferenceService,
   ScopedKeybinding
 } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';

@@ -1,5 +1,5 @@
+import { PreferenceConfigurations } from '@theia/core';
 import { injectable } from '@theia/core/shared/inversify';
-import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 
 export const VES_PREFERENCE_DIR = '.vuengine';
 

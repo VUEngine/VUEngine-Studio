@@ -1,5 +1,5 @@
-import { ApplicationShell, ConfirmDialog, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, MessageService, isWindows, nls } from '@theia/core/lib/common';
+import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
+import { CommandService, MessageService, PreferenceScope, PreferenceService, isWindows, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';

@@ -2,7 +2,9 @@ import {
     bindViewContribution,
     FrontendApplicationContribution,
     OpenHandler,
-    PreferenceContribution, ViewContainerIdentifier, WidgetFactory, WidgetManager
+    ViewContainerIdentifier,
+    WidgetFactory,
+    WidgetManager
 } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
@@ -23,6 +25,7 @@ import { VesPluginsSourceOptions } from './ves-plugins-source';
 import { VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
 import { VesPluginsWidget, VesPluginsWidgetOptions } from './ves-plugins-widget';
+import { PreferenceContribution } from '@theia/core';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands

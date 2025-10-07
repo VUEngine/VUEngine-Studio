@@ -1,11 +1,9 @@
-import { CommandRegistry, CommandService, isOSX, isWindows, nls } from '@theia/core';
+import { CommandRegistry, CommandService, isOSX, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
 import {
   ApplicationShell,
   ConfirmDialog,
   LabelProvider,
   LocalStorageService,
-  PreferenceScope,
-  PreferenceService,
   QuickPickItem,
   QuickPickOptions,
   QuickPickService
@@ -359,7 +357,7 @@ export class VesBuildService {
         switch (preferenceName) {
           case VesBuildPreferenceIds.BUILD_MODE:
             if (newValue !== oldValue) {
-              this.onDidChangeBuildModeEmitter.fire(newValue);
+              this.onDidChangeBuildModeEmitter.fire(newValue as BuildMode);
             }
             break;
         }

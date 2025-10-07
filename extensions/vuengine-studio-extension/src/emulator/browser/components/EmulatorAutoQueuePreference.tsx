@@ -1,5 +1,4 @@
-import { nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { nls, PreferenceService } from '@theia/core';
 import React from 'react';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 
@@ -14,7 +13,7 @@ export default function EmulatorAutoQueuePreference(props: EmulatorAutoQueuePref
     React.useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE) {
-                setAutoQueue(change.newValue);
+                setAutoQueue(change.newValue as boolean);
             }
         });
         return () => preflistener.dispose();

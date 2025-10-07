@@ -1,4 +1,4 @@
-import { bindViewContribution, FrontendApplicationContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
@@ -16,6 +16,7 @@ import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
+import { PreferenceContribution } from '@theia/core';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands

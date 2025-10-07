@@ -2,7 +2,7 @@ import { isWindows } from '@theia/core';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
-export const HBCLI_PLACEHOLDER = '%HBCLI%';
+export const HSCLI_PLACEHOLDER = '%HSCLI%';
 export const NAME_PLACEHOLDER = '%NAME%';
 export const NAME_NO_SPACES_PLACEHOLDER = '%NAME_NO_SPACES%';
 export const ROM_PLACEHOLDER = '%ROM%';
@@ -108,10 +108,8 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
       product: 'HYPERBOY',
     }],
     size: 32,
-    path: HBCLI_PLACEHOLDER,
-    args: isWindows
-      ? `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER}`
-      : `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER} --slow`,
+    path: HSCLI_PLACEHOLDER,
+    args: `-f ${ROM_PLACEHOLDER}`,
     padRom: false,
     image: HYPERBOY_IMAGE_PLACEHOLDER,
   },

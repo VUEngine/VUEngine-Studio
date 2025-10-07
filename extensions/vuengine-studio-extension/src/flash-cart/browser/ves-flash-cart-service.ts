@@ -1,5 +1,4 @@
-import { PreferenceService } from '@theia/core/lib/browser';
-import { CommandService, MessageService, isOSX, isWindows, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, PreferenceService, isOSX, isWindows, nls } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -22,7 +21,7 @@ import {
   ConnectedFlashCart,
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
   FlashCartConfig,
-  HBCLI_PLACEHOLDER,
+  HSCLI_PLACEHOLDER,
   HFCLI_PLACEHOLDER,
   HYPERBOY_IMAGE_PLACEHOLDER,
   HYPERFLASH32_IMAGE_PLACEHOLDER,
@@ -398,7 +397,7 @@ export class VesFlashCartService {
 
   protected async replaceFlasherPath(flasherPath: string): Promise<string> {
     return flasherPath
-      .replace(HBCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHbCliUri()))
+      .replace(HSCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHsCliUri()))
       .replace(HFCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHfCliUri()))
       .replace(PROG_VB_PLACEHOLDER, await this.fileService.fsPath(await this.getProgVbUri()))
       .replace(/\\/g, '/');
@@ -446,7 +445,7 @@ export class VesFlashCartService {
   }
 
   protected async parseStreamDataHyperBoyCli(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> {
-    if (connectedFlashCart.config.path === HBCLI_PLACEHOLDER) {
+    if (connectedFlashCart.config.path === HSCLI_PLACEHOLDER) {
       if (data.startsWith('> Clearing')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
@@ -578,14 +577,14 @@ export class VesFlashCartService {
       .resolve(isWindows ? 'prog-vb.exe' : 'prog-vb');
   }
 
-  async getHbCliUri(): Promise<URI> {
+  async getHsCliUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     return resourcesUri
       .resolve('binaries')
       .resolve('vuengine-studio-tools')
       .resolve(this.vesCommonService.getOs())
-      .resolve('hb-cli')
-      .resolve(isWindows ? 'hbcli.exe' : 'hbcli');
+      .resolve('hscli')
+      .resolve(isWindows ? 'hscli.exe' : 'hscli');
   }
 
   async getHfCliUri(): Promise<URI> {

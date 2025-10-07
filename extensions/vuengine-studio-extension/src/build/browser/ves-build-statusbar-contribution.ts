@@ -1,9 +1,9 @@
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
+import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildService } from './ves-build-service';
-import { nls } from '@theia/core';
+import { nls, PreferenceService } from '@theia/core';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()

@@ -1,5 +1,4 @@
-import { isWindows, nls } from '@theia/core';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { isWindows, nls, PreferenceService } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';

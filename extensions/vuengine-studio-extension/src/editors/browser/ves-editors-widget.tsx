@@ -1,7 +1,7 @@
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
-import { CommandService, Emitter, Event, MessageService, nls, QuickPickService, Reference, UNTITLED_SCHEME, URI } from '@theia/core';
+import { CommandService, Emitter, Event, MessageService, nls, PreferenceService, QuickPickService, Reference, UNTITLED_SCHEME, URI } from '@theia/core';
 import {
     CommonCommands,
     ExtractableWidget,
@@ -12,7 +12,6 @@ import {
     lock,
     NavigatableWidget,
     OpenerService,
-    PreferenceService,
     Saveable,
     SaveableSource,
     StatusBar,
@@ -25,7 +24,6 @@ import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { EditorPreferences } from '@theia/editor/lib/browser';
 import { UndoRedoService } from '@theia/editor/lib/browser/undo-redo-service';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -45,6 +43,7 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
+import { EditorPreferences } from '@theia/editor/lib/common/editor-preferences';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {

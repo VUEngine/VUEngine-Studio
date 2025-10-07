@@ -1,4 +1,3 @@
-import { PreferenceService } from '@theia/core/lib/browser';
 import { Emitter } from '@theia/core/lib/common/event';
 import { ProgressService } from '@theia/core/lib/common/progress-service';
 import { Deferred } from '@theia/core/lib/common/promise-util';
@@ -9,6 +8,7 @@ import { VesPlugin, VesPluginFactory } from './ves-plugin';
 import { VesPluginTag, VesPluginTagFactory } from './ves-plugin-tag';
 import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';
+import { PreferenceService } from '@theia/core';
 
 @injectable()
 export class VesPluginsModel {
