@@ -2371,20 +2371,6 @@
       "waveShort": "W",
       "waveform": "Waveform"
     },
-    "pcmEditor": {
-      "errorSourceFileMustBeInWorkspace": "Source file must live in workspace.",
-      "expansionSpace": "Expansion Space",
-      "expansionSpaceDescription": "Save PCM data to expansion space",
-      "loop": "Loop",
-      "name": "Name",
-      "range": "Range",
-      "romSpace": "ROM Space",
-      "romSpaceDescription": "Save PCM data to ROM space",
-      "section": "Section",
-      "selectSourceFile": "Select source file",
-      "volumeResolution": "Volume Resolution",
-      "volumeResolutionDescription": "VUEngine can dynamically allocate up to 5 channels for playback to increase volume amplitude resolution.                                 Thus, a higher value can deliver finer nuances in volume changes at a small performance cost."
-    },
     "pluginFileEditor": {
       "addConfiguration": "Add Configuration",
       "addTag": "Add Tag",

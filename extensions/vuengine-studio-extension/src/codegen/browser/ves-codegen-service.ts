@@ -9,7 +9,6 @@ import crc32 from 'crc/crc32';
 import * as iconv from 'iconv-lite';
 import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
-import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { hexFromBitsArray, intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
@@ -45,8 +44,6 @@ export class VesCodeGenService {
   protected quickPickService: QuickPickService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
-  @inject(VesAudioConverterService)
-  protected vesAudioConverterService: VesAudioConverterService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
   @inject(VesImagesService)
@@ -678,13 +675,6 @@ export class VesCodeGenService {
     });
 
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
-
-    // nunjucks does not support _async_ functions, but only filters
-    env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, range: number, callback): Promise<void> => {
-      const result = await this.vesAudioConverterService.convertPcm(configFileUri, filePath, range);
-      // eslint-disable-next-line no-null/no-null
-      callback(null, result);
-    }, true);
 
     env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath: string, callback): Promise<void> => {
       const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);

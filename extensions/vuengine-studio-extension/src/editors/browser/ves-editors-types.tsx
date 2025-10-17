@@ -91,7 +91,6 @@ export const TYPE_LABELS: { [typeId: string]: string } = {
     'Image': nls.localize('vuengine/editors/general/typeLabels/image', 'Image'),
     'Logic': nls.localize('vuengine/editors/general/typeLabels/logic', 'Logic'),
     'Messages': nls.localize('vuengine/editors/general/typeLabels/messages', 'Messages'),
-    'Pcm': nls.localize('vuengine/editors/general/typeLabels/pcm', 'PCM'),
     'Pixel': nls.localize('vuengine/editors/general/typeLabels/pixel', 'Pixel Art'),
     'PluginFile': nls.localize('vuengine/editors/general/typeLabels/pluginFile', 'Plugin File'),
     'RumbleEffect': nls.localize('vuengine/editors/general/typeLabels/rumbleEffect', 'Rumble Effect'),
