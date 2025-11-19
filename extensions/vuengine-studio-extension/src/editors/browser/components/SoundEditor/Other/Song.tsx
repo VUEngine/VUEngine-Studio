@@ -1,5 +1,7 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import ReactTextareaAutosize from 'react-textarea-autosize';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
@@ -12,10 +14,27 @@ interface SongProps {
 }
 
 export default function Song(props: SongProps): React.JSX.Element {
+    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { soundData, updateSoundData } = props;
+
+    const handleOnFocus = () => {
+        disableCommands(INPUT_BLOCKING_COMMANDS);
+    };
+
+    const handleOnBlur = () => {
+        enableCommands(INPUT_BLOCKING_COMMANDS);
+    };
 
     const setName = (n: string): void => {
         updateSoundData({ ...soundData, name: n });
+    };
+
+    const setAuthor = (a: string): void => {
+        updateSoundData({ ...soundData, author: a });
+    };
+
+    const setComment = (c: string): void => {
+        updateSoundData({ ...soundData, comment: c });
     };
 
     const setLoopPoint = (loopPoint: number): void => {
@@ -45,6 +64,28 @@ export default function Song(props: SongProps): React.JSX.Element {
             setValue={setName}
             commands={INPUT_BLOCKING_COMMANDS}
         />
+        <Input
+            label={nls.localize('vuengine/editors/sound/author', 'Author')}
+            value={soundData.author}
+            setValue={setAuthor}
+            commands={INPUT_BLOCKING_COMMANDS}
+        />
+
+        <VContainer>
+            <label>
+                {nls.localize('vuengine/editors/sound/comment', 'Comment')}
+            </label>
+            <ReactTextareaAutosize
+                className="theia-input"
+                value={soundData.comment}
+                minRows={1}
+                maxRows={4}
+                onChange={e => setComment(e.target.value)}
+                onFocus={handleOnFocus}
+                onBlur={handleOnBlur}
+                style={{ resize: 'none' }}
+            />
+        </VContainer>
 
         <VContainer>
             <label>

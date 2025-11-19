@@ -286,7 +286,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
         const track = soundData.tracks[currentTrackId];
 
-        Object.keys(track.sequence).forEach(key => {
+        Object.keys(track?.sequence ?? {}).forEach(key => {
             const step = parseInt(key);
             const patternId = track.sequence[step];
             const p = soundData.patterns[patternId];
@@ -453,12 +453,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     useEffect(() => {
         // auto scroll to current pattern in piano roll
-        /*
         pianoRollRef.current?.scrollTo({
+            // TODO: fix offset computation
             left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth,
             behavior: 'smooth',
         });
-        */
     }, [
         currentPatternId,
     ]);

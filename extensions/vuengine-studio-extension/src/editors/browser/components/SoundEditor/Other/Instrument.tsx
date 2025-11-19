@@ -18,6 +18,8 @@ import {
     VSU_ENVELOPE_STEP_TIME_MAX,
     VSU_ENVELOPE_STEP_TIME_MIN,
     VSU_ENVELOPE_STEP_TIME_VALUES,
+    VSU_INTERVAL_MAX,
+    VSU_INTERVAL_MIN,
     VSU_INTERVAL_VALUES,
     VSU_NOISE_TAP,
     VSU_SWEEP_MODULATION_FREQUENCY_MAX,
@@ -122,7 +124,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             interval: {
                 ...instrument?.interval,
                 enabled: interval !== 0,
-                value: clamp(interval - 1, 0, VSU_INTERVAL_VALUES.length - 1),
+                value: clamp(interval - 1, VSU_INTERVAL_MIN, VSU_INTERVAL_MAX),
             },
         };
 
@@ -309,20 +311,24 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     };
 
     const envelopePreviewData = useMemo(() => {
-        let result: number[] = [];
+        const result: number[] = [];
 
-        if (instrument?.envelope.direction === VsuEnvelopeDirection.Decay && instrument?.envelope.initialValue === 0) {
-            result = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 0);
-        } else if (instrument?.envelope.direction === VsuEnvelopeDirection.Grow && instrument?.envelope.initialValue === 15) {
-            result = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 15);
-        } else if (instrument?.envelope.enabled) {
+        if (instrument?.envelope.enabled) {
             const endVolume = instrument?.envelope.direction === VsuEnvelopeDirection.Grow ? 15 : 0;
-            const numberOfSteps = instrument?.envelope.direction === VsuEnvelopeDirection.Grow ? 15 - instrument?.envelope.initialValue : instrument?.envelope.initialValue;
-            const cycleDuration = (instrument?.envelope.stepTime + 1) * numberOfSteps;
+            const numberOfStepsPerCycle = instrument?.envelope.direction === VsuEnvelopeDirection.Grow
+                ? 15 - instrument?.envelope.initialValue
+                : instrument?.envelope.initialValue;
+            const cycleDuration = (instrument?.envelope.stepTime + 1) * numberOfStepsPerCycle;
             const stepDecrease = instrument?.envelope.initialValue / cycleDuration;
-            const stepIncrease = numberOfSteps / cycleDuration;
+            const stepIncrease = numberOfStepsPerCycle / cycleDuration;
+            const cutOff = instrument?.interval.enabled
+                ? (instrument?.interval.value + 1) / 4
+                : ENVELOPE_PREVIEW_SIZE;
+
             for (let index = 0; index < ENVELOPE_PREVIEW_SIZE; index++) {
-                if (index >= cycleDuration && !instrument?.envelope.repeat) {
+                if (index > cutOff) {
+                    result[index] = 0;
+                } else if (index >= cycleDuration && !instrument?.envelope.repeat) {
                     result[index] = endVolume;
                 } else {
                     const decayStepDelta = (index % cycleDuration) * stepDecrease;
@@ -336,6 +342,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
         return result;
     }, [
+        instrument?.interval.enabled,
+        instrument?.interval.value,
         instrument?.envelope.enabled,
         instrument?.envelope.initialValue,
         instrument?.envelope.direction,
@@ -440,8 +448,8 @@ Longer durations can be achieved by manually manipulating the track volume.'
                                     label: `${o.toString()} ms`,
                                 })),
                             ]}
-                            max={VSU_INTERVAL_VALUES.length}
-                            min={0}
+                            max={VSU_INTERVAL_MAX + 1}
+                            min={VSU_INTERVAL_MIN}
                             setValue={updateInterval}
                             commandsToDisable={INPUT_BLOCKING_COMMANDS}
                             selectWidth={96}
@@ -478,9 +486,13 @@ a pre-configured value and repeat the grow/decay process. '
                             <>
                                 <HContainer gap={20}>
                                     <VContainer grow={1}>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/interval', 'Interval')}
-                                        </label>
+                                        <InfoLabel
+                                            label={nls.localize('vuengine/editors/sound/interval', 'Interval')}
+                                            tooltip={nls.localize(
+                                                'vuengine/editors/sound/intervalDescription',
+                                                'Defines for how long each volume level lasts before being modified by the envelope.'
+                                            )}
+                                        />
                                         <Range
                                             value={instrument?.envelope.stepTime}
                                             setValue={setEnvelopeStepTime}

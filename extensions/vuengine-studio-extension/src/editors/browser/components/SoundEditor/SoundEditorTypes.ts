@@ -7,6 +7,8 @@ export type InstrumentMap = Record<string, InstrumentConfig>;
 
 export interface SoundData {
     name: string
+    author: string
+    comment: string
     tracks: TrackConfig[]
     patterns: PatternMap
     instruments: InstrumentMap
@@ -123,6 +125,7 @@ export interface ScrollWindow {
 }
 
 export enum SoundEditorTrackType {
+    ANY = 'any',
     WAVE = 'wave',
     SWEEPMOD = 'sweepMod',
     NOISE = 'noise',

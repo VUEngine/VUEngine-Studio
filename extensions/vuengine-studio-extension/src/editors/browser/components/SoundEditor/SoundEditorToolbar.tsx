@@ -1,4 +1,4 @@
-import { FadersHorizontal, Guitar, Magnet, Minus, PencilSimple, Plus, Selection } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Magnet, Minus, PencilSimple, Plus, Selection, Wrench } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -118,6 +118,8 @@ interface SoundEditorToolbarProps {
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     editInstrument: (instrument: string) => void
+    toolsDialogOpen: boolean
+    setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
     songSettingsDialogOpen: boolean
     setSongSettingsDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
@@ -141,6 +143,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         emulatorInitialized,
         editInstrument,
         currentInstrumentId, setCurrentInstrumentId,
+        toolsDialogOpen, setToolsDialogOpen,
         songSettingsDialogOpen, setSongSettingsDialogOpen,
         setNoteEvent,
         setTrack,
@@ -191,9 +194,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const decreaseSize = (amount: number) =>
         setSize(Math.max(MIN_SEQUENCE_SIZE, soundData.size - amount));
 
-    return soundData.tracks.length > 0
-        ? <StyledSoundEditorToolbar>
-            <StyledSoundEditorToolbarSide>
+    return <StyledSoundEditorToolbar>
+        <StyledSoundEditorToolbarSide>
+            {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarWideButton
                         className={`theia-button ${playing ? 'primary' : 'secondary'}`}
@@ -355,15 +358,17 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         <InputWithActionButton
                             className='theia-button secondary'
                             title={nls.localize('vuengine/editors/sound/setAsTrackDefaultInstrument', 'Set As Default Instrument For Current Track')}
-                            disabled={currentTrack.instrument === currentInstrumentId || currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID}
+                            disabled={currentTrack?.instrument === currentInstrumentId || currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID}
                             onClick={() => setTrack(currentTrackId, { instrument: currentInstrumentId })}
                         >
                             <Guitar size={17} />
                         </InputWithActionButton>
                     </InputWithAction>
                 </StyledSoundEditorToolbarGroup>
-            </StyledSoundEditorToolbarSide>
-            <StyledSoundEditorToolbarSide>
+            </>}
+        </StyledSoundEditorToolbarSide>
+        <StyledSoundEditorToolbarSide>
+            {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarSizeButton
                         className="theia-button secondary"
@@ -399,15 +404,21 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         <Plus size={10} />16
                     </StyledSoundEditorToolbarSizeButton>
                 </StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${songSettingsDialogOpen ? 'primary' : 'secondary'}`}
-                        onClick={() => setSongSettingsDialogOpen(prev => !prev)}
-                    >
-                        <FadersHorizontal size={17} />
-                    </StyledSoundEditorToolbarButton>
-                </StyledSoundEditorToolbarGroup>
-            </StyledSoundEditorToolbarSide>
-        </StyledSoundEditorToolbar>
-        : <></>;
+            </>}
+            <StyledSoundEditorToolbarGroup>
+                <StyledSoundEditorToolbarButton
+                    className={`theia-button ${songSettingsDialogOpen ? 'primary' : 'secondary'}`}
+                    onClick={() => setSongSettingsDialogOpen(prev => !prev)}
+                >
+                    <FadersHorizontal size={17} />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className={`theia-button ${toolsDialogOpen ? 'primary' : 'secondary'}`}
+                    onClick={() => setToolsDialogOpen(prev => !prev)}
+                >
+                    <Wrench size={17} />
+                </StyledSoundEditorToolbarButton>
+            </StyledSoundEditorToolbarGroup>
+        </StyledSoundEditorToolbarSide>
+    </StyledSoundEditorToolbar>;
 }

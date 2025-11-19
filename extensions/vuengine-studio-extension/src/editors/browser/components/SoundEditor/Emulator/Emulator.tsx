@@ -145,7 +145,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                     await services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-gcc.exe')),
                     '-o', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!.resolve('sound.elf')),
                     '-nostartfiles',
-                    '-Tvb_release.ld',
+                    '-Tvb_shipping.ld',
                     '-lm',
                     '-I', await services.vesBuildService.convertToEnvPath(false, tempBaseDir!),
                     '-I', await services.vesBuildService.convertToEnvPath(false, soundBaseUri),
@@ -159,7 +159,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             args: [
                 '-o', tempBaseDir!.resolve('sound.elf').path.fsPath(),
                 '-nostartfiles',
-                '-Tvb_release.ld',
+                '-Tvb_shipping.ld',
                 '-lm',
                 '-I', tempBaseDir!.path.fsPath(),
                 '-I', soundBaseUri.path.fsPath(),
@@ -290,7 +290,12 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             // console.log('========================');
             // console.log('--- 1) play ---');
             // console.log('compare checksums');
-            const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify(soundData));
+            const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify({
+                soundData: soundData,
+                trackSettings: trackSettings,
+            }));
+            console.log('currentSoundDataChecksum', currentSoundDataChecksum);
+            console.log('soundDataChecksum', soundDataChecksum);
             // console.log('current:', currentSoundDataChecksum);
             // console.log('previous:', soundDataChecksum);
             if (soundDataChecksum !== currentSoundDataChecksum) {
@@ -317,6 +322,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         playing,
         sim,
         soundData,
+        trackSettings,
     ]);
 
     return <></>;
