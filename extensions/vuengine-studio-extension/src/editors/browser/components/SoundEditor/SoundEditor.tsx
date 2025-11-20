@@ -42,6 +42,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_TYPE_LABELS,
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
@@ -298,19 +299,19 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (waveAvailable) {
             items.push({
                 id: SoundEditorTrackType.WAVE,
-                label: nls.localize('vuengine/editors/sound/wave', 'Wave'),
+                label: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
             });
         }
         if (sweepModAvailable) {
             items.push({
                 id: SoundEditorTrackType.SWEEPMOD,
-                label: nls.localize('vuengine/editors/sound/waveSm', 'Wave + Sweep/Modulation'),
+                label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
             });
         }
         if (noiseAvailable) {
             items.push({
                 id: SoundEditorTrackType.NOISE,
-                label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
+                label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
             });
         }
 
@@ -1061,17 +1062,19 @@ A total of {0} patterns will be deleted.',
                     onClose={() => setTrackDialogOpen(false)}
                     onOk={() => setTrackDialogOpen(false)}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
-                    height='260px'
+                    height='400px'
                     width='320px'
                     overflow='visible'
                 >
                     <CurrentTrack
                         soundData={soundData}
+                        setSoundData={updateSoundData}
                         currentTrackId={currentTrackId}
                         setCurrentTrackId={updateCurrentTrackId}
                         setTrack={setTrack}
                         removeTrack={removeTrack}
                         editInstrument={editInstrument}
+                        isTrackAvailable={isTrackAvailable}
                     />
                 </PopUpDialog>
             }

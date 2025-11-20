@@ -9,25 +9,28 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType, TrackConfig } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentTrackProps {
     soundData: SoundData
+    setSoundData: Dispatch<SetStateAction<SoundData>>
     currentTrackId: number
     setCurrentTrackId: Dispatch<SetStateAction<number>>
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     removeTrack: (trackId: number) => void
     editInstrument: (instrument: string) => void
+    isTrackAvailable: (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => boolean
 }
 
 export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
-        soundData,
+        soundData, setSoundData,
         currentTrackId, setCurrentTrackId,
         setTrack, removeTrack,
         editInstrument,
+        isTrackAvailable,
     } = props;
 
     const track = soundData.tracks[currentTrackId];
@@ -39,6 +42,18 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
     const setTrackInstrument = (instrumentId: string): void => {
         setTrack(currentTrackId, {
             instrument: instrumentId,
+        });
+    };
+
+    const setTrackType = (type: SoundEditorTrackType): void => {
+        setSoundData({
+            ...soundData,
+            tracks: soundData.tracks
+                .map((t, i) => ({
+                    ...t,
+                    type: i === currentTrackId ? type : t.type,
+                }))
+                .sort((a, b) => b.type.localeCompare(a.type)),
         });
     };
 
@@ -96,6 +111,27 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         <i className='codicon codicon-plus' />
                     </InputWithActionButton>
                 </InputWithAction>
+            </VContainer>
+
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/trackType', 'Track Type')}
+                </label>
+                <AdvancedSelect
+                    options={[
+                        SoundEditorTrackType.WAVE,
+                        SoundEditorTrackType.SWEEPMOD,
+                        SoundEditorTrackType.NOISE,
+                    ]
+                        .filter(type => type === track.type || isTrackAvailable(type, soundData.tracks))
+                        .map(type => ({
+                            value: type,
+                            label: TRACK_TYPE_LABELS[type],
+                        }))}
+                    defaultValue={`${track.type}`}
+                    onChange={options => setTrackType(options[0] as SoundEditorTrackType)}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                />
             </VContainer>
 
             <VContainer>

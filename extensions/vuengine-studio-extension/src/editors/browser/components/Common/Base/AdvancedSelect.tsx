@@ -46,11 +46,27 @@ interface AdvancedSelectProps {
     width?: number
     title?: string
     backgroundColor?: string
+    maxMenuHeight?: number
 }
 
 export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.Element {
     const {
-        options, multi, small, disabled, defaultValue, placeholder, menuPlacement, commands, width, containerStyle, style, onChange, onCreateOption, title, backgroundColor
+        options,
+        multi,
+        small,
+        disabled,
+        defaultValue,
+        placeholder,
+        menuPlacement,
+        commands,
+        width,
+        containerStyle,
+        style,
+        onChange,
+        onCreateOption,
+        title,
+        backgroundColor,
+        maxMenuHeight
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
@@ -101,7 +117,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
             unstyled
             className={className}
             classNamePrefix="react-select"
-            maxMenuHeight={212}
+            maxMenuHeight={maxMenuHeight ?? 212}
             menuPlacement={menuPlacement}
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}

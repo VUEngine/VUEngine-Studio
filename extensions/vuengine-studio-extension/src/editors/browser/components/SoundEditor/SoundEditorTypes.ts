@@ -131,6 +131,12 @@ export enum SoundEditorTrackType {
     NOISE = 'noise',
 }
 
+export const TRACK_TYPE_LABELS: { [type: string]: string } = {
+    [SoundEditorTrackType.WAVE]: nls.localize('vuengine/editors/sound/trackType/wave', 'Wave'),
+    [SoundEditorTrackType.SWEEPMOD]: nls.localize('vuengine/editors/sound/trackType/sweepMod', 'Wave + Sweep/Modulation'),
+    [SoundEditorTrackType.NOISE]: nls.localize('vuengine/editors/sound/trackType/noise', 'Noise'),
+};
+
 export enum SoundEditorTool {
     DEFAULT,
     MARQUEE,
