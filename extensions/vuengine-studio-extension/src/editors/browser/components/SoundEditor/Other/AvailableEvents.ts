@@ -26,26 +26,15 @@ export const AVAILABLE_EVENTS: EventMap = {
         defaultValue: 0x00,
     },
     [SoundEvent.PortamentoUp]: {
-        id: SoundEvent.PortamentoUp,
+        id: SoundEvent.Portamento,
         shortId: '1',
-        label: nls.localize('vuengine/editors/sound/effects/PortamentoUp', 'Portamento Up'),
+        label: nls.localize('vuengine/editors/sound/effects/Portamento', 'Portamento'),
         description: nls.localize(
-            'vuengine/editors/sound/effects/PortamentoUpDescription',
-            'Increases pitch by the specified amount of units per tick.'
+            'vuengine/editors/sound/effects/PortamentoDescription',
+            'Increases or decreases pitch by the specified amount of units per tick.'
         ),
         category: nls.localize('vuengine/editors/sound/effects/pitch', 'Pitch'),
-        defaultValue: 0x04,
-    },
-    [SoundEvent.PortamentoDown]: {
-        id: SoundEvent.PortamentoDown,
-        shortId: '2',
-        label: nls.localize('vuengine/editors/sound/effects/PortamentoDown', 'Portamento Down'),
-        description: nls.localize(
-            'vuengine/editors/sound/effects/PortamentoDownDescription',
-            'Decreases pitch by the specified amount of units per tick.'
-        ),
-        category: nls.localize('vuengine/editors/sound/effects/pitch', 'Pitch'),
-        defaultValue: 0x04,
+        defaultValue: 0,
     },
     [SoundEvent.TonePortamento]: {
         id: SoundEvent.TonePortamento,

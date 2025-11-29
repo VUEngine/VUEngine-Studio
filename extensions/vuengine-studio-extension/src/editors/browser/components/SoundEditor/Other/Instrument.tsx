@@ -10,7 +10,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import PaletteColorSelect, { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import PaletteColorSelect from '../../Common/PaletteColorSelect';
 import { clamp, nanoid } from '../../Common/Utils';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
@@ -24,14 +24,15 @@ import {
     VSU_NOISE_TAP,
     VSU_SWEEP_MODULATION_FREQUENCY_MAX,
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
-    VSU_SWEEP_MODULATION_FREQUENCY_VALUES,
     VSU_SWEEP_MODULATION_INTERVAL_MAX,
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
+    VSU_SWEEP_MODULATION_INTERVAL_VALUES,
+    VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuEnvelopeDirection,
     VsuSweepDirection,
-    VsuSweepModulationFunction,
+    VsuSweepModulationFunction
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, TRACK_DEFAULT_INSTRUMENT_ID, WAVEFORM_MAX } from '../SoundEditorTypes';
@@ -91,18 +92,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
         setInstruments(updatedInstruments);
     };
-
-    /*
-    const setWaveform = (waveform: number) => {
-        const updatedInstruments = {...soundData.instruments};
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            waveform,
-        };
-
-        setInstruments(updatedInstruments);
-    };
-    */
 
     const setStereoLevel = (side: 'left' | 'right', value: number) => {
         const updatedInstruments = { ...soundData.instruments };
@@ -211,26 +200,18 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setSweepModulationFrequency = (frequency: number) => {
-        const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
-            sweepMod: {
-                ...instrument?.sweepMod,
-                frequency: clamp(frequency, VSU_SWEEP_MODULATION_FREQUENCY_MIN, VSU_SWEEP_MODULATION_FREQUENCY_MAX),
-            },
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
     const setSweepModulationInterval = (interval: number) => {
         const updatedInstruments = { ...soundData.instruments };
         updatedInstruments[currentInstrumentId] = {
             ...updatedInstruments[currentInstrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
-                interval: clamp(interval, VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX),
+                frequency: interval >= VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY ? 1 : 0,
+                interval: clamp(
+                    (interval % VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY) + 1,
+                    VSU_SWEEP_MODULATION_INTERVAL_MIN,
+                    VSU_SWEEP_MODULATION_INTERVAL_MAX
+                ),
             },
         };
 
@@ -351,8 +332,24 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         instrument?.envelope.stepTime,
     ]);
 
+    const clampedModulationFrequency = useMemo(() => clamp(
+        instrument?.sweepMod.frequency ?? VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+        VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+        VSU_SWEEP_MODULATION_FREQUENCY_MAX
+    ), [
+        instrument?.sweepMod.frequency,
+    ]);
+
+    const clampedModulationInterval = useMemo(() => clamp(
+        instrument?.sweepMod.interval ?? VSU_SWEEP_MODULATION_INTERVAL_MIN,
+        VSU_SWEEP_MODULATION_INTERVAL_MIN,
+        VSU_SWEEP_MODULATION_INTERVAL_MAX
+    ), [
+        instrument?.sweepMod.interval,
+    ]);
+
     return (instrument !== undefined
-        ? <VContainer gap={20} grow={1} overflow='auto' style={{ padding: 1 }}>
+        ? <VContainer gap={20} grow={1} overflow='auto' style={{ padding: 3 }}>
             <VContainer>
                 <label>
                     {nls.localizeByDefault('Name')}
@@ -381,8 +378,17 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     </InputWithActionButton>
                 </InputWithAction>
             </VContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/color', 'Color')}
+                </label>
+                <PaletteColorSelect
+                    color={instrument.color}
+                    updateColor={setColor}
+                />
+            </VContainer>
             <HContainer gap={40}>
-                <VContainer gap={20} grow={1}>
+                <VContainer gap={20} style={{ width: '50%' }}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/editors/sound/volume', 'Volume')}
@@ -487,9 +493,9 @@ a pre-configured value and repeat the grow/decay process. '
                                 <HContainer gap={20}>
                                     <VContainer grow={1}>
                                         <InfoLabel
-                                            label={nls.localize('vuengine/editors/sound/interval', 'Interval')}
+                                            label={nls.localize('vuengine/editors/sound/envelopeInterval', 'Interval')}
                                             tooltip={nls.localize(
-                                                'vuengine/editors/sound/intervalDescription',
+                                                'vuengine/editors/sound/envelopeIntervalDescription',
                                                 'Defines for how long each volume level lasts before being modified by the envelope.'
                                             )}
                                         />
@@ -503,6 +509,7 @@ a pre-configured value and repeat the grow/decay process. '
                                                 label: `${st} ms`,
                                             }))}
                                             selectWidth={80}
+                                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                         />
                                     </VContainer>
                                     <VContainer>
@@ -519,12 +526,11 @@ a pre-configured value and repeat the grow/decay process. '
                                 <VContainer>
                                     <InfoLabel
                                         label={nls.localizeByDefault('Preview')}
-                                    // subLabel={nls.localize('vuengine/editors/sound/volumeOverTime', 'Volume over time')}
+                                        subLabel={nls.localize('vuengine/editors/sound/volumeOverTime', 'Volume over time')}
                                     />
                                     { /* TODO: switch to canvas */}
                                     <NumberArrayPreview
                                         active={true}
-                                        color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
                                         height={48}
                                         width={ENVELOPE_PREVIEW_SIZE}
                                         maximum={15}
@@ -557,42 +563,28 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                         />
                     </VContainer>
                 </VContainer>
-                <VContainer gap={20} grow={1}>
-                    <HContainer gap={80}>
+                <VContainer gap={20} style={{ width: '50%' }}>
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
+                            subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
+                        />
                         <VContainer>
-                            <label>
-                                {nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
-                                <div className="lightLabel">
-                                    {nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
-                                </div>
-                            </label>
-                            <VContainer>
-                                { /* TODO: switch to canvas */}
-                                <NumberArrayPreview
-                                    active={true}
-                                    color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
-                                    height={WAVEFORM_MAX * 2}
-                                    width={WAVEFORM_MAX * 2}
-                                    maximum={WAVEFORM_MAX}
-                                    data={soundData.instruments[currentInstrumentId].waveform}
-                                    onClick={() => setWaveformDialogOpen(currentInstrumentId)}
-                                />
-                            </VContainer>
-                        </VContainer>
-                        <VContainer grow={1}>
-                            <label>
-                                {nls.localize('vuengine/editors/sound/color', 'Color')}
-                            </label>
-                            <PaletteColorSelect
-                                color={instrument.color}
-                                updateColor={setColor}
+                            { /* TODO: switch to canvas */}
+                            <NumberArrayPreview
+                                active={true}
+                                height={WAVEFORM_MAX * 2}
+                                width={WAVEFORM_MAX * 2}
+                                maximum={WAVEFORM_MAX}
+                                data={soundData.instruments[currentInstrumentId].waveform}
+                                onClick={() => setWaveformDialogOpen(currentInstrumentId)}
                             />
                         </VContainer>
-                    </HContainer>
+                    </VContainer>
                     <VContainer gap={10}>
                         <VContainer>
                             <InfoLabel
-                                label={nls.localizeByDefault('Mode')}
+                                label={nls.localize('vuengine/editors/sound/sweepModulation', 'Sweep/Modulation')}
                                 subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnSweepModulationTrack', 'Only relevant on Sweep/Modulation track')}
                                 tooltip={<>
                                     {nls.localize('vuengine/editors/sound/sweepModDescription',
@@ -639,50 +631,30 @@ from the first modulation value. '
                         {
                             instrument?.sweepMod.enabled &&
                             <VContainer gap={10}>
-                                <HContainer gap={20}>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/clockFrequency', 'Clock Frequency')}
-                                        </label>
-                                        <RadioSelect
-                                            options={VSU_SWEEP_MODULATION_FREQUENCY_VALUES.map((v, i) => ({
-                                                label: `${v} ms`,
-                                                value: i,
-                                            }))}
-                                            defaultValue={instrument?.sweepMod.frequency}
-                                            onChange={options => setSweepModulationFrequency(options[0].value as number)}
-                                            allowBlank
-                                        />
-                                    </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/interval', 'Interval')}
-                                        </label>
-                                        <input
-                                            className='theia-input'
-                                            style={{ width: 48 }}
-                                            type='number'
-                                            min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
-                                            max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
-                                            value={instrument?.sweepMod.interval}
-                                            onChange={e => setSweepModulationInterval(
-                                                e.target.value === ''
-                                                    ? VSU_SWEEP_MODULATION_INTERVAL_MIN
-                                                    : clamp(parseInt(e.target.value), VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX)
-                                            )}
-                                        />
-                                    </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
-                                        </label>
-                                        <input
-                                            type="checkbox"
-                                            checked={instrument?.sweepMod.repeat}
-                                            onChange={toggleSweepModulationRepeat}
-                                        />
-                                    </VContainer>
-                                </HContainer>
+                                <VContainer grow={1}>
+                                    <InfoLabel
+                                        label={nls.localize('vuengine/editors/sound/modulationInterval', 'Interval')}
+                                        tooltip={nls.localize(
+                                            'vuengine/editors/sound/modulationIntervalDescription',
+                                            'Defines for how long each frequency level lasts before being modified.'
+                                        )}
+                                    />
+                                    <Range
+                                        value={clampedModulationFrequency === 1
+                                            ? clampedModulationInterval - 1 + VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY
+                                            : clampedModulationInterval - 1
+                                        }
+                                        setValue={setSweepModulationInterval}
+                                        min={0}
+                                        max={VSU_SWEEP_MODULATION_INTERVAL_VALUES.length - 1}
+                                        options={VSU_SWEEP_MODULATION_INTERVAL_VALUES.map((interval, index) => ({
+                                            value: index,
+                                            label: `${interval} ms`,
+                                        }))}
+                                        selectWidth={88}
+                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                    />
+                                </VContainer>
                                 {instrument?.sweepMod.function === VsuSweepModulationFunction.Sweep &&
                                     <HContainer gap={20}>
                                         <VContainer>
@@ -691,10 +663,10 @@ from the first modulation value. '
                                             </label>
                                             <RadioSelect
                                                 options={[{
-                                                    label: 'Up',
+                                                    label: nls.localize('vuengine/editors/sound/sweepDirectionUp', 'Up'),
                                                     value: VsuSweepDirection.Up,
                                                 }, {
-                                                    label: 'Down',
+                                                    label: nls.localize('vuengine/editors/sound/sweepDirectionDown', 'Down'),
                                                     value: VsuSweepDirection.Down,
                                                 }]}
                                                 defaultValue={instrument?.sweepMod.direction}
@@ -702,43 +674,58 @@ from the first modulation value. '
                                                 allowBlank
                                             />
                                         </VContainer>
-                                        <VContainer>
+                                        <VContainer grow={1}>
                                             <label>
                                                 {nls.localize('vuengine/editors/sound/shiftAmount', 'Shift Amount')}
                                             </label>
                                             <Range
                                                 min={VSU_SWEEP_MODULATION_SHIFT_MIN}
                                                 max={VSU_SWEEP_MODULATION_SHIFT_MAX}
-                                                value={instrument?.sweepMod.shift}
-                                                setValue={setSweepModulationShift}
+                                                value={VSU_SWEEP_MODULATION_SHIFT_MAX - instrument?.sweepMod.shift}
+                                                setValue={v => setSweepModulationShift(VSU_SWEEP_MODULATION_SHIFT_MAX - v)}
+                                                options={[...Array(VSU_SWEEP_MODULATION_SHIFT_MAX - VSU_SWEEP_MODULATION_SHIFT_MIN + 1)].map((x, i) => ({
+                                                    value: i,
+                                                    label: `${i + 1}`,
+                                                }))}
                                                 commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                             />
                                         </VContainer>
                                     </HContainer>
                                 }
                                 {instrument?.sweepMod.function === VsuSweepModulationFunction.Modulation &&
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/modulationData', 'Modulation Data')}
-                                        </label>
-                                        { /* TODO: switch to canvas */}
-                                        <NumberArrayPreview
-                                            active={true}
-                                            color={COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX]}
-                                            maximum={255}
-                                            height={127}
-                                            width={127}
-                                            data={instrument?.modulationData}
-                                            onClick={() => setModulationDataDialogOpen(currentInstrumentId)}
-                                        />
-                                    </VContainer>
+                                    <HContainer gap={20}>
+                                        <VContainer>
+                                            <InfoLabel
+                                                label={nls.localize('vuengine/editors/sound/modulationData', 'Modulation Data')}
+                                            />
+                                            { /* TODO: switch to canvas */}
+                                            <NumberArrayPreview
+                                                active={true}
+                                                maximum={255}
+                                                height={127}
+                                                width={127}
+                                                data={instrument?.modulationData}
+                                                onClick={() => setModulationDataDialogOpen(currentInstrumentId)}
+                                            />
+                                        </VContainer>
+                                        <VContainer>
+                                            <label>
+                                                {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
+                                            </label>
+                                            <input
+                                                type="checkbox"
+                                                checked={instrument?.sweepMod.repeat}
+                                                onChange={toggleSweepModulationRepeat}
+                                            />
+                                        </VContainer>
+                                    </HContainer>
                                 }
                             </VContainer>
                         }
                     </VContainer>
                 </VContainer>
-            </HContainer>
-        </VContainer>
+            </HContainer >
+        </VContainer >
         : <div className="lightLabel">
             {nls.localize(
                 'vuengine/editors/sound/selectInstrumentToEdit',

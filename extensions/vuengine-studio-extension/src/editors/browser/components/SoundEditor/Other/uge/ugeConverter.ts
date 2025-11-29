@@ -37,11 +37,15 @@ const CONVERTED_PATTERN_SIZE = 64 / SEQUENCER_RESOLUTION;
 const WAVE_CHANNEL_VOLUME_LOOKUP = [0, 15, 7, 3];
 
 const DUTY_WAVEFORMS: WaveformData[] = [
-    [63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Pulse (12.5%)
-    [63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Pulse (25%)
-    [63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Pulse (50%)
-    [63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0], // Pulse (75%)
+    [0, 0, 0, 0, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63], // Pulse (12.5%)
+    [0, 0, 0, 0, 0, 0, 0, 0, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63], // Pulse (25%)
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63], // Pulse (50%)
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 63, 63, 63, 63, 63, 63, 63], // Pulse (75%)
 ];
+
+const DUTY_COLORS = [1, 16, 31, 46, 2, 17, 32, 47, 3, 18, 33, 48, 4, 19, 34, 49];
+const WAVE_COLORS = [6, 21, 36, 51, 7, 22, 37, 52, 8, 23, 38, 53, 9, 24, 39, 54];
+const NOISE_COLORS = [11, 26, 41, 56, 12, 27, 42, 57, 13, 28, 43, 58, 14, 29, 44, 59];
 
 interface ConvertedInstrument {
     id: string
@@ -228,7 +232,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                color: index,
+                color: DUTY_COLORS[index],
                 envelope: {
                     direction: i.volume_sweep_change > 0
                         ? VsuEnvelopeDirection.Grow
@@ -293,7 +297,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                color: index + 4,
+                color: WAVE_COLORS[index],
                 envelope: {
                     direction: VsuEnvelopeDirection.Decay,
                     enabled: false,
@@ -345,7 +349,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                color: index + 8,
+                color: NOISE_COLORS[index],
                 envelope: {
                     direction: (i.volume_sweep_change) > 0
                         ? VsuEnvelopeDirection.Grow

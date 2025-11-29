@@ -71,7 +71,7 @@ export const VSU_INTERVAL_MIN = 0;
 export const VSU_INTERVAL_MAX = 31;
 export const VSU_ENVELOPE_STEP_TIME_MIN = 0;
 export const VSU_ENVELOPE_STEP_TIME_MAX = 7;
-export const VSU_SWEEP_MODULATION_INTERVAL_MIN = 0;
+export const VSU_SWEEP_MODULATION_INTERVAL_MIN = 1; // 0 would disable
 export const VSU_SWEEP_MODULATION_INTERVAL_MAX = 7;
 export const VSU_SWEEP_MODULATION_FREQUENCY_MIN = 0;
 export const VSU_SWEEP_MODULATION_FREQUENCY_MAX = 1;
@@ -128,6 +128,26 @@ export const VSU_INTERVAL_VALUES = [
     119.0,
     122.9,
 ];
+
+export const VSU_SWEEP_MODULATION_INTERVAL_VALUES = [
+    0.96, // 1 * 0.96,
+    1.92, // 2 * 0.96,
+    2.88, // 3 * 0.96,
+    3.84, // 4 * 0.96,
+    4.8, // 5 * 0.96,
+    5.76, // 6 * 0.96,
+    6.72, // 7 * 0.96,
+
+    7.68, // 1 * 7.68,
+    15.36, // 2 * 7.68,
+    23.04, // 3 * 7.68,
+    30.72, // 4 * 7.68,
+    38.4, // 5 * 7.68,
+    46.08, // 6 * 7.68,
+    53.76, // 7 * 7.68,
+];
+
+export const VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY = VSU_SWEEP_MODULATION_INTERVAL_VALUES.length / 2;
 
 export const VSU_NOISE_TAP = [
     [14, 32767],

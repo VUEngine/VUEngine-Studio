@@ -1,10 +1,17 @@
 import React from 'react';
 import VerticalRangeInput from '../../Common/Base/VerticalRangeInput';
+import styled from 'styled-components';
 
 interface ModulationDataProps {
     value: number[]
     setValue: (value: number[]) => void
 }
+
+const StyledModulationData = styled.div`
+    display: flex;
+    flex-grow: 1;
+    gap: 2px;
+`;
 
 export default function ModulationData(props: ModulationDataProps): React.JSX.Element {
     const { value, setValue } = props;
@@ -15,8 +22,8 @@ export default function ModulationData(props: ModulationDataProps): React.JSX.El
         setValue(updatedValue);
     };
 
-    return <div className='waveform'>
-        <div>
+    return (
+        <StyledModulationData>
             {[...Array(32)].map((h, y) => {
                 const v = value[y] ?? 255;
                 return <VerticalRangeInput
@@ -28,6 +35,6 @@ export default function ModulationData(props: ModulationDataProps): React.JSX.El
                     setValue={(x: number) => setIndividualValue(y, x)}
                 />;
             })}
-        </div>
-    </div>;
+        </StyledModulationData>
+    );
 }
