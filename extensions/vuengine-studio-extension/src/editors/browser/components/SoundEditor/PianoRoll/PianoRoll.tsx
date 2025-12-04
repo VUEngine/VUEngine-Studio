@@ -454,8 +454,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     useEffect(() => {
         // auto scroll to current pattern in piano roll
         pianoRollRef.current?.scrollTo({
-            // TODO: fix offset computation
-            left: currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth,
+            left: currentSequenceIndex / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
             behavior: 'smooth',
         });
     }, [
