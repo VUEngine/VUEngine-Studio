@@ -73,11 +73,8 @@ export const convertUgeSong = (song: Song): SoundData => {
     };
 
     const dutyInstrumentsLookup = convertDutyInstruments(song.duty_instruments);
-    console.log('dutyInstrumentsLookup', dutyInstrumentsLookup);
     const waveInstrumentsLookup = convertWaveInstruments(song.wave_instruments, song.waves);
-    console.log('waveInstrumentsLookup', waveInstrumentsLookup);
     const noiseInstrumentsLookup = convertNoiseInstruments(song.noise_instruments);
-    console.log('noiseInstrumentsLookup', noiseInstrumentsLookup);
 
     const instrumentsLookup: ConvertedInstrument[][] = [
         dutyInstrumentsLookup,
@@ -86,7 +83,6 @@ export const convertUgeSong = (song: Song): SoundData => {
         noiseInstrumentsLookup,
     ];
     const patternsLookup = convertPatterns(song.patterns, instrumentsLookup);
-    console.log('patternsLookup', patternsLookup);
 
     // for unknown reasons, only every fourth entry, starting with 0, is valid. the rest is 1s.
     const cleanedSequence: number[] = [];
@@ -94,7 +90,6 @@ export const convertUgeSong = (song: Song): SoundData => {
         cleanedSequence.push(song.sequence[i]);
     }
 
-    console.log('cleanedSequence', cleanedSequence);
     const tracks: TrackConfig[] = [
         // Duty 1
         {
