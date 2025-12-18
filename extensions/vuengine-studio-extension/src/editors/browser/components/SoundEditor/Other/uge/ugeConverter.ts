@@ -166,7 +166,7 @@ export const convertUgeSong = (song: Song): SoundData => {
         }
     });
 
-    // remove default instruments from notes
+    // remove explicit default instrument assignments from notes
     tracks.forEach(t => {
         Object.keys(t.sequence).forEach(step => {
             const stepInt = parseInt(step);

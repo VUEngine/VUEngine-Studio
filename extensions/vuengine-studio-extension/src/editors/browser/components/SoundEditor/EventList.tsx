@@ -149,7 +149,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
                                                         }
-                                                        let duration = '-';
+                                                        let duration = '\u00A0'; // nbsp
                                                         if (eventType === SoundEvent.Note || eventType === SoundEvent.NoteSlide) {
                                                             duration = stepEvents[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
                                                         }
@@ -173,6 +173,12 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         if (eventType === SoundEvent.Instrument) {
                                                             const instrumentId = stepEvents[SoundEvent.Instrument];
                                                             value = getInstrumentName(soundData, instrumentId);
+                                                        }
+                                                        if (eventType === SoundEvent.Volume) {
+                                                            const volume = stepEvents[SoundEvent.Volume];
+                                                            const volumeLeft = volume >> 4;
+                                                            const volumeRight = volume - (volumeLeft << 4);
+                                                            value = `${volumeLeft}/${volumeRight}`;
                                                         }
                                                         return <div key={j}>
                                                             {value}
