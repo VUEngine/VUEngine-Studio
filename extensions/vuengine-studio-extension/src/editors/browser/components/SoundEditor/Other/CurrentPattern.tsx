@@ -9,7 +9,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import { getPatternName } from '../SoundEditor';
 import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SequenceMap, SoundData, TrackConfig } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from './Instruments';
+import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentPatternProps {
     soundData: SoundData

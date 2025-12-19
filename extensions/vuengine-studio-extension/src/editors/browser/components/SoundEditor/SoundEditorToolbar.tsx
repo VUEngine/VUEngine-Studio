@@ -6,7 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import Input from '../Common/Base/Input';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
-import { InputWithAction, InputWithActionButton } from './Other/Instruments';
+import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
 import { getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {

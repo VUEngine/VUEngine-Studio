@@ -10,7 +10,7 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from './Instruments';
+import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentTrackProps {
     soundData: SoundData

@@ -2,6 +2,8 @@ import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import styled from 'styled-components';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
@@ -10,7 +12,7 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import PaletteColorSelect from '../../Common/PaletteColorSelect';
+import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { clamp, nanoid } from '../../Common/Utils';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
@@ -38,16 +40,23 @@ import { getInstrumentName } from '../SoundEditor';
 import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, TRACK_DEFAULT_INSTRUMENT_ID, WAVEFORM_MAX } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
+const ColoredDiv = styled.div`
+    cursor: pointer;
+    height: 26px;
+    width: 96px;
+`;
+
 const ENVELOPE_PREVIEW_SIZE = 272;
 
 interface InstrumentProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    instrumentId: string
+    setInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
+    setInstrumentColorDialogOpen: Dispatch<SetStateAction<string>>
     playing: boolean
     testing: boolean
     setTesting: Dispatch<SetStateAction<boolean>>
@@ -61,9 +70,9 @@ interface InstrumentProps {
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        currentInstrumentId, setCurrentInstrumentId,
+        instrumentId, setInstrumentId,
         setInstruments,
-        setWaveformDialogOpen, setModulationDataDialogOpen,
+        setWaveformDialogOpen, setModulationDataDialogOpen, setInstrumentColorDialogOpen,
         /*
         playing,
         testing, setTesting, setTestingDuration, setTestingTrack, setTestingNote, setTestingInstrument,
@@ -71,23 +80,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         */
     } = props;
 
-    const instrument = soundData.instruments[currentInstrumentId];
+    const instrument = soundData.instruments[instrumentId];
 
     const setName = (name: string) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             name,
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
-    const setColor = (color: number) => {
-        const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
-            color,
         };
 
         setInstruments(updatedInstruments);
@@ -95,10 +94,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setStereoLevel = (side: 'left' | 'right', value: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             volume: {
-                ...updatedInstruments[currentInstrumentId].volume,
+                ...updatedInstruments[instrumentId].volume,
                 [side]: value,
             },
         };
@@ -108,8 +107,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const updateInterval = (interval: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             interval: {
                 ...instrument?.interval,
                 enabled: interval !== 0,
@@ -122,8 +121,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const toggleEnvelopeRepeat = () => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             envelope: {
                 ...instrument?.envelope,
                 repeat: !instrument?.envelope.repeat,
@@ -135,8 +134,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeType = (type: -1 | VsuEnvelopeDirection) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             envelope: {
                 ...instrument?.envelope,
                 enabled: type !== -1,
@@ -149,8 +148,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeStepTime = (stepTime: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             envelope: {
                 ...instrument?.envelope,
                 stepTime: clamp(stepTime, VSU_ENVELOPE_STEP_TIME_MIN, VSU_ENVELOPE_STEP_TIME_MAX),
@@ -162,8 +161,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setEnvelopeInitialValue = (initialValue: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             envelope: {
                 ...instrument?.envelope,
                 initialValue: clamp(initialValue, VSU_ENVELOPE_INITIAL_VALUE_MIN, VSU_ENVELOPE_INITIAL_VALUE_MAX),
@@ -175,8 +174,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const toggleSweepModulationRepeat = () => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 repeat: !instrument?.sweepMod.repeat,
@@ -188,8 +187,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const updateSweepModulationFunction = (fnc: -1 | VsuSweepModulationFunction) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 enabled: fnc !== -1,
@@ -202,8 +201,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepModulationInterval = (interval: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 frequency: interval >= VSU_SWEEP_MODULATION_INTERVAL_VALUES_PER_FREQUENCY ? 1 : 0,
@@ -220,8 +219,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepDirection = (direction: VsuSweepDirection) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 direction,
@@ -233,8 +232,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setSweepModulationShift = (shift: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             sweepMod: {
                 ...instrument?.sweepMod,
                 shift: clamp(shift, VSU_SWEEP_MODULATION_SHIFT_MIN, VSU_SWEEP_MODULATION_SHIFT_MAX),
@@ -246,8 +245,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const setTap = (tap: number) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             tap,
         };
 
@@ -260,10 +259,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             ...soundData.instruments,
             [newId]: {
                 ...instrument,
-                name: `${getInstrumentName(soundData, currentInstrumentId)} ${nls.localize('vuengine/general/copy', 'copy')}`,
+                name: `${getInstrumentName(soundData, instrumentId)} ${nls.localize('vuengine/general/copy', 'copy')}`,
             },
         });
-        setCurrentInstrumentId(newId);
+        setInstrumentId(newId);
     };
 
     const removeCurrentInstrument = async () => {
@@ -272,13 +271,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             msg: nls.localize(
                 'vuengine/editors/sound/areYouSureYouWantToDelete',
                 'Are you sure you want to delete {0}?',
-                getInstrumentName(soundData, currentInstrumentId)
+                getInstrumentName(soundData, instrumentId)
             ),
         });
         const remove = await dialog.open();
         if (remove) {
             const updatedInstruments = { ...soundData.instruments };
-            delete updatedInstruments[currentInstrumentId];
+            delete updatedInstruments[instrumentId];
 
             // TODO: update references in tracks and pattern events
             updateSoundData({
@@ -287,7 +286,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             });
 
             const firstInstrumentId = Object.keys(soundData.instruments)[0] ?? TRACK_DEFAULT_INSTRUMENT_ID;
-            setCurrentInstrumentId(firstInstrumentId);
+            setInstrumentId(firstInstrumentId);
         }
     };
 
@@ -349,238 +348,231 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     ]);
 
     return (instrument !== undefined
-        ? <VContainer gap={20} grow={1} overflow='auto' style={{ padding: 3 }}>
-            <VContainer>
-                <label>
-                    {nls.localizeByDefault('Name')}
-                </label>
-                <InputWithAction>
-                    <Input
-                        value={instrument?.name}
-                        setValue={setName}
-                        commands={INPUT_BLOCKING_COMMANDS}
-                    />
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
-                        onClick={cloneInstrument}
-                        disabled={!instrument}
-                    >
-                        <Copy size={16} />
-                    </InputWithActionButton>
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localizeByDefault('Remove')}
-                        onClick={removeCurrentInstrument}
-                        disabled={!instrument}
-                    >
-                        <Trash size={16} />
-                    </InputWithActionButton>
-                </InputWithAction>
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/sound/color', 'Color')}
-                </label>
-                <PaletteColorSelect
-                    color={instrument.color}
-                    updateColor={setColor}
-                />
-            </VContainer>
-            <HContainer gap={40}>
-                <VContainer gap={20} style={{ width: '50%' }}>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/sound/volume', 'Volume')}
-                        </label>
-                        <Range
-                            value={instrument?.envelope.initialValue}
-                            max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
-                            min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
-                            setValue={setEnvelopeInitialValue}
-                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
+        ? <VContainer gap={20} grow={1}>
+            <HContainer gap={20}>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localizeByDefault('Name')}
+                    </label>
+                    <InputWithAction>
+                        <Input
+                            value={instrument?.name}
+                            setValue={setName}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/sound/stereoLevels', 'Stereo Levels')}
-                        </label>
-                        <HContainer alignItems="center">
-                            <div style={{ minWidth: 10, width: 10 }}>
-                                L
-                            </div>
-                            <Range
-                                value={instrument?.volume.left}
-                                max={15}
-                                min={0}
-                                setValue={(v: number) => setStereoLevel('left', v)}
-                                commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                                width="100%"
-                            />
-                        </HContainer>
-                        <HContainer alignItems="center">
-                            <div style={{ minWidth: 10, width: 10 }}>
-                                R
-                            </div>
-                            <Range
-                                value={instrument?.volume.right}
-                                max={15}
-                                min={0}
-                                setValue={(v: number) => setStereoLevel('right', v)}
-                                commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                                width="100%"
-                            />
-                        </HContainer>
-                    </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/editors/sound/noteDuration', 'Note Duration')}
-                            tooltip={nls.localize(
-                                'vuengine/editors/sound/noteDurationDescription',
-                                'Specifies how long the current note should play before automatically being shut off. \
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
+                            onClick={cloneInstrument}
+                            disabled={!instrument}
+                        >
+                            <Copy size={16} />
+                        </InputWithActionButton>
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localizeByDefault('Remove')}
+                            onClick={removeCurrentInstrument}
+                            disabled={!instrument}
+                        >
+                            <Trash size={16} />
+                        </InputWithActionButton>
+                    </InputWithAction>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/color', 'Color')}
+                    </label>
+                    <ColoredDiv
+                        style={{
+                            backgroundColor: COLOR_PALETTE[instrument.color]
+                        }}
+                        onClick={() => setInstrumentColorDialogOpen(instrumentId)}
+                    />
+                </VContainer>
+            </HContainer>
+            <Tabs>
+                <TabList>
+                    <Tab>{nls.localize('vuengine/editors/sound/volume', 'Volume')}</Tab>
+                    <Tab>{nls.localize('vuengine/editors/sound/frequency', 'Frequency')}</Tab>
+                    <Tab>{nls.localize('vuengine/editors/sound/noise', 'Noise')}</Tab>
+                </TabList>
+                <TabPanel style={{ padding: 3 }}>
+                    <HContainer gap={40}>
+                        <VContainer gap={20} style={{ width: '50%' }}>
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/editors/sound/initialVolume', 'Initial Volume')}
+                                </label>
+                                <Range
+                                    value={instrument?.envelope.initialValue}
+                                    max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
+                                    min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
+                                    setValue={setEnvelopeInitialValue}
+                                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                />
+                            </VContainer>
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/editors/sound/stereoLevels', 'Stereo Levels')}
+                                </label>
+                                <HContainer alignItems="center">
+                                    <div style={{ minWidth: 10, width: 10 }}>
+                                        L
+                                    </div>
+                                    <Range
+                                        value={instrument?.volume.left}
+                                        max={15}
+                                        min={0}
+                                        setValue={(v: number) => setStereoLevel('left', v)}
+                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                        width="100%"
+                                    />
+                                </HContainer>
+                                <HContainer alignItems="center">
+                                    <div style={{ minWidth: 10, width: 10 }}>
+                                        R
+                                    </div>
+                                    <Range
+                                        value={instrument?.volume.right}
+                                        max={15}
+                                        min={0}
+                                        setValue={(v: number) => setStereoLevel('right', v)}
+                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                        width="100%"
+                                    />
+                                </HContainer>
+                            </VContainer>
+                            <VContainer>
+                                <InfoLabel
+                                    label={nls.localize('vuengine/editors/sound/noteDuration', 'Note Duration')}
+                                    tooltip={nls.localize(
+                                        'vuengine/editors/sound/noteDurationDescription',
+                                        'Specifies how long the current note should play before automatically being shut off. \
 These are the durations that are natively supported by the Virtual Boy\'s sound chip. \
 Longer durations can be achieved by manually manipulating the track volume.'
-                            )}
-                        />
-                        <Range
-                            value={instrument?.interval?.enabled ? instrument?.interval?.value + 1 : 0}
-                            options={[
-                                {
-                                    value: 0,
-                                    label: 'Unlimited',
-                                },
-                                ...VSU_INTERVAL_VALUES.map((o, i) => ({
-                                    value: i + 1,
-                                    label: `${o.toString()} ms`,
-                                })),
-                            ]}
-                            max={VSU_INTERVAL_MAX + 1}
-                            min={VSU_INTERVAL_MIN}
-                            setValue={updateInterval}
-                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                            selectWidth={96}
-                        />
-                    </VContainer>
-                    <VContainer gap={10}>
-                        <VContainer>
-                            <InfoLabel
-                                label={nls.localize('vuengine/editors/sound/envelope', 'Envelope')}
-                                tooltip={nls.localize(
-                                    'vuengine/editors/sound/envelopeDescription',
-                                    'The envelope acts like a master volume setting independent from the stereo levels. \
-It can be configured to grow or decay automatically over time, and optionally reload \
-a pre-configured value and repeat the grow/decay process. '
-                                )}
-                            />
-                            <RadioSelect
-                                options={[{
-                                    label: nls.localize('vuengine/editors/sound/off', 'Off'),
-                                    value: -1,
-                                }, {
-                                    label: nls.localize('vuengine/editors/sound/envelopeGrow', 'Grow'),
-                                    value: VsuEnvelopeDirection.Grow,
-                                }, {
-                                    label: nls.localize('vuengine/editors/sound/envelopeDecay', 'Decay'),
-                                    value: VsuEnvelopeDirection.Decay,
-                                }]}
-                                defaultValue={instrument?.envelope.enabled ? instrument?.envelope.direction : -1}
-                                onChange={options => setEnvelopeType(options[0].value as -1 | VsuEnvelopeDirection)}
-                                allowBlank
-                            />
-                        </VContainer>
-                        {instrument?.envelope.enabled &&
-                            <>
-                                <HContainer gap={20}>
-                                    <VContainer grow={1}>
-                                        <InfoLabel
-                                            label={nls.localize('vuengine/editors/sound/envelopeInterval', 'Interval')}
-                                            tooltip={nls.localize(
-                                                'vuengine/editors/sound/envelopeIntervalDescription',
-                                                'Defines for how long each volume level lasts before being modified by the envelope.'
-                                            )}
-                                        />
-                                        <Range
-                                            value={instrument?.envelope.stepTime}
-                                            setValue={setEnvelopeStepTime}
-                                            min={0}
-                                            max={VSU_ENVELOPE_STEP_TIME_VALUES.length - 1}
-                                            options={VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) => ({
-                                                value: i,
-                                                label: `${st} ms`,
-                                            }))}
-                                            selectWidth={80}
-                                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                                        />
-                                    </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
-                                        </label>
-                                        <input
-                                            type="checkbox"
-                                            checked={instrument?.envelope.repeat}
-                                            onChange={toggleEnvelopeRepeat}
-                                        />
-                                    </VContainer>
-                                </HContainer>
+                                    )}
+                                />
+                                <Range
+                                    value={instrument?.interval?.enabled ? instrument?.interval?.value + 1 : 0}
+                                    options={[
+                                        {
+                                            value: 0,
+                                            label: 'Unlimited',
+                                        },
+                                        ...VSU_INTERVAL_VALUES.map((o, i) => ({
+                                            value: i + 1,
+                                            label: `${o.toString()} ms`,
+                                        })),
+                                    ]}
+                                    max={VSU_INTERVAL_MAX + 1}
+                                    min={VSU_INTERVAL_MIN}
+                                    setValue={updateInterval}
+                                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                    selectWidth={96}
+                                />
+                            </VContainer>
+                            <VContainer gap={10}>
                                 <VContainer>
                                     <InfoLabel
-                                        label={nls.localizeByDefault('Preview')}
-                                        subLabel={nls.localize('vuengine/editors/sound/volumeOverTime', 'Volume over time')}
+                                        label={nls.localize('vuengine/editors/sound/envelope', 'Envelope')}
+                                        tooltip={nls.localize(
+                                            'vuengine/editors/sound/envelopeDescription',
+                                            'The envelope acts like a master volume setting independent from the stereo levels. \
+It can be configured to grow or decay automatically over time, and optionally reload \
+a pre-configured value and repeat the grow/decay process. '
+                                        )}
                                     />
+                                    <RadioSelect
+                                        options={[{
+                                            label: nls.localize('vuengine/editors/sound/off', 'Off'),
+                                            value: -1,
+                                        }, {
+                                            label: nls.localize('vuengine/editors/sound/envelopeGrow', 'Grow'),
+                                            value: VsuEnvelopeDirection.Grow,
+                                        }, {
+                                            label: nls.localize('vuengine/editors/sound/envelopeDecay', 'Decay'),
+                                            value: VsuEnvelopeDirection.Decay,
+                                        }]}
+                                        defaultValue={instrument?.envelope.enabled ? instrument?.envelope.direction : -1}
+                                        onChange={options => setEnvelopeType(options[0].value as -1 | VsuEnvelopeDirection)}
+                                        allowBlank
+                                    />
+                                </VContainer>
+                                {instrument?.envelope.enabled &&
+                                    <>
+                                        <HContainer gap={20}>
+                                            <VContainer grow={1}>
+                                                <InfoLabel
+                                                    label={nls.localize('vuengine/editors/sound/envelopeInterval', 'Interval')}
+                                                    tooltip={nls.localize(
+                                                        'vuengine/editors/sound/envelopeIntervalDescription',
+                                                        'Defines for how long each volume level lasts before being modified by the envelope.'
+                                                    )}
+                                                />
+                                                <Range
+                                                    value={instrument?.envelope.stepTime}
+                                                    setValue={setEnvelopeStepTime}
+                                                    min={0}
+                                                    max={VSU_ENVELOPE_STEP_TIME_VALUES.length - 1}
+                                                    options={VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) => ({
+                                                        value: i,
+                                                        label: `${st} ms`,
+                                                    }))}
+                                                    selectWidth={80}
+                                                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                                />
+                                            </VContainer>
+                                            <VContainer>
+                                                <label>
+                                                    {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
+                                                </label>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={instrument?.envelope.repeat}
+                                                    onChange={toggleEnvelopeRepeat}
+                                                />
+                                            </VContainer>
+                                        </HContainer>
+                                        <VContainer>
+                                            <InfoLabel
+                                                label={nls.localizeByDefault('Preview')}
+                                                subLabel={nls.localize('vuengine/editors/sound/volumeOverTime', 'Volume over time')}
+                                            />
+                                            { /* TODO: switch to canvas */}
+                                            <NumberArrayPreview
+                                                active={true}
+                                                height={48}
+                                                width={ENVELOPE_PREVIEW_SIZE}
+                                                maximum={15}
+                                                data={envelopePreviewData}
+                                            />
+                                        </VContainer>
+                                    </>
+                                }
+                            </VContainer>
+                        </VContainer>
+                        <VContainer gap={20} style={{ width: '50%' }}>
+                            <VContainer>
+                                <InfoLabel
+                                    label={nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
+                                    subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
+                                />
+                                <VContainer>
                                     { /* TODO: switch to canvas */}
                                     <NumberArrayPreview
                                         active={true}
-                                        height={48}
-                                        width={ENVELOPE_PREVIEW_SIZE}
-                                        maximum={15}
-                                        data={envelopePreviewData}
+                                        height={WAVEFORM_MAX * 2}
+                                        width={WAVEFORM_MAX * 4}
+                                        maximum={WAVEFORM_MAX}
+                                        data={soundData.instruments[instrumentId].waveform}
+                                        onClick={() => setWaveformDialogOpen(instrumentId)}
                                     />
                                 </VContainer>
-                            </>
-                        }
-                    </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/editors/sound/tap', 'Tap')}
-                            subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnNoiseTrack', 'Only relevant on noise track')}
-                            tooltip={nls.localize(
-                                'vuengine/editors/sound/tapDescription',
-                                'Specifies the bit within the shift register to use as the feedback source in noise generation. \
-Different bits will produce pseudorandom bit sequences of different lengths before the sequences repeat.'
-                            )}
-                        />
-                        <AdvancedSelect
-                            options={Object.keys(VSU_NOISE_TAP).map((tl, i) => ({
-                                label: `${nls.localize('vuengine/editors/sound/bit', 'Bit')} ${VSU_NOISE_TAP[i][0]}, ` +
-                                    `${nls.localize('vuengine/editors/sound/sequenceLength', 'Sequence Length')}: ${VSU_NOISE_TAP[i][1]}`,
-                                value: i.toString(),
-                            }))}
-                            defaultValue={instrument?.tap?.toString()}
-                            onChange={options => setTap(parseInt(options[0]))}
-                            menuPlacement='top'
-                            commands={INPUT_BLOCKING_COMMANDS}
-                        />
-                    </VContainer>
-                </VContainer>
-                <VContainer gap={20} style={{ width: '50%' }}>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
-                            subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
-                        />
-                        <VContainer>
-                            { /* TODO: switch to canvas */}
-                            <NumberArrayPreview
-                                active={true}
-                                height={WAVEFORM_MAX * 2}
-                                width={WAVEFORM_MAX * 2}
-                                maximum={WAVEFORM_MAX}
-                                data={soundData.instruments[currentInstrumentId].waveform}
-                                onClick={() => setWaveformDialogOpen(currentInstrumentId)}
-                            />
+                            </VContainer>
                         </VContainer>
-                    </VContainer>
+                    </HContainer>
+                </TabPanel>
+                <TabPanel style={{ padding: 3 }}>
                     <VContainer gap={10}>
                         <VContainer>
                             <InfoLabel
@@ -703,9 +695,9 @@ from the first modulation value. '
                                                 active={true}
                                                 maximum={255}
                                                 height={127}
-                                                width={127}
+                                                width={255}
                                                 data={instrument?.modulationData}
-                                                onClick={() => setModulationDataDialogOpen(currentInstrumentId)}
+                                                onClick={() => setModulationDataDialogOpen(instrumentId)}
                                             />
                                         </VContainer>
                                         <VContainer>
@@ -723,8 +715,31 @@ from the first modulation value. '
                             </VContainer>
                         }
                     </VContainer>
-                </VContainer>
-            </HContainer >
+                </TabPanel>
+                <TabPanel style={{ padding: 3 }}>
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/editors/sound/tapLocation', 'Tap Location')}
+                            subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnNoiseTrack', 'Only relevant on noise track')}
+                            tooltip={nls.localize(
+                                'vuengine/editors/sound/tapDescription',
+                                'Specifies the bit within the shift register to use as the feedback source in noise generation. \
+Different bits will produce pseudorandom bit sequences of different lengths before the sequences repeat.'
+                            )}
+                        />
+                        <AdvancedSelect
+                            options={Object.keys(VSU_NOISE_TAP).map((tl, i) => ({
+                                label: `${nls.localize('vuengine/editors/sound/bit', 'Bit')} ${VSU_NOISE_TAP[i][0]}, ` +
+                                    `${nls.localize('vuengine/editors/sound/sequenceLength', 'Sequence Length')}: ${VSU_NOISE_TAP[i][1]}`,
+                                value: i.toString(),
+                            }))}
+                            defaultValue={instrument?.tap?.toString()}
+                            onChange={options => setTap(parseInt(options[0]))}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
+                    </VContainer>
+                </TabPanel>
+            </Tabs>
         </VContainer >
         : <div className="lightLabel">
             {nls.localize(

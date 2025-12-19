@@ -208,6 +208,7 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const trackDefaultInstrument: InstrumentConfig = {
                 ...convertedInstrument.instrumentConfig,
                 name: convertedInstrument.instrumentConfig.name + ` (CH${trackIndex + 1})`,
+                tap,
                 volume,
                 waveform,
             };

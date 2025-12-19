@@ -1,13 +1,13 @@
 import { nls } from '@theia/core';
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
-import { InstrumentMap, SoundData } from '../SoundEditorTypes';
+import { InstrumentMap, SoundData, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
 import Instrument from './Instrument';
 import { getInstrumentName } from '../SoundEditor';
 
@@ -34,9 +34,10 @@ export const StyledInstrumentsContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    max-width: 240px;
+    min-width: 240px;
     overflow: auto;
     padding: 3px;
-    width: 260px;
 `;
 
 export const StyledInstrument = styled.button`
@@ -61,11 +62,12 @@ export const StyledInstrument = styled.button`
 interface InstrumentsProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
+    currentTrackId: number
     currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
+    setInstrumentColorDialogOpen: Dispatch<SetStateAction<string>>
     playing: boolean
     testing: boolean
     setTesting: (testing: boolean) => void
@@ -79,14 +81,19 @@ interface InstrumentsProps {
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        currentInstrumentId, setCurrentInstrumentId,
+        currentTrackId,
+        currentInstrumentId,
         setInstruments,
-        setWaveformDialogOpen, setModulationDataDialogOpen,
+        setWaveformDialogOpen, setModulationDataDialogOpen, setInstrumentColorDialogOpen,
         playing,
         testing, setTesting, setTestingDuration, setTestingTrack, setTestingNote, setTestingInstrument,
         emulatorInitialized,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
+    const [selectedInstrumentId, setSelectedInstrumentId] = useState<string>(currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
+        ? currentInstrumentId
+        : soundData.tracks[currentTrackId].instrument
+    );
 
     const addInstrument = async () => {
         const type = services.vesProjectService.getProjectDataType('Sound');
@@ -112,7 +119,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 name: `${newNameLabel} ${newNameNumber}`,
             },
         });
-        setCurrentInstrumentId(newId);
+        setSelectedInstrumentId(newId);
     };
 
     return <HContainer
@@ -132,8 +139,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     const instrumentColor = COLOR_PALETTE[instr?.color ?? DEFAULT_COLOR_INDEX];
                     return <StyledInstrument
                         key={i}
-                        className={currentInstrumentId === instrumentId ? 'current' : undefined}
-                        onClick={() => setCurrentInstrumentId(instrumentId)}
+                        className={selectedInstrumentId === instrumentId ? 'current' : undefined}
+                        onClick={() => setSelectedInstrumentId(instrumentId)}
                         style={{
                             backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                             color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
@@ -154,11 +161,12 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             <Instrument
                 soundData={soundData}
                 updateSoundData={updateSoundData}
-                currentInstrumentId={currentInstrumentId}
-                setCurrentInstrumentId={setCurrentInstrumentId}
+                instrumentId={selectedInstrumentId}
+                setInstrumentId={setSelectedInstrumentId}
                 setInstruments={setInstruments}
                 setWaveformDialogOpen={setWaveformDialogOpen}
                 setModulationDataDialogOpen={setModulationDataDialogOpen}
+                setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
                 playing={playing}
                 testing={testing}
                 setTesting={setTesting}

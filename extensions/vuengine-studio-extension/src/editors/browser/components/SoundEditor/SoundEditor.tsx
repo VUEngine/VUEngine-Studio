@@ -8,14 +8,15 @@ import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
 import EmptyContainer from '../Common/EmptyContainer';
+import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import Emulator from './Emulator/Emulator';
 import EventList from './EventList';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
-import ImportExport from './Other/ImportExport';
-import Instruments from './Other/Instruments';
+import Instruments from './Instruments/Instruments';
 import { getMaxNoteDuration } from './Other/Note';
+import Song from './Other/Song';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -48,7 +49,7 @@ import {
 } from './SoundEditorTypes';
 import ModulationData from './Waveforms/ModulationData';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
-import Song from './Other/Song';
+import ImportExport from './ImportExport/ImportExport';
 
 const StyledLowerContainer = styled.div` 
     display: flex;
@@ -124,6 +125,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [patternDialogOpen, setPatternDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
+    const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
 
     const updatePlayRangeStart = (value: number) => {
         if (currentPlayerPosition > -1) {
@@ -481,6 +483,16 @@ A total of {0} patterns will be deleted.',
         }
     };
 
+    const setInstrumentColor = (instrumentId: string, color: number) => {
+        const updatedInstruments = { ...soundData.instruments };
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
+            color,
+        };
+
+        setInstruments(updatedInstruments);
+    };
+
     const removeUnusedInstruments = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
             title: SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label,
@@ -671,20 +683,20 @@ A total of {0} patterns will be deleted.',
         updateSoundData({ ...soundData, instruments });
     };
 
-    const setInstrumentWaveForm = (waveform: number[]) => {
+    const setInstrumentWaveForm = (instrumentId: string, waveform: number[]) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             waveform,
         };
 
         setInstruments(updatedInstruments);
     };
 
-    const setInstrumentModulationData = (modulationData: number[]) => {
+    const setInstrumentModulationData = (instrumentId: string, modulationData: number[]) => {
         const updatedInstruments = { ...soundData.instruments };
-        updatedInstruments[currentInstrumentId] = {
-            ...updatedInstruments[currentInstrumentId],
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
             modulationData,
         };
 
@@ -982,11 +994,12 @@ A total of {0} patterns will be deleted.',
                     <Instruments
                         soundData={soundData}
                         updateSoundData={updateSoundData}
+                        currentTrackId={currentTrackId}
                         currentInstrumentId={currentInstrumentId}
-                        setCurrentInstrumentId={setCurrentInstrumentId}
                         setInstruments={setInstruments}
                         setWaveformDialogOpen={setWaveformDialogOpen}
                         setModulationDataDialogOpen={setModulationDataDialogOpen}
+                        setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
                         playing={playing}
                         testing={testing}
                         setTesting={setTesting}
@@ -1113,7 +1126,7 @@ A total of {0} patterns will be deleted.',
                 >
                     <WaveformWithPresets
                         value={soundData.instruments[waveformDialogOpen].waveform}
-                        setValue={setInstrumentWaveForm}
+                        setValue={value => setInstrumentWaveForm(waveformDialogOpen, value)}
                     />
                 </PopUpDialog>
             }
@@ -1129,7 +1142,24 @@ A total of {0} patterns will be deleted.',
                     {soundData.instruments[modulationDataDialogOpen] &&
                         <ModulationData
                             value={soundData.instruments[modulationDataDialogOpen].modulationData}
-                            setValue={setInstrumentModulationData}
+                            setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
+                        />
+                    }
+                </PopUpDialog>
+            }
+            {instrumentColorDialogOpen !== '' &&
+                <PopUpDialog
+                    open={instrumentColorDialogOpen !== ''}
+                    onClose={() => setInstrumentColorDialogOpen('')}
+                    onOk={() => setInstrumentColorDialogOpen('')}
+                    title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
+                    height='180px'
+                    width='460px'
+                >
+                    {soundData.instruments[instrumentColorDialogOpen] &&
+                        <PaletteColorSelect
+                            color={soundData.instruments[instrumentColorDialogOpen].color}
+                            updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
                         />
                     }
                 </PopUpDialog>
