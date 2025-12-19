@@ -13,14 +13,19 @@ interface BasicSelectProps {
     onFocus?: FocusEventHandler<HTMLSelectElement> | undefined
     onBlur?: FocusEventHandler<HTMLSelectElement> | undefined
     disabled?: boolean
+    size?: 'small' | 'large'
     style?: object
 }
 
 export default function BasicSelect(props: BasicSelectProps): React.JSX.Element {
-    const { options, value, onChange, onFocus, onBlur, disabled, style } = props;
+    const { options, value, onChange, onFocus, onBlur, disabled, size, style } = props;
+    const classNames = ['theia-select'];
+    if (size) {
+        classNames.push(size);
+    }
 
     return <select
-        className='theia-select'
+        className={classNames.join(' ')}
         style={{ width: '100%', ...style }}
         value={value}
         onChange={onChange}

@@ -11,9 +11,19 @@
 .theia-input.small {
     font-size: 10px;
     height: 16px;
+    min-height: 16px;
 }
 
-.theia-input.large {
+.theia-select.small {
+    font-size: 10px;
+    height: 16px;
+    min-height: 16px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.theia-input.large,
+.theia-select.large {
     font-size: 130%;
     line-height: 160%;
 }

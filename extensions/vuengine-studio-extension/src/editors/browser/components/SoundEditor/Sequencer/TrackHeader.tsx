@@ -207,7 +207,10 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                     className={thisTrackSettings.seeThrough ? 'active' : undefined}
                     title={nls.localize('vuengine/editors/sound/showNoteShadows', 'Show Note Shadows On Other Tracks')}
                     onDoubleClick={e => e.stopPropagation()}
-                    onClick={() => toggleTrackSeeThrough(trackId)}
+                    onClick={e => {
+                        toggleTrackSeeThrough(trackId);
+                        e.stopPropagation();
+                    }}
                 >
                     <i
                         className={`fa fa-${thisTrackSettings.seeThrough ? 'eye' : 'eye-slash'}`}
@@ -219,7 +222,10 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                 <StyledTrackHeaderButton
                     title={nls.localize('vuengine/editors/sound/muteTrack', 'Mute Track')}
                     onDoubleClick={e => e.stopPropagation()}
-                    onClick={() => toggleTrackMuted(trackId)}
+                    onClick={e => {
+                        toggleTrackMuted(trackId);
+                        e.stopPropagation();
+                    }}
                 >
                     <i
                         className={`fa fa-volume-${thisTrackSettings.muted ? 'off' : 'up'}`}
@@ -231,7 +237,10 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                 <StyledTrackHeaderButton
                     title={nls.localize('vuengine/editors/sound/soloTrack', 'Solo Track')}
                     onDoubleClick={e => e.stopPropagation()}
-                    onClick={() => toggleTrackSolo(trackId)}
+                    onClick={e => {
+                        toggleTrackSolo(trackId);
+                        e.stopPropagation();
+                    }}
                 >
                     <i
                         className={`fa fa-star${thisTrackSettings.solo ? '' : '-o'}`}

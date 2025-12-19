@@ -1,9 +1,21 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
+import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
 import { getInstrumentName } from './SoundEditor';
-import { BAR_NOTE_RESOLUTION, NOTES_LABELS, PatternConfig, SEQUENCER_RESOLUTION, SOUND_EVENT_LABELS, SoundData, SoundEvent, SUB_NOTE_RESOLUTION } from './SoundEditorTypes';
+import {
+    BAR_NOTE_RESOLUTION,
+    INPUT_BLOCKING_COMMANDS,
+    NOTES_LABELS,
+    PatternConfig,
+    SEQUENCER_RESOLUTION,
+    SOUND_EVENT_LABELS,
+    SoundData,
+    SoundEvent,
+    SUB_NOTE_RESOLUTION,
+} from './SoundEditorTypes';
+import BasicSelect from '../Common/Base/BasicSelect';
 
 const StyledTableContainer = styled.div`
     display: flex;
@@ -22,6 +34,7 @@ const StyledTable = styled.table`
             padding: 13px 4px 2px;
             position: sticky;
             top: 0;
+            z-index: 1;
 
             body.theia-light &,
             body.theia-hc & {
@@ -53,12 +66,19 @@ const StyledTable = styled.table`
                     text-align: center;
                 }
 
-                div {
+                div, input, select {
                     margin-bottom: 4px;
 
                     &:last-child {
                         margin-bottom: 0;
                     }
+                }
+
+                input, select {
+                    height: 16px;
+                    min-height: 16px;
+                    padding-bottom: 0;
+                    padding-top: 0;
                 }
             }
 
@@ -109,10 +129,10 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                 <StyledTable>
                     <thead>
                         <tr>
-                            <td>{nls.localize('vuengine/editors/sound/step', 'Step')}</td>
+                            <td width={56}>{nls.localize('vuengine/editors/sound/step', 'Step')}</td>
+                            <td width={56}>{nls.localize('vuengine/editors/sound/durationShort', 'Dur.')}</td>
                             <td>{nls.localize('vuengine/editors/sound/event', 'Event')}</td>
-                            <td>{nls.localize('vuengine/editors/sound/durationShort', 'Dur.')}</td>
-                            <td>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
+                            <td width={64}>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,16 +145,34 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                         const globalStep = noteOffset + localStep;
                                         const stepEvents = pattern.events[localStep];
                                         const stepEventsKeys = Object.keys(stepEvents);
+                                        const isSelectedNote = noteCursor === globalStep;
+                                        const duration = stepEvents[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
+
                                         return (
                                             <tr
                                                 key={i}
-                                                className={noteCursor === globalStep ? 'selected' : undefined}
+                                                className={isSelectedNote ? 'selected' : undefined}
                                                 onClick={() => setNoteCursor(globalStep)}
                                             >
                                                 <td valign="top">
-                                                    {formatter.format(localStep)}
+                                                    {isSelectedNote && <Input
+                                                        type='number'
+                                                        value={localStep}
+                                                        setValue={() => { /* TODO */ }}
+                                                        commands={INPUT_BLOCKING_COMMANDS}
+                                                    />}
+                                                    {!isSelectedNote && formatter.format(localStep)}
                                                 </td>
-                                                <td>
+                                                <td valign="top">
+                                                    {isSelectedNote && <Input
+                                                        type='number'
+                                                        value={duration}
+                                                        setValue={() => { /* TODO */ }}
+                                                        commands={INPUT_BLOCKING_COMMANDS}
+                                                    />}
+                                                    {!isSelectedNote && formatter.format(duration)}
+                                                </td>
+                                                <td valign="top">
                                                     {stepEventsKeys.map((eventType, j) => {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
@@ -144,42 +182,79 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         </div>;
                                                     })}
                                                 </td>
-                                                <td>
+                                                <td valign="top">
                                                     {stepEventsKeys.map((eventType, j) => {
-                                                        if (eventType === SoundEvent.Duration) {
-                                                            return;
-                                                        }
-                                                        let duration = '\u00A0'; // nbsp
-                                                        if (eventType === SoundEvent.Note || eventType === SoundEvent.NoteSlide) {
-                                                            duration = stepEvents[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
-                                                        }
-                                                        return <div key={j}>
-                                                            {duration}
-                                                        </div>;
-                                                    })}
-                                                </td>
-                                                <td>
-                                                    {stepEventsKeys.map((eventType, j) => {
-                                                        if (eventType === SoundEvent.Duration) {
-                                                            return;
-                                                        }
                                                         let value = stepEvents[eventType];
-                                                        if (eventType === SoundEvent.NoteSlide) {
-                                                            const directionLabel = value < 0 ? '↓' : '↑';
-                                                            const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note] ?? 0);
-                                                            const targetNoteLabel = NOTES_LABELS[noteId - value];
-                                                            value = `${directionLabel}${targetNoteLabel}`;
+
+                                                        switch (eventType) {
+                                                            case SoundEvent.Duration:
+                                                                return;
+
+                                                            case SoundEvent.Instrument:
+                                                                const instrumentId = stepEvents[SoundEvent.Instrument];
+                                                                value = getInstrumentName(soundData, instrumentId);
+
+                                                                if (isSelectedNote) {
+                                                                    return (
+                                                                        <BasicSelect
+                                                                            options={[
+                                                                                ...Object.keys(soundData.instruments)
+                                                                                    .sort((a, b) => (soundData.instruments[a].name.length
+                                                                                        ? soundData.instruments[a].name
+                                                                                        : 'zzz').localeCompare(
+                                                                                            (soundData.instruments[b].name.length
+                                                                                                ? soundData.instruments[b].name
+                                                                                                : 'zzz')
+                                                                                        ))
+                                                                                    .map(instrId => ({
+                                                                                        value: `${instrId}`,
+                                                                                        label: getInstrumentName(soundData, instrId),
+                                                                                    }))
+                                                                            ]}
+                                                                            value={instrumentId}
+                                                                            onChange={v => {
+                                                                                // TODO
+                                                                            }}
+                                                                        />
+                                                                    );
+                                                                }
+                                                                break;
+
+                                                            case SoundEvent.Note:
+                                                                if (isSelectedNote) {
+                                                                    return (
+                                                                        <BasicSelect
+                                                                            options={[
+                                                                                ...NOTES_LABELS
+                                                                                    .map(n => ({
+                                                                                        value: n,
+                                                                                        label: n,
+                                                                                    }))
+                                                                            ]}
+                                                                            value={value}
+                                                                            onChange={v => {
+                                                                                // TODO
+                                                                            }}
+                                                                        />
+                                                                    );
+                                                                }
+                                                                break;
+
+                                                            case SoundEvent.NoteSlide:
+                                                                const directionLabel = value < 0 ? '↓' : '↑';
+                                                                const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note] ?? 0);
+                                                                const targetNoteLabel = NOTES_LABELS[noteId - value];
+                                                                value = `${directionLabel}${targetNoteLabel}`;
+                                                                break;
+
+                                                            case SoundEvent.Volume:
+                                                                const volume = stepEvents[SoundEvent.Volume];
+                                                                const volumeLeft = volume >> 4;
+                                                                const volumeRight = volume - (volumeLeft << 4);
+                                                                value = `${volumeLeft}/${volumeRight}`;
+                                                                break;
                                                         }
-                                                        if (eventType === SoundEvent.Instrument) {
-                                                            const instrumentId = stepEvents[SoundEvent.Instrument];
-                                                            value = getInstrumentName(soundData, instrumentId);
-                                                        }
-                                                        if (eventType === SoundEvent.Volume) {
-                                                            const volume = stepEvents[SoundEvent.Volume];
-                                                            const volumeLeft = volume >> 4;
-                                                            const volumeRight = volume - (volumeLeft << 4);
-                                                            value = `${volumeLeft}/${volumeRight}`;
-                                                        }
+
                                                         return <div key={j}>
                                                             {value}
                                                         </div>;

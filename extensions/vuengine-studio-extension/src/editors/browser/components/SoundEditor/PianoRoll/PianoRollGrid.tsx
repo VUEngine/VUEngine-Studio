@@ -194,9 +194,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
                         const offset = (patternOffset / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
-                        context.fillStyle = trackId === currentTrackId ? fullColor : medColor;
+                        context.fillStyle = trackId === currentTrackId ? fullColor : lowColor;
                         context.fillRect(
-                            offset,
+                            offset + 0.5,
                             noteId * pianoRollNoteHeight,
                             offsetWidth,
                             pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
