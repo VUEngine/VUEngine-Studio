@@ -328,13 +328,19 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             }
         };
 
-        pattern.Row.forEach(tick => {
-            const adjustedTickIndex = tick.ID * SUB_NOTE_RESOLUTION;
+        pattern.Row.forEach((tick, i) => {
             const event: SoundEventMap = {};
 
             if (tick.Note !== undefined) {
                 event[SoundEvent.Note] = NOTES_LABELS_REVERTED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM)];
-                event[SoundEvent.Duration] = 50;
+                let length = 1;
+                while (pattern.Row[i + length] && pattern.Row[i + length].Note === undefined) {
+                    length++;
+                }
+                event[SoundEvent.Duration] = SUB_NOTE_RESOLUTION * (pattern.Row[i + length]
+                    ? pattern.Row[i + length].ID - tick.ID
+                    : song.SongSettings.Rows - tick.ID
+                );
             }
 
             if (tick.Inst !== undefined) {
@@ -380,7 +386,7 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             });
 
             if (Object.keys(event).length > 0) {
-                newPattern.patternConfig.events[adjustedTickIndex] = event;
+                newPattern.patternConfig.events[tick.ID * SUB_NOTE_RESOLUTION] = event;
             }
         });
 

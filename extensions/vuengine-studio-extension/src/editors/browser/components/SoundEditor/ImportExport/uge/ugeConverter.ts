@@ -29,6 +29,7 @@ import {
     TrackConfig
 } from '../../SoundEditorTypes';
 import { DutyInstrument, NoiseInstrument, PatternCell, Song, WaveInstrument } from './ugeHelper';
+import { EffectCommandType } from './ugeTypes';
 
 const NOTES_LABELS_REVERTED = Object.keys(NOTES).reverse();
 const GB_NOTE_OFFSET = 9 - 12; // adjust for frequency ranges (+9) and transpose down an octave (-12)
@@ -438,12 +439,39 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
 
                 if (channelTick.note !== null) {
                     event[SoundEvent.Note] = NOTES_LABELS_REVERTED[clamp(channelTick.note + GB_NOTE_OFFSET, 0, NOTES_SPECTRUM)];
-                    event[SoundEvent.Duration] = 50;
+
+                    let length = 1;
+                    while (pattern[tickIndex + length] && pattern[tickIndex + length][trackIndex].note === null) {
+                        length++;
+                    }
+                    event[SoundEvent.Duration] = length * SUB_NOTE_RESOLUTION;
                 }
+
                 if (channelTick.instrument !== null) {
                     event[SoundEvent.Instrument] = instrumentsLookup[trackIndex][channelTick.instrument].id;
                 }
-                // TODO: effects
+
+                if (channelTick.effectcode !== null && channelTick.effectparam !== null) {
+                    // TODO
+                    switch (channelTick.effectcode) {
+                        case EffectCommandType.Arpeggio: break;
+                        case EffectCommandType.PortamentoUp: break;
+                        case EffectCommandType.PortamentoDown: break;
+                        case EffectCommandType.TonePortamento: break;
+                        case EffectCommandType.Vibrato: break;
+                        case EffectCommandType.SetMasterVolume: break;
+                        case EffectCommandType.CallRoutine: break;
+                        case EffectCommandType.NoteDelay: break;
+                        case EffectCommandType.SetPanning: break;
+                        case EffectCommandType.SetDutyCycle: break;
+                        case EffectCommandType.VolumeSlide: break;
+                        case EffectCommandType.PositionJump: break;
+                        case EffectCommandType.SetVolume: break;
+                        case EffectCommandType.PatternBreak: break;
+                        case EffectCommandType.NoteCut: break;
+                        case EffectCommandType.SetSpeed: break;
+                    }
+                }
 
                 if (Object.keys(event).length > 0) {
                     newPattern[trackIndex].patternConfig.events[adjustedTickIndex] = event;
