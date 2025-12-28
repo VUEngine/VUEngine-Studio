@@ -546,8 +546,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   }
 
   public sendKeypress = (
-    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode,
-    e?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode
   ): void => {
     if (
       this.state.loaded &&
@@ -555,9 +554,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
         keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay)
     ) {
       this.sendCommand('keyPress', keyCode);
-    }
-    if (e) {
-      e.currentTarget.blur();
     }
   };
 
@@ -579,7 +575,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle)
               }
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -592,7 +588,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   VesEmulatorCommands.INPUT_RESET.id,
                   true
                 )}`}
-              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Reset, e)}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Reset)}
               disabled={!this.state.loaded || this.state.showControls}
             >
               <i className="fa fa-refresh"></i>
@@ -607,7 +603,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.AudioMute, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.AudioMute)
               }
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -627,7 +623,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower)
               }
               disabled={
                 !this.state.loaded ||
@@ -656,7 +652,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                       true
                     )}`}
                   onClick={e =>
-                    this.sendKeypress(EmulatorFunctionKeyCode.Rewind, e)
+                    this.sendKeypress(EmulatorFunctionKeyCode.Rewind)
                   }
                   disabled={
                     !this.state.loaded ||
@@ -679,7 +675,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion)
               }
               disabled={
                 !this.state.loaded ||
@@ -701,7 +697,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance)
               }
               disabled={
                 !this.state.loaded ||
@@ -724,7 +720,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward)
               }
               disabled={
                 !this.state.loaded ||
@@ -744,7 +740,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.SaveState, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.SaveState)
               }
               disabled={
                 !this.state.loaded ||
@@ -763,7 +759,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.LoadState, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.LoadState)
               }
               disabled={
                 !this.state.loaded ||
@@ -796,7 +792,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease)
               }
               disabled={
                 !this.state.loaded ||
@@ -815,7 +811,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease)
               }
               disabled={
                 !this.state.loaded ||
@@ -835,7 +831,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.DumpSram, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.DumpSram)
               }
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -912,7 +908,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen)
               }
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -926,7 +922,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   true
                 )}`}
               onClick={e =>
-                this.sendKeypress(EmulatorFunctionKeyCode.Screenshot, e)
+                this.sendKeypress(EmulatorFunctionKeyCode.Screenshot)
               }
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -946,10 +942,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                 true
               )}`}
               onClick={e =>
-                this.sendKeypress(
-                  EmulatorFunctionKeyCode.ToggleControlsOverlay,
-                  e
-                )
+                this.sendKeypress(EmulatorFunctionKeyCode.ToggleControlsOverlay)
               }
               disabled={!this.state.loaded}
             >
