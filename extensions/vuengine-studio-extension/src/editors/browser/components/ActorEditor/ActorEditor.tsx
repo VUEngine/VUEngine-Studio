@@ -472,6 +472,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                 ...data.components,
                 [key]: [
                     ...data.components[key as ComponentKey].slice(0, index),
+                    ...data.components[key as ComponentKey].slice(index + 1)
                 ],
             }
         });
