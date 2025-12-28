@@ -37,7 +37,7 @@ interface AnimationProps {
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData, currentAnimationStep, setCurrentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { data, setData, isAnimationPlaying, setIsAnimationPlaying, currentAnimationStep, setCurrentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
@@ -158,24 +158,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                             'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
                         )}
                     />
-                    <HContainer>
-                        <input
-                            type="checkbox"
-                            checked={animation.loop}
-                            onChange={toggleLoop}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        <i
-                            className="codicon codicon-debug-restart"
-                            onClick={() => setCurrentAnimationStep(0)}
-                            title={nls.localizeByDefault('Restart')}
-                            style={{
-                                fontSize: 18,
-                                cursor: 'pointer',
-                            }}
-                        />
-                    </HContainer>
+                    <input
+                        type="checkbox"
+                        checked={animation.loop}
+                        onChange={toggleLoop}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
                 </VContainer>
             </HContainer>
             {!animation.loop &&
@@ -191,9 +180,40 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 />
             }
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/actor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
-                </label>
+                <HContainer alignItems='end'>
+                    <label>
+                        {nls.localize('vuengine/editors/actor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
+                    </label>
+                    <HContainer grow={1} justifyContent='end' style={{ padding: '0 3px' }}>
+                        <i
+                            className={`codicon codicon-debug-${isAnimationPlaying ? 'pause' : 'start'}`}
+                            onClick={() => setIsAnimationPlaying(prev => !prev)}
+                            title={nls.localize(
+                                'vuengine/editors/actor/playPauseAnimationPreview',
+                                'Play/pause animation preview'
+                            )}
+                            style={{
+                                fontSize: 16,
+                                cursor: 'pointer',
+                            }}
+                        />
+                        <i
+                            className="codicon codicon-debug-restart"
+                            onClick={() => {
+                                setCurrentAnimationStep(0);
+                                setIsAnimationPlaying(true);
+                            }}
+                            title={nls.localize(
+                                'vuengine/editors/actor/restartAnimationPreview',
+                                'Restart animation preview'
+                            )}
+                            style={{
+                                fontSize: 16,
+                                cursor: 'pointer',
+                            }}
+                        />
+                    </HContainer>
+                </HContainer>
                 <HContainer alignItems='start' wrap='wrap'>
                     {animation.frames.map((f, i) =>
                         <HContainer key={i} gap={1}>
@@ -202,6 +222,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                                 className={i === currentAnimationStep ? 'current' : undefined}
                                 value={animation.frames[i] + 1}
                                 setValue={v => setFrame(i, v as number - 1)}
+                                onClick={() => setCurrentAnimationStep(i)}
                                 min={1}
                                 max={totalFrames}
                                 commands={INPUT_BLOCKING_COMMANDS}
@@ -222,6 +243,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                             className='theia-button add-button'
                             onClick={addFrame}
                             title={nls.localizeByDefault('Add')}
+                            style={{ width: 69 }}
                         >
                             <i className='codicon codicon-plus' />
                         </button>

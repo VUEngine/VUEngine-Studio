@@ -46,6 +46,8 @@ export interface ActorEditorContextType {
     removeComponent: (key: ComponentKey | 'body', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
+    isAnimationPlaying: boolean
+    setIsAnimationPlaying: Dispatch<SetStateAction<boolean>>
     currentAnimationStep: number
     setCurrentAnimationStep: Dispatch<SetStateAction<number>>
     previewAnaglyph: boolean

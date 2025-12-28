@@ -34,6 +34,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   const { hasAnyComponent, setCurrentComponentDisplacement } = props;
   const {
     currentComponent, setCurrentComponent,
+    isAnimationPlaying,
     currentAnimationStep, setCurrentAnimationStep,
     previewBackgroundColor,
     previewScreenFrame,
@@ -74,13 +75,15 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   const setAnimationInterval = () => {
     if (animate) {
       timer = setInterval(() => {
-        setCurrentAnimationStep(prevAnimationStep =>
-          prevAnimationStep + 1 < (animation?.frames?.length ?? 1)
-            ? prevAnimationStep + 1
-            : animation?.loop
-              ? 0
-              : prevAnimationStep
-        );
+        if (isAnimationPlaying) {
+          setCurrentAnimationStep(prevAnimationStep =>
+            prevAnimationStep + 1 < (animation?.frames?.length ?? 1)
+              ? prevAnimationStep + 1
+              : animation?.loop
+                ? 0
+                : prevAnimationStep
+          );
+        }
       },
         frameMultiplicator * 20 * (animation?.cycles ?? 8)
       );
@@ -140,6 +143,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   }, [
     animate,
     animation,
+    isAnimationPlaying,
   ]);
 
   return hasPreviewableComponents

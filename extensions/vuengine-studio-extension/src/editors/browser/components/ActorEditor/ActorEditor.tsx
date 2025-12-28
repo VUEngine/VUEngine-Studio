@@ -67,6 +67,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
 
     const [currentComponent, setCurrentComponent] = useState<string>('');
+    const [isAnimationPlaying, setIsAnimationPlaying] = useState<boolean>(true);
     const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
     const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(true);
     const [previewAnaglyph, setPreviewAnaglyph] = useState<boolean>(false);
@@ -611,6 +612,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                     removeComponent: removeComponent,
                     currentComponent: currentComponent,
                     setCurrentComponent: setCurrentComponent,
+                    isAnimationPlaying: isAnimationPlaying,
+                    setIsAnimationPlaying: setIsAnimationPlaying,
                     currentAnimationStep: currentAnimationStep,
                     setCurrentAnimationStep: setCurrentAnimationStep,
                     previewAnaglyph: previewAnaglyph,
