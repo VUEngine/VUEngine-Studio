@@ -24,6 +24,7 @@
 }
 
 #status-bar-ves-editors-actor-preview-anaglyph {
+    justify-content: start !important;
     width: 36px;
 }
 #status-bar-ves-editors-actor-preview-anaglyph span,
