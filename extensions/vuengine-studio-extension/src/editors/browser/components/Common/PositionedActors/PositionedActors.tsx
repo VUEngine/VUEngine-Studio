@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
-import { showActorSelection } from '../Utils';
+import { showItemSelection } from '../Utils';
 import VContainer from '../Base/VContainer';
 import PositionedActor from './PositionedActor';
 
@@ -17,7 +17,13 @@ export default function PositionedActors(props: PositionedActorsProps): React.JS
     const { positionedActors, updatePositionedActors, itemIdsToIgnore } = props;
 
     const addPositionedActor = async (): Promise<void> => {
-        const actorToAdd = await showActorSelection(services.quickPickService, services.vesProjectService, itemIdsToIgnore);
+        const actorToAdd = await showItemSelection(
+            'Actor',
+            services.quickPickService,
+            services.messageService,
+            services.vesProjectService,
+            itemIdsToIgnore
+        );
         if (actorToAdd !== undefined) {
             updatePositionedActors([
                 ...positionedActors,

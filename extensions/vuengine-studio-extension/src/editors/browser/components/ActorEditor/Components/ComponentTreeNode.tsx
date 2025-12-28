@@ -9,6 +9,7 @@ import {
     Hexagon,
     Image,
     Images,
+    MusicNotes,
     Plus,
     Selection,
     SelectionInverse,
@@ -29,6 +30,7 @@ import {
     ComponentKey,
     HIDEABLE_COMPONENT_TYPES,
     HideableComponent,
+    RENAMABLE_COMPONENT_TYPES,
 } from '../ActorEditorTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
@@ -119,6 +121,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     }
                 case 'mutators':
                     return <SneakerMove size={16} />;
+                case 'sounds':
+                    return <MusicNotes size={16} />;
                 case 'sprites':
                     if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
                         ((data.components.sprites[index].texture?.files?.length ?? 0) +
@@ -273,7 +277,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                         title={nls.localizeByDefault('Add')}
                     />
                 }
-                {node.isLeaf && !node.parent?.isRoot && type !== 'children' &&
+                {node.isLeaf && !node.parent?.isRoot && RENAMABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-edit'
                         onClick={() => node.edit()}

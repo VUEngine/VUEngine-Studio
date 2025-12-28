@@ -2,6 +2,8 @@
   margin-left: 0;
   min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
   min-width: 32px;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 .jsonforms-container .add-button {

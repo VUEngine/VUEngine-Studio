@@ -109,6 +109,9 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                             }))}
                             defaultValue={startStage._id}
                             onChange={() => { }}
+                            containerStyle={{
+                                flexGrow: 1,
+                            }}
                         />
                         <button
                             className='theia-button secondary'

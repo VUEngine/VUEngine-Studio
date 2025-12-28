@@ -161,8 +161,11 @@ export interface BodyData {
 }
 
 export interface MutatorData {
-    name: string
     mutationClass: string
+}
+
+export interface SoundComponentData {
+    itemId: string
 }
 
 export interface ColliderData {
@@ -235,8 +238,8 @@ export interface PositionedActorData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'bodies' | 'mutators' | 'children' | 'colliders' | 'sprites' | 'wireframes';
-export type ComponentData = AnimationData | MutatorData | PositionedActorData | ColliderData | SpriteData | WireframeData;
+export type ComponentKey = 'animations' | 'bodies' | 'children' | 'colliders' | 'mutators' | 'sounds' | 'sprites' | 'wireframes';
+export type ComponentData = AnimationData | PositionedActorData | ColliderData | MutatorData | SoundComponentData | SpriteData | WireframeData;
 
 export const CLONABLE_COMPONENT_TYPES = [
     'animations',
@@ -247,6 +250,13 @@ export const CLONABLE_COMPONENT_TYPES = [
 ];
 
 export const ADDABLE_COMPONENT_TYPES = CLONABLE_COMPONENT_TYPES;
+export const RENAMABLE_COMPONENT_TYPES = [
+    'animations',
+    'bodies',
+    'colliders',
+    'sprites',
+    'wireframes',
+];
 
 export type HideableComponent = 'children' | 'colliders' | 'sprites' | 'wireframes';
 export const HIDEABLE_COMPONENT_TYPES = [
@@ -269,6 +279,7 @@ export interface ActorData {
         children: PositionedActorData[]
         colliders: ColliderData[]
         mutators: MutatorData[]
+        sounds: SoundComponentData[]
         sprites: SpriteData[]
         wireframes: WireframeData[]
     }

@@ -94,7 +94,13 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         : 'react-select-container';
 
     const SelectType = onCreateOption ? CreatableSelect : Select;
-    return <div title={title ?? undefined} style={containerStyle}>
+    return <div
+        title={title ?? undefined}
+        style={{
+            display: 'flex',
+            ...containerStyle
+        }}
+    >
         <SelectType
             value={value}
             onChange={multi

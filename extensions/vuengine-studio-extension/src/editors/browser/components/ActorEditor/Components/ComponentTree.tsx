@@ -5,7 +5,7 @@ import { Tree } from 'react-arborist';
 import { WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
-import { ActorData, ActorEditorContext, ActorEditorContextType, ComponentKey } from '../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType, AnimationData, ComponentKey, MutatorData, PositionedActorData, SoundComponentData } from '../ActorEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
@@ -92,6 +92,13 @@ export default function ComponentTree(): React.JSX.Element {
             hasContent: data.components?.mutators?.length > 0,
         },
         {
+            key: 'sounds',
+            componentKey: 'sounds',
+            labelSingular: nls.localize('vuengine/editors/actor/sound', 'Sound'),
+            labelPlural: nls.localize('vuengine/editors/actor/sounds', 'Sounds'),
+            hasContent: data.components?.sounds?.length > 0,
+        },
+        {
             key: 'children',
             componentKey: 'children',
             labelSingular: nls.localize('vuengine/editors/actor/child', 'Child'),
@@ -119,20 +126,26 @@ export default function ComponentTree(): React.JSX.Element {
                 if (componentType.componentKey && data.components[componentType.componentKey]) {
                     const newEntryChildren: TreeNode[] = [];
                     data.components[componentType.componentKey].map((c, i) => {
-                        const fallbackName = `${componentType.labelSingular} ${i + 1}`;
-                        let name = c.name ?? fallbackName;
-
-                        if (componentType.key === 'children') {
-                            // @ts-ignore
-                            const actor = services.vesProjectService.getProjectDataItemById(c.itemId, 'Actor') as ActorData & WithFileUri;
-                            if (actor) {
-                                name = actor._fileUri.path.name;
-                            }
+                        let itemName = (c as AnimationData).name;
+                        switch (componentType.key) {
+                            case 'children':
+                            case 'sounds':
+                                const itemId = (c as PositionedActorData | SoundComponentData).itemId;
+                                const itemType = componentType.key === 'sounds' ? 'Sound' : 'Actor';
+                                const item = services.vesProjectService.getProjectDataItemById(itemId, itemType) as WithFileUri;
+                                if (item) {
+                                    itemName = item._fileUri.path.name;
+                                }
+                                break;
+                            case 'mutators':
+                                itemName = (c as MutatorData).mutationClass;
+                                break;
                         }
+                        const fallbackName = `${componentType.labelSingular} ${i + 1}`;
 
                         newEntryChildren.push({
                             id: `${componentType.key}-${i}`,
-                            name,
+                            name: itemName ?? fallbackName,
                         });
                     });
                     newEntry.children = newEntryChildren;

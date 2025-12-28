@@ -1,43 +1,48 @@
-import { QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
+import { MessageService, QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
 import { EolStyle, Formatter, FracturedJsonOptions, NumberListAlignment } from 'fracturedjsonjs';
 import { customAlphabet } from 'nanoid';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
+import { WithContributor, WithFileUri, WithId } from '../../../../project/browser/ves-project-types';
 
 export const clamp = (value: number, min: number, max: number, deflt: number = 0): number =>
     isNumber(value)
         ? Math.min(Math.max(value, min), max)
         : deflt;
 
-export const showActorSelection = async (
+export const showItemSelection = async (
+    type: string,
     quickPickService: QuickPickService,
+    messageService: MessageService,
     vesProjectService: VesProjectService,
     ignoreIds?: string[]
 ): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-        title: nls.localize('vuengine/editors/general/selectActor', 'Select Actor'),
-        placeholder: nls.localize('vuengine/editors/general/selectActorToAdd', 'Select an Actor to add...'),
+        title: nls.localize('vuengine/editors/general/selectItem', 'Select Item'),
+        placeholder: nls.localize('vuengine/editors/general/selectItemOfTypeToAdd', 'Select item of type {0} to add...', type),
     };
-    const items: QuickPickItem[] = [];
-    const actors = vesProjectService.getProjectDataItemsForType('Actor');
-    if (actors) {
-        Object.keys(actors).map(k => {
-            if (!ignoreIds || !ignoreIds.includes(k)) {
-                const actor = actors[k];
-                // @ts-ignore
-                if (actor._id) {
-                    items.push({
-                        // @ts-ignore
-                        id: actor._id,
-                        // description: `(${actor._id})`,
-                        label: actor._fileUri.path.name,
-                        detail: actor._contributorUri.parent.path.relative(actor._fileUri.path)?.fsPath(),
-                    });
-                }
-            }
-        });
+    const quickPickItems: QuickPickItem[] = [];
+    const projectItems = vesProjectService.getProjectDataItemsForType(type);
+    if (projectItems === undefined || Object.keys(projectItems).length === 0) {
+        messageService.error(
+            nls.localize('vuengine/editors/general/noItemsOfTypeFound', 'No items of type {0} found.', type)
+        );
+        return;
     }
+    Object.keys(projectItems).map(k => {
+        if (!ignoreIds || !ignoreIds.includes(k)) {
+            const item = projectItems[k] as unknown & WithContributor & WithFileUri & WithId;
+            if (item._id) {
+                quickPickItems.push({
+                    id: item._id,
+                    // description: `(${item._id})`,
+                    label: item._fileUri.path.name,
+                    detail: item._contributorUri.parent.path.relative(item._fileUri.path)?.fsPath(),
+                });
+            }
+        }
+    });
 
-    return quickPickService.show(items, quickPickOptions);
+    return quickPickService.show(quickPickItems, quickPickOptions);
 };
 
 export const getMaxScaleInContainer = (containerWidth: number, containerHeight: number, width: number, height: number, integerScale = false) => {

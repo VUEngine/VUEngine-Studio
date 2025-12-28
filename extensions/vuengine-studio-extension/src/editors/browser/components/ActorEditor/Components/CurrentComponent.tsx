@@ -22,6 +22,7 @@ import AnimationsSettings from '../Animation/AnimationsSettings';
 import Collider from '../Collider/Collider';
 import CollidersSettings from '../Collider/CollidersSettings';
 import Mutator from '../Mutator/Mutator';
+import SoundComponent from '../Sound/SoundComponent';
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
@@ -53,11 +54,6 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         body={data.components.bodies[index]}
                         updateBody={(partialData: Partial<BodyData>) => updateComponent('bodies', index, partialData)}
                     />;
-                case 'mutators':
-                    return <Mutator
-                        mutator={data.components.mutators[index]}
-                        updateMutator={(partialData: Partial<MutatorData>) => updateComponent('mutators', index, partialData)}
-                    />;
                 case 'children':
                     return <PositionedActor
                         positionedActor={data.components.children[index]}
@@ -67,6 +63,16 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                     return <Collider
                         collider={data.components.colliders[index]}
                         updateCollider={(partialData: Partial<ColliderData>) => updateComponent('colliders', index, partialData)}
+                    />;
+                case 'mutators':
+                    return <Mutator
+                        mutator={data.components.mutators[index]}
+                        updateMutator={(partialData: Partial<MutatorData>) => updateComponent('mutators', index, partialData)}
+                    />;
+                case 'sounds':
+                    return <SoundComponent
+                        soundComponent={data.components.sounds[index]}
+                    // updateSoundComponent={(partialData: Partial<SoundComponentData>) => updateComponent('sounds', index, partialData)}
                     />;
                 case 'sprites':
                     return <Sprite

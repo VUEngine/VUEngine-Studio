@@ -14,10 +14,7 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
     const { mutator, updateMutator } = props;
 
     const setClass = (mutationClass: string): void => {
-        updateMutator({
-            mutationClass,
-            name: mutationClass
-        });
+        updateMutator({ ...mutator, mutationClass });
     };
 
     return (

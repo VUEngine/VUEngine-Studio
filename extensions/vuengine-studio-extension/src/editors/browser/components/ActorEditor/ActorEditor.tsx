@@ -9,7 +9,7 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
-import { showActorSelection } from '../Common/Utils';
+import { showItemSelection } from '../Common/Utils';
 import ActorMeta from './Actor/ActorMeta';
 import ActorSettings from './Actor/ActorSettings';
 import { ActorEditorCommands } from './ActorEditorCommands';
@@ -296,6 +296,10 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
             label: nls.localize('vuengine/editors/actor/mutator', 'Mutator'),
             allowAdd: data.components.mutators.length === 0,
         }, {
+            key: 'sounds',
+            label: nls.localize('vuengine/editors/actor/sound', 'Sound'),
+            allowAdd: true,
+        }, {
             key: 'children',
             label: nls.localize('vuengine/editors/actor/child', 'Child'),
             allowAdd: true,
@@ -339,6 +343,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                 return addComponentByType(t, nls.localize('vuengine/editors/actor/collider', 'Collider'));
             case 'mutators':
                 return addComponentByType(t, nls.localize('vuengine/editors/actor/mutation', 'Mutation'));
+            case 'sounds':
+                return addSound();
             case 'sprites':
                 return addComponentByType(t, nls.localize('vuengine/editors/actor/sprite', 'Sprite'));
             case 'wireframes':
@@ -377,11 +383,17 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     };
 
     const addPositionedActor = async (): Promise<void> => {
-        const actorToAdd = await showActorSelection(services.quickPickService, services.vesProjectService, [data._id]);
-        if (actorToAdd !== undefined) {
+        const itemToAdd = await showItemSelection(
+            'Actor',
+            services.quickPickService,
+            services.messageService,
+            services.vesProjectService,
+            [data._id]
+        );
+        if (itemToAdd !== undefined) {
             const updatedChildren = [...data.components?.children || []];
             updatedChildren.push({
-                itemId: actorToAdd.id!,
+                itemId: itemToAdd.id!,
                 onScreenPosition: {
                     x: 0,
                     y: 0,
@@ -411,6 +423,31 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
             });
 
             setCurrentComponent(`children-${updatedChildren.length - 1}`);
+        }
+    };
+
+    const addSound = async (): Promise<void> => {
+        const itemToAdd = await showItemSelection(
+            'Sound',
+            services.quickPickService,
+            services.messageService,
+            services.vesProjectService,
+            [data._id]
+        );
+        if (itemToAdd !== undefined) {
+            const updatedSounds = [...data.components?.sounds || []];
+            updatedSounds.push({
+                itemId: itemToAdd.id!,
+            });
+
+            setData({
+                components: {
+                    ...data.components,
+                    sounds: updatedSounds,
+                }
+            });
+
+            setCurrentComponent(`sounds-${updatedSounds.length - 1}`);
         }
     };
 
