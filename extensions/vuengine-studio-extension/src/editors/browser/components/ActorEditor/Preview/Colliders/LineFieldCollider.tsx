@@ -1,12 +1,13 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelVector, ROTATION_RATIO } from '../../../Common/VUEngineTypes';
+import { PixelRotation, PixelSize, PixelVector, ROTATION_RATIO } from '../../../Common/VUEngineTypes';
 import { AxisNumeric, ColliderData, ActorEditorContext, ActorEditorContextType } from '../../ActorEditorTypes';
 
 interface LineFieldFaceProps {
     axis: AxisNumeric
     length: number
     thickness: number
+    pixelSize: PixelSize
     displacement: PixelVector
     rotation: PixelRotation
     highlighted: number // number to work around bug styled-component problem with boolean
@@ -31,7 +32,8 @@ const LineFieldFace = styled.div<LineFieldFaceProps>`
         ? p.rotation.z * ROTATION_RATIO - 90
         : p.rotation.z * ROTATION_RATIO}deg);
     transform-style: preserve-3d;
-    translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
+    translate: ${p => p.displacement.x - (p.length % 2 !== 0 ? 0.5 : 0)}px 
+        ${p => p.displacement.y - (p.thickness % 2 !== 0 ? 0.5 : 0)}px;
     z-index: ${p => p.highlighted ? 999999 : 120000};
     width: ${p => p.length}px;
 `;
@@ -80,6 +82,7 @@ export default function LineFieldCollider(props: LineFieldColiderProps): React.J
         onClick={handleClick}
         axis={a}
         length={l}
+        pixelSize={collider.pixelSize}
         thickness={t}
         displacement={collider.displacement}
         rotation={collider.rotation}

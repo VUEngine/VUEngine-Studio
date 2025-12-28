@@ -24,7 +24,9 @@ const BallFace = styled.div<BallFaceProps>`
         rotateY(${p => p.rotation.y * ROTATION_RATIO}deg) 
         rotateZ(${p => p.rotation.z * ROTATION_RATIO}deg);
     transform-style: preserve-3d;
-    translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
+    translate: ${p => p.displacement.x - (p.diameter % 2 !== 0 ? 0.5 : 0)}px 
+        ${p => p.displacement.y - (p.diameter % 2 !== 0 ? 0.5 : 0)}px 
+        ${p => p.displacement.parallax * -1 - (p.diameter % 2 !== 0 ? 0.5 : 0)}px;
     width: ${p => p.diameter}px;
 `;
 

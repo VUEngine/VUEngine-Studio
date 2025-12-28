@@ -108,6 +108,7 @@ export default function BoxCollider(props: BoxColliderProps): React.JSX.Element 
                     transform: `rotateX(${collider.rotation.x * ROTATION_RATIO}deg) 
                     rotateY(${collider.rotation.y * ROTATION_RATIO}deg) 
                     rotateZ(${collider.rotation.z * ROTATION_RATIO}deg)`,
+                    translate: `${collider.pixelSize.x % 2 !== 0 ? -0.5 : 0}px ${collider.pixelSize.y % 2 !== 0 ? -0.5 : 0}px`,
                 }}
             >
                 <CuboidFaceFront style={highlightedStyle} />
