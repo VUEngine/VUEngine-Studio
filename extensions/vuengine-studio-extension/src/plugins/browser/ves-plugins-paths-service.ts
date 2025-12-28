@@ -29,7 +29,7 @@ export class VesPluginsPathsService {
         ? `/${preference}`
         : preference
       ).withScheme('file');
-      if (!customUri.isEqual(new URI('').withScheme('file'))) {
+      if (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri)) {
         pluginsUri = customUri;
       }
     }
@@ -40,21 +40,21 @@ export class VesPluginsPathsService {
   async getUserPluginsUri(): Promise<URI> {
     const homedir = await this.envVariablesServer.getHomeDirUri();
     const homedirUri = new URI(homedir).withScheme('file');
-    const defaultUri = homedirUri
+    let pluginsUri = homedirUri
       .resolve('vuengine')
       .resolve('plugins');
 
-    const preference = this.preferenceService.get(
-      VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) as string;
-    const customUri = new URI(
-      isWindows && !preference.startsWith('/')
+    const preference = this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH) as string;
+    if (preference !== '') {
+      const customUri = new URI(isWindows && !preference?.startsWith('/')
         ? `/${preference}`
         : preference
-    ).withScheme('file');
+      ).withScheme('file');
+      if (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri)) {
+        pluginsUri = customUri;
+      }
+    }
 
-    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
-      ? customUri
-      : defaultUri;
+    return pluginsUri;
   }
 }
