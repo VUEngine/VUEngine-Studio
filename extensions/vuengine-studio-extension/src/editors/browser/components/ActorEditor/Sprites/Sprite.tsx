@@ -46,8 +46,16 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation, spriteProcessingDialog, setSpriteProcessingDialog } = props;
-    const [dimensions, setDimensions] = useState<number[][]>([[], []]);
-    const [filename, setFilename] = useState<string[]>([]);
+    const [leftWidth, setLeftWidth] = useState<number>(0);
+    const [leftWidthPadded, setLeftWidthPadded] = useState<number>(0);
+    const [leftHeight, setLeftHeight] = useState<number>(0);
+    const [leftHeightPadded, setLeftHeightPadded] = useState<number>(0);
+    const [rightWidth, setRightWidth] = useState<number>(0);
+    const [rightWidthPadded, setRightWidthPadded] = useState<number>(0);
+    const [rightHeight, setRightHeight] = useState<number>(0);
+    const [rightHeightPadded, setRightHeightPadded] = useState<number>(0);
+    const [filenameLeft, setFilenameLeft] = useState<string>('');
+    const [filenameRight, setFilenameRight] = useState<string>('');
 
     const isAnimated = sprite.isAnimated && (data.components?.animations?.length > 0);
 
@@ -58,12 +66,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         !sprite.texture?.repeat?.x &&
         !sprite.texture?.repeat?.y &&
         // FrameBlend sprites are stored in a single map, aligned top/down. Therefore, they can't be higher than 256 px.
-        dimensions[0][3] <= 256;
+        leftHeightPadded <= 256;
 
     const getMetaData = async (): Promise<void> => {
         const dim: number[][] = [[], []];
         const fn: string[] = [];
-        [
+        await Promise.all([
             sprite.texture?.files,
             sprite.texture?.files2
         ].map(async (f, i) => {
@@ -87,10 +95,18 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 const finalWidth = clamp(roundToNextMultipleOf8(imageWidth), 0, MAX_IMAGE_WIDTH);
                 dim[i] = [imageWidth, imageHeight, finalWidth, finalHeight];
             }
-        });
+        }));
 
-        setFilename(fn);
-        setDimensions(dim);
+        setFilenameLeft(fn[0]);
+        setFilenameRight(fn[1]);
+        setLeftWidth(dim[0][0]);
+        setLeftHeight(dim[0][1]);
+        setLeftWidthPadded(dim[0][2]);
+        setLeftHeightPadded(dim[0][3]);
+        setRightWidth(dim[1][0]);
+        setRightHeight(dim[1][1]);
+        setRightWidthPadded(dim[1][2]);
+        setRightHeightPadded(dim[1][3]);
     };
 
     const getTilesCount = (imageData: SpriteImageData | number | undefined): number => {
@@ -503,38 +519,44 @@ or multiple files, where each represents one animation frame.'
                                             }
                                         </div>
                                         : <>
-                                            {filename[0] !== '' &&
+                                            {filenameLeft !== '' &&
                                                 <div
                                                     style={{
                                                         overflow: 'hidden',
                                                         textOverflow: 'ellipsis',
                                                     }}
-                                                    title={filename[0]}
+                                                    title={filenameLeft}
                                                 >
-                                                    {filename[0]}
+                                                    {filenameLeft}
                                                 </div>
                                             }
 
                                             <HContainer>
                                                 <VContainer grow={1}>
-                                                    {dimensions[0].length > 1 &&
-                                                        <div style={{ opacity: .6 }}>
+                                                    {leftWidth > 0
+                                                        ? <div style={{ opacity: .6 }}>
                                                             <div>
-                                                                {dimensions[0][0]} × {dimensions[0][1]} px
+                                                                {leftWidth} × {leftHeight} px
                                                             </div>
-                                                            {(dimensions[0][0] !== dimensions[0][2] || dimensions[0][1] !== dimensions[0][3]) &&
+                                                            {(leftWidth !== leftWidthPadded || leftHeight !== leftHeightPadded) &&
                                                                 <div>
-                                                                    (→ {dimensions[0][2]} × {dimensions[0][3]} px)
+                                                                    (→ {leftWidthPadded} × {leftHeightPadded} px)
                                                                 </div>
                                                             }
                                                             {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                                 <div>
                                                                     (
-                                                                    {dimensions[0][0]} × {Math.round(dimensions[0][1] /
+                                                                    {leftWidth} × {Math.round(leftHeight /
                                                                         data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
                                                                     )
                                                                 </div>
                                                             }
+                                                        </div>
+                                                        : <div
+                                                            className="error"
+                                                            style={{ opacity: .6 }}
+                                                        >
+                                                            {nls.localize('vuengine/editors/actor/imageFileNotFound', 'Image File Not Found')}
                                                         </div>
                                                     }
 
@@ -547,7 +569,7 @@ or multiple files, where each represents one animation frame.'
                                                         </div>
                                                     }
                                                 </VContainer>
-                                                <VContainer alignItems="end" justifyContent="end">
+                                                <VContainer alignItems="end" justifyContent="end" style={{ padding: 2 }}>
                                                     <button
                                                         className="theia-button secondary"
                                                         title={nls.localize('vuengine/editors/actor/imageProcessingSettings', 'Image Processing Settings')}
@@ -592,37 +614,43 @@ or multiple files, where each represents one animation frame.'
                                                 )}
                                             </div>
                                             : <>
-                                                {filename[1] !== '' &&
+                                                {filenameRight !== '' &&
                                                     <div
                                                         style={{
                                                             overflow: 'hidden',
                                                             textOverflow: 'ellipsis',
                                                         }}
-                                                        title={filename[1]}
+                                                        title={filenameRight}
                                                     >
-                                                        {filename[1]}
+                                                        {filenameRight}
                                                     </div>
                                                 }
 
-                                                {dimensions[1].length > 1 &&
-                                                    <div style={{ opacity: .6 }}>
+                                                {rightWidth > 0
+                                                    ? <div style={{ opacity: .6 }}>
                                                         <div>
-                                                            {dimensions[1][0]} × {dimensions[1][1]} px
+                                                            {rightWidth} × {rightHeight} px
                                                         </div>
-                                                        {dimensions[1][0] !== dimensions[1][2] || dimensions[1][1] !== dimensions[1][3] &&
+                                                        {rightWidth !== rightWidthPadded || rightHeight !== rightHeightPadded &&
                                                             <div>
-                                                                <i className="codicon codicon-arrow-right"></i> {dimensions[1][2]} × {dimensions[1][3]} px
+                                                                <i className="codicon codicon-arrow-right"></i> {rightWidthPadded} × {rightHeightPadded} px
                                                             </div>
                                                         }
                                                         {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                             <div>
-                                                                {dimensions[1][0]}
+                                                                {rightWidth}
                                                                 {' × '}
-                                                                {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100}
+                                                                {Math.round(rightHeight / data.animations?.totalFrames * 100) / 100}
                                                                 {' px × '}
                                                                 {data.animations?.totalFrames}
                                                             </div>
                                                         }
+                                                    </div>
+                                                    : <div
+                                                        className="error"
+                                                        style={{ opacity: .6 }}
+                                                    >
+                                                        {nls.localize('vuengine/editors/actor/imageFileNotFound', 'Image File Not Found')}
                                                     </div>
                                                 }
                                             </>
