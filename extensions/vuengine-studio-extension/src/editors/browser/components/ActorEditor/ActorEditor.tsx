@@ -28,6 +28,8 @@ import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
 import Sidebar from '../Common/Editor/Sidebar';
+import ImageProcessingSettingsForm, { ImageProcessingSettingsFormProps } from './Sprites/ImageProcessingSettingsForm';
+import PopUpDialog from '../Common/Base/PopUpDialog';
 
 export const ShowTreeButton = styled.button`
   left: var(--padding);
@@ -78,6 +80,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     const [previewShowSprites, setPreviewShowSprites] = useState<boolean>(true);
     const [previewShowWireframes, setPreviewShowWireframes] = useState<boolean>(true);
     const [previewZoom, setPreviewZoom] = useState<number>(2);
+    const [spriteProcessingDialog, setSpriteProcessingDialog] = useState<boolean | ImageProcessingSettingsFormProps>(false);
 
     const mostFilesOnASprite = getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
@@ -688,8 +691,33 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                 <CurrentComponent
                                     isMultiFileAnimation={isMultiFileAnimation}
                                     updateComponent={updateComponent}
+                                    spriteProcessingDialog={spriteProcessingDialog}
+                                    setSpriteProcessingDialog={setSpriteProcessingDialog}
                                 />
                             </Sidebar>
+                            {spriteProcessingDialog !== false && (
+                                <PopUpDialog
+                                    open={true}
+                                    onClose={() => setSpriteProcessingDialog(false)}
+                                    onOk={() => setSpriteProcessingDialog(false)}
+                                    title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
+                                    height='100%'
+                                    width='100%'
+                                >
+                                    <ImageProcessingSettingsForm
+                                        image={(spriteProcessingDialog as ImageProcessingSettingsFormProps).image}
+                                        setFiles={(spriteProcessingDialog as ImageProcessingSettingsFormProps).setFiles}
+                                        imageData={(spriteProcessingDialog as ImageProcessingSettingsFormProps).imageData}
+                                        processingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).processingSettings}
+                                        updateProcessingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateProcessingSettings}
+                                        colorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).colorMode}
+                                        updateColorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateColorMode}
+                                        allowFrameBlendMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).allowFrameBlendMode}
+                                        compression={(spriteProcessingDialog as ImageProcessingSettingsFormProps).compression}
+                                        convertImage={(spriteProcessingDialog as ImageProcessingSettingsFormProps).convertImage}
+                                    />
+                                </PopUpDialog>
+                            )}
                         </HContainer>
                         }
                     </ActorEditorContext.Consumer>

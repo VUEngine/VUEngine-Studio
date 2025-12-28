@@ -1,17 +1,18 @@
 import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { isNumber, nls } from '@theia/core';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/Base/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
-import PopUpDialog from '../../Common/Base/PopUpDialog';
+import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
-import SectionSelect from '../../Common/SectionSelect';
-import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
+import { DataSection } from '../../Common/CommonTypes';
+import InfoLabel from '../../Common/InfoLabel';
+import SectionSelect from '../../Common/SectionSelect';
+import TransparencySelect from '../../Common/TransparencySelect';
+import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { ActorEditorSaveDataOptions } from '../ActorEditor';
@@ -30,22 +31,21 @@ import {
     SpriteData,
     SpriteImageData,
 } from '../ActorEditorTypes';
-import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
-import TransparencySelect from '../../Common/TransparencySelect';
-import Input from '../../Common/Base/Input';
+import { ImageProcessingSettingsFormProps } from './ImageProcessingSettingsForm';
 
 interface SpriteProps {
     sprite: SpriteData
     updateSprite: (partialData: Partial<SpriteData>, options?: ActorEditorSaveDataOptions) => void
     isMultiFileAnimation: boolean
+    spriteProcessingDialog: boolean | ImageProcessingSettingsFormProps
+    setSpriteProcessingDialog: Dispatch<SetStateAction<boolean | ImageProcessingSettingsFormProps>>
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { sprite, updateSprite, isMultiFileAnimation } = props;
-    const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
+    const { sprite, updateSprite, isMultiFileAnimation, spriteProcessingDialog, setSpriteProcessingDialog } = props;
     const [dimensions, setDimensions] = useState<number[][]>([[], []]);
     const [filename, setFilename] = useState<string[]>([]);
 
@@ -356,6 +356,29 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const setProcessingDialogData = () => {
+        setSpriteProcessingDialog({
+            image: sprite.texture?.files[0],
+            setFiles: setFiles,
+            imageData: !isNumber(sprite._imageData) ? sprite._imageData?.images[0] : undefined,
+            processingSettings: sprite.imageProcessingSettings,
+            updateProcessingSettings: updateImageProcessingSettings,
+            colorMode: allowFrameBlendMode ? sprite.colorMode : ColorMode.Default,
+            updateColorMode: setColorMode,
+            allowFrameBlendMode: allowFrameBlendMode,
+            compression: sprite.compression,
+            convertImage: reconvertImage,
+        });
+    };
+
+    useEffect(() => {
+        if (spriteProcessingDialog !== false) {
+            setProcessingDialogData();
+        }
+    }, [
+        sprite,
+    ]);
+
     useEffect(() => {
         getMetaData();
     }, [
@@ -460,7 +483,7 @@ or multiple files, where each represents one animation frame.'
                                         showMetaData={false}
                                         containerHeight='80px'
                                         containerWidth='100px'
-                                        fileAddExtraAction={() => setProcessingDialogOpen(true)}
+                                        fileAddExtraAction={() => setProcessingDialogData()}
                                     />
                                 </div>
                                 <VContainer grow={1} justifyContent="center" overflow="hidden">
@@ -528,7 +551,7 @@ or multiple files, where each represents one animation frame.'
                                                     <button
                                                         className="theia-button secondary"
                                                         title={nls.localize('vuengine/editors/actor/imageProcessingSettings', 'Image Processing Settings')}
-                                                        onClick={() => setProcessingDialogOpen(true)}
+                                                        onClick={() => setProcessingDialogData()}
                                                     >
                                                         <i className="codicon codicon-settings" />
                                                     </button>
@@ -1027,27 +1050,6 @@ If 0, the value is inferred from the texture.'
             </VContainer>
             <hr />
             <SpritesSettings />
-            <PopUpDialog
-                open={processingDialogOpen}
-                onClose={() => setProcessingDialogOpen(false)}
-                onOk={() => setProcessingDialogOpen(false)}
-                title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
-                height='100%'
-                width='100%'
-            >
-                <ImageProcessingSettingsForm
-                    image={sprite.texture?.files[0]}
-                    setFiles={setFiles}
-                    imageData={!isNumber(sprite._imageData) ? sprite._imageData?.images[0] : undefined}
-                    processingSettings={sprite.imageProcessingSettings}
-                    updateProcessingSettings={updateImageProcessingSettings}
-                    colorMode={allowFrameBlendMode ? sprite.colorMode : ColorMode.Default}
-                    updateColorMode={setColorMode}
-                    allowFrameBlendMode={allowFrameBlendMode}
-                    compression={sprite.compression}
-                    convertImage={reconvertImage}
-                />
-            </PopUpDialog>
         </>
     );
 }

@@ -32,7 +32,7 @@ const ReconvertButton = styled.button`
     height: 100%;
 `;
 
-interface ImageProcessingSettingsFormProps {
+export interface ImageProcessingSettingsFormProps {
     image: string
     setFiles?: (files: string[]) => void
     imageData?: Partial<ConversionResult>
@@ -87,7 +87,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         if (image) {
             const imageUri = fileUri.parent.resolve(image);
             const output = await services.vesImagesService.quantizeImage(imageUri, processingSettings, colorMode);
-            setResultImageBase64(Buffer.from(output).toString('base64'));
+            setResultImageBase64(Buffer.from(output as unknown as string).toString('base64'));
         } else {
             setResultImageBase64('');
         }

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import VContainer from '../../Common/Base/VContainer';
 import PositionedActor from '../../Common/PositionedActors/PositionedActor';
 import Body from '../Actor/Body';
@@ -23,6 +23,7 @@ import Collider from '../Collider/Collider';
 import CollidersSettings from '../Collider/CollidersSettings';
 import Mutator from '../Mutator/Mutator';
 import SoundComponent from '../Sound/SoundComponent';
+import { ImageProcessingSettingsFormProps } from '../Sprites/ImageProcessingSettingsForm';
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
@@ -30,10 +31,12 @@ import Wireframe from '../Wireframes/Wireframe';
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
     updateComponent: (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: ActorEditorSaveDataOptions) => void,
+    spriteProcessingDialog: boolean | ImageProcessingSettingsFormProps
+    setSpriteProcessingDialog: Dispatch<SetStateAction<boolean | ImageProcessingSettingsFormProps>>
 }
 
 export default function CurrentComponent(props: CurrentComponentProps): React.JSX.Element {
-    const { isMultiFileAnimation, updateComponent } = props;
+    const { isMultiFileAnimation, updateComponent, spriteProcessingDialog, setSpriteProcessingDialog } = props;
     const { data, currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
 
     const getComponentEditor = (): React.JSX.Element => {
@@ -79,6 +82,8 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         sprite={data.components.sprites[index]}
                         updateSprite={(partialData: Partial<SpriteData>, options?: ActorEditorSaveDataOptions) => updateComponent('sprites', index, partialData, options)}
                         isMultiFileAnimation={isMultiFileAnimation}
+                        spriteProcessingDialog={spriteProcessingDialog}
+                        setSpriteProcessingDialog={setSpriteProcessingDialog}
                     />;
                 case 'wireframes':
                     return <Wireframe
