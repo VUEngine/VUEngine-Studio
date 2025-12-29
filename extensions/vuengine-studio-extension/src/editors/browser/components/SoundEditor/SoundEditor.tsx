@@ -24,6 +24,7 @@ import SoundEditorToolbar from './SoundEditorToolbar';
 import {
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
+    DEFAULT_PATTERN_SIZE,
     DEFAULT_TRACK_SETTINGS,
     EventsMap,
     InstrumentMap,
@@ -569,11 +570,10 @@ A total of {0} patterns will be deleted.',
 
         const removeNoteFromEvents = (stepToRemove: number) => {
             // remove all note-related events
-            [SoundEvent.Note, SoundEvent.Duration, SoundEvent.NoteSlide].forEach(eventType => {
-                if (updatedEvents[stepToRemove][eventType] !== undefined) {
-                    delete updatedEvents[stepToRemove][eventType];
-                }
-            });
+            delete updatedEvents[stepToRemove][SoundEvent.Note];
+            delete updatedEvents[stepToRemove][SoundEvent.Duration];
+            delete updatedEvents[stepToRemove][SoundEvent.NoteSlide];
+
             // if no events remain, remove entirely
             if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
                 delete updatedEvents[stepToRemove];
@@ -760,31 +760,35 @@ A total of {0} patterns will be deleted.',
         }
     };
 
-    const showPatternSelection = async (trackId: number): Promise<QuickPickItem | undefined> =>
+    const showPatternSelection = async (size?: number): Promise<QuickPickItem | undefined> =>
         services.quickPickService.show(
             [
                 {
                     id: NEW_PATTERN_ID,
                     label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
                 },
-                ...Object.keys(soundData.patterns).map((patternId, i) => ({
-                    id: patternId,
-                    label: getPatternName(soundData, patternId),
-                })).sort((a, b) => a.label.localeCompare(b.label)),
+                ...Object.keys(soundData.patterns)
+                    .filter(patternId => size === undefined || size <= 1 || soundData.patterns[patternId].size === size)
+                    .map((patternId, i) => ({
+                        id: patternId,
+                        label: getPatternName(soundData, patternId),
+                    }))
+                    .sort((a, b) => a.label.localeCompare(b.label)),
             ],
             {
                 title: nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern'),
-                placeholder: nls.localize('vuengine/editors/sound/selectPatternToAdd', 'Select a pattern to add...'),
+                placeholder: size !== undefined && size > 1
+                    ? nls.localize('vuengine/editors/sound/selectPatternOfSizeToAdd', 'Select a pattern to add... (Size: {0})', size)
+                    : nls.localize('vuengine/editors/sound/selectPatternToAdd', 'Select a pattern to add...'),
             }
         );
 
-    const addPattern = async (trackId: number, step: number, size?: number, createNew: boolean = false): Promise<void> => {
+    const addPattern = async (trackId: number, step: number, size?: number, createNew?: boolean): Promise<void> => {
         const patternToAdd = createNew
             ? { id: NEW_PATTERN_ID }
-            // TODO: if size > 1 is given, show only pattern of that size
-            : await showPatternSelection(trackId);
+            : await showPatternSelection(size);
         if (patternToAdd && patternToAdd.id) {
-            addPatternToSequence(trackId, step, patternToAdd.id, size ?? 4);
+            addPatternToSequence(trackId, step, patternToAdd.id, size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE);
         }
     };
 

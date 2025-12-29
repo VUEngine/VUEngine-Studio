@@ -91,7 +91,7 @@ const StyledScrollWindow = styled.div`
     background-color: rgba(255, 255, 255, .1);
     position: absolute;
     top: 0;
-    z-index: -1;
+    z-index: 0;
 
     body.theia-light &,
     body.theia-hc & {

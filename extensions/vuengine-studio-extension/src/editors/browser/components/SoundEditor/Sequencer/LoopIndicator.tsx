@@ -24,7 +24,7 @@ export default function LoopIndicator(props: LoopIndicatorProps): React.JSX.Elem
 
     return <StyledLoopIndicator style={{
         display: hidden ? 'none' : undefined,
-        left: 1 + offset,
+        left: offset - .5,
     }}>
         <i className='fa fa-backward' style={{
             bottom: -1,

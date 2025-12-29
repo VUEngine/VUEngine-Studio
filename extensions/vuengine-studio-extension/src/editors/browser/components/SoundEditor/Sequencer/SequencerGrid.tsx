@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
-    DEFAULT_PATTERN_SIZE,
     SCROLL_BAR_WIDTH,
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
@@ -120,48 +119,52 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + sequencerScrollWindow.x;
-        const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
+        if (e.button === 0 || e.button === 2) { // Left or right mouse button
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + sequencerScrollWindow.x;
+            const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
 
-        const trackId = Math.floor(y / sequencerPatternHeight);
-        const step = Math.floor(x / sequencerPatternWidth) * SEQUENCER_RESOLUTION;
+            const trackId = Math.floor(y / sequencerPatternHeight);
+            const step = Math.floor(x / sequencerPatternWidth) * SEQUENCER_RESOLUTION;
 
-        setDragStartTrackId(trackId);
-        setDragStartStep(step);
-        setDragEndStep(step);
+            setDragStartTrackId(trackId);
+            setDragStartStep(step);
+            setDragEndStep(step);
+        }
     };
 
     const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-            return;
+        if (e.button === 0 || e.button === 2) { // Left or right mouse button
+            if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+                return;
+            }
+
+            const newPatternStep = Math.min(dragStartStep, dragEndStep);
+            const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
+
+            addPattern(dragStartTrackId, newPatternStep, newPatternSize, e.button === 0);
+
+            // reset
+            setDragStartTrackId(-1);
+            setDragStartStep(-1);
+            setDragEndStep(-1);
         }
-
-        const newPatternStep = Math.min(dragStartStep, dragEndStep);
-        const newPatternSize = dragStartStep === dragEndStep
-            ? DEFAULT_PATTERN_SIZE
-            : Math.abs(dragStartStep - dragEndStep) + 1;
-
-        addPattern(dragStartTrackId, newPatternStep, newPatternSize, e.button === 0);
-
-        // reset
-        setDragStartTrackId(-1);
-        setDragStartStep(-1);
-        setDragEndStep(-1);
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-            return;
-        }
+        if (e.button === 0 || e.button === 2) { // Left or right mouse button
+            if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+                return;
+            }
 
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + sequencerScrollWindow.x;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + sequencerScrollWindow.x;
 
-        const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+            const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
 
-        if (step !== dragEndStep) {
-            setDragEndStep(step);
+            if (step !== dragEndStep) {
+                setDragEndStep(step);
+            }
         }
     };
 

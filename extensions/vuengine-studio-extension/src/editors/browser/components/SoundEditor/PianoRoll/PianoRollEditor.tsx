@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import styled from 'styled-components';
 import {
     NOTE_RESOLUTION,
@@ -49,6 +49,7 @@ interface PianoRollEditorProps {
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
     pianoRollScrollWindow: ScrollWindow
+    pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
 }
 
@@ -64,6 +65,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
+        pianoRollRef,
         trackSettings,
     } = props;
     const [dragNoteId, setDragNoteId] = useState<number>(-1);
@@ -117,6 +119,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setDragStartStep={setDragStartStep}
                 setDragEndStep={setDragEndStep}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
             />
         </StyledPianoRollGridContainer>

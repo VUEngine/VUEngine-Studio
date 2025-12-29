@@ -294,8 +294,6 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 soundData: soundData,
                 trackSettings: trackSettings,
             }));
-            console.log('currentSoundDataChecksum', currentSoundDataChecksum);
-            console.log('soundDataChecksum', soundDataChecksum);
             // console.log('current:', currentSoundDataChecksum);
             // console.log('previous:', soundDataChecksum);
             if (soundDataChecksum !== currentSoundDataChecksum) {

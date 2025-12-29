@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
@@ -36,6 +36,7 @@ interface PianoRollGridProps {
     setDragEndStep: Dispatch<SetStateAction<number>>
     setDragNoteId: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
+    pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
 }
 
@@ -53,9 +54,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         dragEndStep, setDragEndStep,
         dragNoteId, setDragNoteId,
         pianoRollScrollWindow,
+        pianoRollRef,
         trackSettings,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
+    const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -171,7 +174,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         // notes
         soundData.tracks.map((track, trackId) => {
             Object.keys(track.sequence).forEach(key => {
-                if (trackId !== currentTrackId && !trackSettings[trackId].seeThrough) {
+                if (trackId !== currentTrackId && trackSettings[trackId] !== undefined && !trackSettings[trackId].seeThrough) {
                     return;
                 }
                 const patternOffset = parseInt(key);
@@ -214,80 +217,104 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-        const y = e.clientY - rect.top;
+        if (e.button === 0) { // Left mouse button
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const y = e.clientY - rect.top;
 
-        const noteId = Math.floor(y / pianoRollNoteHeight);
-        const step = Math.floor(x / pianoRollNoteWidth);
+            const noteId = Math.floor(y / pianoRollNoteHeight);
+            const step = Math.floor(x / pianoRollNoteWidth);
 
-        setDragNoteId(noteId);
-        setDragStartStep(step);
-        setDragEndStep(step);
+            setDragNoteId(noteId);
+            setDragStartStep(step);
+            setDragEndStep(step);
+        } else if (e.button === 1) {
+            setIsDragScrolling(true);
+        }
     };
 
     const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-            return;
-        }
+        setIsDragScrolling(false);
 
-        const newNoteId = dragNoteId;
-        const newNoteStep = Math.min(dragStartStep, dragEndStep);
-        const newNoteDurationSteps = (Math.abs(dragStartStep - dragEndStep) + 1);
-        const newNoteLabel = NOTES_LABELS[newNoteId];
-        const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
+        if (e.button === 0) { // Left mouse button
+            if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+                return;
+            }
 
-        setNoteCursor(newNoteCursor);
+            const newNoteId = dragNoteId;
+            const newNoteStep = Math.min(dragStartStep, dragEndStep);
+            const newNoteDurationSteps = (Math.abs(dragStartStep - dragEndStep) + 1);
+            const newNoteLabel = NOTES_LABELS[newNoteId];
+            const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
 
-        const currentPattern = soundData.patterns[currentPatternId];
-        const currentSequenceIndexStartStep = currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-        const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+            setNoteCursor(newNoteCursor);
 
-        // if inside current pattern
-        if (
-            currentPattern &&
-            newNoteStep >= currentSequenceIndexStartStep &&
-            newNoteStep < currentSequenceIndexEndStep
-        ) {
-            if (e.button === 0) {
+            const currentPattern = soundData.patterns[currentPatternId];
+            const currentSequenceIndexStartStep = currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+            const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+
+            // if inside current pattern
+            if (
+                currentPattern &&
+                newNoteStep >= currentSequenceIndexStartStep &&
+                newNoteStep < currentSequenceIndexEndStep
+            ) {
                 setNote(
                     (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
                     newNoteLabel,
                     undefined,
                     newNoteDurationSteps * SUB_NOTE_RESOLUTION
                 );
+            } else {
+                const newPatternSize = dragStartStep === dragEndStep
+                    ? DEFAULT_PATTERN_SIZE
+                    : newNoteDurationSteps * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
+                setPatternAtCursorPosition(newNoteCursor, newPatternSize, true);
             }
-        } else {
-            const newPatternSize = dragStartStep === dragEndStep
-                ? DEFAULT_PATTERN_SIZE
-                : newNoteDurationSteps * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
-            setPatternAtCursorPosition(newNoteCursor, newPatternSize, e.button === 0);
-        }
 
-        // reset
-        setDragNoteId(-1);
-        setDragStartStep(-1);
-        setDragEndStep(-1);
+            // reset
+            setDragNoteId(-1);
+            setDragStartStep(-1);
+            setDragEndStep(-1);
+
+        } else if (e.button === 2) { // Right mouse button
+            const rect = e.currentTarget.getBoundingClientRect();
+            const step = Math.floor((e.clientX - rect.left + pianoRollScrollWindow.x) / pianoRollNoteWidth);
+            setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION, DEFAULT_PATTERN_SIZE, false);
+        }
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-            return;
-        }
+        if (isDragScrolling) {
+            if (e.movementX > 0 || e.movementY > 0) {
+                pianoRollRef.current?.scrollBy({
+                    left: -e.movementX,
+                    top: -e.movementY,
+                });
+            }
+        } else {
+            if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+                return;
+            }
 
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-        const y = e.clientY - rect.top;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const y = e.clientY - rect.top;
 
-        const noteId = Math.floor(y / pianoRollNoteHeight);
-        const step = Math.floor(x / pianoRollNoteWidth);
+            const noteId = Math.floor(y / pianoRollNoteHeight);
+            const step = Math.floor(x / pianoRollNoteWidth);
 
-        if (noteId !== dragNoteId) {
-            setDragNoteId(noteId);
+            if (noteId !== dragNoteId) {
+                setDragNoteId(noteId);
+            }
+            if (step !== dragEndStep) {
+                setDragEndStep(step);
+            }
         }
-        if (step !== dragEndStep) {
-            setDragEndStep(step);
-        }
+    };
+
+    const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
+        // setIsDragging(false);
     };
 
     useEffect(() => {
@@ -315,6 +342,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
             ref={canvasRef}
         />
     );

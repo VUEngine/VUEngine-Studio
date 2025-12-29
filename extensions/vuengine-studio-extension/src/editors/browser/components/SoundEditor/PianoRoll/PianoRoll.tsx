@@ -565,6 +565,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
             />
             <NoteProperties
