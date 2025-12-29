@@ -241,6 +241,12 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'y',
     };
+    export const OPEN_INSTRUMENT_EDITOR: EditorCommand = {
+        id: 'editors.soundEditor.openInstrumentEditor',
+        label: nls.localize('vuengine/editors/sound/commands/openInstrumentEditor', 'Open Instrument Editor'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'i',
+    };
     export const REMOVE_UNUSED_PATTERNS: EditorCommand = {
         id: 'editors.soundEditor.removeUnusedPatterns',
         label: nls.localize('vuengine/editors/sound/commands/removeUnusedPatterns', 'Remove Unused Patterns'),

@@ -116,7 +116,6 @@ interface SoundEditorToolbarProps {
     emulatorInitialized: boolean
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
-    editInstrument: (instrument: string) => void
     toolsDialogOpen: boolean
     setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
     songSettingsDialogOpen: boolean
@@ -139,7 +138,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         noteSnapping,
         newNoteDuration, setNewNoteDuration,
         emulatorInitialized,
-        editInstrument,
         currentInstrumentId, setCurrentInstrumentId,
         toolsDialogOpen, setToolsDialogOpen,
         songSettingsDialogOpen, setSongSettingsDialogOpen,
@@ -284,6 +282,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             value: `${1 * SUB_NOTE_RESOLUTION}`
                         }]}
                         width={56}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>
@@ -327,8 +326,11 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         />
                         <InputWithActionButton
                             className='theia-button secondary'
-                            title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
-                            onClick={() => editInstrument(currentInstrumentId)}
+                            title={
+                                nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument') +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true)
+                            }
+                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id)}
                         >
                             <i className='codicon codicon-settings-gear' />
                         </InputWithActionButton>
@@ -342,23 +344,20 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         </InputWithActionButton>
                     </InputWithAction>
                 </StyledSoundEditorToolbarGroup>
-            </>
-            }
-        </StyledSoundEditorToolbarSide >
-        <StyledSoundEditorToolbarSide>
-            {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarSizeButton
                         className="theia-button secondary"
-                        onClick={() => decreaseSize(16)}
+                        onClick={() => decreaseSize(4)}
+                        title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
                     >
-                        <Minus size={10} />16
+                        <Minus size={10} />4
                     </StyledSoundEditorToolbarSizeButton>
                     <StyledSoundEditorToolbarSizeButton
                         className="theia-button secondary"
-                        onClick={() => decreaseSize(4)}
+                        onClick={() => decreaseSize(1)}
+                        title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
                     >
-                        <Minus size={10} />4
+                        <Minus size={10} />1
                     </StyledSoundEditorToolbarSizeButton>
                     <Input
                         type="number"
@@ -366,20 +365,23 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         setValue={setSize}
                         min={MIN_SEQUENCE_SIZE}
                         max={MAX_SEQUENCE_SIZE}
+                        title={nls.localize('vuengine/editors/sound/Length', 'Length')}
                         width={48}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <StyledSoundEditorToolbarSizeButton
                         className="theia-button secondary"
-                        onClick={() => increaseSize(4)}
+                        onClick={() => increaseSize(1)}
+                        title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
                     >
-                        <Plus size={10} />4
+                        <Plus size={10} />1
                     </StyledSoundEditorToolbarSizeButton>
                     <StyledSoundEditorToolbarSizeButton
                         className="theia-button secondary"
-                        onClick={() => increaseSize(16)}
+                        onClick={() => increaseSize(4)}
+                        title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
                     >
-                        <Plus size={10} />16
+                        <Plus size={10} />4
                     </StyledSoundEditorToolbarSizeButton>
                 </StyledSoundEditorToolbarGroup>
             </>}

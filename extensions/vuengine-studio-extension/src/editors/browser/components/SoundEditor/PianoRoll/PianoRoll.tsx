@@ -367,6 +367,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     ]);
 
     const commandListener = (e: CustomEvent): void => {
+        const patternRelativeStep = noteCursor - currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
         switch (e.detail) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
@@ -393,38 +394,38 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 } */
                 break;
             case SoundEditorCommands.NOTE_UP.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
-                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) - 1;
+                if (pattern?.events[patternRelativeStep] && pattern?.events[patternRelativeStep][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[patternRelativeStep][SoundEvent.Note]) - 1;
                     if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                         const newNoteLabel = NOTES_LABELS[newNoteId];
-                        setNote(noteCursor, newNoteLabel);
+                        setNote(patternRelativeStep, newNoteLabel);
                     }
                 }
                 break;
             case SoundEditorCommands.NOTE_DOWN.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
-                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) + 1;
+                if (pattern?.events[patternRelativeStep] && pattern?.events[patternRelativeStep][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[patternRelativeStep][SoundEvent.Note]) + 1;
                     if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                         const newNoteLabel = NOTES_LABELS[newNoteId];
-                        setNote(noteCursor, newNoteLabel);
+                        setNote(patternRelativeStep, newNoteLabel);
                     }
                 }
                 break;
             case SoundEditorCommands.CURSOR_UP_AN_OCTAVE.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
-                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) - NOTES_PER_OCTAVE;
+                if (pattern?.events[patternRelativeStep] && pattern?.events[patternRelativeStep][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[patternRelativeStep][SoundEvent.Note]) - NOTES_PER_OCTAVE;
                     if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                         const newNoteLabel = NOTES_LABELS[newNoteId];
-                        setNote(noteCursor, newNoteLabel);
+                        setNote(patternRelativeStep, newNoteLabel);
                     }
                 }
                 break;
             case SoundEditorCommands.CURSOR_DOWN_AN_OCTAVE.id:
-                if (pattern?.events[noteCursor] && pattern?.events[noteCursor][SoundEvent.Note]) {
-                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[noteCursor][SoundEvent.Note]) + NOTES_PER_OCTAVE;
+                if (pattern?.events[patternRelativeStep] && pattern?.events[patternRelativeStep][SoundEvent.Note]) {
+                    const newNoteId = NOTES_LABELS.indexOf(pattern.events[patternRelativeStep][SoundEvent.Note]) + NOTES_PER_OCTAVE;
                     if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                         const newNoteLabel = NOTES_LABELS[newNoteId];
-                        setNote(noteCursor, newNoteLabel);
+                        setNote(patternRelativeStep, newNoteLabel);
                     }
                 }
                 break;
@@ -432,7 +433,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setPatternAtCursorPosition();
                 break;
             case SoundEditorCommands.REMOVE_CURRENT_NOTE.id:
-                setNote(noteCursor);
+                setNote(patternRelativeStep);
                 break;
         }
     };

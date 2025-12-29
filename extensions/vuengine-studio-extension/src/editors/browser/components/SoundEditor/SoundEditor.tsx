@@ -882,6 +882,9 @@ A total of {0} patterns will be deleted.',
             case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
                 removeUnusedInstruments();
                 break;
+            case SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id:
+                editInstrument(currentInstrumentId);
+                break;
         }
     };
 
@@ -935,7 +938,6 @@ A total of {0} patterns will be deleted.',
                     noteSnapping={noteSnapping}
                     newNoteDuration={newNoteDuration}
                     setNewNoteDuration={setNewNoteDuration}
-                    editInstrument={editInstrument}
                     currentInstrumentId={currentInstrumentId}
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     toolsDialogOpen={toolsDialogOpen}
