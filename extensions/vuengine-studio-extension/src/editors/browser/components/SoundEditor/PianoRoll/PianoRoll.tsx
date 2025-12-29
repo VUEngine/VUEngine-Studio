@@ -13,10 +13,8 @@ import {
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
-    PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
     PIANO_ROLL_NOTE_HEIGHT_MAX,
     PIANO_ROLL_NOTE_HEIGHT_MIN,
-    PIANO_ROLL_NOTE_WIDTH_DEFAULT,
     PIANO_ROLL_NOTE_WIDTH_MAX,
     PIANO_ROLL_NOTE_WIDTH_MIN,
     SCROLL_BAR_WIDTH,
@@ -481,32 +479,24 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         onWheel={onWheel}
     >
         <ScaleControls className="vertical">
-            <button onClick={() => setPianoRollNoteHeight(prev =>
-                prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
-            )}>
-                <i className="codicon codicon-plus" />
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id)}>
+                <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT)}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id)}>
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => setPianoRollNoteHeight(prev =>
-                prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
-            )}>
-                <i className="codicon codicon-chrome-minimize" />
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id)}>
+                <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
         <ScaleControls>
-            <button onClick={() => setPianoRollNoteWidth(prev =>
-                prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev - 1 : prev
-            )}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id)}>
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT)}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id)}>
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => setPianoRollNoteWidth(prev =>
-                prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev + 1 : prev
-            )}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id)}>
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>

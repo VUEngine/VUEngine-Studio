@@ -16,6 +16,7 @@ import {
     SUB_NOTE_RESOLUTION,
     TrackSettings
 } from '../SoundEditorTypes';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 
 interface PianoRollGridProps {
     soundData: SoundData
@@ -167,12 +168,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             );
         }
 
-        // non-current pattern notes
+        // notes
         soundData.tracks.map((track, trackId) => {
             Object.keys(track.sequence).forEach(key => {
-                if ((trackId === currentTrackId && currentSequenceIndex === parseInt(key)) ||
-                    (trackId !== currentTrackId && !trackSettings[trackId].seeThrough)
-                ) {
+                if (trackId !== currentTrackId && !trackSettings[trackId].seeThrough) {
                     return;
                 }
                 const patternOffset = parseInt(key);
@@ -192,7 +191,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
                         const offset = (patternOffset / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
-                        context.fillStyle = trackId === currentTrackId ? fullColor : lowColor;
+
+                        const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
+                        const instrument = soundData.instruments[instrumentId];
+                        const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+
+                        context.fillStyle = trackId === currentTrackId
+                            ? currentSequenceIndex === parseInt(key)
+                                ? instrumentColor
+                                : fullColor
+                            : lowColor;
                         context.fillRect(
                             offset + 0.5,
                             noteId * pianoRollNoteHeight,
@@ -207,7 +215,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
+        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
         const y = e.clientY - rect.top;
 
         const noteId = Math.floor(y / pianoRollNoteHeight);
@@ -225,24 +233,34 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
         const newNoteId = dragNoteId;
         const newNoteStep = Math.min(dragStartStep, dragEndStep);
-        const newNoteDuration = Math.abs(dragStartStep - dragEndStep) + 1;
+        const newNoteDurationSteps = (Math.abs(dragStartStep - dragEndStep) + 1);
         const newNoteLabel = NOTES_LABELS[newNoteId];
         const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
 
-        const currentPattern = soundData.patterns[currentPatternId];
-        const localStep = currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-
         setNoteCursor(newNoteCursor);
 
+        const currentPattern = soundData.patterns[currentPatternId];
+        const currentSequenceIndexStartStep = currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+
         // if inside current pattern
-        if (currentPattern && newNoteStep >= localStep && newNoteStep < localStep + currentPattern.size * NOTE_RESOLUTION / SEQUENCER_RESOLUTION) {
+        if (
+            currentPattern &&
+            newNoteStep >= currentSequenceIndexStartStep &&
+            newNoteStep < currentSequenceIndexEndStep
+        ) {
             if (e.button === 0) {
-                setNote((newNoteStep - localStep) * SUB_NOTE_RESOLUTION, newNoteLabel, undefined, newNoteDuration);
+                setNote(
+                    (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
+                    newNoteLabel,
+                    undefined,
+                    newNoteDurationSteps * SUB_NOTE_RESOLUTION
+                );
             }
         } else {
             const newPatternSize = dragStartStep === dragEndStep
                 ? DEFAULT_PATTERN_SIZE
-                : newNoteDuration * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
+                : newNoteDurationSteps * SEQUENCER_RESOLUTION / NOTE_RESOLUTION;
             setPatternAtCursorPosition(newNoteCursor, newPatternSize, e.button === 0);
         }
 
@@ -258,7 +276,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
+        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
         const y = e.clientY - rect.top;
 
         const noteId = Math.floor(y / pianoRollNoteHeight);

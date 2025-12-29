@@ -26,9 +26,11 @@ const StyledPianoRollPlacedNote = styled.div`
     box-sizing: border-box;
     color: #fff;
     cursor: move;
+    overflow: hidden;
     position: absolute;
     text-align: center;
     text-overflow: ellipsis;
+    user-select: none;
     z-index: 100;
 
     &:hover {
@@ -290,9 +292,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
                         />
-                        {width > pianoRollNoteWidth &&
-                            noteLabel
-                        }
+                        {noteLabel}
                     </>
                 </ResizableBox>
             </StyledPianoRollPlacedNote>

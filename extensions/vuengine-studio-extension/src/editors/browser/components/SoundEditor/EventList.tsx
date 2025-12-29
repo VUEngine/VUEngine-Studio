@@ -48,18 +48,14 @@ const StyledTable = styled.table`
 
         tr {
             td {
-            /*
-                border-bottom: 1px solid rgba(255, 255, 255, .2);
-            */
+                border-bottom: 1px solid rgba(255, 255, 255, .1);
                 cursor: pointer;
                 padding: 2px 4px;
 
-            /*
                 body.theia-light &,
                 body.theia-hc & {
-                    border-bottom-color: rgba(0, 0, 0, .2);
+                    border-bottom-color: rgba(0, 0, 0, .1);
                 }
-            */
 
                 &.lightLabel {
                     padding: var(--padding);
@@ -68,6 +64,10 @@ const StyledTable = styled.table`
 
                 div, input, select {
                     margin-bottom: 4px;
+                    max-width: 80px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
 
                     &:last-child {
                         margin-bottom: 0;

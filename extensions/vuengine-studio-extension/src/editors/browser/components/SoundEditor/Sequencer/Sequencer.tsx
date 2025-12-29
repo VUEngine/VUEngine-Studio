@@ -11,10 +11,8 @@ import {
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
-    SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_HEIGHT_MAX,
     SEQUENCER_PATTERN_HEIGHT_MIN,
-    SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_MAX,
     SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
@@ -331,32 +329,24 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         onMouseOut={onMouseOut}
     >
         <ScaleControls className="vertical">
-            <button onClick={() => setSequencerPatternHeight(prev =>
-                prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
-            )}>
-                <i className="codicon codicon-plus" />
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id)}>
+                <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT)}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id)}>
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => setSequencerPatternHeight(prev =>
-                prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
-            )}>
-                <i className="codicon codicon-chrome-minimize" />
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id)}>
+                <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
         <ScaleControls>
-            <button onClick={() => setSequencerPatternWidth(prev =>
-                prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
-            )}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id)}>
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT)}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id)}>
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => setSequencerPatternWidth(prev =>
-                prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
-            )}>
+            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id)}>
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>

@@ -93,7 +93,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 <CurrentlyPlacingNote
                     style={{
                         height: pianoRollNoteHeight,
-                        left: Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth,
+                        left: Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
                         top: dragNoteId * pianoRollNoteHeight,
                         width: pianoRollNoteWidth * (Math.abs(dragStartStep - dragEndStep) + 1),
                     }}

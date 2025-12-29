@@ -31,10 +31,18 @@ import {
     NOTES,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
+    PIANO_ROLL_NOTE_HEIGHT_MAX,
+    PIANO_ROLL_NOTE_HEIGHT_MIN,
     PIANO_ROLL_NOTE_WIDTH_DEFAULT,
+    PIANO_ROLL_NOTE_WIDTH_MAX,
+    PIANO_ROLL_NOTE_WIDTH_MIN,
     ScrollWindow,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
+    SEQUENCER_PATTERN_HEIGHT_MAX,
+    SEQUENCER_PATTERN_HEIGHT_MIN,
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
+    SEQUENCER_PATTERN_WIDTH_MAX,
+    SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
     SINGLE_NOTE_TESTING_DURATION,
     SoundData,
@@ -560,10 +568,13 @@ A total of {0} patterns will be deleted.',
         }
 
         const removeNoteFromEvents = (stepToRemove: number) => {
-            delete updatedEvents[stepToRemove][SoundEvent.Note];
-            if (updatedEvents[stepToRemove][SoundEvent.Duration] !== undefined) {
-                delete updatedEvents[stepToRemove][SoundEvent.Duration];
-            }
+            // remove all note-related events
+            [SoundEvent.Note, SoundEvent.Duration, SoundEvent.NoteSlide].forEach(eventType => {
+                if (updatedEvents[stepToRemove][eventType] !== undefined) {
+                    delete updatedEvents[stepToRemove][eventType];
+                }
+            });
+            // if no events remain, remove entirely
             if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
                 delete updatedEvents[stepToRemove];
             }
@@ -572,7 +583,7 @@ A total of {0} patterns will be deleted.',
         const updatedEvents: EventsMap = {
             ...currentPattern.events,
             [step]: {
-                ...(currentPattern.events[prevStep ?? step] ?? {}),
+                ...(prevStep ? currentPattern.events[prevStep] : {}),
                 [SoundEvent.Note]: note,
             }
         };
@@ -588,32 +599,24 @@ A total of {0} patterns will be deleted.',
                 removeNoteFromEvents(prevStep);
             }
 
-            // set duration
-            if (duration) {
-                updatedEvents[step][SoundEvent.Duration] = Math.min(
-                    getMaxNoteDuration(currentPattern.events, step, currentPattern.size),
-                    duration * SUB_NOTE_RESOLUTION
-                );
-            }
-
             // set and cap new note's duration
-            if (updatedEvents[step][SoundEvent.Duration] === undefined) {
-                let cappedDuration = 0;
-                stop = false;
-                eventKeys.forEach(key => {
-                    const nextEventStep = parseInt(key);
-                    const event = currentPatternEvents[nextEventStep];
-                    if (!stop && nextEventStep > step && event[SoundEvent.Note] !== undefined) {
-                        stop = true;
-                        cappedDuration = Math.min(newNoteDuration, nextEventStep - step);
-                    }
-                });
-                if (cappedDuration === 0) {
-                    cappedDuration = Math.min(newNoteDuration, currentPattern.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION - step);
+            let cappedDuration = Math.min(
+                getMaxNoteDuration(currentPattern.events, step, currentPattern.size),
+                duration ?? updatedEvents[step][SoundEvent.Duration] ?? newNoteDuration,
+            );
+            stop = false;
+            eventKeys.forEach(key => {
+                const nextEventStep = parseInt(key);
+                const event = currentPatternEvents[nextEventStep];
+                if (!stop && nextEventStep > step && event[SoundEvent.Note] !== undefined) {
+                    stop = true;
+                    cappedDuration = Math.min(cappedDuration, nextEventStep - step);
                 }
-
-                updatedEvents[step][SoundEvent.Duration] = cappedDuration;
+            });
+            if (cappedDuration === 0) {
+                cappedDuration = Math.min(newNoteDuration, currentPattern.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION - step);
             }
+            updatedEvents[step][SoundEvent.Duration] = cappedDuration;
 
             // cap previous note's duration
             stop = false;
@@ -814,6 +817,58 @@ A total of {0} patterns will be deleted.',
                 break;
             case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
                 setSequencerHidden(prev => !prev);
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
+                setSequencerPatternHeight(prev =>
+                    prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id:
+                setSequencerPatternHeight(prev =>
+                    prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id:
+                setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id:
+                setSequencerPatternWidth(prev =>
+                    prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id:
+                setSequencerPatternWidth(prev =>
+                    prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id:
+                setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
+                setPianoRollNoteHeight(prev =>
+                    prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id:
+                setPianoRollNoteHeight(prev =>
+                    prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id:
+                setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id:
+                setPianoRollNoteWidth(prev =>
+                    prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev - 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id:
+                setPianoRollNoteWidth(prev =>
+                    prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev + 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
+                setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
                 break;
             case SoundEditorCommands.ADD_PATTERN.id:
                 // TODO

@@ -109,6 +109,36 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'n',
     };
+    export const SEQUENCER_VERTICAL_SCALE_REDUCE: EditorCommand = {
+        id: 'editors.soundEditor.sequencerVerticalScaleReduce',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerVerticalScaleReduce', 'Sequencer: Reduce Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const SEQUENCER_VERTICAL_SCALE_INCREASE: EditorCommand = {
+        id: 'editors.soundEditor.sequencerVerticalScaleIncrease',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerVerticalScaleIncrease', 'Sequencer: Increase Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const SEQUENCER_VERTICAL_SCALE_RESET: EditorCommand = {
+        id: 'editors.soundEditor.sequencerVerticalScaleReset',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerVerticalScaleReset', 'Sequencer: Reset Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const SEQUENCER_HORIZONTAL_SCALE_REDUCE: EditorCommand = {
+        id: 'editors.soundEditor.sequencerHorizontalScaleReduce',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerHorizontalScaleReduce', 'Sequencer: Reduce Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const SEQUENCER_HORIZONTAL_SCALE_INCREASE: EditorCommand = {
+        id: 'editors.soundEditor.sequencerHorizontalScaleIncrease',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerHorizontalScaleIncrease', 'Sequencer: Increase Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const SEQUENCER_HORIZONTAL_SCALE_RESET: EditorCommand = {
+        id: 'editors.soundEditor.sequencerHorizontalScaleReset',
+        label: nls.localize('vuengine/editors/sound/commands/sequencerHorizontalScaleReset', 'Sequencer: Reset Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
     export const PIANO_ROLL_SELECT_NEXT_STEP: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectNextStep',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextStep', 'Piano Roll: Select Next Step'),
@@ -132,6 +162,36 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousBar', 'Piano Roll: Select Previous Bar'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+left',
+    };
+    export const PIANO_ROLL_VERTICAL_SCALE_REDUCE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollVerticalScaleReduce',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollVerticalScaleReduce', 'Piano Roll: Reduce Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const PIANO_ROLL_VERTICAL_SCALE_INCREASE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollVerticalScaleIncrease',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollVerticalScaleIncrease', 'Piano Roll: Increase Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const PIANO_ROLL_VERTICAL_SCALE_RESET: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollVerticalScaleReset',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollVerticalScaleReset', 'Piano Roll: Reset Vertical Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const PIANO_ROLL_HORIZONTAL_SCALE_REDUCE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollHorizontalScaleReduce',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollHorizontalScaleReduce', 'Piano Roll: Reduce Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const PIANO_ROLL_HORIZONTAL_SCALE_INCREASE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollHorizontalScaleIncrease',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollHorizontalScaleIncrease', 'Piano Roll: Increase Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
+    };
+    export const PIANO_ROLL_HORIZONTAL_SCALE_RESET: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollHorizontalScaleReset',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollHorizontalScaleReset', 'Piano Roll: Reset Horizontal Scale'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
     };
     export const NOTE_UP: EditorCommand = {
         id: 'editors.soundEditor.noteUp',
