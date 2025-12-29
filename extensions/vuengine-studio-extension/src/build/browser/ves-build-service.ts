@@ -622,7 +622,9 @@ export class VesBuildService {
   }
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
+    await this.preferenceService.ready;
     await this.workspaceService.ready;
+
     const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
     const isWslInstalled = useWsl && this.vesCommonService.isWslInstalled;
 

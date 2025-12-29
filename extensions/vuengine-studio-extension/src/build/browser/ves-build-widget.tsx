@@ -18,7 +18,7 @@ import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-ser
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
-import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
+import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
 
@@ -64,8 +64,8 @@ export class VesBuildWidget extends ReactWidget {
     outputRomExists: false,
     autoScroll: true,
     searchTerm: '',
-    lineWrap: VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.LOG_LINE_WRAP]?.default as boolean ?? true,
-    useWsl: VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.USE_WSL]?.default as boolean ?? true,
+    lineWrap: true, // properly initialize later when preferences service is ready
+    useWsl: false, // properly initialize later when preferences service is ready
   };
 
   protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
@@ -93,11 +93,19 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected async doInit(): Promise<void> {
+    await this.preferenceService.ready;
+    this.state.lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) ?? this.state.lineWrap;
+    if (isWindows) {
+      this.state.useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) ?? this.state.useWsl;
+    }
+
     this.state.outputRomExists = await this.vesBuildService.outputRomExists();
     this.update();
   }
 
-  protected bindEvents(): void {
+  protected async bindEvents(): Promise<void> {
+    await this.workspaceService.ready;
+
     this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
       if (isCollaboration) {
         this.update();
@@ -114,8 +122,6 @@ export class VesBuildWidget extends ReactWidget {
           this.update();
           break;
         case VesBuildPreferenceIds.LOG_LINE_WRAP:
-          // TODO: this is not correctly initialized.
-          // Good luck fixing this, as the goddamn preferenceservice is returning the wrong value.
           this.state.lineWrap = newValue as boolean;
           this.update();
           break;
@@ -485,8 +491,10 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
   };
 
-  protected toggleLineWrap = (): Promise<void> =>
-    this.preferenceService.set(VesBuildPreferenceIds.LOG_LINE_WRAP, !this.state.lineWrap, PreferenceScope.User);
+  protected toggleLineWrap = (): Promise<void> => {
+    const current = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP);
+    return this.preferenceService.set(VesBuildPreferenceIds.LOG_LINE_WRAP, !current, PreferenceScope.User);
+  };
 
   protected setSearchTerm = (searchTerm: string): void => {
     this.state.searchTerm = searchTerm;
