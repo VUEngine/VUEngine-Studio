@@ -1,4 +1,4 @@
-import { FadersHorizontal, Guitar, Magnet, Minus, PencilSimple, Plus, Selection, Wrench } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -18,7 +18,6 @@ import {
     SequenceMap,
     SEQUENCER_RESOLUTION,
     SoundData,
-    SoundEditorTool,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
@@ -86,6 +85,7 @@ export const StyledSoundEditorToolbarTime = styled.div`
     justify-content: center;
     line-height: 100%;
     padding-top: 1px;
+    user-select: none;
     width: 60px;
 `;
 
@@ -111,7 +111,6 @@ interface SoundEditorToolbarProps {
     noteCursor: number
     playing: boolean
     noteSnapping: boolean
-    tool: SoundEditorTool
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
@@ -137,7 +136,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentSequenceIndex,
         noteCursor,
         playing,
-        tool,
         noteSnapping,
         newNoteDuration, setNewNoteDuration,
         emulatorInitialized,
@@ -242,39 +240,18 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         </span>
                     </StyledSoundEditorToolbarTime>
                 </StyledSoundEditorToolbarGroup>
+                { /* }
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.DEFAULT ? 'primary' : 'secondary'}`}
-                        title={(nls.localize('vuengine/editors/sound/toolPencil', 'Pencil')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_PENCIL.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_PENCIL.id)}
-                    >
-                        <PencilSimple size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.MARQUEE ? 'primary' : 'secondary'}`}
-                        title={(nls.localize('vuengine/editors/sound/toolMarquee', 'Marquee')) +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
-                        }
-                        // onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
-                        disabled={true}
-                        // TODO
-                        onClick={() => alert('Not yet implemented')}
-                    >
-                        <Selection size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${/* recording */false ? 'primary' : 'secondary'} recordButton`}
+                        className={`theia-button ${ recording ? 'primary' : 'secondary'} recordButton`}
                         title='Recording Mode'
                         disabled={true}
-                        // TODO
-                        onClick={() => alert('Not yet implemented')}
-                    // onClick={() => setState({ recording: !recording })}
+                        onClick={() => setRecording(true)}
                     >
                         <i className='fa fa-circle' />
                     </StyledSoundEditorToolbarButton>
                 </StyledSoundEditorToolbarGroup>
+                { */}
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarButton
                         className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
@@ -365,8 +342,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         </InputWithActionButton>
                     </InputWithAction>
                 </StyledSoundEditorToolbarGroup>
-            </>}
-        </StyledSoundEditorToolbarSide>
+            </>
+            }
+        </StyledSoundEditorToolbarSide >
         <StyledSoundEditorToolbarSide>
             {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
@@ -420,5 +398,5 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbarSide>
-    </StyledSoundEditorToolbar>;
+    </StyledSoundEditorToolbar >;
 }

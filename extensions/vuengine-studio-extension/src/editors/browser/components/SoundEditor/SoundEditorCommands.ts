@@ -19,18 +19,6 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+space',
     };
-    export const TOOL_PENCIL: EditorCommand = {
-        id: 'editors.soundEditor.toolPencil',
-        label: nls.localize('vuengine/editors/sound/commands/toolPencil', 'Tool: Pencil'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'b',
-    };
-    export const TOOL_MARQUEE: EditorCommand = {
-        id: 'editors.soundEditor.toolMarquee',
-        label: nls.localize('vuengine/editors/sound/commands/toolMarquee', 'Tool: Marquee'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'm',
-    };
     export const SELECT_TRACK_1: EditorCommand = {
         id: 'editors.soundEditor.selectTrack1',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack1', 'Select Track 1'),

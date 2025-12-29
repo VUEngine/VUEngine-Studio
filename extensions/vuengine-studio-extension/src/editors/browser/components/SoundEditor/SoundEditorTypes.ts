@@ -71,8 +71,6 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.SELECT_NEXT_TRACK.id,
     SoundEditorCommands.SELECT_PREVIOUS_TRACK.id,
     SoundEditorCommands.STOP.id,
-    SoundEditorCommands.TOOL_MARQUEE.id,
-    SoundEditorCommands.TOOL_PENCIL.id,
     SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
     SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
@@ -136,11 +134,6 @@ export const TRACK_TYPE_LABELS: { [type: string]: string } = {
     [SoundEditorTrackType.SWEEPMOD]: nls.localize('vuengine/editors/sound/trackType/sweepMod', 'Wave + Sweep/Modulation'),
     [SoundEditorTrackType.NOISE]: nls.localize('vuengine/editors/sound/trackType/noise', 'Noise'),
 };
-
-export enum SoundEditorTool {
-    DEFAULT,
-    MARQUEE,
-}
 
 export const NOTES: { [note: string]: number } = {
     /*

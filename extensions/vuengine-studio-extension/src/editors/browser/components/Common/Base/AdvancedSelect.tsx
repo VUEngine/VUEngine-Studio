@@ -130,7 +130,8 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
             styles={{
                 container: styles => ({
                     ...styles,
-                    ...(style ?? {})
+                    ...(style ?? {}),
+                    userSelect: 'none',
                 }),
                 control: styles => ({
                     ...styles,

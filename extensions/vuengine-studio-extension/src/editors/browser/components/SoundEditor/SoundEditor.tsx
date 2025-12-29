@@ -12,9 +12,10 @@ import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import Emulator from './Emulator/Emulator';
 import EventList from './EventList';
+import ImportExport from './ImportExport/ImportExport';
+import Instruments from './Instruments/Instruments';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
-import Instruments from './Instruments/Instruments';
 import { getMaxNoteDuration } from './Other/Note';
 import Song from './Other/Song';
 import PianoRoll from './PianoRoll/PianoRoll';
@@ -47,7 +48,6 @@ import {
     SEQUENCER_RESOLUTION,
     SINGLE_NOTE_TESTING_DURATION,
     SoundData,
-    SoundEditorTool,
     SoundEditorTrackType,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
@@ -58,7 +58,6 @@ import {
 } from './SoundEditorTypes';
 import ModulationData from './Waveforms/ModulationData';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
-import ImportExport from './ImportExport/ImportExport';
 
 const StyledLowerContainer = styled.div` 
     display: flex;
@@ -106,7 +105,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingNote, setTestingNote] = useState<number>(0);
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingTrack, setTestingTrack] = useState<number>(0);
-    const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.DEFAULT);
     const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
@@ -267,6 +265,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         setCurrentPatternId(newPatternId);
         setCurrentSequenceIndex(newSequenceIndex);
+        setNoteCursor(newSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
@@ -280,6 +279,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             }
         }
         setCurrentSequenceIndex(sequenceIndex);
+        setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
@@ -288,6 +288,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentTrackId(trackId);
         setCurrentPatternId(sequence && sequence[sequenceIndex] ? sequence[sequenceIndex] : '');
         setCurrentSequenceIndex(sequenceIndex);
+        setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
     const showTrackTypeSelection = async (): Promise<QuickPickItem | undefined> => {
@@ -783,13 +784,16 @@ A total of {0} patterns will be deleted.',
             }
         );
 
-    const addPattern = async (trackId: number, step: number, size?: number, createNew?: boolean): Promise<void> => {
-        const patternToAdd = createNew
-            ? { id: NEW_PATTERN_ID }
-            : await showPatternSelection(size);
+    const addPattern = async (trackId: number, step: number, size?: number): Promise<boolean> => {
+        const patternToAdd = await showPatternSelection(size);
         if (patternToAdd && patternToAdd.id) {
-            addPatternToSequence(trackId, step, patternToAdd.id, size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE);
+            await addPatternToSequence(trackId, step, patternToAdd.id, size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE);
+            updateCurrentSequenceIndex(currentTrackId, step);
+
+            return true;
         }
+
+        return false;
     };
 
     const commandListener = (e: CustomEvent): void => {
@@ -802,12 +806,6 @@ A total of {0} patterns will be deleted.',
                 break;
             case SoundEditorCommands.STOP.id:
                 stopPlaying();
-                break;
-            case SoundEditorCommands.TOOL_PENCIL.id:
-                setTool(SoundEditorTool.DEFAULT);
-                break;
-            case SoundEditorCommands.TOOL_MARQUEE.id:
-                // setTool(SoundEditorTool.MARQUEE);
                 break;
             case SoundEditorCommands.ADD_NOTE.id:
                 // TODO
@@ -933,7 +931,6 @@ A total of {0} patterns will be deleted.',
                     currentSequenceIndex={currentSequenceIndex}
                     noteCursor={noteCursor}
                     playing={playing}
-                    tool={tool}
                     emulatorInitialized={emulatorInitialized}
                     noteSnapping={noteSnapping}
                     newNoteDuration={newNoteDuration}

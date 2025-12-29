@@ -7,7 +7,7 @@ import {
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_RESOLUTION,
-    SoundData
+    SoundData,
 } from '../SoundEditorTypes';
 
 const StyledCanvas = styled.canvas`
@@ -20,7 +20,7 @@ const StyledCanvas = styled.canvas`
 interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
-    addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
+    addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     dragStartTrackId: number
@@ -119,7 +119,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.button === 0 || e.button === 2) { // Left or right mouse button
+        if (e.button === 0) { // Left mouse button
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + sequencerScrollWindow.x;
             const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
@@ -130,11 +130,13 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             setDragStartTrackId(trackId);
             setDragStartStep(step);
             setDragEndStep(step);
+        } else if (e.button === 2) { // Right mouse button
+            // TODO: marquee
         }
     };
 
     const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.button === 0 || e.button === 2) { // Left or right mouse button
+        if (e.button === 0) { // Left mouse button
             if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
                 return;
             }
@@ -142,29 +144,29 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const newPatternStep = Math.min(dragStartStep, dragEndStep);
             const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
 
-            addPattern(dragStartTrackId, newPatternStep, newPatternSize, e.button === 0);
+            addPattern(dragStartTrackId, newPatternStep, newPatternSize);
 
             // reset
             setDragStartTrackId(-1);
             setDragStartStep(-1);
             setDragEndStep(-1);
+        } else if (e.button === 2) { // Right mouse button
+            // TODO: marquee
         }
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.button === 0 || e.button === 2) { // Left or right mouse button
-            if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-                return;
-            }
+        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+            return;
+        }
 
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + sequencerScrollWindow.x;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left + sequencerScrollWindow.x;
 
-            const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+        const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
 
-            if (step !== dragEndStep) {
-                setDragEndStep(step);
-            }
+        if (step !== dragEndStep) {
+            setDragEndStep(step);
         }
     };
 

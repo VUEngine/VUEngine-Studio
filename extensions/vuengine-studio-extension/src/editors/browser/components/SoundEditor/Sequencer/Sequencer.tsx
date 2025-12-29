@@ -118,7 +118,7 @@ interface SequencerProps {
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
     removeTrack: (trackId: number) => void
-    addPattern: (trackId: number, bar: number, size?: number, createNew?: boolean) => void
+    addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
     setPatternSize: (patternId: string, size: number) => void
     setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>

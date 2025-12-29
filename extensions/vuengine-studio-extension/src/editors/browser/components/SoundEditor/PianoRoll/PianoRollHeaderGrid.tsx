@@ -24,7 +24,7 @@ interface PianoRollHeaderGridProps {
     currentSequenceIndex: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
-    setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
     pianoRollScrollWindow: ScrollWindow
 }
 
@@ -203,7 +203,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             }
         } else {
             // TODO: adapt drag to create pattern of specific size, as in sequencer
-            setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION, undefined, e.button === 0);
+            setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION);
         }
     };
 

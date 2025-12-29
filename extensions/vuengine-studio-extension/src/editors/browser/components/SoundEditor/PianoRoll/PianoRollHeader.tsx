@@ -53,7 +53,7 @@ interface PianoRollHeaderProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
-    setPatternAtCursorPosition: (cursor?: number, size?: number, createNew?: boolean) => void
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
     pianoRollScrollWindow: ScrollWindow
 }
 
