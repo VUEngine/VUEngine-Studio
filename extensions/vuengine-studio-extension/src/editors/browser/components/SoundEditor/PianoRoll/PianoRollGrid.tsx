@@ -3,6 +3,7 @@ import React, { Dispatch, RefObject, SetStateAction, useContext, useEffect, useR
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { SetNoteProps } from '../SoundEditor';
 import {
     NOTE_RESOLUTION,
     NOTES_LABELS,
@@ -24,7 +25,7 @@ interface PianoRollGridProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
+    setNote: (notes: SetNoteProps[]) => void
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
@@ -41,6 +42,7 @@ interface PianoRollGridProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
+    setSelectedNotes: Dispatch<SetStateAction<number[]>>
 }
 
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
@@ -61,6 +63,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
+        setSelectedNotes,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
@@ -277,12 +280,12 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 newNoteStep >= currentSequenceIndexStartStep &&
                 newNoteStep < currentSequenceIndexEndStep
             ) {
-                setNote(
-                    (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
-                    newNoteLabel,
-                    undefined,
-                    newNoteDurationSteps * SUB_NOTE_RESOLUTION
-                );
+                setNote([{
+                    step: (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
+                    note: newNoteLabel,
+                    prevStep: undefined,
+                    duration: newNoteDurationSteps * SUB_NOTE_RESOLUTION
+                }]);
                 setNoteCursor(newNoteCursor);
             } else {
                 const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
@@ -302,22 +305,31 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 return;
             }
 
-            const newNoteStep = Math.min(marqueeStartStep, marqueeEndStep);
-            const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
+            const sortedMarqueeStartStep = Math.min(marqueeStartStep, marqueeEndStep);
+            const sortedMarqueeEndStep = Math.max(marqueeStartStep, marqueeEndStep);
 
             const currentPattern = soundData.patterns[currentPatternId];
             const currentSequenceIndexStartStep = currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
             const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
 
+            const currentPatternStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+
             // if inside current pattern
             if (
                 currentPattern &&
-                newNoteStep >= currentSequenceIndexStartStep &&
-                newNoteStep < currentSequenceIndexEndStep
+                sortedMarqueeStartStep >= currentSequenceIndexStartStep &&
+                sortedMarqueeStartStep < currentSequenceIndexEndStep
             ) {
-                // TODO: do selection
-                // ...
-                setNoteCursor(newNoteCursor);
+                const patternRelativeMarqueeStartStep = sortedMarqueeStartStep * SUB_NOTE_RESOLUTION - currentPatternStartStep;
+                const patternRelativeMarqueeEndStep = sortedMarqueeEndStep * SUB_NOTE_RESOLUTION - currentPatternStartStep;
+                const newSelectedNodes = Object.keys(currentPattern.events)
+                    .map(n => parseInt(n))
+                    .filter(eventStep =>
+                        currentPattern.events[eventStep][SoundEvent.Note] !== undefined &&
+                        eventStep >= patternRelativeMarqueeStartStep &&
+                        eventStep <= patternRelativeMarqueeEndStep
+                    );
+                setSelectedNotes(newSelectedNodes);
             }
 
             // reset

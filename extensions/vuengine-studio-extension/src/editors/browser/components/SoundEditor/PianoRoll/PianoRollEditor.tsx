@@ -1,5 +1,6 @@
-import React, { RefObject, useState } from 'react';
+import React, { Dispatch, RefObject, SetStateAction, useState } from 'react';
 import styled from 'styled-components';
+import { SetNoteProps } from '../SoundEditor';
 import {
     NOTE_RESOLUTION,
     NOTES_SPECTRUM,
@@ -51,8 +52,9 @@ interface PianoRollEditorProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (note: number) => void
-    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
+    setNote: (notes: SetNoteProps[]) => void
     playNote: (note: number) => void
+    setSelectedNotes: Dispatch<SetStateAction<number[]>>
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
@@ -70,6 +72,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         noteCursor, setNoteCursor,
         setNote,
         playNote,
+        setSelectedNotes,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
@@ -147,6 +150,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
+                setSelectedNotes={setSelectedNotes}
             />
         </StyledPianoRollGridContainer>
     </StyledPianoRollEditor>;

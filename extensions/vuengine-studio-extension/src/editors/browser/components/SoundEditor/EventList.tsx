@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
-import { getInstrumentName } from './SoundEditor';
+import { getInstrumentName, getNoteSlideLabel } from './SoundEditor';
 import {
     BAR_NOTE_RESOLUTION,
     INPUT_BLOCKING_COMMANDS,
@@ -241,10 +241,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 break;
 
                                                             case SoundEvent.NoteSlide:
-                                                                const directionLabel = value < 0 ? '↓' : '↑';
-                                                                const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note] ?? 0);
-                                                                const targetNoteLabel = NOTES_LABELS[noteId - value];
-                                                                value = `${directionLabel}${targetNoteLabel}`;
+                                                                value = getNoteSlideLabel(stepEvents[SoundEvent.Note], value);
                                                                 break;
 
                                                             case SoundEvent.Volume:

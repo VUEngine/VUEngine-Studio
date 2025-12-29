@@ -19,6 +19,7 @@ import {
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID
 } from '../SoundEditorTypes';
+import { getNoteSlideLabel, SetNoteProps } from '../SoundEditor';
 
 const MAX_FONT_SIZE = 13;
 
@@ -26,10 +27,8 @@ const StyledPianoRollPlacedNote = styled.div`
     box-sizing: border-box;
     color: #fff;
     cursor: move;
-    overflow: hidden;
     position: absolute;
     text-align: center;
-    text-overflow: ellipsis;
     user-select: none;
     z-index: 100;
 
@@ -81,15 +80,20 @@ const StyledPianoRollPlacedNote = styled.div`
     }
 `;
 
+const StyledPianoRollPlacedNoteLabel = styled.div`
+    margin: 0 6px 0 2px;
+    overflow: hidden;
+`;
+
 interface PianoRollPlacedNoteProps {
     currentSequenceIndex: number
-    noteCursor: number
+    selected: boolean
     setNoteCursor: (playRangeEnd: number) => void
     noteLabel: string
     duration: number
     step: number
     instrumentColor: string
-    setNote: (step: number, note?: string, prevStep?: number, duration?: number) => void
+    setNote: (notes: SetNoteProps[]) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     events: EventsMap
     patternSize: number
@@ -102,7 +106,8 @@ interface PianoRollPlacedNoteProps {
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
     const {
         currentSequenceIndex,
-        noteCursor, setNoteCursor: setNoteCursor,
+        selected,
+        setNoteCursor,
         noteLabel,
         duration,
         step,
@@ -124,7 +129,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const width = duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
 
     const classNames = ['placedNote'];
-    if (noteCursor === step) {
+    if (selected) {
         classNames.push('selected');
     }
 
@@ -141,22 +146,30 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const getNoteSlide = () => {
         const event = events[localStep];
         if (event) {
-            const noteSlide = event[SoundEvent.NoteSlide];
-            if (noteSlide > 1) {
-                return noteSlide * pianoRollNoteHeight;
-            }
+            return event[SoundEvent.NoteSlide] ?? 0;
         }
 
         return 0;
     };
 
-    const slideUpHeight = useMemo(() =>
-        getNoteSlide()
-        , [events]);
+    const label = useMemo(() => {
+        let l = noteLabel;
+        const slide = getNoteSlide();
+        if (slide) {
+            l += getNoteSlideLabel(events[localStep][SoundEvent.Note], slide);
+        }
+        return l;
+    }, [events]);
 
-    const slideDownHeight = useMemo(() =>
-        -1 * getNoteSlide()
-        , [events]);
+    const slideUpHeight = useMemo(() => {
+        const slide = getNoteSlide();
+        return slide > 0 ? slide * pianoRollNoteHeight : 0;
+    }, [events]);
+
+    const slideDownHeight = useMemo(() => {
+        const slide = getNoteSlide();
+        return slide < 0 ? Math.abs(slide) * pianoRollNoteHeight : 0;
+    }, [events]);
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newDuration = noteSnapping
@@ -185,10 +198,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
         const newNoteLabel = NOTES_LABELS[newNoteId];
-        if (newStep === localStep) {
-            return;
-        }
-        setNote(newStep, newNoteLabel, localStep);
+        setNote([{ step: newStep, note: newNoteLabel, prevStep: localStep }]);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -200,7 +210,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             }
             setNoteCursor(step);
         } else if (e.buttons === 2) {
-            setNote(localStep);
+            setNote([{ step: localStep }]);
         }
     };
 
@@ -217,7 +227,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             bounds={{
                 bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
                 left: PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
-                right: (currentSequenceIndex + patternSize) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION - (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
+                right: (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION -
+                    (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
                 top: 0,
             }}
         >
@@ -232,6 +243,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 }}
                 onClick={onClick}
                 onContextMenu={onClick}
+                title={label}
             >
                 <ResizableBox
                     width={width}
@@ -292,7 +304,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
                         />
-                        {noteLabel}
+                        <StyledPianoRollPlacedNoteLabel>
+                            {label}
+                        </StyledPianoRollPlacedNoteLabel>
                     </>
                 </ResizableBox>
             </StyledPianoRollPlacedNote>

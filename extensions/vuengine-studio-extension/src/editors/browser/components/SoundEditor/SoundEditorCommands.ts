@@ -181,27 +181,27 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/pianoRollHorizontalScaleReset', 'Piano Roll: Reset Horizontal Scale'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor')
     };
-    export const NOTE_UP: EditorCommand = {
-        id: 'editors.soundEditor.noteUp',
-        label: nls.localize('vuengine/editors/sound/commands/noteUp', 'Move Note Up'),
+    export const NOTES_UP: EditorCommand = {
+        id: 'editors.soundEditor.notesUp',
+        label: nls.localize('vuengine/editors/sound/commands/notesUp', 'Move Selected Note Up'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'up',
     };
-    export const NOTE_DOWN: EditorCommand = {
-        id: 'editors.soundEditor.noteDown',
-        label: nls.localize('vuengine/editors/sound/commands/noteDown', 'Move Note Down'),
+    export const NOTES_DOWN: EditorCommand = {
+        id: 'editors.soundEditor.notesDown',
+        label: nls.localize('vuengine/editors/sound/commands/notesDown', 'Move Selected Note Down'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'down',
     };
-    export const CURSOR_UP_AN_OCTAVE: EditorCommand = {
-        id: 'editors.soundEditor.cursorUpAnOctave',
-        label: nls.localize('vuengine/editors/sound/commands/cursorUpAnOctave', 'Move Cursor Up 1 Octave'),
+    export const NOTES_UP_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.notesUpAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/notesUpAnOctave', 'Move Selected Notes Up 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+up',
     };
-    export const CURSOR_DOWN_AN_OCTAVE: EditorCommand = {
-        id: 'editors.soundEditor.cursorDownAnOctave',
-        label: nls.localize('vuengine/editors/sound/commands/cursorDownAnOctave', 'Move Note Down 1 Octave'),
+    export const NOTES_DOWN_AN_OCTAVE: EditorCommand = {
+        id: 'editors.soundEditor.notesDownAnOctave',
+        label: nls.localize('vuengine/editors/sound/commands/notesDownAnOctave', 'Move Selected Notes Down 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+down',
     };
@@ -211,9 +211,9 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'enter',
     };
-    export const REMOVE_CURRENT_NOTE: EditorCommand = {
-        id: 'editors.soundEditor.removeCurrentNote',
-        label: nls.localize('vuengine/editors/sound/commands/removeCurrentNote', 'Remove Current Note'),
+    export const REMOVE_SELECTED_NOTES: EditorCommand = {
+        id: 'editors.soundEditor.removeSelectedNotes',
+        label: nls.localize('vuengine/editors/sound/commands/removeSelectedNotes', 'Remove Selected Notes'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'del',
     };
@@ -255,6 +255,16 @@ export namespace SoundEditorCommands {
     export const REMOVE_UNUSED_INSTRUMENTS: EditorCommand = {
         id: 'editors.soundEditor.removeUnusedInstruments',
         label: nls.localize('vuengine/editors/sound/commands/removeUnusedInstruments', 'Remove Unused Instruments'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
+    export const IMPORT: EditorCommand = {
+        id: 'editors.soundEditor.import',
+        label: nls.localize('vuengine/editors/sound/commands/import', 'Import'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
+    export const EXPORT: EditorCommand = {
+        id: 'editors.soundEditor.export',
+        label: nls.localize('vuengine/editors/sound/commands/export', 'Export'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
     };
 };

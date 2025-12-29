@@ -80,12 +80,12 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id,
     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id,
     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id,
-    SoundEditorCommands.NOTE_UP.id,
-    SoundEditorCommands.NOTE_DOWN.id,
-    SoundEditorCommands.CURSOR_UP_AN_OCTAVE.id,
-    SoundEditorCommands.CURSOR_DOWN_AN_OCTAVE.id,
+    SoundEditorCommands.NOTES_UP.id,
+    SoundEditorCommands.NOTES_DOWN.id,
+    SoundEditorCommands.NOTES_UP_AN_OCTAVE.id,
+    SoundEditorCommands.NOTES_DOWN_AN_OCTAVE.id,
     SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id,
-    SoundEditorCommands.REMOVE_CURRENT_NOTE.id,
+    SoundEditorCommands.REMOVE_SELECTED_NOTES.id,
     SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
     SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
     SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
@@ -93,6 +93,8 @@ export const INPUT_BLOCKING_COMMANDS = [
     SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id,
     SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id,
     SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id,
+    SoundEditorCommands.IMPORT.id,
+    SoundEditorCommands.EXPORT.id,
 ];
 
 export const EXCLUDED_SOUND_EVENTS = [
