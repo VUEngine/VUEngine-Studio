@@ -52,7 +52,6 @@ const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1:
 export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Element {
     const { wireframe, style, onClick } = props;
     const { previewCurrentMeshSegment } = useContext(ActorEditorContext) as ActorEditorContextType;
-    // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const draw = (projectedSegments: number[][], minX: number, minY: number, maxX: number, maxY: number): void => {

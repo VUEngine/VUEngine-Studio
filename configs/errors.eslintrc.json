@@ -37,7 +37,6 @@
       }
     ],
     "no-new-wrappers": "error",
-    "no-null/no-null": "error",
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": [
       "error",

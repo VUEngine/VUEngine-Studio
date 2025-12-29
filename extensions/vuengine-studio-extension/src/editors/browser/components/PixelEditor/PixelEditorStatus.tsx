@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { StatusBarAlignment } from '@theia/core/lib/browser';
 import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';

@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { CommonCommands } from '@theia/core/lib/browser';
 import {
     CanvasDataChangeHandler,

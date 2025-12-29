@@ -102,7 +102,6 @@ export const mergeLayers = (layers: LayerPixelData[]): number[][] => {
 
     [...layers].reverse().forEach(layer => {
         layer.data.forEach((row, rowIndex) => row.forEach((color, columnIndex) => {
-            // eslint-disable-next-line no-null/no-null
             if (color !== null) {
                 if (result[rowIndex] !== undefined && result[rowIndex][columnIndex] !== undefined) {
                     result[rowIndex][columnIndex] = color;

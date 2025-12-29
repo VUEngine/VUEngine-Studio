@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
 import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';

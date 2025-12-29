@@ -55,7 +55,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         trackSettings,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -185,7 +184,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 Object.keys(pattern.events).map(stepStr => {
                     const step = parseInt(stepStr);
                     const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
-                    // eslint-disable-next-line no-null/no-null
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                         const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
                         if (patternOffset + noteDurationPx < pianoRollScrollWindow.x || patternOffset > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {

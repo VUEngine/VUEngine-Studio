@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ColorMode, PALETTE_BIT_INDEX_MAP, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { DisplayMode } from './VUEngineTypes';

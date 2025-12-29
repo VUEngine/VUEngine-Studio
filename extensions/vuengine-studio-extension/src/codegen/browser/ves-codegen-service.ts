@@ -678,13 +678,11 @@ export class VesCodeGenService {
 
     env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath: string, callback): Promise<void> => {
       const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
-      // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
 
     env.addFilter('uncompressJson', async (str: unknown, callback): Promise<void> => {
       const result = await this.vesCommonService.unzipJson(str);
-      // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
 

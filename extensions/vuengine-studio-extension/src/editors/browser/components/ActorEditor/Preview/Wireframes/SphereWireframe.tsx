@@ -40,7 +40,6 @@ const plotCircle = (context: CanvasRenderingContext2D, radius: number, interlace
 
 export default function SphereWireframe(props: SphereWireframeProps): React.JSX.Element {
     const { wireframe, style, onClick } = props;
-    // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const draw = (projectedRadius: number): void => {

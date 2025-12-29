@@ -162,7 +162,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
     const [dragEndStep, setDragEndStep] = useState<number>(-1);
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
-    // eslint-disable-next-line no-null/no-null
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;

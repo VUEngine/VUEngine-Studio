@@ -105,7 +105,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             /*
             if (c < offset || c >= offset + characterCount) {
                 // @ts-ignore
-                // eslint-disable-next-line no-null/no-null
                 chars[c] = null;
             } else {
             */
@@ -120,7 +119,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         ? imageData.pixelData[currentYIndex][currentXIndex]
                         : 0;
                     // @ts-ignore
-                    // eslint-disable-next-line no-null/no-null
                     chars[c][y][x] = paletteIndex === 0 ? null : paletteIndex;
                 });
             });

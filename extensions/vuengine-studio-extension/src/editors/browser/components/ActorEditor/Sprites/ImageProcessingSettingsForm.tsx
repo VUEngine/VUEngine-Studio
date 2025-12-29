@@ -64,7 +64,6 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const [canvasScale, setCanvasScale] = useState<number>(1);
     const [height, setHeight] = useState<number>(0);
     const [width, setWidth] = useState<number>(0);
-    // eslint-disable-next-line no-null/no-null
     const canvasContainerRef = useRef<HTMLDivElement>(null);
 
     const getImageDimensions = async () => {

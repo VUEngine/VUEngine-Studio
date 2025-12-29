@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { DataSection } from '../../../Common/CommonTypes';
 import { clamp, nanoid } from '../../../Common/Utils';
 import {

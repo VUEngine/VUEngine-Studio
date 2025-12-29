@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
 import { ConfirmDialog, StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useRef, useState } from 'react';

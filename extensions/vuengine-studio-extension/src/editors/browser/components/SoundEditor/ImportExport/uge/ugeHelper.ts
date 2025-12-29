@@ -1,5 +1,4 @@
 // Taken from https://github.com/chrismaltby/gb-studio/blob/2e2e73b4937855276f94d6d10d2ec0f767791b97/src/shared/lib/uge/ugeHelper.ts
-/* eslint-disable no-null/no-null */
 
 export interface DutyInstrument {
     index: number;

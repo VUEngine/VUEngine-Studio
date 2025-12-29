@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import { Copy, DotsSixVertical, EyeClosed, HandEye } from '@phosphor-icons/react';
 import { Eye } from '@phosphor-icons/react/dist/ssr';
 import { nls } from '@theia/core';

@@ -213,7 +213,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         removePatternFromSequence,
         trackSettings,
     } = props;
-    // eslint-disable-next-line no-null/no-null
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const pattern = soundData.patterns[currentPatternId];
@@ -332,7 +331,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             const step = parseInt(stepStr);
             const noteLabel = p.events[step][SoundEvent.Note] ?? '';
             const noteDuration = p.events[step][SoundEvent.Duration] ?? 1;
-            // eslint-disable-next-line no-null/no-null
             if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                 const instrumentId = p.events[step][SoundEvent.Instrument] ?? track.instrument;
                 const instrument = soundData.instruments[instrumentId];
@@ -458,7 +456,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             behavior: 'smooth',
         });
     }, [
-        currentPatternId,
+        currentSequenceIndex,
     ]);
 
     useEffect(() => {

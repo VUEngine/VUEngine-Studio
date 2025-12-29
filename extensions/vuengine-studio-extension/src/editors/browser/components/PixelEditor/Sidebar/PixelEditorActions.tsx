@@ -1,4 +1,3 @@
-/* eslint-disable no-null/no-null */
 import {
     ArrowDown, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowsOut, ArrowUp, ArrowUpLeft, ArrowUpRight, Circle, FileArrowDown, Trash
 } from '@phosphor-icons/react';
