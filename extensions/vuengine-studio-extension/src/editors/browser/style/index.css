@@ -19,6 +19,10 @@
 @import "translations-editor/index.css";
 @import "ves-tree.css";
 
+.theia-ApplicationShell {
+    position: fixed;
+}
+
 .theia-ApplicationShell.hide-text-editor-status-bar-items #status-bar-editor-language-status-items,
 .theia-ApplicationShell.hide-text-editor-status-bar-items #status-bar-editor-status-cursor-position,
 .theia-ApplicationShell.hide-text-editor-status-bar-items #status-bar-editor-status-encoding,
