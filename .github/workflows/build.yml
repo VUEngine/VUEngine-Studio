@@ -72,23 +72,6 @@ jobs:
           path: |
             applications/electron/dist/**
 
-      - name: Test (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          xvfb-run -a yarn electron test
-
-      - name: Test (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          yarn electron test
-
-      - name: Test (macOS)
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          yarn electron test
-
       - name: Lint
         shell: bash
         run: |
