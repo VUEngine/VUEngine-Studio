@@ -55,6 +55,7 @@ jobs:
             applications/electron/dist/**
             !applications/electron/dist/mac/**
             !applications/electron/dist/mac-arm64/**
+          retention-days: 14
 
       - name: Upload artifacts
         if: runner.os == 'Windows'
@@ -63,6 +64,7 @@ jobs:
           name: windows
           path: |
             applications/electron/dist/**
+          retention-days: 14
 
       - name: Upload artifacts
         if: runner.os == 'Linux'
@@ -71,6 +73,7 @@ jobs:
           name: linux
           path: |
             applications/electron/dist/**
+          retention-days: 14
 
       - name: Lint
         shell: bash

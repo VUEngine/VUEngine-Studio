@@ -41,9 +41,8 @@
           "files.watcherExclude": {
             "**/.git/objects/**": true,
             "**/.git/subtree-cache/**": true,
-            "**/node_modules/**": true,
             "**/.hg/store/**": true,
-            "**/build/*/**": true,
+            "**/build/working/**": true,
             "**/build/*.a": true,
             "**/build/*.map": true
           },
