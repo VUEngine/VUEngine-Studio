@@ -1,3 +1,9 @@
+.theia-button.small {
+    max-height: 17px;
+    min-height: 17px;
+    padding: 2px 9px;
+}
+
 .theia-button.large {
     line-height: 16px;
     padding: 8px 18px;

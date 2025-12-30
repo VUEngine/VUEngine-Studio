@@ -10,13 +10,13 @@
   height: 100%;
   line-height: 130%;
   min-width: 250px;
-  padding: calc(var(--theia-ui-padding) * 2);
 }
 
 .buildWidget .buildActions {
   display: flex;
   flex-direction: column;
   gap: var(--theia-ui-padding);
+  padding: calc(var(--theia-ui-padding) * 2) calc(var(--theia-ui-padding) * 2) 0;
 }
 
 .buildWidget .buildButtons {
@@ -66,6 +66,7 @@
 .buildWidget .buildMeta {
   display: flex;
   flex-direction: column;
+  padding: 0 calc(var(--theia-ui-padding) * 2);
 }
 
 .buildWidget .buildStatus {
@@ -94,6 +95,7 @@
 .buildWidget .buildLogButtons {
   display: flex;
   gap: var(--theia-ui-padding);
+  padding: 0 calc(var(--theia-ui-padding) * 2) calc(var(--theia-ui-padding) * 2);
 }
 
 .buildWidget .buildLogButtons .theia-input {
@@ -112,6 +114,7 @@
   display: flex;
   flex-grow: 1;
   height: 0;
+  padding: 0 calc(var(--theia-ui-padding) * 2);
 }
 
 .buildWidget .buildLog {

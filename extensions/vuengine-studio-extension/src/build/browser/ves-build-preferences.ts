@@ -1,6 +1,6 @@
 import { isWindows, nls, PreferenceScope } from '@theia/core';
 import { IndexedAccess, PreferenceDataProperty, PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
-import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
+import { BuildArchiveFrequency, BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
 export namespace VesBuildPreferenceIds {
     export const CATEGORY = 'build';
@@ -21,7 +21,7 @@ export namespace VesBuildPreferenceIds {
     export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
     export const BUILD_ARCHIVE_ENABLE = [CATEGORY, 'buildArchive', 'enable'].join('.');
     export const BUILD_ARCHIVE_RETENTION = [CATEGORY, 'buildArchive', 'retention'].join('.');
-    export const BUILD_ARCHIVE_ONE_PER_DAY = [CATEGORY, 'buildArchive', 'onePerDay'].join('.');
+    export const BUILD_ARCHIVE_FREQUENCY = [CATEGORY, 'buildArchive', 'frequency'].join('.');
     export const LOG_LINE_WRAP = [CATEGORY, 'logLineWrap'].join('.');
     export const USE_WSL = [CATEGORY, 'useWsl'].join('.');
 }
@@ -175,10 +175,20 @@ When a new ROM file gets stored, all ROM files older than the retention period g
         scope: PreferenceScope.Folder,
         overridable: true,
     },
-    [VesBuildPreferenceIds.BUILD_ARCHIVE_ONE_PER_DAY]: {
-        type: 'boolean',
-        description: nls.localize('vuengine/build/preferences/buildArchiveOnePerDayDescription', 'Store only one ROM (the last built) per day.'),
-        default: false,
+    [VesBuildPreferenceIds.BUILD_ARCHIVE_FREQUENCY]: {
+        type: 'string',
+        description: nls.localize('vuengine/build/preferences/buildArchiveFrequencyDescription', 'Whether to archive all ROMs, or only one per hour or day.'),
+        enum: [
+            BuildArchiveFrequency.ALL,
+            BuildArchiveFrequency.DAY,
+            BuildArchiveFrequency.HOUR,
+        ],
+        enumItemLabels: [
+            nls.localize('vuengine/build/preferences/buildArchiveFrequencyAll', 'All'),
+            nls.localize('vuengine/build/preferences/buildArchiveFrequencyDay', 'Day'),
+            nls.localize('vuengine/build/preferences/buildArchiveFrequencyHour', 'Hour'),
+        ],
+        default: BuildArchiveFrequency.ALL,
         scope: PreferenceScope.Folder,
         overridable: true,
     },

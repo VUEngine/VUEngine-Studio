@@ -1,5 +1,5 @@
 import { CommandService, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
-import { Message } from '@theia/core/lib/browser';
+import { HoverService, Message, OpenerService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -21,6 +21,8 @@ import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
+import BuildArchive from './components/BuildArchive';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -39,6 +41,12 @@ export class VesBuildWidget extends ReactWidget {
   private readonly commandService: CommandService;
   @inject(EditorManager)
   private readonly editorManager: EditorManager;
+  @inject(FileService)
+  private readonly fileService: FileService;
+  @inject(HoverService)
+  private readonly hoverService: HoverService;
+  @inject(OpenerService)
+  private readonly openerService: OpenerService;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
@@ -430,15 +438,13 @@ export class VesBuildWidget extends ReactWidget {
                 <i className='fa fa-trash-o'></i>
               </button>
             </div>
-            {/* <div className='buildSelector'>
-          <select className='theia-select' title='Build'>
-            <option value='latest'>
-              {`✔ – ${new Date(
-                  this.vesBuildService.buildStatus.log[0]?.timestamp
-                ).toUTCString()} – ${this.vesBuildService.buildStatus.buildMode}`}
-            </option>
-          </select>
-        </div> */}
+            <BuildArchive
+              fileService={this.fileService}
+              hoverService={this.hoverService}
+              openerService={this.openerService}
+              preferenceService={this.preferenceService}
+              vesBuildService={this.vesBuildService}
+            />
           </div>
         );
   }

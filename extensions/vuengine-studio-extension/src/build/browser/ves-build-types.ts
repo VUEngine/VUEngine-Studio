@@ -14,6 +14,12 @@ export enum BuildResult {
   failed = 'failed',
 }
 
+export enum BuildArchiveFrequency {
+  ALL = 'all',
+  DAY = 'day',
+  HOUR = 'hour',
+}
+
 export const DEFAULT_BUILD_MODE = BuildMode.Beta;
 
 export interface BuildStatus {

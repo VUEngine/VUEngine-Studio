@@ -35,6 +35,7 @@ import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import {
+  BuildArchiveFrequency,
   BuildLogLine,
   BuildLogLineFileLink,
   BuildLogLineType,
@@ -1281,21 +1282,51 @@ Beware! This is usually not necessary and will result in the next build taking l
       .resolve(`output-${buildMode.toLowerCase()}.vb`);
   }
 
+  async getBuildArchiveUri(): Promise<URI | false> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return false;
+    }
+
+    return workspaceRootUri
+      .resolve('build')
+      .resolve('archive');
+  }
+
+  async getBuildArchiveFiles(): Promise<string[]> {
+    const archiveFolderUri = await this.getBuildArchiveUri();
+    if (!archiveFolderUri) {
+      return [];
+    }
+    return window.electronVesCore.findFiles(archiveFolderUri.path.fsPath(), '*.vb')
+      .sort((a, b) => a.localeCompare(b));
+  }
+
+  getBuildArchiveFileDate(filename: string): Date {
+    const ts = filename.slice(-18).substring(0, 15);
+    const fileDate = new Date();
+    fileDate.setFullYear(parseInt(ts.substring(0, 4)));
+    fileDate.setMonth(parseInt(ts.substring(4, 6)) - 1);
+    fileDate.setDate(parseInt(ts.substring(6, 8)));
+    fileDate.setHours(parseInt(ts.substring(9, 11)));
+    fileDate.setMinutes(parseInt(ts.substring(11, 13)));
+    fileDate.setSeconds(parseInt(ts.substring(13, 15)));
+
+    return fileDate;
+  }
+
   protected async copyToBuildArchive(): Promise<void> {
     const buildArchiveEnabled = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE) as boolean;
     if (!buildArchiveEnabled) {
       return;
     }
 
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
+    const archiveFolderUri = await this.getBuildArchiveUri();
+    if (!archiveFolderUri) {
       return;
     }
 
-    const archiveFolderUri = workspaceRootUri
-      .resolve('build')
-      .resolve('archive');
     const archiveFolderExists = await this.fileService.exists(archiveFolderUri);
     if (!archiveFolderExists) {
       // create archive folder if it does not exist
@@ -1304,17 +1335,10 @@ Beware! This is usually not necessary and will result in the next build taking l
       // delete all files older than x days, if a retention period is set
       const retentionDays = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_RETENTION) as number;
       if (retentionDays > 0) {
-        const archivedRomFiles = window.electronVesCore.findFiles(archiveFolderUri.path.fsPath(), '*.vb');
+        const archivedRomFiles = await this.getBuildArchiveFiles();
         Promise.all(archivedRomFiles.map(async f => {
-          const ts = f.slice(-18).substring(0, 15);
           const currentDate = new Date();
-          const fileDate = new Date();
-          fileDate.setFullYear(parseInt(ts.substring(0, 4)));
-          fileDate.setMonth(parseInt(ts.substring(4, 6)) - 1);
-          fileDate.setDate(parseInt(ts.substring(6, 8)));
-          fileDate.setHours(parseInt(ts.substring(9, 11)));
-          fileDate.setMinutes(parseInt(ts.substring(11, 13)));
-          fileDate.setSeconds(parseInt(ts.substring(13, 15)));
+          const fileDate = this.getBuildArchiveFileDate(f);
           // @ts-ignore
           const diffTime = Math.abs(currentDate - fileDate);
           const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -1323,19 +1347,24 @@ Beware! This is usually not necessary and will result in the next build taking l
             await this.fileService.delete(deleteUri);
           }
         }));
-
       }
     }
 
     // build timestamp
-    const BUILD_ARCHIVE_ONE_PER_DAY = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ONE_PER_DAY) as boolean;
+    const buildArchiveFrequency = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_FREQUENCY) as BuildArchiveFrequency;
     const now = new Date();
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
     const day = now.getDate().toString().padStart(2, '0');
-    const hour = BUILD_ARCHIVE_ONE_PER_DAY ? '00' : now.getHours().toString().padStart(2, '0');
-    const minutes = BUILD_ARCHIVE_ONE_PER_DAY ? '00' : now.getMinutes().toString().padStart(2, '0');
-    const seconds = BUILD_ARCHIVE_ONE_PER_DAY ? '00' : now.getSeconds().toString().padStart(2, '0');
+    const hour = buildArchiveFrequency === BuildArchiveFrequency.DAY
+      ? '00'
+      : now.getHours().toString().padStart(2, '0');
+    const minutes = buildArchiveFrequency === BuildArchiveFrequency.DAY || buildArchiveFrequency === BuildArchiveFrequency.HOUR
+      ? '00'
+      : now.getMinutes().toString().padStart(2, '0');
+    const seconds = buildArchiveFrequency === BuildArchiveFrequency.DAY || buildArchiveFrequency === BuildArchiveFrequency.HOUR
+      ? '00'
+      : now.getSeconds().toString().padStart(2, '0');
     const timestamp = `${year}${month}${day}-${hour}${minutes}${seconds}`;
 
     // store rom in archive folder

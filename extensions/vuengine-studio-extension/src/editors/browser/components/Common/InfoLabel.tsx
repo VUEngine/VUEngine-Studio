@@ -15,7 +15,7 @@ interface InfoLabelProps {
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
     const { label, subLabel, tooltip, tooltipPosition, count, hoverService, style } = props;
 
-    return <label style={style}>
+    return <label style={{ whiteSpace: 'nowrap', ...style }}>
         {label}
         {count && <>
             {' '}<span className='count'>{count}</span>
