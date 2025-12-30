@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel] # macos-15-intel is for x64, macOS-15 is for arm64
+        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
         node: ['22.x']
 
     runs-on: ${{ matrix.os }}
@@ -50,32 +50,46 @@ jobs:
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
-          name: Mac
+          name: ${{ matrix.os == 'macos-15-intel' && 'mac-x64' || matrix.os == 'macos-15' && 'mac-arm64'}}
           path: |
-            applications/electron/dist/*.pkg
-            applications/electron/dist/latest-mac.yml
+            applications/electron/dist/**
+            !applications/electron/dist/mac/**
+            !applications/electron/dist/mac-arm64/**
 
       - name: Upload artifacts
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: Windows
+          name: windows
           path: |
-            applications/electron/dist/*.exe
-            applications/electron/dist/latest.yml
+            applications/electron/dist/**
 
       - name: Upload artifacts
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: Linux
+          name: linux
           path: |
-            applications/electron/dist/*.deb
-            applications/electron/dist/*.AppImage
-            applications/electron/dist/latest-linux.yml
+            applications/electron/dist/**
+
+      - name: Test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a yarn electron test
+
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          yarn electron test
+
+      - name: Test (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          yarn electron test
 
       - name: Lint
-        if: matrix.tests != 'skip'
         shell: bash
         run: |
           yarn lint
