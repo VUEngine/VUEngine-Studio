@@ -1,4 +1,4 @@
-import { CommonMenus } from '@theia/core/lib/browser/common-frontend-contribution';
+import { CommonMenus } from '@theia/core/lib/browser';
 import { MenuPath } from '@theia/core/lib/common/menu';
 
 export namespace VesCoreMenus {

@@ -16,7 +16,7 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@theia/cli": "1.65.2",
+    "@theia/cli": "1.67.0",
     "@types/yargs": "17.0.7",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
@@ -36,8 +36,8 @@
     "clean": "lerna run clean && rimraf node_modules",
     "build": "yarn build:extensions && yarn build:applications",
     "build:dev": "yarn build:extensions && yarn build:applications:dev",
-    "build:applications": "yarn build:extensions && lerna run build:prod --concurrency 1",
-    "build:applications:dev": "yarn build:extensions && lerna run build --concurrency 1",
+    "build:applications": "lerna run build:prod --concurrency 1",
+    "build:applications:dev": "lerna run build --concurrency 1",
     "build:extensions": "lerna run build",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false --ignore-errors && yarn permissions:writeable",
     "prePackageTools": "cd applications/electron/binaries/vuengine-studio-tools && npm run prePackage",
@@ -146,6 +146,6 @@
     "**/nan": "2.22.2",
     "**/cpu-features": "0.0.9",
     "**/perfect-scrollbar": "1.5.5",
-    "**/node-abi": "4.9.0"
+    "**/node-abi": "4.14.0"
   }
 }
