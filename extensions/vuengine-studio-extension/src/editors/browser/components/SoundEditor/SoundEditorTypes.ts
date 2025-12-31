@@ -169,6 +169,7 @@ export const NOTES: { [note: string]: number } = {
     'D9': 0,
     'C#9': 0,
     'C9': 2029,
+    */
     'B8': 2028,
     'A#8': 2027,
     'A8': 2026,
@@ -177,7 +178,6 @@ export const NOTES: { [note: string]: number } = {
     'F#8': 2022,
     'F8': 2020,
     'E8': 2018,
-    */
     // Upper end of audible range
     // (Higher sounds are audible, but will not produce a pure, specific note)
     'D#8': 2017,
@@ -254,10 +254,10 @@ export const NOTES: { [note: string]: number } = {
     'E2': 152,
     'D#2': 39,
     // Lower end of audible range
-    /*
     'D2': 0,
     'C#2': 0,
     'C2': 0,
+    /*
     'B1': 0,
     'A#1': 0,
     'A1': 0,

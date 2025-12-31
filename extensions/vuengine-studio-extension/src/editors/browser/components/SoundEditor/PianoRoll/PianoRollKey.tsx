@@ -54,7 +54,7 @@ export const StyledPianoRollKeyName = styled.div`
     display: none;
     z-index: 1;
 
-    ${StyledPianoKey}:nth-child(12n - 8) &,
+    ${StyledPianoKey}.cNote &,
     ${StyledPianoKey}:hover & {
         display: block;
     }

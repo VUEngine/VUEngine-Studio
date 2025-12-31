@@ -108,7 +108,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         SoundEditorTrackType.SWEEPMOD,
         SoundEditorTrackType.NOISE
     ]);
-    const [testNote, setTestNote] = useState<string>(NOTES_LABELS_REVERSED[21]);
+    const [testNote, setTestNote] = useState<string>(NOTES_LABELS_REVERSED[24]);
     const [selectedInstrumentId, setSelectedInstrumentId] = useState<string>(currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
         ? currentInstrumentId
         : soundData.tracks[currentTrackId].instrument
