@@ -392,12 +392,14 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarButton
                     className={`theia-button ${songSettingsDialogOpen ? 'primary' : 'secondary'}`}
+                    title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     onClick={() => setSongSettingsDialogOpen(prev => !prev)}
                 >
                     <FadersHorizontal size={17} />
                 </StyledSoundEditorToolbarButton>
                 <StyledSoundEditorToolbarButton
                     className={`theia-button ${toolsDialogOpen ? 'primary' : 'secondary'}`}
+                    title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
                     onClick={() => setToolsDialogOpen(prev => !prev)}
                 >
                     <Wrench size={17} />

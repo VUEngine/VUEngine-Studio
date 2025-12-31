@@ -125,7 +125,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
 
             const trackId = Math.floor(y / sequencerPatternHeight);
-            const step = Math.floor(x / sequencerPatternWidth) * SEQUENCER_RESOLUTION;
+            const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
 
             setDragStartTrackId(trackId);
             setDragStartStep(step);

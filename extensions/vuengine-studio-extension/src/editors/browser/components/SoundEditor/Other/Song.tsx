@@ -59,7 +59,7 @@ export default function Song(props: SongProps): React.JSX.Element {
 
     return <VContainer gap={15}>
         <Input
-            label={nls.localize('vuengine/editors/sound/songName', 'Song Name')}
+            label={nls.localize('vuengine/editors/sound/name', 'Name')}
             value={soundData.name}
             setValue={setName}
             commands={INPUT_BLOCKING_COMMANDS}

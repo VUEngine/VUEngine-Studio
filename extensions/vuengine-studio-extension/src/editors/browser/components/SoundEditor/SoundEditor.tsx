@@ -521,10 +521,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        // prompt
         const ellipsis = unusedPatternsNames.length > 15 ? '\n[…]' : '';
         const patternList = `• ${unusedPatternsNames.slice(0, 15).join('\n• ')}${ellipsis}`;
 
+        // prompt
         const dialog = new ConfirmDialog({
             title: SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label,
             msg: `${nls.localize(
@@ -569,17 +569,72 @@ A total of {0} patterns will be deleted.',
     };
 
     const removeUnusedInstruments = async (): Promise<void> => {
+        // get all instruments used on placed patterns or set as track default instrument
+        const usedInstruments: string[] = [];
+        soundData.tracks.forEach(track => {
+            usedInstruments.push(track.instrument);
+
+            console.log('-----------------');
+            console.log('-----------------');
+            console.log('-----------------');
+            Object.values(track.sequence).forEach(patternId => {
+                console.log('patternId', patternId);
+                const pattern = soundData.patterns[patternId];
+                console.log('pattern', pattern);
+                Object.values(pattern?.events ?? {}).forEach(event => {
+                    console.log('event', event);
+                    if (event[SoundEvent.Instrument]) {
+                        usedInstruments.push(event[SoundEvent.Instrument]);
+                    }
+                });
+            });
+        });
+
+        // get all instruments, then filter out used ones
+        const unusedInstrumentIds = Object.keys(soundData.instruments)
+            .filter(instrumentId => !usedInstruments.includes(instrumentId));
+
+        // stop if no unused instruments found
+        if (unusedInstrumentIds.length === 0) {
+            services.messageService.info(nls.localize(
+                'vuengine/editors/sound/noUnusedInstrumentsFound',
+                'No unused instruments could be found.'
+            ));
+            return;
+        }
+
+        const unusedInstrumentsNames = unusedInstrumentIds.map(instrumentId => soundData.instruments[instrumentId].name ?? 'unnamed');
+        const ellipsis = unusedInstrumentsNames.length > 15 ? '\n[…]' : '';
+        const patternList = `• ${unusedInstrumentsNames.slice(0, 15).join('\n• ')}${ellipsis}`;
+
         const dialog = new ConfirmDialog({
             title: SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label,
-            msg: nls.localize(
+            msg: `${nls.localize(
                 'vuengine/editors/sound/confirmRemoveUnusedInstruments',
-                'This will delete all instruments that are not currently used in any pattern that is placed on a track.\nAre you sure you want to do this?'
-            ),
+                "This will delete all instruments that are not currently used as a track's default instrument or in any pattern that is placed on a track.\n\
+Are you sure you want to do this?\n\n\
+A total of {0} instruments will be deleted.",
+                unusedInstrumentsNames.length
+            )}\n\n${patternList}`,
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            // TODO
-            alert('not yet implemented');
+            const updatedInstruments = { ...soundData.instruments };
+
+            unusedInstrumentIds.forEach(instrumentId => {
+                delete updatedInstruments[instrumentId];
+            });
+
+            updateSoundData({
+                ...soundData,
+                instruments: updatedInstruments,
+            });
+
+            services.messageService.info(nls.localize(
+                'vuengine/editors/sound/unusedInstrumentsDeleted',
+                'Successfully deleted {0} unused instruments.',
+                unusedInstrumentsNames.length
+            ));
         }
     };
 
@@ -1207,7 +1262,7 @@ A total of {0} patterns will be deleted.',
                     open={songSettingsDialogOpen}
                     onClose={() => setSongSettingsDialogOpen(false)}
                     onOk={() => setSongSettingsDialogOpen(false)}
-                    title={nls.localize('vuengine/editors/sound/songSettings', 'Song Settings')}
+                    title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     height='460px'
                     width='460px'
                     overflow='visible'
@@ -1225,8 +1280,8 @@ A total of {0} patterns will be deleted.',
                     open={toolsDialogOpen}
                     onClose={() => setToolsDialogOpen(false)}
                     onOk={() => setToolsDialogOpen(false)}
-                    title={nls.localizeByDefault('Tools')}
-                    height='460px'
+                    title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
+                    height='260px'
                     width='460px'
                     overflow='visible'
                 >
@@ -1266,7 +1321,7 @@ A total of {0} patterns will be deleted.',
                     onClose={() => setTrackDialogOpen(false)}
                     onOk={() => setTrackDialogOpen(false)}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
-                    height='400px'
+                    height='340px'
                     width='320px'
                     overflow='visible'
                 >
