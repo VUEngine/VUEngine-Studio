@@ -113,6 +113,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const { soundData, updateSoundData } = props;
     const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
+    const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
     const [testing, setTesting] = useState<boolean>(false);
     const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
@@ -120,9 +121,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [testingNote, setTestingNote] = useState<number>(0);
     const [testingInstrument, setTestingInstrument] = useState<string>('');
     const [testingTrack, setTestingTrack] = useState<number>(0);
+    const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
+    const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
+    const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
+    const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
     const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
-    const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
     const [currentTrackId, setCurrentTrackId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.tracks[0]
         ? Object.values(soundData.tracks[0].sequence)[0] ?? '' : '');
@@ -130,8 +134,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         ? parseInt(Object.keys(soundData.tracks[0].sequence)[0]) ?? -1 : -1);
     const [noteCursor, setNoteCursor] = useState<number>(0);
     const [selectedNotes, setSelectedNotes] = useState<number[]>([]);
-    const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
-    const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [pianoRollScrollWindow, setPianoRollScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const [pianoRollNoteHeight, setPianoRollNoteHeight] = useState<number>(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
     const [pianoRollNoteWidth, setPianoRollNoteWidth] = useState<number>(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
@@ -836,6 +838,41 @@ A total of {0} patterns will be deleted.',
         return false;
     };
 
+    const setProgressInterval = (): void => {
+        if (!emulatorRomReady) {
+            return;
+        }
+
+        if (playing) {
+            clearTimeout(progressTimeout);
+            const songSize = soundData.size * SEQUENCER_RESOLUTION;
+            let resolution = 1;
+            while (soundData.speed * resolution < 100) {
+                resolution++;
+            }
+            setProgressTimeout(setInterval(() => {
+                setCurrentPlayerPosition(prev => {
+                    const newPosition = prev + resolution;
+                    if (newPosition >= songSize) {
+                        if (soundData.loop) {
+                            return soundData.loopPoint * SEQUENCER_RESOLUTION;
+                        } else {
+                            return -1;
+                        }
+                    }
+
+                    return newPosition;
+                });
+            }, soundData.speed * resolution));
+        } else {
+            clearTimeout(progressTimeout);
+        }
+    };
+
+    const unsetProgressInterval = (): void => {
+        clearTimeout(progressTimeout);
+    };
+
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
             case SoundEditorCommands.ADD_TRACK.id:
@@ -951,11 +988,26 @@ A total of {0} patterns will be deleted.',
         soundData,
     ]);
 
+    useEffect(() => {
+        setProgressInterval();
+        return () => {
+            unsetProgressInterval();
+        };
+    }, [
+        emulatorRomReady,
+        playing,
+        soundData.loop,
+        soundData.loopPoint,
+        soundData.speed,
+        soundData.size,
+    ]);
+
     return (
         <HContainer className="musicEditor" gap={0} overflow="hidden" style={{ padding: 0 }}>
             <Emulator
                 playing={playing}
                 setEmulatorInitialized={setEmulatorInitialized}
+                setEmulatorRomReady={setEmulatorRomReady}
                 currentPlayerPosition={currentPlayerPosition}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                 soundData={soundData}

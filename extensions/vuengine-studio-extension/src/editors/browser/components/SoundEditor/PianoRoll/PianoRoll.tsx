@@ -529,6 +529,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
+                sequencerPatternWidth={sequencerPatternWidth}
             />}
             {placedPatterns}
             {placedNotesCurrentPattern}

@@ -399,6 +399,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
+                sequencerPatternWidth={sequencerPatternWidth}
             />
             <LoopIndicator
                 position={soundData.loopPoint}

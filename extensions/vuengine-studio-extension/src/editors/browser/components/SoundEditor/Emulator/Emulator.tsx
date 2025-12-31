@@ -14,6 +14,7 @@ interface EmulatorProps {
     testing: boolean
     setTesting: React.Dispatch<React.SetStateAction<boolean>>
     setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
+    setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     testingDuration: number;
@@ -30,7 +31,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const {
         soundData,
         playing,
-        setEmulatorInitialized,
+        setEmulatorInitialized, setEmulatorRomReady,
         currentPlayerPosition,
         setCurrentPlayerPosition,
         // playRangeStart, playRangeEnd,
@@ -104,8 +105,10 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
 
     const createSoundRom = async (): Promise<void> => {
         // console.log('--- 2) createSoundRom ---');
+        setEmulatorRomReady(false);
         await generateSpecFile();
         await compileSpecFile();
+        setEmulatorRomReady(true);
     };
 
     const generateSpecFile = async (): Promise<void> => {
