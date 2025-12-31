@@ -93,10 +93,13 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     };
 
     useEffect(() => {
-        // TODO: wrap in disposable
-        // services.themeService.onDidColorThemeChange(() => draw());
-
         draw();
+
+        // TODO
+        /*
+        const watcher = services.themeService.onDidColorThemeChange(() => draw());
+        return watcher.dispose();
+        */
     }, [
         soundData.tracks,
         songLength,

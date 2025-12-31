@@ -389,10 +389,13 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     useEffect(() => {
-        // TODO: wrap in disposable
-        // services.themeService.onDidColorThemeChange(() => draw());
-
         draw();
+
+        // TODO
+        /*
+        const watcher = services.themeService.onDidColorThemeChange(() => draw());
+        return watcher.dispose();
+        */
     }, [
         soundData,
         currentTrackId,

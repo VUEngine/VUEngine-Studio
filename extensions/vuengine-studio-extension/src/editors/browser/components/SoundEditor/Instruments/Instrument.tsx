@@ -275,7 +275,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             const updatedInstruments = { ...soundData.instruments };
             delete updatedInstruments[instrumentId];
 
-            // TODO: update references in tracks and pattern events
+            // TODO: remove references in tracks and pattern events
             updateSoundData({
                 ...soundData,
                 instruments: updatedInstruments,

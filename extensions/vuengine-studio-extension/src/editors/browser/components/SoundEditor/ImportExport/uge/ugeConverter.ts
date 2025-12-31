@@ -457,7 +457,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                 }
 
                 if (channelTick.effectcode !== null && channelTick.effectparam !== null) {
-                    // TODO
+                    // TODO: add support for missing effects
                     switch (channelTick.effectcode) {
                         case EffectCommandType.Arpeggio: break;
                         case EffectCommandType.PortamentoUp: break;
@@ -471,7 +471,10 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                         case EffectCommandType.SetDutyCycle: break;
                         case EffectCommandType.VolumeSlide: break;
                         case EffectCommandType.PositionJump: break;
-                        case EffectCommandType.SetVolume: break;
+                        case EffectCommandType.SetVolume:
+                            // TODO: add support for "Change Envelope"
+                            // event[SoundEvent.Volume] = ((value ?? 0) << 4) + (value ?? 0);
+                            break;
                         case EffectCommandType.PatternBreak: break;
                         case EffectCommandType.NoteCut: break;
                         case EffectCommandType.SetSpeed: break;

@@ -927,7 +927,7 @@ A total of {0} instruments will be deleted.",
 
     const exportFile = async (): Promise<void> => {
         // TODO
-        alert('nöt yet implemented');
+        alert('not yet implemented');
     };
 
     const importFile = async (): Promise<void> => {
@@ -1046,6 +1046,10 @@ A total of {0} instruments will be deleted.",
                 // TODO
                 alert('not yet implemented');
                 break;
+            case SoundEditorCommands.ADD_PATTERN.id:
+                const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
+                addPattern(currentTrackId, noteCursorStep);
+                break;
             case SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id:
                 setNoteSnapping(prev => !prev);
                 break;
@@ -1107,10 +1111,6 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
                 setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
                 break;
-            case SoundEditorCommands.ADD_PATTERN.id:
-                // TODO
-                alert('not yet implemented');
-                break;
             case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
                 removeUnusedPatterns();
                 break;
@@ -1141,6 +1141,8 @@ A total of {0} instruments will be deleted.",
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
     }, [
+        currentTrackId,
+        noteCursor,
         playing,
         setPlaying,
         soundData,

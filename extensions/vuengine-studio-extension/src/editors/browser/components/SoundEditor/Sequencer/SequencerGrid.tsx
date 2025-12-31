@@ -171,10 +171,13 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     };
 
     useEffect(() => {
-        // TODO: wrap in disposable
-        // services.themeService.onDidColorThemeChange(() => draw());
-
         draw();
+
+        // TODO
+        /*
+        const watcher = services.themeService.onDidColorThemeChange(() => draw());
+        return watcher.dispose();
+        */
     }, [
         soundData.size,
         soundData.tracks.length,

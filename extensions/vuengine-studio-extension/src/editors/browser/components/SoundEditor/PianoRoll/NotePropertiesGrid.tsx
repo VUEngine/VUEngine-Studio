@@ -68,10 +68,13 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
     };
 
     useEffect(() => {
-        // TODO: wrap in disposable
-        // services.themeService.onDidColorThemeChange(() => draw());
-
         draw();
+
+        // TODO
+        /*
+        const watcher = services.themeService.onDidColorThemeChange(() => draw());
+        return watcher.dispose();
+        */
     }, [
         soundData.tracks,
         songLength,
