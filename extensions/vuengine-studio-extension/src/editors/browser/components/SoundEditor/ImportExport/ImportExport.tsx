@@ -1,16 +1,11 @@
-import { nls, URI } from '@theia/core';
-import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import * as midiManager from 'midi-file';
+import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { DEFAULT_TRACK_SETTINGS, SoundData, TrackSettings } from '../SoundEditorTypes';
-import { convertUgeSong } from './uge/ugeConverter';
-import { loadUGESong } from './uge/ugeHelper';
-import { convertVbmSong } from './vbm/vbmConverter';
-import { parseVbmSong } from './vbm/vbmParser';
+import { SoundData, TrackSettings } from '../SoundEditorTypes';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 
 interface ImportExportProps {
     soundData: SoundData
@@ -21,79 +16,7 @@ interface ImportExportProps {
 }
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
-    const { soundData, updateSoundData, setToolsDialogOpen, setTrackSettings, setCurrentSequenceIndex } = props;
-
-    const exportRom = () => {
-        // TODO
-        alert('not yet implemented');
-    };
-
-    const selectFileForImport = async (): Promise<void> => {
-        const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/editors/sound/selectFiles', 'Select file to import'),
-            canSelectFolders: false,
-            canSelectFiles: true,
-            canSelectMany: false,
-            filters: {
-                [nls.localize('vuengine/editors/sound/supportedFiles', 'Supported Files')]: [
-                    // 'midi', 'mid',
-                    // 's3m',
-                    'uge',
-                    'vbm',
-                ],
-            }
-        };
-        const currentPath = await services.fileService.resolve(fileUri.parent);
-        const uri: URI | undefined = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
-        if (uri) {
-            const fileContent = await services.fileService.readFile(uri);
-            const fileArrayBuffer = fileContent.value.buffer as unknown as ArrayBuffer;
-            let importedSoundData: SoundData | undefined;
-            switch (uri.path.ext) {
-                case '.mid':
-                case '.midi':
-                    const parsedMidi = midiManager.parseMidi(fileContent.value.buffer);
-                    console.log('parsed', parsedMidi);
-                    break;
-                case '.s3m':
-                    const parsedS3mSong = window.electronVesCore.kaitaiParse(fileArrayBuffer, uri.path.ext);
-                    console.log('parsed', parsedS3mSong);
-                    break;
-                case '.uge':
-                    const parsedUgeSong = loadUGESong(fileArrayBuffer);
-                    console.log('parsed', parsedUgeSong);
-                    if (parsedUgeSong) {
-                        importedSoundData = convertUgeSong(parsedUgeSong);
-                        console.log('imported', importedSoundData);
-                    }
-                    break;
-                case '.vbm':
-                    const parsedVbmSong = parseVbmSong(fileArrayBuffer);
-                    console.log('parsed', parsedVbmSong);
-                    if (parsedVbmSong) {
-                        importedSoundData = convertVbmSong(parsedVbmSong);
-                        console.log('imported', importedSoundData);
-                    }
-                    break;
-            }
-
-            if (!importedSoundData) {
-                services.messageService.error(
-                    nls.localize(
-                        'vuengine/editors/sound/importError',
-                        'The was an error importing the file {0}.',
-                        uri.path.base,
-                    ));
-                return;
-            }
-
-            setTrackSettings([...importedSoundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
-            updateSoundData({ ...soundData, ...importedSoundData });
-            setToolsDialogOpen(false);
-            setCurrentSequenceIndex(0, 0);
-        }
-    };
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     return <VContainer>
         <InfoLabel
@@ -137,13 +60,13 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
         <HContainer>
             <button
                 className='theia-button secondary'
-                onClick={selectFileForImport}
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.IMPORT.id)}
             >
                 {nls.localize('vuengine/editors/sound/import', 'Import')}
             </button>
             <button
                 className='theia-button secondary'
-                onClick={exportRom}
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
             >
                 {nls.localize('vuengine/editors/sound/export', 'Export')}
             </button>

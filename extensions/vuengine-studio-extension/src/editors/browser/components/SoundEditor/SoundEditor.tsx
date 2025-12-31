@@ -1,5 +1,7 @@
-import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator, URI } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
+import * as midiManager from 'midi-file';
 import { nanoid } from 'nanoid';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -13,6 +15,10 @@ import { sortObjectByKeys } from '../Common/Utils';
 import Emulator from './Emulator/Emulator';
 import EventList from './EventList';
 import ImportExport from './ImportExport/ImportExport';
+import { convertUgeSong } from './ImportExport/uge/ugeConverter';
+import { loadUGESong } from './ImportExport/uge/ugeHelper';
+import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
+import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
@@ -110,7 +116,7 @@ interface SoundEditorProps {
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
@@ -919,6 +925,77 @@ A total of {0} instruments will be deleted.",
         return false;
     };
 
+    const exportFile = async (): Promise<void> => {
+        // TODO
+        alert('nöt yet implemented');
+    };
+
+    const importFile = async (): Promise<void> => {
+        const openFileDialogProps: OpenFileDialogProps = {
+            title: nls.localize('vuengine/editors/sound/selectFiles', 'Select file to import'),
+            canSelectFolders: false,
+            canSelectFiles: true,
+            canSelectMany: false,
+            filters: {
+                [nls.localize('vuengine/editors/sound/supportedFiles', 'Supported Files')]: [
+                    // 'midi', 'mid',
+                    // 's3m',
+                    'uge',
+                    'vbm',
+                ],
+            }
+        };
+        const currentPath = await services.fileService.resolve(fileUri.parent);
+        const uri: URI | undefined = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
+        if (uri) {
+            const fileContent = await services.fileService.readFile(uri);
+            const fileArrayBuffer = fileContent.value.buffer as unknown as ArrayBuffer;
+            let importedSoundData: SoundData | undefined;
+            switch (uri.path.ext) {
+                case '.mid':
+                case '.midi':
+                    const parsedMidi = midiManager.parseMidi(fileContent.value.buffer);
+                    console.log('parsed', parsedMidi);
+                    break;
+                case '.s3m':
+                    const parsedS3mSong = window.electronVesCore.kaitaiParse(fileArrayBuffer, uri.path.ext);
+                    console.log('parsed', parsedS3mSong);
+                    break;
+                case '.uge':
+                    const parsedUgeSong = loadUGESong(fileArrayBuffer);
+                    console.log('parsed', parsedUgeSong);
+                    if (parsedUgeSong) {
+                        importedSoundData = convertUgeSong(parsedUgeSong);
+                        console.log('imported', importedSoundData);
+                    }
+                    break;
+                case '.vbm':
+                    const parsedVbmSong = parseVbmSong(fileArrayBuffer);
+                    console.log('parsed', parsedVbmSong);
+                    if (parsedVbmSong) {
+                        importedSoundData = convertVbmSong(parsedVbmSong);
+                        console.log('imported', importedSoundData);
+                    }
+                    break;
+            }
+
+            if (!importedSoundData) {
+                services.messageService.error(
+                    nls.localize(
+                        'vuengine/editors/sound/importError',
+                        'The was an error importing the file {0}.',
+                        uri.path.base,
+                    ));
+                return;
+            }
+
+            setTrackSettings([...importedSoundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
+            updateSoundData({ ...soundData, ...importedSoundData });
+            setToolsDialogOpen(false);
+            updateCurrentSequenceIndex(0, 0);
+        }
+    };
+
     const setProgressInterval = (): void => {
         clearTimeout(progressTimeout);
 
@@ -1044,10 +1121,10 @@ A total of {0} instruments will be deleted.",
                 editInstrument(currentInstrumentId);
                 break;
             case SoundEditorCommands.IMPORT.id:
-                // TODO
+                importFile();
                 break;
             case SoundEditorCommands.EXPORT.id:
-                // TODO
+                exportFile();
                 break;
         }
     };
