@@ -36,7 +36,16 @@ import {
     VsuSweepModulationFunction
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
-import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID, TRACK_TYPE_LABELS, WAVEFORM_MAX } from '../SoundEditorTypes';
+import {
+    INPUT_BLOCKING_COMMANDS,
+    InstrumentMap,
+    SoundData,
+    SoundEditorTrackType,
+    SoundEvent,
+    TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_TYPE_LABELS,
+    WAVEFORM_MAX
+} from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ColoredDiv = styled.div`
@@ -275,10 +284,32 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             const updatedInstruments = { ...soundData.instruments };
             delete updatedInstruments[instrumentId];
 
-            // TODO: remove references in tracks and pattern events
+            // remove references in tracks
+            const updatedTracks = [
+                ...soundData.tracks.map(track => ({
+                    ...track,
+                    instrument: track.instrument === instrumentId ? '' : track.instrument
+                }))
+            ];
+
+            // remove references in pattern events
+            const updatedPatterns = { ...soundData.patterns };
+            Object.keys(soundData.patterns).forEach(patternId => {
+                Object.keys(soundData.patterns[patternId].events).forEach(eventStep => {
+                    if (soundData.patterns[patternId].events[parseInt(eventStep)][SoundEvent.Instrument] === instrumentId) {
+                        delete updatedPatterns[patternId].events[parseInt(eventStep)][SoundEvent.Instrument];
+                        if (Object.keys(updatedPatterns[patternId].events[parseInt(eventStep)]).length === 0) {
+                            delete updatedPatterns[patternId].events[parseInt(eventStep)];
+                        }
+                    }
+                });
+            });
+
             updateSoundData({
                 ...soundData,
                 instruments: updatedInstruments,
+                patterns: updatedPatterns,
+                tracks: updatedTracks,
             });
 
             const firstInstrumentId = Object.keys(soundData.instruments)[0] ?? TRACK_DEFAULT_INSTRUMENT_ID;
