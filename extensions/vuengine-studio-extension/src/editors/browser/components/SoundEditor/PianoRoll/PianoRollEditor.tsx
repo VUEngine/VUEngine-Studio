@@ -53,7 +53,7 @@ interface PianoRollEditorProps {
     noteCursor: number
     setNoteCursor: (note: number) => void
     setNote: (notes: SetNoteProps[]) => void
-    playNote: (note: number) => void
+    playNote: (note: string, instrumentId?: string) => void
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number

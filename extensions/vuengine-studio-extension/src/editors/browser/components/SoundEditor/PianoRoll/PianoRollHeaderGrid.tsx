@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -19,10 +19,6 @@ const StyledPianoRollHeaderGridContainer = styled.div`
 
 interface PianoRollHeaderGridProps {
     soundData: SoundData
-    currentTrackId: number
-    currentPatternId: string
-    currentSequenceIndex: number
-    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
     pianoRollScrollWindow: ScrollWindow
@@ -31,10 +27,6 @@ interface PianoRollHeaderGridProps {
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
     const {
         soundData,
-        // currentTrackId,
-        // currentPatternId,
-        // currentSequenceIndex,
-        setCurrentPlayerPosition,
         pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
@@ -194,10 +186,12 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y < PIANO_ROLL_GRID_METER_HEIGHT) {
             if (e.button === 0) {
+                /*
                 setCurrentPlayerPosition(prev => prev === step
                     ? -1
                     : step
                 );
+                */
             } else {
                 // TODO: set play range
             }

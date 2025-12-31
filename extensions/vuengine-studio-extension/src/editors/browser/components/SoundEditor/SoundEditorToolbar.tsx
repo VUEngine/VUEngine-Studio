@@ -213,9 +213,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
                         }
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.STOP.id)}
-                        disabled={!emulatorInitialized || currentPlayerPosition < 0}
+                        disabled={!emulatorInitialized || currentPlayerPosition === -1}
                     >
-                        <i className="fa fa-fast-backward" />
+                        <i className="fa fa-stop" />
                     </StyledSoundEditorToolbarButton>
                     <StyledSoundEditorToolbarTime>
                         {currentPlayerPosition + 1}
@@ -294,6 +294,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                     label: nls.localize('vuengine/editors/sound/trackDefaultInstrument', 'Track Default Instrument'),
                                 },
                                 ...Object.keys(soundData.instruments)
+                                    .filter(instrumentId => {
+                                        const instr = soundData.instruments[instrumentId];
+                                        return instr.type === currentTrack.type;
+                                    })
                                     .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
                                         (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')
                                     ))

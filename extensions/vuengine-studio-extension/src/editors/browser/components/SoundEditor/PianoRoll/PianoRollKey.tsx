@@ -63,7 +63,7 @@ export const StyledPianoRollKeyName = styled.div`
 interface PianoRollKeyProps {
     noteId: number
     note: string
-    playNote: (note: number) => void
+    playNote: (note: string, instrumentId?: string) => void
     pianoRollNoteHeight: number
 }
 
@@ -81,23 +81,18 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
         classNames.push('last');
     }
 
-    const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        playNote(noteId);
-        e.preventDefault();
+    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+        playNote(note);
     };
 
-    const onMouse = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.buttons === 1) {
-            playNote(noteId);
-        }
-        e.preventDefault();
+    const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
+        playNote('');
     };
 
     return <StyledPianoKey
         className={classNames.join(' ')}
-        onClick={onClick}
-        onMouseDown={onMouse}
-        onMouseOver={onMouse}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
         style={{
             minHeight: pianoRollNoteHeight,
             maxHeight: pianoRollNoteHeight,

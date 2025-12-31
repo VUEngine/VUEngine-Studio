@@ -16,7 +16,7 @@ import {
 } from '../../Emulator/VsuTypes';
 import {
     InstrumentConfig,
-    NOTES,
+    NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
     SEQUENCER_RESOLUTION,
@@ -30,7 +30,6 @@ import {
 import { DutyInstrument, NoiseInstrument, PatternCell, Song, WaveInstrument } from './ugeHelper';
 import { EffectCommandType } from './ugeTypes';
 
-const NOTES_LABELS_REVERTED = Object.keys(NOTES).reverse();
 const GB_NOTE_OFFSET = 9 - 12; // adjust for frequency ranges (+9) and transpose down an octave (-12)
 const CONVERTED_PATTERN_SIZE = 64 / SEQUENCER_RESOLUTION;
 
@@ -227,6 +226,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
         result.push({
             id: nanoid(),
             instrumentConfig: {
+                type: SoundEditorTrackType.WAVE,
                 color: DUTY_COLORS[index],
                 envelope: {
                     direction: i.volume_sweep_change > 0
@@ -292,6 +292,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
         result.push({
             id: nanoid(),
             instrumentConfig: {
+                type: SoundEditorTrackType.WAVE,
                 color: WAVE_COLORS[index],
                 envelope: {
                     direction: VsuEnvelopeDirection.Decay,
@@ -344,6 +345,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
         result.push({
             id: nanoid(),
             instrumentConfig: {
+                type: SoundEditorTrackType.NOISE,
                 color: NOISE_COLORS[index],
                 envelope: {
                     direction: (i.volume_sweep_change) > 0
@@ -437,7 +439,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                 const event: SoundEventMap = {};
 
                 if (channelTick.note !== null) {
-                    event[SoundEvent.Note] = NOTES_LABELS_REVERTED[clamp(channelTick.note + GB_NOTE_OFFSET, 0, NOTES_SPECTRUM)];
+                    event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(channelTick.note + GB_NOTE_OFFSET, 0, NOTES_SPECTRUM)];
 
                     let length = 1;
                     while (pattern[tickIndex + length] && pattern[tickIndex + length][trackIndex].note === null) {

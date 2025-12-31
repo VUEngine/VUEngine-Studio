@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
     PIANO_ROLL_KEY_WIDTH,
@@ -44,14 +44,10 @@ export const MetaLineHeader = styled.div`
 
 interface PianoRollHeaderProps {
     soundData: SoundData
-    currentTrackId: number
-    currentPatternId: string
-    currentSequenceIndex: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
     pianoRollScrollWindow: ScrollWindow
@@ -60,12 +56,8 @@ interface PianoRollHeaderProps {
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
-        currentTrackId,
-        currentPatternId,
         // playRangeStart, setPlayRangeStart,
         // playRangeEnd, setPlayRangeEnd,
-        currentSequenceIndex,
-        setCurrentPlayerPosition,
         pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
@@ -80,10 +72,6 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
     >
         <PianoRollHeaderGrid
             soundData={soundData}
-            currentTrackId={currentTrackId}
-            currentPatternId={currentPatternId}
-            currentSequenceIndex={currentSequenceIndex}
-            setCurrentPlayerPosition={setCurrentPlayerPosition}
             pianoRollNoteWidth={pianoRollNoteWidth}
             setPatternAtCursorPosition={setPatternAtCursorPosition}
             pianoRollScrollWindow={pianoRollScrollWindow}

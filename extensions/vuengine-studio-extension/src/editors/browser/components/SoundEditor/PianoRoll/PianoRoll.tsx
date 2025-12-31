@@ -154,7 +154,6 @@ interface PianoRollProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
-    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -167,7 +166,7 @@ interface PianoRollProps {
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNote: (notes: SetNoteProps[]) => void
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
-    playNote: (note: number) => void
+    playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
     noteSnapping: boolean
@@ -194,7 +193,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentTrackId,
         currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        currentPlayerPosition, setCurrentPlayerPosition,
+        currentPlayerPosition,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
@@ -557,14 +556,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </StyledToggleButtonContainer>
             <PianoRollHeader
                 soundData={soundData}
-                currentTrackId={currentTrackId}
-                currentPatternId={currentPatternId}
-                currentSequenceIndex={currentSequenceIndex}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}
                 setPlayRangeEnd={setPlayRangeEnd}
-                setCurrentPlayerPosition={setCurrentPlayerPosition}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}

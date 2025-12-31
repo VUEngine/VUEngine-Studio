@@ -13,11 +13,12 @@ interface RadioSelectProps {
     onChange: (options: RadioSelectOption[]) => void
     onFocus?: () => void
     onBlur?: () => void
+    fitSpace?: boolean
     disabled?: boolean
 }
 
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
-    const { allowBlank, options, canSelectMany, defaultValue, onChange, onFocus, onBlur, disabled } = props;
+    const { allowBlank, options, canSelectMany, defaultValue, onChange, onFocus, onBlur, fitSpace, disabled } = props;
     const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
     const [classes, setClasses] = useState<string>('radioSelect');
     const numberOfOptions = options.length;
@@ -125,6 +126,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
                 key={`radio-select-option-${i}`}
                 className={currentIndexes.includes(i) ? 'selected' : ''}
                 onClick={() => toggleValue(i)}
+                style={{ flexGrow: fitSpace ? 1 : 0 }}
             >
                 {o.label ? o.label : o.value}
             </div>

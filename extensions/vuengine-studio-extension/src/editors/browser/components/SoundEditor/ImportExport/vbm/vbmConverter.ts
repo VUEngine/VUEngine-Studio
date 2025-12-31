@@ -15,7 +15,7 @@ import {
 } from '../../Emulator/VsuTypes';
 import {
     InstrumentConfig,
-    NOTES,
+    NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
     SEQUENCER_RESOLUTION,
@@ -30,6 +30,7 @@ import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
 
 const DEFAULT_INSTRUMENT_ID = 'default';
 const DEFAULT_INSTRUMENT = {
+    type: SoundEditorTrackType.WAVE,
     color: 4,
     envelope: {
         direction: VsuEnvelopeDirection.Decay,
@@ -75,7 +76,6 @@ interface ConvertedPattern {
     patternConfig: PatternConfig
 }
 
-const NOTES_LABELS_REVERTED = Object.keys(NOTES).reverse();
 const NOTE_OFFSET = 39;
 
 export const convertVbmSong = (song: VBMusicFile): SoundData => {
@@ -208,6 +208,7 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const trackDefaultInstrument: InstrumentConfig = {
                 ...convertedInstrument.instrumentConfig,
                 name: convertedInstrument.instrumentConfig.name + ` (CH${trackIndex + 1})`,
+                type: tracks[trackIndex].type,
                 tap,
                 volume,
                 waveform,
@@ -276,6 +277,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
         result.push({
             id: nanoid(),
             instrumentConfig: {
+                type: SoundEditorTrackType.WAVE,
                 color: index * 8 % COLOR_PALETTE.length,
                 envelope: {
                     direction: VsuEnvelopeDirection.Decay,
@@ -332,7 +334,7 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             const event: SoundEventMap = {};
 
             if (tick.Note !== undefined) {
-                event[SoundEvent.Note] = NOTES_LABELS_REVERTED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM)];
+                event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM)];
                 let length = 1;
                 while (pattern.Row[i + length] && pattern.Row[i + length].Note === undefined) {
                     length++;

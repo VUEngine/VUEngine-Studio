@@ -81,7 +81,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                     };
                                 case SoundEditorTrackType.SWEEPMOD:
                                     return {
-                                        label: nls.localize('vuengine/editors/sound/waveSm', 'Wave (Sweep / Modulation)'),
+                                        label: nls.localize('vuengine/editors/sound/waveSweepModulation', 'Wave (Sweep/Modulation)'),
                                         value: i.toString(),
                                     };
                                 case SoundEditorTrackType.NOISE:
@@ -141,6 +141,10 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                 <InputWithAction>
                     <AdvancedSelect
                         options={Object.keys(soundData.instruments)
+                            .filter(instrumentId => {
+                                const instrument = soundData.instruments[instrumentId];
+                                return instrument.type === track.type;
+                            })
                             .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                             .map((instrumentId, i) => {
                                 const instrument = soundData.instruments[instrumentId];

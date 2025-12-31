@@ -123,6 +123,7 @@ export interface TrackConfig {
 
 export interface InstrumentConfig {
     name: string
+    type: SoundEditorTrackType
     color: number
     waveform: number[]
     volume: VsuChannelStereoLevelsData
@@ -140,8 +141,8 @@ export interface ScrollWindow {
     h: number
 }
 
+export const ALL_TRACK_TYPES = 'any';
 export enum SoundEditorTrackType {
-    ANY = 'any',
     WAVE = 'wave',
     SWEEPMOD = 'sweepMod',
     NOISE = 'noise',
@@ -284,6 +285,7 @@ export const NOTES: { [note: string]: number } = {
 };
 
 export const NOTES_LABELS = Object.keys(NOTES);
+export const NOTES_LABELS_REVERSED = [...NOTES_LABELS].reverse();
 export const NOTES_SPECTRUM = NOTES_LABELS.length;
 export const NOTES_PER_OCTAVE = 12;
 export const NOTE_RESOLUTION = 16; // 1/16 note
@@ -324,8 +326,6 @@ export const VOLUME_STEPS = 16;
 
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
 export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
-
-export const SINGLE_NOTE_TESTING_DURATION = 500;
 
 export const DEFAULT_NEW_NOTE_DURATION = 1;
 

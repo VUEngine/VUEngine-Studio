@@ -23,6 +23,7 @@ import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
+    ALL_TRACK_TYPES,
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
     DEFAULT_PATTERN_SIZE,
@@ -30,7 +31,6 @@ import {
     EventsMap,
     InstrumentMap,
     NEW_PATTERN_ID,
-    NOTES,
     NOTES_LABELS,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
@@ -47,7 +47,6 @@ import {
     SEQUENCER_PATTERN_WIDTH_MAX,
     SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
-    SINGLE_NOTE_TESTING_DURATION,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -115,12 +114,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
-    const [testing, setTesting] = useState<boolean>(false);
+    const [testNote, setTestNote] = useState<string>('');
+    const [testInstrumentId, setTestInstrumentId] = useState<string>('');
     const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
-    const [testingDuration, setTestingDuration] = useState<number>(0);
-    const [testingNote, setTestingNote] = useState<number>(0);
-    const [testingInstrument, setTestingInstrument] = useState<string>('');
-    const [testingTrack, setTestingTrack] = useState<number>(0);
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
@@ -158,6 +154,37 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         }
         setPlayRangeStart(value);
     };
+
+    const getTestSoundData = (): SoundData => ({
+        ...soundData,
+        loop: testInstrumentId !== '',
+        size: 64,
+        instruments: {
+            'testInstrument': soundData.instruments[testInstrumentId !== '' ? testInstrumentId : soundData.tracks[currentTrackId].instrument]
+        },
+        patterns: {
+            'testPattern': {
+                events: {
+                    0: {
+                        note: testNote,
+                        duration: 64 * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION
+                    }
+                },
+                name: 'testPattern',
+                size: 64
+            }
+        },
+        tracks: [{
+            ...soundData.tracks[currentTrackId],
+            instrument: 'testInstrument',
+            type: testInstrumentId !== ''
+                ? soundData.instruments[testInstrumentId].type
+                : soundData.tracks[currentTrackId].type,
+            sequence: {
+                0: 'testPattern',
+            }
+        }]
+    });
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -252,14 +279,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const playNote = (note: number): void => {
-        if (!playing) {
-            setTesting(true);
-            setTestingNote(Object.values(NOTES)[note]);
-            setTestingTrack(currentTrackId);
-            setTestingInstrument(soundData.tracks[currentTrackId].instrument);
-            setTestingDuration(SINGLE_NOTE_TESTING_DURATION);
-        }
+    const playNote = (note: string, instrumentId: string = ''): void => {
+        setTestNote(note);
+        setTestInstrumentId(instrumentId);
+        setPlaying(!!note);
     };
 
     const updateCurrentTrackId = (id: number): void => {
@@ -343,7 +366,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         if (waveAvailable || sweepModAvailable || noiseAvailable) {
             items.push({
-                id: SoundEditorTrackType.ANY,
+                id: ALL_TRACK_TYPES,
                 label: nls.localize('vuengine/editors/sound/allAvailable', 'All available'),
             });
         }
@@ -375,7 +398,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const addTrack = async (): Promise<void> => {
         const trackType = await showTrackTypeSelection();
         if (trackType && trackType.id) {
-            if (trackType.id === SoundEditorTrackType.ANY) {
+            if (trackType.id === ALL_TRACK_TYPES) {
                 doAddTracks([
                     SoundEditorTrackType.WAVE,
                     SoundEditorTrackType.WAVE,
@@ -558,18 +581,12 @@ A total of {0} patterns will be deleted.',
     };
 
     const togglePlaying = (): void => {
-        if (!playing) {
-            setCurrentPlayerPosition(-1);
-        } else {
-            setCurrentPlayerPosition(playRangeStart > -1 ? playRangeStart : 0);
-        }
         setPlaying(!playing);
-        setTesting(false);
     };
 
     const stopPlaying = (): void => {
         setPlaying(false);
-        setCurrentPlayerPosition(-1);
+        setCurrentPlayerPosition(playRangeStart);
     };
 
     const toggleTrackMuted = (trackId: number): void => {
@@ -841,12 +858,13 @@ A total of {0} patterns will be deleted.',
     };
 
     const setProgressInterval = (): void => {
+        clearTimeout(progressTimeout);
+
         if (!emulatorRomReady) {
-            return;
+            setCurrentPlayerPosition(-1);
         }
 
-        if (playing) {
-            clearTimeout(progressTimeout);
+        if (playing && !testNote) {
             const songSize = soundData.size * SEQUENCER_RESOLUTION;
             let resolution = 1;
             while (soundData.speed * resolution < 100) {
@@ -866,8 +884,6 @@ A total of {0} patterns will be deleted.',
                     return newPosition;
                 });
             }, soundData.speed * resolution));
-        } else {
-            clearTimeout(progressTimeout);
         }
     };
 
@@ -996,12 +1012,29 @@ A total of {0} patterns will be deleted.',
             unsetProgressInterval();
         };
     }, [
+        testNote,
         emulatorRomReady,
         playing,
         soundData.loop,
         soundData.loopPoint,
         soundData.speed,
         soundData.size,
+    ]);
+
+    useEffect(() => {
+        setCurrentPlayerPosition(-1);
+    }, [
+        soundData,
+    ]);
+
+    useEffect(() => {
+        if (!instrumentDialogOpen && testInstrumentId !== '') {
+            setTestInstrumentId('');
+            setTestNote('');
+            setPlaying(false);
+        }
+    }, [
+        instrumentDialogOpen,
     ]);
 
     return (
@@ -1011,15 +1044,7 @@ A total of {0} patterns will be deleted.',
                 setEmulatorInitialized={setEmulatorInitialized}
                 setEmulatorRomReady={setEmulatorRomReady}
                 currentPlayerPosition={currentPlayerPosition}
-                setCurrentPlayerPosition={setCurrentPlayerPosition}
-                soundData={soundData}
-                setPlaying={setPlaying}
-                testing={testing}
-                setTesting={setTesting}
-                testingNote={testingNote}
-                testingDuration={testingDuration}
-                testingInstrument={testingInstrument}
-                testingTrack={testingTrack}
+                soundData={testNote ? getTestSoundData() : soundData}
                 playRangeStart={playRangeStart}
                 playRangeEnd={playRangeEnd}
                 trackSettings={trackSettings}
@@ -1033,7 +1058,7 @@ A total of {0} patterns will be deleted.',
                     currentPlayerPosition={currentPlayerPosition}
                     currentSequenceIndex={currentSequenceIndex}
                     noteCursor={noteCursor}
-                    playing={playing}
+                    playing={playing && !testNote}
                     emulatorInitialized={emulatorInitialized}
                     noteSnapping={noteSnapping}
                     newNoteDuration={newNoteDuration}
@@ -1102,7 +1127,6 @@ A total of {0} patterns will be deleted.',
                             <PianoRoll
                                 soundData={soundData}
                                 currentPlayerPosition={currentPlayerPosition}
-                                setCurrentPlayerPosition={setCurrentPlayerPosition}
                                 noteCursor={noteCursor}
                                 setNoteCursor={updateNoteCursor}
                                 currentPatternId={currentPatternId}
@@ -1145,8 +1169,12 @@ A total of {0} patterns will be deleted.',
             {instrumentDialogOpen &&
                 <PopUpDialog
                     open={instrumentDialogOpen}
-                    onClose={() => setInstrumentDialogOpen(false)}
-                    onOk={() => setInstrumentDialogOpen(false)}
+                    onClose={() => {
+                        setInstrumentDialogOpen(false);
+                    }}
+                    onOk={() => {
+                        setInstrumentDialogOpen(false);
+                    }}
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
                     width='100%'
@@ -1160,13 +1188,8 @@ A total of {0} patterns will be deleted.',
                         setWaveformDialogOpen={setWaveformDialogOpen}
                         setModulationDataDialogOpen={setModulationDataDialogOpen}
                         setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
-                        playing={playing}
-                        testing={testing}
-                        setTesting={setTesting}
-                        setTestingDuration={setTestingDuration}
-                        setTestingNote={setTestingNote}
-                        setTestingInstrument={setTestingInstrument}
-                        setTestingTrack={setTestingTrack}
+                        playingTestNote={playing && !!testNote}
+                        playNote={playNote}
                         emulatorInitialized={emulatorInitialized}
                     />
                 </PopUpDialog>

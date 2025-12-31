@@ -10,17 +10,9 @@ import { SoundData, TrackSettings } from '../SoundEditorTypes.js';
 interface EmulatorProps {
     soundData: SoundData
     playing: boolean
-    setPlaying: React.Dispatch<React.SetStateAction<boolean>>
-    testing: boolean
-    setTesting: React.Dispatch<React.SetStateAction<boolean>>
     setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     currentPlayerPosition: number
-    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    testingDuration: number;
-    testingNote: number;
-    testingInstrument: string;
-    testingTrack: number;
     playRangeStart: number;
     playRangeEnd: number;
     trackSettings: TrackSettings[]
@@ -33,7 +25,6 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         playing,
         setEmulatorInitialized, setEmulatorRomReady,
         currentPlayerPosition,
-        setCurrentPlayerPosition,
         // playRangeStart, playRangeEnd,
         trackSettings,
     } = props;
@@ -108,7 +99,6 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         setEmulatorRomReady(false);
         await generateSpecFile();
         await compileSpecFile();
-        setEmulatorRomReady(true);
     };
 
     const generateSpecFile = async (): Promise<void> => {
@@ -238,7 +228,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 // console.log('process ID:', pId);
                 if (processId === pId || processManagerId === pId) {
                     disposeEventHandlers();
-                    loadRom();
+                    await loadRom();
+                    setEmulatorRomReady(true);
                 }
             })
         ));
@@ -302,7 +293,6 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             if (soundDataChecksum !== currentSoundDataChecksum) {
                 // console.log('checksums differ, compile song');
                 setSoundDataChecksum(currentSoundDataChecksum);
-                setCurrentPlayerPosition(0);
                 createSoundRom();
             } else {
                 // console.log('checksums are the same, play song');

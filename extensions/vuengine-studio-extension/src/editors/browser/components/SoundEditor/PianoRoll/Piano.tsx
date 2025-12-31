@@ -19,7 +19,7 @@ const StyledPiano = styled.div`
 `;
 
 interface PianoProps {
-    playNote: (note: number) => void
+    playNote: (note: string, instrumentId?: string) => void
     pianoRollNoteHeight: number
 }
 
