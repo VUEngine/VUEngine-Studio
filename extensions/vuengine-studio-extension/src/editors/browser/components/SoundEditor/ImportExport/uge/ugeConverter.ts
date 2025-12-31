@@ -93,28 +93,28 @@ export const convertUgeSong = (song: Song): SoundData => {
         // Duty 1
         {
             allowSkip: false,
-            instrument: 'built-in-1',
+            instrument: '',
             sequence: {},
             type: SoundEditorTrackType.SWEEPMOD
         },
         // Duty 2
         {
             allowSkip: false,
-            instrument: 'built-in-1',
+            instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Wave
         {
             allowSkip: false,
-            instrument: 'built-in-1',
+            instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Noise
         {
             allowSkip: false,
-            instrument: 'built-in-1',
+            instrument: '',
             sequence: {},
             type: SoundEditorTrackType.NOISE
         }];
