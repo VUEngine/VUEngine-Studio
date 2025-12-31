@@ -171,7 +171,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     }
                 },
                 name: 'testPattern',
-                size: 64
+                size: 64,
+                type: testInstrumentId !== ''
+                    ? soundData.instruments[testInstrumentId].type
+                    : soundData.tracks[currentTrackId].type,
             }
         },
         tracks: [{
@@ -805,6 +808,7 @@ A total of {0} patterns will be deleted.',
                     [newPatternId]: {
                         ...newPattern,
                         name: `${newNameLabel} ${newNameNumber}`,
+                        type: track.type,
                         size,
                     }
                 }
@@ -822,7 +826,7 @@ A total of {0} patterns will be deleted.',
         }
     };
 
-    const showPatternSelection = async (size?: number): Promise<QuickPickItem | undefined> =>
+    const showPatternSelection = async (trackId: number, size?: number): Promise<QuickPickItem | undefined> =>
         services.quickPickService.show(
             [
                 {
@@ -830,7 +834,10 @@ A total of {0} patterns will be deleted.',
                     label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
                 },
                 ...Object.keys(soundData.patterns)
-                    .filter(patternId => size === undefined || size <= 1 || soundData.patterns[patternId].size === size)
+                    .filter(patternId =>
+                        soundData.patterns[patternId].type === soundData.tracks[trackId].type &&
+                        (size === undefined || size <= 1 || soundData.patterns[patternId].size === size)
+                    )
                     .map((patternId, i) => ({
                         id: patternId,
                         label: getPatternName(soundData, patternId),
@@ -846,7 +853,7 @@ A total of {0} patterns will be deleted.',
         );
 
     const addPattern = async (trackId: number, step: number, size?: number): Promise<boolean> => {
-        const patternToAdd = await showPatternSelection(size);
+        const patternToAdd = await showPatternSelection(trackId, size);
         if (patternToAdd && patternToAdd.id) {
             await addPatternToSequence(trackId, step, patternToAdd.id, size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE);
             updateCurrentSequenceIndex(currentTrackId, step);
@@ -877,6 +884,7 @@ A total of {0} patterns will be deleted.',
                         if (soundData.loop) {
                             return soundData.loopPoint * SEQUENCER_RESOLUTION;
                         } else {
+                            setPlaying(false);
                             return -1;
                         }
                     }

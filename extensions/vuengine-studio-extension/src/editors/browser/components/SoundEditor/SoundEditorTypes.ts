@@ -110,6 +110,7 @@ export type SequenceMap = Record<number, string>;
 
 export interface PatternConfig {
     name: string
+    type: SoundEditorTrackType
     size: number
     events: EventsMap
 }

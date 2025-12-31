@@ -159,38 +159,3 @@ export const VSU_NOISE_TAP = [
     [9, 42],
     [11, 28],
 ];
-
-export const DEFAULT_VSU_DATA: VsuData = {
-    channels: [...Array(6)].map(c => ({
-        enabled: false,
-        interval: {
-            enabled: false,
-            value: 0,
-        },
-        frequency: 0,
-        waveform: 0,
-        stereoLevels: {
-            left: 0,
-            right: 0,
-        },
-        envelope: {
-            enabled: false,
-            repeat: false,
-            direction: VsuEnvelopeDirection.Decay,
-            initialValue: 0,
-            stepTime: 0,
-        },
-        sweepMod: {
-            enabled: false,
-            repeat: false,
-            function: VsuSweepModulationFunction.Sweep,
-            frequency: 0,
-            interval: 0,
-            direction: VsuSweepDirection.Down,
-            shift: 0,
-        },
-        tap: 0,
-    })) as VsuChannelData[],
-    waveforms: [...Array(6)].map((c, i) => [...Array(32)].map(w => 0)),
-    modulation: [...Array(32)].map(w => 0),
-};

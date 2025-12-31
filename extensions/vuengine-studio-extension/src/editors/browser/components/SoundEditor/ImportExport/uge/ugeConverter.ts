@@ -226,7 +226,6 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                type: SoundEditorTrackType.WAVE,
                 color: DUTY_COLORS[index],
                 envelope: {
                     direction: i.volume_sweep_change > 0
@@ -271,6 +270,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                     )
                 },
                 tap: 0,
+                type: SoundEditorTrackType.WAVE,
                 volume: {
                     left: 15,
                     right: 15
@@ -292,7 +292,6 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                type: SoundEditorTrackType.WAVE,
                 color: WAVE_COLORS[index],
                 envelope: {
                     direction: VsuEnvelopeDirection.Decay,
@@ -325,6 +324,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
                     shift: VSU_SWEEP_MODULATION_SHIFT_MIN
                 },
                 tap: 0,
+                type: SoundEditorTrackType.WAVE,
                 volume: {
                     left: 15,
                     right: 15
@@ -345,7 +345,6 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                type: SoundEditorTrackType.NOISE,
                 color: NOISE_COLORS[index],
                 envelope: {
                     direction: (i.volume_sweep_change) > 0
@@ -384,6 +383,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
                     shift: VSU_SWEEP_MODULATION_SHIFT_MIN
                 },
                 tap: 0,
+                type: SoundEditorTrackType.NOISE,
                 volume: {
                     left: 15,
                     right: 15
@@ -408,28 +408,32 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
             patternConfig: {
                 events: {},
                 name: `Duty1-${correctedDisplayIndex}`,
-                size: CONVERTED_PATTERN_SIZE
+                size: CONVERTED_PATTERN_SIZE,
+                type: SoundEditorTrackType.WAVE,
             }
         }, {
             id: nanoid(),
             patternConfig: {
                 events: {},
                 name: `Duty2-${correctedDisplayIndex}`,
-                size: CONVERTED_PATTERN_SIZE
+                size: CONVERTED_PATTERN_SIZE,
+                type: SoundEditorTrackType.SWEEPMOD,
             }
         }, {
             id: nanoid(),
             patternConfig: {
                 events: {},
                 name: `Wave-${correctedDisplayIndex}`,
-                size: CONVERTED_PATTERN_SIZE
+                size: CONVERTED_PATTERN_SIZE,
+                type: SoundEditorTrackType.WAVE,
             }
         }, {
             id: nanoid(),
             patternConfig: {
                 events: {},
                 name: `Noise-${correctedDisplayIndex}`,
-                size: CONVERTED_PATTERN_SIZE
+                size: CONVERTED_PATTERN_SIZE,
+                type: SoundEditorTrackType.NOISE,
             }
         }];
 

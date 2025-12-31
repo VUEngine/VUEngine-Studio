@@ -30,7 +30,6 @@ import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
 
 const DEFAULT_INSTRUMENT_ID = 'default';
 const DEFAULT_INSTRUMENT = {
-    type: SoundEditorTrackType.WAVE,
     color: 4,
     envelope: {
         direction: VsuEnvelopeDirection.Decay,
@@ -57,6 +56,7 @@ const DEFAULT_INSTRUMENT = {
         shift: VSU_SWEEP_MODULATION_SHIFT_MIN
     },
     tap: 0,
+    type: SoundEditorTrackType.WAVE,
     volume: {
         left: 15,
         right: 15
@@ -277,7 +277,6 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
         result.push({
             id: nanoid(),
             instrumentConfig: {
-                type: SoundEditorTrackType.WAVE,
                 color: index * 8 % COLOR_PALETTE.length,
                 envelope: {
                     direction: VsuEnvelopeDirection.Decay,
@@ -304,6 +303,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                     shift: VSU_SWEEP_MODULATION_SHIFT_MIN
                 },
                 tap: 0,
+                type: SoundEditorTrackType.WAVE,
                 volume: {
                     left: 15,
                     right: 15
@@ -326,7 +326,12 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             patternConfig: {
                 events: {},
                 name: `CH${pattern.Channel + 1}-${pattern.ID + 1}`,
-                size: convertedPatternSize
+                size: convertedPatternSize,
+                type: pattern.Channel === 5
+                    ? SoundEditorTrackType.NOISE
+                    : pattern.Channel === 4
+                        ? SoundEditorTrackType.SWEEPMOD
+                        : SoundEditorTrackType.WAVE,
             }
         };
 
