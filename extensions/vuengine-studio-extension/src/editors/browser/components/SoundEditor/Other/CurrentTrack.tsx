@@ -76,17 +76,17 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                 default:
                                 case SoundEditorTrackType.WAVE:
                                     return {
-                                        label: `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`,
+                                        label: `${TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE]} ${i + 1}`,
                                         value: i.toString(),
                                     };
                                 case SoundEditorTrackType.SWEEPMOD:
                                     return {
-                                        label: nls.localize('vuengine/editors/sound/waveSweepModulation', 'Wave (Sweep/Modulation)'),
+                                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
                                         value: i.toString(),
                                     };
                                 case SoundEditorTrackType.NOISE:
                                     return {
-                                        label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
+                                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
                                         value: i.toString(),
                                     };
                             }
@@ -115,7 +115,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
 
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/editors/sound/trackType', 'Track Type')}
+                    {nls.localize('vuengine/editors/sound/type', 'Type')}
                 </label>
                 <AdvancedSelect
                     options={[

@@ -8,7 +8,17 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import { getPatternName } from '../SoundEditor';
-import { INPUT_BLOCKING_COMMANDS, MAX_PATTERN_SIZE, MIN_PATTERN_SIZE, PatternConfig, SequenceMap, SoundData, TrackConfig } from '../SoundEditorTypes';
+import {
+    INPUT_BLOCKING_COMMANDS,
+    MAX_PATTERN_SIZE,
+    MIN_PATTERN_SIZE,
+    PatternConfig,
+    SequenceMap,
+    SoundData,
+    SoundEditorTrackType,
+    TRACK_TYPE_LABELS,
+    TrackConfig
+} from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentPatternProps {
@@ -35,6 +45,10 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
 
     const setPatternName = (name: string): void => {
         setPattern(currentPatternId, { name });
+    };
+
+    const setPatternType = (type: SoundEditorTrackType): void => {
+        setPattern(currentPatternId, { type });
     };
 
     const cloneCurrentPattern = () => {
@@ -126,6 +140,27 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     value={pattern.name ?? ''}
                     setValue={setPatternName}
                     commands={INPUT_BLOCKING_COMMANDS}
+                />
+            </VContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/type', 'Type')}
+                </label>
+                <AdvancedSelect
+                    options={[{
+                        value: SoundEditorTrackType.WAVE,
+                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
+                    }, {
+                        value: SoundEditorTrackType.SWEEPMOD,
+                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
+                    }, {
+                        value: SoundEditorTrackType.NOISE,
+                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
+                    }]}
+                    defaultValue={pattern.type}
+                    onChange={options => setPatternType(options[0] as SoundEditorTrackType)}
+                    commands={INPUT_BLOCKING_COMMANDS}
+                    containerStyle={{ flexGrow: 1 }}
                 />
             </VContainer>
             <VContainer>

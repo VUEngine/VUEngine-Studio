@@ -36,7 +36,7 @@ import {
     VsuSweepModulationFunction
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
-import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID, WAVEFORM_MAX } from '../SoundEditorTypes';
+import { INPUT_BLOCKING_COMMANDS, InstrumentMap, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID, TRACK_TYPE_LABELS, WAVEFORM_MAX } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ColoredDiv = styled.div`
@@ -380,14 +380,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     </label>
                     <AdvancedSelect
                         options={[{
-                            label: nls.localize('vuengine/editors/sound/wave', 'Wave'),
                             value: SoundEditorTrackType.WAVE,
+                            label: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
                         }, {
-                            label: nls.localize('vuengine/editors/sound/waveSweepModulation', 'Wave (Sweep/Modulation)'),
                             value: SoundEditorTrackType.SWEEPMOD,
+                            label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
                         }, {
-                            label: nls.localize('vuengine/editors/sound/noise', 'Noise'),
                             value: SoundEditorTrackType.NOISE,
+                            label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
                         }]}
                         defaultValue={instrument.type}
                         onChange={options => setType(options[0] as SoundEditorTrackType)}

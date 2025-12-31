@@ -409,7 +409,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                 events: {},
                 name: `Duty1-${correctedDisplayIndex}`,
                 size: CONVERTED_PATTERN_SIZE,
-                type: SoundEditorTrackType.WAVE,
+                type: SoundEditorTrackType.SWEEPMOD,
             }
         }, {
             id: nanoid(),
@@ -417,7 +417,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                 events: {},
                 name: `Duty2-${correctedDisplayIndex}`,
                 size: CONVERTED_PATTERN_SIZE,
-                type: SoundEditorTrackType.SWEEPMOD,
+                type: SoundEditorTrackType.WAVE,
             }
         }, {
             id: nanoid(),

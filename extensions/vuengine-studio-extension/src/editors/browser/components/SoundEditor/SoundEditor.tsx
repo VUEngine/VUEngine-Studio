@@ -77,12 +77,12 @@ const StyledLowerContainer = styled.div`
 export const getTrackName = (type: SoundEditorTrackType, i: number): string => {
     switch (type) {
         case SoundEditorTrackType.NOISE:
-            return nls.localize('vuengine/editors/sound/noise', 'Noise');
+            return TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE];
         case SoundEditorTrackType.SWEEPMOD:
-            return nls.localize('vuengine/editors/sound/waveSmShort', 'Wave (SM)');
+            return nls.localize('vuengine/editors/sound/trackType/sweepModShort', 'Wave + SM');
         default:
         case SoundEditorTrackType.WAVE:
-            return `${nls.localize('vuengine/editors/sound/wave', 'Wave')} ${i + 1}`;
+            return `${TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE]} ${i + 1}`;
     }
 };
 
@@ -1289,7 +1289,7 @@ A total of {0} patterns will be deleted.',
                     onOk={() => setPatternDialogOpen(false)}
                     title={nls.localize('vuengine/editors/sound/editPattern', 'Edit Pattern')
                     }
-                    height='320px'
+                    height='350px'
                     width='320px'
                     overflow='visible'
                 >
