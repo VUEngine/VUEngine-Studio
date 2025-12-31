@@ -223,9 +223,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <StyledSoundEditorToolbarTime>
                         <span>
                             {currentPlayerPosition > -1
-                                ? Math.floor(currentPlayerPosition / 1000 / 60) + ':' +
-                                Math.floor((currentPlayerPosition / 1000) % 60).toString().padStart(2, '0') + ',' +
-                                Math.floor((currentPlayerPosition / 100) % 10)
+                                ? Math.floor(currentPlayerPosition * soundData.speed / 1000 / 60) + ':' +
+                                Math.floor((currentPlayerPosition * soundData.speed / 1000) % 60).toString().padStart(2, '0') + ',' +
+                                Math.floor((currentPlayerPosition * soundData.speed / 100) % 10)
                                 : '0:00,0'
                             }
                         </span>

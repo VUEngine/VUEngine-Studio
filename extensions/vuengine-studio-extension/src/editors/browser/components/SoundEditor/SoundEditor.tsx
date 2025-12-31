@@ -558,8 +558,10 @@ A total of {0} patterns will be deleted.',
     };
 
     const togglePlaying = (): void => {
-        if (currentPlayerPosition === -1) {
-            setCurrentPlayerPosition(playRangeStart);
+        if (!playing) {
+            setCurrentPlayerPosition(-1);
+        } else {
+            setCurrentPlayerPosition(playRangeStart > -1 ? playRangeStart : 0);
         }
         setPlaying(!playing);
         setTesting(false);
