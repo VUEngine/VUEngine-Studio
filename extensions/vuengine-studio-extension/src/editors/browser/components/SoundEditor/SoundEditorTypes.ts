@@ -293,6 +293,8 @@ export const NOTE_RESOLUTION = 16; // 1/16 note
 export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 export const BAR_NOTE_RESOLUTION = NOTE_RESOLUTION * SUB_NOTE_RESOLUTION;
 
+export const DEFAULT_PLAY_RANGE_SIZE = 64;
+
 export const SEQUENCER_RESOLUTION = 4;
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
 export const SEQUENCER_PATTERN_HEIGHT_MAX = 64;

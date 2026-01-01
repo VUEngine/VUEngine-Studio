@@ -132,6 +132,10 @@ interface SequencerProps {
     pianoRollScrollWindow: ScrollWindow
     removePatternFromSequence: (trackId: number, step: number) => void
     trackSettings: TrackSettings[]
+    playRangeStart: number
+    setPlayRangeStart: (playRangeStart: number) => void
+    playRangeEnd: number
+    setPlayRangeEnd: (playRangeEnd: number) => void
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -154,6 +158,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         pianoRollScrollWindow,
         removePatternFromSequence,
         trackSettings,
+        playRangeStart, setPlayRangeStart,
+        playRangeEnd, setPlayRangeEnd,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [dragStartTrackId, setDragStartTrackId] = useState<number>(-1);
@@ -410,6 +416,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 soundData={soundData}
                 currentTrackId={currentTrackId}
                 addPattern={addPattern}
+                playRangeStart={playRangeStart}
+                setPlayRangeStart={setPlayRangeStart}
+                playRangeEnd={playRangeEnd}
+                setPlayRangeEnd={setPlayRangeEnd}
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
                 dragStartTrackId={dragStartTrackId}

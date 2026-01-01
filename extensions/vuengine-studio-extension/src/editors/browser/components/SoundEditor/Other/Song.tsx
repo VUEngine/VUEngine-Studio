@@ -8,12 +8,12 @@ import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS, MAX_SEQUENCE_SIZE, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
 
-interface SongProps {
+interface PropertiesProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
 }
 
-export default function Song(props: SongProps): React.JSX.Element {
+export default function Properties(props: PropertiesProps): React.JSX.Element {
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { soundData, updateSoundData } = props;
 
@@ -83,6 +83,7 @@ export default function Song(props: SongProps): React.JSX.Element {
                 onChange={e => setComment(e.target.value)}
                 onFocus={handleOnFocus}
                 onBlur={handleOnBlur}
+                onKeyDown={e => e.stopPropagation()} // allow to use enter key
                 style={{ resize: 'none' }}
             />
         </VContainer>

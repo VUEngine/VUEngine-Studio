@@ -25,7 +25,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         playing,
         setEmulatorInitialized, setEmulatorRomReady,
         currentPlayerPosition,
-        // playRangeStart, playRangeEnd,
+        playRangeStart, playRangeEnd,
         trackSettings,
     } = props;
     const [soundSpecTemplateString, setSoundSpecTemplateString] = useState<string>('');
@@ -104,6 +104,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const generateSpecFile = async (): Promise<void> => {
         // console.log('--- 3) generateSpecFile ---');
         const specFileUri = tempBaseDir?.resolve('SoundSpec.c');
+        // console.log('specFileUri: ', specFileUri?.path.fsPath());
         await services.vesCodeGenService.renderTemplateToFile(
             'SoundSpec',
             specFileUri!,
@@ -114,8 +115,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
                 itemUri: new URI('Dummy.sound'),
                 isSoundEditorPreview: true,
                 trackSettings,
-                // playRangeStart: playRangeStart > -1 ? playRangeStart : 0,
-                // playRangeEnd: playRangeEnd > -1 ? playRangeEnd : 0,
+                startFromSramTick: false, // currentPlayerPosition > 0,
+                playRangeStart: playRangeStart,
+                playRangeEnd: playRangeEnd,
             },
             ProjectDataTemplateEncoding.utf8,
             true
@@ -286,7 +288,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             // console.log('compare checksums');
             const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify({
                 soundData: soundData,
-                trackSettings: trackSettings,
+                trackSettings,
+                playRangeStart,
+                playRangeEnd,
             }));
             // console.log('current:', currentSoundDataChecksum);
             // console.log('previous:', soundDataChecksum);
@@ -303,17 +307,30 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             }
         } else {
             core.suspend(sim);
-            if (currentPlayerPosition === -1) {
-                sim.reset();
-            }
         }
     }, [
         core,
-        currentPlayerPosition,
         playing,
         sim,
         soundData,
         trackSettings,
+        playRangeStart,
+        playRangeEnd,
+    ]);
+
+    useEffect(() => {
+        if (!core || !sim) {
+            return;
+        }
+
+        if (!playing && currentPlayerPosition === -1) {
+            sim.reset();
+        }
+    }, [
+        core,
+        playing,
+        sim,
+        currentPlayerPosition,
     ]);
 
     return <></>;

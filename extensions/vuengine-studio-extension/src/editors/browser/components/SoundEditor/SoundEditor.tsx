@@ -23,7 +23,7 @@ import Instruments from './Instruments/Instruments';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
 import { getMaxNoteDuration } from './Other/Note';
-import Song from './Other/Song';
+import Properties from './Other/Song';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -147,19 +147,12 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
     const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
-    const [songSettingsDialogOpen, setSongSettingsDialogOpen] = useState<boolean>(false);
+    const [propertiesDialogOpen, setPropertiesDialogOpen] = useState<boolean>(false);
     const [trackDialogOpen, setTrackDialogOpen] = useState<boolean>(false);
     const [patternDialogOpen, setPatternDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
-
-    const updatePlayRangeStart = (value: number) => {
-        if (currentPlayerPosition > -1) {
-            setCurrentPlayerPosition(value);
-        }
-        setPlayRangeStart(value);
-    };
 
     const getTestSoundData = (): SoundData => ({
         ...soundData,
@@ -650,7 +643,7 @@ A total of {0} instruments will be deleted.",
 
     const stopPlaying = (): void => {
         setPlaying(false);
-        setCurrentPlayerPosition(playRangeStart);
+        setCurrentPlayerPosition(-1);
     };
 
     const toggleTrackMuted = (trackId: number): void => {
@@ -1011,7 +1004,9 @@ A total of {0} instruments will be deleted.",
             }
             setProgressTimeout(setInterval(() => {
                 setCurrentPlayerPosition(prev => {
-                    const newPosition = prev + resolution;
+                    const newPosition = playRangeStart > -1 && playRangeEnd > - 1 && (prev < playRangeStart || prev >= playRangeEnd)
+                        ? playRangeStart
+                        : prev + resolution;
                     if (newPosition >= songSize) {
                         if (soundData.loop) {
                             return soundData.loopPoint * SEQUENCER_RESOLUTION;
@@ -1157,6 +1152,8 @@ A total of {0} instruments will be deleted.",
         testNote,
         emulatorRomReady,
         playing,
+        playRangeStart,
+        playRangeEnd,
         soundData.loop,
         soundData.loopPoint,
         soundData.speed,
@@ -1209,8 +1206,8 @@ A total of {0} instruments will be deleted.",
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     toolsDialogOpen={toolsDialogOpen}
                     setToolsDialogOpen={setToolsDialogOpen}
-                    songSettingsDialogOpen={songSettingsDialogOpen}
-                    setSongSettingsDialogOpen={setSongSettingsDialogOpen}
+                    propertiesDialogOpen={propertiesDialogOpen}
+                    setPropertiesDialogOpen={setPropertiesDialogOpen}
                     setNoteEvent={setNoteEvent}
                     setTrack={setTrack}
                 />
@@ -1254,6 +1251,10 @@ A total of {0} instruments will be deleted.",
                                 setPatternSize={setPatternSize}
                                 removePatternFromSequence={removePatternFromSequence}
                                 trackSettings={trackSettings}
+                                playRangeStart={playRangeStart}
+                                setPlayRangeStart={setPlayRangeStart}
+                                playRangeEnd={playRangeEnd}
+                                setPlayRangeEnd={setPlayRangeEnd}
                             />
                         }
                         <StyledLowerContainer>
@@ -1276,7 +1277,7 @@ A total of {0} instruments will be deleted.",
                                 currentSequenceIndex={currentSequenceIndex}
                                 setCurrentSequenceIndex={updateCurrentSequenceIndex}
                                 playRangeStart={playRangeStart}
-                                setPlayRangeStart={updatePlayRangeStart}
+                                setPlayRangeStart={setPlayRangeStart}
                                 playRangeEnd={playRangeEnd}
                                 setPlayRangeEnd={setPlayRangeEnd}
                                 playNote={playNote}
@@ -1336,18 +1337,18 @@ A total of {0} instruments will be deleted.",
                     />
                 </PopUpDialog>
             }
-            {songSettingsDialogOpen &&
+            {propertiesDialogOpen &&
                 <PopUpDialog
-                    open={songSettingsDialogOpen}
-                    onClose={() => setSongSettingsDialogOpen(false)}
-                    onOk={() => setSongSettingsDialogOpen(false)}
+                    open={propertiesDialogOpen}
+                    onClose={() => setPropertiesDialogOpen(false)}
+                    onOk={() => setPropertiesDialogOpen(false)}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     height='460px'
                     width='460px'
                     overflow='visible'
                 >
                     <VContainer gap={15}>
-                        <Song
+                        <Properties
                             soundData={soundData}
                             updateSoundData={updateSoundData}
                         />

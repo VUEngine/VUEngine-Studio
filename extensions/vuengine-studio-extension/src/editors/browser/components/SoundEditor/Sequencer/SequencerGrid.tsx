@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
+    NOTE_RESOLUTION,
     SCROLL_BAR_WIDTH,
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
@@ -21,6 +22,10 @@ interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
     addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
+    playRangeStart: number
+    setPlayRangeStart: (playRangeStart: number) => void
+    playRangeEnd: number
+    setPlayRangeEnd: (playRangeEnd: number) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     dragStartTrackId: number
@@ -37,6 +42,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         soundData,
         currentTrackId,
         addPattern,
+        playRangeStart, // setPlayRangeStart,
+        playRangeEnd, // setPlayRangeEnd,
         sequencerPatternHeight, sequencerPatternWidth,
         dragStartTrackId, setDragStartTrackId,
         dragStartStep, setDragStartStep,
@@ -116,6 +123,31 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 : `rgba(${c}, ${c}, ${c}, .4)`;
             context.stroke();
         }
+
+        // play range
+        if (playRangeStart > -1 && playRangeEnd > -1) {
+            context.strokeStyle = services.colorRegistry.getCurrentColor('focusBorder')!;
+            context.fillStyle = context.strokeStyle;
+            const leftOffset = playRangeStart * sequencerPatternWidth / NOTE_RESOLUTION - sequencerScrollWindow.x - 0.5;
+            const rightOffset = playRangeEnd * sequencerPatternWidth / NOTE_RESOLUTION - sequencerScrollWindow.x - 0.5;
+
+            context.beginPath();
+            context.moveTo(leftOffset, 0.5);
+            context.lineTo(rightOffset, 0.5);
+            context.stroke();
+
+            context.beginPath();
+            context.moveTo(leftOffset, 0.5);
+            context.lineTo(leftOffset, 0.5 + SEQUENCER_GRID_METER_HEIGHT / 2);
+            context.lineTo(leftOffset + SEQUENCER_GRID_METER_HEIGHT / 2, 0.5);
+            context.fill();
+
+            context.beginPath();
+            context.moveTo(rightOffset, 0.5);
+            context.lineTo(rightOffset, 0.5 + SEQUENCER_GRID_METER_HEIGHT / 2);
+            context.lineTo(rightOffset - SEQUENCER_GRID_METER_HEIGHT / 2, 0.5);
+            context.fill();
+        }
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -182,6 +214,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         soundData.size,
         soundData.tracks.length,
         currentTrackId,
+        playRangeStart,
+        playRangeEnd,
         sequencerPatternHeight,
         sequencerPatternWidth,
         sequencerScrollWindow.x,

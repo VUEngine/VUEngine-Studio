@@ -438,7 +438,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     />
                 </VContainer>
             </HContainer>
-            <HContainer gap={40} wrap='wrap' overflow='auto'>
+            <HContainer gap={40} grow={1} wrap='wrap' overflow='auto'>
                 <VContainer gap={20} style={{ minWidth: 260 }}>
                     <VContainer>
                         <label>

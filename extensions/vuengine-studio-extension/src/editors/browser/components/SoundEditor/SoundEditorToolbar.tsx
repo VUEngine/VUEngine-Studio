@@ -23,6 +23,7 @@ import {
     TRACK_DEFAULT_INSTRUMENT_ID,
     TrackConfig,
 } from './SoundEditorTypes';
+import VContainer from '../Common/Base/VContainer';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -68,6 +69,9 @@ export const StyledSoundEditorToolbarWideButton = styled(StyledSoundEditorToolba
 export const StyledSoundEditorToolbarSizeButton = styled(StyledSoundEditorToolbarButton)`
     font-size: 11px;
     letter-spacing: -1px;
+    font-size: 9px;
+    max-height: 12px !important;
+    min-height: 12px !important;
     min-width: 26px !important;
     width: 26px;
 `;
@@ -118,8 +122,8 @@ interface SoundEditorToolbarProps {
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     toolsDialogOpen: boolean
     setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
-    songSettingsDialogOpen: boolean
-    setSongSettingsDialogOpen: Dispatch<SetStateAction<boolean>>
+    propertiesDialogOpen: boolean
+    setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
 }
@@ -140,7 +144,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         emulatorInitialized,
         currentInstrumentId, setCurrentInstrumentId,
         toolsDialogOpen, setToolsDialogOpen,
-        songSettingsDialogOpen, setSongSettingsDialogOpen,
+        propertiesDialogOpen, setPropertiesDialogOpen,
         setNoteEvent,
         setTrack,
     } = props;
@@ -349,20 +353,22 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     </InputWithAction>
                 </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarSizeButton
-                        className="theia-button secondary"
-                        onClick={() => decreaseSize(4)}
-                        title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                    >
-                        <Minus size={10} />4
-                    </StyledSoundEditorToolbarSizeButton>
-                    <StyledSoundEditorToolbarSizeButton
-                        className="theia-button secondary"
-                        onClick={() => decreaseSize(1)}
-                        title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                    >
-                        <Minus size={10} />1
-                    </StyledSoundEditorToolbarSizeButton>
+                    <VContainer gap={2}>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => decreaseSize(1)}
+                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
+                        >
+                            <Minus size={10} />1
+                        </StyledSoundEditorToolbarSizeButton>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => decreaseSize(4)}
+                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
+                        >
+                            <Minus size={10} />4
+                        </StyledSoundEditorToolbarSizeButton>
+                    </VContainer>
                     <Input
                         type="number"
                         value={soundData.size}
@@ -373,27 +379,29 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         width={48}
                         commands={INPUT_BLOCKING_COMMANDS}
                     />
-                    <StyledSoundEditorToolbarSizeButton
-                        className="theia-button secondary"
-                        onClick={() => increaseSize(1)}
-                        title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                    >
-                        <Plus size={10} />1
-                    </StyledSoundEditorToolbarSizeButton>
-                    <StyledSoundEditorToolbarSizeButton
-                        className="theia-button secondary"
-                        onClick={() => increaseSize(4)}
-                        title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                    >
-                        <Plus size={10} />4
-                    </StyledSoundEditorToolbarSizeButton>
+                    <VContainer gap={2}>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => increaseSize(1)}
+                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
+                        >
+                            <Plus size={10} />1
+                        </StyledSoundEditorToolbarSizeButton>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => increaseSize(4)}
+                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
+                        >
+                            <Plus size={10} />4
+                        </StyledSoundEditorToolbarSizeButton>
+                    </VContainer>
                 </StyledSoundEditorToolbarGroup>
             </>}
             <StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarButton
-                    className={`theia-button ${songSettingsDialogOpen ? 'primary' : 'secondary'}`}
+                    className={`theia-button ${propertiesDialogOpen ? 'primary' : 'secondary'}`}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
-                    onClick={() => setSongSettingsDialogOpen(prev => !prev)}
+                    onClick={() => setPropertiesDialogOpen(prev => !prev)}
                 >
                     <FadersHorizontal size={17} />
                 </StyledSoundEditorToolbarButton>

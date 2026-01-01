@@ -29,7 +29,6 @@ import {
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
-import PianoRollHeaderPlacedPattern from './PianoRollHeaderPlacedPattern';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
 
 const StyledPianoRollContainer = styled.div`
@@ -281,45 +280,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
     };
 
-    const placedPatterns = useMemo(() => {
-        const patterns: React.JSX.Element[] = [];
-
-        const track = soundData.tracks[currentTrackId];
-
-        Object.keys(track?.sequence ?? {}).forEach(key => {
-            const step = parseInt(key);
-            const patternId = track.sequence[step];
-            const p = soundData.patterns[patternId];
-            if (!p) {
-                return;
-            }
-            const xOffset = PIANO_ROLL_KEY_WIDTH + 2 + step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
-            patterns.push(<PianoRollHeaderPlacedPattern
-                key={key}
-                soundData={soundData}
-                step={step}
-                patternId={patternId}
-                patternSize={p.size}
-                selected={patternId === currentPatternId && step === currentSequenceIndex}
-                current={patternId === currentPatternId}
-                currentTrackId={currentTrackId}
-                left={xOffset}
-                pianoRollNoteWidth={pianoRollNoteWidth}
-                removePatternFromSequence={removePatternFromSequence}
-                setCurrentSequenceIndex={setCurrentSequenceIndex}
-                setPatternDialogOpen={setPatternDialogOpen}
-            />);
-        });
-
-        return patterns;
-    }, [
-        soundData,
-        currentTrackId,
-        currentPatternId,
-        currentSequenceIndex,
-        pianoRollNoteWidth,
-    ]);
-
     const placedNotesCurrentPattern = useMemo(() => {
         const track = soundData.tracks[currentTrackId];
         const patternId = track?.sequence[currentSequenceIndex];
@@ -530,7 +490,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
             />}
-            {placedPatterns}
             {placedNotesCurrentPattern}
             <StyledToggleButtonContainer>
                 <StyledToggleButton
@@ -556,6 +515,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </StyledToggleButtonContainer>
             <PianoRollHeader
                 soundData={soundData}
+                currentTrackId={currentTrackId}
+                currentPatternId={currentPatternId}
+                currentSequenceIndex={currentSequenceIndex}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}
@@ -563,6 +525,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                setPatternDialogOpen={setPatternDialogOpen}
+                removePatternFromSequence={removePatternFromSequence}
             />
             <PianoRollEditor
                 soundData={soundData}
