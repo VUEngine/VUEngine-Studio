@@ -1,6 +1,6 @@
-import { nls, QuickPickItem, QuickPickOptions, QuickPickSeparator, URI } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
-import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
+import { environment, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator, URI } from '@theia/core';
+import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
+import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
 import { nanoid } from 'nanoid';
 import React, { useContext, useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import Emulator from './Emulator/Emulator';
+import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import EventList from './EventList';
 import ImportExport from './ImportExport/ImportExport';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
@@ -159,6 +160,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
+    const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
 
     const getTestSoundData = (): SoundData => ({
         ...soundData,
@@ -927,9 +929,49 @@ A total of {0} instruments will be deleted.",
         return false;
     };
 
+    const confirmOverwrite = async (uri: URI): Promise<boolean> => {
+        // We only need this in browsers. Electron brings up the OS-level confirmation dialog instead.
+        if (environment.electron.is()) {
+            return true;
+        }
+        const confirmed = await new ConfirmDialog({
+            title: nls.localize('vuengine/editors/sound/overwrite', 'Overwrite'),
+            msg: nls.localize('vuengine/editors/sound/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.path.fsPath()),
+        }).open();
+        return !!confirmed;
+    };
+
     const exportFile = async (): Promise<void> => {
-        // TODO
-        alert('not yet implemented');
+        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, playRangeStart, playRangeEnd, trackSettings);
+        let exists: boolean = false;
+        let overwrite: boolean = false;
+        let selected: URI | undefined;
+        const saveFilterDialogProps: SaveFileDialogProps = {
+            title: nls.localize('vuengine/export/exportRom', 'Export ROM'),
+            inputValue: `${fileUri.path.name}.vb`,
+        };
+        const homedir = await services.envVariablesServer.getHomeDirUri();
+        const romStat = await services.fileService.resolve(new URI(homedir).withScheme('file'));
+        do {
+            selected = await services.fileDialogService.showSaveDialog(
+                saveFilterDialogProps,
+                romStat
+            );
+            if (selected) {
+                exists = await services.fileService.exists(selected);
+                if (exists) {
+                    overwrite = await confirmOverwrite(selected);
+                }
+            }
+        } while (selected && exists && !overwrite);
+        if (selected) {
+            try {
+                await services.commandService.executeCommand(CommonCommands.SAVE.id);
+                await services.fileService.copy(romUri, selected, { overwrite });
+            } catch (e) {
+                console.warn(e);
+            }
+        }
     };
 
     const importFile = async (): Promise<void> => {
@@ -1191,6 +1233,7 @@ A total of {0} instruments will be deleted.",
                 playing={playing}
                 setEmulatorInitialized={setEmulatorInitialized}
                 setEmulatorRomReady={setEmulatorRomReady}
+                playerRomBuilder={playerRomBuilder}
                 currentPlayerPosition={currentPlayerPosition}
                 soundData={testNote ? getTestSoundData() : soundData}
                 playRangeStart={playRangeStart}

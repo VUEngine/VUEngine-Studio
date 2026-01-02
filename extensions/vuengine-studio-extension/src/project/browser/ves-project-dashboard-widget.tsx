@@ -13,6 +13,7 @@ import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
@@ -47,6 +48,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(EnvVariablesServer)
+    protected readonly envVariablesServer: EnvVariablesServer;
     @inject(FileService)
     protected readonly fileService: FileService;
     @inject(FileDialogService)
@@ -195,6 +198,7 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
+                            envVariablesServer: this.envVariablesServer,
                             fileService: this.fileService,
                             fileDialogService: this.fileDialogService,
                             hoverService: this.hoverService,

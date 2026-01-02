@@ -21,10 +21,12 @@ import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { UndoRedoService } from '@theia/editor/lib/browser/undo-redo-service';
+import { EditorPreferences } from '@theia/editor/lib/common/editor-preferences';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
@@ -43,7 +45,6 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
-import { EditorPreferences } from '@theia/editor/lib/common/editor-preferences';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -63,6 +64,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly commandService: CommandService;
     @inject(EditorPreferences)
     protected readonly editorPreferences: EditorPreferences;
+    @inject(EnvVariablesServer)
+    protected readonly envVariablesServer: EnvVariablesServer;
     @inject(FileDialogService)
     protected readonly fileDialogService: FileDialogService;
     @inject(FileService)
@@ -488,6 +491,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
+                            envVariablesServer: this.envVariablesServer,
                             fileService: this.fileService,
                             fileDialogService: this.fileDialogService,
                             hoverService: this.hoverService,

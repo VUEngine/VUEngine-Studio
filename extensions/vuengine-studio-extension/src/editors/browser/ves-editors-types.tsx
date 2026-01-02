@@ -8,6 +8,7 @@ import {
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -25,6 +26,7 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
     commandService: CommandService
+    envVariablesServer: EnvVariablesServer
     fileDialogService: FileDialogService
     fileService: FileService
     hoverService: HoverService
