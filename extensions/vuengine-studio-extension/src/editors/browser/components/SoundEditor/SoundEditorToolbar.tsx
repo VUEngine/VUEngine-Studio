@@ -7,7 +7,7 @@ import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import Input from '../Common/Base/Input';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
-import { getInstrumentName } from './SoundEditor';
+import { getInstrumentName, SetNoteEventProps } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
@@ -112,7 +112,7 @@ interface SoundEditorToolbarProps {
     currentPatternId: string
     currentPlayerPosition: number
     currentSequenceIndex: number
-    noteCursor: number
+    selectedNotes: number[]
     playing: boolean
     noteSnapping: boolean
     newNoteDuration: number
@@ -124,7 +124,7 @@ interface SoundEditorToolbarProps {
     setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
     propertiesDialogOpen: boolean
     setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
-    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
+    setNoteEvent: (notes: SetNoteEventProps[]) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
 }
 
@@ -137,7 +137,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentPatternId,
         currentPlayerPosition,
         currentSequenceIndex,
-        noteCursor,
+        selectedNotes,
         playing,
         noteSnapping,
         newNoteDuration, setNewNoteDuration,
@@ -323,9 +323,21 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                 if (currentPattern === undefined) {
                                     return;
                                 }
-                                const localStep = noteCursor - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-                                if (currentPattern.events[localStep] && currentPattern.events[localStep][SoundEvent.Note]) {
-                                    setNoteEvent(localStep, SoundEvent.Instrument, instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined);
+
+                                const setNoteEventProps: SetNoteEventProps[] = [];
+                                selectedNotes.forEach(n => {
+                                    const localStep = n - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+                                    if (currentPattern.events[localStep] && currentPattern.events[localStep][SoundEvent.Note]) {
+                                        setNoteEventProps.push({
+                                            step: localStep,
+                                            event: SoundEvent.Instrument,
+                                            value: instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined
+                                        });
+                                    }
+                                });
+
+                                if (setNoteEventProps.length) {
+                                    setNoteEvent(setNoteEventProps);
                                 }
                             }}
                             backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}

@@ -72,6 +72,12 @@ export interface SetNoteProps {
     duration?: number
 }
 
+export interface SetNoteEventProps {
+    step: number
+    event: SoundEvent
+    value?: any
+}
+
 const StyledLowerContainer = styled.div` 
     display: flex;
     flex-flow: row;
@@ -771,7 +777,7 @@ A total of {0} instruments will be deleted.",
         });
     };
 
-    const setNoteEvent = (step: number, event: SoundEvent, value?: any): void => {
+    const setNoteEvent = (notes: SetNoteEventProps[]): void => {
         const currentPattern = soundData.patterns[currentPatternId];
 
         if (currentPattern === undefined) {
@@ -780,21 +786,24 @@ A total of {0} instruments will be deleted.",
 
         const updatedEvents: EventsMap = {
             ...currentPattern.events,
-            [step]: {
-                ...(currentPattern.events[step] ?? {})
-            }
         };
 
-        if (value === undefined) {
-            delete (updatedEvents[step][event]);
-        } else {
-            updatedEvents[step][event] = value;
-        }
+        notes.forEach(n => {
+            updatedEvents[n.step] = {
+                ...(currentPattern.events[n.step] ?? {})
+            };
 
-        // remove step, if empty
-        if (Object.keys(updatedEvents[step]).length === 0) {
-            delete (updatedEvents[step]);
-        }
+            if (n.value === undefined) {
+                delete (updatedEvents[n.step][n.event]);
+            } else {
+                updatedEvents[n.step][n.event] = n.value;
+            }
+
+            // remove step, if empty
+            if (Object.keys(updatedEvents[n.step]).length === 0) {
+                delete (updatedEvents[n.step]);
+            }
+        });
 
         setPattern(currentPatternId, {
             events: updatedEvents,
@@ -1149,9 +1158,9 @@ A total of {0} instruments will be deleted.",
             unsetProgressInterval();
         };
     }, [
-        testNote,
         emulatorRomReady,
         playing,
+        testNote,
         playRangeStart,
         playRangeEnd,
         soundData.loop,
@@ -1196,7 +1205,6 @@ A total of {0} instruments will be deleted.",
                     currentPatternId={currentPatternId}
                     currentPlayerPosition={currentPlayerPosition}
                     currentSequenceIndex={currentSequenceIndex}
-                    noteCursor={noteCursor}
                     playing={playing && !testNote}
                     emulatorInitialized={emulatorInitialized}
                     noteSnapping={noteSnapping}
@@ -1208,6 +1216,7 @@ A total of {0} instruments will be deleted.",
                     setToolsDialogOpen={setToolsDialogOpen}
                     propertiesDialogOpen={propertiesDialogOpen}
                     setPropertiesDialogOpen={setPropertiesDialogOpen}
+                    selectedNotes={selectedNotes}
                     setNoteEvent={setNoteEvent}
                     setTrack={setTrack}
                 />

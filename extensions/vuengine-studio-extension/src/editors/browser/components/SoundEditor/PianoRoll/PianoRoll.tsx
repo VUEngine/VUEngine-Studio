@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
-import { SetNoteProps } from '../SoundEditor';
+import { SetNoteEventProps, SetNoteProps } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
@@ -164,7 +164,7 @@ interface PianoRollProps {
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNote: (notes: SetNoteProps[]) => void
-    setNoteEvent: (step: number, event: SoundEvent, value?: any) => void
+    setNoteEvent: (notes: SetNoteEventProps[]) => void
     playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
