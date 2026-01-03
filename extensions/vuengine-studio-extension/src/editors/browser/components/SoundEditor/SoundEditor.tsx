@@ -695,6 +695,7 @@ A total of {0} instruments will be deleted.",
         const removeNoteFromEvents = (stepToRemove: number) => {
             // remove all note-related events
             delete updatedEvents[stepToRemove][SoundEvent.Note];
+            delete updatedEvents[stepToRemove][SoundEvent.Instrument];
             delete updatedEvents[stepToRemove][SoundEvent.Duration];
             delete updatedEvents[stepToRemove][SoundEvent.NoteSlide];
 
