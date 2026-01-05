@@ -17,7 +17,12 @@ export default class PlayerRomBuilder {
         this.initTemplating();
     }
 
-    buildSoundPlayerRom = async (soundData: SoundData, playRangeStart: number, playRangeEnd: number, trackSettings: TrackSettings[]): Promise<URI> => {
+    buildSoundPlayerRom = async (
+        soundData: SoundData,
+        playRangeStart: number,
+        playRangeEnd: number,
+        trackSettings: TrackSettings[]
+    ): Promise<URI> => {
         await this.generateSpecFile(soundData, playRangeStart, playRangeEnd, trackSettings);
         await this.compileSpecFile();
 
@@ -52,10 +57,15 @@ export default class PlayerRomBuilder {
         this.tempBaseDir = tempDir;
     };
 
-    protected generateSpecFile = async (soundData: SoundData, playRangeStart: number, playRangeEnd: number, trackSettings: TrackSettings[]): Promise<void> => {
-        // console.log('--- 3) generateSpecFile ---');
+    protected generateSpecFile = async (
+        soundData: SoundData,
+        playRangeStart: number,
+        playRangeEnd: number,
+        trackSettings: TrackSettings[]
+    ): Promise<void> => {
+        console.log('--- 3) generateSpecFile ---');
         const specFileUri = this.tempBaseDir?.resolve('SoundSpec.c');
-        // console.log('specFileUri: ', specFileUri?.path.fsPath());
+        console.log('specFileUri: ', specFileUri?.path.fsPath());
         await this.services.vesCodeGenService.renderTemplateToFile(
             'SoundSpec',
             specFileUri,
@@ -65,10 +75,10 @@ export default class PlayerRomBuilder {
                 project: this.services.vesProjectService.getProjectData(),
                 itemUri: new URI('Dummy.sound'),
                 isSoundEditorPreview: true,
-                trackSettings: trackSettings,
+                trackSettings,
                 startFromSramTick: false, // currentPlayerPosition > 0,
-                playRangeStart: playRangeStart,
-                playRangeEnd: playRangeEnd,
+                playRangeStart,
+                playRangeEnd,
             },
             ProjectDataTemplateEncoding.utf8,
             true
@@ -76,7 +86,7 @@ export default class PlayerRomBuilder {
     };
 
     protected compileSpecFile = async (): Promise<void> => {
-        // console.log('--- 4) compileSpecFile ---');
+        console.log('--- 4) compileSpecFile ---');
         const SpecFileUri = this.tempBaseDir?.resolve('SoundSpec.c');
 
         const compilerUri = await this.services.vesBuildPathsService.getCompilerUri(false);
@@ -115,17 +125,17 @@ export default class PlayerRomBuilder {
             ],
         };
 
-        // console.log('compile with args:', args);
+        console.log('compile with args:', args);
         const { processId, processManagerId } = await this.services.vesProcessService.launchProcess(VesProcessType.Raw, args);
-        // console.log('processId:', processId);
-        // console.log('processManagerId:', processManagerId);
-        // console.log('set up event handler');
+        console.log('processId:', processId);
+        console.log('processManagerId:', processManagerId);
+        console.log('set up event handler');
 
         return new Promise(resolve => {
             this.eventHandler = new DisposableCollection(
                 this.services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
-                    // console.log('process exit event');
-                    // console.log('process ID:', pId);
+                    console.log('process exit event');
+                    console.log('process ID:', pId);
                     if (processId === pId || processManagerId === pId) {
                         this.disposeEventHandlers();
                         await this.objcopy();
@@ -133,21 +143,21 @@ export default class PlayerRomBuilder {
                     }
                 }),
                 this.services.vesProcessWatcher.onDidReceiveErrorStreamData(async ({ pId, data }) => {
-                    // console.log('process error event');
-                    // console.log('process ID:', pId);
-                    // console.log('data:', data);
+                    console.log('process error event');
+                    console.log('process ID:', pId);
+                    console.log('data:', data);
                 }),
                 this.services.vesProcessWatcher.onDidReceiveOutputStreamData(async ({ pId, data }) => {
-                    // console.log('process data event');
-                    // console.log('process ID:', pId);
-                    // console.log('data:', data);
+                    console.log('process data event');
+                    console.log('process ID:', pId);
+                    console.log('data:', data);
                 }),
             );
         });
     };
 
     protected objcopy = async (): Promise<void> => {
-        // console.log('--- 5) objcopy ---');
+        console.log('--- 5) objcopy ---');
         const compilerUri = await this.services.vesBuildPathsService.getCompilerUri();
 
         const args = isWindows ? {
@@ -172,17 +182,17 @@ export default class PlayerRomBuilder {
             ],
         };
 
-        // console.log('objcopy with args:', args);
+        console.log('objcopy with args:', args);
         const { processId, processManagerId } = await this.services.vesProcessService.launchProcess(VesProcessType.Raw, args);
-        // console.log('processId:', processId);
-        // console.log('processManagerId:', processManagerId);
-        // console.log('set up event handler');
+        console.log('processId:', processId);
+        console.log('processManagerId:', processManagerId);
+        console.log('set up event handler');
 
         return new Promise(resolve => {
             this.eventHandler = new DisposableCollection(
                 this.services.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
-                    // console.log('process exit event');
-                    // console.log('process ID:', pId);
+                    console.log('process exit event');
+                    console.log('process ID:', pId);
                     if (processId === pId || processManagerId === pId) {
                         this.disposeEventHandlers();
                         resolve();

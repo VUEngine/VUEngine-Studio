@@ -231,7 +231,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
                     : 1;
                 const startXPosition = Math.floor(s / SUB_NOTE_RESOLUTION);
-                const noteYPosition = Math.round(sequencerPatternHeight / NOTES_SPECTRUM * noteId);
+                const noteYPosition = Math.round(sequencerPatternHeight / NOTES_SPECTRUM * noteId) - 1;
                 for (let k = 0; k < duration; k++) {
                     placePixel(startXPosition + k, noteYPosition, color);
                 }

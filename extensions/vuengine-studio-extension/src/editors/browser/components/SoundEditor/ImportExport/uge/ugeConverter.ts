@@ -270,7 +270,9 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                     )
                 },
                 tap: 0,
-                type: SoundEditorTrackType.WAVE,
+                type: index === 0
+                    ? SoundEditorTrackType.SWEEPMOD
+                    : SoundEditorTrackType.WAVE,
                 volume: {
                     left: 15,
                     right: 15

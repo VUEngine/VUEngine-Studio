@@ -317,6 +317,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentPatternId(newPatternId);
         setCurrentSequenceIndex(newSequenceIndex);
         setNoteCursor(newSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
+        setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
     };
 
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
@@ -943,7 +944,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const exportFile = async (): Promise<void> => {
-        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, playRangeStart, playRangeEnd, trackSettings);
+        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
         let exists: boolean = false;
         let overwrite: boolean = false;
         let selected: URI | undefined;
