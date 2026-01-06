@@ -5,7 +5,10 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import Input from '../Common/Base/Input';
+import VContainer from '../Common/Base/VContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
+import Emulator from './Emulator/Emulator';
+import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
 import { getInstrumentName, SetNoteEventProps } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -22,8 +25,8 @@ import {
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
     TrackConfig,
+    TrackSettings,
 } from './SoundEditorTypes';
-import VContainer from '../Common/Base/VContainer';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -90,7 +93,12 @@ export const StyledSoundEditorToolbarTime = styled.div`
     line-height: 100%;
     padding-top: 1px;
     user-select: none;
-    width: 60px;
+    width: 52px;
+`;
+
+export const StyledSoundEditorToolbarVisualization = styled(StyledSoundEditorToolbarTime)`
+    background-color: black;
+    width: 52px;
 `;
 
 export const SidebarCollapseButton = styled.button`
@@ -118,6 +126,15 @@ interface SoundEditorToolbarProps {
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
+    setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
+    emulatorRomReady: boolean
+    setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
+    testNote: string
+    testInstrumentId: string
+    playRangeStart: number
+    playRangeEnd: number
+    trackSettings: TrackSettings[]
+    playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     toolsDialogOpen: boolean
@@ -141,7 +158,12 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         playing,
         noteSnapping,
         newNoteDuration, setNewNoteDuration,
-        emulatorInitialized,
+        emulatorInitialized, setEmulatorInitialized,
+        emulatorRomReady, setEmulatorRomReady,
+        testNote, testInstrumentId,
+        playRangeStart, playRangeEnd,
+        trackSettings,
+        playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
         toolsDialogOpen, setToolsDialogOpen,
         propertiesDialogOpen, setPropertiesDialogOpen,
@@ -155,6 +177,40 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const totalTicks = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
     const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
     const totalLengthSecs = totalTicks * tickDurationUs / 1000 / 1000;
+
+    const getTestSoundData = (): SoundData => ({
+        ...soundData,
+        loop: testInstrumentId !== '',
+        size: 64,
+        instruments: {
+            'testInstrument': soundData.instruments[testInstrumentId !== '' ? testInstrumentId : soundData.tracks[currentTrackId].instrument]
+        },
+        patterns: {
+            'testPattern': {
+                events: {
+                    0: {
+                        note: testNote,
+                        duration: 64 * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION
+                    }
+                },
+                name: 'testPattern',
+                size: 64,
+                type: testInstrumentId !== ''
+                    ? soundData.instruments[testInstrumentId].type
+                    : soundData.tracks[currentTrackId].type,
+            }
+        },
+        tracks: [{
+            ...soundData.tracks[currentTrackId],
+            instrument: 'testInstrument',
+            type: testInstrumentId !== ''
+                ? soundData.instruments[testInstrumentId].type
+                : soundData.tracks[currentTrackId].type,
+            sequence: {
+                0: 'testPattern',
+            }
+        }]
+    });
 
     const setSize = (size: number): void => {
         if (size > MAX_SEQUENCE_SIZE || size < MIN_SEQUENCE_SIZE) {
@@ -241,6 +297,20 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             }
                         </span>
                     </StyledSoundEditorToolbarTime>
+                    <StyledSoundEditorToolbarVisualization>
+                        <Emulator
+                            playing={playing}
+                            setEmulatorInitialized={setEmulatorInitialized}
+                            emulatorRomReady={emulatorRomReady}
+                            setEmulatorRomReady={setEmulatorRomReady}
+                            playerRomBuilder={playerRomBuilder}
+                            currentPlayerPosition={currentPlayerPosition}
+                            soundData={testNote ? getTestSoundData() : soundData}
+                            playRangeStart={playRangeStart}
+                            playRangeEnd={playRangeEnd}
+                            trackSettings={trackSettings}
+                        />
+                    </StyledSoundEditorToolbarVisualization>
                 </StyledSoundEditorToolbarGroup>
                 { /* }
                 <StyledSoundEditorToolbarGroup>

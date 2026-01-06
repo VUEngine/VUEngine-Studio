@@ -12,7 +12,6 @@ import VContainer from '../Common/Base/VContainer';
 import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
-import Emulator from './Emulator/Emulator';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import EventList from './EventList';
 import ImportExport from './ImportExport/ImportExport';
@@ -161,40 +160,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
     const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
-
-    const getTestSoundData = (): SoundData => ({
-        ...soundData,
-        loop: testInstrumentId !== '',
-        size: 64,
-        instruments: {
-            'testInstrument': soundData.instruments[testInstrumentId !== '' ? testInstrumentId : soundData.tracks[currentTrackId].instrument]
-        },
-        patterns: {
-            'testPattern': {
-                events: {
-                    0: {
-                        note: testNote,
-                        duration: 64 * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION
-                    }
-                },
-                name: 'testPattern',
-                size: 64,
-                type: testInstrumentId !== ''
-                    ? soundData.instruments[testInstrumentId].type
-                    : soundData.tracks[currentTrackId].type,
-            }
-        },
-        tracks: [{
-            ...soundData.tracks[currentTrackId],
-            instrument: 'testInstrument',
-            type: testInstrumentId !== ''
-                ? soundData.instruments[testInstrumentId].type
-                : soundData.tracks[currentTrackId].type,
-            sequence: {
-                0: 'testPattern',
-            }
-        }]
-    });
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -944,7 +909,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const exportFile = async (): Promise<void> => {
-        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
+        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))], false);
         let exists: boolean = false;
         let overwrite: boolean = false;
         let selected: URI | undefined;
@@ -1231,17 +1196,6 @@ A total of {0} instruments will be deleted.",
 
     return (
         <HContainer className="musicEditor" gap={0} overflow="hidden" style={{ padding: 0 }}>
-            <Emulator
-                playing={playing}
-                setEmulatorInitialized={setEmulatorInitialized}
-                setEmulatorRomReady={setEmulatorRomReady}
-                playerRomBuilder={playerRomBuilder}
-                currentPlayerPosition={currentPlayerPosition}
-                soundData={testNote ? getTestSoundData() : soundData}
-                playRangeStart={playRangeStart}
-                playRangeEnd={playRangeEnd}
-                trackSettings={trackSettings}
-            />
             <VContainer gap={0} grow={1} overflow="hidden">
                 <SoundEditorToolbar
                     soundData={soundData}
@@ -1252,9 +1206,18 @@ A total of {0} instruments will be deleted.",
                     currentSequenceIndex={currentSequenceIndex}
                     playing={playing && !testNote}
                     emulatorInitialized={emulatorInitialized}
+                    setEmulatorInitialized={setEmulatorInitialized}
+                    emulatorRomReady={emulatorRomReady}
+                    setEmulatorRomReady={setEmulatorRomReady}
                     noteSnapping={noteSnapping}
                     newNoteDuration={newNoteDuration}
                     setNewNoteDuration={setNewNoteDuration}
+                    testNote={testNote}
+                    testInstrumentId={testInstrumentId}
+                    playRangeStart={playRangeStart}
+                    playRangeEnd={playRangeEnd}
+                    trackSettings={trackSettings}
+                    playerRomBuilder={playerRomBuilder}
                     currentInstrumentId={currentInstrumentId}
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     toolsDialogOpen={toolsDialogOpen}

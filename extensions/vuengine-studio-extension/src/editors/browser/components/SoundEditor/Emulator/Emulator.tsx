@@ -1,14 +1,23 @@
 import { URI } from '@theia/core';
 import { Endpoint } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
 import { SoundData, TrackSettings } from '../SoundEditorTypes.js';
 import PlayerRomBuilder from './PlayerRomBuilder.js';
+
+const EmulatorContainer = styled.div`
+    background-color: #000;
+    height: 15px;
+    overflow: hidden;
+    width: 48px;
+`;
 
 interface EmulatorProps {
     soundData: SoundData
     playing: boolean
     setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
+    emulatorRomReady: boolean
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     currentPlayerPosition: number
     playRangeStart: number;
@@ -22,7 +31,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const {
         soundData,
         playing,
-        setEmulatorInitialized, setEmulatorRomReady,
+        setEmulatorInitialized,
+        emulatorRomReady, setEmulatorRomReady,
         currentPlayerPosition,
         playRangeStart, playRangeEnd,
         trackSettings,
@@ -30,6 +40,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     } = props;
     const [core, setCore] = useState<any>();
     const [sim, setSim] = useState<any>();
+    const emulatorContainerRef = useRef<HTMLDivElement>(null);
     const [soundDataChecksum, setSoundDataChecksum] = useState<string>('');
 
     const init = async (): Promise<void> => {
@@ -53,6 +64,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             wasmUrl: new Endpoint({ path: '/shrooms/core.wasm' }).getRestUrl().toString(),
         });
         const newSim = await newCore.create();
+        newSim.setAnaglyph(0xFF0000, 0);
         await newSim.setVolume(2);
 
         setCore(newCore);
@@ -73,7 +85,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const buildAndPlay = async (): Promise<void> => {
-        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, playRangeStart, playRangeEnd, trackSettings);
+        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, playRangeStart, playRangeEnd, trackSettings, true);
         await loadRom(romFileUri);
         setEmulatorRomReady(true);
     };
@@ -84,6 +96,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
 
     useEffect(() => {
         if (sim) {
+            emulatorContainerRef?.current?.append(sim);
             return () => {
                 cleanUp();
             };
@@ -144,5 +157,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         currentPlayerPosition,
     ]);
 
-    return <></>;
+    return <EmulatorContainer
+        ref={emulatorContainerRef}
+        style={{ display: currentPlayerPosition === -1 || !emulatorRomReady ? 'none' : 'block' }}
+    />;
 }
