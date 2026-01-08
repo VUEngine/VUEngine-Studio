@@ -12,7 +12,7 @@ import TransparencySelect from '../../Common/TransparencySelect';
 import { arrayMove, clamp } from '../../Common/Utils';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import {
-    INPUT_BLOCKING_COMMANDS, MAX_SPHERE_RADIUS,
+    MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,
     MIN_SPHERE_RADIUS,
     MIN_WIREFRAME_DISPLACEMENT,
@@ -169,7 +169,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         }]}
                         defaultValue={wireframe.type}
                         onChange={options => setType(options[0] as WireframeType)}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
@@ -177,8 +176,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <ColorSelector
                         color={wireframe.color}
                         updateColor={setColor}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
             </HContainer>
@@ -186,8 +185,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 <TransparencySelect
                     value={wireframe.transparency}
                     setValue={setTransparency}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onFocus={() => disableCommands()}
+                    onBlur={() => enableCommands()}
                 />
                 <VContainer>
                     <label>
@@ -210,7 +209,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.x}
                         setValue={v => setDisplacement('x', v as number)}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                     <Input
@@ -220,7 +218,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.y}
                         setValue={v => setDisplacement('y', v as number)}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                     <Input
@@ -230,7 +227,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.displacement.z}
                         setValue={v => setDisplacement('z', v as number)}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                     <i
@@ -290,7 +286,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             step={STEP_SPHERE_RADIUS}
                             value={wireframe.radius}
                             setValue={setRadius}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                     </VContainer>
@@ -319,7 +314,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         step={0.1}
                         value={wireframe.length}
                         setValue={setLength}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                 </VContainer>

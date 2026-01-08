@@ -6,7 +6,6 @@ import VContainer from '../Common/Base/VContainer';
 import { getInstrumentName, getNoteSlideLabel } from './SoundEditor';
 import {
     BAR_NOTE_RESOLUTION,
-    INPUT_BLOCKING_COMMANDS,
     NOTES_LABELS,
     PatternConfig,
     SEQUENCER_RESOLUTION,
@@ -159,7 +158,6 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         type='number'
                                                         value={localStep}
                                                         setValue={() => { /* TODO */ }}
-                                                        commands={INPUT_BLOCKING_COMMANDS}
                                                     />}
                                                     {!isSelectedNote && formatter.format(localStep)}
                                                 </td>
@@ -168,7 +166,6 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                         type='number'
                                                         value={duration}
                                                         setValue={() => { /* TODO */ }}
-                                                        commands={INPUT_BLOCKING_COMMANDS}
                                                     />}
                                                     {!isSelectedNote && formatter.format(duration)}
                                                 </td>

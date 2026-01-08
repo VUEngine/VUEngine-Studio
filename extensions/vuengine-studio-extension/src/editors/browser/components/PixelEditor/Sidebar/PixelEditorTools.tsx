@@ -2,19 +2,19 @@ import { Circle, Eraser, Hand, Minus, PaintBucket, PencilSimple, Selection, Squa
 import { nls } from '@theia/core';
 import { BrushTool, DottingRef, useBrush } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { PixelEditorCommands } from '../PixelEditorCommands';
-import { PixelEditorTool } from './PixelEditorTool';
 import { DOT_BRUSH_PATTERNS } from '../PixelEditorTypes';
+import { PixelEditorTool } from './PixelEditorTool';
 
 interface PixelEditorToolsProps {
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorTools(props: PixelEditorToolsProps): React.JSX.Element {
-    const { services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const { dottingRef } = props;
     const { brushTool, changeBrushTool, changeBrushPattern } = useBrush(dottingRef);
     const [previousBrushTool, setPreviousBrushTool] = useState<BrushTool>(BrushTool.NONE);
@@ -32,8 +32,8 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
         }
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case PixelEditorCommands.TOOL_DRAG.id:
                 changeBrushTool(BrushTool.NONE);
                 break;
@@ -82,16 +82,8 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
     }, [brushTool]);
 
     useEffect(() => {
-        enableCommands([
-            ...Object.values(PixelEditorCommands).map(c => c.id)
-        ]);
-    }, []);
-
-    useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     return (

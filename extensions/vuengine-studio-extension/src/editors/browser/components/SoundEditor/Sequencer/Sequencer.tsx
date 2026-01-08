@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
@@ -161,7 +161,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [dragStartTrackId, setDragStartTrackId] = useState<number>(-1);
     const [dragStartStep, setDragStartStep] = useState<number>(-1);
     const [dragEndStep, setDragEndStep] = useState<number>(-1);
@@ -240,8 +240,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setDragEndStep(-1);
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case SoundEditorCommands.SELECT_TRACK_1.id:
                 if (soundData.tracks.length > 0) {
                     setCurrentTrackId(0);
@@ -316,10 +316,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     }, []);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         currentTrackId,
         currentSequenceIndex,

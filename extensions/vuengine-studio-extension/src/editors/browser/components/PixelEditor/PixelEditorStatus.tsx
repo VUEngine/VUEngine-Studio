@@ -1,7 +1,7 @@
 import { StatusBarAlignment } from '@theia/core/lib/browser';
 import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { PixelEditorCommands } from './PixelEditorCommands';
 
 interface PixelEditorStatusProps {
@@ -11,7 +11,7 @@ interface PixelEditorStatusProps {
 }
 
 export default function PixelEditorStatus(props: PixelEditorStatusProps): React.JSX.Element {
-    const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
+    const { setStatusBarItem, removeStatusBarItem, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const { gridSize, setGridSize, dottingRef } = props;
     const {
         addHoverPixelChangeListener,
@@ -74,8 +74,8 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         setCanvasPanZoom(panZoom);
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case PixelEditorCommands.TOGGLE_GRID.id:
                 toggleGrid();
                 break;
@@ -93,10 +93,8 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
     }, []);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         gridSize,
     ]);

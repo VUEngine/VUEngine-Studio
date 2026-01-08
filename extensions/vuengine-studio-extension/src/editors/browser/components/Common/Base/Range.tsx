@@ -13,14 +13,13 @@ interface RangeProps {
     value: number
     options?: BasicSelectOption[]
     setValue: (value: number) => void
-    commandsToDisable?: string[]
     width?: string | number
     selectWidth?: number
 }
 
 export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { min, max, step, value, options, setValue, commandsToDisable, width, selectWidth } = props;
+    const { min, max, step, value, options, setValue, width, selectWidth } = props;
 
     let inputWidth = 32;
     if (!Number.isInteger(step)) {
@@ -50,8 +49,8 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
             step={step}
             value={value ?? max}
             onChange={e => onChange(e.target.value)}
-            onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
-            onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
+            onFocus={() => disableCommands()}
+            onBlur={() => enableCommands()}
         />
         {
             options
@@ -62,7 +61,6 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
                     })) as AdvancedSelectOption[]}
                     defaultValue={value?.toString() ?? max?.toString()}
                     onChange={opts => onChange(opts[0])}
-                    commands={commandsToDisable}
                     width={selectWidth}
                 />
                 : <Input
@@ -73,7 +71,6 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
                     min={min}
                     max={max}
                     step={step}
-                    commands={commandsToDisable}
                 />
         }
     </HContainer>;

@@ -16,7 +16,7 @@ import VContainer from '../../../Common/Base/VContainer';
 import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
-import { CHAR_PIXEL_SIZE, INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
 interface ImportSettingsProps {
@@ -276,7 +276,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={48}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
@@ -287,7 +286,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                             step={CHAR_PIXEL_SIZE}
                             min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={48}
                         />
                     </HContainer>
@@ -299,7 +297,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     setValue={v => setImportOffset(v as number)}
                     min={MIN_OFFSET}
                     max={MAX_OFFSET}
-                    commands={INPUT_BLOCKING_COMMANDS}
                     width={48}
                 />
                 <VContainer>

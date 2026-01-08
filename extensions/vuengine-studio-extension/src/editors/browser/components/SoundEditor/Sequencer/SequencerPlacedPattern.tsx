@@ -1,9 +1,9 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { DisplayMode } from '../../Common/VUEngineTypes';
@@ -101,6 +101,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         setPatternSize,
         removePatternFromSequence,
     } = props;
+    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternPixels, setPatternPixels] = useState<number[][][]>([]);
     const [colorOverrides, setColorOverrides] = useState<string[][]>([]);
 
@@ -122,8 +123,8 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
     const widthCeil = Math.ceil(width);
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case SoundEditorCommands.REMOVE_CURRENT_PATTERN.id:
                 removePatternFromSequence(currentTrackId, step);
                 break;
@@ -174,10 +175,8 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         currentTrackId,
         currentSequenceIndex,

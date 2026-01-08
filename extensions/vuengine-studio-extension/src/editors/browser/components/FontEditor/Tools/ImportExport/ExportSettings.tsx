@@ -4,7 +4,7 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT } from '../../FontEditorTypes';
+import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]
@@ -92,7 +92,6 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
                     <Input
                         value={exportFileName}
                         setValue={setExportFileName}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={160}
                     />
                     .png
@@ -105,7 +104,6 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
                 setValue={v => setCharactersPerLine(v as number)}
                 min={MIN_CHARS_PER_LINE}
                 max={MAX_CHARS_PER_LINE}
-                commands={INPUT_BLOCKING_COMMANDS}
                 width={48}
             />
         </VContainer>

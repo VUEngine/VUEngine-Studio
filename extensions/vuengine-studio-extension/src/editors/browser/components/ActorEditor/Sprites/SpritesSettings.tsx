@@ -5,7 +5,6 @@ import HContainer from '../../Common/Base/HContainer';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { SpriteType } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
 export default function SpritesSettings(): React.JSX.Element {
@@ -48,8 +47,8 @@ export default function SpritesSettings(): React.JSX.Element {
                         }]}
                         defaultValue={data.sprites.type}
                         onChange={options => setType(options[0].value as SpriteType)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
             </HContainer>

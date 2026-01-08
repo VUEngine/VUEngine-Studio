@@ -10,10 +10,11 @@ import {
 } from 'dotting';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import { PixelEditorCommands } from './PixelEditorCommands';
+import PixelEditorFrames from './PixelEditorFrames';
 import PixelEditorLayers from './PixelEditorLayers';
 import PixelEditorStatus from './PixelEditorStatus';
 import { LayerPixelData, PixelData } from './PixelEditorTypes';
@@ -22,7 +23,6 @@ import PixelEditorActions from './Sidebar/PixelEditorActions';
 import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
 import PixelEditorNavigator from './Sidebar/PixelEditorNavigator';
 import PixelEditorTools from './Sidebar/PixelEditorTools';
-import PixelEditorFrames from './PixelEditorFrames';
 
 export const createEmptyPixelData = (width: number, height: number): (number | null)[][] => {
     const data: (number | null)[][] = [];
@@ -54,7 +54,7 @@ interface PixelEditorProps {
 }
 
 export default function PixelEditor(props: PixelEditorProps): React.JSX.Element {
-    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { setCommands, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
     const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
     const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
@@ -67,8 +67,8 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     const [currentFrame, setCurrentFrame] = useState<number>(0);
     const [gridSize, setGridSize] = useState<number>(1);
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case CommonCommands.UNDO.id:
                 undo();
                 break;
@@ -189,7 +189,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     ]);
 
     useEffect(() => {
-        enableCommands([
+        setCommands([
             ...Object.values(PixelEditorCommands).map(c => c.id)
         ]);
     }, []);
@@ -219,10 +219,8 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     ]);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     return (

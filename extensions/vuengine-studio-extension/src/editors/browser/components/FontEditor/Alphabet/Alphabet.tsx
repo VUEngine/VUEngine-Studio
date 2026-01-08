@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
 import { FontEditorCommands } from '../FontEditorCommands';
 import { VariableSize } from '../FontEditorTypes';
@@ -25,6 +25,7 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         currentCharacterIndex, setCurrentCharacterIndex, setCurrentCharacterHoverIndex,
         variableSize,
     } = props;
+    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [controlCharacters, setControlCharacters] = useState<React.JSX.Element>();
     const [asciiCharacters, setAsciiCharacters] = useState<React.JSX.Element>();
     const [extendedCharacters, setExtendedCharacters] = useState<React.JSX.Element>();
@@ -48,8 +49,8 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         })}
     </>;
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id:
                 setCurrentCharacterIndex(currentCharacterIndex + 16 < offset + charCount
                     ? currentCharacterIndex + 16
@@ -86,10 +87,8 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         offset,
         charCount,

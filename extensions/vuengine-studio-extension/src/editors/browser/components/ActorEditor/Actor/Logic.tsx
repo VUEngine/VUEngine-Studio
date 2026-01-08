@@ -4,7 +4,7 @@ import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import SimpleListEditor from '../../SimpleListEditor/SimpleListEditor';
-import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
 export default function Logic(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
@@ -37,7 +37,6 @@ export default function Logic(): React.JSX.Element {
                 )}
                 value={data.logic.customAllocator}
                 setValue={setAllocator}
-                commands={INPUT_BLOCKING_COMMANDS}
             />
             <VContainer grow={1}>
                 <InfoLabel

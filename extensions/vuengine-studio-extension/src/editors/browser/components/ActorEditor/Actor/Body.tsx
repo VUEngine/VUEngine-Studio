@@ -7,7 +7,7 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { Axis } from '../../Common/VUEngineTypes';
-import { BodyData, INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
+import { BodyData } from '../ActorEditorTypes';
 
 interface BodyProps {
     body: BodyData
@@ -65,7 +65,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                     max={511}
                     step={0.1}
                     width={64}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
                 <VContainer>
                     <InfoLabel
@@ -88,8 +87,8 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         }]}
                         defaultValue={body.gravityAxes}
                         onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                         canSelectMany
                         allowBlank
                     />
@@ -105,7 +104,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                     max={511}
                     step={0.1}
                     width={64}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
                 <Input
                     label={nls.localize('vuengine/editors/actor/bounciness', 'Bounciness')}
@@ -116,7 +114,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                     max={511}
                     step={0.1}
                     width={64}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
                 <Input
                     label={nls.localize('vuengine/editors/actor/maximumSpeed', 'Maximum Speed')}
@@ -126,7 +123,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                     min={0}
                     max={511}
                     width={64}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </HContainer>
             <VContainer>
@@ -141,7 +137,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         min={0}
                         max={511}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
                         value={body.maximumVelocity.y}
@@ -150,7 +145,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         min={0}
                         max={511}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
                         value={body.maximumVelocity.z}
@@ -159,7 +153,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         min={0}
                         max={511}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>
             </VContainer>
@@ -186,8 +179,8 @@ Note that sprites need to use AFFINE mode to be able to be rotated.',
                     }]}
                     defaultValue={body.rotationAxes}
                     onChange={options => setRotationAxes(options.map(o => o.value) as Axis[])}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onFocus={() => disableCommands()}
+                    onBlur={() => enableCommands()}
                     canSelectMany
                     allowBlank
                 />

@@ -22,6 +22,7 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { Event } from '@theia/core/shared/vscode-languageserver-protocol';
 
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
@@ -59,14 +60,14 @@ export interface EditorsContextType {
     setSaveCallback: (callback: () => void) => void
     setIsGenerating: (isGenerating: boolean, progress?: number) => void
     setGeneratingProgress: (current: number, total: number) => void
-    enableCommands: (commandIds: string[]) => void
-    disableCommands: (commandIds: string[]) => void
+    setCommands: (commandIds: string[]) => void
+    onCommandExecute: Event<string>
+    enableCommands: () => void
+    disableCommands: () => void
     setStatusBarItem: (id: string, entry: StatusBarEntry) => void
     removeStatusBarItem: (id: string) => void
     services: EditorsServices
 }
-
-export const EDITORS_COMMAND_EXECUTED_EVENT_NAME = 'vesEditorsCommandExecuted';
 
 export interface EditorCommand {
     id: string

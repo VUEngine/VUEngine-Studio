@@ -65,19 +65,15 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
 
         commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_EXPAND, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesEmulatorSidebarWidget.ID,
-            execute: async widget => widget !== undefined &&
-                widget.id === VesEmulatorSidebarWidget.ID &&
+            isVisible: widget => widget?.id === VesEmulatorSidebarWidget.ID,
+            execute: async widget => widget?.id === VesEmulatorSidebarWidget.ID &&
                 await this.openView({ activate: true, reveal: true }) &&
                 this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
         });
 
         commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_HELP, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesEmulatorSidebarWidget.ID,
+            isVisible: widget => widget?.id === VesEmulatorSidebarWidget.ID,
             execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
         });
     }

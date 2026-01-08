@@ -6,7 +6,6 @@ import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/Base/VContainer';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface AnimationsSettingsProps {
     isMultiFileAnimation: boolean
@@ -71,8 +70,8 @@ The maximum value is specified in the engine config and can be changed in the en
                     disabled={isMultiFileAnimation}
                     value={data.animations.totalFrames}
                     onChange={e => setAnimationFrames(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onFocus={() => disableCommands()}
+                    onBlur={() => enableCommands()}
                     width={64}
                 />
             </VContainer>
@@ -89,8 +88,8 @@ This allows multiple sprites to use the same texture, but show a different frame
                     type="checkbox"
                     checked={data.animations.multiframe}
                     onChange={toggleMultiframe}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onFocus={() => disableCommands()}
+                    onBlur={() => enableCommands()}
                 />
             </VContainer>}
         </HContainer>

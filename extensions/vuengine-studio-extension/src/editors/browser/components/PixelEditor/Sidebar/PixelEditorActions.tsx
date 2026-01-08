@@ -12,7 +12,7 @@ import Input from '../../Common/Base/Input';
 import PopUpDialog from '../../Common/Base/PopUpDialog';
 import VContainer from '../../Common/Base/VContainer';
 import { convertLayerPixelDataToPixelModifyItem, convertToLayerProps } from '../PixelEditor';
-import { INPUT_BLOCKING_COMMANDS, LayerPixelData } from '../PixelEditorTypes';
+import { LayerPixelData } from '../PixelEditorTypes';
 import { PixelEditorTool } from './PixelEditorTool';
 
 const ResizeDirectionBox = styled.div`
@@ -249,7 +249,6 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                                 step={8}
                                 tabIndex={0}
                                 width={80}
-                                commands={INPUT_BLOCKING_COMMANDS}
                                 autoFocus
                             />
                             <Input
@@ -261,7 +260,6 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                                 max={colorMode === ColorMode.FrameBlend ? 256 : 512}
                                 step={8}
                                 width={80}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </VContainer>
                         <VContainer>

@@ -5,10 +5,12 @@ import styled from 'styled-components';
 import {
     ConversionResult
 } from '../../../../images/browser/ves-images-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
+import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
 import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
+import Sidebar from '../Common/Editor/Sidebar';
 import { showItemSelection } from '../Common/Utils';
 import ActorMeta from './Actor/ActorMeta';
 import ActorSettings from './Actor/ActorSettings';
@@ -27,9 +29,7 @@ import {
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
-import Sidebar from '../Common/Editor/Sidebar';
 import ImageProcessingSettingsForm, { ImageProcessingSettingsFormProps } from './Sprites/ImageProcessingSettingsForm';
-import PopUpDialog from '../Common/Base/PopUpDialog';
 
 export const ShowTreeButton = styled.button`
   left: var(--padding);
@@ -64,7 +64,7 @@ const getMostFilesOnASprite = (actorData: ActorData): number =>
 
 export default function ActorEditor(props: ActorEditorProps): React.JSX.Element {
     const { data, updateData } = props;
-    const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, setCommands, onCommandExecute, services } = useContext(EditorsContext) as EditorsContextType;
 
     const [currentComponent, setCurrentComponent] = useState<string>('');
     const [isAnimationPlaying, setIsAnimationPlaying] = useState<boolean>(true);
@@ -519,8 +519,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         }
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case ActorEditorCommands.ADD_COMPONENT.id:
                 addComponent();
                 break;
@@ -565,7 +565,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     };
 
     useEffect(() => {
-        enableCommands([
+        setCommands([
             ...Object.values({
                 ...CommonEditorCommands,
                 ...ActorEditorCommands,
@@ -574,10 +574,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     }, []);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         currentComponent,
         data.components,

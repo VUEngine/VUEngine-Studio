@@ -14,7 +14,6 @@ import { getInstrumentName, SetNoteEventProps } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
-    INPUT_BLOCKING_COMMANDS,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
     PIANO_ROLL_KEY_WIDTH,
@@ -356,7 +355,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             value: `${1 * SUB_NOTE_RESOLUTION}`
                         }]}
                         width={56}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>
@@ -412,7 +410,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             }}
                             backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}
                             width={180}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <InputWithActionButton
                             className='theia-button secondary'
@@ -459,7 +456,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         max={MAX_SEQUENCE_SIZE}
                         title={nls.localize('vuengine/editors/sound/Length', 'Length')}
                         width={48}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <VContainer gap={2}>
                         <StyledSoundEditorToolbarSizeButton

@@ -22,7 +22,6 @@ import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Com
 import VContainer from '../../Common/Base/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import ColorModeSelect from './ColorModeSelect';
 import Range from '../../Common/Base/Range';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -309,8 +308,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                             imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
                                         });
                                     }}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onFocus={() => disableCommands()}
+                                    onBlur={() => enableCommands()}
                                 />
                                 {nls.localize('vuengine/editors/general/enable', 'Enable')}
                             </label>
@@ -324,8 +323,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                                 serpentine: !processingSettings?.serpentine,
                                             });
                                         }}
-                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onFocus={() => disableCommands()}
+                                        onBlur={() => enableCommands()}
                                     />
                                     {nls.localize('vuengine/editors/general/serpentine', 'Serpentine')}
                                 </label>
@@ -359,7 +358,6 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                         setValue={(v: number) => updateProcessingSettings({
                                             minimumColorDistanceToDither: v,
                                         })}
-                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                     />
                                 </VContainer>
                                 {processingSettings?.minimumColorDistanceToDither > 0 &&

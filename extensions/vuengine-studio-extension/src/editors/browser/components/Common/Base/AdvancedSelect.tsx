@@ -40,7 +40,6 @@ interface AdvancedSelectProps {
     menuPlacement?: MenuPlacement
     onChange: (options: string[]) => void
     onCreateOption?: (value: string) => void
-    commands?: string[]
     containerStyle?: object
     style?: object
     width?: number
@@ -58,7 +57,6 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         defaultValue,
         placeholder,
         menuPlacement,
-        commands,
         width,
         containerStyle,
         style,
@@ -78,15 +76,11 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
     });
 
     const handleOnFocus = () => {
-        if (commands !== undefined && commands.length) {
-            disableCommands(commands);
-        }
+        disableCommands();
     };
 
     const handleOnBlur = () => {
-        if (commands !== undefined && commands.length) {
-            enableCommands(commands);
-        }
+        enableCommands();
     };
 
     const className = small

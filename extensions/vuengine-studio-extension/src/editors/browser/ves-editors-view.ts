@@ -149,21 +149,16 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }, {
                     // enable and make visible only for the editors for which command is registered
                     isEnabled: widget => {
-                        const w = widget instanceof VesEditorsWidget
-                            ? widget
-                            : this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands !== undefined && w?.commands[command.id] === true;
+                        const w = this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands.includes(command.id);
                     },
                     isVisible: widget => {
-                        const w = widget instanceof VesEditorsWidget
-                            ? widget
-                            : this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands !== undefined && w?.commands[command.id] === true;
+                        const w = this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commands.includes(command.id);
                     },
                     execute: widget => {
-                        const w = widget instanceof VesEditorsWidget
-                            ? widget
-                            : this.shell.currentWidget as VesEditorsWidget;
+                        const w = this.shell.currentWidget as VesEditorsWidget;
+                        console.log('execute', w);
                         w?.dispatchCommandEvent(command.id);
                     }
                 });

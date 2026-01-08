@@ -4,7 +4,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
-import { CHAR_PIXEL_SIZE, INPUT_BLOCKING_COMMANDS, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
 interface CharSettingsProps {
     currentCharacter: number
@@ -145,7 +145,6 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                             min={MIN_VARIABLE_CHAR_SIZE}
                             max={charWidth}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
                         <Input
@@ -155,7 +154,6 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                             min={MIN_VARIABLE_CHAR_SIZE}
                             max={charWidth}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
@@ -179,7 +177,6 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                         max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                         value={charWidth}
                         setValue={setPixelWidth}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                     <div style={{ paddingBottom: 3 }}>×</div>
@@ -190,7 +187,6 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                         max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                         value={charHeight}
                         setValue={setPixelHeight}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         width={64}
                     />
                 </HContainer>

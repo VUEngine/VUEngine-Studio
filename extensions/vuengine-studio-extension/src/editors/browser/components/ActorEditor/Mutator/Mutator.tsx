@@ -3,7 +3,6 @@ import VContainer from '../../Common/Base/VContainer';
 import { MutatorData } from '../ActorEditorTypes';
 import { nls } from '@theia/core';
 import Input from '../../Common/Base/Input';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface MutatorProps {
     mutator: MutatorData
@@ -23,7 +22,6 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
                 label={nls.localize('vuengine/editors/actor/mutationClass', 'Mutation Class')}
                 value={mutator.mutationClass}
                 setValue={setClass}
-                commands={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
     );

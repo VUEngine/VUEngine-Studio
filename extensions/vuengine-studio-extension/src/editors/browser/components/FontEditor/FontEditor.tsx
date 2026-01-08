@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import RadioSelect from '../Common/Base/RadioSelect';
 import VContainer from '../Common/Base/VContainer';
@@ -58,7 +58,7 @@ const EditorSidebar = styled.div`
 
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { data, updateData } = props;
-    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { setCommands, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(3);
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const [currentCharacterIndex, setCurrentCharacterIndex] = useState<number>(data.offset);
@@ -75,8 +75,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     const characters = data.characters || [];
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case CommonCommands.UNDO.id:
                 undo();
                 break;
@@ -108,7 +108,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         // @ts-ignore
         fontData.characters = fontData.characters === null ? null :
             removeTrailingNullsAndZeroesFromArray(fontData.characters.map(character =>
-                character === null ? null :
+                character === null || character === undefined ? null :
                     removeTrailingNullsAndZeroesFromArray(character.map(line =>
                         removeTrailingNullsAndZeroesFromArray(line)
                     ))));
@@ -252,17 +252,15 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
-        enableCommands([
+        setCommands([
             ...Object.values(FontEditorCommands).map(c => c.id),
             ...Object.values(PixelEditorCommands).map(c => c.id),
         ]);
     }, []);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     useEffect(() => {

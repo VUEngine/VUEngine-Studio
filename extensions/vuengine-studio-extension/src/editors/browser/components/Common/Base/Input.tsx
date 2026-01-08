@@ -23,7 +23,6 @@ interface InputProps {
     disabled?: boolean
     readOnly?: boolean
     clearable?: boolean
-    commands?: string[]
     style?: object
     tabIndex?: number
     autoFocus?: boolean
@@ -74,7 +73,6 @@ export default function Input(props: InputProps): React.JSX.Element {
         disabled, readOnly, clearable,
         id, className, style, width, grow,
         tabIndex, autoFocus,
-        commands,
         onClick, onBlur,
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
@@ -105,15 +103,11 @@ export default function Input(props: InputProps): React.JSX.Element {
     };
 
     const handleOnFocus = () => {
-        if (commands !== undefined && commands.length) {
-            disableCommands(commands);
-        }
+        disableCommands();
     };
 
     const handleOnBlur = () => {
-        if (commands !== undefined && commands.length) {
-            enableCommands(commands);
-        }
+        enableCommands();
     };
 
     const validateAndUpdateValue = useCallback(debounce(

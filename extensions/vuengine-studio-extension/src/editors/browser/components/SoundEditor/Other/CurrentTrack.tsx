@@ -9,7 +9,7 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { INPUT_BLOCKING_COMMANDS, SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
+import { SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentTrackProps {
@@ -93,7 +93,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         })]}
                         defaultValue={`${currentTrackId}`}
                         onChange={options => onSelectTrack(parseInt(options[0]))}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'
@@ -130,7 +129,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         }))}
                     defaultValue={`${track.type}`}
                     onChange={options => setTrackType(options[0] as SoundEditorTrackType)}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
 
@@ -157,7 +155,6 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         defaultValue={`${track.instrument}`}
                         onChange={options => setTrackInstrument(options[0])}
                         backgroundColor={soundData.instruments[track.instrument] ? COLOR_PALETTE[soundData.instruments[track.instrument].color] : undefined}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'

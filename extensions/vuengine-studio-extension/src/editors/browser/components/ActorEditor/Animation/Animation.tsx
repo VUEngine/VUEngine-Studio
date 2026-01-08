@@ -7,7 +7,6 @@ import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
     ActorEditorContext,
     ActorEditorContextType,
@@ -111,7 +110,6 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     label={nls.localizeByDefault('Name')}
                     value={animation.name}
                     setValue={setName}
-                    commands={INPUT_BLOCKING_COMMANDS}
                     grow={1}
                 />
                 <VContainer>
@@ -126,8 +124,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         type="checkbox"
                         checked={data.animations.default === index}
                         onChange={setDefault}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
             </HContainer>
@@ -147,7 +145,6 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         min={MIN_ANIMATION_CYLCES}
                         max={MAX_ANIMATION_CYLCES}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
@@ -162,8 +159,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         type="checkbox"
                         checked={animation.loop}
                         onChange={toggleLoop}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
             </HContainer>
@@ -176,7 +173,6 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     )}
                     value={animation.callback}
                     setValue={setCallback}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             }
             <VContainer>
@@ -225,7 +221,6 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                                 onClick={() => setCurrentAnimationStep(i)}
                                 min={1}
                                 max={totalFrames}
-                                commands={INPUT_BLOCKING_COMMANDS}
                                 width={52}
                                 tabIndex={i + 1}
                             />

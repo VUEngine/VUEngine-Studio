@@ -37,7 +37,6 @@ import {
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import {
-    INPUT_BLOCKING_COMMANDS,
     InstrumentMap,
     SoundData,
     SoundEditorTrackType,
@@ -385,7 +384,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <Input
                             value={instrument?.name}
                             setValue={setName}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <InputWithActionButton
                             className='theia-button secondary'
@@ -423,7 +421,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         defaultValue={instrument.type}
                         onChange={options => setType(options[0] as SoundEditorTrackType)}
                         width={180}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </VContainer>
                 <VContainer>
@@ -449,7 +446,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
                             min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
                             setValue={setEnvelopeInitialValue}
-                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                         />
                     </VContainer>
                     <VContainer>
@@ -465,7 +461,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 max={15}
                                 min={0}
                                 setValue={(v: number) => setStereoLevel('left', v)}
-                                commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                 width="100%"
                             />
                         </HContainer>
@@ -478,7 +473,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 max={15}
                                 min={0}
                                 setValue={(v: number) => setStereoLevel('right', v)}
-                                commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                 width="100%"
                             />
                         </HContainer>
@@ -508,7 +502,6 @@ Longer durations can be achieved by manually manipulating the track volume.'
                             max={VSU_INTERVAL_MAX + 1}
                             min={VSU_INTERVAL_MIN}
                             setValue={updateInterval}
-                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                             selectWidth={96}
                         />
                     </VContainer>
@@ -562,7 +555,6 @@ a pre-configured value and repeat the grow/decay process. '
                                                 label: `${st} ms`,
                                             }))}
                                             selectWidth={80}
-                                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                         />
                                     </VContainer>
                                     <VContainer>
@@ -665,7 +657,6 @@ from the first modulation value. '
                                                 label: `${interval} ms`,
                                             }))}
                                             selectWidth={88}
-                                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                         />
                                     </VContainer>
                                     {instrument?.sweepMod.function === VsuSweepModulationFunction.Sweep &&
@@ -700,7 +691,6 @@ from the first modulation value. '
                                                         value: i,
                                                         label: `${i + 1}`,
                                                     }))}
-                                                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                                 />
                                             </VContainer>
                                         </HContainer>
@@ -758,7 +748,6 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                 defaultValue={instrument?.tap?.toString()}
                                 onChange={options => setTap(parseInt(options[0]))}
                                 width={240}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </VContainer>
                     }

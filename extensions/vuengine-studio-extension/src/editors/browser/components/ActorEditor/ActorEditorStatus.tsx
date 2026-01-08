@@ -1,6 +1,6 @@
 import { StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { useContext, useEffect } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
 import { ActorEditorCommands } from './ActorEditorCommands';
 import { ActorEditorContext, ActorEditorContextType, MAX_PREVIEW_SPRITE_ZOOM, MIN_PREVIEW_SPRITE_ZOOM, PREVIEW_SPRITE_ZOOM_STEP } from './ActorEditorTypes';
@@ -11,7 +11,7 @@ interface ActorEditorStatusProps {
 
 export default function ActorEditorStatus(props: ActorEditorStatusProps): React.JSX.Element {
     const { center } = props;
-    const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
+    const { setStatusBarItem, removeStatusBarItem, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const {
         previewAnaglyph,
         previewBackgroundColor,
@@ -32,8 +32,8 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
         return z;
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case ActorEditorCommands.PREVIEW_BACKGROUND_NEXT.id:
                 setPreviewBackgroundColor(previousValue => previousValue === 3 ? -1 : previousValue + 1);
                 break;
@@ -147,10 +147,8 @@ export default function ActorEditorStatus(props: ActorEditorStatusProps): React.
     ]);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     return <></>;

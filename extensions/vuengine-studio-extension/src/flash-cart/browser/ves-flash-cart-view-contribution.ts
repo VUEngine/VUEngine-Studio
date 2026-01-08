@@ -38,34 +38,27 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_EXPAND, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
-            execute: async widget => widget !== undefined &&
-                widget.id === VesFlashCartWidget.ID &&
+            isVisible: widget => widget?.id === VesFlashCartWidget.ID,
+            execute: async widget => widget?.id === VesFlashCartWidget.ID &&
                 await this.openView({ activate: true, reveal: true }) &&
                 this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
         });
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_HELP, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
+            isVisible: widget => widget?.id === VesFlashCartWidget.ID,
             execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/flash-carts', false),
         });
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
+            isVisible: widget => widget?.id === VesFlashCartWidget.ID,
             execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'flash carts'),
         });
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_REFRESH, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
+            isVisible: widget => widget?.id === VesFlashCartWidget.ID,
             execute: () => this.vesFlashCartService.detectConnectedFlashCarts(),
         });
     }

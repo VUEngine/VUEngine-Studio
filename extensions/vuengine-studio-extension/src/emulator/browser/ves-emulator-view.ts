@@ -39,16 +39,13 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_HELP, {
       isEnabled: () => true,
-      isVisible: widget => widget !== undefined &&
-        widget.id !== undefined &&
-        widget.id === VesEmulatorWidget.ID,
+      isVisible: widget => widget?.id === VesEmulatorWidget.ID,
       execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
     });
 
     commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_SETTINGS, {
       isEnabled: () => true,
-      isVisible: widget => widget !== undefined &&
-        widget.id === VesEmulatorWidget.ID,
+      isVisible: widget => widget?.id === VesEmulatorWidget.ID,
       execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'emulator'),
     });
   }

@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { ActorData, INPUT_BLOCKING_COMMANDS, MAX_SCALE, MIN_SCALE, PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
+import { ActorData, MAX_SCALE, MIN_SCALE, PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
 import HContainer from '../Base/HContainer';
 import Rotation from '../Rotation';
 import { clamp } from '../Utils';
@@ -107,21 +107,18 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                             type="number"
                             value={positionedActor.onScreenPosition.x}
                             setValue={v => setPosition('x', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
                             type="number"
                             value={positionedActor.onScreenPosition.y}
                             setValue={v => setPosition('y', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
                             type="number"
                             value={positionedActor.onScreenPosition.z}
                             setValue={v => setPosition('z', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <i
@@ -151,7 +148,6 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                             value={positionedActor.onScreenScale?.x ?? 0}
                             setValue={v => setScale('x', v as number)}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <Input
                             type="number"
@@ -161,7 +157,6 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                             value={positionedActor.onScreenScale?.y ?? 0}
                             setValue={v => setScale('y', v as number)}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <Input
                             type="number"
@@ -171,7 +166,6 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                             value={positionedActor.onScreenScale?.z ?? 0}
                             setValue={v => setScale('z', v as number)}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
@@ -180,14 +174,12 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                     value={positionedActor.name}
                     setValue={setName}
                     width={202}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
                 <Input
                     label={nls.localize('vuengine/editors/general/extraInfo', 'Extra Info')}
                     value={positionedActor.extraInfo}
                     setValue={setExtraInfo}
                     width={202}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
                 <VContainer>
                     <label>

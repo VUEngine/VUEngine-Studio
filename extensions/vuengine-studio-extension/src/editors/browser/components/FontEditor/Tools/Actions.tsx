@@ -3,7 +3,7 @@ import { nls } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { DottingRef, PixelModifyItem, useData, useDotting } from 'dotting';
 import React, { useContext, useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { PixelEditorTool } from '../../PixelEditor/Sidebar/PixelEditorTool';
@@ -17,7 +17,7 @@ interface ActionsProps {
 }
 
 export default function Actions(props: ActionsProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const {
         /* currentCharData, setCurrentCharData, */
         dottingRef,
@@ -27,8 +27,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const { clear, setData } = useDotting(dottingRef);
     const { dataArray } = useData(dottingRef);
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case FontEditorCommands.COPY_CHARACTER.id:
                 copy();
                 break;
@@ -120,10 +120,8 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     };
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         clipboard,
         applyPixelChanges,

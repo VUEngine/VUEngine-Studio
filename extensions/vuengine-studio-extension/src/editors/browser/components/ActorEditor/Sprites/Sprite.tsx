@@ -19,7 +19,6 @@ import { ActorEditorSaveDataOptions } from '../ActorEditor';
 import {
     ActorEditorContext,
     ActorEditorContextType,
-    INPUT_BLOCKING_COMMANDS,
     MAX_SPRITE_REPEAT_SIZE,
     MAX_SPRITE_TEXTURE_DISPLACEMENT,
     MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,
@@ -29,10 +28,10 @@ import {
     MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,
     MIN_TEXTURE_PADDING,
     SpriteData,
-    SpriteImageData,
+    SpriteImageData
 } from '../ActorEditorTypes';
-import SpritesSettings from './SpritesSettings';
 import { ImageProcessingSettingsFormProps } from './ImageProcessingSettingsForm';
+import SpritesSettings from './SpritesSettings';
 
 interface SpriteProps {
     sprite: SpriteData
@@ -473,8 +472,8 @@ Supported file types are [...].'
                         }]}
                         defaultValue={sprite.sourceType}
                         onChange={options => setSourceType(options[0].value as SpriteSourceType)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                     */}
                     <InfoLabel
@@ -690,8 +689,8 @@ or two separate images, one for each eye. Stereo sprites require more system res
                             }]}
                             defaultValue={sprite.displayMode}
                             onChange={options => setDisplayMode(options[0].value as DisplayMode)}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onFocus={() => disableCommands()}
+                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     {sprite.displayMode === DisplayMode.Mono &&
@@ -719,8 +718,8 @@ Use with care! It can be very uncomfortable for the viewer if left and right eye
                                     ? Displays.Both
                                     : options[0].value as Displays)
                                 }
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onFocus={() => disableCommands()}
+                                onBlur={() => enableCommands()}
                             />
                         </VContainer>
                     }
@@ -734,15 +733,15 @@ Use with care! It can be very uncomfortable for the viewer if left and right eye
                             options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
                             defaultValue={sprite.texture.palette}
                             onChange={options => setPalette(options[0].value as number)}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onFocus={() => disableCommands()}
+                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     <TransparencySelect
                         value={sprite.transparency}
                         setValue={setTransparency}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </HContainer>
                 <VContainer>
@@ -762,7 +761,6 @@ Positive z (and parallax) values go into the screen, negative stick out."
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.x}
                             setValue={v => setDisplacement('x', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -771,7 +769,6 @@ Positive z (and parallax) values go into the screen, negative stick out."
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.y}
                             setValue={v => setDisplacement('y', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -780,7 +777,6 @@ Positive z (and parallax) values go into the screen, negative stick out."
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.z}
                             setValue={v => setDisplacement('z', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -789,7 +785,6 @@ Positive z (and parallax) values go into the screen, negative stick out."
                             max={MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             value={sprite.displacement.parallax}
                             setValue={setDisplacementParallax}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <i
@@ -848,8 +843,8 @@ Positive z (and parallax) values go into the screen, negative stick out."
                                 ]}
                                 defaultValue={sprite.bgmapMode}
                                 onChange={options => setBgmapMode(options[0].value as BgmapMode)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onFocus={() => disableCommands()}
+                                onBlur={() => enableCommands()}
                             />
                         </VContainer>
                         {data.components?.animations?.length > 0 &&
@@ -861,8 +856,8 @@ Positive z (and parallax) values go into the screen, negative stick out."
                                     type="checkbox"
                                     checked={sprite.isAnimated ?? false}
                                     onChange={() => toggleIsAnimated()}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onFocus={() => disableCommands()}
+                                    onBlur={() => enableCommands()}
                                 />
                             </VContainer>
                         }
@@ -887,7 +882,6 @@ surrounding textures to appear at the outer edges.'
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.x}
                                     setValue={v => setPadding('x', v as number)}
-                                    commands={INPUT_BLOCKING_COMMANDS}
                                     width={54}
                                 />
                                 <Input
@@ -896,7 +890,6 @@ surrounding textures to appear at the outer edges.'
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.y}
                                     setValue={v => setPadding('y', v as number)}
-                                    commands={INPUT_BLOCKING_COMMANDS}
                                     width={54}
                                 />
                             </HContainer>
@@ -909,7 +902,6 @@ surrounding textures to appear at the outer edges.'
                             )}
                             value={sprite.manipulationFunction}
                             setValue={setManipulationFunction}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 }
@@ -924,8 +916,8 @@ surrounding textures to appear at the outer edges.'
                                     type="checkbox"
                                     checked={sprite.texture?.flip?.y ?? false}
                                     onChange={() => toggleFlip('y')}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onFocus={() => disableCommands()}
+                                    onBlur={() => enableCommands()}
                                 />
                                 <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
                             </label>
@@ -934,8 +926,8 @@ surrounding textures to appear at the outer edges.'
                                     type="checkbox"
                                     checked={sprite.texture?.flip?.x ?? false}
                                     onChange={() => toggleFlip('x')}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onFocus={() => disableCommands()}
+                                    onBlur={() => enableCommands()}
                                 />
                                 <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
                             </label>
@@ -947,8 +939,8 @@ surrounding textures to appear at the outer edges.'
                                         type="checkbox"
                                         checked={sprite.texture?.repeat?.x ?? false}
                                         onChange={() => toggleRepeat('x')}
-                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onFocus={() => disableCommands()}
+                                        onBlur={() => enableCommands()}
                                     />
                                     <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
                                 </label>
@@ -957,8 +949,8 @@ surrounding textures to appear at the outer edges.'
                                         type="checkbox"
                                         checked={sprite.texture?.repeat?.y ?? false}
                                         onChange={() => toggleRepeat('y')}
-                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onFocus={() => disableCommands()}
+                                        onBlur={() => enableCommands()}
                                     />
                                     <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
                                 </label>
@@ -970,8 +962,8 @@ surrounding textures to appear at the outer edges.'
                             type="checkbox"
                             checked={sprite.texture?.recycleable ?? false}
                             onChange={toggleRecycleable}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onFocus={() => disableCommands()}
+                            onBlur={() => enableCommands()}
                         />
                         {nls.localize('vuengine/editors/actor/recycleable', 'Recycleable')}
                     </label>
@@ -994,7 +986,6 @@ If 0, the value is inferred from the texture.'
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.x ?? 0}
                                 setValue={v => setRepeatSize('x', v as number)}
-                                commands={INPUT_BLOCKING_COMMANDS}
                                 width={48}
                             />
                             <Input
@@ -1003,7 +994,6 @@ If 0, the value is inferred from the texture.'
                                 max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.y ?? 0}
                                 setValue={v => setRepeatSize('y', v as number)}
-                                commands={INPUT_BLOCKING_COMMANDS}
                                 width={48}
                             />
                         </HContainer>
@@ -1020,8 +1010,8 @@ If 0, the value is inferred from the texture.'
                                 type="checkbox"
                                 checked={sprite.optimizeTiles}
                                 onChange={toggleOptimizeTiles}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onFocus={() => disableCommands()}
+                                onBlur={() => enableCommands()}
                             />
                             {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
                         </label>
@@ -1031,8 +1021,8 @@ If 0, the value is inferred from the texture.'
                             type="checkbox"
                             checked={sprite.shareTiles}
                             onChange={toggleShareTiles}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onFocus={() => disableCommands()}
+                            onBlur={() => enableCommands()}
                         />
                         <InfoLabel
                             label={nls.localize('vuengine/editors/actor/share', 'Share')}
@@ -1064,15 +1054,15 @@ If 0, the value is inferred from the texture.'
                             }]}
                             defaultValue={sprite.compression}
                             onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onFocus={() => disableCommands()}
+                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     <SectionSelect
                         value={sprite.section}
                         setValue={setSection}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </HContainer>
             </VContainer>

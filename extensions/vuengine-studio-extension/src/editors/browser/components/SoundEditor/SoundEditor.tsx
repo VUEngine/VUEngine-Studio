@@ -5,7 +5,7 @@ import * as midiManager from 'midi-file';
 import { nanoid } from 'nanoid';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
@@ -122,7 +122,7 @@ interface SoundEditorProps {
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { fileUri, services, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, setCommands, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
@@ -1044,8 +1044,8 @@ A total of {0} instruments will be deleted.",
         clearTimeout(progressTimeout);
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case SoundEditorCommands.ADD_TRACK.id:
                 addTrack();
                 break;
@@ -1143,16 +1143,14 @@ A total of {0} instruments will be deleted.",
     };
 
     useEffect(() => {
-        enableCommands([
+        setCommands([
             ...Object.values(SoundEditorCommands).map(c => c.id)
         ]);
     }, []);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         currentTrackId,
         noteCursor,

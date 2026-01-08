@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Tab, TabList, Tabs } from 'react-tabs';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
@@ -82,7 +82,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         pianoRollNoteWidth,
         pianoRollScrollWindow,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -95,8 +95,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         setEffectsPanelHidden(prev => !prev);
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id:
                 toggleEffectsPanel();
                 break;
@@ -130,10 +130,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     }
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     return <MetaLine

@@ -44,7 +44,7 @@ import { ProjectDataType, WithContributor } from '../../project/browser/ves-proj
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
+import { EditorsContext } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -124,7 +124,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     typeId: string;
     uri: URI;
-    commands: { [commandId: string]: boolean } = {};
+    commands: string[] = [];
+    commandsEnabled: boolean = true;
 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
@@ -137,6 +138,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected readonly onContentChangedEmitter = new Emitter<void>();
     readonly onContentChanged = this.onContentChangedEmitter.event;
+
+    protected readonly onCommandExecuteEmitter = new Emitter<string>();
+    readonly onCommandExecute = this.onCommandExecuteEmitter.event;
 
     protected reference: Reference<MonacoEditorModel>;
 
@@ -283,9 +287,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     dispatchCommandEvent(commandId: string): void {
-        const resetInputsEvent = new CustomEvent(EDITORS_COMMAND_EXECUTED_EVENT_NAME, { detail: commandId });
-        // console.info(`Emitting event: EDITORS_COMMAND_EXECUTED_EVENT_NAME ${commandId}`);
-        document.dispatchEvent(resetInputsEvent);
+        if (this.commandsEnabled) {
+            this.onCommandExecuteEmitter.fire(commandId);
+        }
     }
 
     protected bindEvents(): void {
@@ -459,12 +463,16 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.reference?.object.textEditorModel.setValue(stringify(this.data));
     }
 
-    protected enableCommands(commandIds: string[]): void {
-        commandIds.map(commandId => this.commands[commandId] = true);
+    protected setCommands(commandIds: string[]): void {
+        this.commands = commandIds;
     }
 
-    protected disableCommands(commandIds: string[]): void {
-        commandIds.map(commandId => this.commands[commandId] = false);
+    protected enableCommands(): void {
+        this.commandsEnabled = true;
+    }
+
+    protected disableCommands(): void {
+        this.commandsEnabled = false;
     }
 
     protected render(): React.ReactNode {
@@ -484,6 +492,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         setSaveCallback: this.setSaveCallback.bind(this),
                         setIsGenerating: this.setIsGenerating.bind(this),
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
+                        setCommands: this.setCommands.bind(this),
+                        onCommandExecute: this.onCommandExecute.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),

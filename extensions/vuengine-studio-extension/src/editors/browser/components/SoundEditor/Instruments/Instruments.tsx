@@ -7,7 +7,7 @@ import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
-import { INPUT_BLOCKING_COMMANDS, InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
+import { InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
 import Instrument from './Instrument';
 import { getInstrumentName } from '../SoundEditor';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -165,7 +165,6 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                         }))}
                         defaultValue={testNote}
                         onChange={options => setTestNote(options[0])}
-                        commands={INPUT_BLOCKING_COMMANDS}
                         containerStyle={{ flexGrow: 1 }}
                     />
                     <button
@@ -197,8 +196,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     defaultValue={typeFilter}
                     onChange={options => setTypeFilter(options.map(o => o.value) as SoundEditorTrackType[])}
                     fitSpace
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onFocus={() => disableCommands()}
+                    onBlur={() => enableCommands()}
                 />
                 <StyledInstrumentsList>
                     {Object.keys(soundData.instruments)

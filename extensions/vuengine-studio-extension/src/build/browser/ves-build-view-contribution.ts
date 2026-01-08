@@ -46,23 +46,19 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_EXPAND, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
-            execute: async widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
+            isVisible: widget => widget?.id === VesBuildWidget.ID,
+            execute: async widget => widget?.id === VesBuildWidget.ID &&
                 await this.openView({ activate: true, reveal: true }) &&
                 this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
         });
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_HELP, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
+            isVisible: widget => widget?.id === VesBuildWidget.ID,
             execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/building', false),
         });
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
+            isVisible: widget => widget?.id === VesBuildWidget.ID,
             execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'build'),
         });
     }

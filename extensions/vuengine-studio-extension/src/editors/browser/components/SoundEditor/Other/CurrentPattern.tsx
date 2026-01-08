@@ -9,7 +9,6 @@ import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import { getPatternName } from '../SoundEditor';
 import {
-    INPUT_BLOCKING_COMMANDS,
     MAX_PATTERN_SIZE,
     MIN_PATTERN_SIZE,
     PatternConfig,
@@ -112,7 +111,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                         }))}
                         defaultValue={currentPatternId.toString()}
                         onChange={options => setCurrentPatternId(currentTrackId, options[0])}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'
@@ -139,7 +137,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 <Input
                     value={pattern.name ?? ''}
                     setValue={setPatternName}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
             <VContainer>
@@ -159,7 +156,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     }]}
                     defaultValue={pattern.type}
                     onChange={options => setPatternType(options[0] as SoundEditorTrackType)}
-                    commands={INPUT_BLOCKING_COMMANDS}
                     containerStyle={{ flexGrow: 1 }}
                 />
             </VContainer>
@@ -172,7 +168,6 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     setValue={v => setPatternSize(currentPatternId, v as number)}
                     min={MIN_PATTERN_SIZE}
                     max={MAX_PATTERN_SIZE}
-                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
                 />
             </VContainer>
         </VContainer>

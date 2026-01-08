@@ -71,11 +71,10 @@ interface VerticalRangeInputProps {
     barHeight?: number
     value: number
     setValue: (value: number) => void
-    commands?: string[]
 }
 
 export default function VerticalRangeInput(props: VerticalRangeInputProps): React.JSX.Element {
-    const { index, min, max, maxWidth, barHeight, value, setValue, commands } = props;
+    const { index, min, max, maxWidth, barHeight, value, setValue } = props;
 
     const handleSelectInput = (event: React.MouseEvent) =>
         // @ts-ignore
@@ -114,7 +113,6 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
             value={value ?? min}
             setValue={setValue}
             onClick={handleSelectInput}
-            commands={commands}
         />
     </Column>;
 }

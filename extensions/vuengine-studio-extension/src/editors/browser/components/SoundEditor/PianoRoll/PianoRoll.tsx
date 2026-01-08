@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepIndicator from '../Sequencer/StepIndicator';
 import { SetNoteEventProps, SetNoteProps } from '../SoundEditor';
@@ -185,7 +185,7 @@ interface PianoRollProps {
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
         noteCursor, setNoteCursor,
@@ -329,8 +329,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setNote,
     ]);
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
                     setNoteCursor(noteCursor + SUB_NOTE_RESOLUTION);
@@ -413,10 +413,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     };
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         soundData,
         noteCursor,

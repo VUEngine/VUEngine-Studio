@@ -48,21 +48,19 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_CLEAR_ALL, {
             isEnabled: () => !!this.model.search.query,
-            isVisible: widget => widget !== undefined &&
-                [
-                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                    VesPluginsViewContainer.ID
-                ].includes(widget.id),
+            isVisible: widget => [
+                `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                VesPluginsViewContainer.ID
+            ].includes(widget?.id),
             execute: () => this.model.search.query = '',
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_HELP, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                [
-                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                    VesPluginsViewContainer.ID
-                ].includes(widget.id),
+            isVisible: widget => [
+                `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                VesPluginsViewContainer.ID
+            ].includes(widget?.id),
             execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/vuengine-plugins', false),
         });
 
@@ -88,11 +86,10 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                [
-                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                    VesPluginsViewContainer.ID
-                ].includes(widget.id),
+            isVisible: widget => [
+                `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                VesPluginsViewContainer.ID
+            ].includes(widget?.id),
             execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
         });
     }

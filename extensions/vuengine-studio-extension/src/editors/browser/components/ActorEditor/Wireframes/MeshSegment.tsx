@@ -7,7 +7,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { clamp } from '../../Common/Utils';
-import { ActorEditorContext, ActorEditorContextType, INPUT_BLOCKING_COMMANDS, MeshSegmentData } from '../ActorEditorTypes';
+import { ActorEditorContext, ActorEditorContextType, MeshSegmentData } from '../ActorEditorTypes';
 
 const MESH_SEGMENT_MIN_VALUE = -511;
 const MESH_SEGMENT_MAX_VALUE = 512;
@@ -93,28 +93,24 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                             type='number'
                             value={segment.fromVertex.x}
                             setValue={v => setPoint('from', 'x', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.fromVertex.y}
                             setValue={v => setPoint('from', 'y', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.fromVertex.z}
                             setValue={v => setPoint('from', 'z', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.fromVertex.parallax}
                             setValue={v => setPoint('from', 'parallax', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                     </HContainer>
@@ -123,28 +119,24 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                             type='number'
                             value={segment.toVertex.x}
                             setValue={v => setPoint('to', 'x', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.toVertex.y}
                             setValue={v => setPoint('to', 'y', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.toVertex.z}
                             setValue={v => setPoint('to', 'z', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                         <Input
                             type='number'
                             value={segment.toVertex.parallax}
                             setValue={v => setPoint('to', 'parallax', v as number)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={60}
                         />
                     </HContainer>

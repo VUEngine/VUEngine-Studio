@@ -6,7 +6,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS, MAX_SEQUENCE_SIZE, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
+import { MAX_SEQUENCE_SIZE, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
 
 interface PropertiesProps {
     soundData: SoundData
@@ -18,11 +18,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
 
     const handleOnFocus = () => {
-        disableCommands(INPUT_BLOCKING_COMMANDS);
+        disableCommands();
     };
 
     const handleOnBlur = () => {
-        enableCommands(INPUT_BLOCKING_COMMANDS);
+        enableCommands();
     };
 
     const setName = (n: string): void => {
@@ -62,13 +62,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
             label={nls.localize('vuengine/editors/sound/name', 'Name')}
             value={soundData.name}
             setValue={setName}
-            commands={INPUT_BLOCKING_COMMANDS}
         />
         <Input
             label={nls.localize('vuengine/editors/sound/author', 'Author')}
             value={soundData.author}
             setValue={setAuthor}
-            commands={INPUT_BLOCKING_COMMANDS}
         />
 
         <VContainer>
@@ -97,7 +95,6 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                 max={MAX_TICK_DURATION}
                 min={MIN_TICK_DURATION}
                 setValue={setSpeed}
-                commandsToDisable={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
 
@@ -121,7 +118,6 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                     min={0}
                     max={MAX_SEQUENCE_SIZE - 1}
                     width={64}
-                    commands={INPUT_BLOCKING_COMMANDS}
                 />
             }
         </HContainer>

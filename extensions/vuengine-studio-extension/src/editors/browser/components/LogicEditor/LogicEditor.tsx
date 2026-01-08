@@ -3,12 +3,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { HideTreeButton, ShowTreeButton } from '../ActorEditor/ActorEditor';
 import HContainer from '../Common/Base/HContainer';
+import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
+import Sidebar from '../Common/Editor/Sidebar';
 import { LogicData, LogicEditorContext } from './LogicEditorTypes';
 import Script from './Scripts/Script';
 import ScriptedActionDetail from './Scripts/ScriptedActionDetail';
 import MethodsTree from './Tree/MethodsTree';
-import { CommonEditorCommands } from '../Common/Editor/CommonEditorCommands';
-import Sidebar from '../Common/Editor/Sidebar';
 
 interface LogicEditorProps {
   data: LogicData;
@@ -16,17 +16,14 @@ interface LogicEditorProps {
   context: EditorsContextType
 }
 
-export const INPUT_BLOCKING_COMMANDS = [
-];
-
 export default function LogicEditor(props: LogicEditorProps): React.JSX.Element {
   const { data, updateData } = props;
-  const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
+  const { setCommands } = useContext(EditorsContext) as EditorsContextType;
   const [currentComponent, setCurrentComponent] = useState<string>('');
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(true);
 
   useEffect(() => {
-    enableCommands([
+    setCommands([
       ...Object.values(CommonEditorCommands).map(c => c.id)
     ]);
   }, []);

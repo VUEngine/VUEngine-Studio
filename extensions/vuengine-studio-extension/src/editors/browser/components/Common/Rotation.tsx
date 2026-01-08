@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
 import { isNaN } from 'lodash';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor/ActorEditorTypes';
 import HContainer from './Base/HContainer';
 import Input from './Base/Input';
 import VContainer from './Base/VContainer';
@@ -53,7 +52,6 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.x}°
@@ -67,7 +65,6 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.y}°
@@ -81,7 +78,6 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.z}°

@@ -3,7 +3,7 @@ import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS, MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
+import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
 import FontTileInfo from '../Tools/FontTileInfo';
 
 interface AlphabetSettingsProps {
@@ -34,7 +34,6 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 min={MIN_CHAR_COUNT}
                 max={effectiveMaxCharCount}
                 width={48}
-                commands={INPUT_BLOCKING_COMMANDS}
             />
             <Input
                 label={nls.localize('vuengine/editors/font/offset', 'Offset')}
@@ -43,7 +42,6 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 setValue={setOffset}
                 min={MIN_OFFSET}
                 max={effectiveMaxOffset}
-                commands={INPUT_BLOCKING_COMMANDS}
                 width={48}
             />
             <Input
@@ -59,7 +57,6 @@ For all regular use cases, this should be the total amount of characters in the 
                 min={MIN_PAGE_SIZE}
                 max={effectiveMaxPageSize}
                 width={48}
-                commands={INPUT_BLOCKING_COMMANDS}
             />
         </HContainer>
         <VContainer>

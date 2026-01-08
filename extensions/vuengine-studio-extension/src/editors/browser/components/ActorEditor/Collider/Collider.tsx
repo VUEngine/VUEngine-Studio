@@ -9,7 +9,6 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import Rotation from '../../Common/Rotation';
 import { ColliderType, PixelVector } from '../../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import {
     ColliderData,
     MAX_COLLIDER_DIAMETER,
@@ -263,7 +262,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             }]}
                             defaultValue={collider.type}
                             onChange={option => setType(option[0] as ColliderType)}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </VContainer>
                     <VContainer>
@@ -317,7 +315,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
                                 value={collider.pixelSize.y}
@@ -326,7 +323,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
                                 value={collider.pixelSize.z}
@@ -335,7 +331,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={MIN_COLLIDER_PIXEL_SIZE}
                                 max={MAX_COLLIDER_PIXEL_SIZE}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
                     </VContainer>
@@ -349,7 +344,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         min={MIN_COLLIDER_DIAMETER}
                         max={MAX_COLLIDER_DIAMETER}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 }
                 {collider.type === ColliderType.LineField &&
@@ -362,7 +356,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             min={MIN_COLLIDER_LINEFIELD_LENGTH}
                             max={MAX_COLLIDER_LINEFIELD_LENGTH}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                         <VContainer>
                             <label>
@@ -381,8 +374,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 }]}
                                 defaultValue={axis}
                                 onChange={options => updateLineField(options[0].value as number, length, thickness)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onFocus={() => disableCommands()}
+                                onBlur={() => enableCommands()}
                                 allowBlank
                             />
                         </VContainer>
@@ -394,7 +387,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             min={MIN_COLLIDER_LINEFIELD_THICKNESS}
                             max={MAX_COLLIDER_LINEFIELD_THICKNESS}
                             width={64}
-                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 }
@@ -409,7 +401,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -418,7 +409,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -427,7 +417,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <Input
@@ -436,7 +425,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT_PARALLAX}
                             max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
-                            commands={INPUT_BLOCKING_COMMANDS}
                             width={64}
                         />
                         <i
@@ -468,7 +456,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 max={MAX_SCALE}
                                 step={0.5}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
                                 value={collider.scale.y}
@@ -478,7 +465,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 max={MAX_SCALE}
                                 step={0.5}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                             <Input
                                 value={collider.scale.z}
@@ -488,7 +474,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 max={MAX_SCALE}
                                 step={0.5}
                                 width={64}
-                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
                     </VContainer>
@@ -504,7 +489,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         max={MAX_SCALE}
                         step={0.5}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 }
                 <VContainer>
@@ -515,8 +499,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         type="checkbox"
                         checked={collider.checkForCollisions}
                         onChange={toggleCheckForCollisions}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onFocus={() => disableCommands()}
+                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
                 {

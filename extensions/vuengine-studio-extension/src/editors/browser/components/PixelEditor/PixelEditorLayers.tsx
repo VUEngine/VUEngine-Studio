@@ -18,7 +18,7 @@ import VContainer from '../Common/Base/VContainer';
 import CanvasImage from '../Common/CanvasImage';
 import { arrayMove, nanoid } from '../Common/Utils';
 import { DisplayMode, Displays } from '../Common/VUEngineTypes';
-import { INPUT_BLOCKING_COMMANDS, LayerPixelData, PixelData } from './PixelEditorTypes';
+import { LayerPixelData, PixelData } from './PixelEditorTypes';
 
 const LayerPreviewContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);
@@ -255,7 +255,6 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                                             value={data.frames[currentFrame].find(l => l.id === layer.id)?.name ?? ''}
                                             grow={1}
                                             setValue={v => setLayerName(layer.id, v as string)}
-                                            commands={INPUT_BLOCKING_COMMANDS}
                                         />
                                         <HContainer>
                                             <div

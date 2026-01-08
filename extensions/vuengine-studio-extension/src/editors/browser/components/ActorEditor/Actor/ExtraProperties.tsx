@@ -4,7 +4,6 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 import { ActorEditorContext, ActorEditorContextType, MAX_ACTOR_PIXEL_SIZE, MIN_ACTOR_PIXEL_SIZE } from '../ActorEditorTypes';
 
 export default function ExtraProperties(): React.JSX.Element {
@@ -37,7 +36,6 @@ export default function ExtraProperties(): React.JSX.Element {
                 label={nls.localize('vuengine/editors/actor/extraInfo', 'Extra Info')}
                 value={data.extraProperties.extraInfo}
                 setValue={setExtraInfo}
-                commands={INPUT_BLOCKING_COMMANDS}
             />
             <VContainer>
                 <InfoLabel
@@ -56,7 +54,6 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
                         value={data.extraProperties.pixelSize.y}
@@ -65,7 +62,6 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <Input
                         value={data.extraProperties.pixelSize.z}
@@ -74,7 +70,6 @@ If 0, width and height will be inferred from the first sprite's texture size."
                         min={MIN_ACTOR_PIXEL_SIZE}
                         max={MAX_ACTOR_PIXEL_SIZE}
                         width={64}
-                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>
             </VContainer>

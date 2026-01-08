@@ -6,7 +6,6 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditorTypes';
 
 interface ColorModeSelectProps {
     value: ColorMode
@@ -61,8 +60,8 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
             }]}
             defaultValue={value}
             onChange={options => setValue(options[0].value as ColorMode)}
-            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+            onFocus={() => disableCommands()}
+            onBlur={() => enableCommands()}
             disabled={disabled}
         />
     </VContainer>;

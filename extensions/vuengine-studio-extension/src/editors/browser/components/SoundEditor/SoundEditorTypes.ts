@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
 import { DataSection } from '../Common/CommonTypes';
 import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
-import { SoundEditorCommands } from './SoundEditorCommands';
 
 export type InstrumentMap = Record<string, InstrumentConfig>;
 
@@ -46,56 +45,6 @@ export const DEFAULT_TRACK_SETTINGS = {
     solo: false,
     seeThrough: true,
 };
-
-export const INPUT_BLOCKING_COMMANDS = [
-    SoundEditorCommands.ADD_TRACK.id,
-    SoundEditorCommands.PLAY_PAUSE.id,
-    SoundEditorCommands.STOP.id,
-    SoundEditorCommands.SELECT_TRACK_1.id,
-    SoundEditorCommands.SELECT_TRACK_2.id,
-    SoundEditorCommands.SELECT_TRACK_3.id,
-    SoundEditorCommands.SELECT_TRACK_4.id,
-    SoundEditorCommands.SELECT_TRACK_5.id,
-    SoundEditorCommands.SELECT_TRACK_6.id,
-    SoundEditorCommands.SELECT_NEXT_TRACK.id,
-    SoundEditorCommands.SELECT_PREVIOUS_TRACK.id,
-    SoundEditorCommands.ADD_PATTERN.id,
-    SoundEditorCommands.REMOVE_CURRENT_PATTERN.id,
-    SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id,
-    SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX.id,
-    SoundEditorCommands.ADD_NOTE.id,
-    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id,
-    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id,
-    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id,
-    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id,
-    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id,
-    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id,
-    SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR.id,
-    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id,
-    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id,
-    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id,
-    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id,
-    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id,
-    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id,
-    SoundEditorCommands.NOTES_UP.id,
-    SoundEditorCommands.NOTES_DOWN.id,
-    SoundEditorCommands.NOTES_UP_AN_OCTAVE.id,
-    SoundEditorCommands.NOTES_DOWN_AN_OCTAVE.id,
-    SoundEditorCommands.SELECT_PATTERN_AT_CURSOR_POSITION.id,
-    SoundEditorCommands.REMOVE_SELECTED_NOTES.id,
-    SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
-    SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
-    SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
-    SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id,
-    SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id,
-    SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id,
-    SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id,
-    SoundEditorCommands.IMPORT.id,
-    SoundEditorCommands.EXPORT.id,
-];
 
 export const EXCLUDED_SOUND_EVENTS = [
     SoundEvent.Duration,

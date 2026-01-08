@@ -1,8 +1,8 @@
+import { StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../Base/VContainer';
-import { StatusBarAlignment } from '@theia/core/lib/browser';
 import { CommonEditorCommands } from './CommonEditorCommands';
 
 const ScalableContainer = styled.div`
@@ -51,7 +51,7 @@ interface ScalableProps {
 
 export default function Scalable(props: PropsWithChildren<ScalableProps>): React.JSX.Element {
     const { children, minZoom, maxZoom, wheelSensitivity, zoomStep, blockMovement, backgroundClickHandler, moveHandler } = props;
-    const { setStatusBarItem, removeStatusBarItem } = useContext(EditorsContext) as EditorsContextType;
+    const { setStatusBarItem, removeStatusBarItem, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [zoom, setZoom] = useState<number>(1);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [offsetX, setOffsetX] = useState<number>(0);
@@ -97,8 +97,8 @@ export default function Scalable(props: PropsWithChildren<ScalableProps>): React
         return z;
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case CommonEditorCommands.ZOOM_IN.id:
                 setZoom(previousValue => boundZoom(previousValue + zoomStep));
                 break;
@@ -165,10 +165,8 @@ export default function Scalable(props: PropsWithChildren<ScalableProps>): React
     ]);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, []);
 
     return (

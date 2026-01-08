@@ -23,11 +23,10 @@ const StyledWaveform = styled.div`
 interface WaveFormProps {
     value: number[]
     setValue: (value: number[]) => void
-    commands?: string[]
 }
 
 export default function WaveForm(props: WaveFormProps): React.JSX.Element {
-    const { value, setValue, commands } = props;
+    const { value, setValue } = props;
 
     const setIndividualValue = (index: number, v: number): void => {
         const updatedValue = [...value];
@@ -46,7 +45,6 @@ export default function WaveForm(props: WaveFormProps): React.JSX.Element {
                     max={WAVEFORM_MAX}
                     value={v}
                     setValue={x => setIndividualValue(y, x)}
-                    commands={commands}
                 />;
             })}
         </div>

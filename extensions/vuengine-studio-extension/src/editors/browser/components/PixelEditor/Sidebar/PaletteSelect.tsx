@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import { DottingRef, useBrush, useHandlers } from 'dotting';
 import React, { useContext, useEffect } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
-import { EditorCommand, EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -32,7 +32,7 @@ interface PaletteSelectProps {
 }
 
 export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const { colorMode, setColorMode, primaryColorIndex, setPrimaryColorIndex, secondaryColorIndex, setSecondaryColorIndex, includeTransparent, dottingRef } = props;
     const { changeBrushColor } = useBrush(dottingRef);
     const { addCanvasElementEventListener, removeCanvasElementEventListener } = useHandlers(dottingRef);
@@ -97,8 +97,8 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
         changeBrushColor(paletteColors[primaryColorIndex]);
     };
 
-    const commandListener = (e: CustomEvent): void => {
-        switch (e.detail) {
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
             case PixelEditorCommands.SWAP_COLORS.id:
                 const secColorIndex = secondaryColorIndex;
                 setSecondaryColorIndex(primaryColorIndex);
@@ -147,10 +147,8 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
     }, [secondaryColorIndex, primaryColorIndex]);
 
     useEffect(() => {
-        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        return () => {
-            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
-        };
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
     }, [
         primaryColorIndex,
         secondaryColorIndex,
