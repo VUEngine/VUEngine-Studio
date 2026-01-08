@@ -245,7 +245,7 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                             </tr>
                             <tr>
                                 <td>
-                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/totalEngineSize', 'Total Engine Size')}:
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/staticGlobalVariables', 'Static & Global Variables')}:
                                 </td>
                                 <td align='right'>
                                     {globalVariablesTotalSize === 0
