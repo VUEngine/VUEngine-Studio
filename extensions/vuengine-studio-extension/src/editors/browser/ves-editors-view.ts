@@ -158,7 +158,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     },
                     execute: widget => {
                         const w = this.shell.currentWidget as VesEditorsWidget;
-                        console.log('execute', w);
                         w?.dispatchCommandEvent(command.id);
                     }
                 });

@@ -547,15 +547,9 @@ A total of {0} patterns will be deleted.',
         soundData.tracks.forEach(track => {
             usedInstruments.push(track.instrument);
 
-            console.log('-----------------');
-            console.log('-----------------');
-            console.log('-----------------');
             Object.values(track.sequence).forEach(patternId => {
-                console.log('patternId', patternId);
                 const pattern = soundData.patterns[patternId];
-                console.log('pattern', pattern);
                 Object.values(pattern?.events ?? {}).forEach(event => {
-                    console.log('event', event);
                     if (event[SoundEvent.Instrument]) {
                         usedInstruments.push(event[SoundEvent.Instrument]);
                     }
@@ -974,18 +968,14 @@ A total of {0} instruments will be deleted.",
                     break;
                 case '.uge':
                     const parsedUgeSong = loadUGESong(fileArrayBuffer);
-                    console.log('parsed', parsedUgeSong);
                     if (parsedUgeSong) {
                         importedSoundData = convertUgeSong(parsedUgeSong);
-                        console.log('imported', importedSoundData);
                     }
                     break;
                 case '.vbm':
                     const parsedVbmSong = parseVbmSong(fileArrayBuffer);
-                    console.log('parsed', parsedVbmSong);
                     if (parsedVbmSong) {
                         importedSoundData = convertVbmSong(parsedVbmSong);
-                        console.log('imported', importedSoundData);
                     }
                     break;
             }
