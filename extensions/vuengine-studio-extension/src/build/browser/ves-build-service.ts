@@ -1412,7 +1412,17 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     if (full) {
       if (await this.fileService.exists(buildPathUri)) {
-        await this.fileService.delete(buildPathUri, { recursive: true });
+        if (await this.fileService.exists(buildPathUri)) {
+          const files = await this.fileService.resolve(buildPathUri);
+          if (files.children) {
+            await this.deleteLibraryFiles();
+            await Promise.all(files.children.map(async child => {
+              if (child.isDirectory && child.name !== 'archive') {
+                await this.fileService.delete(child.resource, { recursive: true });
+              }
+            }));
+          }
+        }
       }
     } else {
       const buildPathModeUri = await this.getBuildPathUri(buildMode);
