@@ -53,11 +53,12 @@ export interface VsuChannelData {
 }
 
 export type WaveformData = number[];
+export type ModulationData = number[];
 
 export interface VsuData {
     channels: VsuChannelData[]
     waveforms: WaveformData[]
-    modulation: number[]
+    modulation: ModulationData
 }
 
 export const VSU_SAMPLE_RATE = 41667;

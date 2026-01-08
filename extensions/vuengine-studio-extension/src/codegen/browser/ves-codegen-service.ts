@@ -11,7 +11,8 @@ import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { hexFromBitsArray, intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
+import { intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
+import { getTrackKeyframes } from '../../editors/browser/components/SoundEditor/Other/templating';
 import { TYPE_LABELS } from '../../editors/browser/ves-editors-types';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
@@ -688,6 +689,6 @@ export class VesCodeGenService {
 
     // add functions
     env.addGlobal('compressTiles', compressTiles);
-    env.addGlobal('hexFromBitsArray', hexFromBitsArray);
+    env.addGlobal('getTrackKeyframes', getTrackKeyframes);
   }
 }
