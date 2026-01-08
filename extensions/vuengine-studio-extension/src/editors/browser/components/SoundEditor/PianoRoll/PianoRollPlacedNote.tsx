@@ -209,16 +209,13 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
-
-        if (newStep !== localStep && newNoteId !== noteId) {
-            const newNoteLabel = NOTES_LABELS[newNoteId];
-            setNote([{ step: newStep, note: newNoteLabel, prevStep: localStep }]);
-        }
+        const newNoteLabel = NOTES_LABELS[newNoteId];
+        setNote([{ step: newStep, note: newNoteLabel, prevStep: localStep }]);
 
         e.stopPropagation();
     };
 
-    const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent) => {
         if (e.button === 0) {
             const event = events[localStep];
             if (event) {
@@ -229,107 +226,105 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         } else if (e.button === 2) {
             setNote([{ step: localStep }]);
         }
+
         e.stopPropagation();
     };
 
     return (
-        <div
-            onMouseUp={onMouseUp}
+        <Draggable
+            grid={[minWidth, pianoRollNoteHeight]}
+            handle=".placedNote"
+            cancel=".react-resizable-handle"
+            onStop={onDragStop}
+            onMouseDown={onMouseDown}
+            position={{
+                x: left,
+                y: top,
+            }}
+            bounds={{
+                bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
+                left: PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
+                right: (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION -
+                    (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
+                top: 0,
+            }}
         >
-            <Draggable
-                grid={[minWidth, pianoRollNoteHeight]}
-                handle=".placedNote"
-                cancel=".react-resizable-handle"
-                onStop={onDragStop}
-                position={{
-                    x: left,
-                    y: top,
+            <StyledPianoRollPlacedNote
+                className={classNames.join(' ')}
+                style={{
+                    backgroundColor: instrumentColor,
+                    color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
+                    fontSize: Math.min(fontSize, MAX_FONT_SIZE),
+                    lineHeight: `${pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH}px`,
+                    height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                 }}
-                bounds={{
-                    bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
-                    left: PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
-                    right: (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION -
-                        (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
-                    top: 0,
-                }}
+                title={label}
             >
-                <StyledPianoRollPlacedNote
-                    className={classNames.join(' ')}
-                    style={{
-                        backgroundColor: instrumentColor,
-                        color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
-                        fontSize: Math.min(fontSize, MAX_FONT_SIZE),
-                        lineHeight: `${pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH}px`,
-                        height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
+                <ResizableBox
+                    width={width}
+                    height={pianoRollNoteHeight}
+                    draggableOpts={{
+                        grid: [minWidth, pianoRollNoteHeight]
                     }}
-                    title={label}
+                    axis="x"
+                    minConstraints={[minWidth, pianoRollNoteHeight]}
+                    maxConstraints={[maxWidth, pianoRollNoteHeight]}
+                    resizeHandles={['e']}
+                    onResizeStop={onResize}
                 >
-                    <ResizableBox
-                        width={width}
-                        height={pianoRollNoteHeight}
-                        draggableOpts={{
-                            grid: [minWidth, pianoRollNoteHeight]
-                        }}
-                        axis="x"
-                        minConstraints={[minWidth, pianoRollNoteHeight]}
-                        maxConstraints={[maxWidth, pianoRollNoteHeight]}
-                        resizeHandles={['e']}
-                        onResizeStop={onResize}
-                    >
-                        <>
-                            <ResizableBox
-                                className='noteSlide up'
-                                style={{
-                                    background: `linear-gradient(
+                    <>
+                        <ResizableBox
+                            className='noteSlide up'
+                            style={{
+                                background: `linear-gradient(
                                     to bottom right, 
                                     transparent 0%, 
                                     transparent 50%, 
                                     ${instrumentColor} 50%, 
                                     ${instrumentColor} 100%
                                 )`,
-                                    bottom: pianoRollNoteHeight,
-                                }}
-                                width={width}
-                                height={slideUpHeight}
-                                draggableOpts={{
-                                    grid: [minWidth, pianoRollNoteHeight]
-                                }}
-                                axis="y"
-                                minConstraints={[minWidth, 0]}
-                                maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
-                                resizeHandles={['n']}
-                                onResizeStop={onNoteSlideUpResize}
-                            />
-                            <ResizableBox
-                                className='noteSlide down'
-                                style={{
-                                    background: `linear-gradient(
+                                bottom: pianoRollNoteHeight,
+                            }}
+                            width={width}
+                            height={slideUpHeight}
+                            draggableOpts={{
+                                grid: [minWidth, pianoRollNoteHeight]
+                            }}
+                            axis="y"
+                            minConstraints={[minWidth, 0]}
+                            maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
+                            resizeHandles={['n']}
+                            onResizeStop={onNoteSlideUpResize}
+                        />
+                        <ResizableBox
+                            className='noteSlide down'
+                            style={{
+                                background: `linear-gradient(
                                     to top right, 
                                     transparent 0%, 
                                     transparent 50%, 
                                     ${instrumentColor} 50%, 
                                     ${instrumentColor} 100%
                                 )`,
-                                    top: pianoRollNoteHeight,
-                                }}
-                                width={width}
-                                height={slideDownHeight}
-                                draggableOpts={{
-                                    grid: [minWidth, pianoRollNoteHeight]
-                                }}
-                                axis="y"
-                                minConstraints={[minWidth, 0]}
-                                maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
-                                resizeHandles={['s']}
-                                onResizeStop={onNoteSlideDownResize}
-                            />
-                            <StyledPianoRollPlacedNoteLabel>
-                                {label}
-                            </StyledPianoRollPlacedNoteLabel>
-                        </>
-                    </ResizableBox>
-                </StyledPianoRollPlacedNote>
-            </Draggable>
-        </div>
+                                top: pianoRollNoteHeight,
+                            }}
+                            width={width}
+                            height={slideDownHeight}
+                            draggableOpts={{
+                                grid: [minWidth, pianoRollNoteHeight]
+                            }}
+                            axis="y"
+                            minConstraints={[minWidth, 0]}
+                            maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
+                            resizeHandles={['s']}
+                            onResizeStop={onNoteSlideDownResize}
+                        />
+                        <StyledPianoRollPlacedNoteLabel>
+                            {label}
+                        </StyledPianoRollPlacedNoteLabel>
+                    </>
+                </ResizableBox>
+            </StyledPianoRollPlacedNote>
+        </Draggable>
     );
 }

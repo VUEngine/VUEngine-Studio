@@ -359,9 +359,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNote(selectedNotes.map(sn => {
                     const p: SetNoteProps = { step: sn };
                     if (pattern?.events[sn] && pattern?.events[sn][SoundEvent.Note]) {
-                        const newNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]) - 1;
+                        const currentNoteId = pattern.events[sn][SoundEvent.Note];
+                        const currentDuration = pattern.events[sn][SoundEvent.Duration];
+                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - 1;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                             p.note = NOTES_LABELS[newNoteId];
+                            p.duration = currentDuration;
                         }
                     }
                     return p;
@@ -371,9 +374,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNote(selectedNotes.map(sn => {
                     const p: SetNoteProps = { step: sn };
                     if (pattern?.events[sn] && pattern?.events[sn][SoundEvent.Note]) {
-                        const newNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]) + 1;
+                        const currentNoteId = pattern.events[sn][SoundEvent.Note];
+                        const currentDuration = pattern.events[sn][SoundEvent.Duration];
+                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + 1;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                             p.note = NOTES_LABELS[newNoteId];
+                            p.duration = currentDuration;
                         }
                     }
                     return p;
@@ -383,9 +389,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNote(selectedNotes.map(sn => {
                     const p: SetNoteProps = { step: sn };
                     if (pattern?.events[sn] && pattern?.events[sn][SoundEvent.Note]) {
-                        const newNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]) - NOTES_PER_OCTAVE;
+                        const currentNoteId = pattern.events[sn][SoundEvent.Note];
+                        const currentDuration = pattern.events[sn][SoundEvent.Duration];
+                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - NOTES_PER_OCTAVE;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                             p.note = NOTES_LABELS[newNoteId];
+                            p.duration = currentDuration;
                         }
                     }
                     return p;
@@ -395,9 +404,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNote(selectedNotes.map(sn => {
                     const p: SetNoteProps = { step: sn };
                     if (pattern?.events[sn] && pattern?.events[sn][SoundEvent.Note]) {
-                        const newNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]) + NOTES_PER_OCTAVE;
+                        const currentNoteId = pattern.events[sn][SoundEvent.Note];
+                        const currentDuration = pattern.events[sn][SoundEvent.Duration];
+                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + NOTES_PER_OCTAVE;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
                             p.note = NOTES_LABELS[newNoteId];
+                            p.duration = currentDuration;
                         }
                     }
                     return p;
