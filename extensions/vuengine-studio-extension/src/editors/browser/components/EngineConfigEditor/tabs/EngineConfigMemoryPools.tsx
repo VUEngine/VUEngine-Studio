@@ -1,9 +1,11 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
+import HoverInfo from '../../Common/HoverInfo';
 import InfoLabel from '../../Common/InfoLabel';
 import {
     EngineConfigData,
@@ -30,6 +32,8 @@ interface EngineConfigMemoryPoolsProps {
 
 export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsProps): React.JSX.Element {
     const { data, updateData } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const [globalVariablesTotalSize, setGlobalVariablesTotalSize] = useState<number>(0);
 
     const addMemoryPool = (): void => {
         updateData({
@@ -91,16 +95,49 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
         });
     };
 
+    const determineGlobalVariablesTotalSize = async (): Promise<void> => {
+        await services.workspaceService.ready;
+
+        const roots = services.workspaceService.tryGetRoots();
+        const workspaceRootUri = roots[0].resource;
+
+        const mapFileUri = workspaceRootUri.resolve('build').resolve('output.map');
+        const mapFileExists = await services.fileService.exists(mapFileUri);
+        if (!mapFileExists) {
+            return;
+        }
+
+        const mapFileContent = await services.fileService.readFile(mapFileUri);
+        const matches = mapFileContent.value.toString().match(/0x0000000005([a-z0-9]{6})[' ']*PROVIDE \(\_\_bssEnd,/);
+        if (matches === null || matches[1] === undefined) {
+            return;
+        }
+
+        const bssEndAddress = parseInt(matches[1], 16);
+        const computedSize = bssEndAddress - services.vesBuildService.lastBuildTotalMemoryPoolsSize;
+
+        setGlobalVariablesTotalSize(computedSize);
+    };
+
     const totalPoolsSize = (data.memoryPools?.pools ?? []).reduce(
         (accumulator, pool) => accumulator + pool.size * pool.objects,
         0,
     );
-    const totalPoolsUsage = Math.round(totalPoolsSize * 100 / MEMORY_POOLS_TOTAL_AVAILABLE_SIZE);
-    const sizeLevel = totalPoolsSize >= MEMORY_POOLS_ERROR_THRESHOLD
+    const totalMemorySize = totalPoolsSize + globalVariablesTotalSize;
+    const totalMemoryUsage = Math.round(totalMemorySize * 100 / MEMORY_POOLS_TOTAL_AVAILABLE_SIZE);
+    const sizeLevel = totalMemorySize >= MEMORY_POOLS_ERROR_THRESHOLD
         ? 'error'
-        : totalPoolsSize >= MEMORY_POOLS_WARNING_THRESHOLD
+        : totalMemorySize >= MEMORY_POOLS_WARNING_THRESHOLD
             ? 'warning'
             : 'ok';
+
+    useEffect(() => {
+        determineGlobalVariablesTotalSize();
+        const listener = services.vesBuildService.onDidSucceedBuild(() => {
+            determineGlobalVariablesTotalSize();
+        });
+        return () => listener.dispose();
+    }, []);
 
     return (
         <VContainer gap={15}>
@@ -115,10 +152,10 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                 {data.memoryPools?.pools?.length > 0
                     ? <>
                         <HContainer>
-                            <div style={{ width: 110 }}>
+                            <div style={{ width: 100 }}>
                                 {nls.localize('vuengine/editors/engineConfig/memoryPools/sizeInBytes', 'Size (Bytes)')}
                             </div>
-                            <div style={{ width: 110 }}>
+                            <div style={{ width: 100 }}>
                                 {nls.localize('vuengine/editors/engineConfig/memoryPools/blocks', 'Blocks')}
                             </div>
                         </HContainer>
@@ -195,22 +232,69 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                 >
                     <i className='codicon codicon-plus' />
                 </button>
-
-                <HContainer>
-                    <div>
-                        {nls.localize('vuengine/editors/engineConfig/memoryPools/totalSize', 'Total Size')}:
-                    </div>
-                    <div>
-                        <span className={sizeLevel}>
-                            {sizeLevel === 'error' && <><i className="codicon codicon-error" style={{ verticalAlign: 'bottom' }} /> </>}
-                            {sizeLevel === 'warning' && <><i className="codicon codicon-warning" style={{ verticalAlign: 'bottom' }} /> </>}
-                            {totalPoolsSize.toLocaleString()}
-                        </span> / {MEMORY_POOLS_TOTAL_AVAILABLE_SIZE.toLocaleString()} Byte
-                    </div>
-                    <div>
-                        ({totalPoolsUsage.toLocaleString()}%)
-                    </div>
-                </HContainer>
+                <div>
+                    <table style={{ minWidth: 244 }}>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/totalMemoryPoolsSize', 'Total Memory Pools Size')}:
+                                </td>
+                                <td align='right'>
+                                    {totalPoolsSize.toLocaleString()} Byte
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/totalEngineSize', 'Total Engine Size')}:
+                                </td>
+                                <td align='right'>
+                                    {globalVariablesTotalSize === 0
+                                        ? <HContainer>
+                                            {nls.localizeByDefault('Unknown')}
+                                            <HoverInfo
+                                                value={nls.localize(
+                                                    'vuengine/editors/engineConfig/memoryPools/unknownEngineSizeDescription',
+                                                    'The total size of static and global variables can only be determined after a successful build.'
+                                                )}
+                                            />
+                                        </HContainer>
+                                        : <>
+                                            {globalVariablesTotalSize.toLocaleString()} Byte
+                                        </>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/totalUsedMemory', 'Total Used Memory')}:
+                                </td>
+                                <td align='right'>
+                                    {totalMemorySize.toLocaleString()} Byte
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/totalAvailableMemory', 'Total Available Memory')}:
+                                </td>
+                                <td align='right'>
+                                    {MEMORY_POOLS_TOTAL_AVAILABLE_SIZE.toLocaleString()} Byte
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {nls.localize('vuengine/editors/engineConfig/memoryPools/usedMemoryPercent', 'Used Memory (Percent)')}:
+                                </td>
+                                <td align='right'>
+                                    <span className={sizeLevel}>
+                                        {sizeLevel === 'error' && <><i className="codicon codicon-error" style={{ verticalAlign: 'bottom' }} /> </>}
+                                        {sizeLevel === 'warning' && <><i className="codicon codicon-warning" style={{ verticalAlign: 'bottom' }} /> </>}
+                                        {totalMemoryUsage.toLocaleString()}%
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </VContainer>
             <VContainer>
                 <InfoLabel

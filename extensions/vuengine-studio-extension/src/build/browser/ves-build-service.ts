@@ -23,6 +23,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Systeminformation } from 'systeminformation';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { clamp } from '../../editors/browser/components/Common/Utils';
+import { EngineConfigData } from '../../editors/browser/components/EngineConfigEditor/EngineConfigEditorTypes';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -31,6 +32,8 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
+import { VesProjectService } from '../../project/browser/ves-project-service';
+import { ProjectContributor } from '../../project/browser/ves-project-types';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
@@ -79,6 +82,8 @@ export class VesBuildService {
   protected readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(VesPluginsService)
   protected readonly vesPluginsService: VesPluginsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectService: VesProjectService;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -99,11 +104,21 @@ export class VesBuildService {
   readonly onDidChangeLastBuildMode = this.onDidChangeLastBuildModeEmitter.event;
   set lastBuildMode(mode: string | undefined) {
     this._lastBuildMode = mode;
-    this.onDidChangeLastBuildModeEmitter.fire(this._lastBuildMode);
+    this.onDidChangeLastBuildModeEmitter.fire(mode);
     this.localStorageService.setData(this.getLastBuildModeStorageKey(), mode);
   }
   get lastBuildMode(): string | undefined {
     return this._lastBuildMode;
+  }
+
+  // last build total memory pools size
+  protected _lastBuildTotalMemoryPoolsSize: number = 0;
+  set lastBuildTotalMemoryPoolsSize(size: number) {
+    this._lastBuildTotalMemoryPoolsSize = size;
+    this.localStorageService.setData(this.getLastBuildTotalMemoryPoolsSizeStorageKey(), size);
+  }
+  get lastBuildTotalMemoryPoolsSize(): number {
+    return this._lastBuildTotalMemoryPoolsSize;
   }
 
   // is queued
@@ -235,6 +250,7 @@ export class VesBuildService {
     this.cpuInfo = await window.electronVesCore.getCpuInformation();
     await this.workspaceService.ready;
     this.lastBuildMode = await this.localStorageService.getData(this.getLastBuildModeStorageKey());
+    this.lastBuildTotalMemoryPoolsSize = await this.localStorageService.getData(this.getLastBuildTotalMemoryPoolsSizeStorageKey()) ?? 0;
     await this.resetBuildStatus();
     this.bindEvents();
   }
@@ -579,6 +595,7 @@ export class VesBuildService {
     this.printCpuInformation();
 
     this.lastBuildMode = buildMode;
+    this.lastBuildTotalMemoryPoolsSize = this.getTotalMemoryPoolsSize();
 
     await this.runPreBuildTasks();
 
@@ -1303,6 +1320,18 @@ Beware! This is usually not necessary and will result in the next build taking l
       .sort((a, b) => a.localeCompare(b));
   }
 
+  getTotalMemoryPoolsSize(): number {
+    const engineConfig = this.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig') as EngineConfigData;
+    if (engineConfig === undefined) {
+      return 0;
+    }
+
+    return (engineConfig.memoryPools?.pools ?? []).reduce(
+      (accumulator, pool) => accumulator + pool.size * pool.objects,
+      0,
+    );
+  }
+
   getBuildArchiveFileDate(filename: string): Date {
     const ts = filename.slice(-18).substring(0, 15);
     const fileDate = new Date();
@@ -1454,5 +1483,11 @@ Beware! This is usually not necessary and will result in the next build taking l
     const workspaceRoot = this.workspaceService.tryGetRoots()[0];
     const workspacePath = workspaceRoot ? `/${workspaceRoot.resource.path}` : '';
     return `ves-last-build-mode${workspacePath}`;
+  }
+
+  protected getLastBuildTotalMemoryPoolsSizeStorageKey(): string {
+    const workspaceRoot = this.workspaceService.tryGetRoots()[0];
+    const workspacePath = workspaceRoot ? `/${workspaceRoot.resource.path}` : '';
+    return `ves-last-build-total-memory-pools-size${workspacePath}`;
   }
 }
