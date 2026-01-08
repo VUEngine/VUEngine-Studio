@@ -3,7 +3,7 @@ import { Endpoint } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
-import { SoundData, TrackSettings } from '../SoundEditorTypes.js';
+import { SoundData, SUB_NOTE_RESOLUTION, TrackSettings } from '../SoundEditorTypes.js';
 import PlayerRomBuilder from './PlayerRomBuilder.js';
 
 const EmulatorContainer = styled.div`
@@ -11,6 +11,10 @@ const EmulatorContainer = styled.div`
     height: 15px;
     overflow: hidden;
     width: 48px;
+
+    canvas {
+        top: -17px !important;
+    }
 `;
 
 interface EmulatorProps {
@@ -20,6 +24,7 @@ interface EmulatorProps {
     emulatorRomReady: boolean
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     currentPlayerPosition: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     playRangeStart: number;
     playRangeEnd: number;
     trackSettings: TrackSettings[]
@@ -33,7 +38,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         playing,
         setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
-        currentPlayerPosition,
+        currentPlayerPosition, setCurrentPlayerPosition,
         playRangeStart, playRangeEnd,
         trackSettings,
         playerRomBuilder,
@@ -42,6 +47,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const [sim, setSim] = useState<any>();
     const emulatorContainerRef = useRef<HTMLDivElement>(null);
     const [soundDataChecksum, setSoundDataChecksum] = useState<string>('');
+    const [shadowCanvasElement, setShadowCanvasElement] = useState<HTMLCanvasElement>();
+    const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
 
     const init = async (): Promise<void> => {
         await initEmulator();
@@ -90,9 +97,70 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         setEmulatorRomReady(true);
     };
 
+    // visually reads total elapsed ticks from canvas bit by bit
+    // TODO: remove once it is possible to directly read memory from emulator
+    const readCurrentPlayerPosition = () => {
+        const canvas = emulatorContainerRef.current?.firstElementChild?.firstElementChild as HTMLCanvasElement;
+        if (!canvas) {
+            return;
+        }
+        const tempContext = shadowCanvasElement?.getContext('2d');
+        if (!tempContext) {
+            return;
+        }
+        tempContext.drawImage(canvas, 0, 0);
+        const topLineImageData = tempContext.getImageData(0, 0, 256, 1).data;
+
+        let currentElapsedTicks = 0;
+        for (let i = 0; i < 1024; i += 32) {
+            if (topLineImageData[i] > 200) {
+                currentElapsedTicks += (1 << (i >> 5));
+            }
+        }
+
+        let elapsedSteps = Math.round(currentElapsedTicks / SUB_NOTE_RESOLUTION);
+        if (playRangeStart > -1 && playRangeEnd > -1) {
+            elapsedSteps += playRangeStart;
+        }
+
+        setCurrentPlayerPosition(elapsedSteps);
+    };
+
+    const unsetProgressInterval = (): void => {
+        clearTimeout(progressTimeout);
+    };
+
+    const setProgressInterval = (): void => {
+        unsetProgressInterval();
+
+        if (playing) {
+            readCurrentPlayerPosition();
+            setProgressTimeout(setInterval(() => {
+                readCurrentPlayerPosition();
+            }, 100));
+        }
+    };
+
     useEffect(() => {
         init();
+
+        const shadowCanvas = document.createElement('canvas');
+        setShadowCanvasElement(shadowCanvas);
+        return () => {
+            if (shadowCanvasElement) {
+                document.removeChild(shadowCanvasElement);
+            }
+        };
     }, []);
+
+    useEffect(() => {
+        setProgressInterval();
+        return unsetProgressInterval();
+    }, [
+        playing,
+        playRangeStart,
+        playRangeEnd
+    ]);
 
     useEffect(() => {
         if (sim) {

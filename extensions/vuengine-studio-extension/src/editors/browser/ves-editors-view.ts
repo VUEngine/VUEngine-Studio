@@ -150,11 +150,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     // enable and make visible only for the editors for which command is registered
                     isEnabled: widget => {
                         const w = this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands.includes(command.id);
+                        return w?.commands?.includes(command.id);
                     },
                     isVisible: widget => {
                         const w = this.shell.currentWidget as VesEditorsWidget;
-                        return w?.commands.includes(command.id);
+                        return w?.commands?.includes(command.id);
                     },
                     execute: widget => {
                         const w = this.shell.currentWidget as VesEditorsWidget;

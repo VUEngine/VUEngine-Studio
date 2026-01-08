@@ -92,12 +92,12 @@ export const StyledSoundEditorToolbarTime = styled.div`
     line-height: 100%;
     padding-top: 1px;
     user-select: none;
-    width: 52px;
+    width: 48px;
 `;
 
 export const StyledSoundEditorToolbarVisualization = styled(StyledSoundEditorToolbarTime)`
     background-color: black;
-    width: 52px;
+    width: 56px;
 `;
 
 export const SidebarCollapseButton = styled.button`
@@ -118,6 +118,7 @@ interface SoundEditorToolbarProps {
     currentTrackId: number
     currentPatternId: string
     currentPlayerPosition: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     currentSequenceIndex: number
     selectedNotes: number[]
     playing: boolean
@@ -151,7 +152,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         updateSoundData,
         currentTrackId,
         currentPatternId,
-        currentPlayerPosition,
+        currentPlayerPosition, setCurrentPlayerPosition,
         currentSequenceIndex,
         selectedNotes,
         playing,
@@ -304,6 +305,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             setEmulatorRomReady={setEmulatorRomReady}
                             playerRomBuilder={playerRomBuilder}
                             currentPlayerPosition={currentPlayerPosition}
+                            setCurrentPlayerPosition={setCurrentPlayerPosition}
                             soundData={testNote ? getTestSoundData() : soundData}
                             playRangeStart={playRangeStart}
                             playRangeEnd={playRangeEnd}

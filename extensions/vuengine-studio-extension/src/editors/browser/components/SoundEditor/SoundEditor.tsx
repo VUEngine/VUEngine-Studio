@@ -131,7 +131,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
-    const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
     const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
@@ -997,43 +996,6 @@ A total of {0} instruments will be deleted.",
         }
     };
 
-    const setProgressInterval = (): void => {
-        clearTimeout(progressTimeout);
-
-        if (!emulatorRomReady) {
-            setCurrentPlayerPosition(-1);
-        }
-
-        if (playing && !testNote) {
-            const songSize = soundData.size * SEQUENCER_RESOLUTION;
-            let resolution = 1;
-            while (soundData.speed * resolution < 100) {
-                resolution++;
-            }
-            setProgressTimeout(setInterval(() => {
-                setCurrentPlayerPosition(prev => {
-                    const newPosition = playRangeStart > -1 && playRangeEnd > - 1 && (prev < playRangeStart || prev >= playRangeEnd)
-                        ? playRangeStart
-                        : prev + resolution;
-                    if (newPosition >= songSize) {
-                        if (soundData.loop) {
-                            return soundData.loopPoint * SEQUENCER_RESOLUTION;
-                        } else {
-                            setPlaying(false);
-                            return -1;
-                        }
-                    }
-
-                    return newPosition;
-                });
-            }, soundData.speed * resolution));
-        }
-    };
-
-    const unsetProgressInterval = (): void => {
-        clearTimeout(progressTimeout);
-    };
-
     const commandListener = (commandId: string): void => {
         switch (commandId) {
             case SoundEditorCommands.ADD_TRACK.id:
@@ -1150,23 +1112,6 @@ A total of {0} instruments will be deleted.",
     ]);
 
     useEffect(() => {
-        setProgressInterval();
-        return () => {
-            unsetProgressInterval();
-        };
-    }, [
-        emulatorRomReady,
-        playing,
-        testNote,
-        playRangeStart,
-        playRangeEnd,
-        soundData.loop,
-        soundData.loopPoint,
-        soundData.speed,
-        soundData.size,
-    ]);
-
-    useEffect(() => {
         setCurrentPlayerPosition(-1);
     }, [
         soundData,
@@ -1191,6 +1136,7 @@ A total of {0} instruments will be deleted.",
                     currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
                     currentPlayerPosition={currentPlayerPosition}
+                    setCurrentPlayerPosition={setCurrentPlayerPosition}
                     currentSequenceIndex={currentSequenceIndex}
                     playing={playing && !testNote}
                     emulatorInitialized={emulatorInitialized}
