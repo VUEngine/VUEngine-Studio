@@ -48,6 +48,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const emulatorContainerRef = useRef<HTMLDivElement>(null);
     const [soundDataChecksum, setSoundDataChecksum] = useState<string>('');
     const [shadowCanvasElement, setShadowCanvasElement] = useState<HTMLCanvasElement>();
+    const [shadowCanvasElementContext, setShadowCanvasElementContext] = useState<CanvasRenderingContext2D>();
     const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
 
     const init = async (): Promise<void> => {
@@ -104,17 +105,15 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         if (!canvas) {
             return;
         }
-        const tempContext = shadowCanvasElement?.getContext('2d');
-        if (!tempContext) {
-            return;
-        }
-        tempContext.drawImage(canvas, 0, 0);
-        const topLineImageData = tempContext.getImageData(0, 0, 256, 1).data;
+        shadowCanvasElementContext?.drawImage(canvas, 0, 0);
+        const topLineImageData = shadowCanvasElementContext?.getImageData(0, 0, 256, 1).data;
 
         let currentElapsedTicks = 0;
-        for (let i = 0; i < 1024; i += 32) {
-            if (topLineImageData[i] > 200) {
-                currentElapsedTicks += (1 << (i >> 5));
+        if (topLineImageData) {
+            for (let i = 0; i < 1024; i += 32) {
+                if (topLineImageData[i] > 200) {
+                    currentElapsedTicks += (1 << (i >> 5));
+                }
             }
         }
 
@@ -137,7 +136,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             readCurrentPlayerPosition();
             setProgressTimeout(setInterval(() => {
                 readCurrentPlayerPosition();
-            }, 100));
+            }, 50));
         }
     };
 
@@ -146,6 +145,10 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
 
         const shadowCanvas = document.createElement('canvas');
         setShadowCanvasElement(shadowCanvas);
+        const shadowCanvasContext = shadowCanvas.getContext('2d', { willReadFrequently: true });
+        if (shadowCanvasContext) {
+            setShadowCanvasElementContext(shadowCanvasContext);
+        }
         return () => {
             if (shadowCanvasElement) {
                 document.removeChild(shadowCanvasElement);
