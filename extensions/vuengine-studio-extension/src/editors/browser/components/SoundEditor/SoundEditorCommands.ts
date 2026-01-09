@@ -77,7 +77,7 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.removeCurrentPattern',
         label: nls.localize('vuengine/editors/sound/commands/removeCurrentPattern', 'Remove Current Pattern From Sequence'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+del',
+        keybinding: 'shift+backspace',
     };
     export const SELECT_NEXT_SEQUENCE_INDEX: EditorCommand = {
         id: 'editors.soundEditor.selectNextSequenceIndex',
@@ -215,7 +215,7 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.removeSelectedNotes',
         label: nls.localize('vuengine/editors/sound/commands/removeSelectedNotes', 'Remove Selected Notes'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'del',
+        keybinding: 'backspace',
     };
     export const TOGGLE_NOTE_SNAPPING: EditorCommand = {
         id: 'editors.soundEditor.toggleNoteSnapping',
@@ -266,5 +266,11 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.export',
         label: nls.localize('vuengine/editors/sound/commands/export', 'Export'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
+    export const SELECT_ALL_NOTES: EditorCommand = {
+        id: 'editors.soundEditor.selectAllNotes',
+        label: nls.localize('vuengine/editors/sound/commands/selectAllNotes', 'Select All Notes (In Current Pattern)'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'ctrlcmd+a',
     };
 };

@@ -91,26 +91,26 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => this.generateFiles(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.activeWidget as VesEditorsWidget
+                : this.shell.currentWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => this.openSource(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.activeWidget as VesEditorsWidget
+                : this.shell.currentWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_GENERATED_FILES, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => this.openGeneratedFiles(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.activeWidget as VesEditorsWidget
+                : this.shell.currentWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
@@ -120,21 +120,21 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
-            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => {
                 const w = widget instanceof VesEditorsWidget
                     ? widget
-                    : this.shell.activeWidget as VesEditorsWidget;
+                    : this.shell.currentWidget as VesEditorsWidget;
                 w?.undo();
                 w?.dispatchCommandEvent(CommonCommands.UNDO.id);
             }
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
-            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => {
                 const w = widget instanceof VesEditorsWidget
                     ? widget
-                    : this.shell.activeWidget as VesEditorsWidget;
+                    : this.shell.currentWidget as VesEditorsWidget;
                 w?.redo();
                 w?.dispatchCommandEvent(CommonCommands.REDO.id);
             }
@@ -149,15 +149,15 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }, {
                     // enable and make visible only for the editors for which command is registered
                     isEnabled: widget => {
-                        const w = this.shell.activeWidget as VesEditorsWidget;
-                        return w?.commands?.includes(command.id);
+                        const w = this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commandsEnabled && w?.commands?.includes(command.id);
                     },
-                    isVisible: widget => {
-                        const w = this.shell.activeWidget as VesEditorsWidget;
-                        return w?.commands?.includes(command.id);
+                    isVisible: () => {
+                        const w = this.shell.currentWidget as VesEditorsWidget;
+                        return w?.commandsEnabled && w?.commands?.includes(command.id);
                     },
-                    execute: widget => {
-                        const w = this.shell.activeWidget as VesEditorsWidget;
+                    execute: () => {
+                        const w = this.shell.currentWidget as VesEditorsWidget;
                         w?.dispatchCommandEvent(command.id);
                     }
                 });
@@ -198,7 +198,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     category: CommonCommands.FILE_CATEGORY,
                 }, {
                     // Show "new xyz conversion file" commands only in explorer, but hide from command palette
-                    isVisible: widget => this.shell.activeWidget?.id === 'files',
+                    isVisible: widget => this.shell.currentWidget?.id === 'files',
                     execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
                 });
             }
@@ -207,7 +207,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
             isEnabled: () => true,
             isVisible: () => {
-                const p = this.editorManager.all.find(w => w.id === this.shell.activeWidget?.id)?.editor.uri.path;
+                const p = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri.path;
                 if (p) {
                     for (const t of Object.values(types || {})) {
                         if ([p.ext, p.base].includes(t.file)) {
@@ -218,7 +218,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 return false;
             },
             execute: async () => {
-                const u = this.editorManager.all.find(w => w.id === this.shell.activeWidget?.id)?.editor.uri;
+                const u = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);

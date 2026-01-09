@@ -36,10 +36,10 @@ interface PianoRollHeaderGridProps {
     pianoRollScrollWindow: ScrollWindow
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void
-    dragStartStep: number
-    setDragStartStep: Dispatch<SetStateAction<number>>
-    dragEndStep: number
-    setDragEndStep: Dispatch<SetStateAction<number>>
+    rangeDragStartStep: number
+    setRangeDragStartStep: Dispatch<SetStateAction<number>>
+    rangeDragEndStep: number
+    setRangeDragEndStep: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
@@ -55,8 +55,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         pianoRollScrollWindow,
         // setPatternDialogOpen,
         // removePatternFromSequence,
-        dragStartStep, setDragStartStep,
-        dragEndStep, setDragEndStep,
+        rangeDragStartStep, setRangeDragStartStep,
+        rangeDragEndStep, setRangeDragEndStep,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -185,8 +185,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 const x = e.clientX - rect.left + pianoRollScrollWindow.x;
                 const step = Math.floor(x / pianoRollNoteWidth);
                 if (e.button === 0) {
-                    setDragStartStep(step);
-                    setDragEndStep(step);
+                    setRangeDragStartStep(step);
+                    setRangeDragEndStep(step);
                     setPlayRangeStart(-1);
                     setPlayRangeEnd(-1);
                 }
@@ -198,19 +198,19 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         const rect = e.currentTarget.getBoundingClientRect();
         const y = e.clientY - rect.top;
 
-        if (e.button === 0 && dragStartStep !== -1 && dragEndStep !== -1) {
-            const startStep = Math.min(dragStartStep, dragEndStep);
-            const endStep = dragStartStep === dragEndStep
+        if (e.button === 0 && rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
+            const startStep = Math.min(rangeDragStartStep, rangeDragEndStep);
+            const endStep = rangeDragStartStep === rangeDragEndStep
                 ? startStep + DEFAULT_PLAY_RANGE_SIZE
-                : Math.max(dragStartStep, dragEndStep) + 1;
+                : Math.max(rangeDragStartStep, rangeDragEndStep) + 1;
 
             setPlayRangeStart(startStep);
             setPlayRangeEnd(endStep);
             setCurrentPlayerPosition(-1);
 
             // reset
-            setDragStartStep(-1);
-            setDragEndStep(-1);
+            setRangeDragStartStep(-1);
+            setRangeDragEndStep(-1);
         }
 
         if (y < PIANO_ROLL_GRID_METER_HEIGHT) {
@@ -234,13 +234,13 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartStep !== -1 && dragEndStep !== -1) {
+        if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const step = Math.floor(x / pianoRollNoteWidth);
 
-            if (step !== dragEndStep) {
-                setDragEndStep(step);
+            if (step !== rangeDragEndStep) {
+                setRangeDragEndStep(step);
             }
         }
     };
@@ -274,8 +274,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 onMouseUp={onMouseUp}
                 onMouseMove={onMouseMove}
                 onMouseLeave={() => {
-                    setDragStartStep(-1);
-                    setDragEndStep(-1);
+                    // setRangeDragStartStep(-1);
+                    // setRangeDragEndStep(-1);
                 }}
                 ref={canvasRef}
             />

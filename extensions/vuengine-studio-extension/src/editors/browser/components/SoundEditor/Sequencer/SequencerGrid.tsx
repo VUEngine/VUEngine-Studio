@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
+    DEFAULT_PLAY_RANGE_SIZE,
     NOTE_RESOLUTION,
     SCROLL_BAR_WIDTH,
     ScrollWindow,
@@ -28,13 +29,19 @@ interface SequencerGridProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     sequencerPatternHeight: number
     sequencerPatternWidth: number
-    dragStartTrackId: number
-    dragStartStep: number
-    dragEndStep: number
-    setDragStartTrackId: Dispatch<SetStateAction<number>>
-    setDragStartStep: Dispatch<SetStateAction<number>>
-    setDragEndStep: Dispatch<SetStateAction<number>>
+    patternDragTrackId: number
+    setPatternDragTrackId: Dispatch<SetStateAction<number>>
+    patternDragStartStep: number
+    setPatternDragStartStep: Dispatch<SetStateAction<number>>
+    patternDragEndStep: number
+    setPatternDragEndStep: Dispatch<SetStateAction<number>>
     sequencerScrollWindow: ScrollWindow
+    rangeDragStartStep: number
+    setRangeDragStartStep: Dispatch<SetStateAction<number>>
+    rangeDragEndStep: number
+    setRangeDragEndStep: Dispatch<SetStateAction<number>>
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
 }
 
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
@@ -42,13 +49,17 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         soundData,
         currentTrackId,
         addPattern,
-        playRangeStart, // setPlayRangeStart,
-        playRangeEnd, // setPlayRangeEnd,
+        playRangeStart, setPlayRangeStart,
+        playRangeEnd, setPlayRangeEnd,
         sequencerPatternHeight, sequencerPatternWidth,
-        dragStartTrackId, setDragStartTrackId,
-        dragStartStep, setDragStartStep,
-        dragEndStep, setDragEndStep,
+        patternDragTrackId, setPatternDragTrackId,
+        patternDragStartStep, setPatternDragStartStep,
+        patternDragEndStep, setPatternDragEndStep,
         sequencerScrollWindow,
+        rangeDragStartStep, setRangeDragStartStep,
+        rangeDragEndStep, setRangeDragEndStep,
+        setCurrentPlayerPosition,
+        setForcePlayerRomRebuild,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -151,54 +162,104 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.button === 0) { // Left mouse button
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + sequencerScrollWindow.x;
-            const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left + sequencerScrollWindow.x;
+        const y = e.clientY - rect.top;
 
-            const trackId = Math.floor(y / sequencerPatternHeight);
-            const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
+        if (y < SEQUENCER_GRID_METER_HEIGHT) {
+            if (e.button === 0) { // Left mouse button
+                const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION * SEQUENCER_RESOLUTION);
+                if (e.button === 0) {
+                    setRangeDragStartStep(step);
+                    setRangeDragEndStep(step);
+                    setPlayRangeStart(-1);
+                    setPlayRangeEnd(-1);
+                }
+            }
+        } else {
+            if (e.button === 0) { // Left mouse button
+                const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
+                const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
 
-            setDragStartTrackId(trackId);
-            setDragStartStep(step);
-            setDragEndStep(step);
-        } else if (e.button === 2) { // Right mouse button
-            // TODO: marquee
+                setPatternDragTrackId(trackId);
+                setPatternDragStartStep(step);
+                setPatternDragEndStep(step);
+            } else if (e.button === 2) { // Right mouse button
+                // TODO: marquee
+            }
         }
     };
 
     const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
         if (e.button === 0) { // Left mouse button
-            if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-                return;
+            if (patternDragTrackId !== -1 && patternDragStartStep !== -1 && patternDragEndStep !== -1) {
+                const newPatternStep = Math.min(patternDragStartStep, patternDragEndStep);
+                const newPatternSize = Math.abs(patternDragStartStep - patternDragEndStep) + 1;
+
+                addPattern(patternDragTrackId, newPatternStep, newPatternSize);
+
+                // reset
+                setPatternDragTrackId(-1);
+                setPatternDragStartStep(-1);
+                setPatternDragEndStep(-1);
+            } else if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
+                const startStep = Math.min(rangeDragStartStep, rangeDragEndStep);
+                const endStep = rangeDragStartStep === rangeDragEndStep
+                    ? startStep + DEFAULT_PLAY_RANGE_SIZE
+                    : Math.max(rangeDragStartStep, rangeDragEndStep) + 1;
+
+                setPlayRangeStart(startStep);
+                setPlayRangeEnd(endStep);
+                setCurrentPlayerPosition(-1);
+
+                // reset
+                setRangeDragStartStep(-1);
+                setRangeDragEndStep(-1);
             }
-
-            const newPatternStep = Math.min(dragStartStep, dragEndStep);
-            const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
-
-            addPattern(dragStartTrackId, newPatternStep, newPatternSize);
-
-            // reset
-            setDragStartTrackId(-1);
-            setDragStartStep(-1);
-            setDragEndStep(-1);
         } else if (e.button === 2) { // Right mouse button
-            // TODO: marquee
+            const rect = e.currentTarget.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            if (y < SEQUENCER_GRID_METER_HEIGHT) {
+                if (e.button === 2) {
+                    if (playRangeStart !== -1 && playRangeEnd !== -1) {
+                        setPlayRangeStart(-1);
+                        setPlayRangeEnd(-1);
+                    } else {
+                        const x = e.clientX - rect.left + sequencerScrollWindow.x;
+                        const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION * SEQUENCER_RESOLUTION);
+                        setCurrentPlayerPosition(step);
+                        setForcePlayerRomRebuild(prev => prev + 1);
+                    }
+                }
+            }
         }
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (dragStartTrackId === -1 || dragStartStep === -1 || dragEndStep === -1) {
-            return;
-        }
+        if (patternDragTrackId !== -1 && patternDragStartStep !== -1 && patternDragEndStep !== -1) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + sequencerScrollWindow.x;
+            const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
 
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + sequencerScrollWindow.x;
+            const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+            const trackId = Math.floor(y / sequencerPatternHeight);
 
-        const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+            if (trackId !== patternDragTrackId) {
+                setPatternDragTrackId(trackId);
+            }
 
-        if (step !== dragEndStep) {
-            setDragEndStep(step);
+            if (step !== patternDragEndStep) {
+                setPatternDragEndStep(step);
+            }
+        } else if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + sequencerScrollWindow.x;
+
+            const step = Math.floor(x / sequencerPatternWidth * SEQUENCER_RESOLUTION * SEQUENCER_RESOLUTION);
+
+            if (step !== rangeDragEndStep) {
+                setRangeDragEndStep(step);
+            }
         }
     };
 

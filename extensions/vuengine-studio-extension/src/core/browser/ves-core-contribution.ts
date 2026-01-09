@@ -51,12 +51,12 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             execute: path => this.windowService.openNewWindow(`${VesCoreContribution.DOCUMENTATION_URL}${path ? path : ''}`, { external: true })
         });
         commandRegistry.registerCommand(VesCoreCommands.SWITCH_HEADER_SOURCE, {
-            isEnabled: () => this.shell.activeWidget instanceof EditorWidget && (
-                ((this.shell.activeWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.c') ?? false) ||
-                ((this.shell.activeWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.h') ?? false)
+            isEnabled: () => this.shell.currentWidget instanceof EditorWidget && (
+                ((this.shell.currentWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.c') ?? false) ||
+                ((this.shell.currentWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.h') ?? false)
             ),
             execute: async () => {
-                const uri = (this.shell.activeWidget as EditorWidget).getResourceUri();
+                const uri = (this.shell.currentWidget as EditorWidget).getResourceUri();
                 if (uri) {
                     const fsPath = uri.path.fsPath();
                     const updatedPath = fsPath.endsWith('.h')

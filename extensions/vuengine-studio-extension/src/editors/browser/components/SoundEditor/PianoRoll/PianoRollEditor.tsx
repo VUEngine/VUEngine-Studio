@@ -79,17 +79,17 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollRef,
         trackSettings,
     } = props;
-    const [dragNoteId, setDragNoteId] = useState<number>(-1);
-    const [dragStartStep, setDragStartStep] = useState<number>(-1);
-    const [dragEndStep, setDragEndStep] = useState<number>(-1);
+    const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
+    const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
+    const [noteDragEndStep, setNoteDragEndStep] = useState<number>(-1);
     const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
     const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
 
     return <StyledPianoRollEditor
         onMouseOut={() => {
-            setDragNoteId(-1);
-            setDragStartStep(-1);
-            setDragEndStep(-1);
+            setNoteDragNoteId(-1);
+            setNoteDragStartStep(-1);
+            setNoteDragEndStep(-1);
             setMarqueeStartStep(-1);
             setMarqueeEndStep(-1);
         }}
@@ -106,13 +106,13 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 height: NOTES_SPECTRUM * pianoRollNoteHeight
             }}
         >
-            {dragNoteId > -1 &&
+            {noteDragNoteId > -1 &&
                 <CurrentlyPlacingNote
                     style={{
                         height: pianoRollNoteHeight,
-                        left: Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                        top: dragNoteId * pianoRollNoteHeight,
-                        width: pianoRollNoteWidth * (Math.abs(dragStartStep - dragEndStep) + 1),
+                        left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
+                        top: noteDragNoteId * pianoRollNoteHeight,
+                        width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
                     }}
                 />
             }
@@ -137,12 +137,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
-                dragNoteId={dragNoteId}
-                setDragNoteId={setDragNoteId}
-                dragStartStep={dragStartStep}
-                setDragStartStep={setDragStartStep}
-                dragEndStep={dragEndStep}
-                setDragEndStep={setDragEndStep}
+                noteDragNoteId={noteDragNoteId}
+                setNoteDragNoteId={setNoteDragNoteId}
+                noteDragStartStep={noteDragStartStep}
+                setNoteDragStartStep={setNoteDragStartStep}
+                noteDragEndStep={noteDragEndStep}
+                setNoteDragEndStep={setNoteDragEndStep}
                 marqueeStartStep={marqueeStartStep}
                 setMarqueeStartStep={setMarqueeStartStep}
                 marqueeEndStep={marqueeEndStep}

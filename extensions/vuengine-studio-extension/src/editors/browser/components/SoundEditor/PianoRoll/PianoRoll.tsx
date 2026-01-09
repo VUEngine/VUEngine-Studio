@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import StepIndicator from '../Sequencer/StepIndicator';
+import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import { SetNoteEventProps, SetNoteProps } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
@@ -184,6 +184,10 @@ interface PianoRollProps {
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void
     trackSettings: TrackSettings[]
+    rangeDragStartStep: number
+    setRangeDragStartStep: Dispatch<SetStateAction<number>>
+    rangeDragEndStep: number
+    setRangeDragEndStep: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -215,6 +219,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setPatternDialogOpen,
         removePatternFromSequence,
         trackSettings,
+        rangeDragStartStep, setRangeDragStartStep,
+        rangeDragEndStep, setRangeDragEndStep,
     } = props;
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
@@ -433,16 +439,34 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     }, [
         soundData,
         noteCursor,
+        selectedNotes,
     ]);
 
     useEffect(() => {
+        let firstPlacedNote = '';
+        if (pattern) {
+            Object.keys(pattern.events).forEach(step => {
+                if (firstPlacedNote === '' && pattern.events[parseInt(step)][SoundEvent.Note]) {
+                    firstPlacedNote = pattern.events[parseInt(step)][SoundEvent.Note];
+                }
+            });
+        }
+
+        let top = undefined;
+        if (firstPlacedNote !== '') {
+            const noteId = NOTES_LABELS.indexOf(firstPlacedNote);
+            top = PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + (noteId * pianoRollNoteHeight) - PIANO_ROLL_GRID_METER_HEIGHT - (pianoRollScrollWindow.h / 3);
+        }
+
         // auto scroll to current pattern in piano roll
-        pianoRollRef.current?.scrollTo({
+        pianoRollRef?.current?.scrollTo({
             left: currentSequenceIndex / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
+            top,
             behavior: 'smooth',
         });
     }, [
         currentSequenceIndex,
+        currentTrackId,
     ]);
 
     useEffect(() => {
@@ -467,24 +491,60 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         onWheel={onWheel}
     >
         <ScaleControls className="vertical">
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
         <ScaleControls>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id)}
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
@@ -492,17 +552,17 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             ref={pianoRollRef}
             onScroll={getScrollWindowCoords}
         >
-            {<StepIndicator
+            <StepIndicator
                 soundData={soundData}
                 currentPlayerPosition={currentPlayerPosition}
-                isPianoRoll={true}
+                position={StepIndicatorPosition.PIANO_ROLL}
                 hidden={currentPlayerPosition === -1}
                 effectsPanelHidden={effectsPanelHidden}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
-            />}
+            />
             {placedNotesCurrentPattern}
             <StyledToggleButtonContainer>
                 <StyledToggleButton
@@ -531,6 +591,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
+                currentPlayerPosition={currentPlayerPosition}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                 playRangeStart={playRangeStart}
@@ -538,10 +599,18 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 playRangeEnd={playRangeEnd}
                 setPlayRangeEnd={setPlayRangeEnd}
                 pianoRollNoteWidth={pianoRollNoteWidth}
+                pianoRollNoteHeight={pianoRollNoteHeight}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 setPatternDialogOpen={setPatternDialogOpen}
                 removePatternFromSequence={removePatternFromSequence}
+                rangeDragStartStep={rangeDragStartStep}
+                setRangeDragStartStep={setRangeDragStartStep}
+                rangeDragEndStep={rangeDragEndStep}
+                setRangeDragEndStep={setRangeDragEndStep}
+                effectsPanelHidden={effectsPanelHidden}
+                sequencerPatternWidth={sequencerPatternWidth}
+                sequencerPatternHeight={sequencerPatternHeight}
             />
             <PianoRollEditor
                 soundData={soundData}

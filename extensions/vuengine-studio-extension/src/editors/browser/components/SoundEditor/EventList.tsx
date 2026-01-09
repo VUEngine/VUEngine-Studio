@@ -194,6 +194,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 if (isSelectedNote) {
                                                                     return (
                                                                         <BasicSelect
+                                                                            key={j}
                                                                             options={[
                                                                                 ...Object.keys(soundData.instruments)
                                                                                     .sort((a, b) => (soundData.instruments[a].name.length
@@ -221,6 +222,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 if (isSelectedNote) {
                                                                     return (
                                                                         <BasicSelect
+                                                                            key={j}
                                                                             options={[
                                                                                 ...NOTES_LABELS
                                                                                     .map(n => ({

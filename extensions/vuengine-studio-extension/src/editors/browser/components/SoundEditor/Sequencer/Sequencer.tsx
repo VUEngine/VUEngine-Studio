@@ -1,4 +1,3 @@
-import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -6,6 +5,7 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    DEFAULT_PLAY_RANGE_SIZE,
     NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
@@ -22,7 +22,7 @@ import {
 import LoopIndicator from './LoopIndicator';
 import SequencerGrid from './SequencerGrid';
 import SequencerPlacedPattern from './SequencerPlacedPattern';
-import StepIndicator from './StepIndicator';
+import StepIndicator, { StepIndicatorPosition } from './StepIndicator';
 import TrackHeader from './TrackHeader';
 
 export const StyledSequencerContainer = styled.div`
@@ -105,6 +105,15 @@ const StyledCurrentlyPlacingPattern = styled.div`
     position: absolute;
 `;
 
+const CurrentlyPlacingRange = styled.div`
+    border: 1px dashed var(--theia-focusBorder);
+    border-bottom-width: 0;
+    box-sizing: border-box;
+    height: ${SEQUENCER_GRID_METER_HEIGHT / 2}px;
+    position: absolute;
+    top: 0;
+`;
+
 interface SequencerProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
@@ -114,6 +123,7 @@ interface SequencerProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     toggleTrackMuted: (trackId: number) => void
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
@@ -136,6 +146,11 @@ interface SequencerProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
+    rangeDragStartStep: number
+    setRangeDragStartStep: Dispatch<SetStateAction<number>>
+    rangeDragEndStep: number
+    setRangeDragEndStep: Dispatch<SetStateAction<number>>
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -144,7 +159,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentTrackId, setCurrentTrackId,
         currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        currentPlayerPosition,
+        currentPlayerPosition, setCurrentPlayerPosition,
         toggleTrackMuted,
         toggleTrackSolo,
         toggleTrackSeeThrough,
@@ -160,11 +175,14 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         trackSettings,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
+        rangeDragStartStep, setRangeDragStartStep,
+        rangeDragEndStep, setRangeDragEndStep,
+        setForcePlayerRomRebuild,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
-    const [dragStartTrackId, setDragStartTrackId] = useState<number>(-1);
-    const [dragStartStep, setDragStartStep] = useState<number>(-1);
-    const [dragEndStep, setDragEndStep] = useState<number>(-1);
+    const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
+    const [patternDragStartStep, setPatternDragStartStep] = useState<number>(-1);
+    const [patternDragEndStep, setPatternDragEndStep] = useState<number>(-1);
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
 
@@ -235,9 +253,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     };
 
     const onMouseOut = (e: React.MouseEvent<HTMLElement>) => {
-        setDragStartTrackId(-1);
-        setDragStartStep(-1);
-        setDragEndStep(-1);
+        setPatternDragTrackId(-1);
+        setPatternDragStartStep(-1);
+        setPatternDragEndStep(-1);
     };
 
     const commandListener = (commandId: string): void => {
@@ -333,24 +351,60 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         onMouseOut={onMouseOut}
     >
         <ScaleControls className="vertical">
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id)}
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id)}
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id)}
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
         <ScaleControls>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id)}
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-chrome-minimize" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id)}
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-circle-large" />
             </button>
-            <button onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id)}>
+            <button
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id)}
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                    SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id,
+                    true
+                )}`}
+            >
                 <i className="codicon codicon-plus" />
             </button>
         </ScaleControls>
@@ -378,7 +432,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             {soundData.tracks.length < VSU_NUMBER_OF_CHANNELS &&
                 <StyledAddTrackButton
                     onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
-                    title={nls.localizeByDefault('Add')}
+                    title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesCommonService.getKeybindingLabel(
+                        SoundEditorCommands.ADD_TRACK.id,
+                        true
+                    )}`}
                 >
                     <i className='codicon codicon-plus' />
                 </StyledAddTrackButton>
@@ -397,7 +454,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             <StepIndicator
                 soundData={soundData}
                 currentPlayerPosition={currentPlayerPosition}
-                isPianoRoll={false}
+                position={StepIndicatorPosition.SEQUENCER}
                 hidden={currentPlayerPosition === -1}
                 effectsPanelHidden={effectsPanelHidden}
                 pianoRollNoteHeight={pianoRollNoteHeight}
@@ -420,13 +477,19 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setPlayRangeEnd={setPlayRangeEnd}
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
-                dragStartTrackId={dragStartTrackId}
-                dragStartStep={dragStartStep}
-                dragEndStep={dragEndStep}
-                setDragStartTrackId={setDragStartTrackId}
-                setDragStartStep={setDragStartStep}
-                setDragEndStep={setDragEndStep}
+                patternDragTrackId={patternDragTrackId}
+                setPatternDragTrackId={setPatternDragTrackId}
+                patternDragStartStep={patternDragStartStep}
+                setPatternDragStartStep={setPatternDragStartStep}
+                patternDragEndStep={patternDragEndStep}
+                setPatternDragEndStep={setPatternDragEndStep}
                 sequencerScrollWindow={sequencerScrollWindow}
+                rangeDragStartStep={rangeDragStartStep}
+                setRangeDragStartStep={setRangeDragStartStep}
+                rangeDragEndStep={rangeDragEndStep}
+                setRangeDragEndStep={setRangeDragEndStep}
+                setCurrentPlayerPosition={setCurrentPlayerPosition}
+                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
             />
             <StyledScrollWindow
                 style={{
@@ -439,13 +502,23 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     ),
                 }}
             />
-            {dragStartTrackId > -1 &&
+            {patternDragTrackId > -1 && patternDragStartStep !== patternDragEndStep &&
                 <StyledCurrentlyPlacingPattern
                     style={{
                         height: sequencerPatternHeight,
-                        left: Math.min(dragStartStep, dragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION,
-                        top: SEQUENCER_GRID_METER_HEIGHT + dragStartTrackId * sequencerPatternHeight,
-                        width: sequencerPatternWidth * (Math.abs(dragStartStep - dragEndStep) + 1) / SEQUENCER_RESOLUTION,
+                        left: Math.min(patternDragStartStep, patternDragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION,
+                        top: SEQUENCER_GRID_METER_HEIGHT + patternDragTrackId * sequencerPatternHeight,
+                        width: sequencerPatternWidth * (Math.abs(patternDragStartStep - patternDragEndStep) + 1) / SEQUENCER_RESOLUTION,
+                    }}
+                />
+            }
+            {rangeDragStartStep > -1 &&
+                <CurrentlyPlacingRange
+                    style={{
+                        left: Math.min(rangeDragStartStep, rangeDragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION / SEQUENCER_RESOLUTION,
+                        width: sequencerPatternWidth / SEQUENCER_RESOLUTION * (rangeDragStartStep === rangeDragEndStep
+                            ? DEFAULT_PLAY_RANGE_SIZE
+                            : (Math.abs(rangeDragStartStep - rangeDragEndStep) + 1)) / SEQUENCER_RESOLUTION,
                     }}
                 />
             }

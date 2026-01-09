@@ -259,8 +259,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected onActivateRequest(msg: Message): void {
+        super.onActivateRequest(msg);
         this.node.tabIndex = 0;
-        this.node.focus();
+        this.focusEditor();
     }
 
     protected setStatusBarItem(id: string, entry: StatusBarEntry): void {
@@ -271,6 +272,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected removeStatusBarItem(id: string): void {
         delete (this.statusBarItems[id]);
         this.statusBar.removeElement(id);
+    }
+
+    protected focusEditor(): void {
+        setTimeout(() => {
+            this.node.focus();
+        }, 1);
     }
 
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
@@ -496,6 +503,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         onCommandExecute: this.onCommandExecute.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
+                        focusEditor: this.focusEditor.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {

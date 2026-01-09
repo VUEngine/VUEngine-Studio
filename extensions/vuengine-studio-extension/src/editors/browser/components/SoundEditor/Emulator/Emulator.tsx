@@ -120,7 +120,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         }
 
         let elapsedSteps = Math.round(currentElapsedTicks / SUB_NOTE_RESOLUTION);
-        if (playRangeStart > -1 && playRangeEnd > -1) {
+        if (playRangeStart > -1 && playRangeEnd > -1 && elapsedSteps < playRangeStart) {
             elapsedSteps += playRangeStart;
         }
 

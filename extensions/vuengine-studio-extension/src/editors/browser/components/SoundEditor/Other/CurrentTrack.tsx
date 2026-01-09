@@ -103,8 +103,11 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                     </InputWithActionButton>
                     <InputWithActionButton
                         className='theia-button secondary'
-                        title={nls.localizeByDefault('Add')}
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
+                        title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesCommonService.getKeybindingLabel(
+                            SoundEditorCommands.ADD_TRACK.id,
+                            true
+                        )}`}
                         disabled={soundData.tracks.length === VSU_NUMBER_OF_CHANNELS}
                     >
                         <i className='codicon codicon-plus' />

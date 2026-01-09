@@ -29,12 +29,12 @@ interface PianoRollGridProps {
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
-    dragNoteId: number
-    setDragNoteId: Dispatch<SetStateAction<number>>
-    dragStartStep: number
-    setDragStartStep: Dispatch<SetStateAction<number>>
-    dragEndStep: number
-    setDragEndStep: Dispatch<SetStateAction<number>>
+    noteDragNoteId: number
+    setNoteDragNoteId: Dispatch<SetStateAction<number>>
+    noteDragStartStep: number
+    setNoteDragStartStep: Dispatch<SetStateAction<number>>
+    noteDragEndStep: number
+    setNoteDragEndStep: Dispatch<SetStateAction<number>>
     marqueeStartStep: number
     setMarqueeStartStep: Dispatch<SetStateAction<number>>
     marqueeEndStep: number
@@ -55,9 +55,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         setNote,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
-        dragNoteId, setDragNoteId,
-        dragStartStep, setDragStartStep,
-        dragEndStep, setDragEndStep,
+        noteDragNoteId: dragNoteId, setNoteDragNoteId: setDragNoteId,
+        noteDragStartStep: dragStartStep, setNoteDragStartStep: setDragStartStep,
+        noteDragEndStep: dragEndStep, setNoteDragEndStep: setDragEndStep,
         marqueeStartStep, setMarqueeStartStep,
         marqueeEndStep, setMarqueeEndStep,
         pianoRollScrollWindow,

@@ -122,7 +122,7 @@ interface SoundEditorProps {
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { fileUri, services, setCommands, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, setCommands, onCommandExecute, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
@@ -160,6 +160,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
     const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
+    const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
+    const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -208,6 +210,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ]
         });
         setTrackDialogOpen(false);
+        focusEditor();
     };
 
     const setPattern = (patternId: string, pattern: Partial<PatternConfig>): void => {
@@ -281,6 +284,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         setCurrentPatternId(newPatternId);
         setCurrentSequenceIndex(newSequenceIndex);
+        setSelectedNotes([]);
         setNoteCursor(newSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
         setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
     };
@@ -296,6 +300,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             }
         }
         setCurrentSequenceIndex(sequenceIndex);
+        setSelectedNotes([]);
         setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
@@ -305,6 +310,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentTrackId(trackId);
         setCurrentPatternId(sequence && sequence[sequenceIndex] ? sequence[sequenceIndex] : '');
         setCurrentSequenceIndex(sequenceIndex);
+        setSelectedNotes([]);
         setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
@@ -323,10 +329,23 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setSelectedNotes(updatedSelectedNotes);
     };
 
-    const updatSelectedNotes = (notes: number[]): void => {
+    const updateSelectedNotes = (notes: number[]): void => {
         setSelectedNotes(notes);
         const currentPatternStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
         setNoteCursor(currentPatternStartStep + (notes[0] ?? 0));
+    };
+
+    const selectAllNotesInCurrentPattern = (): void => {
+        const currentPattern = soundData.patterns[currentPatternId];
+        const currentPatternEvents = currentPattern?.events;
+        if (!currentPatternEvents) {
+            return;
+        }
+        const currentPatternNoteSteps = Object.keys(currentPatternEvents)
+            .map(step => parseInt(step))
+            .filter(step => currentPatternEvents[step][SoundEvent.Note]);
+
+        setSelectedNotes(currentPatternNoteSteps);
     };
 
     const showTrackTypeSelection = async (): Promise<QuickPickItem | undefined> => {
@@ -738,6 +757,8 @@ A total of {0} instruments will be deleted.",
         setPattern(currentPatternId, {
             events: updatedEvents,
         });
+
+        focusEditor();
     };
 
     const setNoteEvent = (notes: SetNoteEventProps[]): void => {
@@ -861,6 +882,7 @@ A total of {0} instruments will be deleted.",
                 },
                 ...Object.keys(soundData.patterns)
                     .filter(patternId =>
+                        soundData.tracks[trackId] !== undefined &&
                         soundData.patterns[patternId].type === soundData.tracks[trackId].type &&
                         (size === undefined || size <= 1 || soundData.patterns[patternId].size === size)
                     )
@@ -1092,6 +1114,9 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.EXPORT.id:
                 exportFile();
                 break;
+            case SoundEditorCommands.SELECT_ALL_NOTES.id:
+                selectAllNotesInCurrentPattern();
+                break;
         }
     };
 
@@ -1099,6 +1124,7 @@ A total of {0} instruments will be deleted.",
         setCommands([
             ...Object.values(SoundEditorCommands).map(c => c.id)
         ]);
+        focusEditor();
     }, []);
 
     useEffect(() => {
@@ -1175,6 +1201,7 @@ A total of {0} instruments will be deleted.",
                                 soundData={soundData}
                                 updateSoundData={updateSoundData}
                                 currentPlayerPosition={currentPlayerPosition}
+                                setCurrentPlayerPosition={setCurrentPlayerPosition}
                                 currentPatternId={currentPatternId}
                                 currentTrackId={currentTrackId}
                                 setCurrentTrackId={updateCurrentTrackId}
@@ -1202,6 +1229,11 @@ A total of {0} instruments will be deleted.",
                                 setPlayRangeStart={setPlayRangeStart}
                                 playRangeEnd={playRangeEnd}
                                 setPlayRangeEnd={setPlayRangeEnd}
+                                rangeDragStartStep={rangeDragStartStep}
+                                setRangeDragStartStep={setRangeDragStartStep}
+                                rangeDragEndStep={rangeDragEndStep}
+                                setRangeDragEndStep={setRangeDragEndStep}
+                                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                             />
                         }
                         <StyledLowerContainer>
@@ -1240,7 +1272,7 @@ A total of {0} instruments will be deleted.",
                                 eventListHidden={eventListHidden}
                                 setEventListHidden={setEventListHidden}
                                 selectedNotes={selectedNotes}
-                                setSelectedNotes={updatSelectedNotes}
+                                setSelectedNotes={updateSelectedNotes}
                                 noteSnapping={noteSnapping}
                                 pianoRollNoteHeight={pianoRollNoteHeight}
                                 pianoRollNoteWidth={pianoRollNoteWidth}
@@ -1254,6 +1286,10 @@ A total of {0} instruments will be deleted.",
                                 setPatternDialogOpen={setPatternDialogOpen}
                                 removePatternFromSequence={removePatternFromSequence}
                                 trackSettings={trackSettings}
+                                rangeDragStartStep={rangeDragStartStep}
+                                setRangeDragStartStep={setRangeDragStartStep}
+                                rangeDragEndStep={rangeDragEndStep}
+                                setRangeDragEndStep={setRangeDragEndStep}
                             />
                         </StyledLowerContainer>
                     </>}
@@ -1263,9 +1299,13 @@ A total of {0} instruments will be deleted.",
                     open={instrumentDialogOpen}
                     onClose={() => {
                         setInstrumentDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
@@ -1289,8 +1329,16 @@ A total of {0} instruments will be deleted.",
             {propertiesDialogOpen &&
                 <PopUpDialog
                     open={propertiesDialogOpen}
-                    onClose={() => setPropertiesDialogOpen(false)}
-                    onOk={() => setPropertiesDialogOpen(false)}
+                    onClose={() => {
+                        setPropertiesDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setPropertiesDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     height='460px'
                     width='460px'
@@ -1307,8 +1355,16 @@ A total of {0} instruments will be deleted.",
             {toolsDialogOpen &&
                 <PopUpDialog
                     open={toolsDialogOpen}
-                    onClose={() => setToolsDialogOpen(false)}
-                    onOk={() => setToolsDialogOpen(false)}
+                    onClose={() => {
+                        setToolsDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setToolsDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
                     title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
                     height='260px'
                     width='460px'
@@ -1347,8 +1403,16 @@ A total of {0} instruments will be deleted.",
             {trackDialogOpen &&
                 <PopUpDialog
                     open={trackDialogOpen}
-                    onClose={() => setTrackDialogOpen(false)}
-                    onOk={() => setTrackDialogOpen(false)}
+                    onClose={() => {
+                        setTrackDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setTrackDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
                     height='340px'
                     width='320px'
@@ -1369,8 +1433,16 @@ A total of {0} instruments will be deleted.",
             {patternDialogOpen && soundData.tracks[currentTrackId] !== undefined &&
                 <PopUpDialog
                     open={patternDialogOpen}
-                    onClose={() => setPatternDialogOpen(false)}
-                    onOk={() => setPatternDialogOpen(false)}
+                    onClose={() => {
+                        setPatternDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setPatternDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
                     title={nls.localize('vuengine/editors/sound/editPattern', 'Edit Pattern')
                     }
                     height='350px'
@@ -1392,8 +1464,14 @@ A total of {0} instruments will be deleted.",
             {waveformDialogOpen !== '' &&
                 <PopUpDialog
                     open={waveformDialogOpen !== ''}
-                    onClose={() => setWaveformDialogOpen('')}
-                    onOk={() => setWaveformDialogOpen('')}
+                    onClose={() => {
+                        setWaveformDialogOpen('');
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setWaveformDialogOpen('');
+                        enableCommands();
+                    }}
                     title={nls.localize('vuengine/editors/sound/selectWaveform', 'Select Waveform')
                     }
                     height='100%'
@@ -1408,8 +1486,14 @@ A total of {0} instruments will be deleted.",
             {modulationDataDialogOpen !== '' &&
                 <PopUpDialog
                     open={modulationDataDialogOpen !== ''}
-                    onClose={() => setModulationDataDialogOpen('')}
-                    onOk={() => setModulationDataDialogOpen('')}
+                    onClose={() => {
+                        setModulationDataDialogOpen('');
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setModulationDataDialogOpen('');
+                        enableCommands();
+                    }}
                     title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                     height='100%'
                     width='100%'
@@ -1425,8 +1509,14 @@ A total of {0} instruments will be deleted.",
             {instrumentColorDialogOpen !== '' &&
                 <PopUpDialog
                     open={instrumentColorDialogOpen !== ''}
-                    onClose={() => setInstrumentColorDialogOpen('')}
-                    onOk={() => setInstrumentColorDialogOpen('')}
+                    onClose={() => {
+                        setInstrumentColorDialogOpen('');
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setInstrumentColorDialogOpen('');
+                        enableCommands();
+                    }}
                     title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
                     height='180px'
                     width='460px'
