@@ -34,21 +34,21 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
         });
 
         commandRegistry.registerCommand(VesProjectCommands.ZOOM_IN, {
-            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomIn(),
+            isEnabled: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.activeWidget instanceof VesProjectDashboardWidget && this.shell.activeWidget.handleZoomIn(),
         });
 
         commandRegistry.registerCommand(VesProjectCommands.ZOOM_OUT, {
-            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomOut(),
+            isEnabled: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.activeWidget instanceof VesProjectDashboardWidget && this.shell.activeWidget.handleZoomOut(),
         });
 
         commandRegistry.registerCommand(VesProjectCommands.ZOOM_RESET, {
-            isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
-            execute: () => this.shell.currentWidget instanceof VesProjectDashboardWidget && this.shell.currentWidget.handleZoomReset(),
+            isEnabled: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            isVisible: () => this.shell.activeWidget instanceof VesProjectDashboardWidget,
+            execute: () => this.shell.activeWidget instanceof VesProjectDashboardWidget && this.shell.activeWidget.handleZoomReset(),
         });
     }
 }
