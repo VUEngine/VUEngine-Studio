@@ -143,6 +143,7 @@ interface SoundEditorToolbarProps {
     setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteEvent: (notes: SetNoteEventProps[]) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
+    forcePlayerRomRebuild: number
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
@@ -169,6 +170,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         propertiesDialogOpen, setPropertiesDialogOpen,
         setNoteEvent,
         setTrack,
+        forcePlayerRomRebuild,
     } = props;
 
     const currentTrack = soundData.tracks[currentTrackId];
@@ -310,6 +312,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             playRangeStart={playRangeStart}
                             playRangeEnd={playRangeEnd}
                             trackSettings={trackSettings}
+                            forcePlayerRomRebuild={forcePlayerRomRebuild}
                         />
                     </StyledSoundEditorToolbarVisualization>
                 </StyledSoundEditorToolbarGroup>

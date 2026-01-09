@@ -153,6 +153,8 @@ interface PianoRollProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -192,7 +194,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentTrackId,
         currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        currentPlayerPosition,
+        currentPlayerPosition, setCurrentPlayerPosition,
+        setForcePlayerRomRebuild,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
@@ -528,6 +531,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
+                setCurrentPlayerPosition={setCurrentPlayerPosition}
+                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}

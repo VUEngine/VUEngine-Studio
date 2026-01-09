@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import styled from 'styled-components';
 import {
+    DEFAULT_PLAY_RANGE_SIZE,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
@@ -48,6 +49,8 @@ interface PianoRollHeaderProps {
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -68,10 +71,12 @@ const CurrentlyPlacingRange = styled.div`
     top: 0;
 `;
 
-export default function PianoRollHeaderPianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
+export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
         currentTrackId, currentPatternId, currentSequenceIndex,
+        setCurrentPlayerPosition,
+        setForcePlayerRomRebuild,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         pianoRollNoteWidth,
@@ -94,7 +99,9 @@ export default function PianoRollHeaderPianoRollHeader(props: PianoRollHeaderPro
             <CurrentlyPlacingRange
                 style={{
                     left: PIANO_ROLL_KEY_WIDTH + 2 + Math.min(dragStartStep, dragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                    width: pianoRollNoteWidth * (Math.abs(dragStartStep - dragEndStep) + 1),
+                    width: pianoRollNoteWidth * (dragStartStep === dragEndStep
+                        ? DEFAULT_PLAY_RANGE_SIZE
+                        : (Math.abs(dragStartStep - dragEndStep) + 1)),
                 }}
             />
         }
@@ -103,6 +110,8 @@ export default function PianoRollHeaderPianoRollHeader(props: PianoRollHeaderPro
             currentTrackId={currentTrackId}
             currentPatternId={currentPatternId}
             currentSequenceIndex={currentSequenceIndex}
+            setCurrentPlayerPosition={setCurrentPlayerPosition}
+            setForcePlayerRomRebuild={setForcePlayerRomRebuild}
             playRangeStart={playRangeStart}
             setPlayRangeStart={setPlayRangeStart}
             playRangeEnd={playRangeEnd}

@@ -29,6 +29,7 @@ interface EmulatorProps {
     playRangeEnd: number;
     trackSettings: TrackSettings[]
     playerRomBuilder: PlayerRomBuilder
+    forcePlayerRomRebuild: number
 }
 
 export default function Emulator(props: EmulatorProps): React.JSX.Element {
@@ -42,6 +43,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         playRangeStart, playRangeEnd,
         trackSettings,
         playerRomBuilder,
+        forcePlayerRomRebuild,
     } = props;
     const [core, setCore] = useState<any>();
     const [sim, setSim] = useState<any>();
@@ -93,7 +95,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const buildAndPlay = async (): Promise<void> => {
-        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, playRangeStart, playRangeEnd, trackSettings, true);
+        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, currentPlayerPosition, playRangeStart, playRangeEnd, trackSettings, true);
         await loadRom(romFileUri);
         setEmulatorRomReady(true);
     };
@@ -186,8 +188,10 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify({
                 soundData: soundData,
                 trackSettings,
+                currentPlayerPosition,
                 playRangeStart,
                 playRangeEnd,
+                forcePlayerRomRebuild,
             }));
             // console.log('current:', currentSoundDataChecksum);
             // console.log('previous:', soundDataChecksum);
@@ -211,6 +215,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         trackSettings,
         playRangeStart,
         playRangeEnd,
+        forcePlayerRomRebuild,
     ]);
 
     useEffect(() => {

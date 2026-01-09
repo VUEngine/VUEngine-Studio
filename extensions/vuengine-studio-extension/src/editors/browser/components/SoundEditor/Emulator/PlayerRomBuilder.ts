@@ -19,12 +19,13 @@ export default class PlayerRomBuilder {
 
     buildSoundPlayerRom = async (
         soundData: SoundData,
+        currentPlayerPosition: number,
         playRangeStart: number,
         playRangeEnd: number,
         trackSettings: TrackSettings[],
         miniVisualizer: boolean
     ): Promise<URI> => {
-        await this.generateSpecFile(soundData, playRangeStart, playRangeEnd, trackSettings, miniVisualizer);
+        await this.generateSpecFile(soundData, currentPlayerPosition, playRangeStart, playRangeEnd, trackSettings, miniVisualizer);
         await this.compileSpecFile();
 
         return this.tempBaseDir.resolve('sound.vb');
@@ -60,6 +61,7 @@ export default class PlayerRomBuilder {
 
     protected generateSpecFile = async (
         soundData: SoundData,
+        currentPlayerPosition: number,
         playRangeStart: number,
         playRangeEnd: number,
         trackSettings: TrackSettings[],
@@ -80,6 +82,7 @@ export default class PlayerRomBuilder {
                 miniVisualizer,
                 trackSettings,
                 startFromSramTick: false, // currentPlayerPosition > 0,
+                currentPlayerPosition,
                 playRangeStart,
                 playRangeEnd,
             },

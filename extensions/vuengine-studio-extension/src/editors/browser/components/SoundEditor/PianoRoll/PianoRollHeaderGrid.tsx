@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from '
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { getPatternName } from '../SoundEditor';
 import {
     DEFAULT_PLAY_RANGE_SIZE,
     NOTE_RESOLUTION,
@@ -11,9 +12,8 @@ import {
     ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
-    SUB_NOTE_RESOLUTION,
+    SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
-import { getPatternName } from '../SoundEditor';
 
 const StyledPianoRollHeaderGridContainer = styled.div`
     height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT}px;
@@ -25,6 +25,8 @@ interface PianoRollHeaderGridProps {
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
+    setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -44,6 +46,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     const {
         soundData,
         currentTrackId, currentPatternId, currentSequenceIndex,
+        setCurrentPlayerPosition,
+        setForcePlayerRomRebuild,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         pianoRollNoteWidth,
@@ -172,58 +176,6 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.stroke();
     };
 
-    /*
-    const classNames = [];
-    if (playRangeStart === index) {
-        classNames.push('rangeStart');
-    } else if (playRangeEnd === index) {
-        classNames.push('rangeEnd');
-    } else if (index > playRangeStart && index < playRangeEnd) {
-        classNames.push('inRange');
-    }
-
-    const updatePlayRangeStart = (start: number): void => {
-        setPlayRange(start);
-    };
-
-    const updatePlayRangeEnd = (end: number): void => {
-        setPlayRange(undefined, end);
-    };
-
-    const setPlayRange = (start?: number, end?: number): void => {
-        if (start === undefined) {
-            start = playRangeStart;
-        }
-        if (end === undefined) {
-            end = playRangeEnd;
-        }
-
-        // auto set the respective other value if it not yet
-        if (start === -1 && end > -1) {
-            start = 0;
-        }
-        if (end === -1 && start > -1) {
-            end = patternSize - 1;
-        }
-
-        // handle end < start
-        if (end > -1 && start > -1 && end < start) {
-            const temp = start;
-            start = end + 1;
-            end = temp;
-        }
-
-        // unset both if same
-        if (start === end) {
-            start = -1;
-            end = -1;
-        }
-
-        setPlayRangeStart(start);
-        setPlayRangeEnd(end);
-    };
-    */
-
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
         if (e.button === 0) {
             const rect = e.currentTarget.getBoundingClientRect();
@@ -254,6 +206,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
             setPlayRangeStart(startStep);
             setPlayRangeEnd(endStep);
+            setCurrentPlayerPosition(-1);
 
             // reset
             setDragStartStep(-1);
@@ -262,8 +215,15 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y < PIANO_ROLL_GRID_METER_HEIGHT) {
             if (e.button === 2) {
-                setPlayRangeStart(-1);
-                setPlayRangeEnd(-1);
+                if (playRangeStart !== -1 && playRangeEnd !== -1) {
+                    setPlayRangeStart(-1);
+                    setPlayRangeEnd(-1);
+                } else {
+                    const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+                    const step = Math.floor(x / pianoRollNoteWidth);
+                    setCurrentPlayerPosition(step);
+                    setForcePlayerRomRebuild(prev => prev + 1);
+                }
             }
         } else {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;

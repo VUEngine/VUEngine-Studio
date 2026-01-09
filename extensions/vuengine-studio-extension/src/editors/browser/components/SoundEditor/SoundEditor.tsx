@@ -159,6 +159,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
     const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
+    const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -902,7 +903,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const exportFile = async (): Promise<void> => {
-        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))], false);
+        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))], false);
         let exists: boolean = false;
         let overwrite: boolean = false;
         let selected: URI | undefined;
@@ -1112,12 +1113,6 @@ A total of {0} instruments will be deleted.",
     ]);
 
     useEffect(() => {
-        setCurrentPlayerPosition(-1);
-    }, [
-        soundData,
-    ]);
-
-    useEffect(() => {
         if (!instrumentDialogOpen && testInstrumentId !== '') {
             setTestInstrumentId('');
             setTestNote('');
@@ -1161,6 +1156,7 @@ A total of {0} instruments will be deleted.",
                     selectedNotes={selectedNotes}
                     setNoteEvent={setNoteEvent}
                     setTrack={setTrack}
+                    forcePlayerRomRebuild={forcePlayerRomRebuild}
                 />
                 {soundData.tracks.length === 0
                     ? <VContainer grow={1} style={{ position: 'relative' }}>
@@ -1221,6 +1217,8 @@ A total of {0} instruments will be deleted.",
                             <PianoRoll
                                 soundData={soundData}
                                 currentPlayerPosition={currentPlayerPosition}
+                                setCurrentPlayerPosition={setCurrentPlayerPosition}
+                                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                                 noteCursor={noteCursor}
                                 setNoteCursor={updateNoteCursor}
                                 currentPatternId={currentPatternId}
