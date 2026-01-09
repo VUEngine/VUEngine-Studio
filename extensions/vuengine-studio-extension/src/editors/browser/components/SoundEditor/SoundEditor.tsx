@@ -464,6 +464,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
         setTrackSettings(updatedTrackSettings.sort((a, b) => b.type.localeCompare(a.type)));
         setTrackDialogOpen(false);
+        focusEditor();
     };
 
     const removePatternFromSequence = (trackId: number, step: number): void => {

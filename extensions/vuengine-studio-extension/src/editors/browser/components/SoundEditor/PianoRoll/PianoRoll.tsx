@@ -323,6 +323,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         pianoRollNoteHeight={pianoRollNoteHeight}
                         pianoRollNoteWidth={pianoRollNoteWidth}
                         setCurrentInstrumentId={setCurrentInstrumentId}
+                        setSelectedNotes={setSelectedNotes}
                     />
                 );
             }

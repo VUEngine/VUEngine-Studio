@@ -101,6 +101,7 @@ interface PianoRollPlacedNoteProps {
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setSelectedNotes: Dispatch<SetStateAction<number[]>>
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -119,6 +120,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setCurrentInstrumentId,
+        setSelectedNotes,
     } = props;
 
     const noteId = NOTES_LABELS.indexOf(noteLabel);
@@ -217,12 +219,20 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const onMouseDown = (e: MouseEvent) => {
         if (e.button === 0) {
-            const event = events[localStep];
-            if (event) {
-                const instrumentId = event[SoundEvent.Instrument];
-                setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+            if (e.shiftKey) {
+                setSelectedNotes(prev =>
+                    [...prev, step]
+                        .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
+                        .sort()
+                );
+            } else {
+                const stepEvent = events[localStep];
+                if (stepEvent) {
+                    const instrumentId = stepEvent[SoundEvent.Instrument];
+                    setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                }
+                setNoteCursor(step);
             }
-            setNoteCursor(step);
         } else if (e.button === 2) {
             setNote([{ step: localStep }]);
         }
