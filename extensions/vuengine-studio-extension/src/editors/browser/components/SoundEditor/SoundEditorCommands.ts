@@ -267,4 +267,16 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+a',
     };
+    export const COPY_SELECTED_NOTES: EditorCommand = {
+        id: 'editors.soundEditor.copySelectedNotes',
+        label: nls.localize('vuengine/editors/sound/commands/copySelectedNotes', 'Copy Selected Notes'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'ctrlcmd+c',
+    };
+    export const PASTE_SELECTED_NOTES: EditorCommand = {
+        id: 'editors.soundEditor.pasteSelectedNotes',
+        label: nls.localize('vuengine/editors/sound/commands/pasteSelectedNotes', 'Paste Selected Notes'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'ctrlcmd+v',
+    };
 };

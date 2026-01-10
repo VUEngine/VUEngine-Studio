@@ -162,6 +162,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
+    const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -346,6 +347,34 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             .filter(step => currentPatternEvents[step][SoundEvent.Note]);
 
         setSelectedNotes(currentPatternNoteSteps);
+    };
+
+    const copyNotes = (): void => {
+        const noteEvents: EventsMap = {};
+        const smallestStep = Math.min(...selectedNotes);
+        selectedNotes.forEach(sn => {
+            const currentPattern = soundData.patterns[currentPatternId];
+            noteEvents[sn - smallestStep] = currentPattern.events[sn];
+        });
+        setNoteClipboard(noteEvents);
+    };
+
+    const pasteNotes = (): void => {
+        const setNoteProps: SetNoteProps[] = [];
+        const patternStepOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        const relativeNoteCursor = noteCursor - patternStepOffset;
+        Object.keys(noteClipboard).forEach(step => {
+            const stepInt = parseInt(step);
+            // TODO: this would drop other properties like noteSlide, need to rework setNote()
+            setNoteProps.push({
+                step: relativeNoteCursor + stepInt,
+                note: noteClipboard[stepInt][SoundEvent.Note],
+                duration: noteClipboard[stepInt][SoundEvent.Duration]
+            });
+        });
+        if (setNoteProps.length) {
+            setNote(setNoteProps);
+        }
     };
 
     const showTrackTypeSelection = async (): Promise<QuickPickItem | undefined> => {
@@ -1136,6 +1165,12 @@ A total of {0} instruments will be deleted.",
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
                 selectAllNotesInCurrentPattern();
+                break;
+            case SoundEditorCommands.COPY_SELECTED_NOTES.id:
+                copyNotes();
+                break;
+            case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
+                pasteNotes();
                 break;
         }
     };
