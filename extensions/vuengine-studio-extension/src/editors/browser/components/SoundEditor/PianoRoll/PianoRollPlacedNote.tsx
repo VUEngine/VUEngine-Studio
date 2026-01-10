@@ -4,9 +4,10 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { getMaxNoteDuration } from '../Other/Note';
-import { getNoteSlideLabel, SetNoteEventProps, SetNoteProps } from '../SoundEditor';
+import { getNoteSlideLabel, SetNoteEventProps } from '../SoundEditor';
 import {
     BAR_NOTE_RESOLUTION,
+    EventsMap,
     NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
@@ -108,7 +109,7 @@ interface PianoRollPlacedNoteProps {
     duration: number
     step: number
     instrumentColor: string
-    setNote: (notes: SetNoteProps[]) => void
+    setNotes: (notes: EventsMap) => void
     setNoteEvent: (notes: SetNoteEventProps[]) => void
     pattern: PatternConfig
     noteSnapping: boolean
@@ -131,7 +132,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         duration,
         step,
         instrumentColor,
-        setNote,
+        setNotes,
         setNoteEvent,
         pattern,
         noteSnapping,
@@ -343,24 +344,34 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const newStepDifference = newStep - localStep;
         const newNoteDifference = newNoteId - noteId;
 
-        const notes: SetNoteProps[] = [{
-            step: newStep,
-            note: NOTES_LABELS[newNoteId],
-            prevStep: localStep
-        }];
+        const notes: EventsMap = {};
+
+        // add previous notes to delete
+        notes[localStep] = {};
+        selectedNotes.forEach(sn => {
+            if (sn !== localStep && events[sn] !== undefined && events[sn][SoundEvent.Note] !== undefined) {
+                notes[sn] = {};
+            }
+        });
+
+        // add notes to set
+        notes[newStep] = {
+            ...events[localStep],
+            [SoundEvent.Note]: NOTES_LABELS[newNoteId],
+        };
         selectedNotes.forEach(sn => {
             if (sn !== localStep && events[sn] !== undefined && events[sn][SoundEvent.Note] !== undefined) {
                 const snNoteId = NOTES_LABELS.indexOf(events[sn][SoundEvent.Note]);
-                notes.push({
-                    step: sn + newStepDifference,
-                    note: NOTES_LABELS[snNoteId + newNoteDifference],
-                    prevStep: sn
-                });
+                notes[sn + newStepDifference] = {
+                    ...events[sn],
+                    [SoundEvent.Note]: NOTES_LABELS[snNoteId + newNoteDifference],
+                };
             }
         });
-        setNote(notes);
 
-        setSelectedNotes(notes.map(n => n.step));
+        setNotes(notes);
+
+        setSelectedNotes(Object.values(notes).filter(n => n.step !== undefined).map(n => n.step));
         setNoteDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
 
@@ -386,7 +397,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 }
             }
         } else if (e.button === 2) {
-            setNote([{ step: localStep }]);
+            setNotes({ [localStep]: {} });
         }
 
         e.stopPropagation();

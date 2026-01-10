@@ -22,7 +22,6 @@ import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
-import { getMaxNoteDuration } from './Other/Note';
 import Properties from './Other/Song';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -64,13 +63,6 @@ import {
 } from './SoundEditorTypes';
 import ModulationData from './Waveforms/ModulationData';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
-
-export interface SetNoteProps {
-    step: number
-    note?: string
-    prevStep?: number
-    duration?: number
-}
 
 export interface SetNoteEventProps {
     step: number
@@ -350,29 +342,34 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const copyNotes = (): void => {
         const noteEvents: EventsMap = {};
-        const smallestStep = Math.min(...selectedNotes);
         selectedNotes.forEach(sn => {
             const currentPattern = soundData.patterns[currentPatternId];
-            noteEvents[sn - smallestStep] = currentPattern.events[sn];
+            if (currentPattern.events[sn] !== undefined) {
+                noteEvents[sn] = currentPattern.events[sn];
+            }
         });
         setNoteClipboard(noteEvents);
     };
 
     const pasteNotes = (): void => {
-        const setNoteProps: SetNoteProps[] = [];
+        const notesToPaste: EventsMap = {};
+        const currentPattern = soundData.patterns[currentPatternId];
+        if (currentPattern === undefined) {
+            return;
+        }
+
         const patternStepOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const relativeNoteCursor = noteCursor - patternStepOffset;
+        const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
         Object.keys(noteClipboard).forEach(step => {
             const stepInt = parseInt(step);
-            // TODO: this would drop other properties like noteSlide, need to rework setNote()
-            setNoteProps.push({
-                step: relativeNoteCursor + stepInt,
-                note: noteClipboard[stepInt][SoundEvent.Note],
-                duration: noteClipboard[stepInt][SoundEvent.Duration]
-            });
+            if (currentPattern.events[stepInt] !== undefined) {
+                notesToPaste[stepInt - smallestStep + relativeNoteCursor] = currentPattern.events[stepInt];
+            }
         });
-        if (setNoteProps.length) {
-            setNote(setNoteProps);
+
+        if (Object.keys(notesToPaste).length) {
+            setNotes(notesToPaste);
         }
     };
 
@@ -691,23 +688,15 @@ A total of {0} instruments will be deleted.",
         ]);
     };
 
-    const setNote = (notes: SetNoteProps[]): void => {
+    const setNotes = (notes: EventsMap): void => {
         const currentPattern = soundData.patterns[currentPatternId];
-
         if (currentPattern === undefined) {
             return;
         }
 
-        // sort desc to process right most notes first
-        notes.sort((a, b) => {
-            if (a.step < b.step) {
-                return 1;
-            }
-            if (a.step > b.step) {
-                return -1;
-            }
-            return 0;
-        });
+        const updatedEvents: EventsMap = {
+            ...sortObjectByKeys(currentPattern.events),
+        };
 
         const removeNoteFromEvents = (stepToRemove: number) => {
             if (updatedEvents[stepToRemove] === undefined) {
@@ -726,83 +715,53 @@ A total of {0} instruments will be deleted.",
             }
         };
 
-        const updatedEvents: EventsMap = {
-            ...currentPattern.events,
-        };
-
-        // remove notes first
-        notes.forEach(n => {
-            updatedEvents[n.step] = {
-                ...(n.prevStep ? currentPattern.events[n.prevStep] : {}),
-                [SoundEvent.Note]: n.note,
-            };
-
-            if (n.note === undefined) {
-                removeNoteFromEvents(n.step);
-            } else {
-                // remove previous note if it was moved from another step
-                if (n.prevStep !== undefined && n.prevStep !== n.step) {
-                    removeNoteFromEvents(n.prevStep);
-                }
+        // remove notes
+        Object.keys(notes).forEach(step => {
+            const stepInt = parseInt(step);
+            if (Object.keys(notes[stepInt]).length === 0) {
+                removeNoteFromEvents(stepInt);
             }
         });
 
-        notes.forEach(n => {
-            if (n.note !== undefined) {
-                const eventKeys = Object.keys(currentPattern.events);
+        // set notes
+        Object.keys(sortObjectByKeys(notes)).forEach(step => {
+            const stepInt = parseInt(step);
+            if (Object.keys(notes[stepInt]).length > 0) {
+                updatedEvents[stepInt] = {
+                    ...currentPattern.events[stepInt] ?? {},
+                    ...notes[stepInt],
+                };
 
-                // set and cap new note's duration
-                let cappedDuration = Math.min(
-                    getMaxNoteDuration(currentPattern.events, n.step, currentPattern.size),
-                    n.duration !== undefined
-                        ? n.duration
-                        : updatedEvents[n.step] !== undefined
-                            ? updatedEvents[n.step][SoundEvent.Duration]
-                            : newNoteDuration,
-                );
-
-                let stop = false;
-                eventKeys.forEach(key => {
-                    const nextEventStep = parseInt(key);
-                    const event = currentPattern.events[nextEventStep];
-                    if (!stop && nextEventStep > n.step && event[SoundEvent.Note] !== undefined) {
-                        stop = true;
-                        cappedDuration = Math.min(cappedDuration, nextEventStep - n.step);
-                    }
-                });
-                if (cappedDuration === 0) {
-                    cappedDuration = Math.min(newNoteDuration, currentPattern.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION - n.step);
-                }
-                updatedEvents[n.step][SoundEvent.Duration] = cappedDuration;
-
-                // cap previous note's duration
-                stop = false;
-                eventKeys.reverse().forEach(key => {
-                    const prevEventStep = parseInt(key);
-                    const prevEvent = updatedEvents[prevEventStep];
-                    if (!stop && prevEvent !== undefined && prevEventStep < n.step &&
-                        prevEvent[SoundEvent.Note] !== undefined &&
-                        prevEvent[SoundEvent.Duration] !== undefined
-                    ) {
-                        stop = true;
-                        if (prevEvent[SoundEvent.Duration] + prevEventStep >= n.step) {
-                            updatedEvents[prevEventStep][SoundEvent.Duration] = n.step - prevEventStep;
-                        }
-                    }
-                });
-
-                // set instrument
+                // remove explicit default instrument
                 if (currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID) {
-                    if (updatedEvents[n.step][SoundEvent.Instrument] !== undefined) {
-                        delete (updatedEvents[n.step][SoundEvent.Instrument]);
+                    if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined) {
+                        delete (updatedEvents[stepInt][SoundEvent.Instrument]);
                     }
                 } else {
-                    updatedEvents[n.step][SoundEvent.Instrument] = currentInstrumentId;
+                    updatedEvents[stepInt][SoundEvent.Instrument] = currentInstrumentId;
                 }
 
                 // ensure clean key order
-                updatedEvents[n.step] = sortObjectByKeys(updatedEvents[n.step]);
+                updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
             }
+        });
+
+        // cap all note durations
+        let prevStep = -1;
+        [
+            ...Object.keys(updatedEvents),
+            (currentPattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION).toString(), // pattern size is last note's limit
+        ].forEach(step => {
+            const stepInt = parseInt(step);
+            if (
+                updatedEvents[prevStep] !== undefined &&
+                updatedEvents[prevStep][SoundEvent.Duration] !== undefined &&
+                updatedEvents[prevStep][SoundEvent.Duration] > (stepInt - prevStep)
+            ) {
+                updatedEvents[prevStep][SoundEvent.Duration] = stepInt - prevStep;
+            }
+
+            prevStep = stepInt;
         });
 
         setPattern(currentPatternId, {
@@ -1317,7 +1276,7 @@ A total of {0} instruments will be deleted.",
                                 playRangeEnd={playRangeEnd}
                                 setPlayRangeEnd={setPlayRangeEnd}
                                 playNote={playNote}
-                                setNote={setNote}
+                                setNotes={setNotes}
                                 setNoteEvent={setNoteEvent}
                                 addPattern={addPattern}
                                 sequencerHidden={sequencerHidden}

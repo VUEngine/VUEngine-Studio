@@ -3,8 +3,8 @@ import React, { Dispatch, RefObject, SetStateAction, useContext, useEffect, useR
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { SetNoteProps } from '../SoundEditor';
 import {
+    EventsMap,
     NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
@@ -25,7 +25,7 @@ interface PianoRollGridProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
-    setNote: (notes: SetNoteProps[]) => void
+    setNotes: (notes: EventsMap) => void
     newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
@@ -53,7 +53,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         currentPatternId,
         currentSequenceIndex,
         noteCursor, setNoteCursor,
-        setNote,
+        setNotes,
         newNoteDuration,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
@@ -281,12 +281,12 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 newNoteStep >= currentSequenceIndexStartStep &&
                 newNoteStep < currentSequenceIndexEndStep
             ) {
-                setNote([{
-                    step: (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
-                    note: newNoteLabel,
-                    prevStep: undefined,
-                    duration: newNoteDur
-                }]);
+                setNotes({
+                    [(newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION]: {
+                        [SoundEvent.Note]: newNoteLabel,
+                        [SoundEvent.Duration]: newNoteDur,
+                    }
+                });
                 setNoteCursor(newNoteCursor);
             } else {
                 const newPatternSize = Math.abs(noteDragStartStep - noteDragEndStep) + 1;

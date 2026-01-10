@@ -3,7 +3,6 @@ import React from 'react';
 import Checkbox from '../../Common/Base/Checkbox';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import InfoLabel from '../../Common/InfoLabel';
 import {
     EngineConfigData,
     HACK_BGMAP_SPRITE_HEIGHT_DEFAULT_VALUE,
