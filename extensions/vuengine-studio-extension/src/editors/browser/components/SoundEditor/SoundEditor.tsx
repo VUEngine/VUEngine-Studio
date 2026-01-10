@@ -1054,10 +1054,6 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.STOP.id:
                 stopPlaying();
                 break;
-            case SoundEditorCommands.ADD_NOTE.id:
-                // TODO
-                alert('not yet implemented');
-                break;
             case SoundEditorCommands.ADD_PATTERN.id:
                 const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
                 addPattern(currentTrackId, noteCursorStep);
@@ -1173,7 +1169,12 @@ A total of {0} instruments will be deleted.",
     ]);
 
     return (
-        <HContainer className="musicEditor" gap={0} overflow="hidden" style={{ padding: 0 }}>
+        <HContainer
+            className="musicEditor"
+            gap={0}
+            overflow="hidden"
+            style={{ padding: 0 }}
+        >
             <VContainer gap={0} grow={1} overflow="hidden">
                 <SoundEditorToolbar
                     soundData={soundData}

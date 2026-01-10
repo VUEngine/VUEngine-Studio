@@ -58,7 +58,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -81,7 +81,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
-        const c = services.themeService.getCurrentTheme().type === 'light' ? 0 : 255;
+        const c = currentThemeType === 'light' ? 0 : 255;
 
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
@@ -247,13 +247,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
     useEffect(() => {
         draw();
-
-        // TODO
-        /*
-        const watcher = services.themeService.onDidColorThemeChange(() => draw());
-        return watcher.dispose();
-        */
     }, [
+        currentThemeType,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,

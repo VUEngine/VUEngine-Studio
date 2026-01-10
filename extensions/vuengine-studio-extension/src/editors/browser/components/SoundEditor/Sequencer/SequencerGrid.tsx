@@ -61,7 +61,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         setCurrentPlayerPosition,
         setForcePlayerRomRebuild,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -83,7 +83,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
-        const c = services.themeService.getCurrentTheme().type === 'light' ? 0 : 255;
+        const c = currentThemeType === 'light' ? 0 : 255;
 
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .1)`;
         context.lineWidth = 1;
@@ -265,13 +265,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
     useEffect(() => {
         draw();
-
-        // TODO
-        /*
-        const watcher = services.themeService.onDidColorThemeChange(() => draw());
-        return watcher.dispose();
-        */
     }, [
+        currentThemeType,
         soundData.size,
         soundData.tracks.length,
         currentTrackId,

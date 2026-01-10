@@ -31,7 +31,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         pianoRollNoteWidth,
         pianoRollScrollWindow,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -49,10 +49,9 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         if (!context) {
             return;
         }
-        const themeType = services.themeService.getCurrentTheme().type;
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-        drawGrid(canvas, context, themeType, songLength, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
+        drawGrid(canvas, context, currentThemeType, songLength, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
     };
 
     const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
@@ -69,13 +68,8 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
 
     useEffect(() => {
         draw();
-
-        // TODO
-        /*
-        const watcher = services.themeService.onDidColorThemeChange(() => draw());
-        return watcher.dispose();
-        */
     }, [
+        currentThemeType,
         soundData.tracks,
         songLength,
         currentTrackId,

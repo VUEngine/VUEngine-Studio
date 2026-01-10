@@ -91,12 +91,6 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+left',
     };
-    export const ADD_NOTE: EditorCommand = {
-        id: 'editors.soundEditor.addNote',
-        label: nls.localize('vuengine/editors/sound/commands/addNote', 'Add Note'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'n',
-    };
     export const SEQUENCER_VERTICAL_SCALE_REDUCE: EditorCommand = {
         id: 'editors.soundEditor.sequencerVerticalScaleReduce',
         label: nls.localize('vuengine/editors/sound/commands/sequencerVerticalScaleReduce', 'Sequencer: Reduce Vertical Scale'),

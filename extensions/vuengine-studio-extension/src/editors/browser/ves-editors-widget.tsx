@@ -22,6 +22,7 @@ import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { ThemeType } from '@theia/core/lib/common/theme';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -131,6 +132,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected uiSchema: UISchemaElement | undefined;
 
     protected data: ItemData | undefined;
+
+    protected currentThemeType: ThemeType;
 
     protected saveCallback: () => void | undefined;
 
@@ -306,6 +309,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.vesProjectService.onDidAddProjectItem(() => this.update()),
             this.vesProjectService.onDidDeleteProjectItem(() => this.update()),
             this.vesProjectService.onDidUpdateProjectItem(() => this.update()),
+            this.themeService.onDidColorThemeChange(() => {
+                this.currentThemeType = this.themeService.getCurrentTheme().type;
+                this.update();
+            })
         ]);
     }
 
@@ -506,6 +513,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         focusEditor: this.focusEditor.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
+                        currentThemeType: this.currentThemeType,
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,

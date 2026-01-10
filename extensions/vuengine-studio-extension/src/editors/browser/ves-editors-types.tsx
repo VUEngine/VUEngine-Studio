@@ -9,6 +9,8 @@ import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { ThemeType } from '@theia/core/lib/common/theme';
+import { Event } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -22,7 +24,6 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
-import { Event } from '@theia/core/shared/vscode-languageserver-protocol';
 
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
@@ -67,6 +68,7 @@ export interface EditorsContextType {
     focusEditor: () => void
     setStatusBarItem: (id: string, entry: StatusBarEntry) => void
     removeStatusBarItem: (id: string) => void
+    currentThemeType: ThemeType
     services: EditorsServices
 }
 

@@ -67,7 +67,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         trackSettings,
         setSelectedNotes,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -90,9 +90,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
-        const themeType = services.themeService.getCurrentTheme().type;
-        const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
-        const c = ['light', 'hcLight'].includes(themeType) ? 0 : 255;
+        const highContrastTheme = ['hc', 'hcLight'].includes(currentThemeType);
+        const c = ['light', 'hcLight'].includes(currentThemeType) ? 0 : 255;
         const fullColor = `rgba(${c}, ${c}, ${c}, 1)`;
         const lowColor = highContrastTheme
             ? fullColor
@@ -154,7 +153,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
             // sharp note background
             if (NOTES_LABELS[y].includes('#') && !highContrastTheme) {
-                context.fillStyle = themeType === 'light'
+                context.fillStyle = currentThemeType === 'light'
                     ? `rgba(${c}, ${c}, ${c}, .05)`
                     : 'rgba(0, 0, 0, .2)';
                 context.fillRect(
@@ -392,13 +391,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     useEffect(() => {
         draw();
-
-        // TODO
-        /*
-        const watcher = services.themeService.onDidColorThemeChange(() => draw());
-        return watcher.dispose();
-        */
     }, [
+        currentThemeType,
         soundData,
         currentTrackId,
         currentPatternId,
