@@ -239,7 +239,7 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.toggleEffectsVisibility',
         label: nls.localize('vuengine/editors/sound/commands/toggleEffectsVisibility', 'Toggle Effects Visibility'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'y',
+        keybinding: 'f',
     };
     export const OPEN_INSTRUMENT_EDITOR: EditorCommand = {
         id: 'editors.soundEditor.openInstrumentEditor',

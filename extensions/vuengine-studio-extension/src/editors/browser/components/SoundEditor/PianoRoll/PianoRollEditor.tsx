@@ -55,6 +55,7 @@ interface PianoRollEditorProps {
     setNote: (notes: SetNoteProps[]) => void
     playNote: (note: string, instrumentId?: string) => void
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
@@ -73,6 +74,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         setNote,
         playNote,
         setSelectedNotes,
+        newNoteDuration,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
@@ -134,6 +136,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 currentSequenceIndex={currentSequenceIndex}
                 setNoteCursor={setNoteCursor}
                 setNote={setNote}
+                newNoteDuration={newNoteDuration}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}

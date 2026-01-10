@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -172,6 +172,7 @@ interface PianoRollProps {
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
     noteSnapping: boolean
     addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
+    newNoteDuration: number
     pianoRollNoteHeight: number
     setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
@@ -211,6 +212,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         selectedNotes, setSelectedNotes,
         noteSnapping,
         addPattern,
+        newNoteDuration,
         pianoRollNoteHeight, setPianoRollNoteHeight,
         pianoRollNoteWidth, setPianoRollNoteWidth,
         sequencerPatternHeight, sequencerPatternWidth,
@@ -222,6 +224,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
     } = props;
+    const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const pattern = soundData.patterns[currentPatternId];
@@ -317,13 +320,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         setNoteCursor={setNoteCursor}
                         setNote={setNote}
                         setNoteEvent={setNoteEvent}
-                        events={p.events}
-                        patternSize={p.size}
+                        pattern={p}
                         noteSnapping={noteSnapping}
                         pianoRollNoteHeight={pianoRollNoteHeight}
                         pianoRollNoteWidth={pianoRollNoteWidth}
                         setCurrentInstrumentId={setCurrentInstrumentId}
+                        selectedNotes={selectedNotes}
                         setSelectedNotes={setSelectedNotes}
+                        isSelected={selectedNotes.includes(step)}
+                        noteDragDelta={noteDragDelta}
+                        setNoteDragDelta={setNoteDragDelta}
                     />
                 );
             }
@@ -337,6 +343,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         noteCursor,
         soundData.instruments,
         setNote,
+        noteDragDelta.x,
+        noteDragDelta.y,
     ]);
 
     const commandListener = (commandId: string): void => {
@@ -623,6 +631,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNote={setNote}
                 playNote={playNote}
                 setSelectedNotes={setSelectedNotes}
+                newNoteDuration={newNoteDuration}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}

@@ -666,13 +666,27 @@ A total of {0} instruments will be deleted.",
 
     const setNote = (notes: SetNoteProps[]): void => {
         const currentPattern = soundData.patterns[currentPatternId];
-        const currentPatternEvents = currentPattern.events;
 
         if (currentPattern === undefined) {
             return;
         }
 
+        // sort desc to process right most notes first
+        notes.sort((a, b) => {
+            if (a.step < b.step) {
+                return 1;
+            }
+            if (a.step > b.step) {
+                return -1;
+            }
+            return 0;
+        });
+
         const removeNoteFromEvents = (stepToRemove: number) => {
+            if (updatedEvents[stepToRemove] === undefined) {
+                return;
+            }
+
             // remove all note-related events
             delete updatedEvents[stepToRemove][SoundEvent.Note];
             delete updatedEvents[stepToRemove][SoundEvent.Instrument];
@@ -689,6 +703,7 @@ A total of {0} instruments will be deleted.",
             ...currentPattern.events,
         };
 
+        // remove notes first
         notes.forEach(n => {
             updatedEvents[n.step] = {
                 ...(n.prevStep ? currentPattern.events[n.prevStep] : {}),
@@ -698,23 +713,31 @@ A total of {0} instruments will be deleted.",
             if (n.note === undefined) {
                 removeNoteFromEvents(n.step);
             } else {
-                const eventKeys = Object.keys(currentPatternEvents);
-                let stop = false;
-
                 // remove previous note if it was moved from another step
                 if (n.prevStep !== undefined && n.prevStep !== n.step) {
                     removeNoteFromEvents(n.prevStep);
                 }
+            }
+        });
+
+        notes.forEach(n => {
+            if (n.note !== undefined) {
+                const eventKeys = Object.keys(currentPattern.events);
 
                 // set and cap new note's duration
                 let cappedDuration = Math.min(
                     getMaxNoteDuration(currentPattern.events, n.step, currentPattern.size),
-                    n.duration ?? updatedEvents[n.step][SoundEvent.Duration] ?? newNoteDuration,
+                    n.duration !== undefined
+                        ? n.duration
+                        : updatedEvents[n.step] !== undefined
+                            ? updatedEvents[n.step][SoundEvent.Duration]
+                            : newNoteDuration,
                 );
-                stop = false;
+
+                let stop = false;
                 eventKeys.forEach(key => {
                     const nextEventStep = parseInt(key);
-                    const event = currentPatternEvents[nextEventStep];
+                    const event = currentPattern.events[nextEventStep];
                     if (!stop && nextEventStep > n.step && event[SoundEvent.Note] !== undefined) {
                         stop = true;
                         cappedDuration = Math.min(cappedDuration, nextEventStep - n.step);
@@ -729,8 +752,8 @@ A total of {0} instruments will be deleted.",
                 stop = false;
                 eventKeys.reverse().forEach(key => {
                     const prevEventStep = parseInt(key);
-                    const prevEvent = currentPatternEvents[prevEventStep];
-                    if (!stop && prevEventStep < n.step &&
+                    const prevEvent = updatedEvents[prevEventStep];
+                    if (!stop && prevEvent !== undefined && prevEventStep < n.step &&
                         prevEvent[SoundEvent.Note] !== undefined &&
                         prevEvent[SoundEvent.Duration] !== undefined
                     ) {
@@ -1275,12 +1298,13 @@ A total of {0} instruments will be deleted.",
                                 selectedNotes={selectedNotes}
                                 setSelectedNotes={updateSelectedNotes}
                                 noteSnapping={noteSnapping}
+                                newNoteDuration={newNoteDuration}
                                 pianoRollNoteHeight={pianoRollNoteHeight}
+                                setPianoRollNoteHeight={setPianoRollNoteHeight}
                                 pianoRollNoteWidth={pianoRollNoteWidth}
+                                setPianoRollNoteWidth={setPianoRollNoteWidth}
                                 sequencerPatternHeight={sequencerPatternHeight}
                                 sequencerPatternWidth={sequencerPatternWidth}
-                                setPianoRollNoteHeight={setPianoRollNoteHeight}
-                                setPianoRollNoteWidth={setPianoRollNoteWidth}
                                 setPianoRollScrollWindow={setPianoRollScrollWindow}
                                 setCurrentInstrumentId={setCurrentInstrumentId}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
@@ -1468,10 +1492,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/selectWaveform', 'Select Waveform')
                     }
@@ -1490,10 +1516,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                     height='100%'
@@ -1513,10 +1541,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
                     height='180px'

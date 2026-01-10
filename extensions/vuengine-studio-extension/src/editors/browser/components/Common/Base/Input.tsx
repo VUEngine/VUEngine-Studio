@@ -75,7 +75,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         tabIndex, autoFocus,
         onClick, onBlur,
     } = props;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { enableCommands, disableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [internalValue, setInternalValue] = useState<string | number>(value ?? defaultValue);
     const [invalid, setInvalid] = useState<boolean>(false);
 
@@ -108,6 +108,7 @@ export default function Input(props: InputProps): React.JSX.Element {
 
     const handleOnBlur = () => {
         enableCommands();
+        focusEditor();
     };
 
     const validateAndUpdateValue = useCallback(debounce(

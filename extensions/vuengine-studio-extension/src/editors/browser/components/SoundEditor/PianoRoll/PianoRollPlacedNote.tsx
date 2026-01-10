@@ -1,16 +1,17 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useMemo, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getMaxNoteDuration } from '../Other/Note';
 import { getNoteSlideLabel, SetNoteEventProps, SetNoteProps } from '../SoundEditor';
 import {
     BAR_NOTE_RESOLUTION,
-    EventsMap,
     NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
+    PatternConfig,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
@@ -95,13 +96,16 @@ interface PianoRollPlacedNoteProps {
     instrumentColor: string
     setNote: (notes: SetNoteProps[]) => void
     setNoteEvent: (notes: SetNoteEventProps[]) => void
-    events: EventsMap
-    patternSize: number
+    pattern: PatternConfig
     noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    isSelected: boolean
+    noteDragDelta: { x: number, y: number }
+    setNoteDragDelta: Dispatch<SetStateAction<{ x: number, y: number }>>
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -115,16 +119,21 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         instrumentColor,
         setNote,
         setNoteEvent,
-        events,
-        patternSize,
+        pattern,
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setCurrentInstrumentId,
-        setSelectedNotes,
+        selectedNotes, setSelectedNotes,
+        isSelected,
+        noteDragDelta, setNoteDragDelta,
     } = props;
+    const { focusEditor } = useContext(EditorsContext) as EditorsContextType;
+    const [isDragging, setIsDragging] = useState(false);
 
+    const events = pattern.events;
+    const patternSize = pattern.size;
     const noteId = NOTES_LABELS.indexOf(noteLabel);
-    const localStep = step - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+    const localStep = step - (currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
 
     const left = PIANO_ROLL_KEY_WIDTH + 2 + step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
     const top = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + noteId * pianoRollNoteHeight;
@@ -140,6 +149,99 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const maxDuration = useMemo(() =>
         getMaxNoteDuration(events, localStep, patternSize),
         [events, step, currentSequenceIndex, patternSize]
+    );
+
+    const topDragBound = useMemo(() => {
+        const topPianoRollBound = PIANO_ROLL_GRID_METER_HEIGHT + pianoRollNoteHeight + 2;
+
+        let topMostNoteDifference = 0;
+        const topMostNote = selectedNotes
+            .map(sn => NOTES_LABELS.indexOf(events[sn] !== undefined ? events[sn][SoundEvent.Note] : noteId))
+            .filter(snId => snId < noteId)
+            .sort()[0];
+        if (topMostNote !== undefined) {
+            topMostNoteDifference = (noteId - topMostNote) * pianoRollNoteHeight;
+        }
+
+        return topPianoRollBound + topMostNoteDifference;
+    },
+        [
+            pianoRollNoteHeight,
+            selectedNotes,
+            events,
+            noteId
+        ]
+    );
+
+    const rightDragBound = useMemo(() => {
+        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
+        let rightMostNoteDuration = duration;
+
+        let rightMostNoteDifference = 0;
+        const rightMostNote = selectedNotes.filter(sn => sn > localStep).sort().pop();
+        if (rightMostNote !== undefined) {
+            rightMostNoteDifference = (rightMostNote - localStep) / SUB_NOTE_RESOLUTION * pianoRollNoteWidth;
+            if (events[rightMostNote] !== undefined && events[rightMostNote][SoundEvent.Duration] !== undefined) {
+                rightMostNoteDuration = events[rightMostNote][SoundEvent.Duration];
+            } else {
+                rightMostNoteDuration = 1;
+            }
+        }
+
+        const rightMostNoteWidth = (rightMostNoteDuration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth);
+
+        return rightPatternBound - rightMostNoteDifference - rightMostNoteWidth;
+    },
+        [
+            currentSequenceIndex,
+            duration,
+            patternSize,
+            pianoRollNoteWidth,
+            selectedNotes,
+            localStep,
+            events
+        ]
+    );
+
+    const bottomDragBound = useMemo(() => {
+        const bottomPianoRollBound = NOTES_SPECTRUM * pianoRollNoteHeight + PIANO_ROLL_GRID_METER_HEIGHT + 2;
+
+        let bottomMostNoteDifference = 0;
+        const bottomMostNote = selectedNotes
+            .map(sn => NOTES_LABELS.indexOf(events[sn] !== undefined ? events[sn][SoundEvent.Note] : noteId))
+            .filter(snId => snId > noteId)
+            .sort().pop();
+        if (bottomMostNote !== undefined) {
+            bottomMostNoteDifference = (bottomMostNote - noteId) * pianoRollNoteHeight;
+        }
+
+        return bottomPianoRollBound - bottomMostNoteDifference;
+    },
+        [
+            pianoRollNoteHeight,
+            selectedNotes,
+            events,
+            noteId
+        ]
+    );
+
+    const leftDragBound = useMemo(() => {
+        const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
+
+        let leftMostNoteDifference = 0;
+        const leftMostNote = selectedNotes.filter(sn => sn < localStep).sort()[0];
+        if (leftMostNote !== undefined) {
+            leftMostNoteDifference = (localStep - leftMostNote) / SUB_NOTE_RESOLUTION * pianoRollNoteWidth;
+        }
+
+        return leftPatternBound + leftMostNoteDifference;
+    },
+        [
+            currentSequenceIndex,
+            pianoRollNoteWidth,
+            selectedNotes,
+            localStep
+        ]
     );
 
     const minWidth = noteSnapping ? pianoRollNoteWidth : 1;
@@ -185,6 +287,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             event: SoundEvent.Duration,
             value: newDuration
         }]);
+
+        focusEditor();
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
@@ -205,14 +309,50 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         }]);
     };
 
+    const onDrag = (e: DraggableEvent, data: DraggableData) => {
+        setNoteDragDelta(prev => ({
+            x: prev.x + data.deltaX,
+            y: prev.y + data.deltaY
+        }));
+
+        e.stopPropagation();
+    };
+
+    const onDragStart = (e: DraggableEvent, data: DraggableData) => {
+        setIsDragging(true);
+    };
+
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         const newStep = (noteSnapping
             ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
             : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
         ) - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
         const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
-        const newNoteLabel = NOTES_LABELS[newNoteId];
-        setNote([{ step: newStep, note: newNoteLabel, prevStep: localStep }]);
+
+        const newStepDifference = newStep - localStep;
+        const newNoteDifference = newNoteId - noteId;
+
+        const notes: SetNoteProps[] = [{
+            step: newStep,
+            note: NOTES_LABELS[newNoteId],
+            prevStep: localStep
+        }];
+        selectedNotes.forEach(sn => {
+            if (sn !== localStep && events[sn] !== undefined && events[sn][SoundEvent.Note] !== undefined) {
+                const snNoteId = NOTES_LABELS.indexOf(events[sn][SoundEvent.Note]);
+                notes.push({
+                    step: sn + newStepDifference,
+                    note: NOTES_LABELS[snNoteId + newNoteDifference],
+                    prevStep: sn
+                });
+            }
+        });
+        setNote(notes);
+
+        setSelectedNotes(notes.map(n => n.step));
+        setNoteDragDelta({ x: 0, y: 0 });
+        setIsDragging(false);
+        focusEditor();
 
         e.stopPropagation();
     };
@@ -231,12 +371,15 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     const instrumentId = stepEvent[SoundEvent.Instrument];
                     setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
                 }
-                setNoteCursor(step);
+                if (!selectedNotes.includes(localStep)) {
+                    setNoteCursor(step);
+                }
             }
         } else if (e.button === 2) {
             setNote([{ step: localStep }]);
         }
 
+        focusEditor();
         e.stopPropagation();
     };
 
@@ -245,6 +388,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             grid={[minWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
+            onStart={onDragStart}
+            onDrag={onDrag}
             onStop={onDragStop}
             onMouseDown={onMouseDown}
             position={{
@@ -252,11 +397,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 y: top,
             }}
             bounds={{
-                bottom: (NOTES_SPECTRUM - 1) * pianoRollNoteHeight,
-                left: PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION,
-                right: (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION -
-                    (duration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth),
-                top: 0,
+                bottom: bottomDragBound,
+                left: leftDragBound,
+                right: rightDragBound,
+                top: topDragBound,
             }}
         >
             <StyledPianoRollPlacedNote
@@ -267,6 +411,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     fontSize: Math.min(fontSize, MAX_FONT_SIZE),
                     lineHeight: `${pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH}px`,
                     height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
+                    translate: !isDragging && isSelected
+                        ? `${noteDragDelta.x}px ${noteDragDelta.y}px`
+                        : undefined
                 }}
                 title={label}
             >

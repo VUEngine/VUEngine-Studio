@@ -26,6 +26,7 @@ interface PianoRollGridProps {
     noteCursor: number
     setNoteCursor: (noteCursor: number) => void
     setNote: (notes: SetNoteProps[]) => void
+    newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
@@ -53,11 +54,12 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         currentSequenceIndex,
         noteCursor, setNoteCursor,
         setNote,
+        newNoteDuration,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
-        noteDragNoteId: dragNoteId, setNoteDragNoteId: setDragNoteId,
-        noteDragStartStep: dragStartStep, setNoteDragStartStep: setDragStartStep,
-        noteDragEndStep: dragEndStep, setNoteDragEndStep: setDragEndStep,
+        noteDragNoteId, setNoteDragNoteId,
+        noteDragStartStep, setNoteDragStartStep,
+        noteDragEndStep, setNoteDragEndStep,
         marqueeStartStep, setMarqueeStartStep,
         marqueeEndStep, setMarqueeEndStep,
         pianoRollScrollWindow,
@@ -209,7 +211,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
                         context.fillStyle = trackId === currentTrackId
                             ? currentSequenceIndex === parseInt(key)
-                                ? instrumentColor
+                                ? instrumentColor + '50'
                                 : fullColor
                             : lowColor;
                         context.fillRect(
@@ -233,9 +235,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const noteId = Math.floor(y / pianoRollNoteHeight);
             const step = Math.floor(x / pianoRollNoteWidth);
 
-            setDragNoteId(noteId);
-            setDragStartStep(step);
-            setDragEndStep(step);
+            setNoteDragNoteId(noteId);
+            setNoteDragStartStep(step);
+            setNoteDragEndStep(step + newNoteDuration / SUB_NOTE_RESOLUTION - 1);
         } else if (e.button === 1) { // Middle mouse button
             setIsDragScrolling(true);
         } else if (e.button === 2) { // Right mouse button
@@ -260,13 +262,13 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     const onMouseUp = async (e: React.MouseEvent<HTMLElement>) => {
         if (e.button === 0) { // Left mouse button
-            if (dragNoteId === -1 || dragStartStep === -1 || dragEndStep === -1) {
+            if (noteDragNoteId === -1 || noteDragStartStep === -1 || noteDragEndStep === -1) {
                 return;
             }
 
-            const newNoteId = dragNoteId;
-            const newNoteStep = Math.min(dragStartStep, dragEndStep);
-            const newNoteDurationSteps = (Math.abs(dragStartStep - dragEndStep) + 1);
+            const newNoteId = noteDragNoteId;
+            const newNoteStep = Math.min(noteDragStartStep, noteDragEndStep);
+            const newNoteDur = (Math.abs(noteDragStartStep - noteDragEndStep) + 1) * SUB_NOTE_RESOLUTION;
             const newNoteLabel = NOTES_LABELS[newNoteId];
             const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
 
@@ -284,20 +286,20 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     step: (newNoteStep - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION,
                     note: newNoteLabel,
                     prevStep: undefined,
-                    duration: newNoteDurationSteps * SUB_NOTE_RESOLUTION
+                    duration: newNoteDur
                 }]);
                 setNoteCursor(newNoteCursor);
             } else {
-                const newPatternSize = Math.abs(dragStartStep - dragEndStep) + 1;
+                const newPatternSize = Math.abs(noteDragStartStep - noteDragEndStep) + 1;
                 if (await setPatternAtCursorPosition(newNoteCursor, newPatternSize)) {
                     setNoteCursor(newNoteCursor);
                 }
             }
 
             // reset
-            setDragNoteId(-1);
-            setDragStartStep(-1);
-            setDragEndStep(-1);
+            setNoteDragNoteId(-1);
+            setNoteDragStartStep(-1);
+            setNoteDragEndStep(-1);
         } else if (e.button === 1) { // Middle mouse button
             setIsDragScrolling(false);
         } else if (e.button === 2) { // Right mouse button
@@ -347,7 +349,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 });
             }
         } else {
-            if (dragNoteId !== -1 && dragStartStep !== -1 && dragEndStep !== -1) {
+            if (noteDragNoteId !== -1 && noteDragStartStep !== -1 && noteDragEndStep !== -1) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX - rect.left + pianoRollScrollWindow.x;
                 const y = e.clientY - rect.top;
@@ -355,11 +357,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 const noteId = Math.floor(y / pianoRollNoteHeight);
                 const step = Math.floor(x / pianoRollNoteWidth);
 
-                if (noteId !== dragNoteId) {
-                    setDragNoteId(noteId);
+                if (noteId !== noteDragNoteId) {
+                    setNoteDragNoteId(noteId);
                 }
-                if (step !== dragEndStep) {
-                    setDragEndStep(step);
+                if (step !== noteDragEndStep) {
+                    setNoteDragEndStep(step);
                 }
             } else if (marqueeStartStep !== -1 && marqueeEndStep !== -1) {
                 const rect = e.currentTarget.getBoundingClientRect();
