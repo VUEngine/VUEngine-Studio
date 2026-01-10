@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
 export interface RadioSelectOption {
     value: string | number | boolean
@@ -11,14 +12,13 @@ interface RadioSelectProps {
     allowBlank?: boolean
     defaultValue: string | number | boolean | (string | number | boolean)[]
     onChange: (options: RadioSelectOption[]) => void
-    onFocus?: () => void
-    onBlur?: () => void
     fitSpace?: boolean
     disabled?: boolean
 }
 
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
-    const { allowBlank, options, canSelectMany, defaultValue, onChange, onFocus, onBlur, fitSpace, disabled } = props;
+    const { allowBlank, options, canSelectMany, defaultValue, onChange, fitSpace, disabled } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
     const [classes, setClasses] = useState<string>('radioSelect');
     const numberOfOptions = options.length;
@@ -105,6 +105,14 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         onChange(updatedOptions);
     };
 
+    const handleOnFocus = () => {
+        disableCommands();
+    };
+
+    const handleOnBlur = () => {
+        enableCommands();
+    };
+
     useEffect(() => {
         getValues();
         getClasses();
@@ -117,8 +125,8 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     return <div
         className={classes}
         onKeyDown={handleKeyPress}
-        onFocus={onFocus}
-        onBlur={onBlur}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
         tabIndex={0}
     >
         {options.map((o, i) =>

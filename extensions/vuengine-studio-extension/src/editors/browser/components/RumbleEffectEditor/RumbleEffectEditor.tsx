@@ -4,18 +4,18 @@ import React from 'react';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
 import { EditorsContextType } from '../../ves-editors-types';
+import Checkbox from '../Common/Base/Checkbox';
 import HContainer from '../Common/Base/HContainer';
-import { clamp } from '../Common/Utils';
 import VContainer from '../Common/Base/VContainer';
+import { clamp } from '../Common/Utils';
 import {
     BUILT_IN_RUMBLE_EFFECTS,
     DEFAULT_RUMBLE_EFFECT,
-    DEFAULT_RUMBLE_EFFECT_FREQUENCY,
     DEFAULT_RUMBLE_EFFECT_BREAK,
+    DEFAULT_RUMBLE_EFFECT_FREQUENCY,
     DEFAULT_RUMBLE_EFFECT_OVERDRIVE,
     DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
     DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
-    RUMBLE_EFFECT_FREQUENCIES,
     MAX_RUMBLE_EFFECT_BREAK,
     MAX_RUMBLE_EFFECT_OVERDRIVE,
     MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
@@ -24,6 +24,7 @@ import {
     MIN_RUMBLE_EFFECT_OVERDRIVE,
     MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
     MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
+    RUMBLE_EFFECT_FREQUENCIES,
     RumbleEffectData,
     RumbleEffectFrequency,
 } from './RumbleEffectTypes';
@@ -252,16 +253,11 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                     />
                 </VContainer>
             </HContainer>
-            <VContainer>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={data.stopBeforeStarting}
-                        onChange={this.toggleStopBeforeStarting}
-                    />
-                    {nls.localize('vuengine/editors/rumbleEffect/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
-                </label>
-            </VContainer>
+            <Checkbox
+                sideLabel={nls.localize('vuengine/editors/rumbleEffect/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
+                checked={data.stopBeforeStarting}
+                setChecked={this.toggleStopBeforeStarting}
+            />
             <VContainer className="connectionStatus">
                 {nls.localize('vuengine/editors/rumbleEffect/rumbleEffectEditorConnectionStatus', 'Rumble Pack connection status')}: {
                     rumblePackIsConnected

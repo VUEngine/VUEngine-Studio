@@ -1,7 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import Checkbox from '../../Common/Base/Checkbox';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import InfoLabel from '../../Common/InfoLabel';
 import {
     ANGLE_TO_PREVENT_COLLIDER_DISPLACEMENT_DEFAULT_VALUE,
     ANGLE_TO_PREVENT_COLLIDER_DISPLACEMENT_MAX_VALUE,
@@ -33,7 +34,6 @@ import {
     TIME_ELAPSED_DIVISOR_MAX_VALUE,
     TIME_ELAPSED_DIVISOR_MIN_VALUE
 } from '../EngineConfigEditorTypes';
-import Input from '../../Common/Base/Input';
 
 interface EngineConfigPhysicsProps {
     data: EngineConfigData
@@ -186,20 +186,15 @@ Smaller values allow movement to start when colliding against a collider and try
                 defaultValue={GRAVITY_DEFAULT_VALUE}
                 width={64}
             />
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/physics/highPrecision', 'High Precision')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/physics/highPrecisionDescription',
-                        'Use higher precision data type (fix7.9) to perform physics simulations.',
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.physics?.highPrecision ?? PHYSICS_HIGH_PRECISION_DEFAULT_VALUE}
-                    onChange={() => toggleHighPrecision()}
-                />
-            </VContainer>
+            <Checkbox
+                label={nls.localize('vuengine/editors/engineConfig/physics/highPrecision', 'High Precision')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/physics/highPrecisionDescription',
+                    'Use higher precision data type (fix7.9) to perform physics simulations.',
+                )}
+                checked={data.physics?.highPrecision ?? PHYSICS_HIGH_PRECISION_DEFAULT_VALUE}
+                setChecked={toggleHighPrecision}
+            />
             <Input
                 label={nls.localize('vuengine/editors/engineConfig/physics/maximumBouncinessCoefficient', 'Maximum Bounciness Coefficient')}
                 type="number"

@@ -1,9 +1,10 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import ReactTextareaAutosize from 'react-textarea-autosize';
+import Checkbox from '../Common/Base/Checkbox';
 import VContainer from '../Common/Base/VContainer';
 import { ColumnTableData, ColumnTableEntry } from './ColumnTableTypes';
 import Editor from './Editor';
-import ReactTextareaAutosize from 'react-textarea-autosize';
 
 interface ColumnTableEditorProps {
     data: ColumnTableData
@@ -64,14 +65,11 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
                         style={{ resize: 'none' }}
                     />
                 </VContainer>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={data.mirror}
-                        onChange={this.onChangeMirror.bind(this)}
-                    />
-                    {nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
-                </label>
+                <Checkbox
+                    sideLabel={nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
+                    checked={data.mirror}
+                    setChecked={this.onChangeMirror.bind(this)}
+                />
             </VContainer>
 
             <Editor

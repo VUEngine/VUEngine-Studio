@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -308,23 +309,18 @@ export default function EngineConfigOptics(props: EngineConfigOpticsProps): Reac
                     />
                 </HContainer>
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize(
-                        'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjection',
-                        'Use Legacy Coordinate Projection'
-                    )}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjectionDescription',
-                        'Use the legacy coordinate system where (0, 0, 0) is at the top left corner of the screen, instead of in the middle of it.'
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.optics?.useLegacyCoordinateProjection ?? USE_LEGACY_COORDINATE_PROJECTION_DEFAULT_VALUE}
-                    onChange={() => toggleUseLegacyCoordinateProjection()}
-                />
-            </VContainer>
+            <Checkbox
+                label={nls.localize(
+                    'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjection',
+                    'Use Legacy Coordinate Projection'
+                )}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/optics/useLegacyCoordinateProjectionDescription',
+                    'Use the legacy coordinate system where (0, 0, 0) is at the top left corner of the screen, instead of in the middle of it.'
+                )}
+                checked={data.optics?.useLegacyCoordinateProjection ?? USE_LEGACY_COORDINATE_PROJECTION_DEFAULT_VALUE}
+                setChecked={toggleUseLegacyCoordinateProjection}
+            />
         </VContainer>
     );
 }

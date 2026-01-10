@@ -1,6 +1,5 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
@@ -16,7 +15,6 @@ interface BodyProps {
 
 export default function Body(props: BodyProps): React.JSX.Element {
     const { body, updateBody } = props;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setMass = (mass: number): void => {
         updateBody({ mass });
@@ -87,8 +85,6 @@ export default function Body(props: BodyProps): React.JSX.Element {
                         }]}
                         defaultValue={body.gravityAxes}
                         onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
                         canSelectMany
                         allowBlank
                     />
@@ -179,8 +175,6 @@ Note that sprites need to use AFFINE mode to be able to be rotated.',
                     }]}
                     defaultValue={body.rotationAxes}
                     onChange={options => setRotationAxes(options.map(o => o.value) as Axis[])}
-                    onFocus={() => disableCommands()}
-                    onBlur={() => enableCommands()}
                     canSelectMany
                     allowBlank
                 />

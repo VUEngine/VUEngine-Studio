@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React from 'react';
 import SortableList from 'react-easy-sort';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -30,7 +30,6 @@ interface WireframeProps {
 
 export default function Wireframe(props: WireframeProps): React.JSX.Element {
     const { wireframe, updateWireframe } = props;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
         const updatedSegments = [...wireframe.segments];
@@ -176,8 +175,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <ColorSelector
                         color={wireframe.color}
                         updateColor={setColor}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
                     />
                 </VContainer>
             </HContainer>
@@ -185,19 +182,12 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 <TransparencySelect
                     value={wireframe.transparency}
                     setValue={setTransparency}
-                    onFocus={() => disableCommands()}
-                    onBlur={() => enableCommands()}
                 />
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/actor/interlaced', 'Interlaced')}
-                    </label>
-                    <input
-                        type="checkbox"
-                        checked={wireframe.interlaced}
-                        onChange={toggleInterlaced}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/actor/interlaced', 'Interlaced')}
+                    checked={wireframe.interlaced}
+                    setChecked={toggleInterlaced}
+                />
             </HContainer>
             <VContainer>
                 <label>Displacement (x, y, z)</label>
@@ -289,16 +279,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             width={64}
                         />
                     </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/editors/actor/drawCenter', 'Draw Center')}
-                        </label>
-                        <input
-                            type="checkbox"
-                            checked={wireframe.drawCenter}
-                            onChange={toggleDrawCenter}
-                        />
-                    </VContainer>
+                    <Checkbox
+                        label={nls.localize('vuengine/editors/actor/drawCenter', 'Draw Center')}
+                        checked={wireframe.drawCenter}
+                        setChecked={toggleDrawCenter}
+                    />
                 </HContainer>
             }
             {

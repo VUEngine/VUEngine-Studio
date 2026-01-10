@@ -1,7 +1,9 @@
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -15,7 +17,6 @@ import {
     MIN_ANIMATION_CYLCES
 } from '../ActorEditorTypes';
 import AnimationsSettings from './AnimationsSettings';
-import styled from 'styled-components';
 
 export const RemoveFrameButton = styled.button`
     min-width: 0 !important;
@@ -37,7 +38,7 @@ interface AnimationProps {
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData, isAnimationPlaying, setIsAnimationPlaying, currentAnimationStep, setCurrentAnimationStep } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
@@ -112,22 +113,15 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     setValue={setName}
                     grow={1}
                 />
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/editors/actor/default', 'Default')}
-                        tooltip={nls.localize(
-                            'vuengine/editors/actor/defaultAnimationDescription',
-                            'Play this animation as the default when the actor is created.'
-                        )}
-                    />
-                    <input
-                        type="checkbox"
-                        checked={data.animations.default === index}
-                        onChange={setDefault}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/actor/default', 'Default')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/defaultAnimationDescription',
+                        'Play this animation as the default when the actor is created.'
+                    )}
+                    checked={data.animations.default === index}
+                    setChecked={setDefault}
+                />
             </HContainer>
             <HContainer alignItems='start' gap={15}>
                 <VContainer>
@@ -147,22 +141,16 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         width={64}
                     />
                 </VContainer>
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/editors/actor/loop', 'Loop')}
-                        tooltip={nls.localize(
-                            'vuengine/editors/actor/loopDescription',
-                            'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
-                        )}
-                    />
-                    <input
-                        type="checkbox"
-                        checked={animation.loop}
-                        onChange={toggleLoop}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/actor/loop', 'Loop')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/actor/loopDescription',
+                        'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
+                    )}
+
+                    checked={animation.loop}
+                    setChecked={toggleLoop}
+                />
             </HContainer>
             {!animation.loop &&
                 <Input

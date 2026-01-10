@@ -10,6 +10,7 @@ import {
     DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER
 } from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
+import Checkbox from '../../../Common/Base/Checkbox';
 import HContainer from '../../../Common/Base/HContainer';
 import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
@@ -299,16 +300,11 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     max={MAX_OFFSET}
                     width={48}
                 />
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/font/invertColors', 'Invert Colors')}
-                    </label>
-                    <input
-                        type="checkbox"
-                        checked={invert}
-                        onChange={() => setInvert(!invert)}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/font/invertColors', 'Invert Colors')}
+                    checked={invert}
+                    setChecked={() => setInvert(!invert)}
+                />
             </HContainer>
         </VContainer>
     );

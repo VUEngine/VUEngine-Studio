@@ -6,6 +6,7 @@ import VContainer from '../Common/Base/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
 import Preview from './Preview';
+import Checkbox from '../Common/Base/Checkbox';
 
 interface BrightnessRepeatEditorProps {
     data: BrightnessRepeatData
@@ -28,7 +29,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
         });
     }
 
-    protected onChangeMirror(e: React.ChangeEvent<HTMLInputElement>): void {
+    protected onChangeMirror(): void {
         this.props.updateData({
             ...this.props.data,
             mirror: !this.props.data.mirror
@@ -66,14 +67,11 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                             style={{ resize: 'none' }}
                         />
                     </VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={data.mirror}
-                            onChange={this.onChangeMirror.bind(this)}
-                        />
-                        {nls.localize('vuengine/editors/brightnessRepeat/mirror', 'Mirror')}
-                    </label>
+                    <Checkbox
+                        sideLabel={nls.localize('vuengine/editors/brightnessRepeat/mirror', 'Mirror')}
+                        checked={data.mirror}
+                        setChecked={this.onChangeMirror.bind(this)}
+                    />
                 </VContainer>
                 <VContainer>
                     <label>Preview</label>

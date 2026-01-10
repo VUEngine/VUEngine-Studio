@@ -2,9 +2,10 @@ import { URI, nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import AdvancedSelect, { AdvancedSelectOption } from '../../Common/Base/AdvancedSelect';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
-import AdvancedSelect, { AdvancedSelectOption } from '../../Common/Base/AdvancedSelect';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import Rotation from '../../Common/Rotation';
@@ -34,7 +35,7 @@ interface ColliderProps {
 }
 
 export default function Collider(props: ColliderProps): React.JSX.Element {
-    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { collider, updateCollider } = props;
     const [length, setLength] = useState<number>(0);
     const [axis, setAxis] = useState<number>(0);
@@ -374,8 +375,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 }]}
                                 defaultValue={axis}
                                 onChange={options => updateLineField(options[0].value as number, length, thickness)}
-                                onFocus={() => disableCommands()}
-                                onBlur={() => enableCommands()}
                                 allowBlank
                             />
                         </VContainer>
@@ -491,18 +490,11 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         width={64}
                     />
                 }
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/actor/checkForCollisions', 'Check For Collisions')}
-                    </label>
-                    <input
-                        type="checkbox"
-                        checked={collider.checkForCollisions}
-                        onChange={toggleCheckForCollisions}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/actor/checkForCollisions', 'Check For Collisions')}
+                    checked={collider.checkForCollisions}
+                    setChecked={toggleCheckForCollisions}
+                />
                 {
                     collider.checkForCollisions &&
                     <VContainer grow={1}>

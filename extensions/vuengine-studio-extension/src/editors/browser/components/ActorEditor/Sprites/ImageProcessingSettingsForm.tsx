@@ -16,15 +16,16 @@ import {
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import CanvasImage from '../../Common/CanvasImage';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
-import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import CanvasImage from '../../Common/CanvasImage';
+import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
-import Range from '../../Common/Base/Range';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 
 const ReconvertButton = styled.button`
     background-color: transparent;
@@ -45,7 +46,7 @@ export interface ImageProcessingSettingsFormProps {
 }
 
 export default function ImageProcessingSettingsForm(props: ImageProcessingSettingsFormProps): React.JSX.Element {
-    const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const {
         image,
         setFiles,
@@ -296,38 +297,25 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                     </VContainer>
                     <HContainer gap={10} style={{ minHeight: 64 }}>
                         <VContainer>
-                            <label>
-                                {nls.localize('vuengine/editors/general/dither', 'Dither')}
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
-                                    onChange={() => {
+                            <Checkbox
+                                sideLabel={nls.localize('vuengine/editors/general/dither', 'Dither')}
+                                checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
+                                setChecked={() => {
+                                    updateProcessingSettings({
+                                        imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
+                                    });
+                                }}
+                            />
+                            {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                                <Checkbox
+                                    sideLabel={nls.localize('vuengine/editors/general/serpentine', 'Serpentine')}
+                                    checked={processingSettings?.serpentine ?? DEFAULT_DITHER_SERPENTINE}
+                                    setChecked={() => {
                                         updateProcessingSettings({
-                                            imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
+                                            serpentine: !processingSettings?.serpentine,
                                         });
                                     }}
-                                    onFocus={() => disableCommands()}
-                                    onBlur={() => enableCommands()}
                                 />
-                                {nls.localize('vuengine/editors/general/enable', 'Enable')}
-                            </label>
-                            {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={processingSettings?.serpentine ?? DEFAULT_DITHER_SERPENTINE}
-                                        onChange={() => {
-                                            updateProcessingSettings({
-                                                serpentine: !processingSettings?.serpentine,
-                                            });
-                                        }}
-                                        onFocus={() => disableCommands()}
-                                        onBlur={() => enableCommands()}
-                                    />
-                                    {nls.localize('vuengine/editors/general/serpentine', 'Serpentine')}
-                                </label>
                             }
                         </VContainer>
                         {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&

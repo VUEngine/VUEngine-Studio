@@ -1,11 +1,10 @@
 import { nls } from '@theia/core';
 import { HoverService } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
 
 interface ColorModeSelectProps {
     value: ColorMode
@@ -16,7 +15,6 @@ interface ColorModeSelectProps {
 
 export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.Element {
     const { value, setValue, hoverService, disabled } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     return <VContainer>
         <InfoLabel
@@ -60,8 +58,6 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
             }]}
             defaultValue={value}
             onChange={options => setValue(options[0].value as ColorMode)}
-            onFocus={() => disableCommands()}
-            onBlur={() => enableCommands()}
             disabled={disabled}
         />
     </VContainer>;

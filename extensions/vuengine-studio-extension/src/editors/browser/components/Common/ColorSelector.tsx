@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface ColorSelectorProps {
     color: number;
     updateColor: (newColor: number) => void;
     includeTransparent?: boolean
-    onFocus?: () => void
-    onBlur?: () => void
 }
 
 export default function ColorSelector(props: ColorSelectorProps): React.JSX.Element {
-    const { color, updateColor, includeTransparent, onFocus, onBlur } = props;
+    const { color, updateColor, includeTransparent } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const colors = includeTransparent
         ? [-1, 0, 1, 2, 3]
@@ -31,12 +31,20 @@ export default function ColorSelector(props: ColorSelectorProps): React.JSX.Elem
         }
     };
 
+    const handleOnFocus = () => {
+        disableCommands();
+    };
+
+    const handleOnBlur = () => {
+        enableCommands();
+    };
+
     return <div
         className="colorSelector"
         onKeyDown={handleKeyPress}
         tabIndex={0}
-        onFocus={onFocus}
-        onBlur={onBlur}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
     >
         {colors.map(c => {
             const selected = c === color ? ' selected' : '';

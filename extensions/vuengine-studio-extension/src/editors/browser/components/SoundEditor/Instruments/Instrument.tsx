@@ -46,6 +46,7 @@ import {
     WAVEFORM_MAX
 } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import Checkbox from '../../Common/Base/Checkbox';
 
 const ColoredDiv = styled.div`
     cursor: pointer;
@@ -557,16 +558,11 @@ a pre-configured value and repeat the grow/decay process. '
                                             selectWidth={80}
                                         />
                                     </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
-                                        </label>
-                                        <input
-                                            type="checkbox"
-                                            checked={instrument?.envelope.repeat}
-                                            onChange={toggleEnvelopeRepeat}
-                                        />
-                                    </VContainer>
+                                    <Checkbox
+                                        label={nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
+                                        checked={instrument?.envelope.repeat}
+                                        setChecked={toggleEnvelopeRepeat}
+                                    />
                                 </HContainer>
                                 <VContainer>
                                     <InfoLabel
@@ -711,16 +707,11 @@ from the first modulation value. '
                                                     onClick={() => setModulationDataDialogOpen(instrumentId)}
                                                 />
                                             </VContainer>
-                                            <VContainer>
-                                                <label>
-                                                    {nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
-                                                </label>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={instrument?.sweepMod.repeat}
-                                                    onChange={toggleSweepModulationRepeat}
-                                                />
-                                            </VContainer>
+                                            <Checkbox
+                                                label={nls.localize('vuengine/editors/sound/repeat', 'Repeat')}
+                                                checked={instrument?.sweepMod.repeat}
+                                                setChecked={toggleSweepModulationRepeat}
+                                            />
                                         </HContainer>
                                     }
                                 </VContainer>

@@ -102,7 +102,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         playNote,
         emulatorInitialized,
     } = props;
-    const { services, enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const [typeFilter, setTypeFilter] = useState<SoundEditorTrackType[]>([
         SoundEditorTrackType.WAVE,
         SoundEditorTrackType.SWEEPMOD,
@@ -196,8 +196,6 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     defaultValue={typeFilter}
                     onChange={options => setTypeFilter(options.map(o => o.value) as SoundEditorTrackType[])}
                     fitSpace
-                    onFocus={() => disableCommands()}
-                    onBlur={() => enableCommands()}
                 />
                 <StyledInstrumentsList>
                     {Object.keys(soundData.instruments)

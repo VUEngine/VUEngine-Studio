@@ -8,12 +8,10 @@ import { Transparency } from './VUEngineTypes';
 interface TransparencySelectProps {
     value: Transparency
     setValue: (transparency: Transparency) => void
-    onFocus?: () => void
-    onBlur?: () => void
 }
 
 export default function TransparencySelect(props: TransparencySelectProps): React.JSX.Element {
-    const { value, setValue, onFocus, onBlur } = props;
+    const { value, setValue } = props;
 
     return (
         <VContainer>
@@ -39,8 +37,6 @@ This also halves CPU load since 50% less pixels have to be rendered per frame in
                     label: nls.localize('vuengine/editors/general/transparencyEven', 'Even'),
                 }]}
                 onChange={options => setValue(options[0].value as Transparency)}
-                onFocus={onFocus}
-                onBlur={onBlur}
             />
         </VContainer>
     );

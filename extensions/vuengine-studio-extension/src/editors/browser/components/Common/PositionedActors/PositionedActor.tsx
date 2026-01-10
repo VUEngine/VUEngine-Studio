@@ -9,6 +9,7 @@ import { clamp } from '../Utils';
 import VContainer from '../Base/VContainer';
 import { PixelVector } from '../VUEngineTypes';
 import Input from '../Base/Input';
+import Checkbox from '../Base/Checkbox';
 
 interface PositionedActorProps {
     positionedActor: PositionedActorData
@@ -181,16 +182,11 @@ export default function PositionedActor(props: PositionedActorProps): React.JSX.
                     setValue={setExtraInfo}
                     width={202}
                 />
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
-                    </label>
-                    <input
-                        type="checkbox"
-                        checked={positionedActor.loadRegardlessOfPosition}
-                        onChange={toggleLoadRegardlessOfPosition}
-                    />
-                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/general/loadRegardlessOfPosition', 'Always load')}
+                    checked={positionedActor.loadRegardlessOfPosition}
+                    setChecked={toggleLoadRegardlessOfPosition}
+                />
             </>
                 : <VContainer className='error'>
                     {nls.localize('vuengine/editors/general/actorNotFound', 'Actor could not be found')}

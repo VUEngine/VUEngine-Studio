@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import Checkbox from '../../Common/Base/Checkbox';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -93,30 +94,20 @@ export default function EngineConfigSprite(props: EngineConfigSpriteProps): Reac
                 defaultValue={TOTAL_OBJECTS_DEFAULT_VALUE}
                 width={64}
             />
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/sprite/spritesRotateIn3D', 'Sprites Rotate In 3-D')}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.sprite?.spritesRotateIn3D ?? SPRITES_ROTATE_IN_3D_DEFAULT_VALUE}
-                    onChange={() => toggleSpritesRotateIn3D()}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeight', 'Hack: BGMap Sprite Height')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeightDescription',
-                        "Account for VIP's design to draw 8 pixel when BGMAP WORLD's height is less than 8."
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.sprite?.hackBgmapSpriteHeight ?? HACK_BGMAP_SPRITE_HEIGHT_DEFAULT_VALUE}
-                    onChange={() => toggleHackBgmapSpriteHeight()}
-                />
-            </VContainer>
+            <Checkbox
+                label={nls.localize('vuengine/editors/engineConfig/sprite/spritesRotateIn3D', 'Sprites Rotate In 3-D')}
+                checked={data.sprite?.spritesRotateIn3D ?? SPRITES_ROTATE_IN_3D_DEFAULT_VALUE}
+                setChecked={toggleSpritesRotateIn3D}
+            />
+            <Checkbox
+                label={nls.localize('vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeight', 'Hack: BGMap Sprite Height')}
+                tooltip={nls.localize(
+                    'vuengine/editors/engineConfig/sprite/hackBgmapSpriteHeightDescription',
+                    "Account for VIP's design to draw 8 pixel when BGMAP WORLD's height is less than 8."
+                )}
+                checked={data.sprite?.hackBgmapSpriteHeight ?? HACK_BGMAP_SPRITE_HEIGHT_DEFAULT_VALUE}
+                setChecked={toggleHackBgmapSpriteHeight}
+            />
         </VContainer>
     );
 }

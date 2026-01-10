@@ -8,12 +8,10 @@ import { DataSection } from './CommonTypes';
 interface SectionSelectProps {
     value: DataSection
     setValue: (section: DataSection) => void
-    onFocus?: () => void
-    onBlur?: () => void
 }
 
 export default function SectionSelect(props: SectionSelectProps): React.JSX.Element {
-    const { value, setValue, onFocus, onBlur } = props;
+    const { value, setValue } = props;
 
     return (
         <VContainer>
@@ -38,8 +36,6 @@ You usually want to leave this untouched, since the latter only works on special
                     value: DataSection.EXP,
                 }]}
                 onChange={options => setValue(options[0].value as DataSection)}
-                onFocus={onFocus}
-                onBlur={onBlur}
             />
         </VContainer>
     );

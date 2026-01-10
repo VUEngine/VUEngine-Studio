@@ -3,14 +3,14 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import Checkbox from '../../Common/Base/Checkbox';
 import VContainer from '../../Common/Base/VContainer';
-import InfoLabel from '../../Common/InfoLabel';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
+import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import { SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentTrackProps {
     soundData: SoundData
@@ -169,21 +169,16 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                 </InputWithAction>
             </VContainer>
 
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/editors/sound/lowPriority', 'Low Priority')}
-                    tooltip={nls.localize(
-                        'vuengine/editors/sound/allowSkipDescription',
-                        'Allow to skip notes of this track during play back, \
+            <Checkbox
+                label={nls.localize('vuengine/editors/sound/lowPriority', 'Low Priority')}
+                tooltip={nls.localize(
+                    'vuengine/editors/sound/allowSkipDescription',
+                    'Allow to skip notes of this track during play back, \
 if no other sound source is available when requested by e.g. a sound effect.'
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={track.allowSkip}
-                    onChange={() => toggleTrackAllowSkip()}
-                />
-            </VContainer>
+                )}
+                checked={track.allowSkip}
+                setChecked={toggleTrackAllowSkip}
+            />
         </VContainer>
     );
 }

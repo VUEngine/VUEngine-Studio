@@ -32,6 +32,7 @@ import {
 } from '../ActorEditorTypes';
 import { ImageProcessingSettingsFormProps } from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
+import Checkbox from '../../Common/Base/Checkbox';
 
 interface SpriteProps {
     sprite: SpriteData
@@ -42,7 +43,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-    const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation, spriteProcessingDialog, setSpriteProcessingDialog } = props;
     const [leftWidth, setLeftWidth] = useState<number>(0);
@@ -472,8 +473,6 @@ Supported file types are [...].'
                         }]}
                         defaultValue={sprite.sourceType}
                         onChange={options => setSourceType(options[0].value as SpriteSourceType)}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
                     />
                     */}
                     <InfoLabel
@@ -689,8 +688,6 @@ or two separate images, one for each eye. Stereo sprites require more system res
                             }]}
                             defaultValue={sprite.displayMode}
                             onChange={options => setDisplayMode(options[0].value as DisplayMode)}
-                            onFocus={() => disableCommands()}
-                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     {sprite.displayMode === DisplayMode.Mono &&
@@ -718,8 +715,6 @@ Use with care! It can be very uncomfortable for the viewer if left and right eye
                                     ? Displays.Both
                                     : options[0].value as Displays)
                                 }
-                                onFocus={() => disableCommands()}
-                                onBlur={() => enableCommands()}
                             />
                         </VContainer>
                     }
@@ -733,15 +728,11 @@ Use with care! It can be very uncomfortable for the viewer if left and right eye
                             options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
                             defaultValue={sprite.texture.palette}
                             onChange={options => setPalette(options[0].value as number)}
-                            onFocus={() => disableCommands()}
-                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     <TransparencySelect
                         value={sprite.transparency}
                         setValue={setTransparency}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
                     />
                 </HContainer>
                 <VContainer>
@@ -843,23 +834,14 @@ Positive z (and parallax) values go into the screen, negative stick out."
                                 ]}
                                 defaultValue={sprite.bgmapMode}
                                 onChange={options => setBgmapMode(options[0].value as BgmapMode)}
-                                onFocus={() => disableCommands()}
-                                onBlur={() => enableCommands()}
                             />
                         </VContainer>
                         {data.components?.animations?.length > 0 &&
-                            <VContainer>
-                                <label>
-                                    {nls.localize('vuengine/editors/actor/animate', 'Animate')}
-                                </label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.isAnimated ?? false}
-                                    onChange={() => toggleIsAnimated()}
-                                    onFocus={() => disableCommands()}
-                                    onBlur={() => enableCommands()}
-                                />
-                            </VContainer>
+                            <Checkbox
+                                label={nls.localize('vuengine/editors/actor/animate', 'Animate')}
+                                checked={sprite.isAnimated ?? false}
+                                setChecked={toggleIsAnimated}
+                            />
                         }
                     </HContainer>
                 }
@@ -911,62 +893,45 @@ surrounding textures to appear at the outer edges.'
                     </label>
                     <HContainer wrap='wrap'>
                         <VContainer grow={1}>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.texture?.flip?.y ?? false}
-                                    onChange={() => toggleFlip('y')}
-                                    onFocus={() => disableCommands()}
-                                    onBlur={() => enableCommands()}
-                                />
-                                <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.texture?.flip?.x ?? false}
-                                    onChange={() => toggleFlip('x')}
-                                    onFocus={() => disableCommands()}
-                                    onBlur={() => enableCommands()}
-                                />
-                                <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
-                            </label>
+                            <Checkbox
+                                sideLabel={<>
+                                    <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
+                                </>}
+                                checked={sprite.texture?.flip?.y ?? false}
+                                setChecked={() => toggleFlip('y')}
+                            />
+                            <Checkbox
+                                sideLabel={<>
+                                    <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/flip', 'Flip')}
+                                </>}
+                                checked={sprite.texture?.flip?.x ?? false}
+                                setChecked={() => toggleFlip('x')}
+                            />
                         </VContainer>
                         {data.sprites.type === SpriteType.Bgmap &&
                             <VContainer grow={1}>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={sprite.texture?.repeat?.x ?? false}
-                                        onChange={() => toggleRepeat('x')}
-                                        onFocus={() => disableCommands()}
-                                        onBlur={() => enableCommands()}
-                                    />
-                                    <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
-                                </label>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={sprite.texture?.repeat?.y ?? false}
-                                        onChange={() => toggleRepeat('y')}
-                                        onFocus={() => disableCommands()}
-                                        onBlur={() => enableCommands()}
-                                    />
-                                    <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
-                                </label>
+                                <Checkbox
+                                    sideLabel={<>
+                                        <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
+                                    </>}
+                                    checked={sprite.texture?.repeat?.x ?? false}
+                                    setChecked={() => toggleRepeat('x')}
+                                />
+                                <Checkbox
+                                    sideLabel={<>
+                                        <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/editors/actor/repeat', 'Repeat')}
+                                    </>}
+                                    checked={sprite.texture?.repeat?.y ?? false}
+                                    setChecked={() => toggleRepeat('y')}
+                                />
                             </VContainer>
                         }
                     </HContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={sprite.texture?.recycleable ?? false}
-                            onChange={toggleRecycleable}
-                            onFocus={() => disableCommands()}
-                            onBlur={() => enableCommands()}
-                        />
-                        {nls.localize('vuengine/editors/actor/recycleable', 'Recycleable')}
-                    </label>
+                    <Checkbox
+                        sideLabel={nls.localize('vuengine/editors/actor/recycleable', 'Recycleable')}
+                        checked={sprite.texture?.recycleable ?? false}
+                        setChecked={toggleRecycleable}
+                    />
                 </VContainer>
                 {
                     data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y) &&
@@ -1005,24 +970,16 @@ If 0, the value is inferred from the texture.'
                     </label>
                     {/* this setting is implicitly handled for animations */}
                     {!isAnimated &&
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={sprite.optimizeTiles}
-                                onChange={toggleOptimizeTiles}
-                                onFocus={() => disableCommands()}
-                                onBlur={() => enableCommands()}
-                            />
-                            {nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
-                        </label>
+                        <Checkbox
+                            sideLabel={nls.localize('vuengine/editors/actor/optimize', 'Optimize')}
+                            checked={sprite.optimizeTiles}
+                            setChecked={toggleOptimizeTiles}
+                        />
                     }
                     <HContainer gap={0}>
-                        <input
-                            type="checkbox"
+                        <Checkbox
                             checked={sprite.shareTiles}
-                            onChange={toggleShareTiles}
-                            onFocus={() => disableCommands()}
-                            onBlur={() => enableCommands()}
+                            setChecked={toggleShareTiles}
                         />
                         <InfoLabel
                             label={nls.localize('vuengine/editors/actor/share', 'Share')}
@@ -1054,15 +1011,11 @@ If 0, the value is inferred from the texture.'
                             }]}
                             defaultValue={sprite.compression}
                             onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
-                            onFocus={() => disableCommands()}
-                            onBlur={() => enableCommands()}
                         />
                     </VContainer>
                     <SectionSelect
                         value={sprite.section}
                         setValue={setSection}
-                        onFocus={() => disableCommands()}
-                        onBlur={() => enableCommands()}
                     />
                 </HContainer>
             </VContainer>

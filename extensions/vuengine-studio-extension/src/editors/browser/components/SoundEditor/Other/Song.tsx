@@ -2,6 +2,7 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
@@ -99,16 +100,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         </VContainer>
 
         <HContainer gap={20}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/sound/loop', 'Loop')}
-                </label>
-                <input
-                    type="checkbox"
-                    checked={soundData.loop}
-                    onChange={() => toggleLoop()}
-                />
-            </VContainer>
+            <Checkbox
+                label={nls.localize('vuengine/editors/sound/loop', 'Loop')}
+                checked={soundData.loop}
+                setChecked={toggleLoop}
+            />
             {soundData.loop &&
                 <Input
                     label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}

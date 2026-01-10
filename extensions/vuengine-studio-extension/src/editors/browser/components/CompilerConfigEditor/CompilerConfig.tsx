@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import Checkbox from '../Common/Base/Checkbox';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import { CompilerConfigData, CompilerOptimization } from './CompilerConfigEditorTypes';
@@ -68,26 +69,16 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
                 {nls.localize('vuengine/editors/compilerConfig/options', 'Options')}
             </label>
             <HContainer gap={15}>
-                <VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={data.framePointer}
-                            onChange={toggleFramePointer}
-                        />
-                        {nls.localize('vuengine/editors/compilerConfig/useFramePointer', 'Use Frame Pointer')}
-                    </label>
-                </VContainer>
-                <VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={data.prologFunctions}
-                            onChange={togglePrologFunctions}
-                        />
-                        {nls.localize('vuengine/editors/compilerConfig/usePrologFunctions', 'Use Prolog Functions')}
-                    </label>
-                </VContainer>
+                <Checkbox
+                    sideLabel={nls.localize('vuengine/editors/compilerConfig/useFramePointer', 'Use Frame Pointer')}
+                    checked={data.framePointer}
+                    setChecked={toggleFramePointer}
+                />
+                <Checkbox
+                    sideLabel={nls.localize('vuengine/editors/compilerConfig/usePrologFunctions', 'Use Prolog Functions')}
+                    checked={data.prologFunctions}
+                    setChecked={togglePrologFunctions}
+                />
             </HContainer>
         </VContainer>
     </HContainer>;

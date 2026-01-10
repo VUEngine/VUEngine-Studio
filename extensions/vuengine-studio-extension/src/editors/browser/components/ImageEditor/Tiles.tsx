@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import Checkbox from '../Common/Base/Checkbox';
 import VContainer from '../Common/Base/VContainer';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
@@ -16,18 +17,11 @@ export default function Tiles(): React.JSX.Element {
     };
 
     return <VContainer gap={15}>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/image/tiles', 'Tiles')}
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    checked={imageData.tileset.shared}
-                    onChange={toggleShareTiles}
-                />
-                {nls.localize('vuengine/editors/image/shareTiles', 'Maps should share a tileset')}
-            </label>
-        </VContainer>
+        <Checkbox
+            label={nls.localize('vuengine/editors/image/tiles', 'Tiles')}
+            sideLabel={nls.localize('vuengine/editors/image/shareTiles', 'Maps should share a tileset')}
+            checked={imageData.tileset.shared}
+            setChecked={toggleShareTiles}
+        />
     </VContainer>;
 }

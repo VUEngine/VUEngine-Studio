@@ -39,6 +39,14 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
         setValue(clamp(v, min, max));
     };
 
+    const handleOnFocus = () => {
+        disableCommands();
+    };
+
+    const handleOnBlur = () => {
+        enableCommands();
+    };
+
     return <HContainer alignItems="center" style={{ width }}>
         <input
             type="range"
@@ -49,8 +57,8 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
             step={step}
             value={value ?? max}
             onChange={e => onChange(e.target.value)}
-            onFocus={() => disableCommands()}
-            onBlur={() => enableCommands()}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
         />
         {
             options
