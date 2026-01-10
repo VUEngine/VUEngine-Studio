@@ -43,7 +43,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         previewShowSprites, setPreviewShowSprites,
         previewShowWireframes, setPreviewShowWireframes,
     } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
     const [dragging, setDragging] = useState<boolean>(false);
 
@@ -243,10 +243,14 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     <input
                         type="text"
                         defaultValue={node.data.name}
-                        onFocus={e => e.currentTarget.select()}
+                        onFocus={e => {
+                            disableCommands();
+                            e.currentTarget.select();
+                        }}
                         onBlur={e => {
                             node.submit(e.currentTarget.value);
                             setName(e.currentTarget.value);
+                            enableCommands();
                         }}
                         onKeyDown={e => {
                             if (e.key === 'Escape') {
