@@ -185,7 +185,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 setPatternDragStartStep(step);
                 setPatternDragEndStep(step);
             } else if (e.button === 2) { // Right mouse button
-                // TODO: marquee
+                // TODO: marquee and multi pattern select
             }
         }
     };

@@ -228,7 +228,6 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         } else {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const step = Math.floor(x / pianoRollNoteWidth);
-            // TODO: adapt drag to create pattern of specific size, as in sequencer
             setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION);
         }
     };

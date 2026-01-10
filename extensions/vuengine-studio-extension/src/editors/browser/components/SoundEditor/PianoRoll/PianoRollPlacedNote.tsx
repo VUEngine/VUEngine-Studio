@@ -25,9 +25,23 @@ import {
 const MAX_FONT_SIZE = 13;
 
 const StyledPianoRollPlacedNote = styled.div`
+    @keyframes outlineActivate {
+        0%  { outline-width: 0; }
+        11% { outline-width: 1px; }
+        22% { outline-width: 2px; }
+        33% { outline-width: 3px; }
+        44% { outline-width: 4px; }
+        55% { outline-width: 5px; }
+        66% { outline-width: 6px; }
+        77% { outline-width: 5px; }
+        88% { outline-width: 4px; }
+        99% { outline-width: 3px; }
+    }
+
     box-sizing: border-box;
     color: #fff;
     cursor: move;
+    outline: 0 solid var(--theia-focusBorder);
     position: absolute;
     text-align: center;
     user-select: none;
@@ -35,13 +49,14 @@ const StyledPianoRollPlacedNote = styled.div`
 
     &:hover {
         border-radius: 1px;
-        outline: 1px solid var(--theia-focusBorder);
+        outline-width: 1px;
         z-index: 11;
     }
 
     &.selected {
+        animation: outlineActivate .3s linear;
         border-radius: 1px;
-        outline: 3px solid var(--theia-focusBorder);
+        outline-width: 3px;
         z-index: 11;
     }
 

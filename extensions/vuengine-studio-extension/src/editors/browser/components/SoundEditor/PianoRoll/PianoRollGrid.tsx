@@ -331,6 +331,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         eventStep <= patternRelativeMarqueeEndStep
                     );
                 setSelectedNotes(newSelectedNodes);
+                if (newSelectedNodes.length === 0) {
+                    setNoteCursor(sortedMarqueeStartStep * SUB_NOTE_RESOLUTION);
+                }
             }
 
             // reset
