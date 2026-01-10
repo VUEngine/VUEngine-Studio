@@ -135,7 +135,7 @@ const StyledToggleButton = styled.button`
     font-size: 10px;
     justify-content: center;
     min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
-    outline-offset: -1px;
+    outline-width: 0 !important;
     width: 50%;
 
     &:hover {

@@ -66,7 +66,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         backgroundColor,
         maxMenuHeight
     } = props;
-    const { enableCommands, disableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
+    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const value: AdvancedSelectOption[] = [];
     options.map(o => {
@@ -81,7 +81,6 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
 
     const handleOnBlur = () => {
         enableCommands();
-        focusEditor();
     };
 
     const className = small

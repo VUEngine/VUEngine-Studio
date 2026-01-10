@@ -27,7 +27,7 @@ const StyledToggleButton = styled.button`
     font-size: 10px;
     justify-content: center;
     min-height: ${EFFECTS_PANEL_COLLAPSED_HEIGHT}px !important;
-    outline-offset: -1px;
+    outline-width: 0 !important;
 
     &:hover {
         background-color: var(--theia-focusBorder);

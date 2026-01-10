@@ -188,6 +188,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
         this.title.iconClass = 'fa fa-cog';
         this.title.closable = true;
+        this.node.tabIndex = 0;
 
         this.setTitle();
 
@@ -261,12 +262,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.title.caption = this.uri.path.fsPath();
     }
 
-    protected onActivateRequest(msg: Message): void {
-        super.onActivateRequest(msg);
-        this.node.tabIndex = 0;
-        this.focusEditor();
-    }
-
     protected setStatusBarItem(id: string, entry: StatusBarEntry): void {
         this.statusBarItems[id] = entry;
         this.statusBar.setElement(id, entry);
@@ -275,12 +270,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected removeStatusBarItem(id: string): void {
         delete (this.statusBarItems[id]);
         this.statusBar.removeElement(id);
-    }
-
-    protected focusEditor(): void {
-        setTimeout(() => {
-            this.node.focus();
-        }, 1);
     }
 
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
@@ -302,8 +291,19 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
     }
 
+    protected refocus(): void {
+        setTimeout(() => {
+            if (this.commandsEnabled) {
+                this.node.focus();
+            }
+        }, 10);
+    }
+
     protected bindEvents(): void {
         this.onEditorContentHasChanged = (state: Pick<JsonFormsCore, 'data' | 'errors'>) => this.handleEditorChange(state.data);
+
+        this.node.onclick = () => this.refocus;
+        this.node.onblur = () => this.refocus;
 
         this.toDispose.pushAll([
             this.vesProjectService.onDidAddProjectItem(() => this.update()),
@@ -335,6 +335,11 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }, 50);
         super.update();
     };
+
+    protected onActivateRequest(msg: Message): void {
+        super.onActivateRequest(msg);
+        this.node.focus();
+    }
 
     protected onAfterAttach(msg: Message): void {
         this.setStatusBar();
@@ -483,6 +488,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected enableCommands(): void {
         this.commandsEnabled = true;
+        this.refocus();
     }
 
     protected disableCommands(): void {
@@ -510,7 +516,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         onCommandExecute: this.onCommandExecute.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
-                        focusEditor: this.focusEditor.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         currentThemeType: this.currentThemeType,

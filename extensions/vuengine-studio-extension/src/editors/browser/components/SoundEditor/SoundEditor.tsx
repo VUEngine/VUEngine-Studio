@@ -122,7 +122,7 @@ interface SoundEditorProps {
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { fileUri, services, setCommands, onCommandExecute, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, setCommands, onCommandExecute, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
@@ -211,7 +211,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ]
         });
         setTrackDialogOpen(false);
-        focusEditor();
     };
 
     const setPattern = (patternId: string, pattern: Partial<PatternConfig>): void => {
@@ -493,7 +492,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
         setTrackSettings(updatedTrackSettings.sort((a, b) => b.type.localeCompare(a.type)));
         setTrackDialogOpen(false);
-        focusEditor();
     };
 
     const removePatternFromSequence = (trackId: number, step: number): void => {
@@ -810,8 +808,6 @@ A total of {0} instruments will be deleted.",
         setPattern(currentPatternId, {
             events: updatedEvents,
         });
-
-        focusEditor();
     };
 
     const setNoteEvent = (notes: SetNoteEventProps[]): void => {
@@ -1179,7 +1175,6 @@ A total of {0} instruments will be deleted.",
         setCommands([
             ...Object.values(SoundEditorCommands).map(c => c.id)
         ]);
-        focusEditor();
     }, []);
 
     useEffect(() => {
@@ -1361,12 +1356,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setInstrumentDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
@@ -1393,12 +1386,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setPropertiesDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setPropertiesDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     height='460px'
@@ -1419,12 +1410,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setToolsDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setToolsDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
                     height='260px'
@@ -1467,12 +1456,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setTrackDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setTrackDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
                     height='340px'
@@ -1497,12 +1484,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setPatternDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setPatternDialogOpen(false);
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editPattern', 'Edit Pattern')
                     }
@@ -1528,12 +1513,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/selectWaveform', 'Select Waveform')
                     }
@@ -1552,12 +1535,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                     height='100%'
@@ -1577,12 +1558,10 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
-                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
                     height='180px'

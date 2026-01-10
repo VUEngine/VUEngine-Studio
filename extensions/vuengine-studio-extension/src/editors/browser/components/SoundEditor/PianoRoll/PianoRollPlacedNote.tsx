@@ -1,9 +1,8 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getMaxNoteDuration } from '../Other/Note';
 import { getNoteSlideLabel, SetNoteEventProps, SetNoteProps } from '../SoundEditor';
 import {
@@ -142,7 +141,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         isSelected,
         noteDragDelta, setNoteDragDelta,
     } = props;
-    const { focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState(false);
 
     const events = pattern.events;
@@ -302,8 +300,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             event: SoundEvent.Duration,
             value: newDuration
         }]);
-
-        focusEditor();
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
@@ -367,7 +363,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         setSelectedNotes(notes.map(n => n.step));
         setNoteDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
-        focusEditor();
 
         e.stopPropagation();
     };
@@ -394,7 +389,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             setNote([{ step: localStep }]);
         }
 
-        focusEditor();
         e.stopPropagation();
     };
 

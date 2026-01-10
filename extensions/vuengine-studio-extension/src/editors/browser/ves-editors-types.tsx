@@ -65,7 +65,6 @@ export interface EditorsContextType {
     onCommandExecute: Event<string>
     enableCommands: () => void
     disableCommands: () => void
-    focusEditor: () => void
     setStatusBarItem: (id: string, entry: StatusBarEntry) => void
     removeStatusBarItem: (id: string) => void
     currentThemeType: ThemeType
