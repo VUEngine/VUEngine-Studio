@@ -10,7 +10,7 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
+import { SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
 
 interface CurrentTrackProps {
     soundData: SoundData
@@ -144,7 +144,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         options={Object.keys(soundData.instruments)
                             .filter(instrumentId => {
                                 const instrument = soundData.instruments[instrumentId];
-                                return instrument.type === track.type;
+                                return TRACK_TYPE_INSTRUMENT_COMPATIBILITY[track.type].includes(instrument.type);
                             })
                             .sort((a, b) => soundData.instruments[a].name.localeCompare(soundData.instruments[b].name))
                             .map((instrumentId, i) => {

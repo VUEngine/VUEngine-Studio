@@ -283,8 +283,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
-        setCurrentTrackId(trackId);
         setCurrentPatternId(patternId);
+        if (trackId !== currentTrackId) {
+            setCurrentTrackId(trackId);
+            setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+        }
         let sequenceIndex = -1;
         for (const [step, pId] of Object.entries(soundData.tracks[trackId].sequence)) {
             if (pId === patternId) {
@@ -300,7 +303,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
         const track = soundData.tracks[trackId];
         const sequence = track?.sequence;
-        setCurrentTrackId(trackId);
+        if (trackId !== currentTrackId) {
+            setCurrentTrackId(trackId);
+            setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+        }
         setCurrentPatternId(sequence && sequence[sequenceIndex] ? sequence[sequenceIndex] : '');
         setCurrentSequenceIndex(sequenceIndex);
         setSelectedNotes([]);

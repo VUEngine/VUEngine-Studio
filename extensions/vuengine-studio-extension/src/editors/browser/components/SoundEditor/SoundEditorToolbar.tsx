@@ -23,6 +23,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
     TrackConfig,
     TrackSettings,
 } from './SoundEditorTypes';
@@ -375,7 +376,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                 ...Object.keys(soundData.instruments)
                                     .filter(instrumentId => {
                                         const instr = soundData.instruments[instrumentId];
-                                        return instr.type === currentTrack.type;
+                                        return TRACK_TYPE_INSTRUMENT_COMPATIBILITY[currentTrack.type].includes(instr.type);
                                     })
                                     .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
                                         (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')

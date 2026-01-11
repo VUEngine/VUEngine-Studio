@@ -16,6 +16,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
 } from './SoundEditorTypes';
 
 const StyledTableContainer = styled.div`
@@ -245,7 +246,9 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                                 ...Object.keys(soundData.instruments)
                                                                                     .filter(iid => {
                                                                                         const instr = soundData.instruments[iid];
-                                                                                        return iid === instrumentId || instr.type === currentTrack.type;
+                                                                                        return iid ===
+                                                                                            instrumentId ||
+                                                                                            TRACK_TYPE_INSTRUMENT_COMPATIBILITY[currentTrack.type].includes(instr.type);
                                                                                     })
                                                                                     .sort((a, b) => (soundData.instruments[a].name.length
                                                                                         ? soundData.instruments[a].name

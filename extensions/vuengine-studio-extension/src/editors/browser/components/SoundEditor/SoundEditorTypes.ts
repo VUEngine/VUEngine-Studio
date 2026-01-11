@@ -98,6 +98,12 @@ export enum SoundEditorTrackType {
     NOISE = 'noise',
 }
 
+export const TRACK_TYPE_INSTRUMENT_COMPATIBILITY = {
+    [SoundEditorTrackType.WAVE]: [SoundEditorTrackType.WAVE, SoundEditorTrackType.SWEEPMOD],
+    [SoundEditorTrackType.SWEEPMOD]: [SoundEditorTrackType.WAVE, SoundEditorTrackType.SWEEPMOD],
+    [SoundEditorTrackType.NOISE]: [SoundEditorTrackType.NOISE]
+};
+
 export const TRACK_TYPE_LABELS: { [type: string]: string } = {
     [SoundEditorTrackType.WAVE]: nls.localize('vuengine/editors/sound/trackType/wave', 'Wave'),
     [SoundEditorTrackType.SWEEPMOD]: nls.localize('vuengine/editors/sound/trackType/sweepMod', 'Wave + Sweep/Modulation'),
