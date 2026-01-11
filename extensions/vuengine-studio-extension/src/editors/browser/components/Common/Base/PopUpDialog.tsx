@@ -11,12 +11,13 @@ interface PopUpDialogProps {
     error?: string
     height?: string
     width?: string
+    okButton?: boolean
     cancelButton?: boolean
     overflow?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, onClose, onOk, okLabel, title, error, height, width, cancelButton, children, overflow } = props;
+    const { open, onClose, onOk, okLabel, title, error, height, width, okButton, cancelButton, children, overflow } = props;
 
     const onKeyDown = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -74,15 +75,17 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                         {nls.localizeByDefault('Cancel')}
                     </button>
                 }
-                <button
-                    className="theia-button main"
-                    onClick={onOk}
-                    style={{
-                        minWidth: '65px',
-                    }}
-                >
-                    {okLabel ? okLabel : 'OK'}
-                </button>
+                {(okButton === undefined || okButton === true) &&
+                    <button
+                        className="theia-button main"
+                        onClick={onOk}
+                        style={{
+                            minWidth: '65px',
+                        }}
+                    >
+                        {okLabel ? okLabel : 'OK'}
+                    </button>
+                }
             </HContainer>
         </div>
     </div>;

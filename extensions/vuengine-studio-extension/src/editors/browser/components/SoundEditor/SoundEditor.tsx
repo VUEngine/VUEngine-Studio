@@ -1,4 +1,4 @@
-import { environment, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator, URI } from '@theia/core';
+import { environment, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
@@ -20,6 +20,7 @@ import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
 import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
 import AddPattern from './Other/AddPattern';
+import AddTrack from './Other/AddTrack';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
 import Properties from './Other/Properties';
@@ -28,7 +29,6 @@ import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
-    ALL_TRACK_TYPES,
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
     DEFAULT_TRACK_SETTINGS,
@@ -141,10 +141,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [eventListHidden, setEventListHidden] = useState<boolean>(true);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, step: number, size?: number }>({ trackId: -1, step: -1 });
+    const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
     const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
     const [propertiesDialogOpen, setPropertiesDialogOpen] = useState<boolean>(false);
-    const [trackDialogOpen, setTrackDialogOpen] = useState<boolean>(false);
+    const [editTrackDialogOpen, setEditTrackDialogOpen] = useState<boolean>(false);
     const [patternDialogOpen, setPatternDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
@@ -201,7 +202,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 ...soundData.tracks.slice(trackId + 1)
             ]
         });
-        setTrackDialogOpen(false);
+        setEditTrackDialogOpen(false);
     };
 
     const setPattern = (patternId: string, pattern: Partial<PatternConfig>): void => {
@@ -379,122 +380,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         }
     };
 
-    const showTrackTypeSelection = async (): Promise<QuickPickItem | undefined> => {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/sound/addTrack', 'Add Track'),
-            placeholder: nls.localize('vuengine/editors/sound/selectTrackTypeToAdd', 'Select a track type to add...'),
-        };
-        const items: (QuickPickItem | QuickPickSeparator)[] = [];
-
-        const waveAvailable = isTrackAvailable(SoundEditorTrackType.WAVE, soundData.tracks);
-        const sweepModAvailable = isTrackAvailable(SoundEditorTrackType.SWEEPMOD, soundData.tracks);
-        const noiseAvailable = isTrackAvailable(SoundEditorTrackType.NOISE, soundData.tracks);
-
-        if (waveAvailable || sweepModAvailable || noiseAvailable) {
-            items.push({
-                id: ALL_TRACK_TYPES,
-                label: nls.localize('vuengine/editors/sound/allAvailable', 'All available'),
-            });
+    const addTrack = (): void => {
+        if (soundData.tracks.length < 6) {
+            setAddTrackDialogOpen(true);
         }
-        if (waveAvailable) {
-            items.push({
-                id: SoundEditorTrackType.WAVE,
-                label: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
-            });
-        }
-        if (sweepModAvailable) {
-            items.push({
-                id: SoundEditorTrackType.SWEEPMOD,
-                label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
-            });
-        }
-        if (noiseAvailable) {
-            items.push({
-                id: SoundEditorTrackType.NOISE,
-                label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
-            });
-        }
-
-        return services.quickPickService.show(
-            items,
-            quickPickOptions
-        );
-    };
-
-    const addTrack = async (): Promise<void> => {
-        const trackType = await showTrackTypeSelection();
-        if (trackType && trackType.id) {
-            if (trackType.id === ALL_TRACK_TYPES) {
-                doAddTracks([
-                    SoundEditorTrackType.WAVE,
-                    SoundEditorTrackType.WAVE,
-                    SoundEditorTrackType.WAVE,
-                    SoundEditorTrackType.WAVE,
-                    SoundEditorTrackType.SWEEPMOD,
-                    SoundEditorTrackType.NOISE
-                ]);
-            } else {
-                doAddTracks([
-                    trackType.id as SoundEditorTrackType
-                ]);
-            }
-        }
-    };
-
-    const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
-        switch (trackType) {
-            case SoundEditorTrackType.WAVE:
-                return tracks.filter(t => t.type === SoundEditorTrackType.WAVE).length < 4;
-            case SoundEditorTrackType.SWEEPMOD:
-                return tracks.filter(t => t.type === SoundEditorTrackType.SWEEPMOD).length === 0;
-            case SoundEditorTrackType.NOISE:
-                return tracks.filter(t => t.type === SoundEditorTrackType.NOISE).length === 0;
-            default:
-                return false;
-        }
-    };
-
-    const doAddTracks = async (trackTypes: SoundEditorTrackType[]): Promise<void> => {
-        const type = services.vesProjectService.getProjectDataType('Sound');
-        if (!type) {
-            return;
-        }
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
-        if (!schema?.properties?.tracks?.items) {
-            return;
-        }
-        const newTrackData = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.tracks?.items);
-        if (!newTrackData) {
-            return;
-        }
-
-        const updatedTracks = [...soundData.tracks];
-        const updatedTrackSettings = [...trackSettings.map((track, trackId) => ({
-            ...track,
-            type: updatedTracks[trackId].type,
-        }))];
-        trackTypes.forEach(trackType => {
-            if (!isTrackAvailable(trackType, updatedTracks)) {
-                return;
-            }
-
-            updatedTrackSettings.push({
-                ...DEFAULT_TRACK_SETTINGS,
-                type: trackType,
-            });
-
-            updatedTracks.push({
-                ...newTrackData,
-                type: trackType
-            });
-        });
-
-        updateSoundData({
-            ...soundData,
-            tracks: updatedTracks.sort((a, b) => b.type.localeCompare(a.type)),
-        });
-        setTrackSettings(updatedTrackSettings.sort((a, b) => b.type.localeCompare(a.type)));
-        setTrackDialogOpen(false);
     };
 
     const removePatternFromSequence = (trackId: number, step: number): void => {
@@ -784,6 +673,19 @@ A total of {0} instruments will be deleted.",
         });
     };
 
+    const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
+        switch (trackType) {
+            case SoundEditorTrackType.WAVE:
+                return tracks.filter(t => t.type === SoundEditorTrackType.WAVE).length < 4;
+            case SoundEditorTrackType.SWEEPMOD:
+                return tracks.filter(t => t.type === SoundEditorTrackType.SWEEPMOD).length === 0;
+            case SoundEditorTrackType.NOISE:
+                return tracks.filter(t => t.type === SoundEditorTrackType.NOISE).length === 0;
+            default:
+                return false;
+        }
+    };
+
     // TODO: remove and replace all usage with setNotes()
     const setNoteEvent = (notes: SetNoteEventProps[]): void => {
         const currentPattern = soundData.patterns[currentPatternId];
@@ -843,7 +745,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const editInstrument = (instrument: string): void => {
-        setTrackDialogOpen(false);
+        setEditTrackDialogOpen(false);
         setCurrentInstrumentId(instrument);
         setInstrumentDialogOpen(true);
     };
@@ -1235,7 +1137,7 @@ A total of {0} instruments will be deleted.",
                                 toggleTrackSeeThrough={toggleTrackSeeThrough}
                                 removeTrack={removeTrack}
                                 addPattern={addPattern}
-                                setTrackDialogOpen={setTrackDialogOpen}
+                                setEditTrackDialogOpen={setEditTrackDialogOpen}
                                 setPatternDialogOpen={setPatternDialogOpen}
                                 effectsPanelHidden={effectsPanelHidden}
                                 pianoRollNoteHeight={pianoRollNoteHeight}
@@ -1320,6 +1222,37 @@ A total of {0} instruments will be deleted.",
                         </StyledLowerContainer>
                     </>}
             </VContainer>
+            {addTrackDialogOpen &&
+                <PopUpDialog
+                    open={addTrackDialogOpen}
+                    onClose={() => {
+                        setAddTrackDialogOpen(false);
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setAddTrackDialogOpen(false);
+                        enableCommands();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
+                    height='300px'
+                    width='435px'
+                    cancelButton={true}
+                    okButton={false}
+                    overflow='visible'
+                >
+                    <VContainer gap={15}>
+                        <AddTrack
+                            soundData={soundData}
+                            updateSoundData={updateSoundData}
+                            trackSettings={trackSettings}
+                            setTrackSettings={setTrackSettings}
+                            isTrackAvailable={isTrackAvailable}
+                            setAddTrackDialogOpen={setAddTrackDialogOpen}
+                            setEditTrackDialogOpen={setEditTrackDialogOpen}
+                        />
+                    </VContainer>
+                </PopUpDialog>
+            }
             {addPatternDialogOpen.trackId > -1 &&
                 <PopUpDialog
                     open={addPatternDialogOpen.trackId > -1}
@@ -1334,6 +1267,8 @@ A total of {0} instruments will be deleted.",
                     title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
                     height='100%'
                     width='100%'
+                    cancelButton={true}
+                    okButton={false}
                 >
                     <AddPattern
                         soundData={soundData}
@@ -1448,15 +1383,15 @@ A total of {0} instruments will be deleted.",
                     </VContainer>
                 </PopUpDialog>
             }
-            {trackDialogOpen &&
+            {editTrackDialogOpen &&
                 <PopUpDialog
-                    open={trackDialogOpen}
+                    open={editTrackDialogOpen}
                     onClose={() => {
-                        setTrackDialogOpen(false);
+                        setEditTrackDialogOpen(false);
                         enableCommands();
                     }}
                     onOk={() => {
-                        setTrackDialogOpen(false);
+                        setEditTrackDialogOpen(false);
                         enableCommands();
                     }}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}

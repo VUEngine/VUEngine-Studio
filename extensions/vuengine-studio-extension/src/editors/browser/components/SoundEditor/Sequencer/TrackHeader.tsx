@@ -135,7 +135,7 @@ interface TrackHeaderProps {
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
     otherSolo: boolean
-    setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
+    setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
     trackSettings: TrackSettings[]
 }
@@ -149,7 +149,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         removeTrack,
         toggleTrackMuted, toggleTrackSolo, toggleTrackSeeThrough,
         otherSolo,
-        setTrackDialogOpen,
+        setEditTrackDialogOpen,
         sequencerPatternHeight,
         trackSettings,
     } = props;
@@ -183,7 +183,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
     return <StyledTrackHeader
         className={classNames.join(' ')}
         onClick={() => setCurrentTrackId(trackId)}
-        onDoubleClick={() => setTrackDialogOpen(true)}
+        onDoubleClick={() => setEditTrackDialogOpen(true)}
         onContextMenu={() => removeTrack(trackId)}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
@@ -254,7 +254,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                 <StyledTrackHeaderButton
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
                     onDoubleClick={e => e.stopPropagation()}
-                    onClick={() => setTrackDialogOpen(true)}
+                    onClick={() => setEditTrackDialogOpen(true)}
                 >
                     <i className="fa fa-cog" />
                 </StyledTrackHeaderButton>

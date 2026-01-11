@@ -130,7 +130,7 @@ interface SequencerProps {
     removeTrack: (trackId: number) => void
     addPattern: (trackId: number, bar: number, size?: number) => void
     setPatternSize: (patternId: string, size: number) => void
-    setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
+    setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     effectsPanelHidden: boolean
     pianoRollNoteHeight: number
@@ -165,7 +165,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleTrackSeeThrough,
         removeTrack,
         addPattern, setPatternSize,
-        setTrackDialogOpen, setPatternDialogOpen,
+        setEditTrackDialogOpen, setPatternDialogOpen,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
@@ -426,7 +426,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     toggleTrackSolo={toggleTrackSolo}
                     toggleTrackSeeThrough={toggleTrackSeeThrough}
                     otherSolo={soloTrack > -1 && soloTrack !== index}
-                    setTrackDialogOpen={setTrackDialogOpen}
+                    setEditTrackDialogOpen={setEditTrackDialogOpen}
                     sequencerPatternHeight={sequencerPatternHeight}
                     trackSettings={trackSettings}
                 />
