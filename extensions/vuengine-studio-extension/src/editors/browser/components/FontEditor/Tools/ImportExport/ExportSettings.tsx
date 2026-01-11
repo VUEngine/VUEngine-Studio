@@ -127,5 +127,5 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
                 </VContainer>
             }
         </VContainer>
-    </HContainer >;
+    </HContainer>;
 }

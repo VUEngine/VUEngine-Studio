@@ -22,7 +22,7 @@ import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
-import Properties from './Other/Song';
+import Properties from './Other/Properties';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -1194,6 +1194,31 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
                 if (soundData.tracks.length > 0) {
                     pasteNotes();
+                }
+                break;
+            case SoundEditorCommands.SET_NOTE_LENGTH_1.id:
+                if (soundData.tracks.length > 0) {
+                    setNewNoteDuration(16 * SUB_NOTE_RESOLUTION);
+                }
+                break;
+            case SoundEditorCommands.SET_NOTE_LENGTH_2.id:
+                if (soundData.tracks.length > 0) {
+                    setNewNoteDuration(8 * SUB_NOTE_RESOLUTION);
+                }
+                break;
+            case SoundEditorCommands.SET_NOTE_LENGTH_4.id:
+                if (soundData.tracks.length > 0) {
+                    setNewNoteDuration(4 * SUB_NOTE_RESOLUTION);
+                }
+                break;
+            case SoundEditorCommands.SET_NOTE_LENGTH_8.id:
+                if (soundData.tracks.length > 0) {
+                    setNewNoteDuration(2 * SUB_NOTE_RESOLUTION);
+                }
+                break;
+            case SoundEditorCommands.SET_NOTE_LENGTH_16.id:
+                if (soundData.tracks.length > 0) {
+                    setNewNoteDuration(1 * SUB_NOTE_RESOLUTION);
                 }
                 break;
         }

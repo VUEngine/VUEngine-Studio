@@ -182,7 +182,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                             <button
                                 className="theia-button secondary"
                                 onClick={() => setForcePlayerRomRebuild(prev => prev + 1)}
-                                disabled={!emulatorInitialized}
+                                disabled={!emulatorInitialized || !playingTestNote}
                             >
                                 <i className="codicon codicon-debug-restart" />
                             </button>

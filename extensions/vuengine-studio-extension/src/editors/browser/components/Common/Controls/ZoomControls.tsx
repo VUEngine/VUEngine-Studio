@@ -52,5 +52,5 @@ export default function ZoomControls(props: ZoomControlsProps): React.JSX.Elemen
         >
             <i className='codicon codicon-zoom-in' />
         </button>
-    </HContainer >;
+    </HContainer>;
 }

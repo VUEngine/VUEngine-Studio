@@ -123,5 +123,5 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
             setValue={setSection}
         />
         { */ }
-    </VContainer >;
+    </VContainer>;
 }

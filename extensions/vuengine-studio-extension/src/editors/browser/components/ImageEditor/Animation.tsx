@@ -65,5 +65,5 @@ export default function Animation(): React.JSX.Element {
                 min={0}
             />
         </VContainer>}
-    </VContainer >;
+    </VContainer>;
 }

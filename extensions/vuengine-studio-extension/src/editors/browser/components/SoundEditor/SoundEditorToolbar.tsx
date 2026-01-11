@@ -343,7 +343,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         <Magnet size={17} />
                     </StyledSoundEditorToolbarButton>
                     <AdvancedSelect
-                        title={nls.localize('vuengine/editors/sound/defaultNoteLength', 'Default Note Length')}
+                        title={nls.localize('vuengine/editors/sound/noteLength', 'Note Length')}
                         defaultValue={newNoteDuration.toString()}
                         onChange={options => setNewNoteDuration(parseInt(options[0]))}
                         options={[{
@@ -500,5 +500,5 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbarSide>
-    </StyledSoundEditorToolbar >;
+    </StyledSoundEditorToolbar>;
 }

@@ -23,37 +23,37 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.selectTrack1',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack1', 'Select Track 1'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '1',
+        keybinding: 'shift+1',
     };
     export const SELECT_TRACK_2: EditorCommand = {
         id: 'editors.soundEditor.selectTrack2',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack2', 'Select Track 2'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '2',
+        keybinding: 'shift+2',
     };
     export const SELECT_TRACK_3: EditorCommand = {
         id: 'editors.soundEditor.selectTrack3',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack3', 'Select Track 3'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '3',
+        keybinding: 'shift+3',
     };
     export const SELECT_TRACK_4: EditorCommand = {
         id: 'editors.soundEditor.selectTrack4',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack4', 'Select Track 4'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '4',
+        keybinding: 'shift+4',
     };
     export const SELECT_TRACK_5: EditorCommand = {
         id: 'editors.soundEditor.selectTrack5',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack5', 'Select Track 5'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '5',
+        keybinding: 'shift+5',
     };
     export const SELECT_TRACK_6: EditorCommand = {
         id: 'editors.soundEditor.selectTrack6',
         label: nls.localize('vuengine/editors/sound/commands/selectTrack6', 'Select Track 6'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: '6',
+        keybinding: 'shift+6',
     };
     export const SELECT_NEXT_TRACK: EditorCommand = {
         id: 'editors.soundEditor.nextTrack',
@@ -275,5 +275,35 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/pasteSelectedNotes', 'Paste Selected Notes'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+v',
+    };
+    export const SET_NOTE_LENGTH_1: EditorCommand = {
+        id: 'editors.soundEditor.setNoteLength1',
+        label: nls.localize('vuengine/editors/sound/commands/setNoteLength1', 'Set Note Length: 1'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '1',
+    };
+    export const SET_NOTE_LENGTH_2: EditorCommand = {
+        id: 'editors.soundEditor.setNoteLength2',
+        label: nls.localize('vuengine/editors/sound/commands/setNoteLength2', 'Set Note Length: 1/2'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '2',
+    };
+    export const SET_NOTE_LENGTH_4: EditorCommand = {
+        id: 'editors.soundEditor.setNoteLength4',
+        label: nls.localize('vuengine/editors/sound/commands/setNoteLength4', 'Set Note Length: 1/4'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '4',
+    };
+    export const SET_NOTE_LENGTH_8: EditorCommand = {
+        id: 'editors.soundEditor.setNoteLength8',
+        label: nls.localize('vuengine/editors/sound/commands/setNoteLength8', 'Set Note Length: 1/8'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: '8',
+    };
+    export const SET_NOTE_LENGTH_16: EditorCommand = {
+        id: 'editors.soundEditor.setNoteLength16',
+        label: nls.localize('vuengine/editors/sound/commands/setNoteLength16', 'Set Note Length: 1/16'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: ['0', '6'],
     };
 };
