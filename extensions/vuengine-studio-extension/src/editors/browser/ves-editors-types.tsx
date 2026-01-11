@@ -5,6 +5,7 @@ import {
     OpenerService,
     StatusBarEntry
 } from '@theia/core/lib/browser';
+import { ClipboardService } from '@theia/core/lib/browser/clipboard-service';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
@@ -26,6 +27,7 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 
 export interface EditorsServices {
+    clipboardService: ClipboardService;
     colorRegistry: ColorRegistry;
     commandService: CommandService
     envVariablesServer: EnvVariablesServer

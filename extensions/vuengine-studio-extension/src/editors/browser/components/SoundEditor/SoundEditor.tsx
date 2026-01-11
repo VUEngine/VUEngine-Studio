@@ -856,7 +856,6 @@ A total of {0} instruments will be deleted.",
             const newPatternId = nanoid();
             const type = services.vesProjectService.getProjectDataType('Sound');
             const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-            // @ts-ignore
             const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
 
             const updatedTracks = [...soundData.tracks];
@@ -1572,7 +1571,7 @@ A total of {0} instruments will be deleted.",
                         setWaveformDialogOpen('');
                         enableCommands();
                     }}
-                    title={nls.localize('vuengine/editors/sound/selectWaveform', 'Select Waveform')
+                    title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
                     }
                     height='100%'
                     width='100%'

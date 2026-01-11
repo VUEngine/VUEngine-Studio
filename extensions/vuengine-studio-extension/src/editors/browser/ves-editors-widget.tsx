@@ -17,6 +17,7 @@ import {
     StatusBar,
     StatusBarEntry
 } from '@theia/core/lib/browser';
+import { ClipboardService } from '@theia/core/lib/browser/clipboard-service';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
@@ -59,6 +60,8 @@ export interface ItemData {
 
 @injectable()
 export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource, ExtractableWidget {
+    @inject(ClipboardService)
+    private readonly clipboardService: ClipboardService;
     @inject(ColorRegistry)
     private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
@@ -520,6 +523,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         currentThemeType: this.currentThemeType,
                         services: {
+                            clipboardService: this.clipboardService,
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
                             envVariablesServer: this.envVariablesServer,

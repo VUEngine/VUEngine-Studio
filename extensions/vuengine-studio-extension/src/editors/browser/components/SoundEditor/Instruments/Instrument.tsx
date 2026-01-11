@@ -1,8 +1,9 @@
-import { Copy, Trash } from '@phosphor-icons/react';
+import { ArrowBendRightDown, Clipboard, Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
@@ -38,6 +39,7 @@ import {
 } from '../Emulator/VsuTypes';
 import { getInstrumentName } from '../SoundEditor';
 import {
+    InstrumentConfig,
     InstrumentMap,
     SoundData,
     SoundEditorTrackType,
@@ -46,7 +48,6 @@ import {
     TRACK_TYPE_LABELS,
     WAVEFORM_MAX
 } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from './Instruments';
 
 const ColoredDiv = styled.div`
     cursor: pointer;
@@ -74,6 +75,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen, setInstrumentColorDialogOpen,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const instrument = soundData.instruments[instrumentId];
 
@@ -258,7 +260,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const cloneInstrument = async () => {
+    const cloneInstrument = () => {
         const newId = nanoid();
         setInstruments({
             ...soundData.instruments,
@@ -268,6 +270,16 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             },
         });
         setInstrumentId(newId);
+    };
+
+    const addImportedInstrument = (id: string, data: InstrumentConfig) => {
+        setInstruments({
+            ...soundData.instruments,
+            [id]: {
+                ...data,
+            },
+        });
+        setInstrumentId(id);
     };
 
     const removeCurrentInstrument = async () => {
@@ -314,6 +326,65 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
             const firstInstrumentId = Object.keys(soundData.instruments)[0] ?? TRACK_DEFAULT_INSTRUMENT_ID;
             setInstrumentId(firstInstrumentId);
+        }
+    };
+
+    const copyToClipboard = async () => {
+        await services.clipboardService.writeText(btoa(JSON.stringify({ [instrumentId]: instrument })));
+        services.messageService.info(nls.localize(
+            'vuengine/editors/sound/instrumentDataCopiedToClipboard',
+            'Instrument data has been copied to the clipboard.'
+        ));
+    };
+
+    const applyFromClipboard = async () => {
+        const clipboardValue = await services.clipboardService.readText();
+        let importedInstrumentId: string;
+        let importedInstrumentConfig: InstrumentConfig;
+        let valid = false;
+
+        try {
+            const decodedInstrumentData = JSON.parse(atob(clipboardValue));
+            const importedInstrument: InstrumentMap = decodedInstrumentData;
+            importedInstrumentId = Object.keys(importedInstrument)[0];
+            importedInstrumentConfig = Object.values(importedInstrument)[0];
+            if (soundData.instruments[importedInstrumentId] !== undefined) {
+                services.messageService.error(nls.localize(
+                    'vuengine/editors/sound/instrumentExists',
+                    'Instrument with ID {0} already exists.',
+                    importedInstrumentId
+                ));
+                return;
+            }
+
+            const type = services.vesProjectService.getProjectDataType('Sound');
+            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+            const defaultInstrument = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.instruments?.additionalProperties);
+
+            // overlay imported onto default, keeping only existing properties
+            for (const key of Object.keys(importedInstrumentConfig)) {
+                if (key in defaultInstrument) {
+                    // @ts-ignore
+                    defaultInstrument[key] = importedInstrumentConfig[key];
+                }
+            }
+            importedInstrumentConfig = defaultInstrument;
+
+            valid = true;
+        } catch (e) { }
+
+        if (valid) {
+            addImportedInstrument(importedInstrumentId!, importedInstrumentConfig!);
+            services.messageService.info(nls.localize(
+                'vuengine/editors/sound/instrumentDataImported',
+                'Instrument data has been successfully imported.'
+            ));
+        } else {
+            services.messageService.error(nls.localize(
+                'vuengine/editors/general/invalidData',
+                'Data is invalid: {0}',
+                clipboardValue
+            ));
         }
     };
 
@@ -377,33 +448,12 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     return (instrument !== undefined
         ? <VContainer gap={20} grow={1} overflow='hidden'>
             <HContainer gap={20}>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localizeByDefault('Name')}
-                    </label>
-                    <InputWithAction>
-                        <Input
-                            value={instrument?.name}
-                            setValue={setName}
-                        />
-                        <InputWithActionButton
-                            className='theia-button secondary'
-                            title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
-                            onClick={cloneInstrument}
-                            disabled={!instrument}
-                        >
-                            <Copy size={16} />
-                        </InputWithActionButton>
-                        <InputWithActionButton
-                            className='theia-button secondary'
-                            title={nls.localizeByDefault('Remove')}
-                            onClick={removeCurrentInstrument}
-                            disabled={!instrument}
-                        >
-                            <Trash size={16} />
-                        </InputWithActionButton>
-                    </InputWithAction>
-                </VContainer>
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    grow={1}
+                    value={instrument?.name}
+                    setValue={setName}
+                />
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/editors/sound/type', 'Type')}
@@ -434,6 +484,44 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         }}
                         onClick={() => setInstrumentColorDialogOpen(instrumentId)}
                     />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/actions', 'Actions')}
+                    </label>
+                    <HContainer>
+                        <button
+                            className='theia-button secondary'
+                            onClick={copyToClipboard}
+                            title={nls.localize('vuengine/editors/general/copyToClipboard', 'Copy To Clipboard')}
+                        >
+                            <Clipboard size={16} />
+                        </button>
+                        <button
+                            className='theia-button secondary'
+                            onClick={applyFromClipboard}
+                            title={nls.localize('vuengine/editors/general/pasteFromClipboard', 'Paste From Clipboard')}
+                        >
+                            <ArrowBendRightDown size={16} />
+                        </button>
+
+                        <button
+                            className='theia-button secondary'
+                            title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
+                            onClick={cloneInstrument}
+                            disabled={!instrument}
+                        >
+                            <Copy size={16} />
+                        </button>
+                        <button
+                            className='theia-button secondary'
+                            title={nls.localizeByDefault('Remove')}
+                            onClick={removeCurrentInstrument}
+                            disabled={!instrument}
+                        >
+                            <Trash size={16} />
+                        </button>
+                    </HContainer>
                 </VContainer>
             </HContainer>
             <HContainer gap={40} grow={1} wrap='wrap' overflow='auto'>

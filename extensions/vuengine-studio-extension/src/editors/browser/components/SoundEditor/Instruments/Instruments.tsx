@@ -120,7 +120,6 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     const addInstrument = async () => {
         const type = services.vesProjectService.getProjectDataType('Sound');
         const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-        // @ts-ignore
         const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties);
         if (!newInstrument) {
             return;
