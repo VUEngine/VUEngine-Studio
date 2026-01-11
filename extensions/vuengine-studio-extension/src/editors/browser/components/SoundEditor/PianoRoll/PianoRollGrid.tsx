@@ -29,7 +29,7 @@ interface PianoRollGridProps {
     newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
-    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<void>
     noteDragNoteId: number
     setNoteDragNoteId: Dispatch<SetStateAction<number>>
     noteDragStartStep: number
@@ -290,9 +290,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 setNoteCursor(newNoteCursor);
             } else {
                 const newPatternSize = Math.abs(noteDragStartStep - noteDragEndStep) + 1;
-                if (await setPatternAtCursorPosition(newNoteCursor, newPatternSize)) {
-                    setNoteCursor(newNoteCursor);
-                }
+                await setPatternAtCursorPosition(newNoteCursor, newPatternSize);
             }
 
             // reset

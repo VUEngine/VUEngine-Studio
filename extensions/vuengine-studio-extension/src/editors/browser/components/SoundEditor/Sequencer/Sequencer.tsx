@@ -128,7 +128,7 @@ interface SequencerProps {
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
     removeTrack: (trackId: number) => void
-    addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
+    addPattern: (trackId: number, bar: number, size?: number) => void
     setPatternSize: (patternId: string, size: number) => void
     setTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
@@ -291,16 +291,17 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.SELECT_NEXT_TRACK.id:
-                if (currentTrackId < soundData.tracks.length - 1) {
+                if (soundData.tracks.length > 0 && currentTrackId < soundData.tracks.length - 1) {
                     setCurrentTrackId(currentTrackId + 1);
                 }
                 break;
             case SoundEditorCommands.SELECT_PREVIOUS_TRACK.id:
-                if (currentTrackId > 0) {
+                if (soundData.tracks.length > 0 && currentTrackId > 0) {
                     setCurrentTrackId(currentTrackId - 1);
                 }
                 break;
             case SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id:
+                // TODO
                 /*
                 if (currentSequenceIndex < soundData.channels[currentTrackId].sequence.length - 1) {
                     setCurrentSequenceIndex(currentTrackId, currentSequenceIndex + 1);
@@ -308,6 +309,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 */
                 break;
             case SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX.id:
+                // TODO
                 /*
                 if (currentSequenceIndex > 0) {
                     setCurrentSequenceIndex(currentTrackId, currentSequenceIndex - 1);

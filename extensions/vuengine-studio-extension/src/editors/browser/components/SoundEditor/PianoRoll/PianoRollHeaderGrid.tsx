@@ -32,7 +32,7 @@ interface PianoRollHeaderGridProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<void>
     pianoRollScrollWindow: ScrollWindow
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void

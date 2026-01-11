@@ -1,26 +1,18 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import CanvasImage from '../../Common/CanvasImage';
-import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { DisplayMode } from '../../Common/VUEngineTypes';
 import { getPatternName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    NOTE_RESOLUTION,
-    NOTES_LABELS,
-    NOTES_SPECTRUM,
     PatternConfig,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
     SEQUENCER_RESOLUTION,
-    SoundData,
-    SoundEvent,
-    SUB_NOTE_RESOLUTION
+    SoundData
 } from '../SoundEditorTypes';
+import PatternCanvas from './PatternCanvas';
 
 const StyledPattern = styled.div`
     background-color: var(--theia-secondaryButton-background);
@@ -102,15 +94,10 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         removePatternFromSequence,
     } = props;
     const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
-    const [patternPixels, setPatternPixels] = useState<number[][][]>([]);
-    const [colorOverrides, setColorOverrides] = useState<string[][]>([]);
     const nodeRef = useRef(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
     const isCurrent = currentTrackId === trackId && currentPatternId === patternId;
-    const track = soundData.tracks[trackId];
-    const trackDefaultInstrument = soundData.instruments[track.instrument];
-    const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
 
     const classNames = ['placedPattern'];
     if (currentTrackId === trackId && currentSequenceIndex === step) {
@@ -119,10 +106,8 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         classNames.push('current');
     }
 
-    const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
     const patternName = getPatternName(soundData, patternId);
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
-    const widthCeil = Math.ceil(width);
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
@@ -184,70 +169,6 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         soundData,
     ]);
 
-    useEffect(() => {
-        const pixels: number[][] = [];
-        const colors: string[][] = [];
-
-        // init arrays
-        const emptyPixelLine = [...Array(widthCeil)].map(v => 0);
-        const emptyColorLine = [...Array(widthCeil)].map(v => '');
-        [...Array(sequencerPatternHeight)].map(v => {
-            pixels.push([...emptyPixelLine]);
-            colors.push([...emptyColorLine]);
-        });
-
-        const placePixel = (x: number, y: number, color: string) => {
-            if (pixels[y] === undefined) {
-                pixels[y] = [];
-                colors[y] = [];
-            }
-            for (let k = 0; k < patternNoteWidth; k++) {
-                const xPos = Math.round(x * patternNoteWidth + k);
-                pixels[y][xPos] = 1;
-                colors[y][xPos] = color;
-                if (pixels[y - 1]) {
-                    pixels[y - 1][xPos] = 1;
-                    colors[y - 1][xPos] = color;
-                }
-                if (pixels[y + 1]) {
-                    pixels[y + 1][xPos] = 1;
-                    colors[y + 1][xPos] = color;
-                }
-            }
-        };
-
-        // find set notes
-        Object.keys(pattern.events).forEach((key: string) => {
-            const s = parseInt(key);
-            const event = pattern.events[s];
-            const noteLabel = event[SoundEvent.Note];
-            const instrumentId = event[SoundEvent.Instrument];
-            const color = instrumentId
-                ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
-                : defaultColor;
-            if (noteLabel !== '') {
-                const noteId = NOTES_LABELS.indexOf(noteLabel);
-                const duration = event[SoundEvent.Duration]
-                    ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
-                    : 1;
-                const startXPosition = Math.floor(s / SUB_NOTE_RESOLUTION);
-                const noteYPosition = Math.round(sequencerPatternHeight / NOTES_SPECTRUM * noteId) - 1;
-                for (let k = 0; k < duration; k++) {
-                    placePixel(startXPosition + k, noteYPosition, color);
-                }
-            }
-        });
-
-        setPatternPixels([pixels]);
-        setColorOverrides(colors);
-    }, [
-        track.instrument,
-        soundData.instruments[track.instrument],
-        pattern.events,
-        sequencerPatternHeight,
-        sequencerPatternWidth,
-    ]);
-
     return (
         <Draggable
             nodeRef={nodeRef}
@@ -291,20 +212,16 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     onResizeStop={onResize}
                 >
                     <>
-                        <CanvasImage
-                            height={sequencerPatternHeight - 1}
-                            palette={'00000000'}
-                            pixelData={patternPixels}
-                            colorOverride={colorOverrides}
-                            width={widthCeil}
-                            displayMode={DisplayMode.Mono}
-                            colorMode={ColorMode.Default}
+                        <PatternCanvas
+                            soundData={soundData}
+                            pattern={pattern}
+                            trackId={trackId}
+                            sequencerPatternHeight={sequencerPatternHeight}
+                            sequencerPatternWidth={sequencerPatternWidth}
                             style={{
-                                height: sequencerPatternHeight,
                                 left: 0,
                                 position: 'absolute',
                                 top: 0,
-                                width: widthCeil,
                             }}
                         />
                         <StyledPatternName>

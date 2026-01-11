@@ -2,7 +2,6 @@ import { environment, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator, 
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
-import { nanoid } from 'nanoid';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
@@ -20,6 +19,7 @@ import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
 import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
+import AddPattern from './Other/AddPattern';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
 import Properties from './Other/Properties';
@@ -31,11 +31,9 @@ import {
     ALL_TRACK_TYPES,
     BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
-    DEFAULT_PATTERN_SIZE,
     DEFAULT_TRACK_SETTINGS,
     EventsMap,
     InstrumentMap,
-    NEW_PATTERN_ID,
     NOTES_LABELS,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
@@ -142,6 +140,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [effectsPanelHidden, setEffectsPanelHidden] = useState<boolean>(true);
     const [eventListHidden, setEventListHidden] = useState<boolean>(true);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
+    const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, step: number, size?: number }>({ trackId: -1, step: -1 });
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
     const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
     const [propertiesDialogOpen, setPropertiesDialogOpen] = useState<boolean>(false);
@@ -849,91 +848,8 @@ A total of {0} instruments will be deleted.",
         setInstrumentDialogOpen(true);
     };
 
-    const addPatternToSequence = async (trackId: number, step: number, patternId: string, size: number): Promise<void> => {
-        const track = soundData.tracks[trackId];
-        // create if it's a new pattern
-        if (patternId === NEW_PATTERN_ID) {
-            const newPatternId = nanoid();
-            const type = services.vesProjectService.getProjectDataType('Sound');
-            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-            const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
-
-            const updatedTracks = [...soundData.tracks];
-            updatedTracks[trackId].sequence = {
-                ...track.sequence,
-                [step.toString()]: newPatternId,
-            };
-
-            const newNameLabel = nls.localizeByDefault('New');
-            let newNameNumber = 1;
-            const patterns = Object.values(soundData.patterns);
-            while (patterns.filter(i => i.name === `${newNameLabel} ${newNameNumber}`).length) {
-                newNameNumber++;
-            }
-
-            updateSoundData({
-                ...soundData,
-                tracks: updatedTracks,
-                patterns: {
-                    ...soundData.patterns,
-                    [newPatternId]: {
-                        ...newPattern,
-                        name: `${newNameLabel} ${newNameNumber}`,
-                        type: track.type,
-                        size,
-                    }
-                }
-            });
-            updateCurrentPatternId(trackId, newPatternId);
-        } else {
-            setTrack(trackId, {
-                ...track,
-                sequence: {
-                    ...track.sequence,
-                    [step.toString()]: patternId,
-                },
-            });
-            updateCurrentPatternId(trackId, patternId);
-        }
-    };
-
-    const showPatternSelection = async (trackId: number, size?: number): Promise<QuickPickItem | undefined> =>
-        services.quickPickService.show(
-            [
-                {
-                    id: NEW_PATTERN_ID,
-                    label: nls.localize('vuengine/editors/sound/newPattern', 'New Pattern'),
-                },
-                ...Object.keys(soundData.patterns)
-                    .filter(patternId =>
-                        soundData.tracks[trackId] !== undefined &&
-                        soundData.patterns[patternId].type === soundData.tracks[trackId].type &&
-                        (size === undefined || size <= 1 || soundData.patterns[patternId].size === size)
-                    )
-                    .map((patternId, i) => ({
-                        id: patternId,
-                        label: getPatternName(soundData, patternId),
-                    }))
-                    .sort((a, b) => a.label.localeCompare(b.label)),
-            ],
-            {
-                title: nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern'),
-                placeholder: size !== undefined && size > 1
-                    ? nls.localize('vuengine/editors/sound/selectPatternOfSizeToAdd', 'Select a pattern to add... (Size: {0})', size)
-                    : nls.localize('vuengine/editors/sound/selectPatternToAdd', 'Select a pattern to add...'),
-            }
-        );
-
-    const addPattern = async (trackId: number, step: number, size?: number): Promise<boolean> => {
-        const patternToAdd = await showPatternSelection(trackId, size);
-        if (patternToAdd && patternToAdd.id) {
-            await addPatternToSequence(trackId, step, patternToAdd.id, size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE);
-            updateCurrentSequenceIndex(currentTrackId, step);
-
-            return true;
-        }
-
-        return false;
+    const addPattern = (trackId: number, step: number, size?: number): void => {
+        setAddPatternDialogOpen({ trackId, step, size });
     };
 
     const confirmOverwrite = async (uri: URI): Promise<boolean> => {
@@ -1403,7 +1319,36 @@ A total of {0} instruments will be deleted.",
                             />
                         </StyledLowerContainer>
                     </>}
-            </VContainer >
+            </VContainer>
+            {addPatternDialogOpen.trackId > -1 &&
+                <PopUpDialog
+                    open={addPatternDialogOpen.trackId > -1}
+                    onClose={() => {
+                        setAddPatternDialogOpen({ trackId: -1, step: -1 });
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setAddPatternDialogOpen({ trackId: -1, step: -1 });
+                        enableCommands();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
+                    height='100%'
+                    width='100%'
+                >
+                    <AddPattern
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        step={addPatternDialogOpen.step}
+                        trackId={addPatternDialogOpen.trackId}
+                        size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
+                        sequencerPatternHeight={sequencerPatternHeight}
+                        sequencerPatternWidth={sequencerPatternWidth}
+                        setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                        setTrack={setTrack}
+                        setAddPatternDialogOpen={setAddPatternDialogOpen}
+                    />
+                </PopUpDialog>
+            }
             {instrumentDialogOpen &&
                 <PopUpDialog
                     open={instrumentDialogOpen}

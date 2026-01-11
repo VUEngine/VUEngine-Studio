@@ -22,7 +22,7 @@ const StyledCanvas = styled.canvas`
 interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
-    addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
+    addPattern: (trackId: number, bar: number, size?: number) => void
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number

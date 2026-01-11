@@ -171,7 +171,7 @@ interface PianoRollProps {
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
     noteSnapping: boolean
-    addPattern: (trackId: number, bar: number, size?: number) => Promise<boolean>
+    addPattern: (trackId: number, bar: number, size?: number) => void
     newNoteDuration: number
     pianoRollNoteHeight: number
     setPianoRollNoteHeight: Dispatch<SetStateAction<number>>
@@ -230,7 +230,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const pattern = soundData.patterns[currentPatternId];
     const songLength = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
 
-    const setPatternAtCursorPosition = async (cursor?: number, size?: number): Promise<boolean> => {
+    const setPatternAtCursorPosition = async (cursor?: number, size?: number): Promise<void> => {
         const noteCursorStep = Math.floor((cursor ?? noteCursor) / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
         let stepToSelect = -1;
         const currentTrack = soundData.tracks[currentTrackId];
@@ -245,9 +245,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
         if (stepToSelect > -1) {
             setCurrentSequenceIndex(currentTrackId, stepToSelect);
-            return true;
         } else {
-            return addPattern(currentTrackId, noteCursorStep, size);
+            addPattern(currentTrackId, noteCursorStep, size);
         }
     };
 

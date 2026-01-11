@@ -58,7 +58,7 @@ interface PianoRollEditorProps {
     newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
-    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<boolean>
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<void>
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
