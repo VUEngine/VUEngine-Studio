@@ -1044,99 +1044,151 @@ A total of {0} instruments will be deleted.",
                 addTrack();
                 break;
             case SoundEditorCommands.PLAY_PAUSE.id:
-                togglePlaying();
+                if (soundData.tracks.length > 0) {
+                    togglePlaying();
+                }
                 break;
             case SoundEditorCommands.STOP.id:
-                stopPlaying();
+                if (soundData.tracks.length > 0) {
+                    stopPlaying();
+                }
                 break;
             case SoundEditorCommands.ADD_PATTERN.id:
-                const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
-                addPattern(currentTrackId, noteCursorStep);
+                if (soundData.tracks.length > 0) {
+                    const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
+                    addPattern(currentTrackId, noteCursorStep);
+                }
                 break;
             case SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id:
-                setNoteSnapping(prev => !prev);
+                if (soundData.tracks.length > 0) {
+                    setNoteSnapping(prev => !prev);
+                }
                 break;
             case SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id:
-                setEventListHidden(prev => !prev);
+                if (soundData.tracks.length > 0) {
+                    setEventListHidden(prev => !prev);
+                }
                 break;
             case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
-                setSequencerHidden(prev => !prev);
+                if (soundData.tracks.length > 0) {
+                    setSequencerHidden(prev => !prev);
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
-                setSequencerPatternHeight(prev =>
-                    prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternHeight(prev =>
+                        prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id:
-                setSequencerPatternHeight(prev =>
-                    prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternHeight(prev =>
+                        prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id:
-                setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id:
-                setSequencerPatternWidth(prev =>
-                    prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternWidth(prev =>
+                        prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id:
-                setSequencerPatternWidth(prev =>
-                    prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternWidth(prev =>
+                        prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id:
-                setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
+                if (soundData.tracks.length > 0) {
+                    setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
-                setPianoRollNoteHeight(prev =>
-                    prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteHeight(prev =>
+                        prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id:
-                setPianoRollNoteHeight(prev =>
-                    prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteHeight(prev =>
+                        prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id:
-                setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id:
-                setPianoRollNoteWidth(prev =>
-                    prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev / 1.2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteWidth(prev =>
+                        prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev / 1.2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id:
-                setPianoRollNoteWidth(prev =>
-                    prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev * 1.2 : prev
-                );
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteWidth(prev =>
+                        prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev * 1.2 : prev
+                    );
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
-                setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
+                if (soundData.tracks.length > 0) {
+                    setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
+                }
                 break;
             case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
-                removeUnusedPatterns();
+                if (soundData.tracks.length > 0) {
+                    removeUnusedPatterns();
+                    setToolsDialogOpen(false);
+                }
                 break;
             case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
-                removeUnusedInstruments();
+                if (soundData.tracks.length > 0) {
+                    removeUnusedInstruments();
+                    setToolsDialogOpen(false);
+                }
                 break;
             case SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id:
-                editInstrument(currentInstrumentId);
+                if (soundData.tracks.length > 0) {
+                    editInstrument(currentInstrumentId);
+                }
                 break;
             case SoundEditorCommands.IMPORT.id:
                 importFile();
                 break;
             case SoundEditorCommands.EXPORT.id:
-                exportFile();
+                if (soundData.tracks.length > 0) {
+                    exportFile();
+                }
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
-                selectAllNotesInCurrentPattern();
+                if (soundData.tracks.length > 0) {
+                    selectAllNotesInCurrentPattern();
+                }
                 break;
             case SoundEditorCommands.COPY_SELECTED_NOTES.id:
-                copyNotes();
+                if (soundData.tracks.length > 0) {
+                    copyNotes();
+                }
                 break;
             case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
-                pasteNotes();
+                if (soundData.tracks.length > 0) {
+                    pasteNotes();
+                }
                 break;
         }
     };
@@ -1212,7 +1264,7 @@ A total of {0} instruments will be deleted.",
                 {soundData.tracks.length === 0
                     ? <VContainer grow={1} style={{ position: 'relative' }}>
                         <EmptyContainer
-                            title={nls.localize('vuengine/editors/sound/songIsEmpty', 'This song is empty')}
+                            title={nls.localize('vuengine/editors/sound/soundIsEmpty', 'This sound is empty')}
                             description={nls.localize(
                                 'vuengine/editors/sound/clickBelowToAddFirstTrack',
                                 'Click below to add the first track',
@@ -1396,30 +1448,28 @@ A total of {0} instruments will be deleted.",
                     <VContainer gap={15}>
                         <ImportExport
                             soundData={soundData}
-                            updateSoundData={updateSoundData}
-                            setToolsDialogOpen={setToolsDialogOpen}
-                            setTrackSettings={setTrackSettings}
-                            setCurrentSequenceIndex={updateCurrentSequenceIndex}
                         />
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/editors/sound/clean', 'Clean')}
-                            </label>
-                            <HContainer>
-                                <button
-                                    className='theia-button secondary'
-                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id)}
-                                >
-                                    {SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label}
-                                </button>
-                                <button
-                                    className='theia-button secondary'
-                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id)}
-                                >
-                                    {SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label}
-                                </button>
-                            </HContainer>
-                        </VContainer>
+                        {soundData.tracks.length > 0 &&
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/editors/sound/clean', 'Clean')}
+                                </label>
+                                <HContainer>
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id)}
+                                    >
+                                        {SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label}
+                                    </button>
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id)}
+                                    >
+                                        {SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label}
+                                    </button>
+                                </HContainer>
+                            </VContainer>
+                        }
                     </VContainer>
                 </PopUpDialog>
             }

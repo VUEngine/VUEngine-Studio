@@ -1,21 +1,18 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import { SoundData, TrackSettings } from '../SoundEditorTypes';
 import { SoundEditorCommands } from '../SoundEditorCommands';
+import { SoundData } from '../SoundEditorTypes';
 
 interface ImportExportProps {
     soundData: SoundData
-    updateSoundData: (soundData: SoundData) => void
-    setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
-    setTrackSettings: Dispatch<SetStateAction<TrackSettings[]>>
-    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
 }
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
+    const { soundData } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
     return <VContainer>
@@ -64,12 +61,15 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             >
                 {nls.localize('vuengine/editors/sound/import', 'Import')}
             </button>
-            <button
-                className='theia-button secondary'
-                onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
-            >
-                {nls.localize('vuengine/editors/sound/export', 'Export')}
-            </button>
+
+            {soundData.tracks.length > 0 &&
+                <button
+                    className='theia-button secondary'
+                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
+                >
+                    {nls.localize('vuengine/editors/sound/export', 'Export')}
+                </button>
+            }
         </HContainer>
     </VContainer>;
 }

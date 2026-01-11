@@ -4,6 +4,7 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import styled from 'styled-components';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
+import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
@@ -46,7 +47,6 @@ import {
     WAVEFORM_MAX
 } from '../SoundEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import Checkbox from '../../Common/Base/Checkbox';
 
 const ColoredDiv = styled.div`
     cursor: pointer;
