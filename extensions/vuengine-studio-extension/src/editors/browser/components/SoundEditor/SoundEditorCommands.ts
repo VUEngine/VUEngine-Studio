@@ -225,11 +225,12 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 's',
     };
-    export const TOGGLE_EFFECTS_VISIBILITY: EditorCommand = {
-        id: 'editors.soundEditor.toggleEffectsVisibility',
-        label: nls.localize('vuengine/editors/sound/commands/toggleEffectsVisibility', 'Toggle Effects Visibility'),
+    export const TOGGLE_EFFECTS_PANEL_VISIBILITY: EditorCommand = {
+        id: 'editors.soundEditor.toggleEffectsPanelVisibility',
+        label: nls.localize('vuengine/editors/sound/commands/toggleEffectsPanelVisibility', 'Toggle Effects Panel Visibility'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'f',
+        disabled: true,
     };
     export const OPEN_INSTRUMENT_EDITOR: EditorCommand = {
         id: 'editors.soundEditor.openInstrumentEditor',

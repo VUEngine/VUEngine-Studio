@@ -97,7 +97,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
-            case SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id:
+            case SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.id:
                 toggleEffectsPanel();
                 break;
         }
@@ -151,7 +151,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
             <StyledToggleButton
                 onClick={toggleEffectsPanel}
                 title={
-                    `${SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_EFFECTS_VISIBILITY.id, true)}`
+                    `${SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                        SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.id, true
+                    )}`
                 }
                 style={{
                     width: '100%',

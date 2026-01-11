@@ -142,6 +142,9 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         EditorsCommands.map(editor => {
             Object.values(editor).map(command => {
+                if (command.disabled) {
+                    return;
+                }
                 commandRegistry.registerCommand({
                     id: command.id,
                     label: command.label,

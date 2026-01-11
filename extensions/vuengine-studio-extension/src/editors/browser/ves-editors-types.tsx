@@ -76,6 +76,7 @@ export interface EditorCommand {
     label: string
     category: string
     keybinding?: string | string[]
+    disabled?: boolean
 }
 
 export interface EditorCommands {

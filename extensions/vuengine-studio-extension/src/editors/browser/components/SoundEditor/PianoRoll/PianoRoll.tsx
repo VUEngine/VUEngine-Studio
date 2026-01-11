@@ -27,7 +27,6 @@ import {
     SUB_NOTE_RESOLUTION,
     TrackSettings
 } from '../SoundEditorTypes';
-import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
@@ -205,7 +204,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
-        effectsPanelHidden, setEffectsPanelHidden,
+        effectsPanelHidden, /* setEffectsPanelHidden, */
         eventListHidden, setEventListHidden,
         setNotes,
         setNoteEvent,
@@ -659,6 +658,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
             />
+            { /* }
             <NoteProperties
                 soundData={soundData}
                 noteCursor={noteCursor}
@@ -671,6 +671,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 pianoRollScrollWindow={pianoRollScrollWindow}
             />
+            { */ }
         </StyledPianoRoll>
     </StyledPianoRollContainer>;
 }
