@@ -11,7 +11,7 @@ import EmptyContainer from '../../Common/EmptyContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
 import { getInstrumentName } from '../SoundEditor';
-import { InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
+import { InstrumentConfig, InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
 import Instrument from './Instrument';
 
 export const InputWithAction = styled.div`
@@ -120,7 +120,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     const addInstrument = async () => {
         const type = services.vesProjectService.getProjectDataType('Sound');
         const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
-        const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties);
+        const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties) as InstrumentConfig;
         if (!newInstrument) {
             return;
         }
@@ -133,12 +133,21 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             newNameNumber++;
         }
 
-        setInstruments({
-            ...soundData.instruments,
-            [newId]: {
-                ...newInstrument,
-                name: `${newNameLabel} ${newNameNumber}`,
+        updateSoundData({
+            ...soundData,
+            instruments: {
+                ...soundData.instruments,
+                [newId]: {
+                    ...newInstrument,
+                    name: `${newNameLabel} ${newNameNumber}`,
+                },
             },
+            tracks: [...soundData.tracks].map(t => {
+                if (t.type === newInstrument.type && t.instrument === '') {
+                    t.instrument = newId;
+                }
+                return t;
+            })
         });
         setSelectedInstrumentId(newId);
     };

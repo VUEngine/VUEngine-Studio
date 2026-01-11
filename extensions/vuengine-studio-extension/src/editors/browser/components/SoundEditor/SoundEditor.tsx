@@ -288,26 +288,22 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             setCurrentTrackId(trackId);
             setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
         }
-        let sequenceIndex = -1;
-        for (const [step, pId] of Object.entries(soundData.tracks[trackId].sequence)) {
-            if (pId === patternId) {
-                sequenceIndex = parseInt(step);
-                break;
-            }
-        }
-        setCurrentSequenceIndex(sequenceIndex);
+
         setSelectedNotes([]);
-        setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
-        const track = soundData.tracks[trackId];
-        const sequence = track?.sequence;
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
             setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
         }
-        setCurrentPatternId(sequence && sequence[sequenceIndex] ? sequence[sequenceIndex] : '');
+
+        const track = soundData.tracks[trackId];
+        const sequence = track?.sequence;
+        if (sequence && sequence[sequenceIndex]) {
+            setCurrentPatternId(sequence[sequenceIndex]);
+        }
+
         setCurrentSequenceIndex(sequenceIndex);
         setSelectedNotes([]);
         setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
@@ -1128,6 +1124,7 @@ A total of {0} instruments will be deleted.",
                                 currentPlayerPosition={currentPlayerPosition}
                                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                                 currentPatternId={currentPatternId}
+                                setCurrentPatternId={updateCurrentPatternId}
                                 currentTrackId={currentTrackId}
                                 setCurrentTrackId={updateCurrentTrackId}
                                 currentSequenceIndex={currentSequenceIndex}
@@ -1278,6 +1275,7 @@ A total of {0} instruments will be deleted.",
                         size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
                         sequencerPatternHeight={sequencerPatternHeight}
                         sequencerPatternWidth={sequencerPatternWidth}
+                        setCurrentPatternId={updateCurrentPatternId}
                         setCurrentSequenceIndex={updateCurrentSequenceIndex}
                         setTrack={setTrack}
                         setAddPatternDialogOpen={setAddPatternDialogOpen}

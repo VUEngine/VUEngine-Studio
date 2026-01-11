@@ -39,8 +39,8 @@ const CurrentlyPlacingNote = styled.div`
 
 const Marquee = styled.div`
     background: var(--theia-selection-background);
-    border-left: 1px dashed var(--theia-focusBorder);
-    border-right: 1px dashed var(--theia-focusBorder);
+    border: 1px dashed var(--theia-focusBorder);
+    border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
 `;
@@ -86,14 +86,14 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     const [noteDragEndStep, setNoteDragEndStep] = useState<number>(-1);
     const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
     const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
+    const [marqueeStartNote, setMarqueeStartNote] = useState<number>(-1);
+    const [marqueeEndNote, setMarqueeEndNote] = useState<number>(-1);
 
     return <StyledPianoRollEditor
         onMouseOut={() => {
             setNoteDragNoteId(-1);
             setNoteDragStartStep(-1);
             setNoteDragEndStep(-1);
-            setMarqueeStartStep(-1);
-            setMarqueeEndStep(-1);
         }}
         style={{
             width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
@@ -121,10 +121,10 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
             {marqueeStartStep > -1 &&
                 <Marquee
                     style={{
-                        bottom: 0,
+                        height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
                         left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                        top: 0,
-                        width: pianoRollNoteWidth * (Math.abs(marqueeStartStep - marqueeEndStep) + 1),
+                        top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
+                        width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
                     }}
                 />
             }
@@ -150,6 +150,10 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setMarqueeStartStep={setMarqueeStartStep}
                 marqueeEndStep={marqueeEndStep}
                 setMarqueeEndStep={setMarqueeEndStep}
+                marqueeStartNote={marqueeStartNote}
+                setMarqueeStartNote={setMarqueeStartNote}
+                marqueeEndNote={marqueeEndNote}
+                setMarqueeEndNote={setMarqueeEndNote}
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}

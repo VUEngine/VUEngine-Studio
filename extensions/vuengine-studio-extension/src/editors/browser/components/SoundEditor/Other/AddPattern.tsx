@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
@@ -65,6 +65,7 @@ interface AddPatternProps {
     sequencerPatternWidth: number
     size?: number
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, step: number, size?: number }>>
 }
@@ -77,6 +78,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         trackId,
         size,
         setTrack,
+        setCurrentPatternId,
         setCurrentSequenceIndex,
         setAddPatternDialogOpen,
     } = props;
@@ -88,7 +90,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         const track = soundData.tracks[trackId];
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
-            const newPatternId = nanoid();
+            patternId = nanoid();
             const type = services.vesProjectService.getProjectDataType('Sound');
             const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
             const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
@@ -96,7 +98,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             const updatedTracks = [...soundData.tracks];
             updatedTracks[trackId].sequence = {
                 ...track.sequence,
-                [step.toString()]: newPatternId,
+                [step.toString()]: patternId,
             };
 
             const newNameLabel = nls.localizeByDefault('New');
@@ -111,7 +113,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                 tracks: updatedTracks,
                 patterns: {
                     ...soundData.patterns,
-                    [newPatternId]: {
+                    [patternId]: {
                         ...newPattern,
                         name: `${newNameLabel} ${newNameNumber}`,
                         type: track.type,
@@ -129,8 +131,9 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             });
         }
 
-        setCurrentSequenceIndex(trackId, step);
         setAddPatternDialogOpen({ trackId: -1, step: -1 });
+        setCurrentSequenceIndex(trackId, step);
+        setCurrentPatternId(trackId, patternId);
     };
 
     const trackType = soundData.tracks[trackId].type;
@@ -193,14 +196,14 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         </StyledNewPattern>
 
         {Object.values(SoundEditorTrackType).map(t => (
-            <>
+            <Fragment key={t}>
                 {
                     patternMap[t].length > 0 &&
                     <VContainer>
                         <label>{TRACK_TYPE_LABELS[t]}</label>
                         <HContainer gap={10} wrap='wrap'>
                             {patternMap[t].map(p =>
-                                <StyledPattern onClick={() => addPatternToSequence(p.id)}>
+                                <StyledPattern key={p.id} onClick={() => addPatternToSequence(p.id)}>
                                     <VContainer grow={1}>
                                         <PatternCanvas
                                             soundData={soundData}
@@ -224,7 +227,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                         </HContainer>
                     </VContainer>
                 }
-            </>
+            </Fragment>
         ))}
     </VContainer>;
 }

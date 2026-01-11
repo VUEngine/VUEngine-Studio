@@ -96,7 +96,18 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             type,
         };
 
-        setInstruments(updatedInstruments);
+        updateSoundData({
+            ...soundData,
+            instruments: updatedInstruments,
+            tracks: [...soundData.tracks].map(t => {
+                if (t.type !== type && t.instrument === instrumentId) {
+                    t.instrument = '';
+                } else if (t.type === type && t.instrument === '') {
+                    t.instrument = instrumentId;
+                }
+                return t;
+            })
+        });
     };
 
     const setStereoLevel = (side: 'left' | 'right', value: number) => {

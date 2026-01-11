@@ -120,6 +120,7 @@ interface SequencerProps {
     currentTrackId: number
     setCurrentTrackId: Dispatch<SetStateAction<number>>
     currentPatternId: string
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
@@ -157,7 +158,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
         currentTrackId, setCurrentTrackId,
-        currentPatternId,
+        currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
         toggleTrackMuted,
@@ -544,6 +545,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                         currentPatternId={currentPatternId}
                         currentSequenceIndex={currentSequenceIndex}
                         setCurrentSequenceIndex={setCurrentSequenceIndex}
+                        setCurrentPatternId={setCurrentPatternId}
                         setPatternDialogOpen={setPatternDialogOpen}
                         sequencerPatternHeight={sequencerPatternHeight}
                         sequencerPatternWidth={sequencerPatternWidth}

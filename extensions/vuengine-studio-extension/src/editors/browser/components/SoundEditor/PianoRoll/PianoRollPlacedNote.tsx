@@ -392,11 +392,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const onMouseDown = (e: MouseEvent) => {
         if (e.button === 0) {
             if (e.shiftKey) {
-                setSelectedNotes(prev =>
-                    [...prev, step]
-                        .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-                        .sort()
-                );
+                if (selectedNotes.includes(step)) {
+                    setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
+                } else {
+                    setSelectedNotes(prev => [...prev, step].sort());
+                }
             } else {
                 const stepEvent = events[localStep];
                 if (stepEvent) {

@@ -71,6 +71,7 @@ interface SequencerPlacedPatternProps {
     patternId: string
     currentTrackId: number
     currentPatternId: string
+    setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
@@ -86,7 +87,8 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         step,
         trackId,
         pattern, patternId,
-        currentTrackId, currentPatternId,
+        currentTrackId,
+        currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setPatternDialogOpen,
         sequencerPatternHeight, sequencerPatternWidth,
@@ -145,7 +147,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             ...soundData,
             tracks: updatedTracks,
         });
+
         setCurrentSequenceIndex(newTrackId, newBar);
+        setCurrentPatternId(newTrackId, patternId);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
