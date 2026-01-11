@@ -253,6 +253,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setTestNote(note);
         setTestInstrumentId(instrumentId);
         setPlaying(!!note);
+        setCurrentPlayerPosition(-1);
     };
 
     const updateCurrentTrackId = (id: number): void => {
@@ -1173,7 +1174,7 @@ A total of {0} instruments will be deleted.",
                     currentPlayerPosition={currentPlayerPosition}
                     setCurrentPlayerPosition={setCurrentPlayerPosition}
                     currentSequenceIndex={currentSequenceIndex}
-                    playing={playing && !testNote}
+                    playing={playing}
                     emulatorInitialized={emulatorInitialized}
                     setEmulatorInitialized={setEmulatorInitialized}
                     emulatorRomReady={emulatorRomReady}
@@ -1336,6 +1337,7 @@ A total of {0} instruments will be deleted.",
                         playingTestNote={playing && !!testNote}
                         playNote={playNote}
                         emulatorInitialized={emulatorInitialized}
+                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                     />
                 </PopUpDialog>
             }

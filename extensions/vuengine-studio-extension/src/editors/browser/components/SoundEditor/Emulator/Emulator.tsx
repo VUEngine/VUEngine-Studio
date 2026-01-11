@@ -20,6 +20,7 @@ const EmulatorContainer = styled.div`
 interface EmulatorProps {
     soundData: SoundData
     playing: boolean
+    testNote: string
     setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
     emulatorRomReady: boolean
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
@@ -37,6 +38,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const {
         soundData,
         playing,
+        testNote,
         setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
         currentPlayerPosition, setCurrentPlayerPosition,
@@ -134,7 +136,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     const setProgressInterval = (): void => {
         unsetProgressInterval();
 
-        if (playing) {
+        if (playing && !testNote) {
             readCurrentPlayerPosition();
             setProgressTimeout(setInterval(() => {
                 readCurrentPlayerPosition();

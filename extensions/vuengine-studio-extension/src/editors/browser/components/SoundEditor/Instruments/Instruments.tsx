@@ -89,6 +89,7 @@ interface InstrumentsProps {
     playingTestNote: boolean
     playNote: (note: string, instrumentId?: string) => void
     emulatorInitialized: boolean
+    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
 }
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
@@ -101,6 +102,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         playingTestNote,
         playNote,
         emulatorInitialized,
+        setForcePlayerRomRebuild,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [typeFilter, setTypeFilter] = useState<SoundEditorTrackType[]>([
@@ -172,7 +174,14 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                         onClick={() => playingTestNote ? playNote('') : playNote(testNote, selectedInstrumentId)}
                         disabled={!emulatorInitialized}
                     >
-                        <i className={`fa fa-${playingTestNote ? 'pause' : 'play'}`} />
+                        <i className={`codicon codicon-debug-${playingTestNote ? 'pause' : 'start'}`} />
+                    </button>
+                    <button
+                        className="theia-button secondary"
+                        onClick={() => setForcePlayerRomRebuild(prev => prev + 1)}
+                        disabled={!emulatorInitialized}
+                    >
+                        <i className="codicon codicon-debug-restart" />
                     </button>
                 </HContainer>
             </VContainer>

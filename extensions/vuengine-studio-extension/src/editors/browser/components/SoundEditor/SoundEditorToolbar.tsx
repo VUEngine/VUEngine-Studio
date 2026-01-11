@@ -172,6 +172,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setTrack,
         forcePlayerRomRebuild,
     } = props;
+    const isPlayingRegular = playing && !testNote;
 
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
@@ -257,17 +258,17 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
             {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarWideButton
-                        className={`theia-button ${playing ? 'primary' : 'secondary'}`}
-                        title={(playing
+                        className={`theia-button ${isPlayingRegular ? 'primary' : 'secondary'}`}
+                        title={(isPlayingRegular
                             ? nls.localize('vuengine/editors/sound/pause', 'Pause')
                             : nls.localize('vuengine/editors/sound/play', 'Play')) +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
                         }
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.PLAY_PAUSE.id)}
-                        style={{ outlineWidth: playing ? 1 : 0 }}
+                        style={{ outlineWidth: isPlayingRegular ? 1 : 0 }}
                         disabled={!emulatorInitialized}
                     >
-                        <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
+                        <i className={`fa fa-${isPlayingRegular ? 'pause' : 'play'}`} />
                     </StyledSoundEditorToolbarWideButton>
                     <StyledSoundEditorToolbarButton
                         className='theia-button secondary'
@@ -302,6 +303,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <StyledSoundEditorToolbarVisualization>
                         <Emulator
                             playing={playing}
+                            testNote={testNote}
                             setEmulatorInitialized={setEmulatorInitialized}
                             emulatorRomReady={emulatorRomReady}
                             setEmulatorRomReady={setEmulatorRomReady}
