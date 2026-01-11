@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -161,7 +161,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left + sequencerScrollWindow.x;
         const y = e.clientY - rect.top;
@@ -190,7 +190,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0) { // Left mouse button
             if (patternDragTrackId !== -1 && patternDragStartStep !== -1 && patternDragEndStep !== -1) {
                 const newPatternStep = Math.min(patternDragStartStep, patternDragEndStep);
@@ -235,7 +235,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
         if (patternDragTrackId !== -1 && patternDragStartStep !== -1 && patternDragEndStep !== -1) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + sequencerScrollWindow.x;

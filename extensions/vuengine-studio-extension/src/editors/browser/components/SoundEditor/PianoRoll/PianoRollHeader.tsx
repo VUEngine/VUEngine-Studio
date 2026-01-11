@@ -31,6 +31,7 @@ export const MetaLine = styled.div`
 export const MetaLineHeader = styled.div`
     background: var(--theia-editor-background);
     border-bottom: 1px solid rgba(255, 255, 255, .6);
+    border-left: 1px solid rgba(255, 255, 255, .6);
     border-right: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     display: flex;

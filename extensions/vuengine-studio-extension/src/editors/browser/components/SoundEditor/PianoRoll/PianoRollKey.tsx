@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { NOTES_LABELS, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
@@ -81,11 +81,11 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
         classNames.push('last');
     }
 
-    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent<HTMLDivElement>) => {
         playNote(note);
     };
 
-    const onMouseUp = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseUp = (e: MouseEvent<HTMLDivElement>) => {
         playNote('');
     };
 

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction } from 'react';
 import styled from 'styled-components';
 import { getPatternName } from '../SoundEditor';
 import {
@@ -70,15 +70,15 @@ export default function PianoRollHeaderPlacedPattern(props: PianoRollHeaderPlace
         classNames.push('current');
     }
 
-    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+    const onClick = (e: MouseEvent<HTMLDivElement>) => {
         setCurrentSequenceIndex(currentTrackId, step);
     };
 
-    const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
+    const onDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
         setPatternDialogOpen(true);
     };
 
-    const onContextMenu = (e: React.MouseEvent<HTMLElement>) => {
+    const onContextMenu = (e: MouseEvent<HTMLDivElement>) => {
         removePatternFromSequence(currentTrackId, step);
     };
 

@@ -31,7 +31,6 @@ import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
-import { sortObjectByKeys } from '../../Common/Utils';
 
 const StyledPianoRollContainer = styled.div`
     display: flex;
@@ -332,6 +331,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         isSelected={selectedNotes.includes(step)}
                         noteDragDelta={noteDragDelta}
                         setNoteDragDelta={setNoteDragDelta}
+                        newNoteDuration={newNoteDuration}
                     />
                 );
             }
@@ -353,24 +353,24 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         switch (commandId) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
-                    setNoteCursor(noteCursor + SUB_NOTE_RESOLUTION);
+                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + SUB_NOTE_RESOLUTION);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id:
                 if (noteCursor >= SUB_NOTE_RESOLUTION) {
-                    setNoteCursor(noteCursor - SUB_NOTE_RESOLUTION);
+                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id:
                 if (noteCursor < songLength - BAR_NOTE_RESOLUTION) {
-                    setNoteCursor(noteCursor + BAR_NOTE_RESOLUTION);
+                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + BAR_NOTE_RESOLUTION);
                 } /* else {
                     setNoteCursor(songSize - SUB_NOTE_RESOLUTION);
                 } */
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR.id:
                 if (noteCursor >= BAR_NOTE_RESOLUTION) {
-                    setNoteCursor(noteCursor - BAR_NOTE_RESOLUTION);
+                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - BAR_NOTE_RESOLUTION);
                 } /* else {
                     setNoteCursor(0);
                 } */
@@ -382,10 +382,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         const currentNoteId = pattern.events[sn][SoundEvent.Note];
                         const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - 1;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesUp[sn] = sortObjectByKeys({
+                            notesUp[sn] = {
                                 ...pattern.events[sn],
                                 [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            });
+                            };
                         }
                     }
                 });
@@ -400,10 +400,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         const currentNoteId = pattern.events[sn][SoundEvent.Note];
                         const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + 1;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesDown[sn] = sortObjectByKeys({
+                            notesDown[sn] = {
                                 ...pattern.events[sn],
                                 [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            });
+                            };
                         }
                     }
                 });
@@ -418,10 +418,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         const currentNoteId = pattern.events[sn][SoundEvent.Note];
                         const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - NOTES_PER_OCTAVE;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesUpOctave[sn] = sortObjectByKeys({
+                            notesUpOctave[sn] = {
                                 ...pattern.events[sn],
                                 [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            });
+                            };
                         }
                     }
                 });
@@ -436,10 +436,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                         const currentNoteId = pattern.events[sn][SoundEvent.Note];
                         const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + NOTES_PER_OCTAVE;
                         if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesDownOctave[sn] = sortObjectByKeys({
+                            notesDownOctave[sn] = {
                                 ...pattern.events[sn],
                                 [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            });
+                            };
                         }
                     }
                 });

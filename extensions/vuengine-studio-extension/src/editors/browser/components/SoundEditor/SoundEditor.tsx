@@ -734,12 +734,21 @@ A total of {0} instruments will be deleted.",
                 };
 
                 // remove explicit default instrument
-                if (currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID) {
-                    if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined) {
-                        delete (updatedEvents[stepInt][SoundEvent.Instrument]);
+                const currentTrack = soundData.tracks[currentTrackId];
+                if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined && updatedEvents[stepInt][SoundEvent.Instrument] === currentTrack?.instrument) {
+                    delete (updatedEvents[stepInt][SoundEvent.Instrument]);
+                }
+
+                // remove events with empty value
+                Object.keys(updatedEvents[stepInt]).forEach(e => {
+                    if (updatedEvents[stepInt][e] === '') {
+                        delete updatedEvents[stepInt][e];
                     }
-                } else {
-                    updatedEvents[stepInt][SoundEvent.Instrument] = currentInstrumentId;
+                });
+
+                // if no events remain, remove entirely
+                if (Object.keys(updatedEvents[stepInt]).length === 0) {
+                    delete updatedEvents[stepInt];
                 }
 
                 // ensure clean key order
@@ -770,6 +779,7 @@ A total of {0} instruments will be deleted.",
         });
     };
 
+    // TODO: remove and replace all usage with setNotes()
     const setNoteEvent = (notes: SetNoteEventProps[]): void => {
         const currentPattern = soundData.patterns[currentPatternId];
 
@@ -1093,12 +1103,12 @@ A total of {0} instruments will be deleted.",
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id:
                 setPianoRollNoteWidth(prev =>
-                    prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev - 1 : prev
+                    prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev / 1.2 : prev
                 );
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id:
                 setPianoRollNoteWidth(prev =>
-                    prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev + 1 : prev
+                    prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev * 1.2 : prev
                 );
                 break;
             case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
@@ -1255,9 +1265,11 @@ A total of {0} instruments will be deleted.",
                             {!eventListHidden &&
                                 <EventList
                                     soundData={soundData}
+                                    currentTrackId={currentTrackId}
                                     currentSequenceIndex={currentSequenceIndex}
                                     pattern={soundData.patterns[currentPatternId]}
                                     noteCursor={noteCursor}
+                                    setNotes={setNotes}
                                     setNoteCursor={updateNoteCursor}
                                 />
                             }

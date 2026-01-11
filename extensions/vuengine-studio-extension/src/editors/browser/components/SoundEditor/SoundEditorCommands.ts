@@ -121,25 +121,25 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.pianoRollSelectNextStep',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextStep', 'Piano Roll: Select Next Step'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'ctrlcmd+right',
+        keybinding: 'right',
     };
     export const PIANO_ROLL_SELECT_PREVIOUS_STEP: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectPreviousStep',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousStep', 'Piano Roll: Select Previous Step'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'ctrlcmd+left',
+        keybinding: 'left',
     };
     export const PIANO_ROLL_SELECT_NEXT_BAR: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectNextBar',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextBar', 'Piano Roll: Select Next Bar'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'ctrlcmd+shift+right',
+        keybinding: 'shift+right',
     };
     export const PIANO_ROLL_SELECT_PREVIOUS_BAR: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectPreviousBar',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousBar', 'Piano Roll: Select Previous Bar'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'ctrlcmd+shift+left',
+        keybinding: 'shift+left',
     };
     export const PIANO_ROLL_VERTICAL_SCALE_REDUCE: EditorCommand = {
         id: 'editors.soundEditor.pianoRollVerticalScaleReduce',
@@ -175,25 +175,25 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.notesUp',
         label: nls.localize('vuengine/editors/sound/commands/notesUp', 'Move Selected Note Up'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'up',
+        keybinding: 'ctrlcmd+up',
     };
     export const NOTES_DOWN: EditorCommand = {
         id: 'editors.soundEditor.notesDown',
         label: nls.localize('vuengine/editors/sound/commands/notesDown', 'Move Selected Note Down'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'down',
+        keybinding: 'ctrlcmd+down',
     };
     export const NOTES_UP_AN_OCTAVE: EditorCommand = {
         id: 'editors.soundEditor.notesUpAnOctave',
         label: nls.localize('vuengine/editors/sound/commands/notesUpAnOctave', 'Move Selected Notes Up 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+up',
+        keybinding: 'ctrlcmd+shift+up',
     };
     export const NOTES_DOWN_AN_OCTAVE: EditorCommand = {
         id: 'editors.soundEditor.notesDownAnOctave',
         label: nls.localize('vuengine/editors/sound/commands/notesDownAnOctave', 'Move Selected Notes Down 1 Octave'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+down',
+        keybinding: 'ctrlcmd+shift+down',
     };
     export const SELECT_PATTERN_AT_CURSOR_POSITION: EditorCommand = {
         id: 'editors.soundEditor.selectPatternAtCursorPosition',

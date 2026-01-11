@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { MouseEvent, useContext, useEffect, useRef } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
@@ -86,7 +86,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         drawGrid(canvas, context, currentThemeType, songLength, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
     };
 
-    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         expandPanel();
     };
 

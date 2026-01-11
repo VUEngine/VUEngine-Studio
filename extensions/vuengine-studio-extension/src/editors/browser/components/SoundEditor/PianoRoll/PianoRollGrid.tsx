@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -112,7 +112,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         if (!highContrastTheme) {
             context.fillStyle = lowColor;
             context.fillRect(
-                noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
+                noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x,
                 0,
                 pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
                 NOTES_SPECTRUM * pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
@@ -225,7 +225,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         });
     };
 
-    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0) { // Left mouse button
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
@@ -259,7 +259,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseUp = async (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseUp = async (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0) { // Left mouse button
             if (noteDragNoteId === -1 || noteDragStartStep === -1 || noteDragEndStep === -1) {
                 return;
@@ -342,7 +342,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
         if (isDragScrolling) {
             if (e.movementX > 0 || e.movementY > 0) {
                 pianoRollRef.current?.scrollBy({
@@ -388,7 +388,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
     };
 
-    const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
         // setIsDragScrolling(false);
     };
 

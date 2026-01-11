@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -176,7 +176,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.stroke();
     };
 
-    const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0) {
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
@@ -194,7 +194,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         }
     };
 
-    const onMouseUp = async (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const y = e.clientY - rect.top;
 
@@ -232,7 +232,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         }
     };
 
-    const onMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
         if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;

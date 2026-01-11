@@ -121,6 +121,7 @@ interface PianoRollPlacedNoteProps {
     isSelected: boolean
     noteDragDelta: { x: number, y: number }
     setNoteDragDelta: Dispatch<SetStateAction<{ x: number, y: number }>>
+    newNoteDuration: number
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -141,6 +142,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         selectedNotes, setSelectedNotes,
         isSelected,
         noteDragDelta, setNoteDragDelta,
+        newNoteDuration,
     } = props;
     const [isDragging, setIsDragging] = useState(false);
     const nodeRef = useRef(null);
@@ -152,7 +154,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const left = PIANO_ROLL_KEY_WIDTH + 2 + step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
     const top = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + noteId * pianoRollNoteHeight;
-    const width = duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH;
+    const width = Math.max(
+        duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH,
+        1
+    );
 
     const classNames = ['placedNote'];
     if (selected) {
@@ -259,7 +264,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         ]
     );
 
-    const minWidth = noteSnapping ? pianoRollNoteWidth : 1;
+    const gridWidth = noteSnapping
+        ? pianoRollNoteWidth * newNoteDuration / SUB_NOTE_RESOLUTION
+        : 1;
     const maxWidth = pianoRollNoteWidth * maxDuration / SUB_NOTE_RESOLUTION;
 
     const getNoteSlide = () => {
@@ -336,6 +343,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
+        e.stopPropagation();
+        setNoteDragDelta({ x: 0, y: 0 });
+        setIsDragging(false);
+
         const newStep = (noteSnapping
             ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
             : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
@@ -344,6 +355,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
         const newStepDifference = newStep - localStep;
         const newNoteDifference = newNoteId - noteId;
+
+        if (newStepDifference === 0 && newNoteDifference === 0) {
+            return;
+        }
 
         const notes: EventsMap = {};
 
@@ -371,12 +386,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         });
 
         setNotes(notes);
-
-        setSelectedNotes(Object.values(notes).filter(n => n.step !== undefined).map(n => n.step));
-        setNoteDragDelta({ x: 0, y: 0 });
-        setIsDragging(false);
-
-        e.stopPropagation();
+        setSelectedNotes(Object.keys(notes).map(n => parseInt(n)));
     };
 
     const onMouseDown = (e: MouseEvent) => {
@@ -407,7 +417,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     return (
         <Draggable
             nodeRef={nodeRef}
-            grid={[minWidth, pianoRollNoteHeight]}
+            grid={[gridWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
             onStart={onDragStart}
@@ -444,10 +454,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     width={width}
                     height={pianoRollNoteHeight}
                     draggableOpts={{
-                        grid: [minWidth, pianoRollNoteHeight]
+                        grid: [gridWidth, pianoRollNoteHeight]
                     }}
                     axis="x"
-                    minConstraints={[minWidth, pianoRollNoteHeight]}
+                    minConstraints={[gridWidth, pianoRollNoteHeight]}
                     maxConstraints={[maxWidth, pianoRollNoteHeight]}
                     resizeHandles={['e']}
                     onResizeStop={onResize}
@@ -468,10 +478,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             width={width}
                             height={slideUpHeight}
                             draggableOpts={{
-                                grid: [minWidth, pianoRollNoteHeight]
+                                grid: [gridWidth, pianoRollNoteHeight]
                             }}
                             axis="y"
-                            minConstraints={[minWidth, 0]}
+                            minConstraints={[gridWidth, 0]}
                             maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
                             resizeHandles={['n']}
                             onResizeStop={onNoteSlideUpResize}
@@ -491,10 +501,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             width={width}
                             height={slideDownHeight}
                             draggableOpts={{
-                                grid: [minWidth, pianoRollNoteHeight]
+                                grid: [gridWidth, pianoRollNoteHeight]
                             }}
                             axis="y"
-                            minConstraints={[minWidth, 0]}
+                            minConstraints={[gridWidth, 0]}
                             maxConstraints={[maxWidth, pianoRollNoteHeight * NOTES_SPECTRUM]}
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
