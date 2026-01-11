@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArcherContainerRef, ArcherElement } from 'react-archer';
 import { AnchorPositionType, RelationType } from 'react-archer/lib/types';
 import Draggable, { ControlPosition, DraggableData, DraggableEvent } from 'react-draggable';
@@ -111,6 +111,7 @@ export default function StagePreview(props: StagePreviewProps): React.JSX.Elemen
     const { id, stage, archerRef, positions, setPosition, current, scale, relations, onClick } = props;
     const position = positions && positions[id] ? positions[id] : { x: 0, y: 0 };
     const [pos, setPos] = useState<ControlPosition>(position);
+    const nodeRef = useRef(null);
 
     const height = roundToNextMultipleOf16(stage.height) * scale;
     const width = roundToNextMultipleOf16(stage.width) * scale;
@@ -165,6 +166,7 @@ export default function StagePreview(props: StagePreviewProps): React.JSX.Elemen
 
     return (
         <Draggable
+            nodeRef={nodeRef}
             grid={[16 * scale, 16 * scale]}
             handle=".stage"
             onStop={onDragStop}
@@ -175,6 +177,7 @@ export default function StagePreview(props: StagePreviewProps): React.JSX.Elemen
             }}
         >
             <StagePreviewPadding
+                ref={nodeRef}
                 style={{
                     padding: 32 * scale,
                 }}

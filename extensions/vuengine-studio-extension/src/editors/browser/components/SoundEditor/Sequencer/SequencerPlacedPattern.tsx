@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -104,6 +104,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternPixels, setPatternPixels] = useState<number[][][]>([]);
     const [colorOverrides, setColorOverrides] = useState<string[][]>([]);
+    const nodeRef = useRef(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
     const isCurrent = currentTrackId === trackId && currentPatternId === patternId;
@@ -249,6 +250,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
 
     return (
         <Draggable
+            nodeRef={nodeRef}
             grid={[sequencerPatternWidth / SEQUENCER_RESOLUTION, sequencerPatternHeight]}
             handle=".placedPattern"
             cancel=".react-resizable-handle"
@@ -265,6 +267,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             }}
         >
             <StyledPattern
+                ref={nodeRef}
                 className={classNames.join(' ')}
                 data-channel={trackId}
                 data-position={step}

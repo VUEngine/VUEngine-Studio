@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -143,6 +143,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         noteDragDelta, setNoteDragDelta,
     } = props;
     const [isDragging, setIsDragging] = useState(false);
+    const nodeRef = useRef(null);
 
     const events = pattern.events;
     const patternSize = pattern.size;
@@ -405,6 +406,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     return (
         <Draggable
+            nodeRef={nodeRef}
             grid={[minWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
@@ -424,6 +426,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             }}
         >
             <StyledPianoRollPlacedNote
+                ref={nodeRef}
                 className={classNames.join(' ')}
                 style={{
                     backgroundColor: instrumentColor,
