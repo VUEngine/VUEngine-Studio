@@ -68,7 +68,7 @@ export default function MethodsTree(): React.JSX.Element {
             }}>
                 <Tree
                     data={treeData}
-                    indent={24}
+                    indent={20}
                     rowHeight={24}
                     openByDefault={true}
                     width='100%'

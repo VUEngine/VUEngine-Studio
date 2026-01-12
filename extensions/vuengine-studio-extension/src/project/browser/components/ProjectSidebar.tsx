@@ -1,17 +1,12 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
-import styled from 'styled-components';
 import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 import { VesProjectService } from '../ves-project-service';
 import ProjectSettings from './ProjectSettings';
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-`;
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import FilesTree from './AssetsTree';
 
 interface ProjectSidebarProps {
     commandService: CommandService
@@ -25,14 +20,32 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
     const { commandService, fileService, openerService, vesProjectService, workspaceService } = props;
 
     return (
-        <Container className='jsonforms-container'>
-            <ProjectSettings
-                commandService={commandService}
-                fileService={fileService}
-                openerService={openerService}
-                vesProjectService={vesProjectService}
-                workspaceService={workspaceService}
-            />
-        </Container>
+        <Tabs style={{ height: '100%' }}>
+            <TabList style={{ padding: '0 calc(var(--theia-ui-padding) * 2)' }}>
+                <Tab>
+                    {nls.localizeByDefault('Settings')}
+                </Tab>
+                <Tab>
+                    {nls.localize('vuengine/plugins/assets', 'Assets')}
+                </Tab>
+            </TabList>
+            <TabPanel>
+                <ProjectSettings
+                    commandService={commandService}
+                    fileService={fileService}
+                    openerService={openerService}
+                    vesProjectService={vesProjectService}
+                    workspaceService={workspaceService}
+                />
+            </TabPanel>
+            <TabPanel>
+                <FilesTree
+                    fileService={fileService}
+                    openerService={openerService}
+                    vesProjectService={vesProjectService}
+                    workspaceService={workspaceService}
+                />
+            </TabPanel>
+        </Tabs>
     );
 }

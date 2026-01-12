@@ -194,7 +194,7 @@ export default function ComponentTree(): React.JSX.Element {
                 >
                     <Tree
                         data={treeData}
-                        indent={24}
+                        indent={20}
                         rowHeight={24}
                         openByDefault={true}
                         onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}

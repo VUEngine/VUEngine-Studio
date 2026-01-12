@@ -473,7 +473,6 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
                                 scale={scale}
                                 onClick={e => {
                                     setCurrentStage(s._id);
-                                    console.log('setCurrentStage(s._id)', s._id);
                                     e.stopPropagation();
                                 }}
                                 relations={s.targets.map((t: any) => ({

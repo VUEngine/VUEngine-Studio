@@ -1,6 +1,7 @@
 .ves-tree [role=tree],
 .ves-tree [role=tree] > div {
     height: auto !important;
+    outline: none;
 }
 
 .ves-tree [role=treeitem] {
@@ -80,11 +81,12 @@
 }
 
 .ves-tree-node-actions {
-    display: none;
+    display: flex;
+    visibility: hidden;
 }
 
 .ves-tree-node:hover .ves-tree-node-actions {
-    display: flex;
+    visibility: visible;
 }
 
 .ves-tree-node-actions i {

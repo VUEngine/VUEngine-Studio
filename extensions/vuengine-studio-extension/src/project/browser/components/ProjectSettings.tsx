@@ -2,7 +2,6 @@ import { CommandService, nls, URI } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 import AdvancedSelect from '../../../editors/browser/components/Common/Base/AdvancedSelect';
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
@@ -10,19 +9,10 @@ import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { stringify } from '../../../editors/browser/components/Common/Utils';
 import { TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
+import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectService } from '../ves-project-service';
 import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
 import { MOCK_STAGES } from './ProjectDashboard';
-import { VesProjectCommands } from '../ves-project-commands';
-
-const HorizontalRule = styled.div`
-    background-color: var(--theia-editor-foreground);
-    border: none;
-    height: 0;
-    margin: 0;
-    opacity: .1;
-    padding-top: 1px;
-`;
 
 interface ConfigType {
     typeId: string,
@@ -120,66 +110,68 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
     }, []);
 
     return (
-        <VContainer gap={15}>
-            <Input
-                label={nls.localizeByDefault('Name')}
-                value={gameConfig?.projectTitle ?? ''}
-                setValue={v => updateGameConfig({
-                    projectTitle: v as string
-                })}
-            />
-            <Input
-                label={nls.localize('vuengine/project/author', 'Author')}
-                value={gameConfig?.projectAuthor ?? ''}
-                setValue={v => updateGameConfig({
-                    projectAuthor: v as string
-                })}
-            />
-            {MOCK_STAGES && Object.keys(MOCK_STAGES).length > 0 && <>
-                <HorizontalRule />
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/project/startScreen', 'Start Screen')}
-                    </label>
-                    <HContainer alignItems='end' grow={1}>
-                        <AdvancedSelect
-                            options={Object.values(MOCK_STAGES).map(v => ({
-                                value: v._id,
-                                label: v.name,
-                            }))}
-                            defaultValue={startStage._id}
-                            onChange={() => { }}
-                            containerStyle={{
-                                flexGrow: 1,
-                            }}
-                        />
-                        <button
-                            className='theia-button secondary'
-                            onClick={() => openStageEditor(startStage._id)}
-                            title={nls.localizeByDefault('Edit')}
-                            style={{
-                                margin: 0,
-                                minWidth: 'unset',
-                            }}
-                        >
-                            <i className='codicon codicon-edit' />
-                        </button>
-                        <button
-                            className='theia-button secondary'
-                            onClick={() => commandService.executeCommand(VesProjectCommands.DASHBOARD_TOGGLE.id)}
-                            title={nls.localizeByDefault('Edit')}
-                            style={{
-                                margin: 0,
-                                minWidth: 'unset',
-                            }}
-                        >
-                            <i className='codicon codicon-compass' />
-                        </button>
-                    </HContainer>
-                </VContainer>
-            </>}
+        <div className='jsonforms-container' style={{ height: 'unset' }}>
+            <VContainer gap={15} style={{ paddingTop: 0 }}>
+                <Input
+                    label={nls.localizeByDefault('Name')}
+                    value={gameConfig?.projectTitle ?? ''}
+                    setValue={v => updateGameConfig({
+                        projectTitle: v as string
+                    })}
+                />
+                <Input
+                    label={nls.localize('vuengine/project/author', 'Author')}
+                    value={gameConfig?.projectAuthor ?? ''}
+                    setValue={v => updateGameConfig({
+                        projectAuthor: v as string
+                    })}
+                />
+                {MOCK_STAGES && Object.keys(MOCK_STAGES).length > 0 && <>
+                    <hr />
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/project/startStage', 'Start Stage')}
+                        </label>
+                        <HContainer alignItems='end' grow={1}>
+                            <AdvancedSelect
+                                options={Object.values(MOCK_STAGES).map(v => ({
+                                    value: v._id,
+                                    label: v.name,
+                                }))}
+                                defaultValue={startStage._id}
+                                onChange={() => { }}
+                                containerStyle={{
+                                    flexGrow: 1,
+                                }}
+                            />
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => openStageEditor(startStage._id)}
+                                title={nls.localizeByDefault('Edit')}
+                                style={{
+                                    margin: 0,
+                                    minWidth: 'unset',
+                                }}
+                            >
+                                <i className='codicon codicon-edit' />
+                            </button>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => commandService.executeCommand(VesProjectCommands.DASHBOARD_TOGGLE.id)}
+                                title={nls.localizeByDefault('Edit')}
+                                style={{
+                                    margin: 0,
+                                    minWidth: 'unset',
+                                }}
+                            >
+                                <i className='codicon codicon-compass' />
+                            </button>
+                        </HContainer>
+                    </VContainer>
+                </>}
+                <hr />
+            </VContainer>
             {types.length > 0 && <>
-                <HorizontalRule />
                 <VContainer>
                     <label>
                         {nls.localizeByDefault('Settings')}
@@ -205,6 +197,6 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                     </div>
                 </VContainer>
             </>}
-        </VContainer>
+        </div>
     );
 }

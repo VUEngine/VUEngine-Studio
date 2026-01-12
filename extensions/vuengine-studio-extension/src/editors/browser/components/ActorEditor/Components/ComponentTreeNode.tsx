@@ -143,9 +143,15 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             }
         } else {
             if (node.isOpen) {
-                return <i className='codicon codicon-chevron-down' />;
+                return <>
+                    <i className='codicon codicon-chevron-down' />
+                    <i className='codicon codicon-folder-opened' />
+                </>;
             } else {
-                return <i className='codicon codicon-chevron-right' />;
+                return <>
+                    <i className='codicon codicon-chevron-right' />
+                    <i className='codicon codicon-folder' />
+                </>;
             }
         }
     };
