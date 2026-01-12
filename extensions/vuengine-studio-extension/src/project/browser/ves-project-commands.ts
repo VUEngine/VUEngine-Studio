@@ -6,6 +6,7 @@ export namespace VesProjectCommands {
             id: 'project.new',
             label: 'Create New Project',
             iconClass: 'codicon codicon-add',
+            category: 'Project',
         },
         'vuengine/projects/commands/createNewProject',
     );
@@ -20,13 +21,13 @@ export namespace VesProjectCommands {
         'vuengine/projects/commands/category',
     );
 
-    export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
+    export const DASHBOARD_TOGGLE: Command = Command.toLocalizedCommand(
         {
             id: 'project.toggleDashboardView',
-            label: 'Toggle Project Dashboard View',
-            category: 'Project Dashboard',
+            label: 'Toggle Stages Dashboard',
+            category: 'Project',
         },
-        'vuengine/projects/commands/toggleView',
+        'vuengine/projects/commands/toggleStagesDashboard',
         'vuengine/projects/commands/dashboard/category',
     );
 
@@ -34,7 +35,7 @@ export namespace VesProjectCommands {
         {
             id: 'project.dashboard.zoomIn',
             label: 'Zoom In',
-            category: 'Project Dashboard',
+            category: 'Stages Dashboard',
         },
         'vuengine/projects/commands/dashboard/zoomIn',
         'vuengine/projects/commands/dashboard/category',
@@ -44,7 +45,7 @@ export namespace VesProjectCommands {
         {
             id: 'project.dashboard.zoomOut',
             label: 'Zoom Out',
-            category: 'Project Dashboard',
+            category: 'Stages Dashboard',
         },
         'vuengine/projects/commands/dashboard/zoomOut',
         'vuengine/projects/commands/dashboard/category',
@@ -54,7 +55,7 @@ export namespace VesProjectCommands {
         {
             id: 'project.dashboard.zoomReset',
             label: 'Reset Zoom',
-            category: 'Project Dashboard',
+            category: 'Stages Dashboard',
         },
         'vuengine/projects/commands/dashboard/zoomReset',
         'vuengine/projects/commands/dashboard/category',

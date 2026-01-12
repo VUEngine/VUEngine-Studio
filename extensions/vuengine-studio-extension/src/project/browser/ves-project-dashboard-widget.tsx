@@ -97,7 +97,7 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     private readonly workspaceService: WorkspaceService;
 
     static readonly ID = 'vesProjectDashboardWidget';
-    static readonly LABEL = nls.localize('vuengine/project/dashboard', 'Project Dashboard');
+    static readonly LABEL = nls.localize('vuengine/project/stagesDashboard', 'Stages');
 
     protected state: VesProjectDashboardWidgetState = {
         scale: ZOOM_DEFAULT,
@@ -116,8 +116,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
 
         this.id = VesProjectDashboardWidget.ID;
         this.title.label = VesProjectDashboardWidget.LABEL;
-        this.title.caption = 'Project Dashboard';
-        this.title.iconClass = 'codicon codicon-home';
+        this.title.caption = nls.localize('vuengine/project/stagesDashboard', 'Stages');
+        this.title.iconClass = 'codicon codicon-compass';
         this.title.closable = true;
         this.node.style.outline = 'none';
 
@@ -196,6 +196,8 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
                 <EditorsContext.Provider
                     // @ts-ignore
                     value={{
+                        disableCommands: () => { },
+                        enableCommands: () => { },
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {

@@ -44,9 +44,9 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
         [ToolbarAlignment.CENTER]: [
             [
                 {
-                    'id': VesProjectCommands.WIDGET_TOGGLE.id,
-                    'command': VesProjectCommands.WIDGET_TOGGLE.id,
-                    'icon': 'codicon codicon-home'
+                    'id': VesProjectCommands.DASHBOARD_TOGGLE.id,
+                    'command': VesProjectCommands.DASHBOARD_TOGGLE.id,
+                    'icon': 'codicon codicon-compass'
                 },
                 {
                     'id': CommonCommands.OPEN_PREFERENCES.id,

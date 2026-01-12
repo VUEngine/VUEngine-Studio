@@ -13,7 +13,6 @@ import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves
 import { VesProjectCommands } from '../ves-project-commands';
 import { ZOOM_MAX, ZOOM_MIN } from '../ves-project-dashboard-widget';
 import { DashboardConfigPositionMap, GameConfig } from '../ves-project-types';
-import ProjectSettings from './ProjectSettings';
 import StagePreview from './StagePreview';
 import StageSettings from './StageSettings';
 
@@ -420,134 +419,133 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
         determineDragContainerDimensions();
     }, [gameConfig]);
 
-    return (
-        <>
-            {gameConfig &&
-                <DashboardContainer
-                    onWheel={onWheel}
+    return (gameConfig
+        ?
+        <DashboardContainer
+            onWheel={onWheel}
+        >
+            {previewMode && Object.keys(MOCK_STAGES).length > 0
+                ? <ArcherContainer
+                    ref={archerRef}
+                    lineStyle="straight"
+                    offset={-8}
+                    strokeColor="var(--theia-editor-foreground)"
+                    strokeWidth={getArrowStrokeWidth()}
                 >
-                    {previewMode && Object.keys(MOCK_STAGES).length > 0
-                        ? <ArcherContainer
-                            ref={archerRef}
-                            lineStyle="straight"
-                            offset={-8}
-                            strokeColor="var(--theia-editor-foreground)"
-                            strokeWidth={getArrowStrokeWidth()}
-                        >
-                            <div
-                                style={{
-                                    backgroundImage:
-                                        `radial-gradient(rgba(0, 0, 0, .${services.themeService.getCurrentTheme().type === 'light' ? 1 : 5}) ${scale}px, transparent 0)`,
-                                    backgroundPosition: `${8 * scale}px ${8 * scale}px`,
-                                    backgroundSize: `${16 * scale}px ${16 * scale}px`,
-                                    height: dragContainerHeight * scale,
-                                    minHeight: '100%',
-                                    minWidth: '100%',
-                                    width: dragContainerWidth * scale,
-                                }}
-                                onClick={() => setCurrentStage('')}
-                            >
-                                {Object.values(MOCK_STAGES).map(s => (
-                                    <StagePreview
-                                        key={s._id}
-                                        id={s._id}
-                                        archerRef={archerRef}
-                                        stage={MOCK_STAGES[s._id]}
-                                        positions={gameConfig.dashboard?.positions ?? MOCK_POSITIONS}
-                                        setPosition={(p: ControlPosition) => {
-                                            const partialGameConfig = {
-                                                dashboard: {
-                                                    ...(gameConfig.dashboard ?? {}),
-                                                    positions: {
-                                                        ...(gameConfig.dashboard?.positions ?? MOCK_POSITIONS),
-                                                        [s._id]: p,
-                                                    }
-                                                }
-                                            };
-
-                                            const newGameConfig = { ...gameConfig, ...partialGameConfig };
-                                            if (JSON.stringify(newGameConfig) !== JSON.stringify(gameConfig)) {
-                                                setGameConfig({ ...gameConfig, ...partialGameConfig });
-                                                services.vesProjectService.setGameConfig(partialGameConfig);
-                                            }
-                                        }}
-                                        current={s._id === currentStage}
-                                        scale={scale}
-                                        onClick={e => {
-                                            setCurrentStage(s._id);
-                                            console.log('setCurrentStage(s._id)', s._id);
-                                            e.stopPropagation();
-                                        }}
-                                        relations={s.targets.map((t: any) => ({
-                                            targetId: t.id,
-                                            style: {
-                                                strokeDasharray: t.type === 'pause' ? '4,4' : undefined
-                                            }
-                                        }))}
-                                    />
-                                ))}
-                            </div>
-                        </ArcherContainer>
-                        : <>
-                            <div></div>
-                            <EmptyContainer
-                                title={nls.localize(
-                                    'vuengine/project/projectHasNoStages',
-                                    'This project does not yet have any stages',
-                                )}
-                                description={nls.localize(
-                                    'vuengine/project/clickBelowToAddFirstStage',
-                                    'Click below to add the first stage',
-                                )}
-                                onClick={addStage}
-                            />
-                        </>
-                    }
-                    {!sidebarOpen &&
-                        <ShowSidebarButton
-                            style={{
-                                opacity: sidebarOpen ? 0 : 1,
-                            }}
-                            className="theia-button secondary"
-                            title={nls.localize('vuengine/project/showSidebar', 'Show Sidebar')}
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <i className="codicon codicon-chevron-left" />
-                        </ShowSidebarButton>
-                    }
-                    <Sidebar
-                        open={sidebarOpen}
-                        side='right'
-                        width={320}
+                    <div
+                        style={{
+                            backgroundImage:
+                                `radial-gradient(rgba(0, 0, 0, .${services.themeService.getCurrentTheme().type === 'light' ? 1 : 5}) ${scale}px, transparent 0)`,
+                            backgroundPosition: `${8 * scale}px ${8 * scale}px`,
+                            backgroundSize: `${16 * scale}px ${16 * scale}px`,
+                            height: dragContainerHeight * scale,
+                            minHeight: '100%',
+                            minWidth: '100%',
+                            width: dragContainerWidth * scale,
+                        }}
+                        onClick={() => setCurrentStage('')}
                     >
-                        <VContainer
-                            gap={15}
-                            overflow="auto"
-                            style={{ padding: 'calc(2 * var(--theia-ui-padding))' }}
-                        >
-                            <HideSidebarButton
-                                className="theia-button secondary"
-                                title={nls.localize('vuengine/project/hideSidebar', 'Hide Sidebar')}
-                                onClick={() => setSidebarOpen(false)}
-                            >
-                                <i className="codicon codicon-chevron-right" />
-                            </HideSidebarButton>
-                            {
-                                currentStage === ''
-                                    ? <ProjectSettings
-                                        gameConfig={gameConfig}
-                                        setGameConfig={updateGameConfig}
-                                    />
-                                    : <StageSettings
-                                        stageId={currentStage}
-                                        gameConfig={gameConfig}
-                                        setGameConfig={updateGameConfig}
-                                    />
-                            }
-                        </VContainer>
-                    </Sidebar>
-                </DashboardContainer>
+                        {Object.values(MOCK_STAGES).map(s => (
+                            <StagePreview
+                                key={s._id}
+                                id={s._id}
+                                archerRef={archerRef}
+                                stage={MOCK_STAGES[s._id]}
+                                positions={gameConfig.dashboard?.positions ?? MOCK_POSITIONS}
+                                setPosition={(p: ControlPosition) => {
+                                    const partialGameConfig = {
+                                        dashboard: {
+                                            ...(gameConfig.dashboard ?? {}),
+                                            positions: {
+                                                ...(gameConfig.dashboard?.positions ?? MOCK_POSITIONS),
+                                                [s._id]: p,
+                                            }
+                                        }
+                                    };
+
+                                    const newGameConfig = { ...gameConfig, ...partialGameConfig };
+                                    if (JSON.stringify(newGameConfig) !== JSON.stringify(gameConfig)) {
+                                        setGameConfig({ ...gameConfig, ...partialGameConfig });
+                                        services.vesProjectService.setGameConfig(partialGameConfig);
+                                    }
+                                }}
+                                current={s._id === currentStage}
+                                scale={scale}
+                                onClick={e => {
+                                    setCurrentStage(s._id);
+                                    console.log('setCurrentStage(s._id)', s._id);
+                                    e.stopPropagation();
+                                }}
+                                relations={s.targets.map((t: any) => ({
+                                    targetId: t.id,
+                                    style: {
+                                        strokeDasharray: t.type === 'pause' ? '4,4' : undefined
+                                    }
+                                }))}
+                            />
+                        ))}
+                    </div>
+                </ArcherContainer>
+                : <>
+                    <div></div>
+                    <EmptyContainer
+                        title={nls.localize(
+                            'vuengine/project/projectHasNoStages',
+                            'This project does not yet have any stages',
+                        )}
+                        description={nls.localize(
+                            'vuengine/project/clickBelowToAddFirstStage',
+                            'Click below to add the first stage',
+                        )}
+                        onClick={addStage}
+                    />
+                </>
             }
-        </>
+            {currentStage !== '' && <>
+                {!sidebarOpen &&
+                    <ShowSidebarButton
+                        style={{
+                            opacity: sidebarOpen ? 0 : 1,
+                        }}
+                        className="theia-button secondary"
+                        title={nls.localize('vuengine/project/showSidebar', 'Show Sidebar')}
+                        onClick={() => setSidebarOpen(true)}
+                    >
+                        <i className="codicon codicon-chevron-left" />
+                    </ShowSidebarButton>
+                }
+                <Sidebar
+                    open={sidebarOpen}
+                    side='right'
+                    width={320}
+                >
+                    <VContainer
+                        gap={15}
+                        overflow="auto"
+                        style={{ padding: 'calc(2 * var(--theia-ui-padding))' }}
+                    >
+                        <HideSidebarButton
+                            className="theia-button secondary"
+                            title={nls.localize('vuengine/project/hideSidebar', 'Hide Sidebar')}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <i className="codicon codicon-chevron-right" />
+                        </HideSidebarButton>
+                        <StageSettings
+                            stageId={currentStage}
+                            gameConfig={gameConfig}
+                            setGameConfig={updateGameConfig}
+                        />
+                    </VContainer>
+                </Sidebar>
+            </>}
+        </DashboardContainer>
+        :
+        <EmptyContainer
+            title={nls.localize(
+                'vuengine/project/loadingGameConfig',
+                'Loading game config...',
+            )}
+        />
     );
 }

@@ -1,3 +1,4 @@
+import { PreferenceContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -14,9 +15,10 @@ import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
+import { VesProjectSidebarViewContribution } from './ves-project-sidebar-view-contribution';
+import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
-import { PreferenceContribution } from '@theia/core';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -54,5 +56,14 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesProjectDashboardWidget.ID,
         createWidget: () => ctx.container.get<VesProjectDashboardWidget>(VesProjectDashboardWidget)
+    })).inSingletonScope();
+
+    // sidebar view
+    bindViewContribution(bind, VesProjectSidebarViewContribution);
+    bind(FrontendApplicationContribution).toService(VesProjectSidebarViewContribution);
+    bind(VesProjectSidebarWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesProjectSidebarWidget.ID,
+        createWidget: () => ctx.container.get<VesProjectSidebarWidget>(VesProjectSidebarWidget)
     })).inSingletonScope();
 });
