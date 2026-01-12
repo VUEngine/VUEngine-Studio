@@ -2,9 +2,221 @@ import { CommandService } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
 import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
+import styled from 'styled-components';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
+
+const ControlsOverlay = styled.div`
+  align-items: flex-start;
+  background-color: var(--theia-editor-background);
+  bottom: 0;
+  display: flex;
+  left: 0;
+  overflow: auto;
+  padding: calc(var(--theia-ui-padding) * 4) calc(var(--theia-ui-padding) * 2);
+  position: absolute;
+  right: 0;
+  top: 50px;
+  z-index: 10;
+
+  &>div {
+    margin: auto;
+  }
+
+  &>div>div {
+    align-self: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &>div>div {
+    border-bottom: 1px dashed var(--theia-activityBar-background);
+    margin-bottom: calc(var(--theia-ui-padding) * 4);
+    padding-bottom: calc(var(--theia-ui-padding) * 4);
+  }
+
+  &>div>div:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+`;
+
+const Controller = styled.div`
+    align-items: center;
+
+    .controllerImage {
+        margin: 0 calc(var(--theia-ui-padding) * 4);
+        position: relative;
+    }
+
+    .controllerImage img {
+        max-width: 500px;
+        width: 100%;
+    }
+`;
+
+const ControllerImage = styled.div`
+    margin: 0 calc(var(--theia-ui-padding) * 4);
+    position: relative;
+
+    img {
+        max-width: 500px;
+        width: 100%;
+    }
+`;
+
+const ButtonAssignmentGroup = styled.div`
+    display: table;
+
+    &>div {
+        cursor: pointer;
+        display: table-row;
+
+        &:hover,
+        &.highlighted {
+            background-color: var(--theia-list-hoverBackground);
+            color: var(--theia-list-hoverForeground);
+        }
+
+        &>span {
+            display: table-cell;
+            padding: var(--theia-ui-padding) calc(var(--theia-ui-padding) * 2);
+        }
+    }
+
+    .theia-button {
+        min-width: 80px;
+    }
+`;
+
+const ControllerButtonOverlay = styled.div`
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+
+    &:hover,
+    &.highlighted {
+        opacity: 1;
+    }
+
+    &.power {
+        height: 4%;
+        left: 44.5%;
+        top: 36.3%;
+        transform: perspective(7px) rotateX(-10deg);
+        width: 11%;
+        border-radius: 2px;
+    }
+
+    &.select,
+    &.start,
+    &.a,
+    &.b,
+    &.lt,
+    &.rt {
+        border-radius: 50%;
+        height: 7.8%;
+        width: 7.8%;
+    }
+
+    &.lup,
+    &.lleft,
+    &.lright,
+    &.ldown,
+    &.rup,
+    &.rleft,
+    &.rright,
+    &.rdown {
+        border-radius: 2px;
+        height: 5.5%;
+        width: 5.5%;
+    }
+
+    &.select {
+        left: 27.2%;
+        top: 38.7%;
+    }
+
+    &.start {
+        left: 34.8%;
+        top: 42.2%;
+    }
+
+    &.lup {
+        border-bottom-width: 0;
+        left: 15%;
+        top: 30%;
+    }
+
+    &.lleft {
+        border-right-width: 0;
+        left: 10.9%;
+        top: 33.9%;
+    }
+
+    &.lright {
+        border-left-width: 0;
+        left: 19.5%;
+        top: 33.9%;
+    }
+
+    &.ldown {
+        border-top-width: 0;
+        left: 15%;
+        top: 38.4%;
+    }
+
+    &.lt {
+        left: 13.8%;
+        top: 7.7%;
+    }
+
+    &.b {
+        right: 34.8%;
+        top: 42.2%;
+    }
+
+    &.a {
+        right: 27.2%;
+        top: 38.7%;
+    }
+
+    &.rup {
+        border-bottom-width: 0;
+        right: 15%;
+        top: 30%;
+    }
+
+    &.rleft {
+        border-right-width: 0;
+        right: 19.5%;
+        top: 33.9%;
+    }
+
+    &.rright {
+        border-left-width: 0;
+        right: 10.9%;
+        top: 33.9%;
+    }
+
+    &.rdown {
+        border-top-width: 0;
+        right: 15%;
+        top: 38.4%;
+    }
+
+    &.rt {
+        right: 13.8%;
+        top: 7.7%;
+    }
+`;
+
+const ControlsKeyboard = styled.div`
+  align-items: start;
+`;
 
 export interface EmulatorControlsOverlayProps {
     commandService: CommandService
@@ -60,10 +272,10 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
     }
 
     render(): React.JSX.Element {
-        return <>
+        return <ControlsOverlay>
             <div>
-                <div className='controlsController'>
-                    <div className='buttonAssignmentGroup'>
+                <Controller>
+                    <ButtonAssignmentGroup>
                         <div
                             ref={this.controllerButtonAssignmentLTRef}
                             onClick={this.openKeymaps}
@@ -171,118 +383,116 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div>
-                        <div className='controllerImage'>
-                            <img src={IMAGE_VB_CONTROLLER} />
-                            <div
-                                className='buttonOverlay power'
-                                ref={this.controllerButtonPowerRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay select'
-                                ref={this.controllerButtonSelectRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay start'
-                                ref={this.controllerButtonStartRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay a'
-                                ref={this.controllerButtonARef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay b'
-                                ref={this.controllerButtonBRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay lup'
-                                ref={this.controllerButtonLUpRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay lleft'
-                                ref={this.controllerButtonLLeftRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay lright'
-                                ref={this.controllerButtonLRightRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay ldown'
-                                ref={this.controllerButtonLDownRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay rup'
-                                ref={this.controllerButtonRUpRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay rleft'
-                                ref={this.controllerButtonRLeftRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay rright'
-                                ref={this.controllerButtonRRightRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay rdown'
-                                ref={this.controllerButtonRDownRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay lt'
-                                ref={this.controllerButtonLTRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
-                            ></div>
-                            <div
-                                className='buttonOverlay rt'
-                                ref={this.controllerButtonRTRef}
-                                onClick={this.openKeymaps}
-                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
-                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
-                            ></div>
-                        </div>
-                    </div>
-                    <div className='buttonAssignmentGroup'>
+                    </ButtonAssignmentGroup>
+                    <ControllerImage>
+                        <img src={IMAGE_VB_CONTROLLER} />
+                        <ControllerButtonOverlay
+                            className='power'
+                            ref={this.controllerButtonPowerRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='select'
+                            ref={this.controllerButtonSelectRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='start'
+                            ref={this.controllerButtonStartRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='a'
+                            ref={this.controllerButtonARef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='b'
+                            ref={this.controllerButtonBRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='lup'
+                            ref={this.controllerButtonLUpRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='lleft'
+                            ref={this.controllerButtonLLeftRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='lright'
+                            ref={this.controllerButtonLRightRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='ldown'
+                            ref={this.controllerButtonLDownRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='rup'
+                            ref={this.controllerButtonRUpRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='rleft'
+                            ref={this.controllerButtonRLeftRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='rright'
+                            ref={this.controllerButtonRRightRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='rdown'
+                            ref={this.controllerButtonRDownRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='lt'
+                            ref={this.controllerButtonLTRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
+                        />
+                        <ControllerButtonOverlay
+                            className='rt'
+                            ref={this.controllerButtonRTRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
+                        />
+                    </ControllerImage>
+                    <ButtonAssignmentGroup>
                         <div
                             ref={this.controllerButtonAssignmentRTRef}
                             onClick={this.openKeymaps}
@@ -390,10 +600,10 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                </div>
-                <div className='controlsKeyboard'>
-                    <div className='buttonAssignmentGroup'>
+                    </ButtonAssignmentGroup>
+                </Controller>
+                <ControlsKeyboard>
+                    <ButtonAssignmentGroup>
                         <div>
                             <span>{VesEmulatorCommands.INPUT_PAUSE_TOGGLE.label}</span>
                             <span>
@@ -431,8 +641,8 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div className='buttonAssignmentGroup'>
+                    </ButtonAssignmentGroup>
+                    <ButtonAssignmentGroup>
                         <div>
                             <span>{VesEmulatorCommands.INPUT_FRAME_ADVANCE.label}</span>
                             <span>
@@ -465,8 +675,8 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div className='buttonAssignmentGroup'>
+                    </ButtonAssignmentGroup>
+                    <ButtonAssignmentGroup>
                         <div>
                             <span>{VesEmulatorCommands.INPUT_SAVE_STATE.label}</span>
                             <span>
@@ -499,8 +709,8 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div className='buttonAssignmentGroup'>
+                    </ButtonAssignmentGroup>
+                    <ButtonAssignmentGroup>
                         <div>
                             <span>{VesEmulatorCommands.INPUT_FULLSCREEN.label}</span>
                             <span>
@@ -525,10 +735,10 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                                 </button>
                             </span>
                         </div>
-                    </div>
-                </div>
+                    </ButtonAssignmentGroup>
+                </ControlsKeyboard>
             </div>
-        </>;
+        </ControlsOverlay>;
     }
 
     protected toggleRefHighlighted = (buttonOverlayRef: React.RefObject<HTMLDivElement>) =>

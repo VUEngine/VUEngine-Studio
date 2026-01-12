@@ -1,6 +1,6 @@
 import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 const StyledContainer = styled.div`
@@ -17,15 +17,16 @@ const StyledContainer = styled.div`
 
 interface EmptyContainerProps {
     title: string;
-    description: string;
-    onClick: () => void
+    description?: string;
+    icon?: ReactElement;
+    onClick?: () => void
 }
 
 export default function EmptyContainer(props: EmptyContainerProps): React.JSX.Element {
-    const { title, description, onClick } = props;
+    const { title, description, icon, onClick } = props;
 
     return <StyledContainer>
-        <PuzzlePiece size={32} />
+        {icon ? icon : <PuzzlePiece size={32} />}
         <div
             style={{
                 fontSize: '160%'
@@ -33,17 +34,21 @@ export default function EmptyContainer(props: EmptyContainerProps): React.JSX.El
         >
             {title}
         </div>
-        <div>
-            {description}
-        </div>
-        <button
-            className='theia-button secondary large'
-            onClick={onClick}
-            style={{
-                marginTop: 20
-            }}
-        >
-            <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
-        </button>
+        {description &&
+            <div>
+                {description}
+            </div>
+        }
+        {onClick &&
+            <button
+                className='theia-button secondary large'
+                onClick={onClick}
+                style={{
+                    marginTop: 20
+                }}
+            >
+                <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
+            </button>
+        }
     </StyledContainer>;
 }
