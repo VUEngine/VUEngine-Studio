@@ -1,4 +1,4 @@
-import { isBoolean, isNumber, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import { isBoolean, isNumber, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -26,6 +26,7 @@ import {
     MIN_PREVIEW_SPRITE_ZOOM,
     SpriteImageData,
 } from './ActorEditorTypes';
+import AddComponent from './Components/AddComponent';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
@@ -64,7 +65,16 @@ const getMostFilesOnASprite = (actorData: ActorData): number =>
 
 export default function ActorEditor(props: ActorEditorProps): React.JSX.Element {
     const { data, updateData } = props;
-    const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, setCommands, onCommandExecute, services } = useContext(EditorsContext) as EditorsContextType;
+    const {
+        fileUri,
+        isGenerating,
+        setIsGenerating,
+        setGeneratingProgress,
+        enableCommands,
+        setCommands,
+        onCommandExecute,
+        services
+    } = useContext(EditorsContext) as EditorsContextType;
 
     const [currentComponent, setCurrentComponent] = useState<string>('');
     const [isAnimationPlaying, setIsAnimationPlaying] = useState<boolean>(true);
@@ -82,6 +92,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     const [previewShowWireframes, setPreviewShowWireframes] = useState<boolean>(true);
     const [previewZoom, setPreviewZoom] = useState<number>(2);
     const [spriteProcessingDialog, setSpriteProcessingDialog] = useState<boolean | ImageProcessingSettingsFormProps>(false);
+    const [addComponentDialogOpen, setAddComponentDialogOpen] = useState<boolean>(false);
 
     const mostFilesOnASprite = getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
@@ -273,66 +284,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         return actorData;
     };
 
-    const showComponentSelection = async (): Promise<QuickPickItem | undefined> => {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/general/addComponent', 'Add Component'),
-            placeholder: nls.localize('vuengine/editors/general/selectComponentTypeToAdd', 'Select a component type to add...'),
-        };
-        const items: (QuickPickItem | QuickPickSeparator)[] = [];
-        [{
-            key: 'sprites',
-            label: nls.localize('vuengine/editors/actor/sprite', 'Sprite'),
-            allowAdd: true,
-        }, {
-            key: 'animations',
-            label: nls.localize('vuengine/editors/actor/animation', 'Animation'),
-            allowAdd: true,
-        }, {
-            key: 'colliders',
-            label: nls.localize('vuengine/editors/actor/collider', 'Collider'),
-            allowAdd: true,
-        }, {
-            key: 'wireframes',
-            label: nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'),
-            allowAdd: true,
-        }, {
-            key: 'mutators',
-            label: nls.localize('vuengine/editors/actor/mutator', 'Mutator'),
-            allowAdd: data.components.mutators.length === 0,
-        }, {
-            key: 'sounds',
-            label: nls.localize('vuengine/editors/actor/sound', 'Sound'),
-            allowAdd: true,
-        }, {
-            key: 'children',
-            label: nls.localize('vuengine/editors/actor/child', 'Child'),
-            allowAdd: true,
-        }, {
-            key: 'bodies',
-            label: nls.localize('vuengine/editors/actor/body', 'Body'),
-            allowAdd: data.components.bodies.length === 0,
-        }]
-            .sort((a, b) => a.label.localeCompare(b.label))
-            .map(t => {
-                if (t.allowAdd) {
-                    items.push({
-                        id: t.key,
-                        label: t.label,
-                    });
-                }
-            });
-
-        return services.quickPickService.show(
-            items,
-            quickPickOptions
-        );
-    };
-
     const addComponent = async (): Promise<void> => {
-        const componentToAdd = await showComponentSelection();
-        if (componentToAdd && componentToAdd.id) {
-            doAddComponent(componentToAdd.id);
-        }
+        setAddComponentDialogOpen(true);
     };
 
     const doAddComponent = async (t: string): Promise<void> => {
@@ -697,6 +650,33 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                     setSpriteProcessingDialog={setSpriteProcessingDialog}
                                 />
                             </Sidebar>
+                            {addComponentDialogOpen &&
+                                <PopUpDialog
+                                    open={addComponentDialogOpen}
+                                    onClose={() => {
+                                        setAddComponentDialogOpen(false);
+                                        enableCommands();
+                                    }}
+                                    onOk={() => {
+                                        setAddComponentDialogOpen(false);
+                                        enableCommands();
+                                    }}
+                                    title={nls.localize('vuengine/editors/sound/addComponent', 'Add Component')}
+                                    height='400px'
+                                    width='585px'
+                                    cancelButton={true}
+                                    okButton={false}
+                                    overflow='visible'
+                                >
+                                    <VContainer gap={15}>
+                                        <AddComponent
+                                            data={data}
+                                            setAddComponentDialogOpen={setAddComponentDialogOpen}
+                                            addComponent={doAddComponent}
+                                        />
+                                    </VContainer>
+                                </PopUpDialog>
+                            }
                             {spriteProcessingDialog !== false && (
                                 <PopUpDialog
                                     open={true}
