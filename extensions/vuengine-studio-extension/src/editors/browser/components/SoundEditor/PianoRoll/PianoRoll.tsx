@@ -433,16 +433,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id:
                 if (noteCursor < songLength - BAR_NOTE_RESOLUTION) {
                     setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + BAR_NOTE_RESOLUTION);
-                } /* else {
-                    setNoteCursor(songSize - SUB_NOTE_RESOLUTION);
-                } */
+                } else {
+                    setNoteCursor(soundData.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR.id:
                 if (noteCursor >= BAR_NOTE_RESOLUTION) {
                     setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - BAR_NOTE_RESOLUTION);
-                } /* else {
+                } else {
                     setNoteCursor(0);
-                } */
+                }
                 break;
             case SoundEditorCommands.NOTES_UP.id:
                 const notesUp: EventsMap = {};

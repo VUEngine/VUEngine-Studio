@@ -383,26 +383,28 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onMouseDown = (e: MouseEvent) => {
-        if (e.button === 0) {
-            if (e.shiftKey) {
-                if (selectedNotes.includes(step)) {
-                    setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
-                } else {
-                    setSelectedNotes(prev => [...prev, step].sort());
-                }
+        if (e.button === 0 || e.button === 2) {
+            if ((e.button === 2) && (e.metaKey || e.ctrlKey || e.altKey)) {
+                setNotes({ [localStep]: {} });
             } else {
-                const stepEvent = events[localStep];
-                if (stepEvent) {
-                    const instrumentId = stepEvent[SoundEvent.Instrument];
-                    setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                if (e.shiftKey) {
+                    if (selectedNotes.includes(step)) {
+                        setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
+                    } else {
+                        setSelectedNotes(prev => [...prev, step].sort());
+                    }
+                } else {
+                    const stepEvent = events[localStep];
+                    if (stepEvent) {
+                        const instrumentId = stepEvent[SoundEvent.Instrument];
+                        setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                    }
+                    if (!selectedNotes.includes(localStep)) {
+                        setSelectedNotes([localStep]);
+                    }
+                    setNoteCursor(step);
                 }
-                if (!selectedNotes.includes(localStep)) {
-                    setSelectedNotes([localStep]);
-                }
-                setNoteCursor(step);
             }
-        } else if (e.button === 2) {
-            setNotes({ [localStep]: {} });
         }
 
         e.stopPropagation();
