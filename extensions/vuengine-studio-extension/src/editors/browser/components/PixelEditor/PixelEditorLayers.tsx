@@ -1,4 +1,4 @@
-import { Copy, DotsSixVertical, EyeClosed, HandEye } from '@phosphor-icons/react';
+import { Copy, DotsSixVertical, EyeClosed, Star, Trash } from '@phosphor-icons/react';
 import { Eye } from '@phosphor-icons/react/dist/ssr';
 import { nls } from '@theia/core';
 import {
@@ -207,6 +207,10 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                 draggedItemClassName='dragging item'
                 dropTarget={<DropTarget />}
                 lockAxis='y'
+                style={{
+                    display: 'flex',
+                    overflow: 'hidden',
+                }}
             >
                 <VContainer overflow='auto'>
                     {layers.map((layer, index) => (
@@ -218,18 +222,6 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                                 }}
                                 onClick={e => onClickHandler(e, layer.id)}
                             >
-                                {layers.length > 1 &&
-                                    <button
-                                        className="remove-button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            removeDataLayer(layer.id);
-                                        }}
-                                        title={nls.localize('vuengine/editors/pixel/removeLayer', 'Remove Layer')}
-                                    >
-                                        <i className='codicon codicon-x' />
-                                    </button>
-                                }
                                 <HContainer>
                                     <SortableKnob>
                                         <DragHandle>
@@ -256,45 +248,64 @@ export default function PixelEditorLayers(props: PixelEditorLayersProps): React.
                                             grow={1}
                                             setValue={v => setLayerName(layer.id, v as string)}
                                         />
-                                        <HContainer>
-                                            <div
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    if (layer.isVisible) {
-                                                        hideLayer(layer.id);
-                                                    } else {
-                                                        showLayer(layer.id);
+                                        <HContainer justifyContent='space-between'>
+                                            <HContainer>
+                                                <div
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        if (layer.isVisible) {
+                                                            hideLayer(layer.id);
+                                                        } else {
+                                                            showLayer(layer.id);
+                                                        }
+                                                    }}
+                                                    title={layer.isVisible
+                                                        ? nls.localizeByDefault('Hide')
+                                                        : nls.localizeByDefault('Show')}
+                                                >
+                                                    {layer.isVisible
+                                                        ? <Eye size={16} />
+                                                        : <EyeClosed size={16} />
                                                     }
-                                                }}
-                                            >
-                                                {layer.isVisible
-                                                    ? <Eye size={16} />
-                                                    : <EyeClosed size={16} />
-                                                }
-                                            </div>
-                                            <div
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => {
-                                                    isolateLayer(layer.id);
-                                                }}
-                                            >
-                                                <HandEye size={16} />
-                                            </div>
-                                            <div
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={e => {
-                                                    duplicateLayer(layer, index + 1);
-                                                }}
-                                            >
-                                                <Copy size={16} />
-                                            </div>
+                                                </div>
+                                                <div
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => {
+                                                        isolateLayer(layer.id);
+                                                    }}
+                                                    title={nls.localize('vuengine/editors/pixel/showExclusively', 'Show Exclusively')}
+                                                >
+                                                    <Star size={16} />
+                                                </div>
+                                                <div
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={e => {
+                                                        duplicateLayer(layer, index + 1);
+                                                    }}
+                                                    title={nls.localize('vuengine/editors/pixel/clone', 'Clone')}
+                                                >
+                                                    <Copy size={16} />
+                                                </div>
+                                            </HContainer>
+                                            <HContainer>
+                                                <div
+                                                    style={{
+                                                        cursor: layers.length > 1 ? 'pointer' : undefined,
+                                                        opacity: layers.length > 1 ? undefined : .2,
+                                                    }}
+                                                    onClick={e => {
+                                                        if (layers.length > 1) {
+                                                            removeDataLayer(layer.id);
+                                                        }
+                                                    }}
+                                                    title={nls.localizeByDefault('Remove')}
+                                                >
+                                                    <Trash size={16} />
+                                                </div>
+                                            </HContainer>
                                         </HContainer>
                                     </VContainer>
-                                    <div style={{
-                                        maxWidth: 18,
-                                        minWidth: 18,
-                                    }} />
                                 </HContainer>
                             </Layer>
                         </SortableItem>

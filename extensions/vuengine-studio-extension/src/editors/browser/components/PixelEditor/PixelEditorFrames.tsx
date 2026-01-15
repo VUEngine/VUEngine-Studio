@@ -19,6 +19,7 @@ const FramesContainer = styled.div`
     justify-content: end;
     overflow: hidden;
     max-width: 100%;
+    min-height: 100px;
 
     .frames-list {
         display: flex;
