@@ -22,8 +22,6 @@ import {
     TRACK_DEFAULT_INSTRUMENT_ID
 } from '../SoundEditorTypes';
 
-const MAX_FONT_SIZE = 13;
-
 const StyledPianoRollPlacedNote = styled.div`
     @keyframes outlineActivate {
         0%  { outline-width: 0; }
@@ -41,6 +39,7 @@ const StyledPianoRollPlacedNote = styled.div`
     box-sizing: border-box;
     color: #fff;
     cursor: move;
+    opacity: 0;
     outline: 0 solid var(--theia-focusBorder);
     position: absolute;
     text-align: center;
@@ -49,6 +48,7 @@ const StyledPianoRollPlacedNote = styled.div`
 
     &:hover {
         border-radius: 1px;
+        opacity: 1;
         outline-width: 1px;
         z-index: 11;
     }
@@ -68,7 +68,7 @@ const StyledPianoRollPlacedNote = styled.div`
         position: absolute;
         right: 0;
         top: 0;
-        width: 3px;
+        width: 4px;
     }
 
     .noteSlide {
@@ -94,11 +94,6 @@ const StyledPianoRollPlacedNote = styled.div`
             }
         }
     }
-`;
-
-const StyledPianoRollPlacedNoteLabel = styled.div`
-    margin: 0 6px 0 2px;
-    overflow: hidden;
 `;
 
 interface PianoRollPlacedNoteProps {
@@ -163,8 +158,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     if (selected) {
         classNames.push('selected');
     }
-
-    const fontSize = pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH - 2;
 
     const maxDuration = useMemo(() =>
         getMaxNoteDuration(events, localStep, patternSize),
@@ -404,8 +397,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
                 }
                 if (!selectedNotes.includes(localStep)) {
-                    setNoteCursor(step);
+                    setSelectedNotes([localStep]);
                 }
+                setNoteCursor(step);
             }
         } else if (e.button === 2) {
             setNotes({ [localStep]: {} });
@@ -439,10 +433,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 ref={nodeRef}
                 className={classNames.join(' ')}
                 style={{
-                    backgroundColor: instrumentColor,
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
-                    fontSize: Math.min(fontSize, MAX_FONT_SIZE),
-                    lineHeight: `${pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH}px`,
                     height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                     translate: !isDragging && isSelected
                         ? `${noteDragDelta.x}px ${noteDragDelta.y}px`
@@ -509,9 +500,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                             resizeHandles={['s']}
                             onResizeStop={onNoteSlideDownResize}
                         />
-                        <StyledPianoRollPlacedNoteLabel>
-                            {label}
-                        </StyledPianoRollPlacedNoteLabel>
                     </>
                 </ResizableBox>
             </StyledPianoRollPlacedNote>

@@ -60,7 +60,7 @@ interface PianoRollHeaderProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     pianoRollNoteWidth: number
     pianoRollNoteHeight: number
-    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<void>
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void
