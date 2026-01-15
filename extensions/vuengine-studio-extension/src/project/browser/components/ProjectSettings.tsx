@@ -99,8 +99,6 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
             });
         });
 
-        console.log('availableConfigs', availableConfigs);
-
         setTypes(availableConfigs.sort((a, b) => a.label.localeCompare(b.label)));
     };
 

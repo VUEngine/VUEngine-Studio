@@ -422,7 +422,7 @@ export const defaultProjectData: ProjectData = {
       forFiles: ['.png']
     },
     Pixel: {
-      enabled: true,
+      enabled: false,
       file: '.pixel',
       schema: {
         properties: {

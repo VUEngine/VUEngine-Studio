@@ -70,7 +70,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
         Object.keys(types).forEach(typeId => {
             const type = types[typeId];
 
-            if (!type.file.startsWith('.')) {
+            if (!type.file.startsWith('.') || (type.enabled !== undefined && type.enabled === false)) {
                 return;
             }
 
@@ -93,8 +93,6 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
                         }
                     });
                 });
-                console.log('itemsMap', itemsMap);
-                console.log('filteredItemsMap', filteredItemsMap);
 
                 Object.keys(filteredItemsMap).forEach(itemId => {
                     const item = filteredItemsMap[itemId] as unknown as ProjectDataItem & WithFileUri;
