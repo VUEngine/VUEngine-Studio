@@ -152,18 +152,25 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             if (!pattern) {
                 return;
             }
-            const xOffset = step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION - pianoRollScrollWindow.x + 0.5;
+
+            const patternX = step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION + 0.5;
             const patternWidth = pattern.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH - 0.5;
+
+            if (pianoRollScrollWindow.x > patternX + patternWidth || patternX > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
+                return;
+            }
+
+            const patternxOffset = patternX - pianoRollScrollWindow.x + 0.5;
             const isSelected = patternId === currentPatternId && step === currentSequenceIndex;
             context.fillStyle = isSelected ? patternBackgroundHighlight : patternBackground;
             context.fillRect(
-                xOffset,
+                patternxOffset,
                 PIANO_ROLL_GRID_METER_HEIGHT,
                 patternWidth,
                 PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
             );
             context.fillStyle = isSelected ? patternForegroundHighlight : patternForeground;
-            context.fillText(getPatternName(soundData, patternId), xOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
+            context.fillText(getPatternName(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
         });
 
         // bottom line
