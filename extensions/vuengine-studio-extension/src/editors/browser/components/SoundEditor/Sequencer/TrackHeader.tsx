@@ -180,11 +180,21 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         ? soundData.instruments[track.instrument].color
         : DEFAULT_COLOR_INDEX;
 
+    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+        if (e.buttons === 0 || e.buttons === 2) {
+            if (e.buttons === 2 && (e.metaKey || e.ctrlKey || e.altKey)) {
+                removeTrack(trackId);
+            } else {
+                setCurrentTrackId(trackId);
+            }
+        }
+    };
+
     return <StyledTrackHeader
         className={classNames.join(' ')}
-        onClick={() => setCurrentTrackId(trackId)}
+        onClick={onClick}
+        onContextMenu={onClick}
         onDoubleClick={() => setEditTrackDialogOpen(true)}
-        onContextMenu={() => removeTrack(trackId)}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
             minHeight: sequencerPatternHeight,

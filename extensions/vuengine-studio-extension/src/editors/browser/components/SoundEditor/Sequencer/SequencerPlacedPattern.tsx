@@ -136,10 +136,12 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.buttons === 0) {
-            setCurrentSequenceIndex(trackId, step);
-        } else if (e.buttons === 2) {
-            removePatternFromSequence(trackId, step);
+        if (e.buttons === 0 || e.buttons === 2) {
+            if (e.buttons === 2 && (e.metaKey || e.ctrlKey || e.altKey)) {
+                removePatternFromSequence(trackId, step);
+            } else {
+                setCurrentSequenceIndex(trackId, step);
+            }
         }
     };
 
