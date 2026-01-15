@@ -180,7 +180,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                         <button
                             className='theia-button secondary'
                             onClick={openRedViperDocumentation}
-                            title={nls.localize('vuengine/emulator/documentation', 'Documentation')}
+                            title={nls.localizeByDefault('Documentation')}
                         >
                             <i className='codicon codicon-book' />
                         </button>

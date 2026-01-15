@@ -1,7 +1,8 @@
-import { FadersHorizontal, Guitar, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
+import { BookOpen, FadersHorizontal, Guitar, Keyboard, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
+import { VesCoreCommands } from '../../../../core/browser/ves-core-commands';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import Input from '../Common/Base/Input';
@@ -140,6 +141,8 @@ interface SoundEditorToolbarProps {
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     toolsDialogOpen: boolean
     setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
+    keyBindingsDialogOpen: boolean
+    setKeyBindingsDialogOpen: Dispatch<SetStateAction<boolean>>
     propertiesDialogOpen: boolean
     setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteEvent: (notes: SetNoteEventProps[]) => void
@@ -168,6 +171,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
         toolsDialogOpen, setToolsDialogOpen,
+        keyBindingsDialogOpen, setKeyBindingsDialogOpen,
         propertiesDialogOpen, setPropertiesDialogOpen,
         setNoteEvent,
         setTrack,
@@ -497,6 +501,20 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     onClick={() => setToolsDialogOpen(prev => !prev)}
                 >
                     <Wrench size={17} />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className={`theia-button ${keyBindingsDialogOpen ? 'primary' : 'secondary'}`}
+                    title={nls.localizeByDefault('Keybindings')}
+                    onClick={() => setKeyBindingsDialogOpen(prev => !prev)}
+                >
+                    <Keyboard size={17} />
+                </StyledSoundEditorToolbarButton>
+                <StyledSoundEditorToolbarButton
+                    className={`theia-button ${toolsDialogOpen ? 'primary' : 'secondary'}`}
+                    title={nls.localizeByDefault('Documentation')}
+                    onClick={() => services.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/sound-editor', false)}
+                >
+                    <BookOpen size={17} />
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbarSide>

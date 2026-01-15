@@ -6,10 +6,10 @@ interface HContainerProps {
     gap?: number
     grow?: number
     justifyContent?: string
-    onClick?: MouseEventHandler | undefined;
-    onKeyDown?: KeyboardEventHandler | undefined;
-    onMouseOver?: MouseEventHandler | undefined;
-    onMouseOut?: MouseEventHandler | undefined;
+    onClick?: MouseEventHandler;
+    onKeyDown?: KeyboardEventHandler;
+    onMouseOver?: MouseEventHandler;
+    onMouseOut?: MouseEventHandler;
     overflow?: string
     style?: object
     tabIndex?: number

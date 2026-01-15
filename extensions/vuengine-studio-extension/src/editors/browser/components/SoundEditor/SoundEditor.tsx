@@ -23,6 +23,7 @@ import AddPattern from './Other/AddPattern';
 import AddTrack from './Other/AddTrack';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
+import Keybindings from './Other/Keybindings';
 import Properties from './Other/Properties';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -144,6 +145,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
     const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
+    const [keyBindingsDialogOpen, setKeyBindingsDialogOpen] = useState<boolean>(false);
     const [propertiesDialogOpen, setPropertiesDialogOpen] = useState<boolean>(false);
     const [editTrackDialogOpen, setEditTrackDialogOpen] = useState<boolean>(false);
     const [patternDialogOpen, setPatternDialogOpen] = useState<boolean>(false);
@@ -1093,6 +1095,8 @@ A total of {0} instruments will be deleted.",
                     setToolsDialogOpen={setToolsDialogOpen}
                     propertiesDialogOpen={propertiesDialogOpen}
                     setPropertiesDialogOpen={setPropertiesDialogOpen}
+                    keyBindingsDialogOpen={keyBindingsDialogOpen}
+                    setKeyBindingsDialogOpen={setKeyBindingsDialogOpen}
                     selectedNotes={selectedNotes}
                     setNoteEvent={setNoteEvent}
                     setTrack={setTrack}
@@ -1328,6 +1332,24 @@ A total of {0} instruments will be deleted.",
                             updateSoundData={updateSoundData}
                         />
                     </VContainer>
+                </PopUpDialog>
+            }
+            {keyBindingsDialogOpen &&
+                <PopUpDialog
+                    open={keyBindingsDialogOpen}
+                    onClose={() => {
+                        setKeyBindingsDialogOpen(false);
+                        enableCommands();
+                    }}
+                    onOk={() => {
+                        setKeyBindingsDialogOpen(false);
+                        enableCommands();
+                    }}
+                    title={nls.localizeByDefault('Keybindings')}
+                    height='100%'
+                    width='100%'
+                >
+                    <Keybindings />
                 </PopUpDialog>
             }
             {toolsDialogOpen &&

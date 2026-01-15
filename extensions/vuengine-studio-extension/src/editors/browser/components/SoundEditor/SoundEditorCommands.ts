@@ -59,11 +59,13 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.nextTrack',
         label: nls.localize('vuengine/editors/sound/commands/nextTrack', 'Select Next Track'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+down',
     };
     export const SELECT_PREVIOUS_TRACK: EditorCommand = {
         id: 'editors.soundEditor.previousTrack',
         label: nls.localize('vuengine/editors/sound/commands/previousTrack', 'Select Previous Track'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+up',
     };
     export const ADD_PATTERN: EditorCommand = {
         id: 'editors.soundEditor.addPattern',
@@ -119,25 +121,25 @@ export namespace SoundEditorCommands {
     };
     export const PIANO_ROLL_SELECT_NEXT_STEP: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectNextStep',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextStep', 'Piano Roll: Select Next Step'),
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextStep', 'Select Next Step'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'right',
     };
     export const PIANO_ROLL_SELECT_PREVIOUS_STEP: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectPreviousStep',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousStep', 'Piano Roll: Select Previous Step'),
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousStep', 'Select Previous Step'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'left',
     };
     export const PIANO_ROLL_SELECT_NEXT_BAR: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectNextBar',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextBar', 'Piano Roll: Select Next Bar'),
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextBar', 'Select Next Bar'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+right',
     };
     export const PIANO_ROLL_SELECT_PREVIOUS_BAR: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectPreviousBar',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousBar', 'Piano Roll: Select Previous Bar'),
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousBar', 'Select Previous Bar'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+left',
     };

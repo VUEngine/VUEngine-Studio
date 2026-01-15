@@ -6,7 +6,7 @@ interface VContainerProps {
     gap?: number
     grow?: number
     justifyContent?: string
-    onClick?: MouseEventHandler | undefined;
+    onClick?: MouseEventHandler;
     overflow?: string
     style?: object
 }

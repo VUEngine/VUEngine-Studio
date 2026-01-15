@@ -138,14 +138,19 @@ export class VesCommonService {
     commandId: string,
     wrapInBrackets: boolean = false
   ): string {
-    const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-    let keybindingAccelerator = keybinding
-      ? this.keybindingRegistry.acceleratorFor(keybinding, '+').join(', ')
-      : '';
+    const keybindings = this.keybindingRegistry.getKeybindingsForCommand(commandId);
+    const keybindingAccelerators: string[] = [];
+    keybindings.forEach(k => {
+      if (k) {
+        keybindingAccelerators.push(
+          this.keybindingRegistry.acceleratorFor(k, '+').join(', ')
+            .replace(/\s/, nls.localize('vuengine/general/space', 'Space'))
+            .replace(/\+\+/, nls.localize('vuengine/general/plus', '+Plus'))
+        );
+      }
+    });
 
-    keybindingAccelerator = keybindingAccelerator
-      .replace(' ', nls.localize('vuengine/general/space', 'Space'));
-
+    let keybindingAccelerator = keybindingAccelerators.join(', ');
     if (wrapInBrackets && keybindingAccelerator !== '') {
       keybindingAccelerator = ` (${keybindingAccelerator})`;
     }

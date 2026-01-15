@@ -5,6 +5,8 @@ import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import styled from 'styled-components';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
+import ButtonAssignment from '../../../editors/browser/components/Common/ButtonAssignment/ButtonAssignment';
+import ButtonAssignmentGroup from '../../../editors/browser/components/Common/ButtonAssignment/ButtonAssignmentGroup';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 
 const ControlsOverlay = styled.div`
@@ -64,30 +66,6 @@ const ControllerImage = styled.div`
     img {
         max-width: 500px;
         width: 100%;
-    }
-`;
-
-const ButtonAssignmentGroup = styled.div`
-    display: table;
-
-    &>div {
-        cursor: pointer;
-        display: table-row;
-
-        &:hover,
-        &.highlighted {
-            background-color: var(--theia-list-hoverBackground);
-            color: var(--theia-list-hoverForeground);
-        }
-
-        &>span {
-            display: table-cell;
-            padding: var(--theia-ui-padding) calc(var(--theia-ui-padding) * 2);
-        }
-    }
-
-    .theia-button {
-        min-width: 80px;
     }
 `;
 
@@ -276,113 +254,64 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
             <div>
                 <Controller>
                     <ButtonAssignmentGroup>
-                        <div
-                            ref={this.controllerButtonAssignmentLTRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_L_TRIGGER}
+                            refObject={this.controllerButtonAssignmentLTRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_L_TRIGGER.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_TRIGGER.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                         <br />
-                        <div
-                            ref={this.controllerButtonAssignmentLUpRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_L_UP}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentLUpRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_L_UP.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_UP.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentLRightRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_L_RIGHT}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentLRightRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_L_RIGHT.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_RIGHT.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentLDownRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_L_DOWN}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentLDownRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_L_DOWN.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_DOWN.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentLLeftRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_L_LEFT}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentLLeftRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_L_LEFT.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_LEFT.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                         <br />
-                        <div
-                            ref={this.controllerButtonAssignmentSelectRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_SELECT}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentSelectRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_SELECT.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SELECT.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentStartRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_START}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                            refObject={this.controllerButtonAssignmentStartRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_START.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_START.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                     </ButtonAssignmentGroup>
                     <ControllerImage>
                         <img src={IMAGE_VB_CONTROLLER} />
@@ -493,248 +422,152 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                         />
                     </ControllerImage>
                     <ButtonAssignmentGroup>
-                        <div
-                            ref={this.controllerButtonAssignmentRTRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_R_TRIGGER}
+                            refObject={this.controllerButtonAssignmentRTRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_R_TRIGGER.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_TRIGGER.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                         <br />
-                        <div
-                            ref={this.controllerButtonAssignmentRUpRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_R_UP}
+                            refObject={this.controllerButtonAssignmentRUpRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_R_UP.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_UP.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentRRightRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_R_RIGHT}
+                            refObject={this.controllerButtonAssignmentRRightRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_R_RIGHT.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_RIGHT.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentRDownRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_R_DOWN}
+                            refObject={this.controllerButtonAssignmentRDownRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_R_DOWN.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_DOWN.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentRLeftRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_R_LEFT}
+                            refObject={this.controllerButtonAssignmentRLeftRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_R_LEFT.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_LEFT.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                         <br />
-                        <div
-                            ref={this.controllerButtonAssignmentARef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_A}
+                            refObject={this.controllerButtonAssignmentARef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonARef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonARef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_A.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_A.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentBRef}
-                            onClick={this.openKeymaps}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_B}
+                            refObject={this.controllerButtonAssignmentBRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
-                        >
-                            <span>
-                                {VesEmulatorCommands.INPUT_B.label}
-                            </span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_B.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
                     </ButtonAssignmentGroup>
                 </Controller>
                 <ControlsKeyboard>
                     <ButtonAssignmentGroup>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_PAUSE_TOGGLE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div
-                            ref={this.controllerButtonAssignmentPowerRef}
-                            onClick={this.openKeymaps}
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_PAUSE_TOGGLE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_RESET}
+                            refObject={this.controllerButtonAssignmentPowerRef}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
-                        >
-                            <span>{VesEmulatorCommands.INPUT_RESET.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_RESET.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_AUDIO_MUTE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_AUDIO_MUTE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
                     </ButtonAssignmentGroup>
                     <ButtonAssignmentGroup>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_FRAME_ADVANCE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_REWIND.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_FRAME_ADVANCE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_REWIND}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
                     </ButtonAssignmentGroup>
                     <ButtonAssignmentGroup>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_SAVE_STATE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_LOAD_STATE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_SAVE_STATE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_LOAD_STATE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
                     </ButtonAssignmentGroup>
                     <ButtonAssignmentGroup>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_FULLSCREEN.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_FULLSCREEN.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_SCREENSHOT.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>{VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.label}</span>
-                            <span>
-                                <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id, false)}
-                                </button>
-                            </span>
-                        </div>
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_FULLSCREEN}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_SCREENSHOT}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
+                        <ButtonAssignment
+                            command={VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY}
+                            commandService={this.commandService}
+                            vesCommonService={this.vesCommonService}
+                        />
                     </ButtonAssignmentGroup>
                 </ControlsKeyboard>
             </div>
