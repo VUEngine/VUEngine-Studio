@@ -88,14 +88,12 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .1)`;
         context.lineWidth = 1;
         context.font = '9px monospace';
-        const w = canvas.width;
-        const h = canvas.height;
 
         // highlight current track
         context.rect(
             0,
             SEQUENCER_GRID_METER_HEIGHT + currentTrackId * sequencerPatternHeight,
-            w,
+            width,
             sequencerPatternHeight - 1
         );
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .1)`;
@@ -107,7 +105,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const offset = x * sequencerPatternWidth / SEQUENCER_RESOLUTION - sequencerScrollWindow.x - 0.5;
             context.beginPath();
             context.moveTo(offset, x % (4 * SEQUENCER_RESOLUTION) ? SEQUENCER_GRID_METER_HEIGHT : 0);
-            context.lineTo(offset, h);
+            context.lineTo(offset, height);
             context.strokeStyle = x === soundData.size
                 ? `rgba(${c}, ${c}, ${c}, .6)`
                 : x % (4 * SEQUENCER_RESOLUTION) === 0
@@ -128,7 +126,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const offset = SEQUENCER_GRID_METER_HEIGHT + y * sequencerPatternHeight - 0.5;
             context.beginPath();
             context.moveTo(0, offset);
-            context.lineTo(w, offset);
+            context.lineTo(width, offset);
             context.strokeStyle = y % soundData.tracks.length === 0
                 ? `rgba(${c}, ${c}, ${c}, .6)`
                 : `rgba(${c}, ${c}, ${c}, .4)`;

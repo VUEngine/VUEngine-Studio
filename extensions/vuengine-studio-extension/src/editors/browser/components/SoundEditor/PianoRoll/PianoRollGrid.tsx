@@ -126,8 +126,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
         context.strokeStyle = lowColor;
         context.lineWidth = PIANO_ROLL_GRID_WIDTH;
-        const w = canvas.width;
-        const h = canvas.height;
 
         // highlight current step
         if (!highContrastTheme) {
@@ -152,7 +150,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const offset = offsetElement - pianoRollScrollWindow.x - 0.5;
             context.beginPath();
             context.moveTo(offset, 0);
-            context.lineTo(offset, h);
+            context.lineTo(offset, height);
             context.strokeStyle = x % NOTE_RESOLUTION === 0
                 ? hiColor
                 : x % 4 === 0
@@ -166,7 +164,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const offset = y * pianoRollNoteHeight - 0.5;
             context.beginPath();
             context.moveTo(0, offset);
-            context.lineTo(w, offset);
+            context.lineTo(width, offset);
             context.strokeStyle = y % NOTES_PER_OCTAVE === 0
                 ? hiColor
                 : medColor;
@@ -197,7 +195,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 currentSequenceIndex * NOTE_RESOLUTION / SEQUENCER_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
                 0,
                 currentPatternSize * NOTE_RESOLUTION * pianoRollNoteWidth - 0.5,
-                h,
+                height,
             );
         }
 

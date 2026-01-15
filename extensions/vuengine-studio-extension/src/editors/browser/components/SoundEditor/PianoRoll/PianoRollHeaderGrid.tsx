@@ -87,8 +87,6 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.lineWidth = 1;
         context.font = '10px monospace';
-        const w = canvas.width;
-        const h = canvas.height;
 
         // vertical lines
         for (let x = 0; x < songLength; x++) {
@@ -102,7 +100,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             const offset = offsetElement - 0.5 - pianoRollScrollWindow.x;
             context.beginPath();
             context.moveTo(offset, 0);
-            context.lineTo(offset, h);
+            context.lineTo(offset, height);
             context.stroke();
 
             // meter numbers
@@ -113,7 +111,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .2)`;
         context.beginPath();
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
-        context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
+        context.lineTo(width, PIANO_ROLL_GRID_METER_HEIGHT - 0.5);
         context.stroke();
 
         // play range
@@ -172,7 +170,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .6)`;
         context.beginPath();
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
-        context.lineTo(w, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
+        context.lineTo(width, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.stroke();
     };
 

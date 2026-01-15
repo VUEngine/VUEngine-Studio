@@ -34,7 +34,7 @@ export const StyledStepIndicator = styled.div`
         content: '';
         display: block;
         height: 0;
-        margin-left: -4px;
+        margin-left: -3px;
         position: sticky;
         top: 0;
         width: 1px;
