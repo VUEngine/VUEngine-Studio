@@ -402,7 +402,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         currentPattern.events[eventStep][SoundEvent.Note] !== undefined &&
                         NOTES_LABELS.indexOf(currentPattern.events[eventStep][SoundEvent.Note]) >= sortedMarqueeStartNote &&
                         NOTES_LABELS.indexOf(currentPattern.events[eventStep][SoundEvent.Note]) <= sortedMarqueeEndNote &&
-                        eventStep >= patternRelativeMarqueeStartStep &&
+                        ((currentPattern.events[eventStep][SoundEvent.Duration] !== undefined &&
+                            eventStep + parseInt(currentPattern.events[eventStep][SoundEvent.Duration]) >= patternRelativeMarqueeStartStep) ||
+                            eventStep >= patternRelativeMarqueeStartStep) &&
                         eventStep <= patternRelativeMarqueeEndStep
                     );
 
