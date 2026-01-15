@@ -41,6 +41,7 @@ const StyledPianoRollPlacedNote = styled.div`
     cursor: move;
     opacity: 0;
     outline: 0 solid var(--theia-focusBorder);
+    outline-offset: 1px;
     position: absolute;
     text-align: center;
     user-select: none;
@@ -64,7 +65,7 @@ const StyledPianoRollPlacedNote = styled.div`
         border-left: 1px solid;
         bottom: 0;
         cursor: col-resize;
-        opacity: .3;
+        opacity: .7;
         position: absolute;
         right: 0;
         top: 0;

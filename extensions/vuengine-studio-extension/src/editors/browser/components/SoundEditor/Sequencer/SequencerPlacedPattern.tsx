@@ -12,25 +12,20 @@ import {
     SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
-import PatternCanvas from './PatternCanvas';
 
 const StyledPattern = styled.div`
-    background-color: var(--theia-secondaryButton-background);
     box-sizing: border-box;
     cursor: move;
-    outline-offset: -1px;
+    opacity: 0;
+    outline-offset: 1px;
     overflow: hidden;
     position: absolute;
     z-index: 10;
 
-    &:hover,
-    &.current {
+    &:hover {
+        border: 1px solid;
+        opacity: 1;
         outline: 1px solid var(--theia-focusBorder);
-    }
-        
-    &.selected {
-        background-color: var(--theia-focusBorder);
-        color: #fff;
     }
 
     canvas {
@@ -41,25 +36,13 @@ const StyledPattern = styled.div`
         border-left: 1px solid;
         bottom: 0;
         cursor: col-resize;
-        opacity: .3;
+        opacity: .7;
         position: absolute;
         right: 0;
         top: 0;
-        width: 2px;
+        width: 4px;
         z-index: 10;
     }
-`;
-
-const StyledPatternName = styled.div`
-    display: flex;
-    font-size: 9px;
-    height: 100%;
-    overflow: hidden;
-    padding: 0 3px;
-    position: relative;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    z-index: 1;
 `;
 
 interface SequencerPlacedPatternProps {
@@ -109,7 +92,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     }
 
     const patternName = getPatternName(soundData, patternId);
-    const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
+    const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH * 2;
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
@@ -212,27 +195,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     axis="x"
                     minConstraints={[sequencerPatternWidth / SEQUENCER_RESOLUTION, sequencerPatternHeight]}
                     maxConstraints={[sequencerPatternWidth * songLength, sequencerPatternHeight]}
-                    resizeHandles={trackId === currentTrackId ? ['e'] : []}
+                    resizeHandles={['e']}
                     onResizeStop={onResize}
-                >
-                    <>
-                        <PatternCanvas
-                            soundData={soundData}
-                            pattern={pattern}
-                            trackId={trackId}
-                            sequencerPatternHeight={sequencerPatternHeight}
-                            sequencerPatternWidth={sequencerPatternWidth}
-                            style={{
-                                left: 0,
-                                position: 'absolute',
-                                top: 0,
-                            }}
-                        />
-                        <StyledPatternName>
-                            {patternName}
-                        </StyledPatternName>
-                    </>
-                </ResizableBox>
+                />
             </StyledPattern>
         </Draggable>
     );

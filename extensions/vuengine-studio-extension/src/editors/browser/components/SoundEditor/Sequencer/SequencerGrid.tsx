@@ -5,12 +5,19 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     DEFAULT_PLAY_RANGE_SIZE,
     NOTE_RESOLUTION,
+    NOTES_LABELS,
+    NOTES_SPECTRUM,
     SCROLL_BAR_WIDTH,
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_NOTE_HEIGHT,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEvent,
+    SUB_NOTE_RESOLUTION,
 } from '../SoundEditorTypes';
+import { getPatternName } from '../SoundEditor';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 
 const StyledCanvas = styled.canvas`
     cursor: crosshair;
@@ -22,6 +29,7 @@ const StyledCanvas = styled.canvas`
 interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
+    currentSequenceIndex: number
     addPattern: (trackId: number, bar: number, size?: number) => void
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -48,6 +56,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const {
         soundData,
         currentTrackId,
+        currentSequenceIndex,
         addPattern,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
@@ -71,6 +80,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         songLength * sequencerPatternWidth
     );
 
+    const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
+    const noteHeightOverlap = (SEQUENCER_NOTE_HEIGHT - 1) / 2;
+
     const draw = (): void => {
         const canvas = canvasRef.current;
         if (!canvas) {
@@ -83,9 +95,25 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
+        const highContrastTheme = ['hc', 'hcLight'].includes(currentThemeType);
         const c = currentThemeType === 'light' ? 0 : 255;
+        const highlightFullColor = services.colorRegistry.getCurrentColor('focusBorder')!;
+        const highlightHiColor = highlightFullColor + '75';
+        const fullColor = `rgba(${c}, ${c}, ${c}, 1)`;
+        const lowColor = highContrastTheme
+            ? fullColor
+            : `rgba(${c}, ${c}, ${c}, .1)`;
+        const medColor = highContrastTheme
+            ? fullColor
+            : `rgba(${c}, ${c}, ${c}, .2)`;
+        const hiColor = highContrastTheme
+            ? fullColor
+            : `rgba(${c}, ${c}, ${c}, .4)`;
+        const strongColor = highContrastTheme
+            ? fullColor
+            : `rgba(${c}, ${c}, ${c}, .6)`;
 
-        context.strokeStyle = `rgba(${c}, ${c}, ${c}, .1)`;
+        context.strokeStyle = medColor;
         context.lineWidth = 1;
         context.font = '9px monospace';
 
@@ -96,42 +124,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             width,
             sequencerPatternHeight - 1
         );
-        context.fillStyle = `rgba(${c}, ${c}, ${c}, .1)`;
+        context.fillStyle = medColor;
         context.fill();
-        context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
-
-        // vertical lines
-        for (let x = 0; x <= soundData.size; x++) {
-            const offset = x * sequencerPatternWidth / SEQUENCER_RESOLUTION - sequencerScrollWindow.x - 0.5;
-            context.beginPath();
-            context.moveTo(offset, x % (4 * SEQUENCER_RESOLUTION) ? SEQUENCER_GRID_METER_HEIGHT : 0);
-            context.lineTo(offset, height);
-            context.strokeStyle = x === soundData.size
-                ? `rgba(${c}, ${c}, ${c}, .6)`
-                : x % (4 * SEQUENCER_RESOLUTION) === 0
-                    ? `rgba(${c}, ${c}, ${c}, .4)`
-                    : x % SEQUENCER_RESOLUTION === 0
-                        ? `rgba(${c}, ${c}, ${c}, .2)`
-                        : `rgba(${c}, ${c}, ${c}, .1)`;
-            context.stroke();
-
-            // meter numbers
-            if ((x / SEQUENCER_RESOLUTION) % 4 === 0) {
-                context.fillText((x / SEQUENCER_RESOLUTION).toString(), offset + 3, 10);
-            }
-        }
-
-        // horizontal lines
-        for (let y = 0; y <= soundData.tracks.length; y++) {
-            const offset = SEQUENCER_GRID_METER_HEIGHT + y * sequencerPatternHeight - 0.5;
-            context.beginPath();
-            context.moveTo(0, offset);
-            context.lineTo(width, offset);
-            context.strokeStyle = y % soundData.tracks.length === 0
-                ? `rgba(${c}, ${c}, ${c}, .6)`
-                : `rgba(${c}, ${c}, ${c}, .4)`;
-            context.stroke();
-        }
 
         // play range
         if (playRangeStart > -1 && playRangeEnd > -1) {
@@ -156,6 +150,117 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             context.lineTo(rightOffset, 0.5 + SEQUENCER_GRID_METER_HEIGHT / 2);
             context.lineTo(rightOffset - SEQUENCER_GRID_METER_HEIGHT / 2, 0.5);
             context.fill();
+        }
+
+        // patterns
+        {
+            soundData.tracks.forEach((track, trackId) =>
+                Object.keys(track.sequence).forEach(key => {
+                    const step = parseInt(key);
+                    const patternId = track.sequence[step];
+                    const pattern = soundData.patterns[patternId];
+                    if (!pattern) {
+                        return;
+                    }
+
+                    const patternX = step / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+                    const patternWidth = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+
+                    if (sequencerScrollWindow.x > patternX + patternWidth || patternX > sequencerScrollWindow.x + sequencerScrollWindow.w) {
+                        return;
+                    }
+
+                    const patternXOffset = patternX - sequencerScrollWindow.x;
+                    const patternY = SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight;
+                    const patternHeight = sequencerPatternHeight;
+
+                    // pattern background
+                    if (trackId === currentTrackId && step === currentSequenceIndex) {
+                        context.fillStyle = highlightHiColor;
+                    } else {
+                        context.fillStyle = medColor;
+                    }
+                    context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
+
+                    // pattern notes
+                    const trackDefaultInstrument = soundData.instruments[track.instrument];
+                    const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
+                    Object.keys(pattern.events).forEach((eventKey: string) => {
+                        const s = parseInt(eventKey);
+                        const event = pattern.events[s];
+                        const noteLabel = event[SoundEvent.Note];
+                        if (noteLabel) {
+                            const instrumentId = event[SoundEvent.Instrument];
+                            const color = instrumentId
+                                ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
+                                : defaultColor;
+                            const noteId = NOTES_LABELS.indexOf(noteLabel);
+                            const duration = event[SoundEvent.Duration]
+                                ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
+                                : 1;
+                            const noteXPosition = Math.floor(s / SUB_NOTE_RESOLUTION) * patternNoteWidth;
+                            const noteYPosition = Math.floor(((sequencerPatternHeight - SEQUENCER_NOTE_HEIGHT) / NOTES_SPECTRUM * noteId)
+                                - (SEQUENCER_NOTE_HEIGHT / 2)) + noteHeightOverlap;
+                            context.fillStyle = color;
+                            context.fillRect(
+                                patternXOffset + noteXPosition,
+                                patternY + noteYPosition,
+                                duration * patternNoteWidth,
+                                SEQUENCER_NOTE_HEIGHT
+                            );
+                        }
+                    });
+
+                    // pattern name
+                    context.fillStyle = fullColor;
+                    const patternName = pattern.size >= 4
+                        ? getPatternName(soundData, patternId)
+                        : '…';
+                    context.fillText(patternName, patternXOffset + 3, patternY + 10, patternWidth - 6);
+                })
+            );
+        }
+
+        // vertical lines
+        for (let x = 0; x <= soundData.size; x++) {
+            const lineX = x * sequencerPatternWidth / SEQUENCER_RESOLUTION - 0.5;
+            if (lineX < sequencerScrollWindow.x) {
+                continue;
+            }
+            if (lineX > sequencerScrollWindow.x + sequencerScrollWindow.w) {
+                break;
+            }
+
+            const offset = lineX - sequencerScrollWindow.x;
+            context.beginPath();
+            context.moveTo(offset, x % (4 * SEQUENCER_RESOLUTION) ? SEQUENCER_GRID_METER_HEIGHT : 0);
+            context.lineTo(offset, height);
+            context.strokeStyle = x === soundData.size
+                ? strongColor
+                : x % (4 * SEQUENCER_RESOLUTION) === 0
+                    ? hiColor
+                    : x % SEQUENCER_RESOLUTION === 0
+                        ? medColor
+                        : lowColor;
+            context.stroke();
+
+            // meter numbers
+            if ((x / SEQUENCER_RESOLUTION) % 4 === 0) {
+                context.fillStyle = hiColor;
+                context.fillText((x / SEQUENCER_RESOLUTION).toString(), offset + 3, 10);
+            }
+        }
+
+        // horizontal lines
+        for (let y = 0; y <= soundData.tracks.length; y++) {
+            const offset = SEQUENCER_GRID_METER_HEIGHT + y * sequencerPatternHeight - 0.5;
+            context.beginPath();
+            context.moveTo(0, offset);
+            context.lineTo(width, offset);
+            context.strokeStyle = y % soundData.tracks.length === 0
+                ? strongColor
+                : hiColor;
+            context.stroke();
         }
     };
 
@@ -264,10 +369,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     useEffect(() => {
         draw();
     }, [
+        soundData,
         currentThemeType,
-        soundData.size,
-        soundData.tracks.length,
         currentTrackId,
+        currentSequenceIndex,
         playRangeStart,
         playRangeEnd,
         sequencerPatternHeight,
