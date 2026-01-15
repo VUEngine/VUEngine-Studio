@@ -32,7 +32,7 @@ interface PianoRollHeaderGridProps {
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
     setPlayRangeEnd: (playRangeEnd: number) => void
-    setPatternAtCursorPosition: (cursor?: number, size?: number) => Promise<void>
+    setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     removePatternFromSequence: (trackId: number, step: number) => void
@@ -86,7 +86,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.lineWidth = 1;
-        context.font = '9px monospace';
+        context.font = '10px monospace';
         const w = canvas.width;
         const h = canvas.height;
 
@@ -106,7 +106,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             context.stroke();
 
             // meter numbers
-            context.fillText(x.toString(), offset + 4, 11);
+            context.fillText(x.toString(), offset + 4, 12);
         }
 
         // middle line

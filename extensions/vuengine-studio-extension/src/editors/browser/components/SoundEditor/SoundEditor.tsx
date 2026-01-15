@@ -321,13 +321,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (currentPatternEvents[patternRelativeStep] && currentPatternEvents[patternRelativeStep][SoundEvent.Note]) {
             updatedSelectedNotes.push(patternRelativeStep);
         }
-        setSelectedNotes(updatedSelectedNotes);
-    };
-
-    const updateSelectedNotes = (notes: number[]): void => {
-        setSelectedNotes(notes);
-        const currentPatternStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
-        setNoteCursor(currentPatternStartStep + (notes[0] ?? 0));
     };
 
     const selectAllNotesInCurrentPattern = (): void => {
@@ -1196,7 +1189,7 @@ A total of {0} instruments will be deleted.",
                                 eventListHidden={eventListHidden}
                                 setEventListHidden={setEventListHidden}
                                 selectedNotes={selectedNotes}
-                                setSelectedNotes={updateSelectedNotes}
+                                setSelectedNotes={setSelectedNotes}
                                 noteSnapping={noteSnapping}
                                 newNoteDuration={newNoteDuration}
                                 pianoRollNoteHeight={pianoRollNoteHeight}

@@ -195,11 +195,17 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+shift+down',
     };
-    export const SELECT_PATTERN_AT_CURSOR_POSITION: EditorCommand = {
-        id: 'editors.soundEditor.selectPatternAtCursorPosition',
-        label: nls.localize('vuengine/editors/sound/commands/selectPatternAtCursorPosition', 'Select Pattern At Cursor Position'),
+    export const SELECT_AT_CURSOR_POSITION: EditorCommand = {
+        id: 'editors.soundEditor.selectAtCursorPosition',
+        label: nls.localize('vuengine/editors/sound/commands/selectAtCursorPosition', 'Select Note At Cursor Position'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'enter',
+    };
+    export const ADD_AT_CURSOR_POSITION: EditorCommand = {
+        id: 'editors.soundEditor.addAtCursorPosition',
+        label: nls.localize('vuengine/editors/sound/commands/addAtCursorPosition', 'Add Note At Cursor Position To Selection'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+enter',
     };
     export const REMOVE_SELECTED_NOTES: EditorCommand = {
         id: 'editors.soundEditor.removeSelectedNotes',

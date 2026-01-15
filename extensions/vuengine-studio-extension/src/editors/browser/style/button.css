@@ -16,6 +16,7 @@
   background-color: var(--theia-button-hoverBackground);
   color: #fff;
   border-color: var(--theia-button-hoverBackground);
+  outline: none;
 }
 .jsonforms-container .add-button.large {
   height: 48px;
