@@ -10,20 +10,23 @@ import { getPatternName } from '../SoundEditor';
 import { DEFAULT_PATTERN_SIZE, NEW_PATTERN_ID, SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
 import Input from '../../Common/Base/Input';
 
-const StyledPattern = styled.div`
+const StyledPattern = styled.button`
     background-color: var(--theia-secondaryButton-background);
+    border: none;
     border-radius: 2px;
     box-sizing: border-box;
+    color: var(--theia-foreground-color);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     font-size: 80%;
     gap: 5px;
-    height: 70px;
+    min-height: 70px !important;
     overflow: hidden;
-    padding: var(--theia-ui-padding);
+    padding: var(--theia-ui-padding) !important;
     width: 200px;
 
+    &:focus,
     &:hover {
         outline: 1px solid var(--theia-button-background);
         outline-offset: 1px;
@@ -82,7 +85,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setCurrentSequenceIndex,
         setAddPatternDialogOpen,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [filter, setFilter] = React.useState<string>('');
 
     const addPatternToSequence = async (patternId: string): Promise<void> => {
@@ -159,7 +162,13 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         [SoundEditorTrackType.NOISE]: patterns.filter(p => p.type === SoundEditorTrackType.NOISE),
     };
 
-    return <VContainer gap={20} grow={1}>
+    const onEnter = (e: React.KeyboardEvent, fn: () => void): void => {
+        if (e.key === 'Enter') {
+            fn();
+        }
+    };
+
+    return <VContainer gap={20} grow={1} overflow='auto' style={{ padding: 2 }}>
         <HContainer gap={20}>
             <Input
                 value={filter}
@@ -180,7 +189,14 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             </VContainer>
         </HContainer>
 
-        <StyledNewPattern onClick={() => addPatternToSequence(NEW_PATTERN_ID)}>
+        <StyledNewPattern
+            onClick={() => addPatternToSequence(NEW_PATTERN_ID)}
+            onKeyDown={e => onEnter(e, () => addPatternToSequence(NEW_PATTERN_ID))}
+            tabIndex={0}
+            autoFocus
+            onFocus={disableCommands}
+            onBlur={enableCommands}
+        >
             <VContainer justifyContent='center' grow={1}>
                 <i className='codicon codicon-plus' />
             </VContainer>
@@ -195,39 +211,47 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             </HContainer>
         </StyledNewPattern>
 
-        {Object.values(SoundEditorTrackType).map(t => (
-            <Fragment key={t}>
-                {
-                    patternMap[t].length > 0 &&
-                    <VContainer>
-                        <label>{TRACK_TYPE_LABELS[t]}</label>
-                        <HContainer gap={10} wrap='wrap'>
-                            {patternMap[t].map(p =>
-                                <StyledPattern key={p.id} onClick={() => addPatternToSequence(p.id)}>
-                                    <VContainer grow={1}>
-                                        <PatternCanvas
-                                            soundData={soundData}
-                                            pattern={soundData.patterns[p.id]}
-                                            trackId={trackId}
-                                            sequencerPatternHeight={sequencerPatternHeight}
-                                            sequencerPatternWidth={sequencerPatternWidth}
-                                        />
-                                    </VContainer>
-                                    <HContainer justifyContent='space-between'>
-                                        <div>
-                                            {p.label}
-                                        </div>
-                                        <div>
-                                            <i className='codicon codicon-arrow-both' />
-                                            {p.size}
-                                        </div>
-                                    </HContainer>
-                                </StyledPattern>
-                            )}
-                        </HContainer>
-                    </VContainer>
-                }
-            </Fragment>
-        ))}
-    </VContainer>;
+        {
+            Object.values(SoundEditorTrackType).map(t => (
+                <Fragment key={t}>
+                    {
+                        patternMap[t].length > 0 &&
+                        <VContainer>
+                            <label>{TRACK_TYPE_LABELS[t]}</label>
+                            <HContainer gap={10} wrap='wrap'>
+                                {patternMap[t].map(p =>
+                                    <StyledPattern
+                                        key={p.id}
+                                        onClick={() => addPatternToSequence(p.id)}
+                                        onKeyDown={e => onEnter(e, () => addPatternToSequence(p.id))}
+                                        onFocus={disableCommands}
+                                        onBlur={enableCommands}
+                                    >
+                                        <VContainer grow={1}>
+                                            <PatternCanvas
+                                                soundData={soundData}
+                                                pattern={soundData.patterns[p.id]}
+                                                trackId={trackId}
+                                                sequencerPatternHeight={sequencerPatternHeight}
+                                                sequencerPatternWidth={sequencerPatternWidth}
+                                            />
+                                        </VContainer>
+                                        <HContainer justifyContent='space-between'>
+                                            <div>
+                                                {p.label}
+                                            </div>
+                                            <div>
+                                                <i className='codicon codicon-arrow-both' />
+                                                {p.size}
+                                            </div>
+                                        </HContainer>
+                                    </StyledPattern>
+                                )}
+                            </HContainer>
+                        </VContainer>
+                    }
+                </Fragment>
+            ))
+        }
+    </VContainer >;
 }

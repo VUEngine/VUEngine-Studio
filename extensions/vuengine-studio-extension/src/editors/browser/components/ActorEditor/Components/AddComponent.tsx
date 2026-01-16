@@ -1,25 +1,29 @@
 import { Atom, FilmStrip, Hexagon, Image, MusicNotes, Selection, SneakerMove, UserFocus } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { ActorData } from '../ActorEditorTypes';
 
-const StyledComponent = styled.div`
+const StyledComponent = styled.button`
     align-items: center;
     background-color: var(--theia-secondaryButton-background);
+    border: none;
     border-radius: 2px;
     box-sizing: border-box;
+    color: var(--theia-foreground-color);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 5px;
     height: 88px;
     overflow: hidden;
-    padding: var(--theia-ui-padding);
+    padding: var(--theia-ui-padding) !important;
     width: 180px;
 
+    &:focus,
     &:hover {
         outline: 1px solid var(--theia-button-background);
         outline-offset: 1px;
@@ -47,6 +51,13 @@ export default function AddComponent(props: AddComponentProps): React.JSX.Elemen
         setAddComponentDialogOpen,
         addComponent,
     } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+
+    const onEnter = (e: React.KeyboardEvent, fn: () => void): void => {
+        if (e.key === 'Enter') {
+            fn();
+        }
+    };
 
     const componentButtons = [{
         key: 'sprites',
@@ -90,15 +101,27 @@ export default function AddComponent(props: AddComponentProps): React.JSX.Elemen
         allowAdd: data.components.bodies.length === 0,
     }]
         .sort((a, b) => a.label.localeCompare(b.label))
-        .map(t =>
+        .map((t, i) =>
             <StyledComponent
+                key={i}
                 className={!t.allowAdd ? 'disabled' : undefined}
+                disabled={!t.allowAdd}
+                tabIndex={i === 0 ? 0 : undefined}
+                autoFocus={i === 0 ? true : undefined}
                 onClick={() => {
                     if (t.allowAdd) {
                         addComponent(t.key);
                         setAddComponentDialogOpen(false);
                     }
                 }}
+                onKeyDown={e => onEnter(e, () => {
+                    if (t.allowAdd) {
+                        addComponent(t.key);
+                        setAddComponentDialogOpen(false);
+                    }
+                })}
+                onFocus={disableCommands}
+                onBlur={enableCommands}
             >
                 <VContainer justifyContent='center' grow={1}>
                     {t.icon}
@@ -107,7 +130,7 @@ export default function AddComponent(props: AddComponentProps): React.JSX.Elemen
             </StyledComponent>
         );
 
-    return <HContainer gap={10} wrap='wrap'>
+    return <HContainer gap={10} wrap='wrap' overflow='auto' style={{ padding: 2 }}>
         {componentButtons}
     </HContainer>;
 }

@@ -1,4 +1,4 @@
-import { BookOpen, FadersHorizontal, Guitar, Keyboard, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Keyboard, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -514,7 +514,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     title={nls.localizeByDefault('Documentation')}
                     onClick={() => services.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/sound-editor', false)}
                 >
-                    <BookOpen size={17} />
+                    <i className="codicon codicon-book" />
                 </StyledSoundEditorToolbarButton>
             </StyledSoundEditorToolbarGroup>
         </StyledSoundEditorToolbarSide>

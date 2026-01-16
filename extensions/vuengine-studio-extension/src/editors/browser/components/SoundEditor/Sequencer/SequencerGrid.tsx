@@ -10,6 +10,7 @@ import {
     SCROLL_BAR_WIDTH,
     ScrollWindow,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_GRID_WIDTH,
     SEQUENCER_NOTE_HEIGHT,
     SEQUENCER_RESOLUTION,
     SoundData,
@@ -29,6 +30,7 @@ const StyledCanvas = styled.canvas`
 interface SequencerGridProps {
     soundData: SoundData
     currentTrackId: number
+    currentPatternId: string
     currentSequenceIndex: number
     addPattern: (trackId: number, bar: number, size?: number) => void
     playRangeStart: number
@@ -56,6 +58,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const {
         soundData,
         currentTrackId,
+        currentPatternId,
         currentSequenceIndex,
         addPattern,
         playRangeStart, setPlayRangeStart,
@@ -97,8 +100,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         const highContrastTheme = ['hc', 'hcLight'].includes(currentThemeType);
         const c = currentThemeType === 'light' ? 0 : 255;
-        const highlightFullColor = services.colorRegistry.getCurrentColor('focusBorder')!;
-        const highlightHiColor = highlightFullColor + '75';
+        const highlightColor = services.colorRegistry.getCurrentColor('focusBorder')!;
+        const patternBackgroundColor = services.colorRegistry.getCurrentColor('secondaryButton.background')!;
+        const patternForegroundColor = services.colorRegistry.getCurrentColor('secondaryButton.foreground')!;
         const fullColor = `rgba(${c}, ${c}, ${c}, 1)`;
         const lowColor = highContrastTheme
             ? fullColor
@@ -124,7 +128,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             width,
             sequencerPatternHeight - 1
         );
-        context.fillStyle = medColor;
+        context.fillStyle = lowColor;
         context.fill();
 
         // play range
@@ -150,75 +154,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             context.lineTo(rightOffset, 0.5 + SEQUENCER_GRID_METER_HEIGHT / 2);
             context.lineTo(rightOffset - SEQUENCER_GRID_METER_HEIGHT / 2, 0.5);
             context.fill();
-        }
-
-        // patterns
-        {
-            soundData.tracks.forEach((track, trackId) =>
-                Object.keys(track.sequence).forEach(key => {
-                    const step = parseInt(key);
-                    const patternId = track.sequence[step];
-                    const pattern = soundData.patterns[patternId];
-                    if (!pattern) {
-                        return;
-                    }
-
-                    const patternX = step / SEQUENCER_RESOLUTION * sequencerPatternWidth;
-                    const patternWidth = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth;
-
-                    if (sequencerScrollWindow.x > patternX + patternWidth || patternX > sequencerScrollWindow.x + sequencerScrollWindow.w) {
-                        return;
-                    }
-
-                    const patternXOffset = patternX - sequencerScrollWindow.x;
-                    const patternY = SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight;
-                    const patternHeight = sequencerPatternHeight;
-
-                    // pattern background
-                    if (trackId === currentTrackId && step === currentSequenceIndex) {
-                        context.fillStyle = highlightHiColor;
-                    } else {
-                        context.fillStyle = medColor;
-                    }
-                    context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
-
-                    // pattern notes
-                    const trackDefaultInstrument = soundData.instruments[track.instrument];
-                    const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
-                    Object.keys(pattern.events).forEach((eventKey: string) => {
-                        const s = parseInt(eventKey);
-                        const event = pattern.events[s];
-                        const noteLabel = event[SoundEvent.Note];
-                        if (noteLabel) {
-                            const instrumentId = event[SoundEvent.Instrument];
-                            const color = instrumentId
-                                ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
-                                : defaultColor;
-                            const noteId = NOTES_LABELS.indexOf(noteLabel);
-                            const duration = event[SoundEvent.Duration]
-                                ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
-                                : 1;
-                            const noteXPosition = Math.floor(s / SUB_NOTE_RESOLUTION) * patternNoteWidth;
-                            const noteYPosition = Math.floor(((sequencerPatternHeight - SEQUENCER_NOTE_HEIGHT) / NOTES_SPECTRUM * noteId)
-                                - (SEQUENCER_NOTE_HEIGHT / 2)) + noteHeightOverlap;
-                            context.fillStyle = color;
-                            context.fillRect(
-                                patternXOffset + noteXPosition,
-                                patternY + noteYPosition,
-                                duration * patternNoteWidth,
-                                SEQUENCER_NOTE_HEIGHT
-                            );
-                        }
-                    });
-
-                    // pattern name
-                    context.fillStyle = fullColor;
-                    const patternName = pattern.size >= 4
-                        ? getPatternName(soundData, patternId)
-                        : '…';
-                    context.fillText(patternName, patternXOffset + 3, patternY + 10, patternWidth - 6);
-                })
-            );
         }
 
         // vertical lines
@@ -261,6 +196,87 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 ? strongColor
                 : hiColor;
             context.stroke();
+        }
+
+        // patterns
+        {
+            soundData.tracks.forEach((track, trackId) =>
+                Object.keys(track.sequence).forEach(key => {
+                    const step = parseInt(key);
+                    const patternId = track.sequence[step];
+                    const pattern = soundData.patterns[patternId];
+                    if (!pattern) {
+                        return;
+                    }
+
+                    const patternX = step / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+                    const patternWidth = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
+
+                    if (sequencerScrollWindow.x > patternX + patternWidth || patternX > sequencerScrollWindow.x + sequencerScrollWindow.w) {
+                        return;
+                    }
+
+                    const patternXOffset = patternX - sequencerScrollWindow.x;
+                    const patternY = SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight;
+                    const patternHeight = sequencerPatternHeight - SEQUENCER_GRID_WIDTH;
+
+                    // pattern background
+                    if (trackId === currentTrackId && step === currentSequenceIndex) {
+                        context.fillStyle = highlightColor;
+                    } else {
+                        context.fillStyle = patternBackgroundColor;
+                    }
+                    context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
+
+                    // pattern border
+                    if (patternId === currentPatternId) {
+                        context.strokeStyle = highlightColor;
+                        context.beginPath();
+                        context.moveTo(patternXOffset, patternY);
+                        context.lineTo(patternXOffset + patternWidth, patternY);
+                        context.lineTo(patternXOffset + patternWidth, patternY + patternHeight);
+                        context.lineTo(patternXOffset, patternY + patternHeight);
+                        context.lineTo(patternXOffset, patternY);
+                        context.stroke();
+                    }
+
+                    // pattern notes
+                    const trackDefaultInstrument = soundData.instruments[track.instrument];
+                    const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
+                    Object.keys(pattern.events).forEach((eventKey: string) => {
+                        const s = parseInt(eventKey);
+                        const event = pattern.events[s];
+                        const noteLabel = event[SoundEvent.Note];
+                        if (noteLabel) {
+                            const instrumentId = event[SoundEvent.Instrument];
+                            const color = instrumentId
+                                ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
+                                : defaultColor;
+                            const noteId = NOTES_LABELS.indexOf(noteLabel);
+                            const duration = event[SoundEvent.Duration]
+                                ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
+                                : 1;
+                            const noteXPosition = Math.floor(s / SUB_NOTE_RESOLUTION) * patternNoteWidth;
+                            const noteYPosition = Math.floor(((sequencerPatternHeight - SEQUENCER_NOTE_HEIGHT) / NOTES_SPECTRUM * noteId)
+                                - (SEQUENCER_NOTE_HEIGHT / 2)) + noteHeightOverlap;
+                            context.fillStyle = color;
+                            context.fillRect(
+                                patternXOffset + noteXPosition,
+                                patternY + noteYPosition,
+                                duration * patternNoteWidth,
+                                SEQUENCER_NOTE_HEIGHT
+                            );
+                        }
+                    });
+
+                    // pattern name
+                    context.fillStyle = patternForegroundColor;
+                    const patternName = pattern.size >= 4
+                        ? getPatternName(soundData, patternId)
+                        : '…';
+                    context.fillText(patternName, patternXOffset + 3, patternY + 10, patternWidth - 6);
+                })
+            );
         }
     };
 

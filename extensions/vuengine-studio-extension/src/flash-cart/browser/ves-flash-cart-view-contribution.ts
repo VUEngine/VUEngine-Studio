@@ -36,14 +36,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             execute: () => this.toggleView()
         });
 
-        commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_EXPAND, {
-            isEnabled: () => true,
-            isVisible: widget => widget?.id === VesFlashCartWidget.ID,
-            execute: async widget => widget?.id === VesFlashCartWidget.ID &&
-                await this.openView({ activate: true, reveal: true }) &&
-                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
-        });
-
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_HELP, {
             isEnabled: () => true,
             isVisible: widget => widget?.id === VesFlashCartWidget.ID,
@@ -53,7 +45,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,
             isVisible: widget => widget?.id === VesFlashCartWidget.ID,
-            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'flash carts'),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Flash Carts'),
         });
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_REFRESH, {
@@ -64,12 +56,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
     }
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
-        toolbar.registerItem({
-            id: VesFlashCartCommands.WIDGET_EXPAND.id,
-            command: VesFlashCartCommands.WIDGET_EXPAND.id,
-            tooltip: VesFlashCartCommands.WIDGET_EXPAND.label,
-            priority: 1,
-        });
         toolbar.registerItem({
             id: VesFlashCartCommands.WIDGET_SETTINGS.id,
             command: VesFlashCartCommands.WIDGET_SETTINGS.id,

@@ -1,6 +1,7 @@
 import { CommandContribution, CommandRegistry, CommandService } from '@theia/core';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 
@@ -8,6 +9,8 @@ import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 export class VesProjectDashboardViewContribution extends AbstractViewContribution<VesProjectDashboardWidget> implements CommandContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(VesWorkspaceService)
+    protected readonly workspaceService: VesWorkspaceService;
 
     constructor() {
         super({
@@ -23,13 +26,15 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesProjectCommands.DASHBOARD_TOGGLE, {
             execute: async () => {
-                await this.openView({
-                    area: 'main',
-                    activate: true,
-                    reveal: true,
-                    // rank: -1000,
-                });
-                // this.commandService.executeCommand(CommonCommands.PIN_TAB.id);
+                if (this.workspaceService.opened) {
+                    await this.openView({
+                        area: 'main',
+                        activate: true,
+                        reveal: true,
+                        // rank: -1000,
+                    });
+                    // this.commandService.executeCommand(CommonCommands.PIN_TAB.id);
+                }
             }
         });
 

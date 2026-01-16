@@ -7,7 +7,7 @@ import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
-import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
@@ -140,7 +140,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         const buildMenuRunButton = new TouchBarButton({
             icon: runIcon,
-            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesEmulatorCommands.RUN.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, EmulatorCommands.RUN.id),
         });
         const buildMenuFlashButton = new TouchBarButton({
             icon: flashIcon,

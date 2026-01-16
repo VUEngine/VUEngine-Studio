@@ -354,7 +354,7 @@ Compatibility with your version of VUEngine is not guaranteed.'
     });
 
     protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        folder: e.currentTarget.value
+        folder: this.getPathName(e.currentTarget.value)
     });
 
     protected toggleUseTagged = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
@@ -372,7 +372,9 @@ Compatibility with your version of VUEngine is not guaranteed.'
 
     protected getPathName(name: string): string {
         return filenamify(name, { replacement: ' ' })
-            .replace(/\s+/g, '-')
+            .replace(/^\d+/, '') // remove leading numbers
+            .replace(/^\s+/, '') // remove leading whitespaces
+            .replace(/\s+/g, '-') // replace whitespaces with dashes
             .toLowerCase();
     }
 

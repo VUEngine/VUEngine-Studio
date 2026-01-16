@@ -90,7 +90,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
                 VesPluginsViewContainer.ID
             ].includes(widget?.id),
-            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Plugins'),
         });
     }
 

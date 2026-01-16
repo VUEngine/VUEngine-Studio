@@ -2,7 +2,7 @@ import { CommandService, nls, PreferenceService } from '@theia/core';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
-import { VesEmulatorCommands } from '../ves-emulator-commands';
+import { EmulatorCommands } from '../ves-emulator-commands';
 import EmulatorAutoQueuePreference from './EmulatorAutoQueuePreference';
 import EmulatorConfigs from './EmulatorConfigs';
 
@@ -16,7 +16,7 @@ interface EmulatorSidebarProps {
 
 export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.Element {
     const { isQueued, commandService, fileDialogService, fileService, preferenceService } = props;
-    const run = () => commandService.executeCommand(VesEmulatorCommands.RUN.id);
+    const run = () => commandService.executeCommand(EmulatorCommands.RUN.id);
 
     return <div className='emulatorSidebarWidget'>
         <div className='runActions'>

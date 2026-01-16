@@ -30,16 +30,6 @@ export namespace VesFlashCartCommands {
     'vuengine/flashCarts/commands/category'
   );
 
-  export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
-    {
-      id: 'flashCarts.expandView',
-      label: 'Toggle Maximized',
-      iconClass: 'codicon codicon-arrow-both',
-    },
-    'vuengine/flashCarts/commands/expandView',
-    'vuengine/flashCarts/commands/category'
-  );
-
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'flashCarts.showHelp',

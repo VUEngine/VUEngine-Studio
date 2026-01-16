@@ -64,7 +64,11 @@ export default function ButtonAssignment(props: ButtonAssignmentProps): React.JS
         classNames.push(className);
     }
 
-    const openKeymaps = async () => commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
+    const openKeymaps = async () => commandService.executeCommand(
+        KeymapsCommands.OPEN_KEYMAPS.id, command.category
+        ? `${command.category}: ${command.label}`
+        : command.label
+    );
     let label = vesCommonService.getKeybindingLabel(command.id, false);
     if (label === '') {
         classNames.push('none');

@@ -1,5 +1,5 @@
 import { Command, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -12,16 +12,6 @@ export namespace VesEmulatorSidebarCommands {
             label: 'Toggle Emulator View',
         },
         'vuengine/emulator/sidebar/commands/toggleView',
-        'vuengine/emulator/sidebar/commands/category'
-    );
-
-    export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
-        {
-            id: 'emulatorSidebar.expandView',
-            label: 'Toggle Maximized',
-            iconClass: 'codicon codicon-arrow-both',
-        },
-        'vuengine/emulator/sidebar/commands/expandView',
         'vuengine/emulator/sidebar/commands/category'
     );
 
@@ -63,14 +53,6 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             execute: () => this.toggleView()
         });
 
-        commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_EXPAND, {
-            isEnabled: () => true,
-            isVisible: widget => widget?.id === VesEmulatorSidebarWidget.ID,
-            execute: async widget => widget?.id === VesEmulatorSidebarWidget.ID &&
-                await this.openView({ activate: true, reveal: true }) &&
-                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
-        });
-
         commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_HELP, {
             isEnabled: () => true,
             isVisible: widget => widget?.id === VesEmulatorSidebarWidget.ID,
@@ -79,12 +61,6 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
     }
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
-        toolbar.registerItem({
-            id: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
-            command: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
-            tooltip: VesEmulatorSidebarCommands.WIDGET_EXPAND.label,
-            priority: 1,
-        });
         toolbar.registerItem({
             id: VesEmulatorSidebarCommands.WIDGET_HELP.id,
             command: VesEmulatorSidebarCommands.WIDGET_HELP.id,

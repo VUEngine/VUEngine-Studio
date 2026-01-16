@@ -23,15 +23,14 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
         <Tabs style={{ height: '100%' }}>
             <TabList style={{ padding: '0 calc(var(--theia-ui-padding) * 2)' }}>
                 <Tab>
-                    {nls.localizeByDefault('Settings')}
+                    {nls.localize('vuengine/plugins/assets', 'Assets')}
                 </Tab>
                 <Tab>
-                    {nls.localize('vuengine/plugins/assets', 'Assets')}
+                    {nls.localizeByDefault('Settings')}
                 </Tab>
             </TabList>
             <TabPanel>
-                <ProjectSettings
-                    commandService={commandService}
+                <FilesTree
                     fileService={fileService}
                     openerService={openerService}
                     vesProjectService={vesProjectService}
@@ -39,7 +38,8 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
                 />
             </TabPanel>
             <TabPanel>
-                <FilesTree
+                <ProjectSettings
+                    commandService={commandService}
                     fileService={fileService}
                     openerService={openerService}
                     vesProjectService={vesProjectService}

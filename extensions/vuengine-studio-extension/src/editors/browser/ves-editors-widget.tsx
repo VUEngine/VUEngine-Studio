@@ -4,7 +4,6 @@ import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, va
 import { CommandService, Emitter, Event, MessageService, nls, PreferenceService, QuickPickService, Reference, UNTITLED_SCHEME, URI } from '@theia/core';
 import {
     CommonCommands,
-    ExtractableWidget,
     FrontendApplication,
     HoverService,
     LabelProvider,
@@ -59,7 +58,7 @@ export interface ItemData {
 };
 
 @injectable()
-export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource, ExtractableWidget {
+export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource {
     @inject(ClipboardService)
     private readonly clipboardService: ClipboardService;
     @inject(ColorRegistry)
@@ -158,9 +157,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected generatingProgress: number;
 
     protected statusBarItems: { [id: string]: StatusBarEntry } = {};
-
-    isExtractable: boolean = true;
-    secondaryWindow: Window | undefined;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {

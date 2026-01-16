@@ -22,6 +22,8 @@ import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
+import { KeymapsFrontendContribution } from '@theia/keymaps/lib/browser';
+import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
@@ -50,6 +52,8 @@ import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
 import { VesFilterContribution } from './ves-filter-contribution';
+import { VesKeybindingWidget } from './ves-keybindings-widget';
+import { VesKeymapsFrontendContribution } from './ves-keymaps-frontend-contribution';
 import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesOutlineViewContribution } from './ves-outline-view-contribution';
@@ -141,6 +145,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // quick open workspace
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
+
+    // override keybindings widget to allow querying through OPEN_KEYMAPS command parameter
+    rebind(KeymapsFrontendContribution).to(VesKeymapsFrontendContribution).inSingletonScope();
+    rebind(KeybindingWidget).to(VesKeybindingWidget);
 
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();

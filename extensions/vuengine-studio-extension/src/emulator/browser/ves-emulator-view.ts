@@ -3,9 +3,10 @@ import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browse
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { VesEmulatorCommands } from './ves-emulator-commands';
+import { EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorWidget } from './ves-emulator-widget';
+import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 
 @injectable()
 export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements CommandContribution, TabBarToolbarContribution {
@@ -37,30 +38,40 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_HELP, {
+    commandRegistry.registerCommand(EmulatorCommands.WIDGET_HELP, {
       isEnabled: () => true,
       isVisible: widget => widget?.id === VesEmulatorWidget.ID,
       execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
     });
-
-    commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_SETTINGS, {
+    commandRegistry.registerCommand(EmulatorCommands.WIDGET_KEYBINDINGS, {
       isEnabled: () => true,
       isVisible: widget => widget?.id === VesEmulatorWidget.ID,
-      execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'emulator'),
+      execute: () => this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id, 'Emulator'),
+    });
+    commandRegistry.registerCommand(EmulatorCommands.WIDGET_SETTINGS, {
+      isEnabled: () => true,
+      isVisible: widget => widget?.id === VesEmulatorWidget.ID,
+      execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Emulator'),
     });
   }
 
   registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
     toolbar.registerItem({
-      id: VesEmulatorCommands.WIDGET_HELP.id,
-      command: VesEmulatorCommands.WIDGET_HELP.id,
-      tooltip: VesEmulatorCommands.WIDGET_HELP.label,
+      id: EmulatorCommands.WIDGET_HELP.id,
+      command: EmulatorCommands.WIDGET_HELP.id,
+      tooltip: EmulatorCommands.WIDGET_HELP.label,
+      priority: 2,
+    });
+    toolbar.registerItem({
+      id: EmulatorCommands.WIDGET_KEYBINDINGS.id,
+      command: EmulatorCommands.WIDGET_KEYBINDINGS.id,
+      tooltip: EmulatorCommands.WIDGET_KEYBINDINGS.label,
       priority: 1,
     });
     toolbar.registerItem({
-      id: VesEmulatorCommands.WIDGET_SETTINGS.id,
-      command: VesEmulatorCommands.WIDGET_SETTINGS.id,
-      tooltip: VesEmulatorCommands.WIDGET_SETTINGS.label,
+      id: EmulatorCommands.WIDGET_SETTINGS.id,
+      command: EmulatorCommands.WIDGET_SETTINGS.id,
+      tooltip: EmulatorCommands.WIDGET_SETTINGS.label,
       priority: 0,
     });
   }

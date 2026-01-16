@@ -9,7 +9,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import Input from '../../editors/browser/components/Common/Base/Input';
-import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesExportService } from '../../export/browser/ves-export-service';
@@ -255,7 +255,7 @@ export class VesBuildWidget extends ReactWidget {
                   onClick={this.run}
                   title={this.vesEmulatorService.isQueued
                     ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                    : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+                    : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`}
                 >
                   {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
                 </button>
@@ -526,7 +526,7 @@ export class VesBuildWidget extends ReactWidget {
 
   protected abort = async () => this.vesBuildService.abortBuild();
   protected run = () => {
-    this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+    this.commandService.executeCommand(EmulatorCommands.RUN.id);
     this.update();
   };
   protected flash = () => {

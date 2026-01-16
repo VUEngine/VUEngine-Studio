@@ -24,7 +24,7 @@ import { Systeminformation } from 'systeminformation';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { clamp } from '../../editors/browser/components/Common/Utils';
 import { EngineConfigData } from '../../editors/browser/components/EngineConfigEditor/EngineConfigEditorTypes';
-import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
@@ -273,7 +273,7 @@ export class VesBuildService {
     } else {
       await this.build();
       if (this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE)) {
-        this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+        this.commandService.executeCommand(EmulatorCommands.RUN.id);
       }
       if (this.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE)) {
         this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);

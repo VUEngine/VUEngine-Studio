@@ -1232,19 +1232,16 @@ A total of {0} instruments will be deleted.",
                     width='435px'
                     cancelButton={true}
                     okButton={false}
-                    overflow='visible'
                 >
-                    <VContainer gap={15}>
-                        <AddTrack
-                            soundData={soundData}
-                            updateSoundData={updateSoundData}
-                            trackSettings={trackSettings}
-                            setTrackSettings={setTrackSettings}
-                            isTrackAvailable={isTrackAvailable}
-                            setAddTrackDialogOpen={setAddTrackDialogOpen}
-                            setEditTrackDialogOpen={setEditTrackDialogOpen}
-                        />
-                    </VContainer>
+                    <AddTrack
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        trackSettings={trackSettings}
+                        setTrackSettings={setTrackSettings}
+                        isTrackAvailable={isTrackAvailable}
+                        setAddTrackDialogOpen={setAddTrackDialogOpen}
+                        setEditTrackDialogOpen={setEditTrackDialogOpen}
+                    />
                 </PopUpDialog>
             }
             {addPatternDialogOpen.trackId > -1 &&

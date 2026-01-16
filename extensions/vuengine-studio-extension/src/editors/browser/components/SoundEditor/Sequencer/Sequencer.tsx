@@ -473,6 +473,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             <SequencerGrid
                 soundData={soundData}
                 currentTrackId={currentTrackId}
+                currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 addPattern={addPattern}
                 playRangeStart={playRangeStart}

@@ -666,15 +666,12 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                     width='585px'
                                     cancelButton={true}
                                     okButton={false}
-                                    overflow='visible'
                                 >
-                                    <VContainer gap={15}>
-                                        <AddComponent
-                                            data={data}
-                                            setAddComponentDialogOpen={setAddComponentDialogOpen}
-                                            addComponent={doAddComponent}
-                                        />
-                                    </VContainer>
+                                    <AddComponent
+                                        data={data}
+                                        setAddComponentDialogOpen={setAddComponentDialogOpen}
+                                        addComponent={doAddComponent}
+                                    />
                                 </PopUpDialog>
                             }
                             {spriteProcessingDialog !== false && (

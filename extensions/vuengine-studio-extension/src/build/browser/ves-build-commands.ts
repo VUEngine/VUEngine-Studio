@@ -60,16 +60,6 @@ export namespace VesBuildCommands {
     'vuengine/build/commands/toggleViewy'
   );
 
-  export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
-    {
-      id: 'build.expandView',
-      label: 'Toggle Maximized',
-      iconClass: 'codicon codicon-arrow-both',
-    },
-    'vuengine/build/commands/expandView',
-    'vuengine/build/commands/category'
-  );
-
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'build.showHelp',

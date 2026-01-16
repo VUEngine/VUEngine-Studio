@@ -2,7 +2,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesEmulatorCommands } from './ves-emulator-commands';
+import { EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorService } from './ves-emulator-service';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 
@@ -16,132 +16,132 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
   private readonly workspaceService: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesEmulatorCommands.RUN, {
+    commandRegistry.registerCommand(EmulatorCommands.RUN, {
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.run(),
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.SELECT, {
+    commandRegistry.registerCommand(EmulatorCommands.SELECT, {
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.selectEmulator(),
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER, {
+    commandRegistry.registerCommand(EmulatorCommands.CANCEL_RED_VIPER_TRANSFER, {
       isVisible: () => false,
       execute: () => this.vesEmulatorService.cancelRedViperTransfer(),
     });
 
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_UP, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_L_UP, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_RIGHT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_L_RIGHT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_DOWN, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_L_DOWN, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_LEFT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_L_LEFT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_START, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_START, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SELECT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_SELECT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_TRIGGER, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_L_TRIGGER, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_UP, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_R_UP, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_RIGHT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_R_RIGHT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_DOWN, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_R_DOWN, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_LEFT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_R_LEFT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_B, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_B, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_A, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_A, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_TRIGGER, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_R_TRIGGER, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SAVE_STATE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_SAVE_STATE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_LOAD_STATE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_LOAD_STATE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_STATE_SLOT_DECREASE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_STATE_SLOT_INCREASE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_PAUSE_TOGGLE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_PAUSE_TOGGLE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_SLOWMOTION, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_LOW_POWER, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_REWIND, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_REWIND, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_FRAME_ADVANCE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_FRAME_ADVANCE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_RESET, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_RESET, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_AUDIO_MUTE, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_AUDIO_MUTE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_FULLSCREEN, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_FULLSCREEN, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SCREENSHOT, {
+    commandRegistry.registerCommand(EmulatorCommands.INPUT_SCREENSHOT, {
       execute: () => { },
       isVisible: () => false,
     });
@@ -149,153 +149,153 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
   registerKeybindings(registry: KeybindingRegistry): void {
     registry.registerKeybinding({
-      command: VesEmulatorCommands.RUN.id,
+      command: EmulatorCommands.RUN.id,
       keybinding: 'alt+shift+r',
     });
 
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_L_UP.id,
+      command: EmulatorCommands.INPUT_L_UP.id,
       keybinding: 'e',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_L_RIGHT.id,
+      command: EmulatorCommands.INPUT_L_RIGHT.id,
       keybinding: 'f',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_L_DOWN.id,
+      command: EmulatorCommands.INPUT_L_DOWN.id,
       keybinding: 'd',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_L_LEFT.id,
+      command: EmulatorCommands.INPUT_L_LEFT.id,
       keybinding: 's',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_START.id,
+      command: EmulatorCommands.INPUT_START.id,
       keybinding: 'b',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_SELECT.id,
+      command: EmulatorCommands.INPUT_SELECT.id,
       keybinding: 'v',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_L_TRIGGER.id,
+      command: EmulatorCommands.INPUT_L_TRIGGER.id,
       keybinding: 'g',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_R_UP.id,
+      command: EmulatorCommands.INPUT_R_UP.id,
       keybinding: 'i',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_R_RIGHT.id,
+      command: EmulatorCommands.INPUT_R_RIGHT.id,
       keybinding: 'l',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_R_DOWN.id,
+      command: EmulatorCommands.INPUT_R_DOWN.id,
       keybinding: 'k',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_R_LEFT.id,
+      command: EmulatorCommands.INPUT_R_LEFT.id,
       keybinding: 'j',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_B.id,
+      command: EmulatorCommands.INPUT_B.id,
       keybinding: 'n',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_A.id,
+      command: EmulatorCommands.INPUT_A.id,
       keybinding: 'm',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_R_TRIGGER.id,
+      command: EmulatorCommands.INPUT_R_TRIGGER.id,
       keybinding: 'h',
       when: 'emulatorFocus',
     });
 
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_SAVE_STATE.id,
+      command: EmulatorCommands.INPUT_SAVE_STATE.id,
       keybinding: '1',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_LOAD_STATE.id,
+      command: EmulatorCommands.INPUT_LOAD_STATE.id,
       keybinding: '2',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
+      command: EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
       keybinding: '3',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
+      command: EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
       keybinding: '4',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
+      command: EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
       keybinding: 'right',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
+      command: EmulatorCommands.INPUT_PAUSE_TOGGLE.id,
       keybinding: 'space',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
+      command: EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
       keybinding: 'down',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
+      command: EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
       keybinding: 'w',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_REWIND.id,
+      command: EmulatorCommands.INPUT_REWIND.id,
       keybinding: 'left',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
+      command: EmulatorCommands.INPUT_FRAME_ADVANCE.id,
       keybinding: 'up',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_RESET.id,
+      command: EmulatorCommands.INPUT_RESET.id,
       keybinding: 'f10',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
+      command: EmulatorCommands.INPUT_AUDIO_MUTE.id,
       keybinding: 'q',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_FULLSCREEN.id,
+      command: EmulatorCommands.INPUT_FULLSCREEN.id,
       keybinding: 'o',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
+      command: EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
       keybinding: 'p',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_SCREENSHOT.id,
+      command: EmulatorCommands.INPUT_SCREENSHOT.id,
       keybinding: 'f9',
       when: 'emulatorFocus',
     });
@@ -303,13 +303,13 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
-      commandId: VesEmulatorCommands.RUN.id,
-      label: VesEmulatorCommands.RUN.label,
+      commandId: EmulatorCommands.RUN.id,
+      label: EmulatorCommands.RUN.label,
       order: '3',
     });
     menus.registerMenuAction(VesBuildMenuSection.CONFIG, {
-      commandId: VesEmulatorCommands.SELECT.id,
-      label: VesEmulatorCommands.SELECT.label,
+      commandId: EmulatorCommands.SELECT.id,
+      label: EmulatorCommands.SELECT.label,
       order: '2',
     });
   }

@@ -1,5 +1,5 @@
-import { CommandService, Emitter } from '@theia/core';
-import { ApplicationShell, CommonCommands, Widget } from '@theia/core/lib/browser';
+import { CommandService } from '@theia/core';
+import { ApplicationShell, CommonCommands, MAXIMIZED_CLASS } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -18,16 +18,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
 
-    protected _isMaximized: Widget | false = false;
-    protected readonly onDidChangeIsMaximizedEmitter = new Emitter<Widget | false>();
-    readonly onDidChangeIsMaximized = this.onDidChangeIsMaximizedEmitter.event;
-    set isMaximized(flag: Widget | false) {
-        this._isMaximized = flag;
-        this.onDidChangeIsMaximizedEmitter.fire(this._isMaximized);
-    }
-    get isMaximized(): Widget | false {
-        return this._isMaximized;
-    }
+    protected isMaximized: boolean = false;
 
     @postConstruct()
     protected init(): void {
@@ -35,7 +26,10 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.title.label = VesTitlebarActionButtonsWidget.LABEL;
         this.title.caption = VesTitlebarActionButtonsWidget.LABEL;
         this.title.closable = false;
-        this.onDidChangeIsMaximized(() => this.update());
+        this.applicationShell.onDidToggleMaximized(max => {
+            this.isMaximized = max.hasClass(MAXIMIZED_CLASS);
+            this.update();
+        });
 
         this.update();
     }
@@ -46,6 +40,9 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 className="titlebar-action-button"
                 title={`${CommonCommands.TOGGLE_MAXIMIZED.label}${this.vesCommonService.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`}
                 onClick={this.collapse}
+                style={{
+                    display: !this.isMaximized ? 'none' : undefined,
+                }}
             >
                 <i className="fa fa-compress"></i>
             </div>

@@ -1,6 +1,6 @@
 import { Command } from '@theia/core';
 
-export namespace VesEmulatorCommands {
+export namespace EmulatorCommands {
   export const RUN: Command = Command.toLocalizedCommand(
     {
       id: 'emulator.run',
@@ -329,6 +329,17 @@ export namespace VesEmulatorCommands {
       iconClass: 'codicon codicon-book',
     },
     'vuengine/emulator/showDocumentation',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const WIDGET_KEYBINDINGS: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.showKeybindings',
+      label: 'Show Emulator Keybindings',
+      category: 'Emulator',
+      iconClass: 'fa fa-keyboard-o',
+    },
+    'vuengine/emulator/commands/showKeybindings',
     'vuengine/emulator/commands/category'
   );
 

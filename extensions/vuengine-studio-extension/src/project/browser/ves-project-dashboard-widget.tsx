@@ -1,6 +1,5 @@
 import { CommandService, MessageService, nls, PreferenceService, QuickPickService } from '@theia/core';
 import {
-    ExtractableWidget,
     FrontendApplication,
     HoverService,
     LocalStorageService,
@@ -42,7 +41,7 @@ interface VesProjectDashboardWidgetState {
 }
 
 @injectable()
-export class VesProjectDashboardWidget extends ReactWidget implements ExtractableWidget {
+export class VesProjectDashboardWidget extends ReactWidget {
     @inject(FrontendApplication)
     protected readonly app: FrontendApplication;
     @inject(ClipboardService)
@@ -104,9 +103,6 @@ export class VesProjectDashboardWidget extends ReactWidget implements Extractabl
     };
 
     protected resource = '';
-
-    isExtractable: boolean = true;
-    secondaryWindow: Window | undefined;
 
     protected statusBarItems: { [id: string]: StatusBarEntry } = {};
 

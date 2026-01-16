@@ -44,13 +44,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                     : this.toggleView()
         });
 
-        commandRegistry.registerCommand(VesBuildCommands.WIDGET_EXPAND, {
-            isEnabled: () => true,
-            isVisible: widget => widget?.id === VesBuildWidget.ID,
-            execute: async widget => widget?.id === VesBuildWidget.ID &&
-                await this.openView({ activate: true, reveal: true }) &&
-                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
-        });
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_HELP, {
             isEnabled: () => true,
             isVisible: widget => widget?.id === VesBuildWidget.ID,
@@ -59,17 +52,11 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,
             isVisible: widget => widget?.id === VesBuildWidget.ID,
-            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'build'),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Build'),
         });
     }
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
-        toolbar.registerItem({
-            id: VesBuildCommands.WIDGET_EXPAND.id,
-            command: VesBuildCommands.WIDGET_EXPAND.id,
-            tooltip: VesBuildCommands.WIDGET_EXPAND.label,
-            priority: 0,
-        });
         toolbar.registerItem({
             id: VesBuildCommands.WIDGET_SETTINGS.id,
             command: VesBuildCommands.WIDGET_SETTINGS.id,
