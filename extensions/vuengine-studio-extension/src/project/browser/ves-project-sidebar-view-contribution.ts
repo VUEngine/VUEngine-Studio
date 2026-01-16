@@ -1,5 +1,6 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
+import { Command, CommandContribution, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
 import { AbstractViewContribution, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 
@@ -9,13 +10,31 @@ export namespace VesProjectSidebarCommands {
             id: 'projectSidebar.toggleView',
             label: 'Toggle Project View',
         },
-        'vuengine/emulator/sidebar/commands/toggleView',
-        'vuengine/emulator/sidebar/commands/category'
+        'vuengine/projects/sidebar/commands/toggleView',
+        'vuengine/projects/sidebar/commands/category'
+    );
+    export const EXPAND_ALL: Command = Command.toLocalizedCommand(
+        {
+            id: 'projectSidebar.expandAll',
+            label: 'Expand All',
+            iconClass: 'codicon codicon-expand-all',
+        },
+        'vuengine/projects/sidebar/commands/expandAll',
+        'vuengine/projects/sidebar/commands/category'
+    );
+    export const COLLAPSE_ALL: Command = Command.toLocalizedCommand(
+        {
+            id: 'projectSidebar.collapseAll',
+            label: 'Collapse All',
+            iconClass: 'codicon codicon-collapse-all',
+        },
+        'vuengine/projects/sidebar/commands/collapseAll',
+        'vuengine/projects/sidebar/commands/category'
     );
 };
 
 @injectable()
-export class VesProjectSidebarViewContribution extends AbstractViewContribution<VesProjectSidebarWidget> {
+export class VesProjectSidebarViewContribution extends AbstractViewContribution<VesProjectSidebarWidget> implements CommandContribution, TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
 
@@ -40,6 +59,20 @@ export class VesProjectSidebarViewContribution extends AbstractViewContribution<
         commandRegistry.registerCommand(VesProjectSidebarCommands.WIDGET_TOGGLE, {
             execute: () => this.toggleView()
         });
+        commandRegistry.registerCommand(VesProjectSidebarCommands.EXPAND_ALL, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectSidebarWidget &&
+                this.shell.currentWidget.tabIndex === 0,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectSidebarWidget &&
+                this.shell.currentWidget.tabIndex === 0,
+            execute: () => (this.shell.currentWidget as VesProjectSidebarWidget).setAllExpanded(true),
+        });
+        commandRegistry.registerCommand(VesProjectSidebarCommands.COLLAPSE_ALL, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectSidebarWidget &&
+                this.shell.currentWidget.tabIndex === 0,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectSidebarWidget &&
+                this.shell.currentWidget.tabIndex === 0,
+            execute: () => (this.shell.currentWidget as VesProjectSidebarWidget).setAllExpanded(false),
+        });
     }
 
     async registerMenus(menus: MenuModelRegistry): Promise<void> {
@@ -57,6 +90,21 @@ export class VesProjectSidebarViewContribution extends AbstractViewContribution<
         keybindings.registerKeybinding({
             command: VesProjectSidebarCommands.WIDGET_TOGGLE.id,
             keybinding: 'ctrlcmd+shift+h'
+        });
+    }
+
+    registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
+        toolbar.registerItem({
+            id: VesProjectSidebarCommands.EXPAND_ALL.id,
+            command: VesProjectSidebarCommands.EXPAND_ALL.id,
+            tooltip: VesProjectSidebarCommands.EXPAND_ALL.label,
+            priority: 0,
+        });
+        toolbar.registerItem({
+            id: VesProjectSidebarCommands.COLLAPSE_ALL.id,
+            command: VesProjectSidebarCommands.COLLAPSE_ALL.id,
+            tooltip: VesProjectSidebarCommands.COLLAPSE_ALL.label,
+            priority: 1,
         });
     }
 }

@@ -1,5 +1,5 @@
 import { nls, URI } from '@theia/core';
-import { OpenerService } from '@theia/core/lib/browser';
+import { ConfirmDialog, open, OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useEffect, useRef, useState } from 'react';
@@ -8,19 +8,24 @@ import Input from '../../../editors/browser/components/Common/Base/Input';
 import RadioSelect from '../../../editors/browser/components/Common/Base/RadioSelect';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { VesProjectService } from '../ves-project-service';
-import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithFileUri } from '../ves-project-types';
+import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithContributor, WithFileUri } from '../ves-project-types';
 import AssetsTreeNode from './AssetsTreeNode';
 
 interface TreeNode {
     id: string
     name: string
+    contributor: ProjectContributor
     isLeaf: boolean
     icon?: string
     children?: TreeNode[]
     handleClick?: (e: React.MouseEvent) => void
+    add?: () => void
+    clone?: () => void
+    remove?: () => void
 }
 
 interface AssetsTreeProps {
+    allExpanded: boolean
     fileService: FileService
     openerService: OpenerService
     vesProjectService: VesProjectService
@@ -28,13 +33,18 @@ interface AssetsTreeProps {
 }
 
 export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
-    const { openerService, vesProjectService } = props;
+    const {
+        allExpanded,
+        fileService, openerService, vesProjectService, // workspaceService,
+    } = props;
     const treeContainerRef = useRef<HTMLDivElement>(null);
     const [treeHeight, setTreeHeight] = useState<number>(300);
     const [treeWidth, setTreeWidth] = useState<number>(300);
     const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selection, setSelection] = useState<string>('');
     const [contributorsFilter, setContributorsFilter] = useState<ProjectContributor[]>([ProjectContributor.Project]);
     const [treeData, setTreeData] = useState<TreeNode[]>([]);
+    const treeRef = useRef();
 
     /*
     const open = async (type: ProjectDataType & WithContributor, item?: ProjectDataItem & WithFileUri): Promise<void> => {
@@ -77,9 +87,11 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
             const typeNode: TreeNode = {
                 id: `type-${typeId}`,
                 name: typeId,
+                contributor: type._contributor,
                 isLeaf: false,
                 icon: type.icon,
                 children: [],
+                add: () => addItem(typeId)
             };
 
             const itemsMap = vesProjectService.getProjectDataItemsForType(typeId);
@@ -95,14 +107,20 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
                 });
 
                 Object.keys(filteredItemsMap).forEach(itemId => {
-                    const item = filteredItemsMap[itemId] as unknown as ProjectDataItem & WithFileUri;
-                    typeNode.children!.push({
+                    const item = filteredItemsMap[itemId] as unknown as ProjectDataItem & WithFileUri & WithContributor;
+                    const node: TreeNode = {
                         id: `item-${itemId}`,
                         name: item._fileUri.path.name,
+                        contributor: item._contributor,
                         isLeaf: true,
                         icon: type.icon,
                         handleClick: () => openEditor(item._fileUri),
-                    });
+                        clone: () => addItem(typeId, itemId)
+                    };
+                    if (item._contributor === ProjectContributor.Project) {
+                        node.remove = () => removeItem(item._fileUri);
+                    }
+                    typeNode.children!.push(node);
                 });
             }
 
@@ -114,8 +132,36 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
         setTreeData(foundItems);
     };
 
+    const removeItem = async (fileUri: URI) => {
+        const dialog = new ConfirmDialog({
+            title: nls.localizeByDefault('Remove'),
+            msg: nls.localize('vuengine/projects/areYouSureYouWantToRemoveItem', 'Are you sure you want to remove {0}?', fileUri.path.base),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            await fileService.delete(fileUri);
+        }
+    };
+
+    const addItem = async (typeId: string, itemIdToClone?: string) => {
+        const result = await vesProjectService.createNewFileForType(typeId, itemIdToClone);
+        if (result !== undefined) {
+            const newItemId = result.data._id;
+            setSelection(`item-${newItemId}`);
+            await open(openerService, result.fileUri);
+        }
+    };
+
     useEffect(() => {
         getItems();
+        const addObserver = vesProjectService.onDidAddProjectItem(() => getItems());
+        const deleteObserver = vesProjectService.onDidDeleteProjectItem(() => getItems());
+        const updateObserver = vesProjectService.onDidUpdateProjectItem(() => getItems());
+        return () => {
+            addObserver.dispose();
+            deleteObserver.dispose();
+            updateObserver.dispose();
+        };
     }, [
         contributorsFilter
     ]);
@@ -182,16 +228,17 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
                             {nls.localize('vuengine/editors/project/noAssetsFound', 'No Assets Found')}
                         </div>
                         : <Tree
+                            ref={treeRef}
                             data={treeData}
                             indent={20}
                             rowHeight={24}
                             height={treeHeight}
                             width={treeWidth}
-                            openByDefault={false}
+                            openByDefault={allExpanded}
                             disableDrag
                             disableDrop
-                            disableEdit
                             disableMultiSelection
+                            selection={selection}
                             searchTerm={searchTerm}
                         >
                             {AssetsTreeNode}

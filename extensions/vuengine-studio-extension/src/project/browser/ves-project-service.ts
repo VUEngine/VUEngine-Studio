@@ -12,7 +12,7 @@ import {
   isWindows,
   nls
 } from '@theia/core';
-import { OpenerService } from '@theia/core/lib/browser';
+import { OpenerService, SingleTextInputDialog } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -312,17 +312,32 @@ export class VesProjectService {
     }
   }
 
-  async createNewFileForType(typeId: string): Promise<URI | undefined> {
+  async createNewFileForType(typeId: string, itemIdToClone?: string): Promise<{ fileUri: URI, data: ProjectDataItem } | undefined> {
     const type = this.getProjectDataType(typeId);
     if (this.workspaceProjectFolderUri === undefined || !type || !type.file.startsWith('.')) {
       return;
     }
 
-    const defaultName = nls.localize('vuengine/editors/general/newFileDialog/untitled', 'Untitled');
-    const filename = await this.quickInputService.input({
-      value: defaultName,
+    let cloneItem;
+    let cloneItemName;
+    if (itemIdToClone) {
+      const itemToClone = this.getProjectDataItemById(itemIdToClone, typeId) as ItemData & WithFileUri;
+      cloneItemName = itemToClone._fileUri.path.name;
+      const fileContent = await this.fileService.read(itemToClone._fileUri);
+      cloneItem = JSON.parse(fileContent.value.toString());
+    }
+
+    const defaultName =
+      cloneItemName
+        ? `${cloneItemName} ${nls.localize('vuengine/general/copy', 'Copy')}`
+        : nls.localize('vuengine/editors/general/newFileDialog/untitled', 'Untitled');
+
+    const dialog = new SingleTextInputDialog({
       title: nls.localize('vuengine/projects/newFileName', 'New File Name'),
+      initialValue: defaultName,
+      maxWidth: 450,
     });
+    const filename = await dialog.open();
 
     if (!filename) {
       return;
@@ -336,14 +351,16 @@ export class VesProjectService {
       count++;
     }
 
-    let fileValue;
-    if (type) {
-      const data = await this.getSchemaDefaults(type);
-      fileValue = stringify(data);
+    let data = await this.getSchemaDefaults(type);
+    if (cloneItem) {
+      data = { ...cloneItem };
+      data._id = nanoid();
     }
+
+    const fileValue = stringify(data);
     await this.fileService.create(fileUri, fileValue);
 
-    return fileUri;
+    return { fileUri, data };
   }
 
   protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {
@@ -555,6 +572,7 @@ export class VesProjectService {
         if (itemIdByUri) {
           this.enableFileChangeEventLock();
           this.deleteProjectDataItem(typeId, itemIdByUri, fileUri);
+          this.onDidUpdateProjectItemEmitter.fire(fileUri);
         }
       }
     });

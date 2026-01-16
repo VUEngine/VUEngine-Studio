@@ -2,13 +2,16 @@ import { CommandService, nls } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 import { VesProjectService } from '../ves-project-service';
-import ProjectSettings from './ProjectSettings';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import FilesTree from './AssetsTree';
+import ProjectSettings from './ProjectSettings';
 
 interface ProjectSidebarProps {
+    tabIndex: number
+    setTabIndex: (tab: number) => void
+    allExpanded: boolean
     commandService: CommandService
     fileService: FileService
     openerService: OpenerService
@@ -17,10 +20,18 @@ interface ProjectSidebarProps {
 }
 
 export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.Element {
-    const { commandService, fileService, openerService, vesProjectService, workspaceService } = props;
+    const {
+        tabIndex, setTabIndex,
+        allExpanded,
+        commandService, fileService, openerService, vesProjectService, workspaceService
+    } = props;
 
     return (
-        <Tabs style={{ height: '100%' }}>
+        <Tabs
+            selectedIndex={tabIndex}
+            onSelect={setTabIndex}
+            style={{ height: '100%' }}
+        >
             <TabList style={{ padding: '0 calc(var(--theia-ui-padding) * 2)' }}>
                 <Tab>
                     {nls.localize('vuengine/plugins/assets', 'Assets')}
@@ -31,6 +42,7 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
             </TabList>
             <TabPanel>
                 <FilesTree
+                    allExpanded={allExpanded}
                     fileService={fileService}
                     openerService={openerService}
                     vesProjectService={vesProjectService}
@@ -46,6 +58,6 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
                     workspaceService={workspaceService}
                 />
             </TabPanel>
-        </Tabs>
+        </Tabs >
     );
 }

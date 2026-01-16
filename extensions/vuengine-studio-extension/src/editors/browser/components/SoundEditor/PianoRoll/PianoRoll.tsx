@@ -563,7 +563,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollRef?.current?.scrollTo({
             left: currentSequenceIndex / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
             top,
-            behavior: 'instant',
+            // behavior: 'smooth',
         });
     }, [
         currentSequenceIndex,

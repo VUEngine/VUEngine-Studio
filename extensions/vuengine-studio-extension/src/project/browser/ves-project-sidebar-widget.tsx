@@ -1,13 +1,13 @@
 import { CommandService, nls } from '@theia/core';
+import { OpenerService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import ProjectSidebar from './components/ProjectSidebar';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { OpenerService } from '@theia/core/lib/browser';
 import { VesProjectService } from './ves-project-service';
 
 @injectable()
@@ -26,6 +26,9 @@ export class VesProjectSidebarWidget extends ReactWidget {
   static readonly ID = 'vesProjectSidebarWidget';
   static readonly LABEL = nls.localize('vuengine/projects/project', 'Project');
 
+  public tabIndex: number = 0;
+  public allExpanded: boolean = true;
+
   @postConstruct()
   protected init(): void {
     this.id = VesProjectSidebarWidget.ID;
@@ -35,6 +38,7 @@ export class VesProjectSidebarWidget extends ReactWidget {
     this.bindEvents();
     this.setTitle();
     this.update();
+    this.render();
   }
 
   protected bindEvents(): void {
@@ -50,6 +54,16 @@ export class VesProjectSidebarWidget extends ReactWidget {
     this.title.caption = this.title.label;
   }
 
+  protected setTabIndex(tabIndex: number): void {
+    this.tabIndex = tabIndex;
+    this.update();
+  }
+
+  public setAllExpanded(allExpanded: boolean): void {
+    this.allExpanded = allExpanded;
+    this.update();
+  }
+
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.node.tabIndex = 0;
@@ -62,6 +76,9 @@ export class VesProjectSidebarWidget extends ReactWidget {
         commandService={this.commandService}
       />
       : <ProjectSidebar
+        tabIndex={this.tabIndex}
+        setTabIndex={tabIndex => this.setTabIndex(tabIndex)}
+        allExpanded={this.allExpanded}
         commandService={this.commandService}
         fileService={this.fileService}
         openerService={this.openerService}

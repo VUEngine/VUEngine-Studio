@@ -19,6 +19,7 @@ import { VesProjectSidebarViewContribution } from './ves-project-sidebar-view-co
 import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -61,6 +62,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // sidebar view
     bindViewContribution(bind, VesProjectSidebarViewContribution);
     bind(FrontendApplicationContribution).toService(VesProjectSidebarViewContribution);
+    bind(TabBarToolbarContribution).toService(VesProjectSidebarViewContribution);
     bind(VesProjectSidebarWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesProjectSidebarWidget.ID,

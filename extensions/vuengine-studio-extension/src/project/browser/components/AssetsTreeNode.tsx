@@ -1,5 +1,12 @@
+import { nls } from '@theia/core';
 import React from 'react';
 import { NodeRendererProps } from 'react-arborist';
+import { ProjectContributor } from '../ves-project-types';
+import styled from 'styled-components';
+
+const ContributorLabel = styled.span`
+    opacity: .3;
+`;
 
 export default function AssetsTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
@@ -52,7 +59,7 @@ export default function AssetsTreeNode(props: NodeRendererProps<any>): React.JSX
                 onClick={handleClick}
                 onDoubleClick={() => {
                     if (node.data.isLeaf && !node.parent?.isRoot) {
-                        // node.edit();
+                        node.edit();
                     }
                 }}
             >
@@ -78,41 +85,50 @@ export default function AssetsTreeNode(props: NodeRendererProps<any>): React.JSX
                         autoFocus
                     />
                 ) : (
-                    node.data.name
+                    <>
+                        {node.data.name}
+                        {node.data.isLeaf && node.data.contributor !== ProjectContributor.Project && <>
+                            {' '}
+                            <ContributorLabel>
+                                ({node.data.contributor === ProjectContributor.Engine
+                                    ? nls.localize('vuengine/editors/projects/engine', 'Engine')
+                                    : nls.localize('vuengine/editors/projects/plugin', 'Plugin')
+                                })
+                            </ContributorLabel>
+                        </>}
+                    </>
                 )}
             </div>
-            { /* }
             <div className='ves-tree-node-actions'>
-                {!node.data.isLeaf &&
+                {node.data.add &&
                     <i
                         className='codicon codicon-plus'
-                        onClick={() => { }}
+                        onClick={node.data.add}
                         title={nls.localizeByDefault('Add')}
                     />
                 }
-                {node.data.isLeaf && !node.parent?.isRoot &&
+                {node.data.isLeaf && !node.parent?.isRoot && node.data.contributor === ProjectContributor.Project &&
                     <i
                         className='codicon codicon-edit'
-                        onClick={() => node.edit()}
+                        onClick={node.edit}
                         title={nls.localize('vuengine/editors/actor/editName', 'Edit Name')}
                     />
                 }
-                {node.data.isLeaf && !node.parent?.isRoot &&
+                {node.data.clone &&
                     <i
                         className='codicon codicon-copy'
-                        onClick={() => { }}
+                        onClick={node.data.clone}
                         title={nls.localize('vuengine/editors/projects/clone', 'Clone')}
                     />
                 }
-                {node.data.isLeaf && !node.parent?.isRoot &&
+                {node.data.remove &&
                     <i
                         className='codicon codicon-trash'
-                        onClick={() => { }}
+                        onClick={node.data.remove}
                         title={nls.localizeByDefault('Remove')}
                     />
                 }
             </div>
-            { */ }
         </div>
     );
 }
