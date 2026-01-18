@@ -28,6 +28,60 @@ import {
     RumbleEffectData,
     RumbleEffectFrequency,
 } from './RumbleEffectTypes';
+import styled from 'styled-components';
+
+const ConnectionStatus = styled.div`
+    padding-top: 20px;
+
+    .connected {
+        color: var(--theia-editorSuccess-foreground);
+    }
+
+    .disconnected {
+        color: var(--theia-editorError-foreground);
+    }
+`;
+
+const RumblePakLog = styled.div`
+    border: 1px solid var(--theia-activityBar-background);
+    box-sizing: border-box;
+    flex-grow: 1;
+    font-family: monospace;
+    font-size: 90%;
+    line-height: 130%;
+    overflow: auto;
+
+    > div {
+        display: table;
+        padding: var(--theia-ui-padding) 0;
+        width: 100%;
+    }
+`;
+
+const RumblePakLogLine = styled.div`
+    display: table-row;
+
+    &:empty {
+        height: 5px;
+    }
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    > span:first-child {
+        display: table-cell;
+        opacity: .5;
+        padding: 0 var(--theia-ui-padding);
+    }
+
+    >   span:last-child {
+        display: table-cell;
+        padding-right: var(--theia-ui-padding);
+        white-space: pre-wrap;
+        width: 100%;
+    }
+`;
 
 interface RumbleEffectProps {
     data: RumbleEffectData
@@ -158,7 +212,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         const rumblePackIsConnected = services.vesRumblePackService.connectedRumblePack !== undefined;
         this.rumblePakLogLineLastElementRef.current?.scrollIntoView();
 
-        return <VContainer className='rumbleEffectEditor' gap={15}>
+        return <VContainer gap={15} overflow='hidden'>
             <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>
@@ -258,13 +312,13 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 checked={data.stopBeforeStarting}
                 setChecked={this.toggleStopBeforeStarting}
             />
-            <VContainer className="connectionStatus">
+            <ConnectionStatus>
                 {nls.localize('vuengine/editors/rumbleEffect/rumbleEffectEditorConnectionStatus', 'Rumble Pack connection status')}: {
                     rumblePackIsConnected
                         ? <span className='connected'>{nls.localize('vuengine/editors/rumbleEffect/connected', 'Connected')}</span>
                         : <span className='disconnected'>{nls.localize('vuengine/editors/rumbleEffect/disconnected', 'Disconnected')}</span>
                 }
-            </VContainer>
+            </ConnectionStatus>
             {rumblePackIsConnected
                 ? <>
                     <HContainer gap={15}>
@@ -340,21 +394,21 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             </HContainer>
                         </VContainer>
                     </HContainer>
-                    <VContainer className='log'>
+                    <VContainer className='log' gap={4} grow={1} overflow='hidden'>
                         <label>
                             {nls.localize('vuengine/editors/rumbleEffect/log', 'Log')}
                         </label>
-                        <div className='rumblePakLog'>
+                        <RumblePakLog>
                             <div>
                                 {services.vesRumblePackService.rumblePackLog.map((line: RumblePakLogLine, index: number) => (
-                                    <div className='rumblePakLogLine' key={`rumblePakLogLine${index} `}>
+                                    <RumblePakLogLine key={`rumblePakLogLine${index} `}>
                                         <span>{new Date(line.timestamp).toTimeString().substring(0, 8)}</span>
                                         <span>{line.text}</span>
-                                    </div>
+                                    </RumblePakLogLine>
                                 ))}
                                 <div ref={this.rumblePakLogLineLastElementRef} key={'rumblePakLogLineLast'}></div>
                             </div>
-                        </div>
+                        </RumblePakLog>
                         <button
                             className="theia-button secondary"
                             title={nls.localize('vuengine/editors/rumbleEffect/clearLog', 'Clear Log')}

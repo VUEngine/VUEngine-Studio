@@ -17,7 +17,9 @@ configs[0].module.rules.push({
 }); */
 
 const shroomsPath = path.resolve(__dirname, 'binaries/vuengine-studio-tools/web/shrooms-vb-core');
+// @ts-ignore
 configs[0].entry['shrooms.audio'] = shroomsPath + '/Audio.js';
+// @ts-ignore
 configs[0].entry['shrooms.core'] = shroomsPath + '/Core.js';
 
 module.exports = [

@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import { ControlPosition } from 'react-draggable';
@@ -250,7 +251,7 @@ export const defaultProjectData: ProjectData = {
       file: 'GameConfig',
       excludeFromDashboard: true,
       schema: {
-        title: 'Game Config',
+        title: nls.localize('vuengine/projects/typeLabels/gameConfig', 'Game Config'),
         properties: {
           dashboard: {
             type: 'object',
@@ -284,7 +285,7 @@ export const defaultProjectData: ProjectData = {
     Image: {
       file: '.image',
       schema: {
-        title: 'Image Conversion',
+        title: nls.localize('vuengine/projects/typeLabels/image', 'Image'),
         properties: {
           files: {
             type: 'array',
@@ -425,6 +426,7 @@ export const defaultProjectData: ProjectData = {
       enabled: false,
       file: '.pixel',
       schema: {
+        title: nls.localize('vuengine/projects/typeLabels/pixel', 'Pixel Art'),
         properties: {
           colorMode: {
             type: 'number'
@@ -488,7 +490,7 @@ export const defaultProjectData: ProjectData = {
       file: 'vuengine.plugin',
       excludeFromDashboard: true,
       schema: {
-        title: 'Plugin File',
+        title: nls.localize('vuengine/projects/typeLabels/pluginFile', 'VUEngine Plugin'),
         properties: {
           displayName: {
             type: 'object',
@@ -583,6 +585,7 @@ export const defaultProjectData: ProjectData = {
     RomInfo: {
       file: 'RomInfo',
       schema: {
+        title: nls.localize('vuengine/projects/typeLabels/romInfo', 'ROM Info'),
         properties: {
           gameTitle: {
             type: 'string',

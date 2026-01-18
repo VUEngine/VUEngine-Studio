@@ -1,7 +1,5 @@
-@import "brightness-repeat-editor/index.css";
 @import "button.css";
 @import "color-selector.css";
-@import "column-table-editor/index.css";
 @import "controls/index.css";
 @import "actor-editor/index.css";
 @import "font-editor/index.css";
@@ -14,7 +12,6 @@
 @import "radio-select.css";
 @import "react-select.css";
 @import "react-tabs.css";
-@import "rumble-effect-editor/index.css";
 @import "sprite-editor/index.css";
 @import "translations-editor/index.css";
 @import "ves-tree.css";

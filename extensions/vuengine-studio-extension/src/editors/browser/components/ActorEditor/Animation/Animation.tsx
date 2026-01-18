@@ -157,7 +157,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     label={nls.localize('vuengine/editors/actor/callback', 'Callback')}
                     tooltip={nls.localize(
                         'vuengine/editors/actor/animationCallbackDescription',
-                        'Provide the name of the method to call on animation completion.'
+                        'Name of a method to call on animation completion.'
                     )}
                     value={animation.callback}
                     setValue={setCallback}

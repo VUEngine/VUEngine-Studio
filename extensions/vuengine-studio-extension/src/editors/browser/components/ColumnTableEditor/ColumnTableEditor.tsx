@@ -47,36 +47,34 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
     render(): React.JSX.Element {
         const { data } = this.props;
 
-        return <div
-            tabIndex={0}
-            className='columnTableEditor'
-        >
-            <VContainer gap={15} style={{ maxWidth: 500 }}>
-                <VContainer>
-                    <label>
-                        {nls.localizeByDefault('Description')}
-                    </label>
-                    <ReactTextareaAutosize
-                        className="theia-input"
-                        value={data.description}
-                        minRows={2}
-                        maxRows={4}
-                        onChange={this.onChangeDescription.bind(this)}
-                        style={{ resize: 'none' }}
+        return (
+            <VContainer gap={20}>
+                <VContainer gap={15} style={{ maxWidth: 500 }}>
+                    <VContainer>
+                        <label>
+                            {nls.localizeByDefault('Description')}
+                        </label>
+                        <ReactTextareaAutosize
+                            className="theia-input"
+                            value={data.description}
+                            minRows={2}
+                            maxRows={4}
+                            onChange={this.onChangeDescription.bind(this)}
+                            style={{ resize: 'none' }}
+                        />
+                    </VContainer>
+                    <Checkbox
+                        sideLabel={nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
+                        checked={data.mirror}
+                        setChecked={this.onChangeMirror.bind(this)}
                     />
                 </VContainer>
-                <Checkbox
-                    sideLabel={nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
-                    checked={data.mirror}
-                    setChecked={this.onChangeMirror.bind(this)}
+                <Editor
+                    mirror={data.mirror}
+                    values={data.values}
+                    setValue={this.setValue.bind(this)}
                 />
             </VContainer>
-
-            <Editor
-                mirror={data.mirror}
-                values={data.values}
-                setValue={this.setValue.bind(this)}
-            />
-        </div>;
+        );
     }
 }

@@ -5,7 +5,7 @@ import React from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 import { VesProjectService } from '../ves-project-service';
-import FilesTree from './AssetsTree';
+import AssetsTree from './AssetsTree';
 import ProjectSettings from './ProjectSettings';
 
 interface ProjectSidebarProps {
@@ -41,7 +41,7 @@ export default function ProjectSidebar(props: ProjectSidebarProps): React.JSX.El
                 </Tab>
             </TabList>
             <TabPanel>
-                <FilesTree
+                <AssetsTree
                     allExpanded={allExpanded}
                     fileService={fileService}
                     openerService={openerService}

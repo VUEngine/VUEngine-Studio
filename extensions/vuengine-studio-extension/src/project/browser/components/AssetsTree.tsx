@@ -7,6 +7,7 @@ import { Tree } from 'react-arborist';
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import RadioSelect from '../../../editors/browser/components/Common/Base/RadioSelect';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
+import { TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
 import { VesProjectService } from '../ves-project-service';
 import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithContributor, WithFileUri } from '../ves-project-types';
 import AssetsTreeNode from './AssetsTreeNode';
@@ -86,7 +87,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
 
             const typeNode: TreeNode = {
                 id: `type-${typeId}`,
-                name: typeId,
+                name: type.schema?.title ?? TYPE_LABELS[typeId] ?? typeId,
                 contributor: type._contributor,
                 isLeaf: false,
                 icon: type.icon,

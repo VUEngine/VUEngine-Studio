@@ -1,12 +1,12 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
+import Checkbox from '../Common/Base/Checkbox';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
 import Preview from './Preview';
-import Checkbox from '../Common/Base/Checkbox';
 
 interface BrightnessRepeatEditorProps {
     data: BrightnessRepeatData
@@ -48,10 +48,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
     render(): React.JSX.Element {
         const { data } = this.props;
 
-        return <div
-            tabIndex={0}
-            className='brightnessRepeatEditor'
-        >
+        return <VContainer gap={20}>
             <HContainer gap={15} alignItems='start'>
                 <VContainer grow={1} gap={15} style={{ maxWidth: 500 }}>
                     <VContainer>
@@ -86,6 +83,6 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                 values={data.values}
                 setValue={this.setValue.bind(this)}
             />
-        </div>;
+        </VContainer>;
     }
 }

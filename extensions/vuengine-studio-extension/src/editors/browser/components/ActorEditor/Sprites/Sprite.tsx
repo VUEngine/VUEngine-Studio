@@ -878,10 +878,15 @@ surrounding textures to appear at the outer edges.'
                         </VContainer>
                         <Input
                             label={nls.localize('vuengine/editors/actor/manipulationFunction', 'Manipulation Function')}
-                            tooltip={nls.localize(
-                                'vuengine/editors/actor/manipulationFunctionDescription',
-                                'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
-                            )}
+                            tooltip={sprite.bgmapMode === BgmapMode.HBias ? nls.localize(
+                                'vuengine/editors/actor/manipulationFunctionDescriptionHBias',
+                                'Name of the function responsible for handling the HBias transformations of this sprite.'
+                            )
+                                : nls.localize(
+                                    'vuengine/editors/actor/manipulationFunctionDescriptionAffine',
+                                    "Name of the function responsible for handling the Affine transformations of this sprite. \
+Will use the engine's stock function Affine::transform if left blank."
+                                )}
                             value={sprite.manipulationFunction}
                             setValue={setManipulationFunction}
                         />
