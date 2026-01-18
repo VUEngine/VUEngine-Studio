@@ -76,11 +76,15 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
     });
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     const className = small

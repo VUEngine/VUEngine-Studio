@@ -1,0 +1,284 @@
+{%- import 'templates/partials/macros.njk' as macros -%}
+
+{%- set notesLookup = {'B9': 0,'A#9': 0,'A9': 0,'G#9': 0,'G9': 0,'F#9': 0,'F9': 0,'E9': 0,'D#9': 0,'D9': 0,'C#9': 0,'C9': 2029,'B8': 2028,'A#8': 2027,'A8': 2026,'G#8': 2024,'G8': 2023,'F#8': 2022,'F8': 2020,'E8': 2018,'D#8': 2017,'D8': 2015,'C#8': 2013,'C8': 2011,'B7': 2008,'A#7': 2006,'A7': 2004,'G#7': 2001,'G7': 1998,'F#7': 1995,'F7': 1992,'E7': 1989,'D#7': 1985,'D7': 1981,'C#7': 1978,'C7': 1973,'B6': 1969,'A#6': 1964,'A6': 1960,'G#6': 1954,'G6': 1948,'F#6': 1942,'F6': 1936,'E6': 1930,'D#6': 1922,'D6': 1915,'C#6': 1907,'C6': 1899,'B5': 1890,'A#5': 1880,'A5': 1870,'G#5': 1860,'G5': 1849,'F#5': 1837,'F5': 1824,'E5': 1811,'D#5': 1797,'D5': 1782,'C#5': 1766,'C5': 1749,'B4': 1732,'A#4': 1713,'A4': 1693,'G#4': 1672,'G4': 1650,'F#4': 1625,'F4': 1600,'E4': 1574,'D#4': 1547,'D4': 1516,'C#4': 1484,'C4': 1451,'B3': 1415,'A#3': 1378,'A3': 1338,'G#3': 1296,'G3': 1251,'F#3': 1203,'F3': 1153,'E3': 1100,'D#3': 1044,'D3': 984,'C#3': 921,'C3': 854,'B2': 783,'A#2': 707,'A2': 628,'G#2': 543,'G2': 454,'F#2': 359,'F2': 258,'E2': 152,'D#2': 39,'D2': 0,'C#2': 0,'C2': 0,'B1': 0,'A#1': 0,'A1': 0,'G#1': 0,'G1': 0,'F#1': 0,'F1': 0,'E1': 0,'D#1': 0,'D1': 0,'C#1': 0,'C1': 0,'B0': 0,'A#0': 0,'A0': 0,'G#0': 0,'G0': 0,'F#0': 0,'F0': 0,'E0': 0,'D#0': 0,'D0': 0,'C#0': 0,'C0': 0} -%}
+{%- set noteResolution = 16 -%}
+{%- set sequencerResolution = 4 -%}
+{%- set subNoteResolution = 50 -%}
+{%- set barNoteResolution = noteResolution * subNoteResolution -%}
+
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+
+{%- set waveforms = {} -%}
+{%- set modulationData = {} -%}
+
+{%- set totalSize = item.size * barNoteResolution / sequencerResolution -%}
+{%- set loopPoint = item.loopPoint -%}
+{%- set soloTrack = -1 -%}
+{%- set playInLoop = item.loop -%}
+
+{%- macro instrumentIsUsed(instrumentId) -%}
+	{%- set result = false -%}
+	{%- for track in item.tracks -%}
+		{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+			{%- if track.instrument == instrumentId -%}
+				{%- set result = true -%}
+			{%- endif -%}
+			{%- for patternId in track.sequence | values -%}
+				{%- set pattern = item.patterns[patternId] -%}
+				{%- if pattern -%}
+					{%- for step in pattern.events | values -%}
+						{%- if step.instrument is defined and step.instrument == instrumentId -%}
+							{%- set result = true -%}
+						{%- endif -%}
+					{%- endfor -%}
+				{%- endif -%}
+			{%- endfor -%}
+		{%- endif -%}
+	{%- endfor -%}
+	{{ result }}
+{%- endmacro -%}
+
+{%- macro printValueList(values, columnWidth=16) -%}
+	{% set count = 0 -%}
+	{%- for value in values -%}
+		{{- value | safe -}}{{- ', ' -}}
+		{% set count = count + 1 -%}
+		{%- if count == columnWidth and not loop.last -%}
+			{{- '\n\t' -}}
+			{% set count = 0 -%}
+		{%- endif -%}
+	{%- endfor %}
+{%- endmacro -%}
+
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <Sound.h>
+#include <SoundTrack.h>
+
+{{ macros.sectionHeader('Declarations') }}
+
+{%- if isSoundEditorPreview -%}
+	{%- for trackSetting in trackSettings -%}
+		{%- if trackSetting.solo -%}
+			{%- set soloTrack = loop.index0 -%}
+		{%- endif -%}
+	{%- endfor -%}
+
+	{%- set startTick = 0  -%}
+	{%- if playRangeStart is defined and playRangeStart > -1 -%}
+		{%- set startTick = playRangeStart * subNoteResolution -%}
+		{%- set loopPoint = playRangeStart / sequencerResolution -%}
+		{%- set playInLoop = true -%}
+		{%- if playRangeEnd is defined and playRangeEnd > -1 and playRangeEnd > playRangeStart -%}
+			{%- set totalSize = playRangeEnd / sequencerResolution * barNoteResolution / sequencerResolution -%}
+		{%- endif -%}
+	{%- elseif currentPlayerPosition > -1 -%}
+		{%- set startTick = currentPlayerPosition * subNoteResolution -%}
+	{%- endif -%}
+
+	{{- '\n\nconst bool startFromSramTick = ' ~ startFromSramTick ~ ';\n' -}}
+	{{- 'const uint32 startFromTick = ' ~ startTick ~ ';\n' -}}
+	{{- 'const bool miniVisualizer = ' ~ miniVisualizer ~ ';' -}}
+{%- endif -%}
+
+{#- Render waveforms for all instruments -#}
+{%- set isFirstWaveform = true -%}
+{%- for instrumentId in item.instruments | keys -%}
+{%- set instrument = item.instruments[instrumentId] -%}
+{%- set checksum = instrument.waveform | crc32 -%}
+{%- set isUsed = instrumentIsUsed(instrumentId) -%}
+{%- if isUsed == 'true' and not waveforms[checksum] is defined -%}
+{%- set waveformsKey = waveforms | length + 1 -%}
+{%- set waveforms = waveforms | setProperty(checksum | string, waveformsKey) -%}
+
+{%- if isFirstWaveform %}
+
+// Waveforms
+{%- endif %}
+
+const WaveformData {{ sanitizedSpecName }}Waveform{{ waveformsKey }} =
+{
+	// Data
+	{
+		{% for value in instrument.waveform -%}
+			{{- (value ~ '') -}}
+			{%- if not loop.last -%}{{ ', ' }}{%- endif -%}
+		{%- endfor %}
+	},
+
+	// Checksum
+	{{ checksum }}
+};
+{%- set isFirstWaveform = false -%}
+{%- endif -%}
+{%- endfor -%}
+
+{#- Render modulation data for all instruments -#}
+{%- set isFirstModulationData = true -%}
+{%- for instrument in item.instruments | values -%}
+{%- set isUsed = instrumentIsUsed(instrumentId) -%}
+{%- if isUsed == 'true' -%}
+{%- set checksum = instrument.modulationData | crc32 | string -%}
+{%- if not modulationData[checksum] is defined -%}
+{%- set modulationDataKey = modulationData | length + 1 -%}
+{%- set modulationData = modulationData | setProperty(checksum, modulationDataKey) -%}
+
+{%- if isFirstModulationData %}
+
+// Modulation Data
+{%- endif %}
+
+const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[] =
+{
+	{% for value in instrument.modulationData -%}
+		{{- (value ~ '') ~ ', ' -}} 
+	{%- endfor %}
+};
+{%- set isFirstModulationData = false -%}
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+
+{#- Render all tracks -#}
+{%- for track in item.tracks -%}
+{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+
+{%- set trackKeyframes = getTrackKeyframes(track, sanitizedSpecName, totalSize, loopPoint, waveforms, modulationData, item) %}
+
+// Track {{ loop.index }}
+
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT[] =
+{
+	{{ printValueList(trackKeyframes.values.SxINT, 22) }}
+};
+
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxLRV[] =
+{
+	{{ printValueList(trackKeyframes.values.SxLRV, 22) }}
+};
+
+const uint16 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxFQ[] =
+{
+	{{ printValueList(trackKeyframes.values.SxFQ, 16) }}
+};
+
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV0[] =
+{
+	{{ printValueList(trackKeyframes.values.SxEV0, 22) }}
+};
+
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV1[] =
+{
+	{{ printValueList(trackKeyframes.values.SxEV1, 22) }}
+};
+
+const WaveformData* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxRAM[] =
+{
+	{{ printValueList(trackKeyframes.values.SxRAM, 4) }}
+};
+
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxSWP[] =
+{
+	{{ printValueList(trackKeyframes.values.SxSWP, 22) }}
+};
+
+const int8* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxMOD[] =
+{
+	{{ printValueList(trackKeyframes.values.SxMOD, 4) }}
+};
+
+const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes[] =
+{
+	{% for keyframe in trackKeyframes.keyframes -%}
+	{{-'{'}}{{ keyframe.duration }}, {% if keyframe.flags | length == 0 %}0{% else %}{{ keyframe.flags | join(' | ') }}{% endif %}{{'},'}}
+	{% endfor -%}
+	{0, kSoundTrackEventEnd}, 
+};
+
+SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }} =
+{
+	// kTrackNative, kTrackPCM
+	kTrackNative,
+
+	// Skip if no sound source available?
+	{{ track.allowSkip }},
+
+	// Total number of samples (0 if not PCM)
+	0,
+
+	// Loop back point (cursor)
+	{{ trackKeyframes.loopKeyframe }},
+
+	// Keyframes that define the track
+	(SoundTrackKeyframe*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes,
+
+	// SxINT values
+	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT,
+
+	// SxLRV values
+	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxLRV,
+
+	// SxFQH and SxFQL values
+	(uint16*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxFQ,
+
+	// SxEV0 values
+	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV0,
+
+	// SxEV1 values
+	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV1,
+
+	// SxRAM pointers
+	(WaveformData**){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxRAM,
+
+	// SxSWP values
+	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxSWP,
+
+	// SxMOD pointers
+	(int8**){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxMOD,
+};
+{%- endif %}
+{%- endfor %}
+
+{{ macros.sectionHeader('Definitions') }}
+
+SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[] =
+{
+	{%- for track in item.tracks %}
+	{%- if track.sequence | length and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) %}
+	&{{ sanitizedSpecName }}SoundTrack{{ loop.index0 }},
+	{%- endif %}
+	{%- endfor %}
+	NULL
+};
+
+SoundROMSpec {{ sanitizedSpecName }}SoundSpec =
+{
+	// Component
+	{
+		// Allocator
+		__TYPE(Sound),
+
+		// Component type
+		kSoundComponent
+	},
+
+	// Name
+	"
+		{%- if item.author -%}
+			{{- item.author | safe -}}
+			{{- ' - ' -}}
+		{%- endif -%}
+		{{- item.name | safe -}}
+	",
+
+	// Play in loop
+	{{ playInLoop }},
+
+	// Tick duration in US
+	{{ item.speed * 1000 / subNoteResolution }},
+
+	// Tracks
+	(SoundTrackSpec**){{ sanitizedSpecName }}SoundTracks,
+};

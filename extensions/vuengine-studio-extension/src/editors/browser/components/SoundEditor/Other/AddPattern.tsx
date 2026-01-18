@@ -1,14 +1,15 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, Fragment, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
+import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import PatternCanvas from '../Sequencer/PatternCanvas';
 import { getPatternName } from '../SoundEditor';
 import { DEFAULT_PATTERN_SIZE, NEW_PATTERN_ID, SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
-import Input from '../../Common/Base/Input';
 
 const StyledPattern = styled.button`
     background-color: var(--theia-secondaryButton-background);
@@ -94,8 +95,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
             patternId = nanoid();
-            const type = services.vesProjectService.getProjectDataType('Sound');
-            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+            const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
             const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
 
             const updatedTracks = [...soundData.tracks];

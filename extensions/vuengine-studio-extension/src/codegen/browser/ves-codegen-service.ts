@@ -13,12 +13,12 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
 import { getTrackKeyframes } from '../../editors/browser/components/SoundEditor/Other/templating';
-import { TYPE_LABELS } from '../../editors/browser/ves-editors-types';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { ImageConfigWithName } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
+import { PROJECT_TEMPLATES, PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
   ProjectContributor,
@@ -26,7 +26,6 @@ import {
   ProjectDataTemplateEncoding,
   ProjectDataTemplateEventType,
   ProjectDataTemplateTargetForEachOfType,
-  WithContributor,
   WithFileUri
 } from '../../project/browser/ves-project-types';
 import { CODEGEN_CHANNEL_NAME, GenerationMode, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
@@ -125,9 +124,8 @@ export class VesCodeGenService {
   }
 
   protected async handleFileDelete(fileUri: URI): Promise<void> {
-    const types = this.vesProjectService.getProjectDataTypes() ?? {};
-    await Promise.all(Object.keys(types).map(async typeId => {
-      const type = types[typeId];
+    await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
+      const type = PROJECT_TYPES[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         // TODO: delete corresponding generated code for deleted files
       }
@@ -135,9 +133,8 @@ export class VesCodeGenService {
   }
 
   protected async handleFileUpdate(fileUri: URI): Promise<void> {
-    const types = this.vesProjectService.getProjectDataTypes() ?? {};
-    await Promise.all(Object.keys(types).map(async typeId => {
-      const type = types[typeId];
+    await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
+      const type = PROJECT_TYPES[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file) && type.templates?.length) {
         await this.generate([typeId], GenerationMode.All, fileUri);
         // TODO: delete corresponding generated code for moved files and regenerate at new location
@@ -151,7 +148,7 @@ export class VesCodeGenService {
 
   async getGeneratedFileUris(itemUri: URI, typeId: string): Promise<URI[]> {
     let result: URI[] = [];
-    const type = this.vesProjectService.getProjectDataType(typeId);
+    const type = PROJECT_TYPES[typeId];
     if (!type || !type.templates) {
       return [];
     }
@@ -162,7 +159,7 @@ export class VesCodeGenService {
     }
 
     await Promise.all(type.templates.map(async templateId => {
-      const template = this.vesProjectService.getProjectDataTemplate(templateId);
+      const template = PROJECT_TEMPLATES[templateId];
       if (!template) {
         return;
       }
@@ -201,12 +198,11 @@ export class VesCodeGenService {
 
   protected async getTemplatableTypes(): Promise<QuickPickItem[]> {
     await this.vesProjectService.projectDataReady;
-    const types = this.vesProjectService.getProjectDataTypes() ?? {};
     const items: QuickPickItem[] = [];
-    Object.keys(types).map(typeId => {
+    Object.keys(PROJECT_TYPES).map(typeId => {
       const numberOfItems = Object.keys(this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || []).length;
-      const type = types[typeId];
-      const templates = type.templates?.map(templateId => this.vesProjectService.getProjectDataTemplate(templateId))
+      const type = PROJECT_TYPES[typeId];
+      const templates = type.templates?.map(templateId => PROJECT_TEMPLATES[templateId])
         .filter(template => template?.enabled !== false);
       const iconClasses = type.icon?.split(' ') || ['codicon', 'codicon-file-code'];
       const templateTargets: string[] = [];
@@ -219,7 +215,7 @@ export class VesCodeGenService {
       if (templateTargets?.length) {
         items.push({
           id: typeId,
-          label: TYPE_LABELS[typeId] ?? type.schema.title,
+          label: type.schema.title,
           iconClasses,
           description: (numberOfItems === 1)
             ? `(${nls.localize('vuengine/codegen/oneTypeFile', '1 file')})`
@@ -290,7 +286,7 @@ export class VesCodeGenService {
 
     try {
       await Promise.all(types.map(async typeId => {
-        const type = this.vesProjectService.getProjectDataType(typeId);
+        const type = PROJECT_TYPES[typeId];
         if (type && Array.isArray(type.templates)) {
           let inferredFileUri: URI;
           if (!fileUri && !type.file.startsWith('.')) {
@@ -382,8 +378,9 @@ export class VesCodeGenService {
     }
   }
 
-  async getTemplateString(template: ProjectDataTemplate & WithContributor): Promise<string> {
-    let templateUri = template._contributorUri;
+  async getTemplateString(template: ProjectDataTemplate): Promise<string> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    let templateUri = resourcesUri.resolve('templates');
     const templatePathParts = template.template.split('/');
     templatePathParts.forEach(templatePathPart => {
       templateUri = templateUri.resolve(templatePathPart);
@@ -399,7 +396,7 @@ export class VesCodeGenService {
     return templateString;
   }
 
-  protected async getTargetUris(template: ProjectDataTemplate & WithContributor, item: any, itemUri?: URI): Promise<URI[]> {
+  protected async getTargetUris(template: ProjectDataTemplate, item: any, itemUri?: URI): Promise<URI[]> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
@@ -471,7 +468,7 @@ export class VesCodeGenService {
 
   protected async renderTemplate(templateId: string, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
     await this.vesProjectService.projectDataReady;
-    const template = this.vesProjectService.getProjectDataTemplate(templateId);
+    const template = PROJECT_TEMPLATES[templateId];
     if (!template) {
       console.warn(`Template ${templateId} not found.`);
       return 0;
@@ -566,36 +563,30 @@ export class VesCodeGenService {
   }
 
   protected async handlePluginChange(): Promise<void> {
-    const templates = this.vesProjectService.getProjectDataTemplates();
-    if (templates) {
-      await Promise.all(Object.keys(templates).map(async templateId => {
-        const template = templates[templateId];
-        if (template.events) {
-          await Promise.all(template.events.map(async event => {
-            if (event.type === ProjectDataTemplateEventType.installedPluginsChanged) {
-              return this.renderTemplate(templateId, GenerationMode.All);
-            }
-          }));
-        }
-      }));
-    }
+    await Promise.all(Object.keys(PROJECT_TEMPLATES).map(async templateId => {
+      const template = PROJECT_TEMPLATES[templateId];
+      if (template.events) {
+        await Promise.all(template.events.map(async event => {
+          if (event.type === ProjectDataTemplateEventType.installedPluginsChanged) {
+            return this.renderTemplate(templateId, GenerationMode.All);
+          }
+        }));
+      }
+    }));
   }
 
   protected async handleDeleteItem(typeId: string): Promise<void> {
-    const templates = this.vesProjectService.getProjectDataTemplates();
-    if (templates) {
-      await Promise.all(Object.keys(templates).map(async templateId => {
-        const template = templates[templateId];
-        if (template.events) {
-          await Promise.all(template.events.map(async templateEvent => {
-            if (templateEvent.type === ProjectDataTemplateEventType.itemOfTypeGotDeleted
-              && templateEvent.value === typeId) {
-              await this.renderTemplate(templateId, GenerationMode.All);
-            }
-          }));
-        }
-      }));
-    }
+    await Promise.all(Object.keys(PROJECT_TEMPLATES).map(async templateId => {
+      const template = PROJECT_TEMPLATES[templateId];
+      if (template.events) {
+        await Promise.all(template.events.map(async templateEvent => {
+          if (templateEvent.type === ProjectDataTemplateEventType.itemOfTypeGotDeleted
+            && templateEvent.value === typeId) {
+            await this.renderTemplate(templateId, GenerationMode.All);
+          }
+        }));
+      }
+    }));
   }
 
   protected async configureTemplateEngine(): Promise<void> {

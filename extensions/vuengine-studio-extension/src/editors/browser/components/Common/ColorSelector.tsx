@@ -32,11 +32,15 @@ export default function ColorSelector(props: ColorSelectorProps): React.JSX.Elem
     };
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     return <div

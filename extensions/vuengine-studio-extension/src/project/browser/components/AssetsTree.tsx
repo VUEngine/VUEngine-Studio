@@ -7,7 +7,7 @@ import { Tree } from 'react-arborist';
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import RadioSelect from '../../../editors/browser/components/Common/Base/RadioSelect';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
-import { TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
+import { PROJECT_TYPES } from '../ves-project-data';
 import { VesProjectService } from '../ves-project-service';
 import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithContributor, WithFileUri } from '../ves-project-types';
 import AssetsTreeNode from './AssetsTreeNode';
@@ -48,7 +48,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const treeRef = useRef();
 
     /*
-    const open = async (type: ProjectDataType & WithContributor, item?: ProjectDataItem & WithFileUri): Promise<void> => {
+    const open = async (type: ProjectDataType, item?: ProjectDataItem & WithFileUri): Promise<void> => {
         if (item && item._fileUri) {
             openEditor(item._fileUri);
         } else if (!type.file.startsWith('.')) {
@@ -72,14 +72,10 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
 
     const getItems = async () => {
         await vesProjectService.projectDataReady;
-        const types = vesProjectService.getProjectDataTypes();
-        if (types === undefined) {
-            return;
-        }
 
         const foundItems: TreeNode[] = [];
-        Object.keys(types).forEach(typeId => {
-            const type = types[typeId];
+        Object.keys(PROJECT_TYPES).forEach(typeId => {
+            const type = PROJECT_TYPES[typeId];
 
             if (!type.file.startsWith('.') || (type.enabled !== undefined && type.enabled === false)) {
                 return;
@@ -87,8 +83,8 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
 
             const typeNode: TreeNode = {
                 id: `type-${typeId}`,
-                name: type.schema?.title ?? TYPE_LABELS[typeId] ?? typeId,
-                contributor: type._contributor,
+                name: type.schema?.title,
+                contributor: ProjectContributor.Studio,
                 isLeaf: false,
                 icon: type.icon,
                 children: [],

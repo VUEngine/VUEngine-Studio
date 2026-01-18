@@ -2,6 +2,7 @@ import { nls } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
@@ -118,8 +119,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     );
 
     const addInstrument = async () => {
-        const type = services.vesProjectService.getProjectDataType('Sound');
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+        const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
         const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema.properties?.instruments?.additionalProperties) as InstrumentConfig;
         if (!newInstrument) {
             return;

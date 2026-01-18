@@ -2,7 +2,8 @@ import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
 import PluginDefaultInput from '../../../../plugins/browser/components/PluginDefaultInput';
 import { PluginConfiguration, PluginConfigurationDataType } from '../../../../plugins/browser/ves-plugins-types';
-import { ProjectDataTypesWithContributor } from '../../../../project/browser/ves-project-types';
+import { PROJECT_TYPES } from '../../../../project/browser/ves-project-data';
+import { ProjectDataTypes } from '../../../../project/browser/ves-project-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import Input from '../Common/Base/Input';
@@ -18,27 +19,24 @@ interface PluginConfigurationProps {
 
 export default function PluginConfiguration(props: PluginConfigurationProps): React.JSX.Element {
     const { data, updateData, context } = props;
-    const [types, setTypes] = useState<ProjectDataTypesWithContributor>({});
+    const [types, setTypes] = useState<ProjectDataTypes>({});
 
     const initTypes = async (): Promise<void> => {
         await context.services.vesProjectService.projectDataReady;
-        const t = context.services.vesProjectService.getProjectDataTypes();
-        if (t && Object.keys(t).length > 0) {
-            const typesWithItems: ProjectDataTypesWithContributor = {};
-            Object.keys(t).map(typeId => {
-                const i = context.services.vesProjectService.getProjectDataItemsForType(typeId);
-                if (i && Object.keys(i).length > 0 && t[typeId].file.startsWith('.')) {
-                    typesWithItems[typeId] = t[typeId];
-                }
-            });
+        const typesWithItems: ProjectDataTypes = {};
+        Object.keys(PROJECT_TYPES).map(typeId => {
+            const i = context.services.vesProjectService.getProjectDataItemsForType(typeId);
+            if (i && Object.keys(i).length > 0 && PROJECT_TYPES[typeId].file.startsWith('.')) {
+                typesWithItems[typeId] = PROJECT_TYPES[typeId];
+            }
+        });
 
-            const sortedTypesWithItems: ProjectDataTypesWithContributor = {};
-            Object.keys(typesWithItems).sort((a, b) => a.localeCompare(b)).forEach(key => {
-                sortedTypesWithItems[key] = typesWithItems[key];
-            });
+        const sortedTypesWithItems: ProjectDataTypes = {};
+        Object.keys(typesWithItems).sort((a, b) => a.localeCompare(b)).forEach(key => {
+            sortedTypesWithItems[key] = typesWithItems[key];
+        });
 
-            setTypes(sortedTypesWithItems);
-        }
+        setTypes(sortedTypesWithItems);
     };
 
     const setData = (partialData: Partial<PluginConfigurationData>): void => {

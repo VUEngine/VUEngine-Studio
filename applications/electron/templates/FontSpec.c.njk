@@ -1,0 +1,131 @@
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+
+{%- set tilesData = [] -%}
+{%- set block = '' -%}
+{%- set currentByte = '' -%}
+{%- for character in range(item.offset, item.offset + item.characterCount) -%}
+	{%- for charRow in range(0, item.size.y) -%}
+		{%- for char in range(0, item.size.x) -%}
+			{%- for yPixel in range(0, 8) -%}
+				{%- for xPixel in range(0, 8) -%}
+					{%- set pixel = item.characters[character][yPixel + (charRow*8)][xPixel + (char*8)] | default(0) -%}
+					{%- set currentByte = [pixel | intToBin(2), currentByte] | join -%}
+
+					{%- if currentByte | length === 4 -%}
+						{%- set block = [currentByte | binToHex, block] | join -%}
+						{%- set currentByte = '' -%}
+					{%- endif -%}
+
+					{%- if block | length === 8 -%}
+						{%- set tilesData = (tilesData.push(block),tilesData) -%}
+						{%- set block = '' -%}
+					{%- endif -%}
+				{%- endfor -%}
+			{%- endfor -%}
+		{%- endfor -%}
+	{%- endfor -%}
+{%- endfor -%}
+
+{%- if item.compression != 'none' -%}
+	{%- set compressionResults = compressTiles(tilesData, item.compression, {
+		isAnimation: true,
+		individualFiles: false,
+		frameWidth: item.size.x,
+		frameHeight: item.size.y
+	}) -%}
+	{%- set tilesData = compressionResults.data -%}
+	{%- set tilesFrameOffsetsData = compressionResults.frameOffsets -%}
+
+	{%- set tilesCompressionLabel = '// ' ~ item.compression | upper -%}
+	{%- if compressionResults.compressionRatio < 0 -%}
+		{%- set tilesCompressionLabel = tilesCompressionLabel ~ ' compressed (' ~ compressionResults.compressionRatio | round(2) ~ '%)' -%}
+	{%- elseif compressionResults.compressionRatio == 0 -%}
+		{%- set tilesCompressionLabel = tilesCompressionLabel ~ ' compression skipped for not reducing size (±' ~ compressionResults.compressionRatio | round(2) ~ '%)' -%}
+	{%- else -%}
+		{%- set tilesCompressionLabel = tilesCompressionLabel ~ ' compression skipped for inflating size (+' ~ compressionResults.compressionRatio | round(2) ~ '%)' -%}
+	{%- endif -%}
+	{%- set tilesCompressionLabel = tilesCompressionLabel ~ '\n' -%}
+{%- endif -%}
+
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <Printer.h>
+
+{{ macros.sectionHeader('Declarations') }}
+
+{{ tilesCompressionLabel -}}
+const uint32 {{ sanitizedSpecName }}FontTiles[] __attribute__((aligned(4)))
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+	{% if item.compression != 'none' -%}
+		0x00000001,
+	{%- else -%}
+		0x00000000,
+	{%- endif %}
+	{% for tileData in tilesData -%}
+	0x{{ tileData }},
+	{%- if loop.index % 8 == 0 and not loop.last %}{{ "\n	" }}{% endif -%}
+	{%- endfor %}
+};
+
+{%- if tilesFrameOffsetsData is defined %}
+
+const uint32 {{ sanitizedSpecName }} FontTilesFrameOffsets[] __attribute__((aligned(4)))
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %} =
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+	{% for tilesFrameOffset in tilesFrameOffsetsData -%}
+	0x{{  tilesFrameOffset | string | padStart(8, '0') }},
+	{%- if loop.index % 8 == 0 and not loop.last %}{{ "\n	" }}{% endif -%}
+	{%- endfor %}
+};
+{%- endif %}
+
+{{ macros.sectionHeader('Definitions') }}
+
+CharSetROMSpec {{ sanitizedSpecName }}FontCharSet =
+{
+	// Number of chars in function of the number of frames to load at the same time
+	{{ item.pageSize * item.size.x * item.size.y }},
+
+	// Whether it is shared or not
+	true,
+
+	// Whether the tiles are optimized or not
+	false,
+
+	// Tiles array
+	(uint32*){{ sanitizedSpecName }}FontTiles,
+
+	// Frame offsets array
+	{% if tilesFrameOffsetsData is defined -%}
+		(uint32*){{ sanitizedSpecName }}FontTilesFrameOffsets
+	{%- else -%}
+		NULL
+	{%- endif %}	
+};
+
+FontROMSpec {{ sanitizedSpecName }}FontSpec =
+{
+	// Pointer to the char spec that the font uses
+	(CharSetSpec*)&{{ sanitizedSpecName }}FontCharSet,
+
+	// Offset at which character number the font starts
+	{{ item.offset }},
+
+	// Number of characters in this font
+	{{ item.characterCount }},
+
+	// Number of characters per line in charset
+	1,
+
+	// Size of a single character (in chars) ({width, height})
+	{{ "{" }}{{ item.size.x }}, {{ item.size.y }}{{ "}" }},
+
+	// Font's name
+	"{{ sanitizedSpecName }}",
+};

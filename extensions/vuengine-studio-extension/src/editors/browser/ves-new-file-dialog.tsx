@@ -3,14 +3,13 @@ import { Dialog, DialogProps, Message } from '@theia/core/lib/browser';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { inject, injectable } from 'inversify';
 import * as React from 'react';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectContributor, ProjectDataTypesWithContributor } from '../../project/browser/ves-project-types';
-import { TYPE_LABELS } from './ves-editors-types';
+import { ProjectContributor } from '../../project/browser/ves-project-types';
 
 @injectable()
 export class VesNewFileDialogProps extends DialogProps {
     parentLabel: string;
-    types: ProjectDataTypesWithContributor;
     vesProjectService: VesProjectService;
     defaultName: string;
     defaultExt: string;
@@ -41,9 +40,9 @@ export class VesNewFileDialog extends ReactDialog<string> {
     }
 
     protected render(): React.ReactNode {
-        const typeKeys = Object.keys(this.props.types).sort();
-        const multiFileTypes = typeKeys.filter(typeId => this.props.types[typeId].file?.startsWith('.'));
-        const singleFileTypes = typeKeys.filter(typeId => !this.props.types[typeId].file?.startsWith('.') &&
+        const typeKeys = Object.keys(PROJECT_TYPES).sort();
+        const multiFileTypes = typeKeys.filter(typeId => PROJECT_TYPES[typeId].file?.startsWith('.'));
+        const singleFileTypes = typeKeys.filter(typeId => !PROJECT_TYPES[typeId].file?.startsWith('.') &&
             // ignore if a file of this kind already exists
             !this.props.vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId));
 
@@ -132,10 +131,10 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             b.length > 0 &&
                             <optgroup key={'optgroup-' + i}>
                                 {b.map(typeId => {
-                                    const ext = this.props.types[typeId].file;
+                                    const ext = PROJECT_TYPES[typeId].file;
                                     return (
                                         <option value={ext} key={ext}>
-                                            {TYPE_LABELS[typeId] ?? this.props.types[typeId].schema.title}
+                                            {PROJECT_TYPES[typeId].schema.title}
                                         </option>
                                     );
                                 })}

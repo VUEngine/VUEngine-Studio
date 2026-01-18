@@ -1,0 +1,33 @@
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <VIPManager.h>
+
+{{ macros.sectionHeader('Definitions') }}
+
+BrightnessRepeatROMSpec {{ sanitizedSpecName }}BrightnessRepeatSpec =
+{
+	// Mirror spec?
+	{% if item.mirror %}true{% else %}false{% endif %},
+
+	// Brightness repeat values
+	{
+		{% for x in range(0, 96) -%}
+			{%- if not (item.mirror and loop.index > 48) -%}
+				{%- set value = item.values[x] | default(0) -%}
+				{%- if value is null -%}
+					{%- set value = 0 -%}
+				{%- endif -%}
+				{%- if value < 10 -%}{{ ' ' }} {%- endif -%}
+				{{- value -}}{{- ', '-}} 
+				{%- if loop.index % 16 == 0 and not (loop.last or (item.mirror and loop.index == 48)) -%}
+					{{ "\n		" }}
+				{%- endif -%}
+			{%- endif -%}
+		{%- endfor %}
+	}
+};

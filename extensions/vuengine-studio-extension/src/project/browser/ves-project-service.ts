@@ -38,27 +38,23 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
+import { PROJECT_TYPES } from './ves-project-data';
 import { VesProjectPreferenceIds } from './ves-project-preferences';
 import {
   GameConfig,
   PROJECT_CHANNEL_NAME,
   ProjectContributor,
-  ProjectData,
   ProjectDataItem,
   ProjectDataItemsByTypeWithContributor,
   ProjectDataItemsWithContributor,
-  ProjectDataTemplate,
-  ProjectDataTemplatesWithContributor,
   ProjectDataType,
-  ProjectDataTypesWithContributor,
   ProjectDataWithContributor,
   ProjectUpdateMode,
   VUENGINE_WORKSPACE_EXT,
   WithContributor,
   WithFileUri,
   WithType,
-  WithVersion,
-  defaultProjectData
+  WithVersion
 } from './ves-project-types';
 
 @injectable()
@@ -131,36 +127,12 @@ export class VesProjectService {
   protected knownContributors: { [contributor: string]: URI } = {};
 
   // project data
-  protected _projectData: ProjectDataWithContributor | undefined;
+  protected _projectData: ProjectDataWithContributor = {
+    items: {},
+  };
 
   getProjectData(): ProjectDataWithContributor | undefined {
     return this._projectData;
-  }
-
-  getProjectDataTypes(): ProjectDataTypesWithContributor | undefined {
-    return this._projectData?.types;
-  }
-
-  getProjectDataType(typeId: string): ProjectDataType & WithContributor | undefined {
-    return this._projectData?.types
-      && this._projectData?.types[typeId];
-  }
-
-  getProjectDataTypeByExt(file: string): ProjectDataType & WithContributor | undefined {
-    if (!this._projectData?.types) {
-      return;
-    }
-
-    return Object.values(this._projectData?.types).filter((type: ProjectDataType & WithContributor) => type.file === file)[0];
-  }
-
-  getProjectDataTemplates(): ProjectDataTemplatesWithContributor | undefined {
-    return this._projectData?.templates;
-  }
-
-  getProjectDataTemplate(templateId: string): ProjectDataTemplate & WithContributor | undefined {
-    return this._projectData?.templates
-      && this._projectData?.templates[templateId];
   }
 
   getProjectDataItems(): ProjectDataItemsByTypeWithContributor | undefined {
@@ -313,7 +285,7 @@ export class VesProjectService {
   }
 
   async createNewFileForType(typeId: string, itemIdToClone?: string): Promise<{ fileUri: URI, data: ProjectDataItem } | undefined> {
-    const type = this.getProjectDataType(typeId);
+    const type = PROJECT_TYPES[typeId];
     if (this.workspaceProjectFolderUri === undefined || !type || !type.file.startsWith('.')) {
       return;
     }
@@ -365,14 +337,18 @@ export class VesProjectService {
 
   protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {
     if (!this._projectData) {
-      this._projectData = {};
+      this._projectData = {
+        items: {}
+      };
     }
     this._projectData.plugins = plugins;
   }
 
   protected setProjectDataItem(typeId: string, itemId: string, data: ProjectDataItem, fileUri: URI): boolean {
     if (!this._projectData) {
-      this._projectData = {};
+      this._projectData = {
+        items: {},
+      };
     }
     if (!this._projectData.items) {
       this._projectData.items = {};
@@ -433,7 +409,7 @@ export class VesProjectService {
         delete this._projectData?.items[typeId];
       }
       if (!Object.keys(this._projectData?.items).length) {
-        delete this._projectData?.items;
+        this._projectData.items = {};
       }
       this.onDidDeleteProjectItemEmitter.fire(fileUri);
       this.logLine(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
@@ -563,9 +539,8 @@ export class VesProjectService {
   }
 
   protected handleFileDelete(fileUri: URI): void {
-    const types = this.getProjectDataTypes() || {};
-    Object.keys(types).map(async typeId => {
-      const type = types[typeId];
+    Object.keys(PROJECT_TYPES).map(async typeId => {
+      const type = PROJECT_TYPES[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         const items = this.getProjectDataItemsForType(typeId) || {};
         const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
@@ -589,9 +564,8 @@ export class VesProjectService {
       await this.readProjectData();
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
     } else {
-      const types = this.getProjectDataTypes() || {};
-      Object.keys(types).map(async typeId => {
-        const type = types[typeId];
+      Object.keys(PROJECT_TYPES).map(async typeId => {
+        const type = PROJECT_TYPES[typeId];
         if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
           const items = this.getProjectDataItemsForType(typeId) || {};
           const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
@@ -619,6 +593,58 @@ export class VesProjectService {
     }
   }
 
+  protected async setKnownContributors(): Promise<void> {
+    this.knownContributors = {};
+
+    // workspace
+    this.workspaceProjectFolderUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (this.workspaceProjectFolderUri) {
+      this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFolderUri;
+    }
+
+    // engine
+    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    if (!this.workspaceProjectFolderUri?.isEqual(engineCoreUri)) {
+      this.knownContributors[ProjectContributor.Engine] = engineCoreUri;
+    }
+
+    // plugins
+    let plugins: string[] = [];
+    this.gameConfigFileUri = this.workspaceProjectFolderUri?.resolve('config').resolve('GameConfig');
+    if (this.gameConfigFileUri && await this.fileService.exists(this.gameConfigFileUri)) {
+      try {
+        const fileContent = await this.fileService.readFile(this.gameConfigFileUri);
+        plugins = Object.keys(JSON.parse(fileContent.value.toString()).plugins || {});
+      } catch (error) { }
+    }
+    this.vesPluginsService.setInstalledPlugins(plugins);
+    const pluginsData = await this.getAllPluginsData();
+    this.setProjectDataAllKnownPlugins(pluginsData);
+    this.vesPluginsService.setPluginsData(pluginsData);
+
+    // installed plugins
+    const actuallyUsedPlugins = this.vesPluginsService.getActualUsedPluginNames();
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+    await Promise.all(actuallyUsedPlugins.map(async installedPluginId => {
+      let uri: URI | undefined;
+      if (installedPluginId.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+        uri = enginePluginsUri.resolve(installedPluginId.replace(VUENGINE_PLUGINS_PREFIX, ''));
+      } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
+        uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
+      }
+      if (uri && !this.workspaceProjectFolderUri?.isEqual(uri)) {
+        const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
+        this.knownContributors[contributor] = uri;
+      }
+    }));
+
+    // vuengine studio
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const studioTemplatesUri = resourcesUri.resolve('templates');
+    this.knownContributors[ProjectContributor.Studio] = studioTemplatesUri;
+  };
+
   protected async readProjectData(): Promise<void> {
     await this.workspaceService.ready;
 
@@ -633,126 +659,16 @@ export class VesProjectService {
 
     const startTime = performance.now();
 
-    this.knownContributors = {};
-
-    // workspace
-    let workspaceTypeData: ProjectData = {};
-    this.workspaceProjectFolderUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    this.gameConfigFileUri = this.workspaceProjectFolderUri?.resolve('config').resolve('GameConfig');
-    if (this.workspaceProjectFolderUri) {
-      workspaceTypeData = await this.findContributions(this.workspaceProjectFolderUri);
-    }
-
-    // engine
-    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-    const engineCoreTypeData = await this.findContributions(engineCoreUri);
-
-    // plugins
-    let plugins: string[] = [];
-    if (this.gameConfigFileUri && await this.fileService.exists(this.gameConfigFileUri)) {
-      try {
-        const fileContent = await this.fileService.readFile(this.gameConfigFileUri);
-        plugins = Object.keys(JSON.parse(fileContent.value.toString()).plugins || {});
-      } catch (error) { }
-    }
-    this.vesPluginsService.setInstalledPlugins(plugins);
-    const pluginsData = await this.getAllPluginsData();
-    this.setProjectDataAllKnownPlugins(pluginsData);
-    this.vesPluginsService.setPluginsData(pluginsData);
-
-    // installed plugins
-    const pluginsProjectDataWithContributors: (ProjectData & WithContributor)[] = [];
-    const actuallyUsedPlugins = this.vesPluginsService.getActualUsedPluginNames();
-    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-    await Promise.all(actuallyUsedPlugins.map(async installedPluginId => {
-      let uri: URI | undefined;
-      if (installedPluginId.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-        uri = enginePluginsUri.resolve(installedPluginId.replace(VUENGINE_PLUGINS_PREFIX, ''));
-      } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
-        uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
-      }
-      const pluginsTypeData = uri ? await this.findContributions(uri) : undefined;
-      if (uri && pluginsTypeData && !this.workspaceProjectFolderUri?.isEqual(uri)) {
-        const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
-        pluginsProjectDataWithContributors.push({
-          _contributor: contributor,
-          _contributorUri: uri,
-          ...pluginsTypeData,
-        });
-        this.knownContributors[contributor] = uri;
-      }
-    }));
-
-    const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const studioTemplatesUri = resourcesUri.resolve('templates');
-    const projectDataWithContributors: (ProjectData & WithContributor)[] = [{
-      _contributor: ProjectContributor.Studio,
-      _contributorUri: studioTemplatesUri,
-      ...defaultProjectData
-    }];
-    this.knownContributors[ProjectContributor.Studio] = studioTemplatesUri;
-
-    if (!this.workspaceProjectFolderUri?.isEqual(engineCoreUri)) {
-      projectDataWithContributors.push({
-        _contributor: ProjectContributor.Engine,
-        _contributorUri: engineCoreUri,
-        ...engineCoreTypeData
-      });
-      this.knownContributors[ProjectContributor.Engine] = engineCoreUri;
-    }
-
-    if (pluginsProjectDataWithContributors.length) {
-      projectDataWithContributors.push(...pluginsProjectDataWithContributors);
-    }
-
-    if (this.workspaceProjectFolderUri) {
-      projectDataWithContributors.push({
-        _contributor: ProjectContributor.Project,
-        _contributorUri: this.workspaceProjectFolderUri,
-        ...workspaceTypeData
-      });
-      this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFolderUri;
-    }
-
-    const combinedProjectData: {
-      [key: string]: ProjectDataItemsByTypeWithContributor | ProjectDataTemplatesWithContributor | ProjectDataTypesWithContributor
-    } = {
-      items: {},
-      templates: {},
-      types: {},
-    };
-
-    // add types and templates to combined data
-    projectDataWithContributors.map(async projectDataWithContributor => {
-      ['templates', 'types'].map(combinedKey => {
-        // @ts-ignore
-        const data = projectDataWithContributor[combinedKey];
-        if (data) {
-          Object.keys(data).map(dataKey => {
-            if (data[dataKey].enabled !== false) {
-              combinedProjectData[combinedKey][dataKey] = {
-                _contributor: projectDataWithContributor._contributor,
-                _contributorUri: projectDataWithContributor._contributorUri,
-                ...data[dataKey],
-              };
-            }
-          });
-        }
-      });
-    });
-
-    this._projectData = {
-      ...this._projectData,
-      ...combinedProjectData,
-    };
+    await this.setKnownContributors();
 
     // add items to project data
-    const filePatterns = Object.values(combinedProjectData.types).map((t: ProjectDataType) => t.file?.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
-    await Promise.all(projectDataWithContributors.map(async projectDataWithContributor => {
+    const filePatterns = Object.values(PROJECT_TYPES).map((t: ProjectDataType) => t.file?.startsWith('.')
+      ? `**/*${t.file}`
+      : `**/${t.file}`);
+    await Promise.all(Object.keys(this.knownContributors).map(async knownContributorKey => {
       // find item files
       const itemFiles = window.electronVesCore.findFiles(
-        await this.fileService.fsPath(projectDataWithContributor._contributorUri),
+        await this.fileService.fsPath(this.knownContributors[knownContributorKey]),
         filePatterns,
         {
           ignore: ['build/**'],
@@ -762,27 +678,27 @@ export class VesProjectService {
       );
       // find type
       await Promise.all(itemFiles.map(async filename => {
-        const uri = projectDataWithContributor._contributorUri.resolve(filename);
-        await Promise.all(Object.keys(combinedProjectData.types).map(async typeId => {
-          const type = combinedProjectData.types[typeId] as (ProjectDataType & WithContributor);
+        const uri = this.knownContributors[knownContributorKey].resolve(filename);
+        await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
+          const type = PROJECT_TYPES[typeId] as (ProjectDataType);
           if ([uri.path.ext, uri.path.base].includes(type.file)) {
-            if (!combinedProjectData['items'][typeId]) {
-              combinedProjectData['items'][typeId] = {};
+            if (!this._projectData.items[typeId]) {
+              this._projectData.items[typeId] = {};
             }
 
             const fileContent = await this.fileService.readFile(uri);
             try {
               const fileContentJson = JSON.parse(fileContent.value.toString());
               const itemWithContributor = {
-                _contributor: projectDataWithContributor._contributor,
-                _contributorUri: projectDataWithContributor._contributorUri,
+                _contributor: knownContributorKey,
+                _contributorUri: this.knownContributors[knownContributorKey],
                 _fileUri: uri,
                 ...fileContentJson
               };
               if (type.file?.startsWith('.')) {
                 if (fileContentJson._id) {
                   // @ts-ignore
-                  if (combinedProjectData['items'][typeId][fileContentJson._id]) {
+                  if (this._projectData.items[typeId][fileContentJson._id]) {
                     const openFileButtonLabel = nls.localize(
                       'vuengine/projects/openFile',
                       'Open File',
@@ -797,7 +713,7 @@ export class VesProjectService {
                         'Duplicate item ID detected in file "{0}". Previously seen in file "{1}"',
                         uri?.path.fsPath(),
                         // @ts-ignore
-                        combinedProjectData['items'][typeId][fileContentJson._id]._fileUri?.path.fsPath(),
+                        this._projectData.items[typeId][fileContentJson._id]._fileUri?.path.fsPath(),
                       ),
                       openFileButtonLabel,
                       generateIdButtonLabel,
@@ -812,8 +728,7 @@ export class VesProjectService {
                       }
                     });
                   }
-                  // @ts-ignore
-                  combinedProjectData['items'][typeId][fileContentJson._id] = itemWithContributor;
+                  this._projectData.items[typeId][fileContentJson._id] = itemWithContributor;
                 } else {
                   const openFileButtonLabel = nls.localize(
                     'vuengine/projects/openFile',
@@ -843,8 +758,7 @@ export class VesProjectService {
                   });
                 }
               } else {
-                // @ts-ignore
-                combinedProjectData['items'][typeId][projectDataWithContributor._contributor] = itemWithContributor;
+                this._projectData.items[typeId][knownContributorKey] = itemWithContributor;
               }
             } catch (error) {
               console.error('Malformed item file could not be parsed.', uri?.path.fsPath());
@@ -854,11 +768,6 @@ export class VesProjectService {
         }));
       }));
     }));
-
-    this._projectData = {
-      ...this._projectData,
-      ...combinedProjectData,
-    };
 
     const duration = performance.now() - startTime;
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
@@ -883,7 +792,7 @@ export class VesProjectService {
 
     let gameConfig = this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfig;
     if (!gameConfig) {
-      gameConfig = this.generateDataFromJsonSchema(defaultProjectData!.types!['GameConfig'].schema?.properties) as GameConfig;
+      gameConfig = this.generateDataFromJsonSchema(PROJECT_TYPES['GameConfig'].schema?.properties) as GameConfig;
     }
 
     return gameConfig;
@@ -1010,36 +919,6 @@ export class VesProjectService {
     }
 
     return field as string;
-  }
-
-  protected async findContributions(root: URI): Promise<ProjectData> {
-    const result = {
-      types: {},
-      templates: {},
-    };
-
-    const files = window.electronVesCore.findFiles(
-      root?.path.fsPath(),
-      [
-        'contributions/TemplateConfig/*.templateConfig',
-        'contributions/Type/*.type',
-      ],
-      {
-        nodir: true
-      });
-
-    await Promise.all(files.map(async f => {
-      const fileContent = await this.fileService.readFile(root.resolve(f));
-      const fileContentJson = JSON.parse(fileContent.value.toString());
-      const t = f.startsWith('contributions/Type') ||
-        (isWindows && f.startsWith('contributions\\Type'))
-        ? 'types'
-        : 'templates';
-      // @ts-ignore
-      result[t][fileContent.resource.path.name] = fileContentJson;
-    }));
-
-    return result;
   }
 
   async getProjectName(workspaceFileUri?: URI): Promise<string> {
@@ -1205,7 +1084,7 @@ export class VesProjectService {
     // get project-contributed items
     const projectItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
     Object.keys(itemsByType).map(typeId => {
-      const type = this.getProjectDataType(typeId);
+      const type = PROJECT_TYPES[typeId];
       Object.values(itemsByType[typeId]).map((item: ProjectDataItem & WithContributor & WithFileUri & WithVersion) => {
         if (item._contributor === ProjectContributor.Project) {
           projectItems.push({

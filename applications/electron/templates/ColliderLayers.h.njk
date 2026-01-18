@@ -1,0 +1,26 @@
+{%- set layers = project.items.ColliderLayers.project -%}
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
+
+#ifndef COLLIDER_LAYERS_H_
+#define COLLIDER_LAYERS_H_
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <ColliderManager.h>
+
+{{ macros.sectionHeader('Definitions') }}
+
+{% if layers.layers | length > 0 -%}
+enum ColliderLayers
+{
+	{%- set current = 0 -%}
+	{%- for layer in layers.layers | values | removeEmpty | sort -%}
+	{%- set current = current + 1 %}
+	kLayer{{ layer | sanitizeSpecName }} = 1 << (kLayerNone + {{ current }}),
+	{%- endfor %}
+	kLayerAll = __COLLISION_ALL_LAYERS,
+};
+{%- endif %}
+
+#endif

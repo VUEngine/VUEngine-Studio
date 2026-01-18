@@ -1,6 +1,7 @@
 import { WidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 
@@ -13,11 +14,9 @@ export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsWidget> {
 
     readonly id = VesEditorsWidget.ID;
 
-    async canHandle(uri: URI): Promise<number> {
-        await this.vesProjectService.projectDataReady;
-        const types = this.vesProjectService.getProjectDataTypes();
-        for (const typeId of Object.keys(types || {})) {
-            if ([uri.path.ext, uri.path.base].includes(types![typeId].file)) {
+    canHandle(uri: URI): number {
+        for (const typeId of Object.keys(PROJECT_TYPES)) {
+            if ([uri.path.ext, uri.path.base].includes(PROJECT_TYPES[typeId].file)) {
                 this.typeId = typeId;
                 return 1000;
             }

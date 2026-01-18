@@ -19,11 +19,10 @@ import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesProjectService } from '../../project/browser/ves-project-service';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
-import { TYPE_LABELS } from './ves-editors-types';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
@@ -46,8 +45,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsContextKeyService)
     protected readonly contextKeyService: VesEditorsContextKeyService;
-    @inject(VesProjectService)
-    protected readonly vesProjectService: VesProjectService;
     @inject(UserWorkingDirectoryProvider)
     protected readonly workingDirProvider: UserWorkingDirectoryProvider;
 
@@ -86,7 +83,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         );
     }
 
-    async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+    registerCommands(commandRegistry: CommandRegistry): void {
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
@@ -167,11 +164,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             });
         });
 
-        await this.vesProjectService.projectDataReady;
-        const types = this.vesProjectService.getProjectDataTypes();
-
-        for (const typeId of Object.keys(types || {})) {
-            const type = types![typeId];
+        for (const typeId of Object.keys(PROJECT_TYPES)) {
+            const type = PROJECT_TYPES[typeId];
 
             // TODO: Need a strategy to handle relative file paths, e.g. for sprites in actor editor
             // See also: line 256
@@ -179,7 +173,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand({
                     id: `editors.new-untitled.${typeId}`,
-                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', type.schema.title),
                     category: CommonCommands.FILE_CATEGORY,
                     iconClass: type.icon,
                 }, {
@@ -197,7 +191,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             if (type.forFiles?.length) {
                 commandRegistry.registerCommand({
                     id: `editors.new-file.${typeId}`,
-                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', TYPE_LABELS[typeId] ?? type.schema.title),
+                    label: nls.localize('vuengine/editors/general/newTypeFile', 'New {0} File...', type.schema.title),
                     category: CommonCommands.FILE_CATEGORY,
                 }, {
                     // Show "new xyz conversion file" commands only in explorer, but hide from command palette
@@ -212,7 +206,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             isVisible: () => {
                 const p = this.editorManager.all.find(w => w.id === this.shell.currentWidget?.id)?.editor.uri.path;
                 if (p) {
-                    for (const t of Object.values(types || {})) {
+                    for (const t of Object.values(PROJECT_TYPES)) {
                         if ([p.ext, p.base].includes(t.file)) {
                             return true;
                         }
@@ -278,13 +272,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
     }
 
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
+    registerMenus(menus: MenuModelRegistry): void {
         super.registerMenus(menus);
 
-        await this.vesProjectService.projectDataReady;
-        const types = this.vesProjectService.getProjectDataTypes();
-        for (const typeId of Object.keys(types || {})) {
-            const type = types![typeId];
+        for (const typeId of Object.keys(PROJECT_TYPES)) {
+            const type = PROJECT_TYPES[typeId];
 
             // TODO: Need a strategy to handle relative file paths, e.g. for sprites in actor editor
             // See also: line 144

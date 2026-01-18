@@ -1,0 +1,754 @@
+{%- import 'templates/partials/macros.njk' as macros -%}
+{%- include('templates/partials/fileHeader/fileHeader.c.njk') -%}
+{{ '\n\n' }}
+
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+
+{%- set hasAnimations = false -%}
+{%- if item.components.animations | length -%}
+	{%- set hasAnimations = true -%}
+{%- endif -%}
+
+{%- set isSpritesheetAnimation = false -%}
+{%- if hasAnimations -%}
+	{%- set isSpritesheetAnimation = true -%}
+{%- endif -%}
+
+{#- DETERMINE ACTOR CLASS -#}
+{%- if item.logic.customAllocator is defined and item.logic.customAllocator != '' -%}
+	{%- set actorClass = item.logic.customAllocator -%}
+{%- else -%}
+	{%- set actorClass = 'Actor' -%}
+{%- endif %}
+
+{#- DETERMINE INCLUDES -#}
+{%- set includes = [actorClass, 'Texture'] -%}
+{%- if item.inGameType != '' -%}
+	{{- macros.append(includes, 'InGameTypes') -}}
+{%- endif -%}
+{%- if item.components.bodies | length -%}
+	{{- macros.append(includes, 'Body') -}}
+{%- endif -%}
+{%- if item.components.sprites | length -%}
+	{%- for sprite in item.components.sprites -%}
+		{%- set isAnimated = false -%}
+		{%- if hasAnimations and sprite.isAnimated -%}
+			{%- set isAnimated = true -%}
+		{%- endif -%}
+		{%- set spriteClass = item.sprites.type ~ 'Sprite' -%}
+		{%- set spriteAllocatorClass = item.sprites.type ~ 'Sprite' -%}
+		{%- if item.sprites.type == 'Bgmap' and not sprite.texture.repeat.x and not sprite.texture.repeat.y and sprite.colorMode == 1 and not isAnimated -%}
+			{%- set spriteClass = 'FrameBlendBgmapSprite' -%}
+			{%- set spriteAllocatorClass = 'FrameBlendBgmapSprite' -%}
+		{%- elseif item.sprites.type == 'Bgmap' and (sprite.texture.repeat.x or sprite.texture.repeat.y) and isAnimated -%}
+			{%- set spriteClass = 'MBgmapSprite' -%}
+			{%- set spriteAllocatorClass = 'MBgmapSprite' -%}
+		{%- elseif item.sprites.type == 'Bgmap' and (sprite.texture.repeat.x or sprite.texture.repeat.y) and not isAnimated -%}
+			{%- set spriteClass = 'MBgmapSprite' -%}
+			{%- set spriteAllocatorClass = 'MBgmapSprite' -%}
+		{%- elseif isAnimated -%}
+			{%- set spriteAllocatorClass = item.sprites.type ~ 'Sprite' -%}
+		{%- endif -%}
+		{{- macros.append(includes, spriteClass) -}}
+		{{- macros.append(includes, spriteAllocatorClass) -}}
+		{%- if sprite.bgmapMode == 'HBias' and sprite.manipulationFunction != '' %}
+			{{- macros.append(includes, sprite.manipulationFunction.split('_')[0] ~ 'Extensions') -}}
+		{%- endif %}
+	{%- endfor -%}
+{%- endif -%}
+{%- if item.components.colliders | length -%}
+	{{- macros.append(includes, 'ColliderLayers') -}}
+	{%- for collider in item.components.colliders -%}
+		{{- macros.append(includes, collider.type) -}}
+	{%- endfor -%}
+{%- endif -%}
+{%- if item.components.mutators | length -%}
+		{{- macros.append(includes, 'Mutator') -}}
+	{%- for mutator in item.components.mutators -%}
+		{{- macros.append(includes, mutator.mutationClass) -}}
+	{%- endfor -%}
+{%- endif -%}
+{%- if item.components.sounds | length -%}
+		{{- macros.append(includes, 'Sound') -}}
+{%- endif -%}
+{%- if item.components.wireframes | length -%}
+	{%- for wireframe in item.components.wireframes -%}
+		{{- macros.append(includes, wireframe.type) -}}
+	{%- endfor -%}
+{%- endif -%}
+
+{#- DETERMINE DECLARATIONS -#}
+{%- set declarations = [] -%}
+
+{%- if item.components.children | length -%}
+	{%- for child in item.components.children -%}
+		{%- set childActor = project.items.Actor[child.itemId] -%}
+		{%- if childActor is defined %}
+			{%- set childName = childActor._fileUri | basename(false) | sanitizeSpecName -%}
+			{{- macros.append(declarations, 'ActorSpec ' ~ childName ~ 'ActorSpec') -}}
+		{%- endif -%}
+	{%- endfor -%}
+{%- endif -%}
+{%- if item.components.sounds | length -%}
+	{%- for sound in item.components.sounds -%}
+		{%- set soundItem = project.items.Sound[sound.itemId] -%}
+		{%- if soundItem is defined %}
+			{%- set childName = soundItem._fileUri | basename(false) | sanitizeSpecName -%}
+			{{- macros.append(declarations, 'SoundSpec ' ~ childName ~ 'SoundSpec') -}}
+		{%- endif -%}
+	{%- endfor -%}
+{%- endif -%}
+{%- if item.components.sprites | length -%}
+	{%- for sprite in item.components.sprites -%}
+		{%- if not sprite._imageData | int and sprite._imageData.images | length -%}
+			{%- for imageData in sprite._imageData.images -%}
+				{#- Tiles -#}
+				{%- if imageData.tiles.data -%}
+					{{- macros.append(declarations, 'uint32 ' ~ sanitizedSpecName ~ 'Actor' ~ (imageData.tiles.name | sanitizeSpecName)  ~ 'Tiles[]') -}}
+				{%- endif -%}
+				{#- Maps -#}
+				{%- for map in imageData.maps -%}
+					{%- set mapName = sanitizedSpecName ~ 'Actor' ~ map.name | sanitizeSpecName -%}
+					{{- macros.append(declarations, 'uint16 ' ~ mapName ~ 'Map[]') -}}
+				{%- endfor -%}
+				{#- Frame Offsets -#}
+				{%- if imageData.tiles.frameOffsets is defined -%}
+					{{- macros.append(declarations, 'uint32 ' ~ sanitizedSpecName ~ 'Actor' ~ imageData.tiles.name | sanitizeSpecName  ~ 'TilesFrameOffsets[]') -}}
+				{%- endif -%}
+			{%- endfor -%}
+		{%- endif %}
+	{%- endfor -%}
+{%- endif -%}
+
+{#- PRINT INCLUDES -#}
+{%- if includes | length -%}
+
+{{- macros.sectionHeader('Includes') ~ '\n\n' -}}
+
+{%- for include in includes | unique | sort -%}
+#include <{{ include }}.h>
+{% endfor %}
+{%- endif %}
+
+{#- PRINT DECLARATIONS -#}
+{%- if declarations | length -%}
+
+{{- '\n' ~ macros.sectionHeader('Declarations') ~ '\n\n' -}}
+
+{%- for declaration in declarations | unique | sort -%}
+extern {{ declaration }};
+{% endfor %}
+{% endif %}
+
+{#- PRINT IMAGE DATA AND SPRITES -#}
+{%- if item.components.sprites | length -%}
+
+{#- PRINT ANIMATIONS -#}
+{%- if hasAnimations -%}
+
+{{- macros.sectionHeader('Animations') ~ '\n\n' -}}
+
+{%- for animation in item.components.animations -%}
+{%- if animation.name != '' -%}
+	{%- set animationName = animation.name -%}
+{%- else -%} 
+	{%- set animationName = loop.index -%}
+{%- endif -%}
+AnimationFunctionROMSpec {{ sanitizedSpecName }}Animation{{ loop.index }}AnimationSpec =
+{
+	// Number of frames that the texture supports of this animation function
+	{{ animation.frames | length }},
+
+	// Frames to play in animation
+	{
+		{% for frame in animation.frames -%}
+			{{ frame }}, {% if loop.index % 10 == 0 and not loop.last %}{{ "\n		" }}{% endif %}
+		{%- endfor %}
+	},
+
+	// Number of cycles a frame of animation is displayed
+	{{ animation.cycles }},
+
+	// Whether to play it in loop or not
+	{{ animation.loop }},
+
+	// Animation's name
+	"{{ animationName }}",
+};
+
+{% endfor -%}
+
+AnimationFunctionROMSpec* {{ sanitizedSpecName }}AnimationSpecs[] =
+{
+	{% for animation in item.components.animations -%}
+	(AnimationFunction*)&{{ sanitizedSpecName }}Animation{{ loop.index }}AnimationSpec,
+	{% endfor -%}
+	NULL,
+};
+
+{% endif %}
+
+{{- macros.sectionHeader('Sprites') ~ '\n' -}}
+
+{%- set spriteNames = [] -%}
+{%- for sprite in item.components.sprites -%}
+
+{%- set isAnimated = false -%}
+{%- if hasAnimations and sprite.isAnimated -%}
+	{%- set isAnimated = true -%}
+{%- endif -%}
+{%- set spriteNumber = loop.index -%}
+
+{%- set spriteClass = item.sprites.type ~ 'Sprite' -%}
+{%- set spriteAllocatorClass = item.sprites.type ~ 'Sprite' -%}
+{%- if item.sprites.type == 'Bgmap' and not sprite.texture.repeat.x and not sprite.texture.repeat.y and sprite.colorMode == 1 and not isAnimated -%}
+	{%- set spriteClass = 'FrameBlendBgmapSprite' -%}
+	{%- set spriteAllocatorClass = 'FrameBlendBgmapSprite' -%}
+{%- elseif item.sprites.type == 'Bgmap' and (sprite.texture.repeat.x or sprite.texture.repeat.y) and isAnimated -%}
+	{%- set spriteClass = 'MBgmapSprite' -%}
+	{%- set spriteAllocatorClass = 'MBgmapSprite' -%}
+{%- elseif item.sprites.type == 'Bgmap' and (sprite.texture.repeat.x or sprite.texture.repeat.y) and not isAnimated -%}
+	{%- set spriteClass = 'MBgmapSprite' -%}
+	{%- set spriteAllocatorClass = 'MBgmapSprite' -%}
+{%- elseif isAnimated -%}
+	{%- set spriteAllocatorClass = item.sprites.type ~ 'Sprite' -%}
+{%- endif -%}
+
+{%- set isStereo = sprite.texture.files2 is defined and sprite.texture.files2 | length > 0 -%}
+{%- set isStereoAnimation = sprite._imageData.images and sprite._imageData.images | length == 2 -%}
+{%- for eye in ['L', 'R'] -%}
+{%- if eye === 'L' or isStereo -%}
+{%- set spriteImageData = sprite._imageData -%}
+{%- if spriteImageData | int -%}
+	{#- Resolve dupes -#}
+	{%- set spriteImageData = item.components.sprites[sprite._imageData - 1]._imageData -%}
+{%- endif -%}
+{%- set imageData = spriteImageData.images[0] -%}
+{%- set charsetSpecName = sanitizedSpecName ~ 'Sprite' ~ spriteNumber -%}
+{%- if isStereoAnimation -%}
+	{%- set imageData = spriteImageData.images[loop.index0] -%}
+	{%- set charsetSpecName = charsetSpecName ~ eye -%}
+{%- endif -%}
+{%- set tilesName = sanitizedSpecName ~ 'Actor' ~ imageData.tiles.name -%}
+{%- set spriteName = sanitizedSpecName ~ 'Sprite' ~ spriteNumber -%}
+{%- if isStereo -%}
+	{%- set spriteName = spriteName ~ eye -%}
+{%- endif -%}
+{{- macros.append(spriteNames, spriteName) -}}
+{%- set isOptimizedAnimation = false -%}
+{%- if isAnimated and imageData.animation.largestFrame is defined -%}
+	{%- set isOptimizedAnimation = true -%}
+{%- endif -%}
+
+{%- if imageData.tiles is defined and (eye !== 'R' or isStereoAnimation) %}
+CharSetROMSpec {{ charsetSpecName }}CharsetSpec =
+{
+	// Number of CHARs in function of the number of frames to load at the same time
+	{%- if isAnimated and isOptimizedAnimation %}
+	{{ imageData.animation.largestFrame }},
+	{%- elseif isAnimated and isSpritesheetAnimation and not item.animations.multiframe %}
+	{{ (imageData.tiles.count / item.animations.totalFrames) | round(0, "floor") }},
+	{%- else %}
+	{{ imageData.tiles.count }},
+	{%- endif %}
+
+	// Whether it is shared or not
+	{{ sprite.shareTiles }},
+
+	// Whether the tiles are optimized or not
+	{%- if isOptimizedAnimation %}
+	true,
+	{%- elseif isSpritesheetAnimation %}
+	false,
+	{%- else %}
+	{{ sprite.optimizeTiles }},
+	{%- endif %}
+
+	// Tiles array
+	{{ tilesName }}Tiles,
+
+	// Frame offsets array
+	{%- if imageData.tiles.frameOffsets is defined and imageData.tiles.frameOffsets | length %}
+	{{ tilesName }}TilesFrameOffsets
+	{%- else %}
+	NULL
+	{%- endif %}
+};
+
+{% endif -%}
+
+TextureROMSpec {{ spriteName }}TextureSpec =
+{
+	// Pointer to the char spec that the texture uses
+	(CharSetSpec*)&{{ charsetSpecName }}CharsetSpec,
+
+	// Pointer to the map array that defines how to use the tiles from the char set
+	{% if isStereo and not isStereoAnimation and eye === 'R' -%}
+	{{ sanitizedSpecName ~ 'Actor' ~ imageData.maps[1].name }}Map,
+	{%- else -%}
+	{{ sanitizedSpecName ~ 'Actor' ~ imageData.maps[0].name }}Map,
+	{%- endif %}
+
+	// Horizontal size in tiles of the texture (max. 64)
+	{{ imageData.maps[0].width | round(0, "floor") }},
+
+	// Vertical size in tiles of the texture (max. 64)
+	{% set mapHeight = imageData.maps[0].height | round(0, "floor") -%}
+	{%- if spriteClass == 'FrameBlendBgmapSprite' -%}
+		{%- set mapHeight = mapHeight / 2 | round(0, "floor") -%}
+	{%- endif -%}
+	{%- if isAnimated and isSpritesheetAnimation and not isOptimizedAnimation -%}
+		{%- set mapHeight = mapHeight / item.animations.totalFrames -%}
+	{%- endif -%}
+	{{ mapHeight }},
+
+	// padding for affine/hbias transformations
+	{{ '{' ~ sprite.texture.padding.x ~ ', ' ~ sprite.texture.padding.y ~ '}' }},
+
+	// Number of frames that the texture supports
+	{%- if isAnimated and item.animations.multiframe %}
+	{{ item.animations.totalFrames }},
+	{%- elseif spriteClass == 'FrameBlendBgmapSprite' %}
+	2,
+	{%- else %}
+	1,
+	{%- endif %}
+
+	// Palette index to use by the graphical data (0 - 3)
+	{{ sprite.texture.palette | default(0) }},
+
+	// Flag to recycle the texture with a different map
+	{{ sprite.texture.recycleable | default(false) }},
+
+	// Flag to vertically flip the image
+	{{ sprite.texture.flip.x | default(false) }},
+
+	// Flag to horizontally flip the image
+	{{ sprite.texture.flip.y | default(false) }}
+};
+
+{%- if spriteAllocatorClass == 'MBgmapSprite' or spriteAllocatorClass == 'MBgmapSprite' %}
+
+TextureROMSpec* const {{ spriteName }}TextureSpecs[] =
+{
+	(TextureSpec*)&{{ spriteName }}TextureSpec,
+	NULL
+};
+{%- endif %}
+
+{{ spriteClass }}ROMSpec {{ spriteName }}SpriteSpec =
+{
+	{%- if spriteClass == 'FrameBlendBgmapSprite' %}
+	{
+	{%- endif %}
+	{%- if spriteAllocatorClass == 'MBgmapSprite' %}
+	{
+	{%- endif %}
+	{
+		// VisualComponent
+		{
+			// Component
+			{
+				// Allocator
+				__TYPE({{ spriteAllocatorClass }}),
+
+				// Component type
+				kSpriteComponent
+			},
+
+			// Array of animation functions
+			{%- if isAnimated %}
+			(const AnimationFunction**){{ sanitizedSpecName }}AnimationSpecs
+			{%- else %}
+			(const AnimationFunction**)NULL
+			{%- endif %}
+		},
+
+		// Spec for the texture to display
+		{%- if spriteAllocatorClass == 'MBgmapSprite' or spriteAllocatorClass == 'MBgmapSprite' %}
+		NULL,
+		{%- else %}
+		(TextureSpec*)&{{ spriteName }}TextureSpec,
+		{%- endif %}
+
+		// Transparency mode (__TRANSPARENCY_NONE, __TRANSPARENCY_EVEN or __TRANSPARENCY_ODD)
+		__TRANSPARENCY_{{ sprite.transparency | upper }},
+
+		// Displacement added to the sprite's position
+		{{ '{' ~ sprite.displacement.x ~ ', ' ~ sprite.displacement.y ~ ', ' ~ sprite.displacement.z ~ ', ' ~ sprite.displacement.parallax ~ '}' }}
+	},
+
+	// Flag to indicate in which display to show the texture (__WORLD_ON, __WORLD_LON or __WORLD_RON)
+	{% if isStereo -%}
+	__WORLD_{{ eye }}ON,
+	{%- else -%}
+	__WORLD_{{ sprite.displays }},
+	{%- endif %}
+
+	{%- if item.sprites.type != 'Object' %}
+
+	// The display mode (__WORLD_BGMAP, __WORLD_AFFINE or __WORLD_HBIAS)
+	__WORLD_{{ sprite.bgmapMode | upper }},
+	{% endif %}
+
+	{%- if item.sprites.type != 'Object' %}
+	// Pointer to affine/hbias manipulation function
+	{% if sprite.manipulationFunction %}(ParamTableEffectMethod){{ sprite.manipulationFunction }}{% else %}NULL{% endif %}
+	{%- endif %}
+
+	{%- if spriteClass == 'FrameBlendBgmapSprite' %}
+	}
+	{%- endif %}
+	{%- if spriteAllocatorClass == 'MBgmapSprite' or spriteAllocatorClass == 'MBgmapSprite' %}
+	},
+
+	// Texture to use with the sprite
+	(TextureSpec**){{ spriteName }}TextureSpecs,
+
+	// SCX/SCY value
+	__WORLD_{{ sprite.texture.repeat.mode | default('1x1') }},
+
+	// Flag to loop the x axis
+	{{ sprite.texture.repeat.x | default(false) }},
+
+	// Flag to loop the y axis
+	{{ sprite.texture.repeat.y | default(false) }},
+
+	// Bounds the sprite's width to provide culling; if 0, the value is inferred from the texture
+	{{ sprite.texture.repeat.size.x | default(0) }},
+
+	// Bounds the sprite's height to provide culling; if 0, the value is inferred from the texture
+	{{ sprite.texture.repeat.size.y | default(0) }}
+	{%- endif %}
+};
+
+{% endif -%}
+{% endfor -%}
+{% endfor -%}
+{% endif -%}
+
+{#- PRINT WIREFRAMES -#}
+{%- if item.components.wireframes | length -%}
+
+{{- macros.sectionHeader('Wireframes') ~ '\n\n' -}}
+
+{%- set wireframeNames = [] -%}
+{%- for wireframe in item.components.wireframes -%}
+{%- set wireframeName = sanitizedSpecName ~ 'Wireframe' ~ loop.index -%}
+{{- macros.append(wireframeNames, wireframeName) -}}
+
+{% if wireframe.type == 'Mesh' -%}
+const PixelVector {{ wireframeName }}WireframeSegments[][2]=
+{
+	{%- for segment in wireframe.segments %}
+	{
+		{{- '{' ~ segment.fromVertex.x ~ ', ' ~ segment.fromVertex.y ~ ', ' ~ segment.fromVertex.z ~ ', ' ~ segment.fromVertex.parallax ~ '}, ' -}}
+		{{- '{' ~ segment.toVertex.x ~ ', ' ~ segment.toVertex.y ~ ', ' ~ segment.toVertex.z ~ ', ' ~ segment.toVertex.parallax ~ '}' -}}
+	},
+	{%- endfor %}
+
+	// limiter
+	{{ '{{0, 0, 0, 0}, {0, 0, 0, 0}},' }}
+};
+
+{% endif -%}
+
+{{ wireframe.type }}ROMSpec {{ wireframeName }}WireframeSpec =
+{
+	// Wireframe
+	{
+		// VisualComponent
+		{
+			// Component
+			{
+				// Allocator
+				__TYPE({{ wireframe.type }}),
+
+				// Component type
+				kWireframeComponent
+			},
+
+			// Array of function animations
+			(const AnimationFunction**)NULL
+		},
+
+		// Displacement
+		{{ '{' ~ wireframe.displacement.x ~ ', ' ~ wireframe.displacement.y ~ ', ' ~ wireframe.displacement.z ~ '}' }},
+		
+		// color
+		{{ ['__COLOR_BLACK', '__COLOR_DARK_RED', '__COLOR_MEDIUM_RED', '__COLOR_BRIGHT_RED'][wireframe.color] }},
+
+		// Transparency mode (__TRANSPARENCY_NONE, __TRANSPARENCY_EVEN or __TRANSPARENCY_ODD)
+		__TRANSPARENCY_{{ wireframe.transparency | upper }},
+
+		// Flag to render the wireframe in interlaced mode
+		{{ wireframe.interlaced }},
+	},
+
+	{% if wireframe.type == 'Sphere' -%}
+	// radius
+	__PIXELS_TO_METERS({{ wireframe.radius }}),
+
+	// draw center
+	{{ wireframe.drawCenter }}
+	{%- elseif wireframe.type == 'Mesh' -%}
+	// segments
+	(PixelVector (*)[2]){{ wireframeName }}WireframeSegments
+	{%- elseif wireframe.type == 'Asterisk' -%}
+	// length
+	{{ wireframe | length }}
+	{%- endif %}
+};
+
+{% endfor -%}
+{% endif %}
+
+{#- PRINT COLLIDERS -#}
+{%- if item.inGameType != '' and item.components.colliders | length -%}
+
+{{- macros.sectionHeader('Colliders') ~ '\n\n' -}}
+
+{%- set colliderNames = [] -%}
+{%- for collider in item.components.colliders -%}
+{%- set colliderName = sanitizedSpecName ~ 'Collider' ~ loop.index -%}
+{{- macros.append(colliderNames, colliderName) -}}
+
+ColliderROMSpec {{ colliderName }}ColliderSpec = 
+{
+	// Component
+	{
+		// Allocator
+		__TYPE({{ collider.type }}),
+
+		// Component type
+		kColliderComponent
+	},
+
+	// Size (x, y, z)
+	{{ '{' ~ collider.pixelSize.x ~ ', ' ~ collider.pixelSize.y ~ ', ' ~ collider.pixelSize.z ~ '}' }},
+
+	// Displacement (x, y, z, p)
+	{{ '{' ~ collider.displacement.x ~ ', ' ~ collider.displacement.y ~ ', ' ~ collider.displacement.z ~ ', ' ~ collider.displacement.parallax ~ '}' }},
+
+	// Rotation (x, y, z)
+	{{ '{' ~ collider.rotation.x ~ ', ' ~ collider.rotation.y ~ ', ' ~ collider.rotation.z ~ '}' }},
+
+	// Scale (x, y, z)
+	{__F_TO_FIX7_9({{ (collider.scale.x | float).toFixed(3) }}f), __F_TO_FIX7_9({{ (collider.scale.y | float).toFixed(3) }}f), __F_TO_FIX7_9({{ (collider.scale.z | float).toFixed(3) }}f)},
+
+	// If true this collider checks for collisions against other colliders
+	{{ collider.checkForCollisions }},
+
+	// Layers in which I live
+	{%- if collider.layers | length > 0 %}
+	kLayer
+		{%- for layerId in collider.layers %}
+			{{- project.items.ColliderLayers.project.layers[layerId] | sanitizeSpecName -}}
+			{%- if not loop.last -%}
+				{{- " | kLayer" -}}
+			{%- endif -%}
+		{%- endfor -%},
+	{%- else %}
+	kLayerNone,
+	{%- endif %}
+
+	// Layers to ignore when checking for collisions
+	{%- if collider.layersToCheck | length > 0 %}
+	kLayerAll & ~(kLayer
+		{%- for layerId in collider.layersToCheck %}
+			{{- project.items.ColliderLayers.project.layers[layerId] | sanitizeSpecName -}}
+			{%- if not loop.last -%}
+				{{- " | kLayer" -}}
+			{%- endif -%}
+		{%- endfor -%})
+	{%- else %}
+	kLayerAll
+	{%- endif %}
+};
+{% endfor %}
+{% endif -%}
+
+{#- PRINT BODIES -#}
+{% set bodyNames = [] -%}
+{% if item.components.bodies | length -%}
+{{ macros.sectionHeader('Bodies') }}
+
+{% for body in item.components.bodies -%}
+{% set bodyName = sanitizedSpecName ~ 'Body' ~ loop.index -%}
+{{- macros.append(bodyNames, bodyName) -}}
+
+BodyROMSpec {{ bodyName }}BodySpec =
+{
+	// Component
+	{
+		// Allocator
+		__TYPE(Body),
+
+		// Component type
+		kPhysicsComponent
+	},
+
+	// Create body
+	true,
+
+	// Mass
+	__F_TO_FIX10_6({{ (body.mass | float).toFixed(3) }}f),
+
+	// Friction
+	__F_TO_FIX10_6({{ (body.friction | float).toFixed(3) }}f),
+
+	// Bounciness
+	__F_TO_FIX10_6({{ (body.bounciness | float).toFixed(3) }}f),
+
+	// Maximum velocity
+	{ __I_TO_FIXED({{ body.maximumVelocity.x }}), __I_TO_FIXED({{ body.maximumVelocity.y }}), __I_TO_FIXED({{ body.maximumVelocity.z }}) },
+
+	// Maximum speed
+	__I_TO_FIX10_6({{ body.maximumSpeed }}),
+
+	// Axises on which the body is subject to gravity
+	{% if body.gravityAxes.length -%}
+	__{{- body.gravityAxes | join(' | __') -}}
+	{%- else -%}
+	__NO_AXIS
+	{%- endif -%},
+
+	// Axises around which to rotate the owner when syncronizing with body
+	{% if body.rotationAxes.length -%}
+	__{{- body.rotationAxes | join(' | __') -}}
+	{%- else -%}
+	__NO_AXIS
+	{%- endif %}
+};
+
+{% endfor %}
+{%- endif -%}
+
+{# PRINT MUTATORS -#}
+{% set mutatorNames = [] -%}
+{% if item.components.mutators | length %}
+{{ macros.sectionHeader('Mutators') }}
+
+{% for mutator in item.components.mutators -%}
+{% set mutatorName = sanitizedSpecName ~ 'Mutator' ~ loop.index -%}
+{{- macros.append(mutatorNames, mutatorName) -}}
+
+MutatorROMSpec {{ mutatorName }}MutatorSpec =
+{
+	{
+		// Allocator
+		__TYPE(Mutator),
+
+		// Component type
+		kMutatorComponent
+	},
+
+	// Mutation target class
+	class({{ mutator.mutationClass }}),
+
+	// Enabled
+	true
+};
+
+{% endfor %}
+{% endif %}
+
+{#- PRINT CHILDREN -#}
+{%- if item.components.children | length -%}
+{{ macros.sectionHeader('Children') }}
+
+PositionedActorROMSpec {{ sanitizedSpecName }}Children[] =
+{
+	{%- for child in item.components.children -%}
+	{%- set childActor = project.items.Actor[child.itemId] -%}
+	{%- if childActor is defined %}
+	{&{{ childActor._fileUri | basename(false) | sanitizeSpecName }}ActorSpec, { {{ child.onScreenPosition.x }}, {{ child.onScreenPosition.y }}, {{ child.onScreenPosition.z }} }, { {{ child.onScreenRotation.x }}, {{ child.onScreenRotation.y }}, {{ child.onScreenRotation.z }} }, { {{ child.onScreenScale.x }}, {{ child.onScreenScale.y }}, {{ child.onScreenScale.z }} }, 0, {% if child.name != '' %}"{{ child.name }}"{% else %}NULL{% endif %}, NULL, {% if child.extraInfo != '' %}(void*)"{{ child.extraInfo }}"{% else %}NULL{% endif %}, {{ child.loadRegardlessOfPosition }}},
+	{%- endif %}
+	{%- endfor %}
+	{NULL, {0, 0, 0}, {0, 0, 0}, {1, 1, 1},  0, NULL, NULL, NULL, false},
+};
+
+{% endif %}
+
+{{- macros.sectionHeader('Actor') ~ '\n\n' -}}
+
+{# PRINT COMPONENT LIST -#}
+ComponentSpec* const {{ sanitizedSpecName }}ComponentSpecs[] = 
+{
+	{% for spriteName in spriteNames -%}
+	(ComponentSpec*)&{{ spriteName }}SpriteSpec,
+	{% endfor -%}
+	{% for wireframeName in wireframeNames -%}
+	(ComponentSpec*)&{{ wireframeName }}WireframeSpec,
+	{% endfor -%}
+	{% for colliderName in colliderNames -%}
+	(ComponentSpec*)&{{ colliderName }}ColliderSpec,
+	{% endfor -%}
+	{% for bodyName in bodyNames -%}
+	(ComponentSpec*)&{{ bodyName }}BodySpec,
+	{% endfor -%}
+	{% for mutatorName in mutatorNames -%}
+	(ComponentSpec*)&{{ mutatorName }}MutatorSpec,
+	{% endfor -%}
+	{% for sound in item.components.sounds -%}
+	{% set soundItem = project.items.Sound[sound.itemId] -%}
+	{% if soundItem is defined -%}
+	{% set soundName = soundItem._fileUri | basename(false) | sanitizeSpecName -%}
+	(ComponentSpec*)&{{ soundName }}SoundSpec,
+	{% endif -%}
+	{% endfor -%}
+	NULL
+};
+
+{# PRINT ACTOR SPEC -#}
+{{ actorClass }}ROMSpec {{ sanitizedSpecName }}ActorSpec =
+{
+	{% if actorClass != 'Actor' -%}
+	{
+	{% endif -%}
+	// Class allocator
+	__TYPE({{ actorClass }}),
+
+	// Component specs
+	(ComponentSpec**){{ sanitizedSpecName }}ComponentSpecs,
+
+	// Children specs
+	{%- if item.components.children | length %}
+	(struct PositionedActor*){{ sanitizedSpecName }}Children,
+	{%- else %}
+	NULL,
+	{%- endif %}
+
+	// Extra info
+	{%- if item.extraProperties.extraInfo != '' %}
+	(void*)"{{ item.extraProperties.extraInfo }}",
+	{%- else %}
+	NULL,
+	{%- endif %}
+
+	// Size
+	// If 0, it is computed from the visual components if any
+	{{ '{' ~ item.extraProperties.pixelSize.x ~ ', ' ~ item.extraProperties.pixelSize.y ~ ', ' ~ item.extraProperties.pixelSize.z ~ '}' }},
+
+	// Actor's in-game type
+	{%- if item.inGameType == 'None' %}
+	kTypeNone,
+	{%- else %}
+	kType{{ project.items.InGameTypes.project.types[item.inGameType] | sanitizeSpecName }},
+	{%- endif %}
+
+	// Animation to play automatically
+	{%- if hasAnimations and item.components.animations[item.animations.default].name != '' %}
+	"{{ item.components.animations[item.animations.default].name }}"
+	{%- elseif hasAnimations %} 
+	"{{ item.animations.default + 1 }}"
+	{%- else %}
+	NULL
+	{%- endif %}
+	{% if actorClass != 'Actor' -%}
+	},
+	{%- for configuration in item.logic.configuration | values | removeEmpty %}
+	{{ configuration | safe }},
+	{%- endfor %}
+	{%- endif %}
+};

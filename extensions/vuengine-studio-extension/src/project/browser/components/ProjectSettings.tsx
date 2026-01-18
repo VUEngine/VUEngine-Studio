@@ -8,15 +8,15 @@ import HContainer from '../../../editors/browser/components/Common/Base/HContain
 import Input from '../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { stringify } from '../../../editors/browser/components/Common/Utils';
-import { TYPE_LABELS } from '../../../editors/browser/ves-editors-types';
 import { VesProjectCommands } from '../ves-project-commands';
+import { PROJECT_TYPES } from '../ves-project-data';
 import { VesProjectService } from '../ves-project-service';
-import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithContributor, WithFileUri } from '../ves-project-types';
+import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithFileUri } from '../ves-project-types';
 import { MOCK_STAGES } from './ProjectDashboard';
 
 interface ConfigType {
     typeId: string,
-    type: ProjectDataType & WithContributor
+    type: ProjectDataType
     item: ProjectDataItem & WithFileUri
     label: string,
 }
@@ -44,7 +44,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
         }));
     };
 
-    const openSettings = async (type: ProjectDataType & WithContributor, item?: ProjectDataItem & WithFileUri): Promise<void> => {
+    const openSettings = async (type: ProjectDataType, item?: ProjectDataItem & WithFileUri): Promise<void> => {
         if (item && item._fileUri) {
             openEditor(item._fileUri);
         } else {
@@ -85,17 +85,16 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
 
     const getTypes = async (): Promise<void> => {
         await vesProjectService.projectDataReady;
-        const registeredTypes = vesProjectService.getProjectDataTypes() ?? {};
         const availableConfigs: ConfigType[] = [];
-        Object.keys(registeredTypes).forEach(typeId => {
-            const type = registeredTypes[typeId];
+        Object.keys(PROJECT_TYPES).forEach(typeId => {
+            const type = PROJECT_TYPES[typeId];
             if (type.file.startsWith('.') || type.excludeFromDashboard || type.enabled === false) {
                 return;
             }
             const item = vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId) as ProjectDataItem & WithFileUri;
             availableConfigs.push({
                 typeId, type, item,
-                label: TYPE_LABELS[typeId] ?? type.file,
+                label: type.schema.title,
             });
         });
 

@@ -3,6 +3,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 
 @injectable()
 export class VesEditorsLabelProviderContribution implements LabelProviderContribution {
@@ -14,15 +15,9 @@ export class VesEditorsLabelProviderContribution implements LabelProviderContrib
 
     @postConstruct()
     protected init(): void {
-        this.doInit();
-    }
-
-    protected async doInit(): Promise<void> {
-        await this.vesProjectService.projectDataReady;
-        const types = this.vesProjectService.getProjectDataTypes();
-        for (const typeId of Object.keys(types || {})) {
-            if (types![typeId].icon !== undefined) {
-                this.fileIcons[types![typeId].file] = types![typeId].icon!;
+        for (const typeId of Object.keys(PROJECT_TYPES)) {
+            if (PROJECT_TYPES[typeId].icon !== undefined) {
+                this.fileIcons[PROJECT_TYPES[typeId].file] = PROJECT_TYPES[typeId].icon!;
             }
         }
     }

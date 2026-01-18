@@ -15,12 +15,6 @@ const FILE_TYPES: FileType[] = [{
     ext: `.${VUENGINE_WORKSPACE_EXT}`,
     icon: 'ves-codicon-file-icon codicon codicon-folder-library medium-purple',
 }, {
-    ext: '.type',
-    icon: 'ves-codicon-file-icon codicon codicon-library medium-blue',
-}, {
-    ext: '.templateConfig',
-    icon: 'ves-codicon-file-icon codicon codicon-notebook-template medium-green',
-}, {
     ext: '.vb',
     icon: 'ves-codicon-file-icon codicon codicon-play',
 }, {

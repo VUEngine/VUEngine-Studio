@@ -1,9 +1,10 @@
 import { nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
+import { LogicType } from '../../../../../project/browser/types/Logic';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { LogicEditorContext, LogicEditorContextType } from '../LogicEditorTypes';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 
 export default function MethodTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
@@ -16,11 +17,7 @@ export default function MethodTreeNode(props: NodeRendererProps<any>): React.JSX
     const index = parseInt(nodeParts[1] || '-1');
 
     const addMethod = async (): Promise<void> => {
-        const type = services.vesProjectService.getProjectDataType('Logic');
-        if (!type) {
-            return;
-        }
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
+        const schema = await window.electronVesCore.dereferenceJsonSchema(LogicType.schema);
         if (!schema?.properties?.methods?.items) {
             return;
         }

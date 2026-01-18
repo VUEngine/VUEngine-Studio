@@ -103,11 +103,15 @@ export default function Input(props: InputProps): React.JSX.Element {
     };
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     const validateAndUpdateValue = useCallback(debounce(

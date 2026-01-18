@@ -2,6 +2,7 @@ import { CommandRegistry, nls } from '@theia/core';
 import { open } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceCommandContribution, WorkspaceCommands, WorkspaceRootUriAwareCommandHandler } from '@theia/workspace/lib/browser';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { stringify } from './components/Common/Utils';
 import { VesNewFileDialog } from './ves-new-file-dialog';
@@ -11,11 +12,8 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
 
-    async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+    registerCommands(commandRegistry: CommandRegistry): void {
         super.registerCommands(commandRegistry);
-
-        await this.vesProjectService.projectDataReady;
-        const types = this.vesProjectService.getProjectDataTypes() || {};
 
         commandRegistry.unregisterCommand(WorkspaceCommands.NEW_FILE.id);
         commandRegistry.registerCommand(WorkspaceCommands.NEW_FILE, new WorkspaceRootUriAwareCommandHandler(this.workspaceService, this.selectionService, {
@@ -28,11 +26,11 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                     let didMatchType = false;
                     if (!parentUri.isEqual(uri)) {
                         // if not on a folder, check if we can preset a type based on the filename
-                        Object.keys(types).map(typeId => {
-                            types[typeId].forFiles?.map(f => {
+                        Object.keys(PROJECT_TYPES).map(typeId => {
+                            PROJECT_TYPES[typeId].forFiles?.map(f => {
                                 if ([uri.path.ext, uri.path.base].includes(f)) {
                                     defaultName = uri.path.name;
-                                    defaultExt = types[typeId].file.substring(1);
+                                    defaultExt = PROJECT_TYPES[typeId].file.substring(1);
                                     didMatchType = true;
                                 }
                             });
@@ -40,9 +38,9 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                     }
                     if (!didMatchType) {
                         // ... otherwise, try to match folder (and parent folder) name with a type name
-                        Object.keys(types).map(typeId => {
+                        Object.keys(PROJECT_TYPES).map(typeId => {
                             if ([uri.path.base, uri.parent.path.base].includes(typeId)) {
-                                defaultExt = types[typeId].file.substring(1);
+                                defaultExt = PROJECT_TYPES[typeId].file.substring(1);
                             }
                         });
                     }
@@ -50,7 +48,6 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                         title: nls.localizeByDefault('New File...'),
                         maxWidth: 500,
                         parentLabel: this.labelProvider.getLongName(parentUri) + '/',
-                        types,
                         vesProjectService: this.vesProjectService,
                         defaultName,
                         defaultExt,
@@ -62,7 +59,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                                 const fileUri = parentUri.resolve(fileName);
                                 let fileValue;
                                 if (ext) {
-                                    const type = this.vesProjectService.getProjectDataTypeByExt(ext);
+                                    const type = Object.values(PROJECT_TYPES).filter(t => t.file === ext)[0];
                                     if (type) {
                                         const data = await this.vesProjectService.getSchemaDefaults(type);
                                         fileValue = stringify(data);

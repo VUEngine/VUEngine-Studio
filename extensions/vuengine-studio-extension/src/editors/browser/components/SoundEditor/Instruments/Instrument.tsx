@@ -3,6 +3,7 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
 import styled from 'styled-components';
+import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
@@ -368,8 +369,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 return;
             }
 
-            const type = services.vesProjectService.getProjectDataType('Sound');
-            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+            const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
             const defaultInstrument = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.instruments?.additionalProperties);
 
             // overlay imported onto default, keeping only existing properties

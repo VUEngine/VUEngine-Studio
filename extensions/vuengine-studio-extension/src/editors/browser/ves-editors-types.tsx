@@ -1,4 +1,4 @@
-import { CommandService, MessageService, nls, PreferenceService, QuickPickService, URI } from '@theia/core';
+import { CommandService, MessageService, PreferenceService, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
     LocalStorageService,
@@ -84,26 +84,3 @@ export interface EditorCommand {
 export interface EditorCommands {
     [id: string]: EditorCommand
 }
-
-export const TYPE_LABELS: { [typeId: string]: string } = {
-    'Actor': nls.localize('vuengine/projects/typeLabels/actor', 'Actor'),
-    'BrightnessRepeat': nls.localize('vuengine/projects/typeLabels/brightnessRepeat', 'Brightness Repeat'),
-    'ColliderLayers': nls.localize('vuengine/projects/typeLabels/colliderLayers', 'Collider Layers'),
-    'ColumnTable': nls.localize('vuengine/projects/typeLabels/columnTable', 'Column Table'),
-    'CompilerConfig': nls.localize('vuengine/projects/typeLabels/compilerConfig', 'Compiler Config'),
-    'EngineConfig': nls.localize('vuengine/projects/typeLabels/engineConfig', 'Engine Config'),
-    'Events': nls.localize('vuengine/projects/typeLabels/events', 'Events'),
-    'Font': nls.localize('vuengine/projects/typeLabels/font', 'Font'),
-    'GameConfig': nls.localize('vuengine/projects/typeLabels/gameConfig', 'Game Config'),
-    'InGameTypes': nls.localize('vuengine/projects/typeLabels/inGameTypes', 'In-Game Types'),
-    'Image': nls.localize('vuengine/projects/typeLabels/image', 'Image'),
-    'Logic': nls.localize('vuengine/projects/typeLabels/logic', 'Logic'),
-    'Messages': nls.localize('vuengine/projects/typeLabels/messages', 'Messages'),
-    'Pixel': nls.localize('vuengine/projects/typeLabels/pixel', 'Pixel Art'),
-    'PluginFile': nls.localize('vuengine/projects/typeLabels/pluginFile', 'Plugin File'),
-    'RumbleEffect': nls.localize('vuengine/projects/typeLabels/rumbleEffect', 'Rumble Effect'),
-    'RomInfo': nls.localize('vuengine/projects/typeLabels/romInfo', 'ROM Info'),
-    'Sound': nls.localize('vuengine/projects/typeLabels/sound', 'Sound'),
-    'Stage': nls.localize('vuengine/projects/typeLabels/stage', 'Stage'),
-    'Translations': nls.localize('vuengine/projects/typeLabels/translations', 'Translations'),
-};

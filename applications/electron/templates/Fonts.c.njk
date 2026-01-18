@@ -1,0 +1,30 @@
+{%- import 'templates/partials/macros.njk' as macros -%}
+{%- set itemNames = [] -%}
+{%- if project.items.Font is defined-%}
+{%- for item in project.items.Font | values | unique('_fileUri') -%}
+	{%- set itemSanitizedSpecName = item._fileUri | basename(false) | sanitizeSpecName -%}
+	{%- if item._contributor != "engine" -%}
+		{%- set itemNames = (itemNames.push(itemSanitizedSpecName), itemNames) -%}
+	{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <Fonts.h>
+
+{{ macros.sectionHeader('Definitions') }}
+
+FontData _fontData[] =
+{
+	{(FontSpec*)&DefaultFontSpec, NULL},
+	{(FontSpec*)&ProfilerFontSpec, NULL},
+	{(FontSpec*)&DebugFontSpec, NULL},
+	{% if itemNames %}
+	{%- for itemName in itemNames | sort -%}
+	{(FontSpec*)&{{ itemName }}FontSpec, NULL},
+	{% endfor -%}
+	{% endif %}
+	{NULL, NULL}
+};

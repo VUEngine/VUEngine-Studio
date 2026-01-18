@@ -1,0 +1,25 @@
+{%- import 'templates/partials/macros.njk' as macros -%}
+{%- set itemNames = [] -%}
+{%- if project.items.RumbleEffect is defined -%}
+{%- for item in project.items.RumbleEffect | values | unique('_fileUri') -%}
+	{%- set itemSanitizedSpecName = item._fileUri | basename(false) | sanitizeSpecName -%}
+	{%- set itemNames = (itemNames.push(itemSanitizedSpecName), itemNames) -%}
+{%- endfor -%}
+{%- endif -%}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
+
+#ifndef RUMBLE_EFFECTS_H_
+#define RUMBLE_EFFECTS_H_
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <RumbleManager.h>
+
+{{ macros.sectionHeader('Declarations') }}
+
+{% if itemNames %}
+{%- for itemName in itemNames | sort -%}
+extern RumbleEffectSpec {{ itemName }}RumbleEffectSpec;
+{% endfor -%}
+{% endif %}
+#endif

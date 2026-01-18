@@ -22,11 +22,15 @@ export default function Checkbox(props: CheckboxProps): React.JSX.Element {
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     return (

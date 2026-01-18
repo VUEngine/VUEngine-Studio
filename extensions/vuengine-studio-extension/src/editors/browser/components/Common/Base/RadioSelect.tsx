@@ -106,11 +106,15 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     };
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     useEffect(() => {

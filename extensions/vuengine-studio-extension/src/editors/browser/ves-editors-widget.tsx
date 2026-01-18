@@ -40,8 +40,9 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
+import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
@@ -199,9 +200,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.uri = new URI(this.options.uri);
         this.typeId = this.options.typeId;
 
-        await this.vesProjectService.projectDataReady;
-
-        const type = this.vesProjectService.getProjectDataType(this.options.typeId);
+        const type = PROJECT_TYPES[this.options.typeId];
         if (!type) {
             return;
         }
@@ -464,7 +463,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         );
     }
 
-    protected async handleModelChange(type: ProjectDataType & WithContributor): Promise<void> {
+    protected async handleModelChange(type: ProjectDataType): Promise<void> {
         if (this.justUpdatedModel) {
             this.justUpdatedModel = false;
             return;

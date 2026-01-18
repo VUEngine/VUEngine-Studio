@@ -1,0 +1,257 @@
+{%- if project.items.EngineConfig.project is defined -%}
+	{%- set config = project.items.EngineConfig.project -%}
+{%- else -%}
+	{%- set config = project.items.EngineConfig.engine -%}
+{%- endif -%}
+{%- if project.items.CompilerConfig.project is defined -%}
+	{%- set compiler = project.items.CompilerConfig.project -%}
+{%- else -%}
+	{%- set compiler = project.items.CompilerConfig.engine -%}
+{%- endif -%}
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
+
+#ifndef CONFIG_H_
+#define CONFIG_H_
+
+{{ macros.sectionHeader('Includes') }}
+
+#include "PluginsConfig.h"
+#include "RomInfo.h"
+
+{% if config.macros | length -%}
+{{ macros.sectionHeader('Macros') }}
+
+{% for macro in config.macros | sort(false, false, "name") -%}
+{% if macro.enabled and macro.name -%}
+{% set macroName = macro.name | toUpperSnakeCase -%}
+{% if macro.type == 'define' -%}
+#define {{ macroName }} 
+{% elseif macro.type == 'undefine' -%}
+#undef {{ macroName }} 
+{% elseif macro.type == 'macro' or macro.type == 'symbol' -%}
+#define {{ macroName }} {{ macro.value | formatValue | safe |replace('"', '') }}
+{% elseif macro.type == 'text' -%}
+#define {{ macroName }} "{{ macro.value | formatValue | safe |replace('"', '') }}"
+{% elseif macro.type == 'number' -%}
+#define {{ macroName }} ({{ macro.value | formatValue | safe }})
+{% elseif macro.type == 'boolean' -%}
+#define {{ macroName }} ({%- if macro.value -%}1{%- else -%}0{%- endif -%})
+{% endif -%}
+{% endif -%}
+{% endfor %}
+{% endif -%}
+
+{{ macros.sectionHeader('Game Entry Point') }}
+
+#ifndef __GAME_ENTRY_POINT
+#define __GAME_ENTRY_POINT game
+#endif
+
+{{ macros.sectionHeader('Fixed point data type') }}
+
+#define __FIXED_POINT_TYPE {% if config.math.fixedPointPrecision %}{{config.math.fixedPointPrecision}}{% else %}6{% endif %}
+
+{{ macros.sectionHeader('Debugging / Profiling') }}
+
+{% if config.debug.alertGraphicsDepletion -%}
+#ifndef __SHIPPING
+#define __ALERT_CHAR_MEMORY_DEPLETION
+#define __ALERT_BGMAP_MEMORY_DEPLETION
+#define __ALERT_OBJECT_MEMORY_DEPLETION
+#define __ALERT_WORLD_MEMORY_DEPLETION
+#endif
+
+{% endif -%}
+#define __STACK_HEADROOM {{ config.debug.stackHeadroom }}
+
+{% if config.debug.enableProfiler -%}
+#define __ENABLE_PROFILER
+
+{% elseif config.debug.diagnostics is defined and config.debug.diagnostics != 'NONE' -%}
+#define __DEBUGGING
+#define __DEBUGGING_{{ config.debug.diagnostics }}
+{% endif -%}
+{{ macros.sectionHeader('Debugging tools') }}
+
+#ifdef __TOOLS
+
+#undef __SHIPPING
+
+#ifndef __DEBUG_TOOL
+#define __DEBUG_TOOL
+#endif
+
+#ifndef __STAGE_EDITOR
+#define __STAGE_EDITOR
+#endif
+
+#ifndef __ANIMATION_INSPECTOR
+#define __ANIMATION_INSPECTOR
+#endif
+
+#ifndef __SOUND_TEST
+#define __SOUND_TEST
+#endif
+
+#endif
+
+{{ macros.sectionHeader('Wireframes') }}
+
+{% if config.wireframes.sort %}
+{%- if config.wireframes.sort === false -%}
+#undef __WIREFRAME_MANAGER_SORT_FOR_DRAWING
+{%- else -%}
+#define __WIREFRAME_MANAGER_SORT_FOR_DRAWING
+{%- endif -%}
+{%- else -%}
+#undef __WIREFRAME_MANAGER_SORT_FOR_DRAWING
+{% endif %}
+#define __DIRECT_DRAW_INTERLACED_THRESHOLD	  {% if config.wireframes.interlacedThreshold %}__PIXELS_TO_METERS({{config.wireframes.interlacedThreshold}}) {% else %}__PIXELS_TO_METERS(8191){% endif %} 
+
+#define __DIRECT_DRAW_LINE_SHRINKING_PADDING  {% if config.wireframes.lineShrinkingPadding %}{{config.wireframes.lineShrinkingPadding}} {% else %}0{% endif %} 
+
+#define __DIRECT_DRAW_FRUSTUM_EXTENSION_POWER {% if config.wireframes.frustumExtensionPower %}{{config.wireframes.frustumExtensionPower}} {% else %}0{% endif %} 
+
+{% if config.wireframes.verticalLineOptimization %}#define{% else %}#undef{% endif %} __DIRECT_DRAW_OPTIMIZED_VERTICAL_LINES
+
+{{ macros.sectionHeader('Optics / Projection') }}
+
+{% if config.optics.useLegacyCoordinateProjection %}#define{% else %}#undef{% endif %} __LEGACY_COORDINATE_PROJECTION
+
+#define __SCREEN_WIDTH				   {{ config.optics.screenWidth }}
+#define __SCREEN_HEIGHT				   {{ config.optics.screenHeight }}
+#define __SCREEN_DEPTH				   {{ config.optics.screenDepth }}
+
+#define __MAXIMUM_X_VIEW_DISTANCE	   {{ config.optics.maximumXViewDistance }}
+#define __MAXIMUM_Y_VIEW_DISTANCE	   {{ config.optics.maximumYViewDistance }}
+
+#define __CAMERA_NEAR_PLANE			   {% if config.optics.cameraNearPlane %}{{ config.optics.cameraNearPlane }}{% else %}0{% endif %}
+
+#define __BASE_FACTOR				   {{ config.optics.baseFactor }}
+
+#define __HORIZONTAL_VIEW_POINT_CENTER {{ config.optics.horizontalViewPointCenter }}
+#define __VERTICAL_VIEW_POINT_CENTER   {{ config.optics.verticalViewPointCenter }}
+
+#define __SCALING_MODIFIER_FACTOR	   {{ config.optics.scalingModifierFactor }}{% if not '.' in '' ~ config.optics.scalingModifierFactor %}.0{% endif %}f
+
+{{ macros.sectionHeader('Frame rate control') }}
+
+#define __TIMER_RESOLUTION			   {{ config.frameRate.timerResolution }}
+
+#define __FRAME_CYCLE				   {{ config.frameRate.frameCycle }}
+
+#define __TARGET_FPS				   (__MAXIMUM_FPS >> __FRAME_CYCLE)
+#define __GAME_FRAME_DURATION		   (__MILLISECONDS_PER_SECOND / __TARGET_FPS)
+#define __OPTIMUM_FPS				   (__TARGET_FPS >> __FRAME_CYCLE)
+
+{{ macros.sectionHeader('Animation') }}
+
+#define __MAX_ANIMATION_FUNCTION_NAME_LENGTH {{ config.animation.maxAnimationFunctionNameLength }}
+#define __MAX_FRAMES_PER_ANIMATION_FUNCTION	 {{ config.animation.maxFramesPerAnimationFunction }}
+
+{{ macros.sectionHeader('Memory pool') }}
+
+#undef __MEMORY_POOLS
+#define __MEMORY_POOLS {{ config.memoryPools.pools | length }}
+
+#undef __MEMORY_POOL_ARRAYS
+#define __MEMORY_POOL_ARRAYS \
+{%- set poolBlockDefinitions = '' -%}
+{% for pool in config.memoryPools.pools | sort(false, false, "size") %}
+	{%- set poolBlockDefinitions = '	__BLOCK_DEFINITION(' ~ pool.size ~ ', ' ~  pool.objects ~') \\\n' ~ poolBlockDefinitions -%}
+{% endfor %}
+{{ poolBlockDefinitions | safe }}
+#undef __SET_MEMORY_POOL_ARRAYS
+#define __SET_MEMORY_POOL_ARRAYS \
+{%- set poolArrayDefinitions = '' -%}
+{% for pool in config.memoryPools.pools | sort(false, false, "size") -%}
+	{%- set poolArrayDefinitions = '	__SET_MEMORY_POOL_ARRAY(' ~ pool.size ~ ') \\\n' ~ poolArrayDefinitions -%}
+{% endfor %}
+{{ poolArrayDefinitions | safe }}
+#define __MEMORY_POOL_WARNING_THRESHOLD {{ config.memoryPools.warningThreshold }}
+
+{{ macros.sectionHeader('SRAM') }}
+
+#define __TOTAL_SAVE_RAM				{{ config.sram.totalSram }}
+
+{{ macros.sectionHeader('Char management') }}
+
+#define __CHAR_MEMORY_TOTAL_CHARS		{{ config.chars.totalChars }}
+
+{{ macros.sectionHeader('Sprite management') }}
+
+#define __TOTAL_LAYERS					{{ config.sprite.totalLayers }}
+#define __TOTAL_OBJECTS					{{ config.sprite.totalObjects }}
+{% if config.sprite.spritesRotateIn3D %}#define{% else %}#undef{% endif %} __SPRITE_ROTATE_IN_3D
+{% if config.sprite.hackBgmapSpriteHeight %}#define{% else %}#undef{% endif %} __HACK_BGMAP_SPRITE_HEIGHT
+
+{{ macros.sectionHeader('Texture management') }}
+{% set dramLength = compiler.memorySections.dram.length %}
+{%- set bgmapEndAddress = ((compiler.memorySections.dram.origin | hexToInt) - dramLength * 1024) %}
+{%- set bgmapStartAddress = ("0x20000") | hexToInt %}
+#define __TOTAL_NUMBER_OF_BGMAPS_SEGMENTS {{ ((bgmapEndAddress - bgmapStartAddress) / 8192) | round(0, "floor") }}
+#define __PARAM_TABLE_SEGMENTS			  {{ config.texture.paramTableSegments }}
+#define __NUM_BGMAPS_PER_SEGMENT		  {{ config.texture.bgmapsPerSegments }}
+#define __MAX_NUMBER_OF_BGMAPS_SEGMENTS	  (__TOTAL_NUMBER_OF_BGMAPS_SEGMENTS - __PARAM_TABLE_SEGMENTS)
+
+#define __PRINTING_BGMAP_X_OFFSET		  {{ config.texture.printing.offset.x }}
+#define __PRINTING_BGMAP_Y_OFFSET		  (64 * 8 - __SCREEN_HEIGHT)
+#define __PRINTING_BGMAP_PARALLAX_OFFSET  {{ config.texture.printing.offset.parallax }}
+
+{{ macros.sectionHeader('Param table') }}
+
+#define __MAXIMUM_SCALE					  {{ config.affine.maxScale }}
+#define __MAXIMUM_AFFINE_ROWS_PER_CALL	  {{ config.affine.maxRowsPerCall }}
+
+{{ macros.sectionHeader('Physics') }}
+
+#define __GRAVITY						  {{ config.physics.gravity }}{% if not '.' in '' ~ config.physics.gravity %}.0{% endif %}f
+#define __MAXIMUM_FRICTION_COEFFICIENT	  {% if config.physics.maximumFrictionCoefficient %}__I_TO_FIXED({{config.physics.maximumFrictionCoefficient }}){% else %}__I_TO_FIXED(1){% endif %}
+#define __PHYSICS_TIME_ELAPSED_DIVISOR	  {{ config.physics.timeElapsedDivisor }}
+{% if config.physics.highPrecision %}#define{% else %}#undef{% endif %} __PHYSICS_HIGH_PRECISION
+#define __STOP_VELOCITY_THRESHOLD				 __PIXELS_TO_METERS({{ config.physics.stopVelocityThreshold }})
+#define __STOP_BOUNCING_VELOCITY_THRESHOLD		 __PIXELS_TO_METERS({{ config.physics.stopBouncingVelocityThreshold }})
+#define __MAXIMUM_BOUNCINESS_COEFFICIENT		 {{ config.physics.maximumBouncinessCoefficient }}{% if not '.' in '' ~ config.physics.maximumBouncinessCoefficient %}.0{% endif %}f
+#define __FRICTION_FORCE_FACTOR_POWER			 {{ config.physics.frictionForceFactorPower }}
+#define __COLLIDER_ANGLE_TO_PREVENT_DISPLACEMENT {% if config.physics.angleToPreventColliderDisplacement %}__FIX7_9_TO_FIXED(__COS({{ config.physics.angleToPreventColliderDisplacement }})){% else %}__F_TO_FIXED(0.01f){% endif %}
+#define __COLLIDER_MAXIMUM_SIZE					 __PIXELS_TO_METERS({{ config.physics.collidersMaximumSize }})
+
+{{ macros.sectionHeader('Sound') }}
+
+#define __EAR_DISPLACEMENT						 {% if config.sound.earDisplacement %}{{ config.sound.earDisplacement }}{% else %}384{% endif %}
+#define __SOUND_STEREO_ATTENUATION_DISTANCE		 {% if config.sound.stereoAttenuationDistance %}{{ config.sound.stereoAttenuationDistance }}{% else %}1024{% endif %}
+
+{{ macros.sectionHeader('Brightness') }}
+
+#define __BRIGHTNESS_DARK_RED					 {{ config.brightness.darkRed }}
+#define __BRIGHTNESS_MEDIUM_RED					 {{ config.brightness.mediumRed }}
+#define __BRIGHTNESS_BRIGHT_RED					 {{ config.brightness.brightRed }}
+
+#define __FADE_DELAY							 {{ config.brightness.fadeDelay }}
+#define __CAMERA_EFFECT_FADE_INCREMENT			 {{ config.brightness.fadeIncrement }}
+
+{{ macros.sectionHeader('Color palettes') }}
+
+#define __PRINTING_PALETTE						 {{ config.palettes.printingPalette }}
+
+#define __BGMAP_PALETTE_0						 0x{{ config.palettes.bgMapPalette0 | binToHex }}  // {{ config.palettes.bgMapPalette0 }}
+#define __BGMAP_PALETTE_1						 0x{{ config.palettes.bgMapPalette1 | binToHex }}  // {{ config.palettes.bgMapPalette1 }}
+#define __BGMAP_PALETTE_2						 0x{{ config.palettes.bgMapPalette2 | binToHex }}  // {{ config.palettes.bgMapPalette2 }}
+#define __BGMAP_PALETTE_3						 0x{{ config.palettes.bgMapPalette3 | binToHex }}  // {{ config.palettes.bgMapPalette3 }}
+
+#define __OBJECT_PALETTE_0						 0x{{ config.palettes.objectPalette0 | binToHex }}  // {{ config.palettes.objectPalette0 }}
+#define __OBJECT_PALETTE_1						 0x{{ config.palettes.objectPalette1 | binToHex }}  // {{ config.palettes.objectPalette1 }}
+#define __OBJECT_PALETTE_2						 0x{{ config.palettes.objectPalette2 | binToHex }}  // {{ config.palettes.objectPalette2 }}
+#define __OBJECT_PALETTE_3						 0x{{ config.palettes.objectPalette3 | binToHex }}  // {{ config.palettes.objectPalette3 }}
+
+{{ macros.sectionHeader('Random number generation') }}
+
+{% if config.random.addUserInputAndTimeToRandomSeed %}#define{% else %}#undef{% endif %} __ADD_USER_INPUT_AND_TIME_TO_RANDOM_SEED
+
+{{ macros.sectionHeader('Exceptions') }}
+
+#define __EXCEPTION_COLUMN {{ config.exceptions.position.x }}
+#define __EXCEPTION_LINE   {{ config.exceptions.position.y }}
+
+#endif

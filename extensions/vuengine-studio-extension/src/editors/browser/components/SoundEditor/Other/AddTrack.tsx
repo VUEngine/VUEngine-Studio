@@ -2,6 +2,7 @@ import { Waveform, WaveSine, WaveTriangle } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
+import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
@@ -92,11 +93,7 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
     };
 
     const doAddTracks = async (trackTypes: SoundEditorTrackType[]): Promise<void> => {
-        const type = services.vesProjectService.getProjectDataType('Sound');
-        if (!type) {
-            return;
-        }
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
+        const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
         if (!schema?.properties?.tracks?.items) {
             return;
         }

@@ -40,11 +40,15 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
     };
 
     const handleOnFocus = () => {
-        disableCommands();
+        if (disableCommands) {
+            disableCommands();
+        }
     };
 
     const handleOnBlur = () => {
-        enableCommands();
+        if (enableCommands) {
+            enableCommands();
+        }
     };
 
     return <HContainer alignItems="center" style={{ width }}>

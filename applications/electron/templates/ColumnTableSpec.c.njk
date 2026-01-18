@@ -1,0 +1,33 @@
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <VIPManager.h>
+
+{{ macros.sectionHeader('Definitions') }}
+
+ColumnTableROMSpec {{ sanitizedSpecName }}ColumnTableSpec =
+{
+	// Mirror spec?
+	{% if item.mirror %}true{% else %}false{% endif %},
+
+	// Column table spec
+	{
+		{% for x in range(0, 256) -%}
+			{%- if not (item.mirror and loop.index > 128) -%}
+				{%- set value = item.values[x] | default([]) -%}
+				{%- if not (item.mirror and loop.index > 128) -%}
+					{%- set repeat = value.repeat - 1 | default(15) -%}
+					{%- set time = value.time - 1 | default(15) -%}
+					{{- (repeat * 16 + time) | intToHex(2) -}}{{- ', '-}} 
+					{%- if loop.index % 8 == 0 and not (loop.last or (item.mirror and loop.index == 128)) -%}
+						{{ "\n		" }}
+					{%- endif -%}
+				{%- endif -%}
+			{%- endif -%}
+		{%- endfor %}
+	}
+};

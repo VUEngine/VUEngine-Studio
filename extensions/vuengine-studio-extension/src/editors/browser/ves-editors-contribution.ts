@@ -6,7 +6,7 @@ import {
 import { nls } from '@theia/core/lib/common/nls';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { EditorManager } from '@theia/editor/lib/browser';
-import { VesProjectService } from '../../project/browser/ves-project-service';
+import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 
 @injectable()
 export class VesEditorsContribution implements FrontendApplicationContribution {
@@ -16,24 +16,19 @@ export class VesEditorsContribution implements FrontendApplicationContribution {
     protected readonly openerService: OpenerService;
     @inject(OpenWithService)
     protected readonly openWithService: OpenWithService;
-    @inject(VesProjectService)
-    protected readonly vesProjectService: VesProjectService;
 
     onStart(): void {
         this.registerOpenWithHandler();
     }
 
-    protected async registerOpenWithHandler(): Promise<void> {
-        await this.vesProjectService.projectDataReady;
-
+    protected registerOpenWithHandler(): void {
         this.openWithService.registerHandler({
             id: 'graphicalEditor',
             label: nls.localize('vuengine/editors/general/graphicalEditor', 'Graphical Editor'),
             providerName: nls.localizeByDefault('Built-in'),
             canHandle: uri => {
-                const types = this.vesProjectService.getProjectDataTypes();
-                for (const typeId of Object.keys(types || {})) {
-                    if ([uri.path.ext, uri.path.base].includes(types![typeId].file)) {
+                for (const typeId of Object.keys(PROJECT_TYPES)) {
+                    if ([uri.path.ext, uri.path.base].includes(PROJECT_TYPES[typeId].file)) {
                         return 1000;
                     }
                 }

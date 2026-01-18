@@ -1,0 +1,48 @@
+{%- if project.items.CompilerConfig.project is defined -%}
+	{%- set compiler = project.items.CompilerConfig.project -%}
+{%- else -%}
+	{%- set compiler = project.items.CompilerConfig.engine -%}
+{%- endif -%}
+{%- set plugins = project.items.GameConfig.project.plugins | default({}) -%}
+{% include('templates/partials/fileHeader/fileHeader.make.njk') %}
+
+# VUEngine plugins which the project uses
+PLUGINS							= {{ plugins | keys | sort | join(' \\\n\t\t\t\t\t\t\t\t  ') | safe }}
+
+# Optimization level
+OPTIMIZATION					= {{ compiler.optimization }}
+
+# Frame pointer's usage
+# 0: Omit.
+# 1: Use.
+USE_FRAME_POINTER				= {% if compiler.framePointer %}1{% else %}0{% endif %}
+
+# Prolog functions' usage
+# 0: Omit.
+# 1: Use.
+USE_PROLOG_FUNCTIONS			= {% if compiler.prologFunctions %}1{% else %}0{% endif %}
+
+# Sections' usage
+# SRAM's usage
+# You can use SRAM as WRAM. It adds, theoretically, 16MB of WRAM where all non initialized variables can be allocated.
+# This feature is experimental and only works properly on emulators.
+# Since only 8KB of SRAM is available on real carts, more than that will only work on emulators.
+# To make effective any change to these options, the whole project needs to be recompiled.
+# DRAM can be used as WRAM too, you must edit the linker script vb.ld to accommodate this
+# taking into account that the Param Table's last address normally is 0x0003D800, where
+# the WORLD attributes start.
+
+# valid options are [/.data/.sdata/.dram_data/.sram_data]
+MEMORY_POOL_SECTION					= {{ compiler.memoryUsage.memoryPool }}
+# valid options are [/.bss/.sbss/.dram_bss/.sram_bss]
+NON_INITIALIZED_GLOBAL_DATA_SECTION	= {{ compiler.memoryUsage.uninitializedData }}
+# valid options are [/.data/.sdata/.dram_data/.sram_data]
+INITIALIZED_GLOBAL_DATA_SECTION		= {{ compiler.memoryUsage.initializedData }}
+# valid options are [/.bss/.sbss/.dram_bss/.sram_bss]
+STATIC_SINGLETONS_DATA_SECTION		= {{ compiler.memoryUsage.staticSingletons }}
+# valid options are [/.bss/.sbss/.dram_bss/.sram_bss]
+VIRTUAL_TABLES_DATA_SECTION			= {{ compiler.memoryUsage.virtualTables }}
+
+# Size of variables to be loaded in the .sdata section
+# Not working properly because rosdata is used instead of rodata section
+# MSDA_SIZE							= 0

@@ -1,5 +1,6 @@
 import { DisposableCollection, isWindows, URI } from '@theia/core';
 import { VesProcessType } from '../../../../../process/common/ves-process-service-protocol.js';
+import { PROJECT_TEMPLATES } from '../../../../../project/browser/ves-project-data.js';
 import { ProjectDataTemplateEncoding } from '../../../../../project/browser/ves-project-types.js';
 import { EditorsServices } from '../../../ves-editors-types.js';
 import { nanoid } from '../../Common/Utils.js';
@@ -46,7 +47,7 @@ export default class PlayerRomBuilder {
 
     protected initTemplating = async (): Promise<void> => {
         await this.services.vesProjectService.projectDataReady;
-        const soundSpecTemplate = this.services.vesProjectService.getProjectDataTemplate('SoundSpec');
+        const soundSpecTemplate = PROJECT_TEMPLATES.SoundSpec;
         if (!soundSpecTemplate) {
             console.error('could not find SoundSpec template');
             return;

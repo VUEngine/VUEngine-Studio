@@ -1,0 +1,39 @@
+{%- set projectTranslations = project.items.Translations.project -%}
+{%- set allLanguages = project.items.Translations | values -%}
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
+
+#ifndef LANGUAGES_H_
+#define LANGUAGES_H_
+
+{{ macros.sectionHeader('Definitions') }}
+
+{% if projectTranslations.languages | length -%}
+enum LanguageIdentifiers
+{
+	{% for language in projectTranslations.languages|sort(attribute='order') -%}
+	kLanguage{{ language.name | sanitizeSpecName }},
+	{%- if not loop.last -%}{{ '\n	' }}{%- endif -%}
+	{%- endfor %}
+};
+
+{% endif -%}
+
+{%- set strings = [] -%}
+{%- for language in allLanguages -%}
+    {%- for translationId, translation in language.translations %}
+        {%- set strings = (strings.push(translationId), strings) %}
+    {%- endfor -%}
+{%- endfor %}
+{%- set strings = strings | unique | sort -%}
+
+{% if strings | length -%}
+enum LanguageStrings
+{
+    {%- for string in strings %}
+    kString{{- string -}},
+	{%- endfor %}
+};
+
+{% endif -%}
+#endif

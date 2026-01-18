@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import {
     ConversionResult
 } from '../../../../images/browser/ves-images-types';
+import { ActorType } from '../../../../project/browser/types/Actor';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
@@ -310,11 +311,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     };
 
     const addComponentByType = async (componentKey: ComponentKey, name: string): Promise<void> => {
-        const type = services.vesProjectService.getProjectDataType('Actor');
-        if (!type) {
-            return;
-        }
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
+        const schema = await window.electronVesCore.dereferenceJsonSchema(ActorType.schema);
         if (!schema?.properties?.components?.properties || !schema?.properties?.components?.properties[componentKey]) {
             return;
         }
