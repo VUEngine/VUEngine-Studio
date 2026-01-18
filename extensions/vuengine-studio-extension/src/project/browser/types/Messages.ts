@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { MessagesTemplate } from '../template/Messages';
 import { ProjectDataType } from '../ves-project-types';
 
 export const MessagesType: ProjectDataType = {
@@ -22,6 +23,6 @@ export const MessagesType: ProjectDataType = {
     },
     icon: 'codicon codicon-comment',
     templates: [
-        'Messages'
+        MessagesTemplate
     ]
 };

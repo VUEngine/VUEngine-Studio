@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { InGameTypesTemplate } from '../template/InGameTypes';
 import { ProjectDataType } from '../ves-project-types';
 
 export const InGameTypesType: ProjectDataType = {
@@ -22,6 +23,6 @@ export const InGameTypesType: ProjectDataType = {
     },
     icon: 'codicon codicon-broadcast',
     templates: [
-        'InGameTypes'
+        InGameTypesTemplate
     ]
 };

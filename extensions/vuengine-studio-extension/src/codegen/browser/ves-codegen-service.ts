@@ -158,12 +158,7 @@ export class VesCodeGenService {
       return [];
     }
 
-    await Promise.all(type.templates.map(async templateId => {
-      const template = PROJECT_TEMPLATES[templateId];
-      if (!template) {
-        return;
-      }
-
+    await Promise.all(type.templates.map(async template => {
       const targetUris = await this.getTargetUris(template, {
         ...item,
         _filename: itemUri.path.name,
@@ -202,16 +197,15 @@ export class VesCodeGenService {
     Object.keys(PROJECT_TYPES).map(typeId => {
       const numberOfItems = Object.keys(this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || []).length;
       const type = PROJECT_TYPES[typeId];
-      const templates = type.templates?.map(templateId => PROJECT_TEMPLATES[templateId])
-        .filter(template => template?.enabled !== false);
       const iconClasses = type.icon?.split(' ') || ['codicon', 'codicon-file-code'];
       const templateTargets: string[] = [];
-      templates?.map(t => {
-        t?.targets?.map(target => {
-          const root = target.root === 'file' ? '{file}/' : '';
-          templateTargets.push(`${root}${target.path}`);
+      type.templates?.filter(template => template?.enabled !== false)
+        .map(t => {
+          t?.targets?.map(target => {
+            const root = target.root === 'file' ? '{file}/' : '';
+            templateTargets.push(`${root}${target.path}`);
+          });
         });
-      });
       if (templateTargets?.length) {
         items.push({
           id: typeId,
@@ -293,8 +287,8 @@ export class VesCodeGenService {
             inferredFileUri = (this.vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId) as WithFileUri)?._fileUri;
           }
 
-          await Promise.all(type.templates.map(async templateId => {
-            const count = await this.renderTemplate(templateId, generationMode, fileUri ?? inferredFileUri);
+          await Promise.all(type.templates.map(async template => {
+            const count = await this.renderTemplate(template, generationMode, fileUri ?? inferredFileUri);
             numberOfGeneratedFiles += count;
           }));
         };
@@ -318,7 +312,7 @@ export class VesCodeGenService {
   }
 
   async renderTemplateToFile(
-    templateId: string,
+    template: ProjectDataTemplate,
     targetUri: URI,
     templateString: string,
     data: object,
@@ -332,7 +326,7 @@ export class VesCodeGenService {
         if (err) {
           if (!silent === true) {
             this.logLine(
-              `Failed to render template ${templateId}.Nunjucks output: ${err}`,
+              `Failed to render template ${template.template}. Nunjucks output: ${err}`,
               OutputChannelSeverity.Error
             );
           }
@@ -345,7 +339,7 @@ export class VesCodeGenService {
             ).then(() => {
               const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
               if (!silent === true) {
-                this.logLine(`Rendered template ${templateId} to ${p}.`);
+                this.logLine(`Rendered template ${template.template} to ${p}.`);
               }
               resolve();
             });
@@ -466,13 +460,8 @@ export class VesCodeGenService {
     return result;
   }
 
-  protected async renderTemplate(templateId: string, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
+  protected async renderTemplate(template: ProjectDataTemplate, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
     await this.vesProjectService.projectDataReady;
-    const template = PROJECT_TEMPLATES[templateId];
-    if (!template) {
-      console.warn(`Template ${templateId} not found.`);
-      return 0;
-    }
 
     if (template.enabled === false) {
       return 0;
@@ -549,7 +538,7 @@ export class VesCodeGenService {
 
           numberOfGeneratedFiles++;
           await this.renderTemplateToFile(
-            templateId,
+            template,
             targetUri,
             templateString,
             data,
@@ -568,7 +557,7 @@ export class VesCodeGenService {
       if (template.events) {
         await Promise.all(template.events.map(async event => {
           if (event.type === ProjectDataTemplateEventType.installedPluginsChanged) {
-            return this.renderTemplate(templateId, GenerationMode.All);
+            return this.renderTemplate(template, GenerationMode.All);
           }
         }));
       }
@@ -582,7 +571,7 @@ export class VesCodeGenService {
         await Promise.all(template.events.map(async templateEvent => {
           if (templateEvent.type === ProjectDataTemplateEventType.itemOfTypeGotDeleted
             && templateEvent.value === typeId) {
-            await this.renderTemplate(templateId, GenerationMode.All);
+            await this.renderTemplate(template, GenerationMode.All);
           }
         }));
       }

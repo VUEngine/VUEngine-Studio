@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { PluginsConfigTemplate } from '../template/PluginsConfig';
 import { ProjectDataType } from '../ves-project-types';
 
 export const GameConfigType: ProjectDataType = {
@@ -35,6 +36,6 @@ export const GameConfigType: ProjectDataType = {
     },
     icon: 'codicon codicon-gear',
     templates: [
-        'PluginsConfig'
+        PluginsConfigTemplate
     ]
 };

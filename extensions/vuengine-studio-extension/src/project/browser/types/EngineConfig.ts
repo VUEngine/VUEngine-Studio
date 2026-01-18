@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { ConfigTemplate } from '../template/Config';
 import { ProjectDataType } from '../ves-project-types';
 
 export const EngineConfigType: ProjectDataType = {
@@ -553,6 +554,6 @@ export const EngineConfigType: ProjectDataType = {
     },
     icon: 'codicon codicon-settings',
     templates: [
-        'Config'
+        ConfigTemplate
     ]
 };

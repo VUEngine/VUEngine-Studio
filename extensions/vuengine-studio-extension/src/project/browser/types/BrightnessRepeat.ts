@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { BrightnessRepeatSpecTemplate } from '../template/BrightnessRepeatSpec';
 import { ProjectDataType } from '../ves-project-types';
 
 export const BrightnessRepeatType: ProjectDataType = {
@@ -33,6 +34,6 @@ export const BrightnessRepeatType: ProjectDataType = {
     },
     icon: 'codicon codicon-color-mode',
     templates: [
-        'BrightnessRepeatSpec'
+        BrightnessRepeatSpecTemplate
     ]
 };

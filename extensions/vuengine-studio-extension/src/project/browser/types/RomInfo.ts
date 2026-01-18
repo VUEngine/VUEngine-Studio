@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { RomInfoTemplate } from '../template/RomInfo';
 import { ProjectDataType } from '../ves-project-types';
 
 export const RomInfoType: ProjectDataType = {
@@ -51,6 +52,6 @@ export const RomInfoType: ProjectDataType = {
     },
     icon: 'codicon codicon-chip',
     templates: [
-        'RomInfo'
+        RomInfoTemplate
     ]
 };

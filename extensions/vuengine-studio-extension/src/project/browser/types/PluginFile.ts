@@ -1,4 +1,6 @@
 import { nls } from '@theia/core';
+import { PluginConfigTemplate } from '../template/PluginConfig';
+import { PluginConfigMakeTemplate } from '../template/PluginConfigMake';
 import { ProjectDataType } from '../ves-project-types';
 
 export const PluginFileType: ProjectDataType = {
@@ -93,7 +95,7 @@ export const PluginFileType: ProjectDataType = {
     },
     icon: 'codicon codicon-plug',
     templates: [
-        'PluginConfig',
-        'PluginConfigMake',
+        PluginConfigTemplate,
+        PluginConfigMakeTemplate,
     ]
 };

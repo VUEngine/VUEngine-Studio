@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { ColliderLayersTemplate } from '../template/ColliderLayers';
 import { ProjectDataType } from '../ves-project-types';
 
 export const ColliderLayersType: ProjectDataType = {
@@ -22,6 +23,6 @@ export const ColliderLayersType: ProjectDataType = {
     },
     icon: 'codicon codicon-activate-breakpoints',
     templates: [
-        'ColliderLayers'
+        ColliderLayersTemplate
     ]
 };

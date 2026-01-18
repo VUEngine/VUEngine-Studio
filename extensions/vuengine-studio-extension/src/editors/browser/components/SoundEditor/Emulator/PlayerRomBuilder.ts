@@ -1,5 +1,6 @@
 import { DisposableCollection, isWindows, URI } from '@theia/core';
 import { VesProcessType } from '../../../../../process/common/ves-process-service-protocol.js';
+import { SoundSpecTemplate } from '../../../../../project/browser/template/SoundSpec.js';
 import { PROJECT_TEMPLATES } from '../../../../../project/browser/ves-project-data.js';
 import { ProjectDataTemplateEncoding } from '../../../../../project/browser/ves-project-types.js';
 import { EditorsServices } from '../../../ves-editors-types.js';
@@ -72,7 +73,7 @@ export default class PlayerRomBuilder {
         const specFileUri = this.tempBaseDir?.resolve('SoundSpec.c');
         // console.log('specFileUri: ', specFileUri?.path.fsPath());
         await this.services.vesCodeGenService.renderTemplateToFile(
-            'SoundSpec',
+            SoundSpecTemplate,
             specFileUri,
             this.soundSpecTemplateString,
             {

@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { GameEventsTemplate } from '../template/GameEvents';
 import { ProjectDataType } from '../ves-project-types';
 
 export const EventsType: ProjectDataType = {
@@ -22,6 +23,6 @@ export const EventsType: ProjectDataType = {
     },
     icon: 'codicon codicon-symbol-event',
     templates: [
-        'GameEvents'
+        GameEventsTemplate
     ]
 };

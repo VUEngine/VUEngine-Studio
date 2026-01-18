@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { ColumnTableSpecTemplate } from '../template/ColumnTableSpec';
 import { ProjectDataType } from '../ves-project-types';
 
 export const ColumnTableType: ProjectDataType = {
@@ -47,6 +48,6 @@ export const ColumnTableType: ProjectDataType = {
     },
     icon: 'codicon codicon-table',
     templates: [
-        'ColumnTableSpec'
+        ColumnTableSpecTemplate
     ]
 };

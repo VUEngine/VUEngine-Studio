@@ -1,4 +1,6 @@
 import { nls } from '@theia/core';
+import { ActorImageDataTemplate } from '../template/ActorImageData';
+import { ActorSpecTemplate } from '../template/ActorSpec';
 import { ProjectDataType } from '../ves-project-types';
 
 export const ActorType: ProjectDataType = {
@@ -674,7 +676,7 @@ export const ActorType: ProjectDataType = {
     },
     icon: 'codicon codicon-smiley',
     templates: [
-        'ActorImageData',
-        'ActorSpec'
+        ActorImageDataTemplate,
+        ActorSpecTemplate
     ]
 };

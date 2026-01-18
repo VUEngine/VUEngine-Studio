@@ -47,7 +47,7 @@ export interface ProjectDataType {
   icon?: string
   schema: any
   uiSchema?: any
-  templates?: string[]
+  templates?: ProjectDataTemplate[]
   forFiles?: string[]
 };
 

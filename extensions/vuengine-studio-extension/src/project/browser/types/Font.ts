@@ -1,4 +1,7 @@
 import { nls } from '@theia/core';
+import { FontsCTemplate } from '../template/FontsC';
+import { FontsHTemplate } from '../template/FontsH';
+import { FontSpecTemplate } from '../template/FontSpec';
 import { ProjectDataType } from '../ves-project-types';
 
 export const FontType: ProjectDataType = {
@@ -101,8 +104,8 @@ export const FontType: ProjectDataType = {
     },
     icon: 'codicon codicon-case-sensitive',
     templates: [
-        'FontsC',
-        'FontsH',
-        'FontSpec'
+        FontsCTemplate,
+        FontsHTemplate,
+        FontSpecTemplate
     ]
 };

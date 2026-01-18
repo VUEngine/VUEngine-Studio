@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { ImageTemplate } from '../template/Image';
 import { ProjectDataType } from '../ves-project-types';
 
 export const ImageType: ProjectDataType = {
@@ -139,7 +140,7 @@ export const ImageType: ProjectDataType = {
     },
     icon: 'codicon codicon-file-media',
     templates: [
-        'Image'
+        ImageTemplate
     ],
     forFiles: [
         '.png'

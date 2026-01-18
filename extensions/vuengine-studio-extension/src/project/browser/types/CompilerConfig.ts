@@ -1,4 +1,8 @@
 import { nls } from '@theia/core';
+import { ConfigTemplate } from '../template/Config';
+import { ConfigMakeTemplate } from '../template/ConfigMake';
+import { vbLdTemplate } from '../template/vbLd';
+import { vbToolsLdTemplate } from '../template/vbToolsLd';
 import { ProjectDataType } from '../ves-project-types';
 
 export const CompilerConfigType: ProjectDataType = {
@@ -134,9 +138,9 @@ export const CompilerConfigType: ProjectDataType = {
     },
     icon: 'codicon codicon-terminal',
     templates: [
-        'Config',
-        'configMake',
-        'vbLd',
-        'vbToolsLd'
+        ConfigTemplate,
+        ConfigMakeTemplate,
+        vbLdTemplate,
+        vbToolsLdTemplate
     ]
 };

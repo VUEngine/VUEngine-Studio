@@ -1,4 +1,6 @@
 import { nls } from '@theia/core';
+import { LanguagesCTemplate } from '../template/LanguagesC';
+import { LanguagesHTemplate } from '../template/LanguagesH';
 import { ProjectDataType } from '../ves-project-types';
 
 export const TranslationsType: ProjectDataType = {
@@ -47,7 +49,7 @@ export const TranslationsType: ProjectDataType = {
     },
     icon: 'codicon codicon-comment-discussion',
     templates: [
-        'LanguagesC',
-        'LanguagesH'
+        LanguagesCTemplate,
+        LanguagesHTemplate
     ]
 };

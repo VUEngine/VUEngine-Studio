@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
 export const SoundType: ProjectDataType = {
@@ -254,6 +255,6 @@ export const SoundType: ProjectDataType = {
     },
     icon: 'codicon codicon-music',
     templates: [
-        'SoundSpec'
+        SoundSpecTemplate
     ]
 };

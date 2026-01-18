@@ -1,4 +1,6 @@
 import { nls } from '@theia/core';
+import { RumbleEffectSpecTemplate } from '../template/RumbleEffectSpec';
+import { RumbleEffectsTemplate } from '../template/RumbleEffects';
 import { ProjectDataType } from '../ves-project-types';
 
 export const RumbleEffectType: ProjectDataType = {
@@ -53,7 +55,7 @@ export const RumbleEffectType: ProjectDataType = {
     },
     icon: 'codicon codicon-screen-full',
     templates: [
-        'RumbleEffectSpec',
-        'RumbleEffects'
+        RumbleEffectSpecTemplate,
+        RumbleEffectsTemplate
     ]
 };
