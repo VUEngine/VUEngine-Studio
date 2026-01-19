@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import { NodeRendererProps } from 'react-arborist';
-import { ProjectContributor } from '../ves-project-types';
+import { ProjectContributor } from '../../ves-project-types';
 import styled from 'styled-components';
 
 const ContributorLabel = styled.span`

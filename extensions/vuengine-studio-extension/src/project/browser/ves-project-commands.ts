@@ -21,13 +21,14 @@ export namespace VesProjectCommands {
         'vuengine/projects/commands/category',
     );
 
-    export const DASHBOARD_TOGGLE: Command = Command.toLocalizedCommand(
+    export const DASHBOARD_SHOW: Command = Command.toLocalizedCommand(
         {
-            id: 'project.toggleDashboardView',
-            label: 'Toggle Stages Dashboard',
+            id: 'project.showDashboardView',
+            label: 'Show Stages Dashboard',
+            iconClass: 'codicon codicon-compass',
             category: 'Project',
         },
-        'vuengine/projects/commands/toggleStagesDashboard',
+        'vuengine/projects/commands/showStagesDashboard',
         'vuengine/projects/commands/dashboard/category',
     );
 

@@ -24,7 +24,7 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesProjectCommands.DASHBOARD_TOGGLE, {
+        commandRegistry.registerCommand(VesProjectCommands.DASHBOARD_SHOW, {
             execute: async () => {
                 if (this.workspaceService.opened) {
                     await this.openView({

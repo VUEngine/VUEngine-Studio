@@ -1,18 +1,17 @@
-import { CommandService, nls, URI } from '@theia/core';
+import { nls, URI } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React, { useEffect, useState } from 'react';
-import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
-import AdvancedSelect from '../../../editors/browser/components/Common/Base/AdvancedSelect';
-import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
-import Input from '../../../editors/browser/components/Common/Base/Input';
-import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
-import { stringify } from '../../../editors/browser/components/Common/Utils';
-import { VesProjectCommands } from '../ves-project-commands';
-import { PROJECT_TYPES } from '../ves-project-data';
-import { VesProjectService } from '../ves-project-service';
-import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithFileUri } from '../ves-project-types';
-import { MOCK_STAGES } from './ProjectDashboard';
+import { VesWorkspaceService } from '../../../../core/browser/ves-workspace-service';
+import AdvancedSelect from '../../../../editors/browser/components/Common/Base/AdvancedSelect';
+import HContainer from '../../../../editors/browser/components/Common/Base/HContainer';
+import Input from '../../../../editors/browser/components/Common/Base/Input';
+import VContainer from '../../../../editors/browser/components/Common/Base/VContainer';
+import { stringify } from '../../../../editors/browser/components/Common/Utils';
+import { PROJECT_TYPES } from '../../ves-project-data';
+import { VesProjectService } from '../../ves-project-service';
+import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithFileUri } from '../../ves-project-types';
+import { MOCK_STAGES } from '../StagesDashboard/ProjectDashboard';
 
 interface ConfigType {
     typeId: string,
@@ -22,7 +21,6 @@ interface ConfigType {
 }
 
 interface ProjectSettingsProps {
-    commandService: CommandService
     fileService: FileService
     openerService: OpenerService
     vesProjectService: VesProjectService
@@ -30,7 +28,7 @@ interface ProjectSettingsProps {
 }
 
 export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.Element {
-    const { commandService, fileService, openerService, vesProjectService, workspaceService } = props;
+    const { fileService, openerService, vesProjectService, workspaceService } = props;
     const [gameConfig, setGameConfig] = useState<GameConfig>();
     const [types, setTypes] = useState<ConfigType[]>([]);
 
@@ -107,8 +105,8 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
     }, []);
 
     return (
-        <div className='jsonforms-container' style={{ height: 'unset' }}>
-            <VContainer gap={15} style={{ paddingTop: 0 }}>
+        <div className='jsonforms-container'>
+            <VContainer gap={15}>
                 <Input
                     label={nls.localizeByDefault('Name')}
                     value={gameConfig?.projectTitle ?? ''}
@@ -152,48 +150,38 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                             >
                                 <i className='codicon codicon-edit' />
                             </button>
-                            <button
-                                className='theia-button secondary'
-                                onClick={() => commandService.executeCommand(VesProjectCommands.DASHBOARD_TOGGLE.id)}
-                                title={nls.localizeByDefault('Edit')}
-                                style={{
-                                    margin: 0,
-                                    minWidth: 'unset',
-                                }}
-                            >
-                                <i className='codicon codicon-compass' />
-                            </button>
                         </HContainer>
                     </VContainer>
                 </>}
                 <hr />
-            </VContainer>
-            {types.length > 0 && <>
-                <VContainer>
-                    <label>
-                        {nls.localizeByDefault('Settings')}
-                    </label>
-                    <div className='ves-tree' style={{ margin: '0 calc(-1 * var(--padding))' }}>
-                        {types.map(t => (
-                            <div
-                                key={t.typeId}
-                                role="treeitem"
-                                onClick={() => openSettings(t.type, t.item)}
-                                tabIndex={-1}
-                            >
-                                <div className="ves-tree-node">
-                                    <div className="ves-tree-node-icon">
-                                        <i className={t.type.icon as string}></i>
-                                    </div>
-                                    <div className="ves-tree-node-name">
-                                        {t.label}
+
+                {types.length > 0 && <>
+                    <VContainer grow={1}>
+                        <label>
+                            {nls.localizeByDefault('Settings')}
+                        </label>
+                        <div className='ves-tree' style={{ margin: '0 calc(-1 * var(--padding))' }}>
+                            {types.map(t => (
+                                <div
+                                    key={t.typeId}
+                                    role="treeitem"
+                                    onClick={() => openSettings(t.type, t.item)}
+                                    tabIndex={-1}
+                                >
+                                    <div className="ves-tree-node">
+                                        <div className="ves-tree-node-icon">
+                                            <i className={t.type.icon as string}></i>
+                                        </div>
+                                        <div className="ves-tree-node-name">
+                                            {t.label}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                </VContainer>
-            </>}
+                            ))}
+                        </div>
+                    </VContainer>
+                </>}
+            </VContainer>
         </div>
     );
 }

@@ -3,8 +3,8 @@ import { ArcherContainerRef, ArcherElement } from 'react-archer';
 import { AnchorPositionType, RelationType } from 'react-archer/lib/types';
 import Draggable, { ControlPosition, DraggableData, DraggableEvent } from 'react-draggable';
 import styled from 'styled-components';
-import { roundToNextMultipleOf16 } from '../../../editors/browser/components/Common/Utils';
-import { DashboardConfigPositionMap } from '../ves-project-types';
+import { roundToNextMultipleOf16 } from '../../../../editors/browser/components/Common/Utils';
+import { DashboardConfigPositionMap } from '../../ves-project-types';
 import { MOCK_AUTO_PAUSE_SCREEN, MOCK_STAGES, MOCK_START_SCREEN } from './ProjectDashboard';
 
 const ARROW_PADDING = 30;

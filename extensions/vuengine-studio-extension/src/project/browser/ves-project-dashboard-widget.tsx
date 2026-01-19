@@ -28,7 +28,7 @@ import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
-import ProjectDashboard from './components/ProjectDashboard';
+import ProjectDashboard from './components/StagesDashboard/ProjectDashboard';
 import { VesProjectService } from './ves-project-service';
 
 export const ZOOM_MIN = 0.25;

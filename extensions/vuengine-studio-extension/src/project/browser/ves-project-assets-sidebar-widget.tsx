@@ -7,11 +7,11 @@ import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import AssetsTree from './components/AssetsSidebar/AssetsTree';
 import { VesProjectService } from './ves-project-service';
-import ProjectSettings from './components/ProjectSidebar/ProjectSettings';
 
 @injectable()
-export class VesProjectSidebarWidget extends ReactWidget {
+export class VesProjectAssetsSidebarWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
   @inject(FileService)
@@ -23,13 +23,15 @@ export class VesProjectSidebarWidget extends ReactWidget {
   @inject(VesWorkspaceService)
   private readonly workspaceService: VesWorkspaceService;
 
-  static readonly ID = 'vesProjectSidebarWidget';
-  static readonly LABEL = nls.localize('vuengine/projects/project', 'Project');
+  static readonly ID = 'vesProjectAssetsSidebarWidget';
+  static readonly LABEL = nls.localize('vuengine/projects/assets', 'Assets');
+
+  public allExpanded: boolean = true;
 
   @postConstruct()
   protected init(): void {
-    this.id = VesProjectSidebarWidget.ID;
-    this.title.iconClass = 'codicon codicon-home';
+    this.id = VesProjectAssetsSidebarWidget.ID;
+    this.title.iconClass = 'codicon codicon-library';
     this.title.closable = false;
     this.node.style.outline = 'none';
     this.bindEvents();
@@ -47,8 +49,13 @@ export class VesProjectSidebarWidget extends ReactWidget {
   }
 
   protected setTitle(): void {
-    this.title.label = VesProjectSidebarWidget.LABEL;
+    this.title.label = VesProjectAssetsSidebarWidget.LABEL;
     this.title.caption = this.title.label;
+  }
+
+  public setAllExpanded(allExpanded: boolean): void {
+    this.allExpanded = allExpanded;
+    this.update();
   }
 
   protected onActivateRequest(msg: Message): void {
@@ -62,7 +69,8 @@ export class VesProjectSidebarWidget extends ReactWidget {
       ? <NoWorkspaceOpened
         commandService={this.commandService}
       />
-      : <ProjectSettings
+      : <AssetsTree
+        allExpanded={this.allExpanded}
         fileService={this.fileService}
         openerService={this.openerService}
         vesProjectService={this.vesProjectService}

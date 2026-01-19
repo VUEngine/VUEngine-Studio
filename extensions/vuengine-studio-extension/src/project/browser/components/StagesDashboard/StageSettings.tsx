@@ -1,10 +1,10 @@
 import { nls, URI } from '@theia/core';
 import React, { useContext } from 'react';
-import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
-import Input from '../../../editors/browser/components/Common/Base/Input';
-import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
-import { EditorsContext, EditorsContextType } from '../../../editors/browser/ves-editors-types';
-import { GameConfig, ProjectDataItem, WithFileUri } from '../ves-project-types';
+import HContainer from '../../../../editors/browser/components/Common/Base/HContainer';
+import Input from '../../../../editors/browser/components/Common/Base/Input';
+import VContainer from '../../../../editors/browser/components/Common/Base/VContainer';
+import { EditorsContext, EditorsContextType } from '../../../../editors/browser/ves-editors-types';
+import { GameConfig, ProjectDataItem, WithFileUri } from '../../ves-project-types';
 import { MOCK_AUTO_PAUSE_SCREEN, MOCK_STAGES, MOCK_START_SCREEN } from './ProjectDashboard';
 
 interface StageSettingsProps {

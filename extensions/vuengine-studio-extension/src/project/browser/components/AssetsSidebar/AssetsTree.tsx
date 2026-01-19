@@ -4,12 +4,12 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useEffect, useRef, useState } from 'react';
 import { Tree } from 'react-arborist';
-import Input from '../../../editors/browser/components/Common/Base/Input';
-import RadioSelect from '../../../editors/browser/components/Common/Base/RadioSelect';
-import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
-import { PROJECT_TYPES } from '../ves-project-data';
-import { VesProjectService } from '../ves-project-service';
-import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithContributor, WithFileUri } from '../ves-project-types';
+import Input from '../../../../editors/browser/components/Common/Base/Input';
+import RadioSelect from '../../../../editors/browser/components/Common/Base/RadioSelect';
+import VContainer from '../../../../editors/browser/components/Common/Base/VContainer';
+import { PROJECT_TYPES } from '../../ves-project-data';
+import { VesProjectService } from '../../ves-project-service';
+import { ProjectContributor, ProjectDataItem, ProjectDataItemsWithContributor, WithContributor, WithFileUri } from '../../ves-project-types';
 import AssetsTreeNode from './AssetsTreeNode';
 
 interface TreeNode {
@@ -176,9 +176,9 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     }, []);
 
     return (
-        <VContainer gap={10} grow={1} overflow='hidden'>
+        <VContainer gap={0} grow={1} overflow='hidden' style={{ height: '100%' }}>
             <VContainer style={{
-                padding: '0 calc(2 * var(--theia-ui-padding))',
+                padding: 'calc(2 * var(--theia-ui-padding))',
             }}>
                 <Input
                     value={searchTerm}
@@ -205,8 +205,8 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
             </VContainer>
             <VContainer
                 grow={1}
+                overflow='auto'
                 style={{
-                    overflow: 'auto',
                     paddingBottom: 'var(--padding)',
                 }}
             >

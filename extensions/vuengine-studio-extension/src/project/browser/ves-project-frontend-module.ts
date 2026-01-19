@@ -20,6 +20,8 @@ import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { VesProjectAssetsSidebarViewContribution } from './ves-project-assets-sidebar-view-contribution';
+import { VesProjectAssetsSidebarWidget } from './ves-project-assets-sidebar-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -59,13 +61,22 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         createWidget: () => ctx.container.get<VesProjectDashboardWidget>(VesProjectDashboardWidget)
     })).inSingletonScope();
 
-    // sidebar view
+    // project sidebar view
     bindViewContribution(bind, VesProjectSidebarViewContribution);
     bind(FrontendApplicationContribution).toService(VesProjectSidebarViewContribution);
-    bind(TabBarToolbarContribution).toService(VesProjectSidebarViewContribution);
     bind(VesProjectSidebarWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesProjectSidebarWidget.ID,
         createWidget: () => ctx.container.get<VesProjectSidebarWidget>(VesProjectSidebarWidget)
+    })).inSingletonScope();
+
+    // assets sidebar view
+    bindViewContribution(bind, VesProjectAssetsSidebarViewContribution);
+    bind(FrontendApplicationContribution).toService(VesProjectAssetsSidebarViewContribution);
+    bind(TabBarToolbarContribution).toService(VesProjectAssetsSidebarViewContribution);
+    bind(VesProjectAssetsSidebarWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesProjectAssetsSidebarWidget.ID,
+        createWidget: () => ctx.container.get<VesProjectAssetsSidebarWidget>(VesProjectAssetsSidebarWidget)
     })).inSingletonScope();
 });
