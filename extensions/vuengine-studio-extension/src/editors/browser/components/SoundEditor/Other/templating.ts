@@ -18,6 +18,8 @@ import {
 } from '../SoundEditorTypes';
 import { isString } from '@theia/core';
 
+const NOTE_SLIDE_STEP_DURATION = 25;
+
 interface Keyframe {
     SxINT?: string
     SxLRV?: string
@@ -314,6 +316,76 @@ const applyNoteDuration = (
     return result;
 };
 
+// replace note labels with frequencies
+const notesToFrequencies = (
+    trackEventsMap: EventsMap,
+): EventsMap => {
+    const result: EventsMap = { ...trackEventsMap };
+
+    const trackSteps: number[] = Object.keys(result)
+        .map(step => parseInt(step));
+    trackSteps.forEach(step => {
+        const stepEvents = result[step];
+        if (stepEvents[SoundEvent.Note] !== undefined) {
+            if (isString(stepEvents[SoundEvent.Note]) && NOTES[stepEvents[SoundEvent.Note]] !== undefined) {
+                result[step][SoundEvent.Note] = NOTES[stepEvents[SoundEvent.Note]];
+            } else {
+                delete result[step][SoundEvent.Note];
+            }
+        }
+    });
+
+    return result;
+};
+
+// add additional note events for note slide effects
+const applyNoteSlide = (
+    trackEventsMap: EventsMap,
+): EventsMap => {
+    const result: EventsMap = { ...trackEventsMap };
+
+    const sortedTrackSteps: number[] = Object.keys(result)
+        .map(step => parseInt(step))
+        .sort((a, b) => a - b);
+    sortedTrackSteps.forEach(step => {
+        const stepEvents = result[step];
+        const noteSlide = stepEvents[SoundEvent.NoteSlide];
+        if (noteSlide === undefined || noteSlide === 0) {
+            return;
+        }
+
+        const note = stepEvents[SoundEvent.Note];
+        const noteId = Object.values(NOTES).indexOf(note);
+        const duration = stepEvents[SoundEvent.Duration];
+        if (note === undefined || noteId === undefined || duration === undefined) {
+            return;
+        }
+
+        const noteSlideDirection = noteSlide < 0 ? -1 : 1;
+        const targetNote = Object.values(NOTES)[noteId - noteSlide];
+        const distance = Math.abs(note - targetNote);
+
+        const numberOfSteps = Math.round(duration / NOTE_SLIDE_STEP_DURATION);
+        if (numberOfSteps <= 2) {
+            return;
+        }
+
+        const changePerStep = Math.round(distance / numberOfSteps) * noteSlideDirection;
+
+        for (let i = 0; i < numberOfSteps; i++) {
+            const artificialStep = step + (i * NOTE_SLIDE_STEP_DURATION);
+            if (result[artificialStep] === undefined) {
+                result[artificialStep] = {};
+            }
+            result[artificialStep][SoundEvent.Note] = note + (i * changePerStep);
+            result[artificialStep][SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
+        }
+
+    });
+
+    return result;
+};
+
 // interpret events, transform to actual register values
 const transformToKeyframes = (
     trackEventsMap: EventsMap,
@@ -334,9 +406,7 @@ const transformToKeyframes = (
 
         // note event
         if (stepEvents[SoundEvent.Note] !== undefined) {
-            if (isString(stepEvents[SoundEvent.Note]) && NOTES[stepEvents[SoundEvent.Note]] !== undefined) {
-                keyframe.SxFQ = SxFQ(NOTES[stepEvents[SoundEvent.Note]]);
-            }
+            keyframe.SxFQ = SxFQ(stepEvents[SoundEvent.Note]);
         }
 
         // instrument event
@@ -533,29 +603,33 @@ export const getTrackKeyframes = (
 ): TrackKeyframesPrepared => {
     const initialInstrument = soundData.instruments[track.instrument];
 
-    console.log('-----------------------------------------------------');
+    // console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
-    console.log('mergePatterns', { ...trackEventsMap });
+    // console.log('mergePatterns', { ...trackEventsMap });
     trackEventsMap = filterEmptyEvents(trackEventsMap);
-    console.log('filterEmptyEvents', { ...trackEventsMap });
+    // console.log('filterEmptyEvents', { ...trackEventsMap });
     trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    console.log('applyTrackInitialVolume', { ...trackEventsMap });
+    // console.log('applyTrackInitialVolume', { ...trackEventsMap });
     trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
-    console.log('applyTrackInitialInstrument', { ...trackEventsMap });
+    // console.log('applyTrackInitialInstrument', { ...trackEventsMap });
+    trackEventsMap = notesToFrequencies(trackEventsMap);
+    // console.log('notesToFrequencies', { ...trackEventsMap });
     trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
-    console.log('applyNoteDuration', { ...trackEventsMap });
+    // console.log('applyNoteDuration', { ...trackEventsMap });
+    trackEventsMap = applyNoteSlide(trackEventsMap);
+    // console.log('applyNoteSlide', { ...trackEventsMap });
 
     let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
-    console.log('transformToKeyframes', trackKeyframes);
+    // console.log('transformToKeyframes', trackKeyframes);
     trackKeyframes = reduceKeyframes(trackKeyframes);
-    console.log('reduceKeyframes', trackKeyframes);
+    // console.log('reduceKeyframes', trackKeyframes);
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
-    console.log('applyLoopPoint', trackKeyframes);
+    // console.log('applyLoopPoint', trackKeyframes);
 
     let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
-    console.log('transformToKeyframesPrepared', trackKeyframesPrepared);
+    // console.log('transformToKeyframesPrepared', trackKeyframesPrepared);
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
-    console.log('setStartEvent', trackKeyframesPrepared);
+    // console.log('setStartEvent', trackKeyframesPrepared);
 
     return trackKeyframesPrepared;
 };
