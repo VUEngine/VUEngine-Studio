@@ -1,8 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-    EFFECTS_PANEL_COLLAPSED_HEIGHT,
-    EFFECTS_PANEL_EXPANDED_HEIGHT,
     NOTE_RESOLUTION,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_METER_HEIGHT,
@@ -66,7 +64,8 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         pianoRollScrollWindow,
     } = props;
 
-    const effectsPanelHeight = effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT;
+    // const effectsPanelHeight = effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT;
+    const effectsPanelHeight = effectsPanelHidden ? 0 : 0;
 
     const style = {
         display: hidden ? 'none' : undefined,
@@ -78,7 +77,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         height: position === StepIndicatorPosition.SEQUENCER
             ? soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT
             : position === StepIndicatorPosition.PIANO_ROLL_HEADER
-                ? PIANO_ROLL_GRID_METER_HEIGHT
+                ? PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT
                 : PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + NOTES_SPECTRUM * pianoRollNoteHeight + effectsPanelHeight
     };
 
