@@ -40,17 +40,137 @@ extraResources:
     to: app/plugins
 
 fileAssociations:
+  - ext: vb
+    name: Virtual Boy ROM
+    description: ROM image of a Virtual Boy program
+    role: Viewer
+    rank: Alternate
+    isPackage: false
   - ext: workspace
     name: VUEngine Studio Workspace
-    description: VUEngine Studio Workspace file
+    description: VUEngine Studio Workspace
     role: Editor
     rank: Owner
     isPackage: false
-  - ext: vb
-    name: Virtual Boy ROM
-    description: ROM image of Virtual Boy program
-    role: Viewer
-    rank: Default
+  - ext: actor
+    name: VUEngine Studio Actor
+    description: VUEngine Studio Actor
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: brightness
+    name: VUEngine Studio Brightness Repeat
+    description: VUEngine Studio Brightness Repeat
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: ColliderLayers
+    name: VUEngine Studio Collider Layers
+    description: VUEngine Studio Collider Layers
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: ctable
+    name: VUEngine Studio Column Table
+    description: VUEngine Studio Column Table
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: CompilerConfig
+    name: VUEngine Studio Compiler Config
+    description: VUEngine Studio Compiler Config
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: EngineConfig
+    name: VUEngine Studio Engine Config
+    description: VUEngine Studio Engine Config
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: Events
+    name: VUEngine Studio Events
+    description: VUEngine Studio Events
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: font
+    name: VUEngine Studio Font
+    description: VUEngine Studio Font
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: GameConfig
+    name: VUEngine Studio Game Config
+    description: VUEngine Studio Game Config
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: image
+    name: VUEngine Studio Image
+    description: VUEngine Studio Image
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: InGameTypes
+    name: VUEngine Studio In-Game Types
+    description: VUEngine Studio In-Game Types
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: logic
+    name: VUEngine Studio Logic
+    description: VUEngine Studio Logic
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: Messages
+    name: VUEngine Studio Messages
+    description: VUEngine Studio Messages
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: pixel
+    name: VUEngine Studio Pixel Art
+    description: VUEngine Studio Pixel Art
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: vuengine.plugin
+    name: VUEngine Studio Plugin
+    description: VUEngine Studio Plugin
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: RomInfo
+    name: VUEngine Studio ROM Info
+    description: VUEngine Studio ROM Info
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: rumble
+    name: VUEngine Studio Rumble Effect
+    description: VUEngine Studio Rumble Effect
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: sound
+    name: VUEngine Studio Sound
+    description: VUEngine Studio Sound
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: stage
+    name: VUEngine Studio Stage
+    description: VUEngine Studio Stage
+    role: Editor
+    rank: Owner
+    isPackage: false
+  - ext: Translations
+    name: VUEngine Studio Translations
+    description: VUEngine Studio Translations
+    role: Editor
+    rank: Owner
     isPackage: false
 
 win:

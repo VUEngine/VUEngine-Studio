@@ -1,4 +1,30 @@
 import { nls } from '@theia/core';
+import {
+    VSU_ENVELOPE_INITIAL_VALUE_DEFAULT,
+    VSU_ENVELOPE_INITIAL_VALUE_MAX,
+    VSU_ENVELOPE_INITIAL_VALUE_MIN,
+    VSU_ENVELOPE_STEP_TIME_DEFAULT,
+    VSU_ENVELOPE_STEP_TIME_MAX,
+    VSU_ENVELOPE_STEP_TIME_MIN,
+    VSU_INTERVAL_DEFAULT,
+    VSU_INTERVAL_MAX,
+    VSU_INTERVAL_MIN,
+    VSU_NOISE_TAP,
+    VSU_NUMBER_OF_CHANNELS,
+    VSU_SWEEP_MODULATION_FREQUENCY_DEFAULT,
+    VSU_SWEEP_MODULATION_FREQUENCY_MAX,
+    VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+    VSU_SWEEP_MODULATION_INTERVAL_DEFAULT,
+    VSU_SWEEP_MODULATION_INTERVAL_MAX,
+    VSU_SWEEP_MODULATION_INTERVAL_MIN,
+    VSU_SWEEP_MODULATION_SHIFT_DEFAULT,
+    VSU_SWEEP_MODULATION_SHIFT_MAX,
+    VSU_SWEEP_MODULATION_SHIFT_MIN,
+    VsuEnvelopeDirection,
+    VsuSweepDirection,
+    VsuSweepModulationFunction
+} from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
+import { SoundEditorTrackType } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
@@ -8,16 +34,13 @@ export const SoundType: ProjectDataType = {
         title: nls.localize('vuengine/projects/typeLabels/sound', 'Sound'),
         properties: {
             name: {
-                type: 'string',
-                default: ''
+                type: 'string'
             },
             author: {
-                type: 'string',
-                default: ''
+                type: 'string'
             },
             comment: {
-                type: 'string',
-                default: ''
+                type: 'string'
             },
             tracks: {
                 type: 'array',
@@ -26,7 +49,7 @@ export const SoundType: ProjectDataType = {
                     properties: {
                         type: {
                             type: 'string',
-                            default: 'wave'
+                            default: SoundEditorTrackType.WAVE
                         },
                         instrument: {
                             type: 'string'
@@ -44,7 +67,7 @@ export const SoundType: ProjectDataType = {
                     },
                     additionalProperties: false
                 },
-                maxItems: 6
+                maxItems: VSU_NUMBER_OF_CHANNELS
             },
             patterns: {
                 type: 'object',
@@ -52,12 +75,11 @@ export const SoundType: ProjectDataType = {
                     type: 'object',
                     properties: {
                         name: {
-                            type: 'string',
-                            default: ''
+                            type: 'string'
                         },
                         type: {
                             type: 'string',
-                            default: 'wave'
+                            default: SoundEditorTrackType.WAVE
                         },
                         size: {
                             type: 'number',
@@ -87,7 +109,7 @@ export const SoundType: ProjectDataType = {
                         },
                         type: {
                             type: 'string',
-                            default: 'wave'
+                            default: SoundEditorTrackType.WAVE
                         },
                         color: {
                             type: 'number',
@@ -131,8 +153,9 @@ export const SoundType: ProjectDataType = {
                                 },
                                 value: {
                                     type: 'integer',
-                                    minimum: 0,
-                                    maximum: 31
+                                    minimum: VSU_INTERVAL_MIN,
+                                    maximum: VSU_INTERVAL_MAX,
+                                    default: VSU_INTERVAL_DEFAULT,
                                 }
                             },
                             additionalProperties: false
@@ -150,18 +173,21 @@ export const SoundType: ProjectDataType = {
                                 },
                                 direction: {
                                     type: 'number',
-                                    default: 0
+                                    minimum: 0,
+                                    maximum: 1,
+                                    default: VsuEnvelopeDirection.Decay,
                                 },
                                 initialValue: {
                                     type: 'integer',
-                                    default: 15,
-                                    minimum: 0,
-                                    maximum: 15
+                                    minimum: VSU_ENVELOPE_INITIAL_VALUE_MIN,
+                                    maximum: VSU_ENVELOPE_INITIAL_VALUE_MAX,
+                                    default: VSU_ENVELOPE_INITIAL_VALUE_DEFAULT,
                                 },
                                 stepTime: {
                                     type: 'integer',
-                                    minimum: 0,
-                                    maximum: 7
+                                    minimum: VSU_ENVELOPE_STEP_TIME_MIN,
+                                    maximum: VSU_ENVELOPE_STEP_TIME_MAX,
+                                    default: VSU_ENVELOPE_STEP_TIME_DEFAULT,
                                 }
                             },
                             additionalProperties: false
@@ -179,27 +205,33 @@ export const SoundType: ProjectDataType = {
                                 },
                                 function: {
                                     type: 'number',
-                                    default: 1
+                                    minimum: 0,
+                                    maximum: 1,
+                                    default: VsuSweepModulationFunction.Sweep,
                                 },
                                 frequency: {
                                     type: 'integer',
-                                    minimum: 0,
-                                    maximum: 1
+                                    minimum: VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+                                    maximum: VSU_SWEEP_MODULATION_FREQUENCY_MAX,
+                                    default: VSU_SWEEP_MODULATION_FREQUENCY_DEFAULT,
                                 },
                                 interval: {
                                     type: 'integer',
-                                    minimum: 1,
-                                    maximum: 7
+                                    minimum: VSU_SWEEP_MODULATION_INTERVAL_MIN,
+                                    maximum: VSU_SWEEP_MODULATION_INTERVAL_MAX,
+                                    default: VSU_SWEEP_MODULATION_INTERVAL_DEFAULT,
                                 },
                                 direction: {
                                     type: 'number',
-                                    default: 0
+                                    minimum: 0,
+                                    maximum: 1,
+                                    default: VsuSweepDirection.Down,
                                 },
                                 shift: {
                                     type: 'integer',
-                                    default: 7,
-                                    minimum: 0,
-                                    maximum: 7
+                                    minimum: VSU_SWEEP_MODULATION_SHIFT_MIN,
+                                    maximum: VSU_SWEEP_MODULATION_SHIFT_MAX,
+                                    default: VSU_SWEEP_MODULATION_SHIFT_DEFAULT,
                                 }
                             },
                             additionalProperties: false
@@ -218,7 +250,7 @@ export const SoundType: ProjectDataType = {
                         tap: {
                             type: 'integer',
                             minimum: 0,
-                            maximum: 7
+                            maximum: VSU_NOISE_TAP.length,
                         }
                     },
                     additionalProperties: false
