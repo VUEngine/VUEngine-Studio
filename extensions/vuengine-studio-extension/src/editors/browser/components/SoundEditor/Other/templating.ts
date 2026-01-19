@@ -177,25 +177,64 @@ const mergePatterns = (
     return trackEventsMap;
 };
 
+// remove empty events
+const filterEmptyEvents = (
+    trackEventsMap: EventsMap,
+): EventsMap => {
+    const result: EventsMap = {};
+
+    const sortedTrackSteps: number[] = Object.keys(trackEventsMap)
+        .map(step => parseInt(step))
+        .sort((a, b) => a - b);
+
+    sortedTrackSteps.forEach(step => {
+        if (Object.keys(trackEventsMap[step]).length) {
+            result[step] = trackEventsMap[step];
+        }
+    });
+
+    return result;
+};
+
 // if there's no note at step 0, set volume to 0 initially
 const applyTrackInitialVolume = (
     trackEventsMap: EventsMap,
     initialInstrument: InstrumentConfig,
 ): EventsMap => {
-    trackEventsMap[0][SoundEvent.Instrument] = initialInstrument;
-    const trackSteps: number[] = Object.keys(trackEventsMap).map(step => parseInt(step)).sort((a, b) => a - b);
-    const firstStep: number = trackSteps[0];
-    if (firstStep > 0 && firstStep !== undefined) {
-        trackEventsMap[0] = {
+    const result: EventsMap = { ...trackEventsMap };
+
+    const sortedTrackStepsWithNote: number[] = Object.keys(result)
+        .map(step => parseInt(step))
+        .filter(step => result[step][SoundEvent.Note] !== undefined)
+        .sort((a, b) => a - b);
+    const firstStepWithNote: number = sortedTrackStepsWithNote[0];
+    if (firstStepWithNote !== undefined && firstStepWithNote > 0) {
+        result[0] = {
             [SoundEvent.Volume]: zeroVolume,
         };
         // set initial instrument volume on first step only if it does not set the volume explicitly
-        if (trackEventsMap[firstStep][SoundEvent.Volume] === undefined) {
-            trackEventsMap[firstStep][SoundEvent.Volume] = initialInstrument?.volume ?? zeroVolume;
+        if (result[firstStepWithNote][SoundEvent.Instrument] === undefined &&
+            result[firstStepWithNote][SoundEvent.Volume] === undefined
+        ) {
+            result[firstStepWithNote][SoundEvent.Volume] = initialInstrument?.volume ?? zeroVolume;
         }
     }
 
-    return trackEventsMap;
+    return result;
+};
+
+// set initial instrument on step 0 for initialization
+const applyTrackInitialInstrument = (
+    trackEventsMap: EventsMap,
+    initialInstrumentId: string,
+): EventsMap => {
+    const result: EventsMap = { ...trackEventsMap };
+
+    if (result[0][SoundEvent.Instrument] === undefined) {
+        result[0][SoundEvent.Instrument] = initialInstrumentId;
+    }
+
+    return result;
 };
 
 // set volume to 0 if a note's duration end before a new note plays
@@ -205,11 +244,13 @@ const applyNoteDuration = (
     instruments: InstrumentMap,
     totalSize: number,
 ): EventsMap => {
-    const trackSteps: number[] = Object.keys(trackEventsMap).map(step => parseInt(step)).sort((a, b) => a - b);
+    const result: EventsMap = { ...trackEventsMap };
+
+    const trackSteps: number[] = Object.keys(result).map(step => parseInt(step)).sort((a, b) => a - b);
     let lastVolume = initialInstrument?.volume ?? zeroVolume;
 
     trackSteps.forEach((step, stepIndex) => {
-        const stepEvents = trackEventsMap[step];
+        const stepEvents = result[step];
 
         // remember last set volume
         // explicit volume event has preference over instument event
@@ -237,29 +278,29 @@ const applyNoteDuration = (
                     break;
                 }
                 // if there's a note event along the way, stop
-                if (trackEventsMap[i] !== undefined && trackEventsMap[i][SoundEvent.Note] !== undefined) {
+                if (result[i] !== undefined && result[i][SoundEvent.Note] !== undefined) {
                     break;
                 }
                 // if there's none until the final step...
                 if (i === endStep &&
                     // ... and there's no explicit volume set at that step...
-                    (trackEventsMap[i] === undefined || trackEventsMap[i][SoundEvent.Volume] === undefined)
+                    (result[i] === undefined || result[i][SoundEvent.Volume] === undefined)
                 ) {
                     // ... then set volume to 0
-                    trackEventsMap[i] = {
-                        ...(trackEventsMap[i] ?? {}),
+                    result[i] = {
+                        ...(result[i] ?? {}),
                         [SoundEvent.Volume]: zeroVolume,
                     };
 
                     // if there's a next step and it doesn't set the volume, reset it there
                     const nextStep = trackSteps[stepIndex + 1];
                     if (nextStep !== undefined) {
-                        const nextStepEvents = trackEventsMap[nextStep];
+                        const nextStepEvents = result[nextStep];
                         if (nextStepEvents !== undefined &&
                             nextStepEvents[SoundEvent.Instrument] === undefined &&
                             nextStepEvents[SoundEvent.Volume] === undefined
                         ) {
-                            trackEventsMap[nextStep] = {
+                            result[nextStep] = {
                                 ...(nextStepEvents ?? {}),
                                 [SoundEvent.Volume]: lastVolume,
                             };
@@ -270,7 +311,7 @@ const applyNoteDuration = (
         }
     });
 
-    return trackEventsMap;
+    return result;
 };
 
 // interpret events, transform to actual register values
@@ -336,6 +377,8 @@ const transformToKeyframes = (
 const reduceKeyframes = (
     trackKeyframes: TrackKeyframes,
 ): TrackKeyframes => {
+    const result = { ...trackKeyframes };
+
     const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step))
         .sort((a, b) => a - b)
         .reverse();
@@ -349,14 +392,14 @@ const reduceKeyframes = (
             if (stepValues[v] !== undefined) {
                 let foundPrev = false;
                 trackSteps.filter(prevStep => prevStep < step).forEach(prevStep => {
-                    const prevStepValues = trackKeyframes.keyframeMap[prevStep];
+                    const prevStepValues = result.keyframeMap[prevStep];
                     // @ts-ignore
                     if (!foundPrev && prevStepValues[v] !== undefined) {
                         foundPrev = true;
                         // @ts-ignore
                         if (prevStepValues[v] === stepValues[v]) {
                             // @ts-ignore
-                            delete stepValues[v];
+                            delete result.keyframeMap[step][v];
                         }
                     }
                 });
@@ -369,11 +412,11 @@ const reduceKeyframes = (
         const stepValues = trackKeyframes.keyframeMap[step];
 
         if (Object.keys(stepValues).length === 0) {
-            delete trackKeyframes.keyframeMap[step];
+            delete result.keyframeMap[step];
         }
     });
 
-    return trackKeyframes;
+    return result;
 };
 
 // find keyframe (step index) of looping point
@@ -381,19 +424,46 @@ const applyLoopPoint = (
     trackKeyframes: TrackKeyframes,
     loopPoint: number,
 ): TrackKeyframes => {
+    const result = { ...trackKeyframes };
+
     const loopPointStep = loopPoint * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION;
 
     // create dummy event if none exists at loop point
-    if (trackKeyframes.keyframeMap[loopPointStep] === undefined) {
-        trackKeyframes.keyframeMap[loopPointStep] = {};
+    if (result.keyframeMap[loopPointStep] === undefined) {
+        result.keyframeMap[loopPointStep] = {};
     }
 
-    const loopKeyframe = Object.keys(trackKeyframes.keyframeMap).indexOf(`${loopPointStep}`);
+    const loopKeyframe = Object.keys(result.keyframeMap).indexOf(`${loopPointStep}`);
 
     return {
-        ...trackKeyframes,
+        ...result,
         loopKeyframe,
     };
+};
+
+// set the very first keyframe's flags to just kSoundTrackEventStart
+const setStartEvent = (
+    trackKeyframesPrepared: TrackKeyframesPrepared,
+    trackType: SoundEditorTrackType,
+): TrackKeyframesPrepared => {
+    const result = { ...trackKeyframesPrepared };
+
+    // if there's no note on the first keyframe, set initial frequency to 0x00
+    if (!result.keyframes[0].flags.includes(EventName.SxFQ)) {
+        result.values.SxFQ.unshift('0x0000');
+    }
+
+    // set the very first keyframe's flags to just kSoundTrackEventStart
+    const flags: EventName[] = [EventName.Start];
+    if (trackType === SoundEditorTrackType.SWEEPMOD) {
+        flags.push(EventName.SweepMod);
+    }
+    if (trackType === SoundEditorTrackType.NOISE) {
+        flags.push(EventName.Noise);
+    }
+    result.keyframes[0].flags = flags;
+
+    return result;
 };
 
 // transform to final return format with event flags
@@ -401,26 +471,20 @@ const transformToKeyframesPrepared = (
     trackKeyframes: TrackKeyframes,
     initialInstrument: InstrumentConfig,
     trackType: SoundEditorTrackType,
-    specName: string,
-    waveformRegistry: WaveformData[],
-    modulationDataRegistry: ModulationData[],
 ): TrackKeyframesPrepared => {
     const keyFrameSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step)).sort((a, b) => a - b);
     const trackKeyframesPrepared: TrackKeyframesPrepared = {
         values: {
-            SxEV0: [SxEV0(initialInstrument.envelope)],
-            SxEV1: [SxEV1(initialInstrument.envelope, initialInstrument.sweepMod, initialInstrument.tap, trackType)],
-            SxFQ: ['0x0000'],
-            SxINT: [SxINT(true, initialInstrument.interval)],
-            SxLRV: ['0x00'], // explicit silent note. initial instrument's volume is set on the first event.
-            SxRAM: [SxRAM(specName, waveformRegistry, initialInstrument.waveform, trackType)],
-            SxSWP: [S5SWP(initialInstrument.sweepMod)],
-            SxMOD: [S5MOD(specName, modulationDataRegistry, initialInstrument.modulationData, initialInstrument.sweepMod, trackType)],
+            SxEV0: [],
+            SxEV1: [],
+            SxFQ: [],
+            SxINT: [],
+            SxLRV: [],
+            SxRAM: [],
+            SxSWP: [],
+            SxMOD: [],
         },
-        keyframes: [{
-            duration: keyFrameSteps[0],
-            flags: [EventName.Start]
-        }],
+        keyframes: [],
         loopKeyframe: trackKeyframes.loopKeyframe,
     };
 
@@ -469,15 +533,17 @@ export const getTrackKeyframes = (
 ): TrackKeyframesPrepared => {
     const initialInstrument = soundData.instruments[track.instrument];
 
+    console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
-    console.log('-----------------------------------------------------1');
-    console.log('-----------------------------------------------------2');
-    console.log('-----------------------------------------------------3');
-    console.log('mergePatterns', trackEventsMap);
+    console.log('mergePatterns', { ...trackEventsMap });
+    trackEventsMap = filterEmptyEvents(trackEventsMap);
+    console.log('filterEmptyEvents', { ...trackEventsMap });
     trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    console.log('applyTrackInitialVolume', trackEventsMap);
+    console.log('applyTrackInitialVolume', { ...trackEventsMap });
+    trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
+    console.log('applyTrackInitialInstrument', { ...trackEventsMap });
     trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
-    console.log('applyNoteDuration', trackEventsMap);
+    console.log('applyNoteDuration', { ...trackEventsMap });
 
     let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
     console.log('transformToKeyframes', trackKeyframes);
@@ -486,8 +552,10 @@ export const getTrackKeyframes = (
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
     console.log('applyLoopPoint', trackKeyframes);
 
-    const trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type, specName, waveformRegistry, modulationDataRegistry);
+    let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
     console.log('transformToKeyframesPrepared', trackKeyframesPrepared);
+    trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
+    console.log('setStartEvent', trackKeyframesPrepared);
 
     return trackKeyframesPrepared;
 };
