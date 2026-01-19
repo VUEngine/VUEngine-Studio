@@ -67,7 +67,7 @@ const StyledTable = styled.table`
 
                 div, input, select {
                     margin-bottom: 4px;
-                    max-width: 80px;
+                    max-width: 120px;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -151,8 +151,8 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                         <tr>
                             <td width={56}>{nls.localize('vuengine/editors/sound/step', 'Step')}</td>
                             <td width={56}>{nls.localize('vuengine/editors/sound/durationShort', 'Dur.')}</td>
-                            <td>{nls.localize('vuengine/editors/sound/event', 'Event')}</td>
-                            <td width={64}>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
+                            <td width={72}>{nls.localize('vuengine/editors/sound/event', 'Event')}</td>
+                            <td width={120}>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
                             <td width={10}></td>
                         </tr>
                     </thead>
@@ -262,6 +262,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                                         label: getInstrumentName(soundData, instrId),
                                                                                     }))
                                                                             ]}
+                                                                            title={value}
                                                                             value={instrumentId}
                                                                             onChange={e => {
                                                                                 setNotes({
@@ -293,6 +294,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                                     }))
                                                                             ]}
                                                                             value={value}
+                                                                            title={value}
                                                                             onChange={e => {
                                                                                 setNotes({
                                                                                     [localStep]: {
@@ -318,7 +320,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 break;
                                                         }
 
-                                                        return <div key={j}>
+                                                        return <div key={j} title={value}>
                                                             {value}
                                                         </div>;
                                                     })}
