@@ -106,4 +106,4 @@ export const WINDOWS_EXECUTABLE_EXTENSIONS = [
   'ps1',
 ];
 
-export const VES_VERSION = '0.6.0';
+export const VES_VERSION = '0.7.0';

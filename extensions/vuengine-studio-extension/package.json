@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "vuengine-studio-extension",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "VUEngine Studio specific functionality",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.1.0",

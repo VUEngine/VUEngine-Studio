@@ -3,7 +3,7 @@
   "name": "vuengine-studio",
   "description": "Nintendo Virtual Boy game development application",
   "productName": "VUEngine Studio",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "main": "scripts/ves-electron-main.js",
   "license": "MIT",
   "author": "KR155E <c.radke@posteo.de>",
@@ -111,7 +111,7 @@
     "@theia/vsx-registry": "1.67.0",
     "@theia/workspace": "1.67.0",
     "fs-extra": "^9.0.1",
-    "vuengine-studio-extension": "0.6.0"
+    "vuengine-studio-extension": "0.7.0"
   },
   "devDependencies": {
     "@theia/cli": "1.67.0",
