@@ -495,6 +495,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setRangeDragEndStep={setRangeDragEndStep}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                trackSettings={trackSettings}
+                soloTrack={soloTrack}
             />
             <StyledScrollWindow
                 style={{

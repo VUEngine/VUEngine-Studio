@@ -16,6 +16,7 @@ import {
     SoundData,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
+    TrackSettings,
 } from '../SoundEditorTypes';
 import { getPatternName } from '../SoundEditor';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -52,6 +53,8 @@ interface SequencerGridProps {
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    trackSettings: TrackSettings[]
+    soloTrack: number
 }
 
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
@@ -72,6 +75,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         rangeDragEndStep, setRangeDragEndStep,
         setCurrentPlayerPosition,
         setForcePlayerRomRebuild,
+        trackSettings,
+        soloTrack,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -200,7 +205,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         // patterns
         {
-            soundData.tracks.forEach((track, trackId) =>
+            soundData.tracks.forEach((track, trackId) => {
+                const trackMuted = trackSettings[trackId].muted || (soloTrack > -1 && soloTrack !== trackId);
                 Object.keys(track.sequence).forEach(key => {
                     const step = parseInt(key);
                     const patternId = track.sequence[step];
@@ -224,7 +230,11 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                     if (trackId === currentTrackId && step === currentSequenceIndex) {
                         context.fillStyle = highlightColor;
                     } else {
-                        context.fillStyle = patternBackgroundColor;
+                        if (trackMuted) {
+                            context.fillStyle = 'transparent';
+                        } else {
+                            context.fillStyle = patternBackgroundColor;
+                        }
                     }
                     context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
 
@@ -249,9 +259,11 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                         const noteLabel = event[SoundEvent.Note];
                         if (noteLabel) {
                             const instrumentId = event[SoundEvent.Instrument];
-                            const color = instrumentId
-                                ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
-                                : defaultColor;
+                            const color = trackMuted
+                                ? patternBackgroundColor
+                                : instrumentId
+                                    ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
+                                    : defaultColor;
                             const noteId = NOTES_LABELS.indexOf(noteLabel);
                             const duration = event[SoundEvent.Duration]
                                 ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
@@ -275,8 +287,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                         ? getPatternName(soundData, patternId)
                         : '…';
                     context.fillText(patternName, patternXOffset + 3, patternY + 10, patternWidth - 6);
-                })
-            );
+                });
+            });
         }
     };
 
@@ -395,6 +407,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         sequencerPatternWidth,
         sequencerScrollWindow.x,
         sequencerScrollWindow.w,
+        trackSettings,
+        soloTrack,
     ]);
 
     return (
