@@ -381,7 +381,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
         Object.keys(noteClipboard).forEach(step => {
             const stepInt = parseInt(step);
-            notesToPaste[stepInt - smallestStep + relativeNoteCursor] = noteClipboard[stepInt];
+            const stepRelativeToCursor = stepInt - smallestStep + relativeNoteCursor;
+            if (stepRelativeToCursor < currentPattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION) {
+                notesToPaste[stepRelativeToCursor] = noteClipboard[stepInt];
+            }
         });
 
         if (Object.keys(notesToPaste).length) {
