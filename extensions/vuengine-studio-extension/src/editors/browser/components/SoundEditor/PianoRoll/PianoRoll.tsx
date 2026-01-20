@@ -331,7 +331,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
                 const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
                 const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + amount;
-                if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM) {
                     notes[sn] = {
                         ...currentPattern.events[sn],
                         [SoundEvent.Note]: NOTES_LABELS[newNoteId],
