@@ -269,10 +269,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                             if (noteSlide) {
                                 context.fillStyle = instrumentColor;
                                 const path = new Path2D();
-                                const noteSlideY = noteSlide > 0 ? noteY : noteY + noteHeight;
-                                path.moveTo(noteXOffset, noteSlideY);
-                                path.lineTo(noteXOffset + noteWidth, noteSlideY);
-                                path.lineTo(noteXOffset + noteWidth, noteSlideY - noteSlide * pianoRollNoteHeight);
+                                const noteSlideStartY = noteSlide > 0 ? noteY : noteY + noteHeight;
+                                const noteSlideEndY = noteSlideStartY - noteSlide * pianoRollNoteHeight;
+                                path.moveTo(noteXOffset, noteSlideStartY);
+                                path.lineTo(noteXOffset + noteWidth, noteSlideStartY);
+                                path.lineTo(noteXOffset + noteWidth, noteSlideEndY);
                                 context.fill(path);
                             }
 

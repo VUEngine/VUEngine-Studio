@@ -253,6 +253,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                     // pattern notes
                     const trackDefaultInstrument = soundData.instruments[track.instrument];
                     const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
+                    const scalingFactorY = (sequencerPatternHeight - SEQUENCER_NOTE_HEIGHT) / NOTES_SPECTRUM;
                     Object.keys(pattern.events).forEach((eventKey: string) => {
                         const s = parseInt(eventKey);
                         const event = pattern.events[s];
@@ -268,16 +269,33 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                             const duration = event[SoundEvent.Duration]
                                 ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
                                 : 1;
-                            const noteXPosition = Math.floor(s / SUB_NOTE_RESOLUTION) * patternNoteWidth;
-                            const noteYPosition = Math.floor(((sequencerPatternHeight - SEQUENCER_NOTE_HEIGHT) / NOTES_SPECTRUM * noteId)
+                            const noteX = Math.floor(s / SUB_NOTE_RESOLUTION) * patternNoteWidth;
+                            const noteY = Math.floor((scalingFactorY * noteId)
                                 - (SEQUENCER_NOTE_HEIGHT / 2)) + noteHeightOverlap;
+                            const noteXOffset = patternXOffset + noteX;
+                            const noteYOffset = patternY + noteY;
+                            const noteWidth = duration * patternNoteWidth;
                             context.fillStyle = color;
                             context.fillRect(
-                                patternXOffset + noteXPosition,
-                                patternY + noteYPosition,
-                                duration * patternNoteWidth,
+                                noteXOffset,
+                                noteYOffset,
+                                noteWidth,
                                 SEQUENCER_NOTE_HEIGHT
                             );
+
+                            // note slide triangle
+                            const noteSlide = event[SoundEvent.NoteSlide];
+                            if (noteSlide) {
+                                const path = new Path2D();
+                                const noteSlideStartY = noteSlide > 0
+                                    ? noteYOffset
+                                    : noteYOffset + SEQUENCER_NOTE_HEIGHT;
+                                const noteSlideEndY = noteSlideStartY - (noteSlide * scalingFactorY);
+                                path.moveTo(noteXOffset, noteSlideStartY);
+                                path.lineTo(noteXOffset + noteWidth, noteSlideStartY);
+                                path.lineTo(noteXOffset + noteWidth, noteSlideEndY);
+                                context.fill(path);
+                            }
                         }
                     });
 
