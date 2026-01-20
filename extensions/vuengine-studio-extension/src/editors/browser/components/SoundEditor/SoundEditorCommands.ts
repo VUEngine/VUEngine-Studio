@@ -207,13 +207,13 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.addAtCursorPosition',
         label: nls.localize('vuengine/editors/sound/commands/addAtCursorPosition', 'Add Note At Cursor Position To Selection'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+enter',
+        keybinding: 'ctrlcmd+enter',
     };
     export const REMOVE_SELECTED_NOTES: EditorCommand = {
         id: 'editors.soundEditor.removeSelectedNotes',
         label: nls.localize('vuengine/editors/sound/commands/removeSelectedNotes', 'Remove Selected Notes'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'backspace',
+        keybinding: ['backspace', 'delete'],
     };
     export const TOGGLE_NOTE_SNAPPING: EditorCommand = {
         id: 'editors.soundEditor.toggleNoteSnapping',
@@ -277,6 +277,12 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/copySelectedNotes', 'Copy Selected Notes'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+c',
+    };
+    export const CUT_SELECTED_NOTES: EditorCommand = {
+        id: 'editors.soundEditor.cutSelectedNotes',
+        label: nls.localize('vuengine/editors/sound/commands/cutSelectedNotes', 'Cut Selected Notes'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'ctrlcmd+x',
     };
     export const PASTE_SELECTED_NOTES: EditorCommand = {
         id: 'editors.soundEditor.pasteSelectedNotes',

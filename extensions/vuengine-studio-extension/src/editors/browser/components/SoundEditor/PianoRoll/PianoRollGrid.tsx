@@ -434,8 +434,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         eventStep <= patternRelativeMarqueeEndStep
                     );
 
-                // add to selected notes with shift key
-                if (e.shiftKey) {
+                // add to selected notes with ctrlcmd key
+                if (e.metaKey || e.ctrlKey) {
                     setSelectedNotes(prev => [...prev, ...newSelectedNodes]
                         // .filter(item => !(prev.includes(item) && newSelectedNodes.includes(item))) // unselect already selected
                         .filter((item, pos, self) => self.indexOf(item) === pos) // remove double

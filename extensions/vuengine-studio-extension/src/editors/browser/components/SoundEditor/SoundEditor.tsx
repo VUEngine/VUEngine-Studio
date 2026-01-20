@@ -38,18 +38,10 @@ import {
     NOTES_LABELS,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
-    PIANO_ROLL_NOTE_HEIGHT_MAX,
-    PIANO_ROLL_NOTE_HEIGHT_MIN,
     PIANO_ROLL_NOTE_WIDTH_DEFAULT,
-    PIANO_ROLL_NOTE_WIDTH_MAX,
-    PIANO_ROLL_NOTE_WIDTH_MIN,
     ScrollWindow,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
-    SEQUENCER_PATTERN_HEIGHT_MAX,
-    SEQUENCER_PATTERN_HEIGHT_MIN,
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
-    SEQUENCER_PATTERN_WIDTH_MAX,
-    SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTrackType,
@@ -156,7 +148,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
-    const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -336,39 +327,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             .filter(step => currentPatternEvents[step][SoundEvent.Note]);
 
         setSelectedNotes(currentPatternNoteSteps);
-    };
-
-    const copyNotes = (): void => {
-        const noteEvents: EventsMap = {};
-        selectedNotes.forEach(sn => {
-            const currentPattern = soundData.patterns[currentPatternId];
-            if (currentPattern.events[sn] !== undefined) {
-                noteEvents[sn] = currentPattern.events[sn];
-            }
-        });
-        setNoteClipboard(noteEvents);
-    };
-
-    const pasteNotes = (): void => {
-        const notesToPaste: EventsMap = {};
-        const currentPattern = soundData.patterns[currentPatternId];
-        if (currentPattern === undefined) {
-            return;
-        }
-
-        const patternStepOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-        const relativeNoteCursor = noteCursor - patternStepOffset;
-        const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
-        Object.keys(noteClipboard).forEach(step => {
-            const stepInt = parseInt(step);
-            if (currentPattern.events[stepInt] !== undefined) {
-                notesToPaste[stepInt - smallestStep + relativeNoteCursor] = currentPattern.events[stepInt];
-            }
-        });
-
-        if (Object.keys(notesToPaste).length) {
-            setNotes(notesToPaste);
-        }
     };
 
     const addTrack = (): void => {
@@ -883,87 +841,6 @@ A total of {0} instruments will be deleted.",
                     setEventListHidden(prev => !prev);
                 }
                 break;
-            case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerHidden(prev => !prev);
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternHeight(prev =>
-                        prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternHeight(prev =>
-                        prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternWidth(prev =>
-                        prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternWidth(prev =>
-                        prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id:
-                if (soundData.tracks.length > 0) {
-                    setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteHeight(prev =>
-                        prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteHeight(prev =>
-                        prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteWidth(prev =>
-                        prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev / 1.2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteWidth(prev =>
-                        prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev * 1.2 : prev
-                    );
-                }
-                break;
-            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
-                if (soundData.tracks.length > 0) {
-                    setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
-                }
-                break;
             case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedPatterns();
@@ -992,16 +869,6 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
                 if (soundData.tracks.length > 0) {
                     selectAllNotesInCurrentPattern();
-                }
-                break;
-            case SoundEditorCommands.COPY_SELECTED_NOTES.id:
-                if (soundData.tracks.length > 0) {
-                    copyNotes();
-                }
-                break;
-            case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
-                if (soundData.tracks.length > 0) {
-                    pasteNotes();
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_1.id:
@@ -1153,6 +1020,7 @@ A total of {0} instruments will be deleted.",
                                 rangeDragEndStep={rangeDragEndStep}
                                 setRangeDragEndStep={setRangeDragEndStep}
                                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                setSequencerHidden={setSequencerHidden}
                             />
                         }
                         <StyledLowerContainer>

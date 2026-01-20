@@ -11,8 +11,10 @@ import {
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
     SEQUENCER_GRID_METER_HEIGHT,
+    SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_HEIGHT_MAX,
     SEQUENCER_PATTERN_HEIGHT_MIN,
+    SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_MAX,
     SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
@@ -152,6 +154,7 @@ interface SequencerProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -179,6 +182,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setForcePlayerRomRebuild,
+        setSequencerHidden,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
@@ -260,6 +264,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     };
 
     const commandListener = (commandId: string): void => {
+        if (soundData.tracks.length === 0) {
+            return;
+        }
         switch (commandId) {
             case SoundEditorCommands.SELECT_TRACK_1.id:
                 if (soundData.tracks.length > 0) {
@@ -316,6 +323,35 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentSequenceIndex(currentTrackId, currentSequenceIndex - 1);
                 }
                 */
+                break;
+            case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
+                setSequencerHidden(prev => !prev);
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
+                setSequencerPatternHeight(prev =>
+                    prev > SEQUENCER_PATTERN_HEIGHT_MIN ? prev - 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id:
+                setSequencerPatternHeight(prev =>
+                    prev < SEQUENCER_PATTERN_HEIGHT_MAX ? prev + 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id:
+                setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id:
+                setSequencerPatternWidth(prev =>
+                    prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id:
+                setSequencerPatternWidth(prev =>
+                    prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
+                );
+                break;
+            case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id:
+                setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
                 break;
         }
     };

@@ -16,8 +16,10 @@ import {
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
+    PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
     PIANO_ROLL_NOTE_HEIGHT_MAX,
     PIANO_ROLL_NOTE_HEIGHT_MIN,
+    PIANO_ROLL_NOTE_WIDTH_DEFAULT,
     PIANO_ROLL_NOTE_WIDTH_MAX,
     PIANO_ROLL_NOTE_WIDTH_MIN,
     SCROLL_BAR_WIDTH,
@@ -226,6 +228,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         rangeDragEndStep, setRangeDragEndStep,
     } = props;
     const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const currentTrack = soundData.tracks[currentTrackId];
@@ -319,6 +322,70 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentSequenceIndex(currentTrackId, stepSequenceIndexOffset);
         } else {
             addPattern(currentTrackId, noteCursorSequenceIndex, size);
+        }
+    };
+
+    const moveSelectedNotes = (amount: number) => {
+        const notes: EventsMap = {};
+        selectedNotes.map(sn => {
+            if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
+                const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
+                const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + amount;
+                if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
+                    notes[sn] = {
+                        ...currentPattern.events[sn],
+                        [SoundEvent.Note]: NOTES_LABELS[newNoteId],
+                    };
+                }
+            }
+        });
+        if (Object.keys(notes).length) {
+            setNotes(notes);
+        }
+    };
+
+    const removeSelectedNotes = () => {
+        const notesToDelete: EventsMap = {};
+        selectedNotes.forEach(step => {
+            notesToDelete[step] = {};
+        });
+        if (Object.keys(notesToDelete).length) {
+            setNotes(notesToDelete);
+        }
+        setSelectedNotes([]);
+    };
+
+    const copySelectedNotes = (): void => {
+        const noteEvents: EventsMap = {};
+        selectedNotes.forEach(sn => {
+            if (currentPattern.events[sn] !== undefined) {
+                noteEvents[sn] = { ...currentPattern.events[sn] };
+            }
+        });
+        setNoteClipboard({ ...noteEvents });
+    };
+
+    const cutSelectedNotes = (): void => {
+        copySelectedNotes();
+        removeSelectedNotes();
+    };
+
+    const pasteNotes = (): void => {
+        const notesToPaste: EventsMap = {};
+        if (currentPattern === undefined) {
+            return;
+        }
+
+        const patternStepOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        const relativeNoteCursor = noteCursor - patternStepOffset;
+        const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
+        Object.keys(noteClipboard).forEach(step => {
+            const stepInt = parseInt(step);
+            notesToPaste[stepInt - smallestStep + relativeNoteCursor] = noteClipboard[stepInt];
+        });
+
+        if (Object.keys(notesToPaste).length) {
+            setNotes(notesToPaste);
         }
     };
 
@@ -419,6 +486,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     ]);
 
     const commandListener = (commandId: string): void => {
+        if (soundData.tracks.length === 0) {
+            return;
+        }
         switch (commandId) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
@@ -445,76 +515,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.NOTES_UP.id:
-                const notesUp: EventsMap = {};
-                selectedNotes.map(sn => {
-                    if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
-                        const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
-                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - 1;
-                        if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesUp[sn] = {
-                                ...currentPattern.events[sn],
-                                [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            };
-                        }
-                    }
-                });
-                if (Object.keys(notesUp).length) {
-                    setNotes(notesUp);
-                }
+                moveSelectedNotes(-1);
                 break;
             case SoundEditorCommands.NOTES_DOWN.id:
-                const notesDown: EventsMap = {};
-                selectedNotes.map(sn => {
-                    if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
-                        const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
-                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + 1;
-                        if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesDown[sn] = {
-                                ...currentPattern.events[sn],
-                                [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            };
-                        }
-                    }
-                });
-                if (Object.keys(notesDown).length) {
-                    setNotes(notesDown);
-                }
+                moveSelectedNotes(1);
                 break;
             case SoundEditorCommands.NOTES_UP_AN_OCTAVE.id:
-                const notesUpOctave: EventsMap = {};
-                selectedNotes.map(sn => {
-                    if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
-                        const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
-                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) - NOTES_PER_OCTAVE;
-                        if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesUpOctave[sn] = {
-                                ...currentPattern.events[sn],
-                                [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            };
-                        }
-                    }
-                });
-                if (Object.keys(notesUpOctave).length) {
-                    setNotes(notesUpOctave);
-                }
+                moveSelectedNotes(-1 * NOTES_PER_OCTAVE);
                 break;
             case SoundEditorCommands.NOTES_DOWN_AN_OCTAVE.id:
-                const notesDownOctave: EventsMap = {};
-                selectedNotes.map(sn => {
-                    if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
-                        const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
-                        const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + NOTES_PER_OCTAVE;
-                        if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM - 1) {
-                            notesDownOctave[sn] = {
-                                ...currentPattern.events[sn],
-                                [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-                            };
-                        }
-                    }
-                });
-                if (Object.keys(notesDownOctave).length) {
-                    setNotes(notesDownOctave);
-                }
+                moveSelectedNotes(NOTES_PER_OCTAVE);
                 break;
             case SoundEditorCommands.SELECT_AT_CURSOR_POSITION.id:
                 selectAtCursorPosition(false);
@@ -523,13 +533,42 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 selectAtCursorPosition(true);
                 break;
             case SoundEditorCommands.REMOVE_SELECTED_NOTES.id:
-                const notesToDelete: EventsMap = {};
-                selectedNotes.forEach(step => {
-                    notesToDelete[step] = {};
-                });
-                if (Object.keys(notesToDelete).length) {
-                    setNotes(notesToDelete);
-                }
+                removeSelectedNotes();
+                break;
+            case SoundEditorCommands.COPY_SELECTED_NOTES.id:
+                copySelectedNotes();
+                break;
+            case SoundEditorCommands.CUT_SELECTED_NOTES.id:
+                cutSelectedNotes();
+                break;
+            case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
+                pasteNotes();
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
+                setPianoRollNoteHeight(prev =>
+                    prev > PIANO_ROLL_NOTE_HEIGHT_MIN ? prev - 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id:
+                setPianoRollNoteHeight(prev =>
+                    prev < PIANO_ROLL_NOTE_HEIGHT_MAX ? prev + 1 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id:
+                setPianoRollNoteHeight(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id:
+                setPianoRollNoteWidth(prev =>
+                    prev > PIANO_ROLL_NOTE_WIDTH_MIN ? prev / 1.2 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id:
+                setPianoRollNoteWidth(prev =>
+                    prev < PIANO_ROLL_NOTE_WIDTH_MAX ? prev * 1.2 : prev
+                );
+                break;
+            case SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id:
+                setPianoRollNoteWidth(PIANO_ROLL_NOTE_WIDTH_DEFAULT);
                 break;
         }
     };
@@ -539,6 +578,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         return () => disp.dispose();
     }, [
         soundData,
+        noteClipboard,
         noteCursor,
         selectedNotes,
     ]);
