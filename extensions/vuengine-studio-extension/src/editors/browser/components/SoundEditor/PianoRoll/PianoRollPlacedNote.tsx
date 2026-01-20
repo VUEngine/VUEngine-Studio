@@ -291,6 +291,15 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         return slide < 0 ? Math.abs(slide) * pianoRollNoteHeight : 0;
     }, [events]);
 
+    const setNoteSlide = (height: number) => {
+        const slideStep = Math.ceil(height / pianoRollNoteHeight);
+        setNoteEvent(selectedNotes.map(sn => ({
+            step: sn,
+            event: SoundEvent.NoteSlide,
+            value: slideStep !== 0 ? slideStep : undefined
+        })));
+    };
+
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newDuration = noteSnapping
             ? Math.ceil(data.size.width / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
@@ -306,21 +315,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const slideStep = Math.ceil(data.size.height / pianoRollNoteHeight);
-        setNoteEvent([{
-            step: localStep,
-            event: SoundEvent.NoteSlide,
-            value: slideStep !== 0 ? slideStep : undefined
-        }]);
+        setNoteSlide(data.size.height);
     };
 
     const onNoteSlideDownResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const slideStep = -1 * Math.ceil(data.size.height / pianoRollNoteHeight);
-        setNoteEvent([{
-            step: localStep,
-            event: SoundEvent.NoteSlide,
-            value: slideStep !== 0 ? slideStep : undefined
-        }]);
+        setNoteSlide(-1 * data.size.height);
     };
 
     const onDrag = (e: DraggableEvent, data: DraggableData) => {
@@ -388,7 +387,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             if ((e.button === 2) && (e.metaKey || e.ctrlKey || e.altKey)) {
                 setNotes({ [localStep]: {} });
             } else {
-                if (e.shiftKey) {
+                if (e.metaKey || e.ctrlKey) {
                     if (selectedNotes.includes(step)) {
                         setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
                     } else {
