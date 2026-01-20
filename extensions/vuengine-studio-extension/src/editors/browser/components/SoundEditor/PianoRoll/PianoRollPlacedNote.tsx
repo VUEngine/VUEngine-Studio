@@ -307,11 +307,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         if (newDuration === duration) {
             return;
         }
-        setNoteEvent([{
-            step: localStep,
+        setNoteEvent(selectedNotes.map(sn => ({
+            step: sn,
             event: SoundEvent.Duration,
             value: newDuration
-        }]);
+        })));
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
