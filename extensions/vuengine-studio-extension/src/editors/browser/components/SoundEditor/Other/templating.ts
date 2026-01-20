@@ -172,7 +172,7 @@ const mergePatterns = (
         // Is there an event for the current step in the current pattern?
         const patternStep = step - patternStartStep;
         if (pattern.events && patternStep < patternStepSize && pattern.events[patternStep]) {
-            trackEventsMap[step] = pattern.events[patternStep];
+            trackEventsMap[step] = { ...pattern.events[patternStep] };
         }
     }
 
@@ -191,7 +191,7 @@ const filterEmptyEvents = (
 
     sortedTrackSteps.forEach(step => {
         if (Object.keys(trackEventsMap[step]).length) {
-            result[step] = trackEventsMap[step];
+            result[step] = { ...trackEventsMap[step] };
         }
     });
 
