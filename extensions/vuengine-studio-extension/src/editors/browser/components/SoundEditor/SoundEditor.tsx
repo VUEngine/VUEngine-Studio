@@ -617,6 +617,23 @@ A total of {0} instruments will be deleted.",
             prevStep = stepInt;
         });
 
+        // cap all note slide amounts
+        Object.keys(updatedEvents).map(step => {
+            const stepInt = parseInt(step);
+            const stepEvents = updatedEvents[stepInt];
+            if (stepEvents[SoundEvent.NoteSlide] !== undefined && stepEvents[SoundEvent.Note] !== undefined) {
+                const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note]);
+                const noteSlide = stepEvents[SoundEvent.NoteSlide];
+                if (noteId - noteSlide >= NOTES_LABELS.length) {
+                    stepEvents[SoundEvent.NoteSlide] = noteId - NOTES_LABELS.length + 1;
+                } else if (noteId - noteSlide <= 0) {
+                    stepEvents[SoundEvent.NoteSlide] = noteId;
+                }
+            }
+
+            return stepEvents;
+        });
+
         setPattern(currentPatternId, {
             events: updatedEvents,
         });
