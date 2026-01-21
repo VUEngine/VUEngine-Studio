@@ -105,6 +105,7 @@ const StyledCurrentlyPlacingPattern = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
+    z-index: 10;
 `;
 
 const CurrentlyPlacingRange = styled.div`
@@ -511,6 +512,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
+                setCurrentSequenceIndex={setCurrentSequenceIndex}
                 addPattern={addPattern}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
@@ -533,10 +535,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
+                setPatternDialogOpen={setPatternDialogOpen}
+                removePatternFromSequence={removePatternFromSequence}
             />
             <StyledScrollWindow
                 style={{
-                    bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 0 : 8,
+                    bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 2 : 10,
                     left: sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.x,
                     width: Math.min(
                         sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.w,
@@ -565,35 +569,26 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     }}
                 />
             }
-            {soundData.tracks.map((track, index) =>
-                Object.keys(track.sequence).map(key => {
-                    const step = parseInt(key);
-                    const patternId = track.sequence[step];
-                    const pattern = soundData.patterns[patternId];
-                    if (!pattern) {
-                        return;
-                    }
-                    return <SequencerPlacedPattern
-                        key={`${index}-${step}`}
-                        soundData={soundData}
-                        updateSoundData={updateSoundData}
-                        step={step}
-                        trackId={index}
-                        pattern={pattern}
-                        patternId={patternId}
-                        currentTrackId={currentTrackId}
-                        currentPatternId={currentPatternId}
-                        currentSequenceIndex={currentSequenceIndex}
-                        setCurrentSequenceIndex={setCurrentSequenceIndex}
-                        setCurrentPatternId={setCurrentPatternId}
-                        setPatternDialogOpen={setPatternDialogOpen}
-                        sequencerPatternHeight={sequencerPatternHeight}
-                        sequencerPatternWidth={sequencerPatternWidth}
-                        setPatternSize={setPatternSize}
-                        removePatternFromSequence={removePatternFromSequence}
-                    />;
-                })
-            )}
+            {soundData.patterns[currentPatternId] &&
+                <SequencerPlacedPattern
+                    soundData={soundData}
+                    updateSoundData={updateSoundData}
+                    step={currentSequenceIndex}
+                    trackId={currentTrackId}
+                    pattern={soundData.patterns[currentPatternId]}
+                    patternId={currentPatternId}
+                    currentTrackId={currentTrackId}
+                    currentPatternId={currentPatternId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={setCurrentSequenceIndex}
+                    setCurrentPatternId={setCurrentPatternId}
+                    setPatternDialogOpen={setPatternDialogOpen}
+                    sequencerPatternHeight={sequencerPatternHeight}
+                    sequencerPatternWidth={sequencerPatternWidth}
+                    setPatternSize={setPatternSize}
+                    removePatternFromSequence={removePatternFromSequence}
+                />
+            }
         </StyledSequencerGridContainer>
     </StyledSequencerContainer>;
 }

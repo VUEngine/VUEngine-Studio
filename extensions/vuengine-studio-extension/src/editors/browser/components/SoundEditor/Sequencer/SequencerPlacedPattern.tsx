@@ -17,15 +17,13 @@ const StyledPattern = styled.div`
     box-sizing: border-box;
     cursor: move;
     opacity: 0;
-    outline-offset: 1px;
+    outline: 1px solid;
     overflow: hidden;
     position: absolute;
     z-index: 10;
 
     &:hover {
-        border: 1px solid;
         opacity: 1;
-        outline: 1px solid var(--theia-focusBorder);
     }
 
     canvas {

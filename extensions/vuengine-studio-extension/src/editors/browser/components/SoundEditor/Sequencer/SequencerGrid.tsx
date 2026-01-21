@@ -33,7 +33,9 @@ interface SequencerGridProps {
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     addPattern: (trackId: number, bar: number, size?: number) => void
+    removePatternFromSequence: (trackId: number, step: number) => void
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -55,6 +57,7 @@ interface SequencerGridProps {
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     trackSettings: TrackSettings[]
     soloTrack: number
+    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function SequencerGrid(props: SequencerGridProps): React.JSX.Element {
@@ -62,8 +65,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         soundData,
         currentTrackId,
         currentPatternId,
-        currentSequenceIndex,
+        currentSequenceIndex, setCurrentSequenceIndex,
         addPattern,
+        removePatternFromSequence,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerPatternHeight, sequencerPatternWidth,
@@ -77,6 +81,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         setForcePlayerRomRebuild,
         trackSettings,
         soloTrack,
+        setPatternDialogOpen,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -310,6 +315,20 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
     };
 
+    const getFoundPatternSequenceIndex = (trackId: number, step: number) => {
+        let insidePatternAtSi = -1;
+        Object.keys(soundData.tracks[trackId].sequence).forEach(si => {
+            const siInt = parseInt(si);
+            const patternId = soundData.tracks[trackId].sequence[siInt];
+            const pattern = soundData.patterns[patternId];
+            if (insidePatternAtSi === -1 && pattern && step >= siInt && step < siInt + pattern.size) {
+                insidePatternAtSi = siInt;
+            }
+        });
+
+        return insidePatternAtSi;
+    };
+
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left + sequencerScrollWindow.x;
@@ -326,15 +345,29 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 }
             }
         } else {
-            if (e.button === 0) { // Left mouse button
-                const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-                const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
+            const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
+            const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
 
-                setPatternDragTrackId(trackId);
-                setPatternDragStartStep(step);
-                setPatternDragEndStep(step);
+            if (e.button === 0) { // Left mouse button
+                const insidePatternAtSi = getFoundPatternSequenceIndex(trackId, step);
+
+                if (insidePatternAtSi > -1) {
+                    setCurrentSequenceIndex(trackId, insidePatternAtSi);
+                } else {
+                    setPatternDragTrackId(trackId);
+                    setPatternDragStartStep(step);
+                    setPatternDragEndStep(step);
+                }
             } else if (e.button === 2) { // Right mouse button
-                // TODO: marquee and multi pattern select
+                if (e.metaKey || e.ctrlKey || e.altKey) {
+                    const insidePatternAtSi = getFoundPatternSequenceIndex(trackId, step);
+
+                    if (insidePatternAtSi > -1) {
+                        removePatternFromSequence(trackId, insidePatternAtSi);
+                    }
+                } else {
+                    // TODO: marquee and multi pattern select
+                }
             }
         }
     };
@@ -412,6 +445,23 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         }
     };
 
+    const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left + sequencerScrollWindow.x;
+        const y = e.clientY - rect.top;
+
+        if (y > SEQUENCER_GRID_METER_HEIGHT) {
+            const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
+            const step = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
+
+            const insidePatternAtSi = getFoundPatternSequenceIndex(trackId, step);
+
+            if (insidePatternAtSi > -1) {
+                setPatternDialogOpen(true);
+            }
+        }
+    };
+
     useEffect(() => {
         draw();
     }, [
@@ -436,6 +486,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
+            onDoubleClick={onDoubleClick}
             ref={canvasRef}
         />
     );
