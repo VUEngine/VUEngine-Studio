@@ -40,25 +40,14 @@ const StyledPianoRollPlacedNote = styled.div`
     color: #fff;
     cursor: move;
     opacity: 0;
-    outline: 0 solid var(--theia-focusBorder);
-    outline-offset: 1px;
+    outline: 1px solid;
+    outline-offset: -1px;
     position: absolute;
     text-align: center;
-    user-select: none;
     z-index: 100;
 
     &:hover {
-        border-radius: 1px;
         opacity: 1;
-        outline-width: 1px;
-        z-index: 11;
-    }
-
-    &.selected {
-        animation: outlineActivate .3s linear;
-        border-radius: 1px;
-        outline-width: 3px;
-        z-index: 11;
     }
 
     .react-resizable-handle-e {
@@ -99,7 +88,6 @@ const StyledPianoRollPlacedNote = styled.div`
 
 interface PianoRollPlacedNoteProps {
     currentSequenceIndex: number
-    selected: boolean
     setNoteCursor: (playRangeEnd: number) => void
     noteLabel: string
     duration: number
@@ -123,7 +111,6 @@ interface PianoRollPlacedNoteProps {
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
     const {
         currentSequenceIndex,
-        selected,
         setNoteCursor,
         noteLabel,
         duration,
@@ -154,11 +141,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH,
         1
     );
-
-    const classNames = ['placedNote'];
-    if (selected) {
-        classNames.push('selected');
-    }
 
     const maxDuration = useMemo(() =>
         getMaxNoteDuration(events, localStep, patternSize),
@@ -383,27 +365,27 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onMouseDown = (e: MouseEvent) => {
-        if (e.button === 0 || e.button === 2) {
-            if ((e.button === 2) && (e.metaKey || e.ctrlKey || e.altKey)) {
-                setNotes({ [localStep]: {} });
-            } else {
-                if (e.metaKey || e.ctrlKey) {
-                    if (selectedNotes.includes(step)) {
-                        setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
-                    } else {
-                        setSelectedNotes(prev => [...prev, step].sort());
-                    }
+        if (e.button === 0) {
+            if (e.metaKey || e.ctrlKey) {
+                if (selectedNotes.includes(step)) {
+                    setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
                 } else {
-                    const stepEvent = events[localStep];
-                    if (stepEvent) {
-                        const instrumentId = stepEvent[SoundEvent.Instrument];
-                        setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
-                    }
-                    if (!selectedNotes.includes(localStep)) {
-                        setSelectedNotes([localStep]);
-                    }
-                    setNoteCursor(step);
+                    setSelectedNotes(prev => [...prev, step].sort());
                 }
+            } else {
+                const stepEvent = events[localStep];
+                if (stepEvent) {
+                    const instrumentId = stepEvent[SoundEvent.Instrument];
+                    setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                }
+                if (!selectedNotes.includes(localStep)) {
+                    setSelectedNotes([localStep]);
+                }
+                setNoteCursor(step);
+            }
+        } else if ((e.button === 2)) {
+            if ((e.metaKey || e.ctrlKey || e.altKey)) {
+                setNotes({ [localStep]: {} });
             }
         }
 
@@ -433,10 +415,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         >
             <StyledPianoRollPlacedNote
                 ref={nodeRef}
-                className={classNames.join(' ')}
+                className='placedNote'
                 style={{
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                     height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
+                    outlineColor: instrumentColor,
                     translate: !isDragging && isSelected
                         ? `${noteDragDelta.x}px ${noteDragDelta.y}px`
                         : undefined

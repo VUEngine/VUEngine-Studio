@@ -338,15 +338,18 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const removePatternFromSequence = (trackId: number, step: number): void => {
         const updatedSequence = { ...soundData.tracks[trackId].sequence };
 
-        // Select previous (or none) pattern
-        const sequenceSteps = Object.keys(updatedSequence);
-        const stepSequenceIndex = sequenceSteps.indexOf(step.toString());
-        if (stepSequenceIndex > 0) {
-            const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
-            setCurrentPatternId(updatedSequence[prevStep]);
-            setCurrentSequenceIndex(prevStep);
-        } else {
-            setCurrentSequenceIndex(-1);
+        // Select previous (or no) pattern if deleted currently selected pattern
+        if (currentTrackId === trackId && currentSequenceIndex === step) {
+            const sequenceSteps = Object.keys(updatedSequence);
+            const stepSequenceIndex = sequenceSteps.indexOf(step.toString());
+            if (stepSequenceIndex > 0) {
+                const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
+                setCurrentPatternId(updatedSequence[prevStep]);
+                setCurrentSequenceIndex(prevStep);
+            } else {
+                setCurrentPatternId('');
+                setCurrentSequenceIndex(-1);
+            }
         }
 
         // Remove pattern

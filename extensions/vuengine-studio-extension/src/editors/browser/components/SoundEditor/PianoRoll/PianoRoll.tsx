@@ -439,44 +439,45 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         if (!p) {
             return;
         }
-        const result: React.JSX.Element[] = [];
-        Object.keys(p.events).map(stepStr => {
-            const step = parseInt(stepStr);
-            const noteLabel = p.events[step][SoundEvent.Note] ?? '';
-            const noteDuration = p.events[step][SoundEvent.Duration] ?? 1;
-            if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
-                const instrumentId = p.events[step][SoundEvent.Instrument] ?? currentTrack.instrument;
-                const instrument = soundData.instruments[instrumentId];
-                const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
-                result.push(
-                    <PianoRollPlacedNote
-                        key={step}
-                        instrumentColor={instrumentColor}
-                        noteLabel={noteLabel}
-                        step={currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION + step}
-                        duration={noteDuration}
-                        currentSequenceIndex={currentSequenceIndex}
-                        selected={selectedNotes.includes(step)}
-                        setNoteCursor={setNoteCursor}
-                        setNotes={setNotes}
-                        setNoteEvent={setNoteEvent}
-                        pattern={p}
-                        noteSnapping={noteSnapping}
-                        pianoRollNoteHeight={pianoRollNoteHeight}
-                        pianoRollNoteWidth={pianoRollNoteWidth}
-                        setCurrentInstrumentId={setCurrentInstrumentId}
-                        selectedNotes={selectedNotes}
-                        setSelectedNotes={setSelectedNotes}
-                        isSelected={selectedNotes.includes(step)}
-                        noteDragDelta={noteDragDelta}
-                        setNoteDragDelta={setNoteDragDelta}
-                        newNoteDuration={newNoteDuration}
-                    />
-                );
-            }
-        });
 
-        return result;
+        const currentSequenceIndexStartStep = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        const relativeNoteCursor = noteCursor - currentSequenceIndexStartStep;
+        const stepEvents = p.events[relativeNoteCursor];
+        if (!stepEvents) {
+            return;
+        }
+
+        const noteLabel = stepEvents[SoundEvent.Note];
+        const noteDuration = stepEvents[SoundEvent.Duration];
+        if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
+            const instrumentId = stepEvents[SoundEvent.Instrument] ?? currentTrack.instrument;
+            const instrument = soundData.instruments[instrumentId];
+            const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+            return (
+                <PianoRollPlacedNote
+                    key={relativeNoteCursor}
+                    instrumentColor={instrumentColor}
+                    noteLabel={noteLabel}
+                    step={currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION + relativeNoteCursor}
+                    duration={noteDuration}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setNoteCursor={setNoteCursor}
+                    setNotes={setNotes}
+                    setNoteEvent={setNoteEvent}
+                    pattern={p}
+                    noteSnapping={noteSnapping}
+                    pianoRollNoteHeight={pianoRollNoteHeight}
+                    pianoRollNoteWidth={pianoRollNoteWidth}
+                    setCurrentInstrumentId={setCurrentInstrumentId}
+                    selectedNotes={selectedNotes}
+                    setSelectedNotes={setSelectedNotes}
+                    isSelected={selectedNotes.includes(relativeNoteCursor)}
+                    noteDragDelta={noteDragDelta}
+                    setNoteDragDelta={setNoteDragDelta}
+                    newNoteDuration={newNoteDuration}
+                />
+            );
+        }
     }, [
         currentTrackId,
         currentTrack,
@@ -761,6 +762,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
+                setCurrentInstrumentId={setCurrentInstrumentId}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}
                 setNotes={setNotes}
