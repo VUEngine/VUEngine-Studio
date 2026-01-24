@@ -1,4 +1,4 @@
-import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -442,7 +442,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setCancelNoteDrag(true);
     };
 
-    const placedNotesCurrentPattern = useMemo(() => {
+    const placedNotesCurrentPattern = () => {
         const patternId = currentTrack?.sequence[currentSequenceIndex];
         const p = soundData.patterns[patternId];
         if (!p) {
@@ -488,16 +488,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 />
             );
         }
-    }, [
-        currentTrackId,
-        currentTrack,
-        currentSequenceIndex,
-        noteCursor,
-        soundData.instruments,
-        setNotes,
-        noteDragDelta.x,
-        noteDragDelta.y,
-    ]);
+    };
 
     const commandListener = (commandId: string): void => {
         if (soundData.tracks.length === 0) {
@@ -721,7 +712,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 sequencerPatternWidth={sequencerPatternWidth}
             />
             {tool === SoundEditorTool.EDIT &&
-                placedNotesCurrentPattern
+                placedNotesCurrentPattern()
             }
             <StyledToggleButtonContainer>
                 <StyledToggleButton

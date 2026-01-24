@@ -1,5 +1,5 @@
 import { deepClone } from '@theia/core';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -111,7 +111,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const patternName = getPatternName(soundData, patternId);
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH * 2;
 
-    const topDragBound = useMemo(() => {
+    const topDragBound = () => {
         const topBound = SEQUENCER_GRID_METER_HEIGHT;
 
         let topMostTrackDifference = 0;
@@ -124,14 +124,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         }
 
         return topBound + topMostTrackDifference;
-    }, [
-        soundData.tracks.length,
-        selectedPatterns,
-        trackId,
-        sequencerPatternHeight,
-    ]);
+    };
 
-    const rightDragBound = useMemo(() => {
+    const rightDragBound = () => {
         const rightBound = songLength * sequencerPatternWidth;
         let rightMostPatternSize = pattern.size;
 
@@ -156,17 +151,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         const rightMostPatternWidth = rightMostPatternSize / SEQUENCER_RESOLUTION * sequencerPatternWidth;
 
         return rightBound - rightMostPatternDifference - rightMostPatternWidth;
-    },
-        [
-            selectedPatterns,
-            pattern.size,
-            sequenceIndex,
-            sequencerPatternWidth,
-            songLength,
-        ]
-    );
+    };
 
-    const bottomDragBound = useMemo(() => {
+    const bottomDragBound = () => {
         const bottomBound = SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight;
 
         let bottomMostTrackDifference = 0;
@@ -179,14 +166,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         }
 
         return bottomBound - bottomMostTrackDifference;
-    }, [
-        soundData.tracks.length,
-        selectedPatterns,
-        trackId,
-        sequencerPatternHeight,
-    ]);
+    };
 
-    const leftDragBound = useMemo(() => {
+    const leftDragBound = () => {
         const leftBound = 0;
 
         let leftMostPatternDifference = 0;
@@ -199,13 +181,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         }
 
         return leftBound + leftMostPatternDifference;
-    },
-        [
-            selectedPatterns,
-            sequenceIndex,
-            sequencerPatternWidth,
-        ]
-    );
+    };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newSize = Math.ceil(data.size.width / sequencerPatternWidth * SEQUENCER_RESOLUTION);
@@ -328,10 +304,10 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                 y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
-                bottom: bottomDragBound,
-                left: leftDragBound,
-                right: rightDragBound,
-                top: topDragBound,
+                bottom: bottomDragBound(),
+                left: leftDragBound(),
+                right: rightDragBound(),
+                top: topDragBound(),
             }}
         >
             <StyledPattern
