@@ -137,10 +137,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
         setCurrentSequenceIndex(trackId, sequenceIndex);
         setCurrentPatternId(trackId, patternId);
-        setSelectedPatterns(prev => [...prev, `${trackId}-${sequenceIndex}`]
-            .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-            .sort()
-        );
+        setSelectedPatterns(prev => [...prev, `${trackId}-${sequenceIndex}`]);
     };
 
     const trackType = soundData.tracks[trackId].type;

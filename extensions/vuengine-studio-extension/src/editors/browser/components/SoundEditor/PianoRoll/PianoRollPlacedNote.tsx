@@ -23,20 +23,6 @@ import {
 } from '../SoundEditorTypes';
 
 const StyledPianoRollPlacedNote = styled.div`
-    @keyframes outlineActivate {
-        0%  { outline-width: 0; }
-        11% { outline-width: 1px; }
-        22% { outline-width: 2px; }
-        33% { outline-width: 3px; }
-        44% { outline-width: 4px; }
-        55% { outline-width: 5px; }
-        66% { outline-width: 6px; }
-        77% { outline-width: 5px; }
-        88% { outline-width: 4px; }
-        99% { outline-width: 3px; }
-    }
-
-    animation: outlineActivate .3s linear;
     box-sizing: border-box;
     color: #fff;
     cursor: move;
@@ -404,6 +390,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         } else if ((e.button === 2)) {
             if ((e.metaKey || e.ctrlKey || e.altKey)) {
                 setNotes({ [localStep]: {} });
+            } else if (selectedNotes.includes(step)) {
+                setSelectedNotes(prev => prev.filter(sn => sn !== step).sort());
+            } else {
+                setSelectedNotes(prev => [...prev, step].sort());
             }
         }
 

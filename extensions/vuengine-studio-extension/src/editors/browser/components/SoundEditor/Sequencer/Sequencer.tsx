@@ -520,6 +520,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <SequencerPlacedPattern
                     soundData={soundData}
                     updateSoundData={updateSoundData}
+                    tool={tool}
                     sequenceIndex={currentSequenceIndex}
                     trackId={currentTrackId}
                     pattern={soundData.patterns[currentPatternId]}
@@ -535,6 +536,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     sequencerPatternHeight={sequencerPatternHeight}
                     sequencerPatternWidth={sequencerPatternWidth}
                     setPatternSizes={setPatternSizes}
+                    removePatternsFromSequence={removePatternsFromSequence}
                 />
             }
         </StyledSequencerGridContainer>

@@ -179,13 +179,27 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
 
     const updateSelectedNotes = (sn: number[]) => {
-        setSelectedNotes(sn);
+        if (!sn) {
+            return;
+        }
+
+        setSelectedNotes(sn
+            .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
+            .sort()
+        );
         setSelectedPatterns([]);
     };
 
     const updateSelectedPatterns = (sp: string[]) => {
+        if (!sp) {
+            return;
+        }
+
         setSelectedNotes([]);
-        setSelectedPatterns(sp);
+        setSelectedPatterns(sp
+            .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
+            .sort()
+        );
     };
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
@@ -399,14 +413,24 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             if (updatedTracks[trackId] && updatedTracks[trackId].sequence[sequenceIndex]) {
                 delete updatedTracks[trackId].sequence[sequenceIndex];
 
-                // Select previous (or no) pattern if deleted currently selected pattern
+                // Select previous, next or no pattern if deleted currently selected pattern
                 if (currentTrackId === trackId && currentSequenceIndex === sequenceIndex) {
                     const sequenceSteps = Object.keys(updatedTracks[trackId].sequence);
                     const stepSequenceIndex = sequenceSteps.indexOf(sequenceIndex.toString());
                     if (stepSequenceIndex > 0) {
-                        const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
-                        setCurrentPatternId(updatedTracks[trackId].sequence[prevStep]);
-                        setCurrentSequenceIndex(prevStep);
+                        const prevSequenceIndex = parseInt(sequenceSteps[stepSequenceIndex - 1]);
+                        setCurrentPatternId(updatedTracks[trackId].sequence[prevSequenceIndex]);
+                        setCurrentSequenceIndex(prevSequenceIndex);
+                        if (selectedPatterns.length <= 1) {
+                            updateSelectedPatterns([`${trackId}-${prevSequenceIndex}`]);
+                        }
+                    } else if (sequenceSteps[stepSequenceIndex + 1] !== undefined) {
+                        const nextSequenceIndex = parseInt(sequenceSteps[stepSequenceIndex + 1]);
+                        setCurrentPatternId(updatedTracks[trackId].sequence[nextSequenceIndex]);
+                        setCurrentSequenceIndex(nextSequenceIndex);
+                        if (selectedPatterns.length <= 1) {
+                            updateSelectedPatterns([`${trackId}-${nextSequenceIndex}`]);
+                        }
                     } else {
                         setCurrentPatternId('');
                         setCurrentSequenceIndex(-1);
@@ -419,7 +443,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ...soundData,
             tracks: updatedTracks,
         });
-        setSelectedPatterns([]);
     };
 
     const removeUnusedPatterns = async (): Promise<void> => {

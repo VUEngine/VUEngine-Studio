@@ -1,4 +1,5 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
+import { deepClone } from '@theia/core';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -8,9 +9,9 @@ import {
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
     SEQUENCER_RESOLUTION,
-    SoundData
+    SoundData,
+    SoundEditorTool
 } from '../SoundEditorTypes';
-import { deepClone } from '@theia/core';
 
 const StyledPattern = styled.div`
     box-sizing: border-box;
@@ -21,7 +22,8 @@ const StyledPattern = styled.div`
     position: absolute;
     z-index: 21;
 
-    &:hover {
+    &:hover,
+    &.react-draggable-dragging {
         opacity: 1;
     }
 
@@ -51,6 +53,7 @@ const StyledPattern = styled.div`
 interface SequencerPlacedPatternProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
+    tool: SoundEditorTool
     sequenceIndex: number
     pattern: PatternConfig
     selectedPatterns: string[]
@@ -66,11 +69,13 @@ interface SequencerPlacedPatternProps {
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
+    removePatternsFromSequence: (patterns: string[]) => void
 }
 
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
+        tool,
         sequenceIndex,
         trackId,
         pattern, patternId,
@@ -81,6 +86,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         setPatternDialogOpen,
         sequencerPatternHeight, sequencerPatternWidth,
         setPatternSizes,
+        removePatternsFromSequence,
     } = props;
     const [isDragging, setIsDragging] = useState(false);
     const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -98,6 +104,102 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
 
     const patternName = getPatternName(soundData, patternId);
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH * 2;
+
+    const topDragBound = useMemo(() => {
+        const topBound = SEQUENCER_GRID_METER_HEIGHT;
+
+        let topMostTrackDifference = 0;
+        const topMostTrackId = selectedPatterns
+            .map(spId => parseInt(spId.split('-')[0]))
+            .filter(spId => spId < trackId)
+            .sort()[0];
+        if (topMostTrackId !== undefined) {
+            topMostTrackDifference = (trackId - topMostTrackId) * sequencerPatternHeight;
+        }
+
+        return topBound + topMostTrackDifference;
+    }, [
+        soundData.tracks.length,
+        selectedPatterns,
+        trackId,
+        sequencerPatternHeight,
+    ]);
+
+    const rightDragBound = useMemo(() => {
+        const rightBound = songLength * sequencerPatternWidth;
+        let rightMostPatternSize = pattern.size;
+
+        let rightMostPatternDifference = 0;
+        const rightMostPattern = selectedPatterns
+            .filter(sp => parseInt(sp.split('-')[1]) > sequenceIndex)
+            .sort().pop();
+        if (rightMostPattern !== undefined) {
+            const rightMostPatternTrackId = parseInt(rightMostPattern.split('-')[0]);
+            const rightMostPatternSequenceIndex = parseInt(rightMostPattern.split('-')[1]);
+            rightMostPatternDifference = (rightMostPatternSequenceIndex - sequenceIndex) / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+            if (soundData.tracks[rightMostPatternTrackId]) {
+                const t = soundData.tracks[rightMostPatternTrackId];
+                const pId = t.sequence[rightMostPatternSequenceIndex];
+                const p = soundData.patterns[pId];
+                if (p) {
+                    rightMostPatternSize = p.size;
+                }
+            }
+        }
+
+        const rightMostPatternWidth = rightMostPatternSize / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+
+        return rightBound - rightMostPatternDifference - rightMostPatternWidth;
+    },
+        [
+            selectedPatterns,
+            pattern.size,
+            sequenceIndex,
+            sequencerPatternWidth,
+            songLength,
+        ]
+    );
+
+    const bottomDragBound = useMemo(() => {
+        const bottomBound = SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight;
+
+        let bottomMostTrackDifference = 0;
+        const bottomMostTrackId = selectedPatterns
+            .map(spId => parseInt(spId.split('-')[0]))
+            .filter(spId => spId > trackId)
+            .sort().pop();
+        if (bottomMostTrackId !== undefined) {
+            bottomMostTrackDifference = (bottomMostTrackId - trackId) * sequencerPatternHeight;
+        }
+
+        return bottomBound - bottomMostTrackDifference;
+    }, [
+        soundData.tracks.length,
+        selectedPatterns,
+        trackId,
+        sequencerPatternHeight,
+    ]);
+
+    const leftDragBound = useMemo(() => {
+        const leftBound = 0;
+
+        let leftMostPatternDifference = 0;
+        const leftMostPatternSi = selectedPatterns
+            .map(spId => parseInt(spId.split('-')[1]))
+            .filter(sp => sp < sequenceIndex)
+            .sort()[0];
+        if (leftMostPatternSi !== undefined) {
+            leftMostPatternDifference = (sequenceIndex - leftMostPatternSi) / SEQUENCER_RESOLUTION * sequencerPatternWidth;
+        }
+
+        return leftBound + leftMostPatternDifference;
+    },
+        [
+            selectedPatterns,
+            sequenceIndex,
+            sequencerPatternWidth,
+        ]
+    );
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newSize = Math.ceil(data.size.width / sequencerPatternWidth * SEQUENCER_RESOLUTION);
@@ -184,8 +286,15 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.buttons === 0 || e.buttons === 2) {
+        const identifier = `${trackId}-${sequenceIndex}`;
+        if (tool === SoundEditorTool.ERASER && e.button === 0 || (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2) {
+            removePatternsFromSequence([`${trackId}-${sequenceIndex}`]);
+            setSelectedPatterns(prev => [...prev, identifier]);
+        } else if (tool === SoundEditorTool.EDIT && e.button === 0) {
             setCurrentSequenceIndex(trackId, sequenceIndex);
+            if (selectedPatterns.length <= 1) {
+                setSelectedPatterns([identifier]);
+            }
         }
     };
 
@@ -207,10 +316,10 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                 y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
-                bottom: SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight,
-                left: 0,
-                right: (songLength - pattern.size / SEQUENCER_RESOLUTION) * sequencerPatternWidth,
-                top: SEQUENCER_GRID_METER_HEIGHT,
+                bottom: bottomDragBound,
+                left: leftDragBound,
+                right: rightDragBound,
+                top: topDragBound,
             }}
         >
             <StyledPattern

@@ -151,37 +151,37 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 currentPatternSize * NOTE_RESOLUTION * pianoRollNoteWidth - 0.5,
                 height,
             );
-        }
 
-        // highlight current step
-        const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
-        const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
-        const relativeNoteCursor = noteCursor - currentSequenceIndexStartStep;
-        // if on note inside current pattern, set cursor width accordingly
-        if (
-            currentPattern &&
-            noteCursor >= currentSequenceIndexStartStep &&
-            noteCursor < currentSequenceIndexEndStep &&
-            currentPattern.events[relativeNoteCursor] !== undefined &&
-            currentPattern.events[relativeNoteCursor][SoundEvent.Note] !== undefined &&
-            currentPattern.events[relativeNoteCursor][SoundEvent.Duration] !== undefined
-        ) {
-            context.fillStyle = highlightLowColor;
+            // highlight current step
+            const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+            const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+            const relativeNoteCursor = noteCursor - currentSequenceIndexStartStep;
+            // if on note inside current pattern, set cursor width accordingly
+            if (
+                currentPattern &&
+                noteCursor >= currentSequenceIndexStartStep &&
+                noteCursor < currentSequenceIndexEndStep &&
+                currentPattern.events[relativeNoteCursor] !== undefined &&
+                currentPattern.events[relativeNoteCursor][SoundEvent.Note] !== undefined &&
+                currentPattern.events[relativeNoteCursor][SoundEvent.Duration] !== undefined
+            ) {
+                context.fillStyle = highlightLowColor;
+                context.fillRect(
+                    noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x,
+                    0,
+                    currentPattern.events[relativeNoteCursor][SoundEvent.Duration] / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
+                    NOTES_SPECTRUM * pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
+                );
+
+            }
+            context.fillStyle = highlightMedColor;
             context.fillRect(
                 noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x,
                 0,
-                currentPattern.events[relativeNoteCursor][SoundEvent.Duration] / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
+                pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
                 NOTES_SPECTRUM * pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
             );
-
         }
-        context.fillStyle = highlightMedColor;
-        context.fillRect(
-            noteCursor / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x,
-            0,
-            pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH,
-            NOTES_SPECTRUM * pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
-        );
 
         // vertical lines
         for (let x = 1; x <= songLength * NOTE_RESOLUTION; x++) {
@@ -628,10 +628,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     );
 
                 if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]
-                        .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-                        .sort()
-                    );
+                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]);
                 } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                     setSelectedNotes(prev => [...prev, ...newSelectedNotes]
                         .filter(item => !(prev.includes(item) && newSelectedNotes.includes(item)))
