@@ -25,10 +25,11 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect
 import Emulator from './Emulator/Emulator';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
-import { getInstrumentName, SetNoteEventProps } from './SoundEditor';
+import { getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
+    EventsMap,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
     PIANO_ROLL_KEY_WIDTH,
@@ -137,7 +138,6 @@ interface SoundEditorToolbarProps {
     currentPatternId: string
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    currentSequenceIndex: number
     selectedNotes: number[]
     playing: boolean
     noteSnapping: boolean
@@ -163,7 +163,7 @@ interface SoundEditorToolbarProps {
     setKeyBindingsDialogOpen: Dispatch<SetStateAction<boolean>>
     propertiesDialogOpen: boolean
     setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
-    setNoteEvent: (notes: SetNoteEventProps[]) => void
+    setNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
 }
@@ -176,7 +176,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentTrackId,
         currentPatternId,
         currentPlayerPosition, setCurrentPlayerPosition,
-        currentSequenceIndex,
         selectedNotes,
         playing,
         tool,
@@ -193,7 +192,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         toolsDialogOpen, setToolsDialogOpen,
         keyBindingsDialogOpen, setKeyBindingsDialogOpen,
         propertiesDialogOpen, setPropertiesDialogOpen,
-        setNoteEvent,
+        setNotes,
         setTrack,
         forcePlayerRomRebuild,
     } = props;
@@ -492,20 +491,17 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                     return;
                                 }
 
-                                const setNoteEventProps: SetNoteEventProps[] = [];
-                                selectedNotes.forEach(n => {
-                                    const localStep = n - currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-                                    if (currentPattern.events[localStep] && currentPattern.events[localStep][SoundEvent.Note]) {
-                                        setNoteEventProps.push({
-                                            step: localStep,
-                                            event: SoundEvent.Instrument,
-                                            value: instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined
-                                        });
+                                const notes: EventsMap = {};
+                                selectedNotes.forEach(sn => {
+                                    if (currentPattern.events[sn] && currentPattern.events[sn][SoundEvent.Note]) {
+                                        notes[sn] = {
+                                            [SoundEvent.Instrument]: instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined
+                                        };
                                     }
                                 });
 
-                                if (setNoteEventProps.length) {
-                                    setNoteEvent(setNoteEventProps);
+                                if (Object.keys(notes).length) {
+                                    setNotes(notes);
                                 }
                             }}
                             backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}

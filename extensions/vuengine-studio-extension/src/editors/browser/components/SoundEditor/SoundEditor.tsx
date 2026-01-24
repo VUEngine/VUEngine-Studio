@@ -57,12 +57,6 @@ import {
 import ModulationData from './Waveforms/ModulationData';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
-export interface SetNoteEventProps {
-    step: number
-    event: SoundEvent
-    value?: any
-}
-
 const StyledLowerContainer = styled.div` 
     display: flex;
     flex-flow: row;
@@ -619,7 +613,7 @@ A total of {0} instruments will be deleted.",
             }
         };
 
-        // remove notes
+        // remove empty notes
         Object.keys(notes).forEach(step => {
             const stepInt = parseInt(step);
             if (Object.keys(notes[stepInt]).length === 0) {
@@ -710,40 +704,6 @@ A total of {0} instruments will be deleted.",
             default:
                 return false;
         }
-    };
-
-    // TODO: remove and replace all usage with setNotes()
-    const setNoteEvent = (notes: SetNoteEventProps[]): void => {
-        const currentPattern = soundData.patterns[currentPatternId];
-
-        if (currentPattern === undefined) {
-            return;
-        }
-
-        const updatedEvents: EventsMap = {
-            ...currentPattern.events,
-        };
-
-        notes.forEach(n => {
-            updatedEvents[n.step] = {
-                ...(currentPattern.events[n.step] ?? {})
-            };
-
-            if (n.value === undefined) {
-                delete (updatedEvents[n.step][n.event]);
-            } else {
-                updatedEvents[n.step][n.event] = n.value;
-            }
-
-            // remove step, if empty
-            if (Object.keys(updatedEvents[n.step]).length === 0) {
-                delete (updatedEvents[n.step]);
-            }
-        });
-
-        setPattern(currentPatternId, {
-            events: updatedEvents,
-        });
     };
 
     const setInstruments = (instruments: InstrumentMap): void => {
@@ -1058,7 +1018,6 @@ A total of {0} instruments will be deleted.",
                     currentPatternId={currentPatternId}
                     currentPlayerPosition={currentPlayerPosition}
                     setCurrentPlayerPosition={setCurrentPlayerPosition}
-                    currentSequenceIndex={currentSequenceIndex}
                     playing={playing}
                     emulatorInitialized={emulatorInitialized}
                     setEmulatorInitialized={setEmulatorInitialized}
@@ -1084,7 +1043,7 @@ A total of {0} instruments will be deleted.",
                     keyBindingsDialogOpen={keyBindingsDialogOpen}
                     setKeyBindingsDialogOpen={setKeyBindingsDialogOpen}
                     selectedNotes={selectedNotes}
-                    setNoteEvent={setNoteEvent}
+                    setNotes={setNotes}
                     setTrack={setTrack}
                     forcePlayerRomRebuild={forcePlayerRomRebuild}
                 />
@@ -1176,7 +1135,6 @@ A total of {0} instruments will be deleted.",
                                 setPlayRangeEnd={setPlayRangeEnd}
                                 playNote={playNote}
                                 setNotes={setNotes}
-                                setNoteEvent={setNoteEvent}
                                 addPattern={addPattern}
                                 sequencerHidden={sequencerHidden}
                                 setSequencerHidden={setSequencerHidden}

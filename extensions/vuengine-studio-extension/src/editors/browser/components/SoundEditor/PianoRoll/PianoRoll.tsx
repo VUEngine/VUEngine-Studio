@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
-import { SetNoteEventProps } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
@@ -173,7 +172,6 @@ interface PianoRollProps {
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNotes: (notes: EventsMap) => void
-    setNoteEvent: (notes: SetNoteEventProps[]) => void
     playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
@@ -214,7 +212,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         effectsPanelHidden, /* setEffectsPanelHidden, */
         eventListHidden, setEventListHidden,
         setNotes,
-        setNoteEvent,
         playNote,
         selectedNotes, setSelectedNotes,
         noteSnapping,
@@ -466,7 +463,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     currentSequenceIndex={currentSequenceIndex}
                     setNoteCursor={setNoteCursor}
                     setNotes={setNotes}
-                    setNoteEvent={setNoteEvent}
                     pattern={p}
                     noteSnapping={noteSnapping}
                     pianoRollNoteHeight={pianoRollNoteHeight}
@@ -610,7 +606,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollRef?.current?.scrollTo({
             left: currentSequenceIndex / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
             top,
-            // behavior: 'smooth',
+            behavior: 'smooth',
         });
     }, [
         currentSequenceIndex,

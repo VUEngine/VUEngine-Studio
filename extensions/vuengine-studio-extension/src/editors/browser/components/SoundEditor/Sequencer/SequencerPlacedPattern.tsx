@@ -28,7 +28,7 @@ const StyledPattern = styled.div`
         box-sizing: border-box;
     }
 
-    .react-resizable-handle {
+    .react-resizable-handle-e {
         border-left: 1px solid;
         bottom: 0;
         cursor: col-resize;

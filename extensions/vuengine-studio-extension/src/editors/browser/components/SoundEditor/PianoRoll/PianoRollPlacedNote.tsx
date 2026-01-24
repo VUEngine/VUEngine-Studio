@@ -4,7 +4,7 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { getMaxNoteDuration } from '../Other/Note';
-import { getNoteSlideLabel, SetNoteEventProps } from '../SoundEditor';
+import { getNoteSlideLabel } from '../SoundEditor';
 import {
     BAR_NOTE_RESOLUTION,
     EventsMap,
@@ -36,6 +36,7 @@ const StyledPianoRollPlacedNote = styled.div`
         99% { outline-width: 3px; }
     }
 
+    animation: outlineActivate .3s linear;
     box-sizing: border-box;
     color: #fff;
     cursor: move;
@@ -44,13 +45,14 @@ const StyledPianoRollPlacedNote = styled.div`
     outline-offset: -1px;
     position: absolute;
     text-align: center;
+    user-select: none;
     z-index: 100;
 
     &:hover {
         opacity: 1;
     }
 
-    .react-resizable-handle {
+    .react-resizable-handle-e {
         border-left: 1px solid;
         bottom: 0;
         cursor: col-resize;
@@ -100,7 +102,6 @@ interface PianoRollPlacedNoteProps {
     step: number
     instrumentColor: string
     setNotes: (notes: EventsMap) => void
-    setNoteEvent: (notes: SetNoteEventProps[]) => void
     pattern: PatternConfig
     noteSnapping: boolean
     pianoRollNoteHeight: number
@@ -123,7 +124,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         step,
         instrumentColor,
         setNotes,
-        setNoteEvent,
         pattern,
         noteSnapping,
         pianoRollNoteHeight, pianoRollNoteWidth,
@@ -281,11 +281,14 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const setNoteSlide = (height: number) => {
         const slideStep = Math.ceil(height / pianoRollNoteHeight);
-        setNoteEvent(selectedNotes.map(sn => ({
-            step: sn,
-            event: SoundEvent.NoteSlide,
-            value: slideStep !== 0 ? slideStep : undefined
-        })));
+        const slideStepToApply = slideStep !== 0 ? slideStep : undefined;
+        const notes: EventsMap = {};
+        selectedNotes.forEach(sn => {
+            notes[sn] = {
+                [SoundEvent.NoteSlide]: slideStepToApply,
+            };
+        });
+        setNotes(notes);
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
@@ -295,11 +298,20 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         if (newDuration === duration) {
             return;
         }
-        setNoteEvent(selectedNotes.map(sn => ({
-            step: sn,
-            event: SoundEvent.Duration,
-            value: newDuration
-        })));
+
+        const durationDelta = newDuration - duration;
+        const notes: EventsMap = {};
+        selectedNotes.forEach(sn => {
+            const adjustedDuration = events[sn][SoundEvent.Duration]
+                ? noteSnapping
+                    ? Math.max(SUB_NOTE_RESOLUTION, events[sn][SoundEvent.Duration] + durationDelta)
+                    : Math.max(1, events[sn][SoundEvent.Duration] + durationDelta)
+                : newDuration;
+            notes[sn] = {
+                [SoundEvent.Duration]: adjustedDuration,
+            };
+        });
+        setNotes(notes);
     };
 
     const onNoteSlideUpResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
