@@ -8,6 +8,8 @@ import {
     ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     TrackSettings
 } from '../SoundEditorTypes';
 import Piano from './Piano';
@@ -27,7 +29,7 @@ const StyledPianoRollGridContainer = styled.div`
 
     canvas {
         position: relative;
-        z-index: 1;
+        z-index: 10;
     }
 `;
 
@@ -35,6 +37,7 @@ const CurrentlyPlacingNote = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
+    z-index: 10;
 `;
 
 const Marquee = styled.div`
@@ -43,10 +46,13 @@ const Marquee = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
+    z-index: 10;
 `;
 
 interface PianoRollEditorProps {
     soundData: SoundData
+    tool: SoundEditorTool
+    marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
@@ -69,6 +75,7 @@ interface PianoRollEditorProps {
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
     const {
         soundData,
+        tool, marqueeMode,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,
@@ -92,78 +99,77 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     const [marqueeStartNote, setMarqueeStartNote] = useState<number>(-1);
     const [marqueeEndNote, setMarqueeEndNote] = useState<number>(-1);
 
-    return <StyledPianoRollEditor
-        onMouseOut={() => {
-            setNoteDragNoteId(-1);
-            setNoteDragStartStep(-1);
-            setNoteDragEndStep(-1);
-        }}
-        style={{
-            width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
-        }}
-    >
-        <Piano
-            playNote={playNote}
-            pianoRollNoteHeight={pianoRollNoteHeight}
-        />
-        <StyledPianoRollGridContainer
+    return (
+        <StyledPianoRollEditor
             style={{
-                height: NOTES_SPECTRUM * pianoRollNoteHeight
+                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
             }}
         >
-            {noteDragNoteId > -1 &&
-                <CurrentlyPlacingNote
-                    style={{
-                        height: pianoRollNoteHeight,
-                        left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                        top: noteDragNoteId * pianoRollNoteHeight,
-                        width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
-                    }}
-                />
-            }
-            {marqueeStartStep > -1 &&
-                <Marquee
-                    style={{
-                        height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
-                        left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                        top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
-                        width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
-                    }}
-                />
-            }
-            <PianoRollGrid
-                soundData={soundData}
-                noteCursor={noteCursor}
-                currentTrackId={currentTrackId}
-                currentPatternId={currentPatternId}
-                currentSequenceIndex={currentSequenceIndex}
-                setCurrentInstrumentId={setCurrentInstrumentId}
-                setNoteCursor={setNoteCursor}
-                setNotes={setNotes}
-                newNoteDuration={newNoteDuration}
+            <Piano
+                playNote={playNote}
                 pianoRollNoteHeight={pianoRollNoteHeight}
-                pianoRollNoteWidth={pianoRollNoteWidth}
-                setPatternAtCursorPosition={setPatternAtCursorPosition}
-                noteDragNoteId={noteDragNoteId}
-                setNoteDragNoteId={setNoteDragNoteId}
-                noteDragStartStep={noteDragStartStep}
-                setNoteDragStartStep={setNoteDragStartStep}
-                noteDragEndStep={noteDragEndStep}
-                setNoteDragEndStep={setNoteDragEndStep}
-                marqueeStartStep={marqueeStartStep}
-                setMarqueeStartStep={setMarqueeStartStep}
-                marqueeEndStep={marqueeEndStep}
-                setMarqueeEndStep={setMarqueeEndStep}
-                marqueeStartNote={marqueeStartNote}
-                setMarqueeStartNote={setMarqueeStartNote}
-                marqueeEndNote={marqueeEndNote}
-                setMarqueeEndNote={setMarqueeEndNote}
-                pianoRollScrollWindow={pianoRollScrollWindow}
-                pianoRollRef={pianoRollRef}
-                trackSettings={trackSettings}
-                selectedNotes={selectedNotes}
-                setSelectedNotes={setSelectedNotes}
             />
-        </StyledPianoRollGridContainer>
-    </StyledPianoRollEditor>;
+            <StyledPianoRollGridContainer
+                style={{
+                    height: NOTES_SPECTRUM * pianoRollNoteHeight
+                }}
+            >
+                {noteDragNoteId > -1 &&
+                    <CurrentlyPlacingNote
+                        style={{
+                            height: pianoRollNoteHeight,
+                            left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
+                            top: noteDragNoteId * pianoRollNoteHeight,
+                            width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
+                        }}
+                    />
+                }
+                {marqueeStartStep > -1 &&
+                    <Marquee
+                        style={{
+                            height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
+                            left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
+                            top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
+                            width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
+                        }}
+                    />
+                }
+                <PianoRollGrid
+                    soundData={soundData}
+                    tool={tool}
+                    marqueeMode={marqueeMode}
+                    noteCursor={noteCursor}
+                    currentTrackId={currentTrackId}
+                    currentPatternId={currentPatternId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentInstrumentId={setCurrentInstrumentId}
+                    setNoteCursor={setNoteCursor}
+                    setNotes={setNotes}
+                    newNoteDuration={newNoteDuration}
+                    pianoRollNoteHeight={pianoRollNoteHeight}
+                    pianoRollNoteWidth={pianoRollNoteWidth}
+                    setPatternAtCursorPosition={setPatternAtCursorPosition}
+                    noteDragNoteId={noteDragNoteId}
+                    setNoteDragNoteId={setNoteDragNoteId}
+                    noteDragStartStep={noteDragStartStep}
+                    setNoteDragStartStep={setNoteDragStartStep}
+                    noteDragEndStep={noteDragEndStep}
+                    setNoteDragEndStep={setNoteDragEndStep}
+                    marqueeStartStep={marqueeStartStep}
+                    setMarqueeStartStep={setMarqueeStartStep}
+                    marqueeEndStep={marqueeEndStep}
+                    setMarqueeEndStep={setMarqueeEndStep}
+                    marqueeStartNote={marqueeStartNote}
+                    setMarqueeStartNote={setMarqueeStartNote}
+                    marqueeEndNote={marqueeEndNote}
+                    setMarqueeEndNote={setMarqueeEndNote}
+                    pianoRollScrollWindow={pianoRollScrollWindow}
+                    pianoRollRef={pianoRollRef}
+                    trackSettings={trackSettings}
+                    selectedNotes={selectedNotes}
+                    setSelectedNotes={setSelectedNotes}
+                />
+            </StyledPianoRollGridContainer>
+        </StyledPianoRollEditor>
+    );
 }

@@ -194,6 +194,7 @@ export class VesProjectDashboardWidget extends ReactWidget {
                     value={{
                         disableCommands: () => { },
                         enableCommands: () => { },
+                        focusEditor: () => { },
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         services: {

@@ -1,14 +1,15 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, RefObject, SetStateAction } from 'react';
 import styled from 'styled-components';
+import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import {
     DEFAULT_PLAY_RANGE_SIZE,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
-    SoundData
+    SoundData,
+    SoundEditorTool
 } from '../SoundEditorTypes';
 import PianoRollHeaderGrid from './PianoRollHeaderGrid';
-import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 
 export const MetaLine = styled.div`
     background: var(--theia-editor-background);
@@ -46,8 +47,18 @@ export const MetaLineHeader = styled.div`
     }
 `;
 
+const CurrentlyPlacingRange = styled.div`
+    border: 1px dashed var(--theia-focusBorder);
+    border-bottom-width: 0;
+    box-sizing: border-box;
+    height: ${PIANO_ROLL_GRID_METER_HEIGHT / 2}px;
+    position: absolute;
+    top: 0;
+`;
+
 interface PianoRollHeaderProps {
     soundData: SoundData
+    tool: SoundEditorTool
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
@@ -62,8 +73,8 @@ interface PianoRollHeaderProps {
     pianoRollNoteHeight: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
+    pianoRollRef: RefObject<HTMLDivElement>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    removePatternFromSequence: (trackId: number, step: number) => void
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
@@ -73,18 +84,10 @@ interface PianoRollHeaderProps {
     sequencerPatternHeight: number
 }
 
-const CurrentlyPlacingRange = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    border-bottom-width: 0;
-    box-sizing: border-box;
-    height: ${PIANO_ROLL_GRID_METER_HEIGHT / 2}px;
-    position: absolute;
-    top: 0;
-`;
-
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
     const {
         soundData,
+        tool,
         currentTrackId, currentPatternId, currentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
         setForcePlayerRomRebuild,
@@ -93,8 +96,8 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         pianoRollNoteWidth, pianoRollNoteHeight,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
+        pianoRollRef,
         setPatternDialogOpen,
-        removePatternFromSequence,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         effectsPanelHidden,
@@ -132,6 +135,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         />
         <PianoRollHeaderGrid
             soundData={soundData}
+            tool={tool}
             currentTrackId={currentTrackId}
             currentPatternId={currentPatternId}
             currentSequenceIndex={currentSequenceIndex}
@@ -144,8 +148,8 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             pianoRollNoteWidth={pianoRollNoteWidth}
             setPatternAtCursorPosition={setPatternAtCursorPosition}
             pianoRollScrollWindow={pianoRollScrollWindow}
+            pianoRollRef={pianoRollRef}
             setPatternDialogOpen={setPatternDialogOpen}
-            removePatternFromSequence={removePatternFromSequence}
             rangeDragStartStep={rangeDragStartStep}
             setRangeDragStartStep={setRangeDragStartStep}
             rangeDragEndStep={rangeDragEndStep}

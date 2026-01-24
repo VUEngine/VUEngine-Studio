@@ -1,8 +1,8 @@
-import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { getPatternName } from '../SoundEditor';
+import { getFoundPatternSequenceIndex, getPatternName, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_PLAY_RANGE_SIZE,
     NOTE_RESOLUTION,
@@ -12,6 +12,7 @@ import {
     ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorTool,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
 
@@ -22,6 +23,7 @@ const StyledPianoRollHeaderGridContainer = styled.div`
 
 interface PianoRollHeaderGridProps {
     soundData: SoundData
+    tool: SoundEditorTool
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
@@ -34,8 +36,8 @@ interface PianoRollHeaderGridProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
+    pianoRollRef: RefObject<HTMLDivElement>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    removePatternFromSequence: (trackId: number, step: number) => void
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
@@ -45,6 +47,7 @@ interface PianoRollHeaderGridProps {
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
     const {
         soundData,
+        tool,
         currentTrackId, currentPatternId, currentSequenceIndex,
         setCurrentPlayerPosition,
         setForcePlayerRomRebuild,
@@ -53,16 +56,16 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         pianoRollNoteWidth,
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
-        // setPatternDialogOpen,
-        // removePatternFromSequence,
+        pianoRollRef,
+        setPatternDialogOpen,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
+    const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
-    // const track = soundData.tracks[currentTrackId];
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
     const width = Math.min(
         pianoRollScrollWindow.w,
@@ -181,8 +184,18 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.stroke();
     };
 
-    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (e.button === 0) {
+    const resetPlayRange = () => {
+        setPlayRangeStart(-1);
+        setPlayRangeEnd(-1);
+    };
+
+    const resetRangeDrag = () => {
+        setRangeDragStartStep(-1);
+        setRangeDragEndStep(-1);
+    };
+
+    const handleMouseDownPlayRange = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0 && tool === SoundEditorTool.EDIT) {
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
 
@@ -192,14 +205,29 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 if (e.button === 0) {
                     setRangeDragStartStep(step);
                     setRangeDragEndStep(step);
-                    setPlayRangeStart(-1);
-                    setPlayRangeEnd(-1);
+                    resetPlayRange();
                 }
             }
         }
     };
 
-    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+    const handleMouseMovePlayRange = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const step = Math.floor(x / pianoRollNoteWidth);
+
+            if (step !== rangeDragEndStep) {
+                setRangeDragEndStep(step);
+            }
+        }
+    };
+
+    const handleMouseUpPlayRange = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool !== SoundEditorTool.EDIT) {
+            return;
+        }
+
         const rect = e.currentTarget.getBoundingClientRect();
         const y = e.clientY - rect.top;
 
@@ -213,16 +241,13 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             setPlayRangeEnd(endStep);
             setCurrentPlayerPosition(-1);
 
-            // reset
-            setRangeDragStartStep(-1);
-            setRangeDragEndStep(-1);
+            resetRangeDrag();
         }
 
         if (y < PIANO_ROLL_GRID_METER_HEIGHT) {
             if (e.button === 2) {
                 if (playRangeStart !== -1 && playRangeEnd !== -1) {
-                    setPlayRangeStart(-1);
-                    setPlayRangeEnd(-1);
+                    resetPlayRange();
                 } else {
                     const x = e.clientX - rect.left + pianoRollScrollWindow.x;
                     const step = Math.floor(x / pianoRollNoteWidth);
@@ -237,14 +262,60 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         }
     };
 
-    const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = Math.floor(x / pianoRollNoteWidth);
+    const handleMouseDownDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool === SoundEditorTool.DRAG || e.button === 1) {
+            setIsDragScrolling(true);
+        }
+    };
 
-            if (step !== rangeDragEndStep) {
-                setRangeDragEndStep(step);
+    const handleMouseMoveDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (isDragScrolling) {
+            if (e.movementX !== 0 || e.movementY !== 0) {
+                pianoRollRef.current?.scrollBy({
+                    left: -e.movementX,
+                    top: -e.movementY,
+                });
+            }
+        }
+    };
+
+    const handleMouseUpDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool === SoundEditorTool.DRAG || e.button === 1) {
+            setIsDragScrolling(false);
+        }
+    };
+
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+        handleMouseDownPlayRange(e);
+        handleMouseDownDragScrolling(e);
+    };
+
+    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+        handleMouseUpPlayRange(e);
+        handleMouseUpDragScrolling(e);
+    };
+
+    const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+        handleMouseMovePlayRange(e);
+        handleMouseMoveDragScrolling(e);
+    };
+
+    const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
+        setIsDragScrolling(false);
+        resetRangeDrag();
+    };
+
+    const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+
+        if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const step = Math.floor(x / pianoRollNoteWidth / SEQUENCER_RESOLUTION);
+
+            const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, currentTrackId, step);
+            if (insidePatternAtSi > -1) {
+                setPatternDialogOpen(true);
             }
         }
     };
@@ -267,15 +338,16 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     return (
         <StyledPianoRollHeaderGridContainer>
             <canvas
+                style={{
+                    cursor: getToolModeCursor(tool, isDragScrolling),
+                }}
                 height={height}
                 width={width}
+                onDoubleClick={onDoubleClick}
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp}
                 onMouseMove={onMouseMove}
-                onMouseLeave={() => {
-                    // setRangeDragStartStep(-1);
-                    // setRangeDragEndStep(-1);
-                }}
+                onMouseLeave={onMouseLeave}
                 ref={canvasRef}
             />
         </StyledPianoRollHeaderGridContainer>

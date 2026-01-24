@@ -18,7 +18,7 @@ import {
 } from '../SoundEditorTypes';
 import { isString } from '@theia/core';
 
-const NOTE_SLIDE_STEP_DURATION = 25;
+const NOTE_SLIDE_STEP_DURATION = 10;
 
 interface Keyframe {
     SxINT?: string

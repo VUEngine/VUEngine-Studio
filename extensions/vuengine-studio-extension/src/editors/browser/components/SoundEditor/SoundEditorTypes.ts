@@ -18,6 +18,19 @@ export interface SoundData {
     section: DataSection
 }
 
+export enum SoundEditorTool {
+    EDIT,
+    ERASER,
+    MARQUEE,
+    DRAG,
+    // RECORD,
+}
+export enum SoundEditorMarqueeMode {
+    REPLACE,
+    ADD,
+    SUBTRACT,
+}
+
 export enum SoundEvent {
     Duration = 'duration',
     Instrument = 'instrument',

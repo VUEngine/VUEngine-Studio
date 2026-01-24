@@ -63,7 +63,7 @@ const StyledNewPattern = styled(StyledPattern)`
 interface AddPatternProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    step: number
+    sequenceIndex: number
     trackId: number
     sequencerPatternHeight: number
     sequencerPatternWidth: number
@@ -71,19 +71,19 @@ interface AddPatternProps {
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, step: number, size?: number }>>
+    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
+    setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, sequenceIndex: number, size?: number }>>
 }
 
 export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
         sequencerPatternHeight, sequencerPatternWidth,
-        step,
+        sequenceIndex,
         trackId,
         size,
         setTrack,
-        setCurrentPatternId,
-        setCurrentSequenceIndex,
+        setCurrentPatternId, setCurrentSequenceIndex, setSelectedPatterns,
         setAddPatternDialogOpen,
     } = props;
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
@@ -101,7 +101,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             const updatedTracks = [...soundData.tracks];
             updatedTracks[trackId].sequence = {
                 ...track.sequence,
-                [step.toString()]: patternId,
+                [sequenceIndex.toString()]: patternId,
             };
 
             const newNameLabel = nls.localizeByDefault('New');
@@ -129,14 +129,18 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                 ...track,
                 sequence: {
                     ...track.sequence,
-                    [step.toString()]: patternId,
+                    [sequenceIndex.toString()]: patternId,
                 },
             });
         }
 
-        setAddPatternDialogOpen({ trackId: -1, step: -1 });
-        setCurrentSequenceIndex(trackId, step);
+        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
+        setCurrentSequenceIndex(trackId, sequenceIndex);
         setCurrentPatternId(trackId, patternId);
+        setSelectedPatterns(prev => [...prev, `${trackId}-${sequenceIndex}`]
+            .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
+            .sort()
+        );
     };
 
     const trackType = soundData.tracks[trackId].type;
@@ -169,26 +173,20 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     };
 
     return <VContainer gap={20} grow={1} overflow='auto' style={{ padding: 2 }}>
-        <HContainer gap={20}>
-            <Input
-                value={filter}
-                setValue={v => setFilter(v as string)}
-                autoFocus
-                grow={1}
-                placeholder={nls.localize('vuengine/editors/sound/filterList', 'Filter List...')}
-            />
-            <VContainer>
-                <div>
-                    {nls.localize('vuengine/editors/sound/trackType', 'Track Type')}: {TRACK_TYPE_LABELS[trackType]}
-                </div>
-                {size !== undefined && size > 1 &&
-                    <div>
-                        {nls.localize('vuengine/editors/sound/requestedSize', 'Requested Size')}: {size}
-                    </div>
-                }
-            </VContainer>
-        </HContainer>
-
+        <VContainer>
+            {nls.localize('vuengine/editors/sound/trackType', 'Track Type')}: {TRACK_TYPE_LABELS[trackType]}
+            {size !== undefined && size > 1 &&
+                <>
+                    , {nls.localize('vuengine/editors/sound/requestedSize', 'Requested Size')}: {size}
+                </>
+            }
+        </VContainer>
+        <Input
+            value={filter}
+            setValue={v => setFilter(v as string)}
+            autoFocus
+            placeholder={nls.localize('vuengine/editors/sound/filterList', 'Filter List...')}
+        />
         <StyledNewPattern
             onClick={() => addPatternToSequence(NEW_PATTERN_ID)}
             onKeyDown={e => onEnter(e, () => addPatternToSequence(NEW_PATTERN_ID))}
@@ -206,7 +204,11 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                 </div>
                 <div>
                     <i className='codicon codicon-arrow-both' />
-                    {DEFAULT_PATTERN_SIZE}
+                    {
+                        size !== undefined && size > 1
+                            ? size
+                            : DEFAULT_PATTERN_SIZE
+                    }
                 </div>
             </HContainer>
         </StyledNewPattern>

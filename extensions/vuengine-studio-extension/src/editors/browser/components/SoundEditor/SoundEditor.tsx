@@ -44,6 +44,8 @@ import {
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     SoundEditorTrackType,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
@@ -98,6 +100,34 @@ export const getNoteSlideLabel = (note: string, slide: number): string => {
     return `${directionLabel}${targetNoteLabel}`;
 };
 
+export const getFoundPatternSequenceIndex = (soundData: SoundData, trackId: number, step: number) => {
+    let result = -1;
+    Object.keys(soundData.tracks[trackId].sequence).forEach(si => {
+        const siInt = parseInt(si);
+        const patternId = soundData.tracks[trackId].sequence[siInt];
+        const pattern = soundData.patterns[patternId];
+        if (result === -1 && pattern && step >= siInt && step < siInt + pattern.size) {
+            result = siInt;
+        }
+    });
+
+    return result;
+};
+
+export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) => {
+    switch (tool) {
+        default:
+        case SoundEditorTool.EDIT:
+            return 'crosshair';
+        case SoundEditorTool.ERASER:
+            return 'not-allowed';
+        case SoundEditorTool.DRAG:
+            return isDragging ? 'grabbing' : 'grab';
+        case SoundEditorTool.MARQUEE:
+            return 'initial';
+    }
+};
+
 interface SoundEditorProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
@@ -105,7 +135,7 @@ interface SoundEditorProps {
 
 export default function SoundEditor(props: SoundEditorProps): React.JSX.Element {
     const { soundData, updateSoundData } = props;
-    const { fileUri, services, setCommands, onCommandExecute, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, setCommands, onCommandExecute, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [emulatorInitialized, setEmulatorInitialized] = useState<boolean>(false);
     const [emulatorRomReady, setEmulatorRomReady] = useState<boolean>(false);
     const [playing, setPlaying] = useState<boolean>(false);
@@ -116,6 +146,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
     const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
+    const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
+    const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
     const [currentTrackId, setCurrentTrackId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.tracks[0]
@@ -123,6 +155,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(soundData.tracks[0]
         ? parseInt(Object.keys(soundData.tracks[0].sequence)[0]) ?? -1 : -1);
     const [noteCursor, setNoteCursor] = useState<number>(0);
+    const [selectedPatterns, setSelectedPatterns] = useState<string[]>(soundData.tracks[0] && Object.keys(soundData.tracks[0].sequence).length
+        ? [`0-${Object.keys(soundData.tracks[0].sequence)[0]}`]
+        : []);
     const [selectedNotes, setSelectedNotes] = useState<number[]>([]);
     const [pianoRollScrollWindow, setPianoRollScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const [pianoRollNoteHeight, setPianoRollNoteHeight] = useState<number>(PIANO_ROLL_NOTE_HEIGHT_DEFAULT);
@@ -133,7 +168,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [effectsPanelHidden, setEffectsPanelHidden] = useState<boolean>(true);
     const [eventListHidden, setEventListHidden] = useState<boolean>(true);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
-    const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, step: number, size?: number }>({ trackId: -1, step: -1 });
+    const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, sequenceIndex: number, size?: number }>({ trackId: -1, sequenceIndex: -1 });
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
     const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
@@ -148,6 +183,16 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
+
+    const updateSelectedNotes = (sn: number[]) => {
+        setSelectedNotes(sn);
+        setSelectedPatterns([]);
+    };
+
+    const updateSelectedPatterns = (sp: string[]) => {
+        setSelectedNotes([]);
+        setSelectedPatterns(sp);
+    };
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
         updateSoundData({
@@ -335,28 +380,40 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         }
     };
 
-    const removePatternFromSequence = (trackId: number, step: number): void => {
-        const updatedSequence = { ...soundData.tracks[trackId].sequence };
-
-        // Select previous (or no) pattern if deleted currently selected pattern
-        if (currentTrackId === trackId && currentSequenceIndex === step) {
-            const sequenceSteps = Object.keys(updatedSequence);
-            const stepSequenceIndex = sequenceSteps.indexOf(step.toString());
-            if (stepSequenceIndex > 0) {
-                const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
-                setCurrentPatternId(updatedSequence[prevStep]);
-                setCurrentSequenceIndex(prevStep);
-            } else {
-                setCurrentPatternId('');
-                setCurrentSequenceIndex(-1);
-            }
+    const removePatternsFromSequence = (patterns: string[]): void => {
+        if (!patterns.length) {
+            return;
         }
 
-        // Remove pattern
-        delete (updatedSequence[step]);
-        setTrack(trackId, {
-            sequence: updatedSequence,
+        const updatedTracks = [...soundData.tracks];
+        patterns.forEach(identifier => {
+            const trackId = parseInt(identifier.split('-')[0]);
+            const sequenceIndex = parseInt(identifier.split('-')[1]);
+
+            if (updatedTracks[trackId] && updatedTracks[trackId].sequence[sequenceIndex]) {
+                delete updatedTracks[trackId].sequence[sequenceIndex];
+
+                // Select previous (or no) pattern if deleted currently selected pattern
+                if (currentTrackId === trackId && currentSequenceIndex === sequenceIndex) {
+                    const sequenceSteps = Object.keys(updatedTracks[trackId].sequence);
+                    const stepSequenceIndex = sequenceSteps.indexOf(sequenceIndex.toString());
+                    if (stepSequenceIndex > 0) {
+                        const prevStep = parseInt(sequenceSteps[stepSequenceIndex - 1]);
+                        setCurrentPatternId(updatedTracks[trackId].sequence[prevStep]);
+                        setCurrentSequenceIndex(prevStep);
+                    } else {
+                        setCurrentPatternId('');
+                        setCurrentSequenceIndex(-1);
+                    }
+                }
+            }
         });
+
+        updateSoundData({
+            ...soundData,
+            tracks: updatedTracks,
+        });
+        setSelectedPatterns([]);
     };
 
     const removeUnusedPatterns = async (): Promise<void> => {
@@ -720,7 +777,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const addPattern = (trackId: number, step: number, size?: number): void => {
-        setAddPatternDialogOpen({ trackId, step, size });
+        setAddPatternDialogOpen({ trackId, sequenceIndex: step, size });
     };
 
     const confirmOverwrite = async (uri: URI): Promise<boolean> => {
@@ -845,6 +902,41 @@ A total of {0} instruments will be deleted.",
                     stopPlaying();
                 }
                 break;
+            case SoundEditorCommands.TOOL_EDIT.id:
+                if (soundData.tracks.length > 0) {
+                    setTool(SoundEditorTool.EDIT);
+                }
+                break;
+            case SoundEditorCommands.TOOL_ERASER.id:
+                if (soundData.tracks.length > 0) {
+                    setTool(SoundEditorTool.ERASER);
+                }
+                break;
+            case SoundEditorCommands.TOOL_MARQUEE.id:
+                if (soundData.tracks.length > 0) {
+                    setTool(SoundEditorTool.MARQUEE);
+                }
+                break;
+            case SoundEditorCommands.TOOL_DRAG.id:
+                if (soundData.tracks.length > 0) {
+                    setTool(SoundEditorTool.DRAG);
+                }
+                break;
+            case SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id:
+                if (soundData.tracks.length > 0) {
+                    setMarqueeMode(SoundEditorMarqueeMode.REPLACE);
+                }
+                break;
+            case SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id:
+                if (soundData.tracks.length > 0) {
+                    setMarqueeMode(SoundEditorMarqueeMode.ADD);
+                }
+                break;
+            case SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id:
+                if (soundData.tracks.length > 0) {
+                    setMarqueeMode(SoundEditorMarqueeMode.SUBTRACT);
+                }
+                break;
             case SoundEditorCommands.ADD_PATTERN.id:
                 if (soundData.tracks.length > 0) {
                     const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
@@ -854,6 +946,11 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id:
                 if (soundData.tracks.length > 0) {
                     setNoteSnapping(prev => !prev);
+                }
+                break;
+            case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
+                if (soundData.tracks.length > 0) {
+                    setSequencerHidden(prev => !prev);
                 }
                 break;
             case SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id:
@@ -968,6 +1065,8 @@ A total of {0} instruments will be deleted.",
                     emulatorRomReady={emulatorRomReady}
                     setEmulatorRomReady={setEmulatorRomReady}
                     noteSnapping={noteSnapping}
+                    tool={tool}
+                    marqueeMode={marqueeMode}
                     newNoteDuration={newNoteDuration}
                     setNewNoteDuration={setNewNoteDuration}
                     testNote={testNote}
@@ -1004,6 +1103,8 @@ A total of {0} instruments will be deleted.",
                         {!sequencerHidden &&
                             <Sequencer
                                 soundData={soundData}
+                                tool={tool}
+                                marqueeMode={marqueeMode}
                                 updateSoundData={updateSoundData}
                                 currentPlayerPosition={currentPlayerPosition}
                                 setCurrentPlayerPosition={setCurrentPlayerPosition}
@@ -1013,6 +1114,8 @@ A total of {0} instruments will be deleted.",
                                 setCurrentTrackId={updateCurrentTrackId}
                                 currentSequenceIndex={currentSequenceIndex}
                                 setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                                selectedPatterns={selectedPatterns}
+                                setSelectedPatterns={updateSelectedPatterns}
                                 toggleTrackMuted={toggleTrackMuted}
                                 toggleTrackSolo={toggleTrackSolo}
                                 toggleTrackSeeThrough={toggleTrackSeeThrough}
@@ -1029,7 +1132,7 @@ A total of {0} instruments will be deleted.",
                                 setSequencerPatternWidth={setSequencerPatternWidth}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternSize={setPatternSize}
-                                removePatternFromSequence={removePatternFromSequence}
+                                removePatternsFromSequence={removePatternsFromSequence}
                                 trackSettings={trackSettings}
                                 playRangeStart={playRangeStart}
                                 setPlayRangeStart={setPlayRangeStart}
@@ -1040,7 +1143,6 @@ A total of {0} instruments will be deleted.",
                                 rangeDragEndStep={rangeDragEndStep}
                                 setRangeDragEndStep={setRangeDragEndStep}
                                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
-                                setSequencerHidden={setSequencerHidden}
                             />
                         }
                         <StyledLowerContainer>
@@ -1057,6 +1159,8 @@ A total of {0} instruments will be deleted.",
                             }
                             <PianoRoll
                                 soundData={soundData}
+                                tool={tool}
+                                marqueeMode={marqueeMode}
                                 currentPlayerPosition={currentPlayerPosition}
                                 setCurrentPlayerPosition={setCurrentPlayerPosition}
                                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
@@ -1081,7 +1185,7 @@ A total of {0} instruments will be deleted.",
                                 eventListHidden={eventListHidden}
                                 setEventListHidden={setEventListHidden}
                                 selectedNotes={selectedNotes}
-                                setSelectedNotes={setSelectedNotes}
+                                setSelectedNotes={updateSelectedNotes}
                                 noteSnapping={noteSnapping}
                                 newNoteDuration={newNoteDuration}
                                 pianoRollNoteHeight={pianoRollNoteHeight}
@@ -1094,7 +1198,6 @@ A total of {0} instruments will be deleted.",
                                 setCurrentInstrumentId={setCurrentInstrumentId}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternDialogOpen={setPatternDialogOpen}
-                                removePatternFromSequence={removePatternFromSequence}
                                 trackSettings={trackSettings}
                                 rangeDragStartStep={rangeDragStartStep}
                                 setRangeDragStartStep={setRangeDragStartStep}
@@ -1110,10 +1213,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setAddTrackDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setAddTrackDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
                     height='300px'
@@ -1136,12 +1241,14 @@ A total of {0} instruments will be deleted.",
                 <PopUpDialog
                     open={addPatternDialogOpen.trackId > -1}
                     onClose={() => {
-                        setAddPatternDialogOpen({ trackId: -1, step: -1 });
+                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
-                        setAddPatternDialogOpen({ trackId: -1, step: -1 });
+                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
                     height='100%'
@@ -1152,7 +1259,7 @@ A total of {0} instruments will be deleted.",
                     <AddPattern
                         soundData={soundData}
                         updateSoundData={updateSoundData}
-                        step={addPatternDialogOpen.step}
+                        sequenceIndex={addPatternDialogOpen.sequenceIndex}
                         trackId={addPatternDialogOpen.trackId}
                         size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
                         sequencerPatternHeight={sequencerPatternHeight}
@@ -1160,6 +1267,7 @@ A total of {0} instruments will be deleted.",
                         setCurrentPatternId={updateCurrentPatternId}
                         setCurrentSequenceIndex={updateCurrentSequenceIndex}
                         setTrack={setTrack}
+                        setSelectedPatterns={updateSelectedPatterns}
                         setAddPatternDialogOpen={setAddPatternDialogOpen}
                     />
                 </PopUpDialog>
@@ -1170,10 +1278,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setInstrumentDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
@@ -1201,10 +1311,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setPropertiesDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setPropertiesDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
                     height='460px'
@@ -1225,10 +1337,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setKeyBindingsDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setKeyBindingsDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localizeByDefault('Keybindings')}
                     height='100%'
@@ -1243,10 +1357,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setToolsDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setToolsDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
                     height='260px'
@@ -1287,10 +1403,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setEditTrackDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setEditTrackDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
                     height='340px'
@@ -1315,10 +1433,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setPatternDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setPatternDialogOpen(false);
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editPattern', 'Edit Pattern')
                     }
@@ -1344,10 +1464,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setWaveformDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
                     }
@@ -1366,10 +1488,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setModulationDataDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                     height='100%'
@@ -1389,10 +1513,12 @@ A total of {0} instruments will be deleted.",
                     onClose={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     onOk={() => {
                         setInstrumentColorDialogOpen('');
                         enableCommands();
+                        focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
                     height='180px'

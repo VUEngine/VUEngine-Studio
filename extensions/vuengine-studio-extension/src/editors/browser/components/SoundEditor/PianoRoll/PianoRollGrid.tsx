@@ -3,6 +3,7 @@ import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, use
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
 import {
     EventsMap,
     NOTE_RESOLUTION,
@@ -15,15 +16,18 @@ import {
     ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
     TrackSettings
 } from '../SoundEditorTypes';
-import { getNoteSlideLabel } from '../SoundEditor';
 
 interface PianoRollGridProps {
     soundData: SoundData
+    tool: SoundEditorTool
+    marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
@@ -56,9 +60,12 @@ interface PianoRollGridProps {
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
 }
 
+const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
+
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
     const {
         soundData,
+        tool, marqueeMode,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,
@@ -228,19 +235,19 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             ...soundData.tracks.filter((t, i) => i !== currentTrackId),
             soundData.tracks[currentTrackId],
         ].map((track, trackId) => {
-            Object.keys(track.sequence).forEach(key => {
+            Object.keys(track.sequence).forEach(sequenceIndex => {
                 const isCurrentTrack = currentTrackId !== undefined && trackId === soundData.tracks.length - 1;
                 if (!isCurrentTrack && trackSettings[trackId] !== undefined && !trackSettings[trackId].seeThrough) {
                     return;
                 }
-                const patternOffset = parseInt(key);
-                const patternId = track.sequence[patternOffset];
+                const patternSi = parseInt(sequenceIndex);
+                const patternId = track.sequence[patternSi];
                 const pattern = soundData.patterns[patternId];
                 if (!pattern) {
                     return;
                 }
 
-                const patternOffsetPx = patternOffset * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
+                const patternOffsetPx = patternSi * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
                 const patternWidthPx = pattern.size * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
                 if (pianoRollScrollWindow.x > patternOffsetPx + patternWidthPx ||
                     patternOffsetPx > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
@@ -253,7 +260,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                         const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
-                        const offset = (patternOffset / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
+                        const offset = (patternSi / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
 
                         const noteX = offset + 0.5;
@@ -266,60 +273,77 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         }
 
                         const noteXOffset = noteX - pianoRollScrollWindow.x;
+                        const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
+                        const instrument = soundData.instruments[instrumentId];
+                        const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
 
-                        if (isCurrentTrack && currentSequenceIndex === parseInt(key)) {
-                            const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
-                            const instrument = soundData.instruments[instrumentId];
-                            const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+                        // note rect
+                        context.fillStyle = isCurrentTrack
+                            ? instrumentColor
+                            : lowColor;
+                        context.fillRect(
+                            noteXOffset,
+                            noteY,
+                            noteWidth,
+                            noteHeight,
+                        );
 
-                            // note slide triangle
-                            const noteSlide = pattern.events[step][SoundEvent.NoteSlide];
-                            if (noteSlide) {
-                                context.fillStyle = instrumentColor;
-                                const path = new Path2D();
-                                const noteSlideStartY = noteSlide > 0 ? noteY : noteY + noteHeight;
-                                const noteSlideEndY = noteSlideStartY - noteSlide * pianoRollNoteHeight;
-                                path.moveTo(noteXOffset, noteSlideStartY);
-                                path.lineTo(noteXOffset + noteWidth, noteSlideStartY);
-                                path.lineTo(noteXOffset + noteWidth, noteSlideEndY);
-                                context.fill(path);
-                            }
+                        // note slide triangle
+                        const noteSlide = pattern.events[step][SoundEvent.NoteSlide];
+                        if (noteSlide) {
+                            const path = new Path2D();
+                            const noteSlideStartY = noteSlide > 0 ? noteY : noteY + noteHeight;
+                            const noteSlideEndY = noteSlideStartY - noteSlide * pianoRollNoteHeight;
+                            path.moveTo(noteXOffset, noteSlideStartY);
+                            path.lineTo(noteXOffset + noteWidth, noteSlideStartY);
+                            path.lineTo(noteXOffset + noteWidth, noteSlideEndY);
+                            context.fill(path);
+                        }
 
-                            // selection outline
-                            if (selectedNotes.includes(step)) {
-                                context.fillStyle = highlightFullColor;
-                                context.fillRect(
-                                    noteXOffset - 3,
-                                    noteY - 3,
-                                    noteWidth + 6,
-                                    noteHeight + 6,
-                                );
-                            }
+                        // note label
+                        if (isCurrentTrack &&
+                            pianoRollNoteHeight >= PIANO_ROLL_NOTE_HEIGHT_DEFAULT &&
+                            noteWidth >= PIANO_ROLL_NOTE_WIDTH_DEFAULT - PIANO_ROLL_GRID_WIDTH
+                        ) {
+                            context.fillStyle = chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black';
+                            context.font = '10px monospace';
+                            context.fillText(getNoteLabel(pattern.events, step), noteXOffset + 2, noteY + 11, noteWidth - 4);
+                        }
+                    }
+                });
 
-                            // note rect
-                            context.fillStyle = instrumentColor;
-                            context.fillRect(
-                                noteXOffset,
-                                noteY,
-                                noteWidth,
-                                noteHeight,
-                            );
+                Object.keys(pattern.events).forEach(stepStr => {
+                    const step = parseInt(stepStr);
+                    const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
+                    if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
+                        const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
+                        const offset = (patternSi / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
+                        const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
 
-                            // note label
-                            if (pianoRollNoteHeight >= PIANO_ROLL_NOTE_HEIGHT_DEFAULT && noteWidth >= PIANO_ROLL_NOTE_WIDTH_DEFAULT - PIANO_ROLL_GRID_WIDTH) {
-                                context.fillStyle = chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black';
-                                context.font = '10px monospace';
-                                context.fillText(getNoteLabel(pattern.events, step), noteXOffset + 2, noteY + 11, noteWidth - 4);
-                            }
-                        } else {
-                            context.fillStyle = isCurrentTrack ? fullColor : lowColor;
+                        const noteX = offset + 0.5;
 
-                            context.fillRect(
-                                noteXOffset,
-                                noteY,
-                                noteWidth,
-                                noteHeight,
-                            );
+                        if (pianoRollScrollWindow.x > noteX + offsetWidth || noteX > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
+                            return;
+                        }
+
+                        // selection outline
+                        if (isCurrentTrack && currentSequenceIndex === patternSi && selectedNotes.includes(step)) {
+                            const noteXOffset = noteX - pianoRollScrollWindow.x - (SELECTED_PATTERN_OUTLINE_WIDTH / 2);
+                            const noteId = NOTES_LABELS.indexOf(noteLabel);
+                            const noteY = noteId * pianoRollNoteHeight - (SELECTED_PATTERN_OUTLINE_WIDTH / 2);
+                            const noteHeight = pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH + SELECTED_PATTERN_OUTLINE_WIDTH;
+                            const noteWidth = offsetWidth + SELECTED_PATTERN_OUTLINE_WIDTH;
+
+                            context.strokeStyle = highlightFullColor;
+                            context.lineWidth = SELECTED_PATTERN_OUTLINE_WIDTH;
+                            context.beginPath();
+                            context.moveTo(noteXOffset, noteY);
+                            context.lineTo(noteXOffset + noteWidth, noteY);
+                            context.lineTo(noteXOffset + noteWidth, noteY + noteHeight);
+                            context.lineTo(noteXOffset, noteY + noteHeight);
+                            context.lineTo(noteXOffset, noteY);
+                            context.stroke();
+                            context.lineWidth = 1;
                         }
                     }
                 });
@@ -360,8 +384,21 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         return result;
     };
 
-    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (e.button === 0) { // Left mouse button
+    const resetNoteDrag = () => {
+        setNoteDragNoteId(-1);
+        setNoteDragStartStep(-1);
+        setNoteDragEndStep(-1);
+    };
+
+    const resetMarquee = () => {
+        setMarqueeStartStep(-1);
+        setMarqueeEndStep(-1);
+        setMarqueeStartNote(-1);
+        setMarqueeEndNote(-1);
+    };
+
+    const handleMouseDownNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0 && tool === SoundEditorTool.EDIT) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const y = e.clientY - rect.top;
@@ -372,33 +409,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
             const relativeStep = (step - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION;
             const foundStep = findNoteStep(relativeStep, noteId);
-            if (foundStep > -1) {
-                if (e.metaKey || e.ctrlKey) {
-                    if (selectedNotes.includes(foundStep)) {
-                        setSelectedNotes(prev => prev.filter(sn => sn !== foundStep).sort());
-                    } else {
-                        setSelectedNotes(prev => [...prev, foundStep].sort());
-                    }
-                } else {
-                    const currentPattern = soundData.patterns[currentPatternId];
-                    const stepEvent = currentPattern.events[foundStep];
-                    if (stepEvent) {
-                        const instrumentId = stepEvent[SoundEvent.Instrument];
-                        setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
-                    }
-                    if (!selectedNotes.includes(foundStep)) {
-                        setSelectedNotes([foundStep]);
-                    }
-                    setNoteCursor(foundStep + (currentSequenceIndexStartStep * SUB_NOTE_RESOLUTION));
-                }
-            } else {
+            if (foundStep === -1) {
                 setNoteDragNoteId(noteId);
                 setNoteDragStartStep(step);
                 setNoteDragEndStep(step + newNoteDuration / SUB_NOTE_RESOLUTION - 1);
             }
-        } else if (e.button === 1) { // Middle mouse button
-            setIsDragScrolling(true);
-        } else if (e.button === 2) { // Right mouse button
+        }
+    };
+
+    const handleMouseMoveNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (noteDragNoteId !== -1 && noteDragStartStep !== -1 && noteDragEndStep !== -1) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const y = e.clientY - rect.top;
@@ -406,32 +426,17 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const noteId = Math.floor(y / pianoRollNoteHeight);
             const step = Math.floor(x / pianoRollNoteWidth);
 
-            const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
-            const relativeStep = (step - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION;
-            const foundStep = findNoteStep(relativeStep, noteId);
-            if (foundStep > -1) {
-                setNotes({ [foundStep]: {} });
-            } else {
-                const currentPattern = soundData.patterns[currentPatternId];
-                const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION;
-
-                // if inside current pattern
-                if (
-                    currentPattern &&
-                    step >= currentSequenceIndexStartStep &&
-                    step < currentSequenceIndexEndStep
-                ) {
-                    setMarqueeStartStep(step);
-                    setMarqueeEndStep(step);
-                    setMarqueeStartNote(noteId);
-                    setMarqueeEndNote(noteId);
-                }
+            if (noteId !== noteDragNoteId) {
+                setNoteDragNoteId(noteId);
+            }
+            if (step !== noteDragEndStep) {
+                setNoteDragEndStep(step);
             }
         }
     };
 
-    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (e.button === 0) { // Left mouse button
+    const handleMouseUpNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0 && tool === SoundEditorTool.EDIT) {
             if (noteDragNoteId === -1 || noteDragStartStep === -1 || noteDragEndStep === -1) {
                 return;
             }
@@ -465,13 +470,128 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 setPatternAtCursorPosition(newNoteCursor, newPatternSize);
             }
 
-            // reset
-            setNoteDragNoteId(-1);
-            setNoteDragStartStep(-1);
-            setNoteDragEndStep(-1);
-        } else if (e.button === 1) { // Middle mouse button
+            resetNoteDrag();
+        }
+    };
+
+    const handleMouseUpNoteSelect = (e: MouseEvent<HTMLCanvasElement>) => {
+        if ((tool === SoundEditorTool.EDIT || tool === SoundEditorTool.ERASER) && e.button === 0) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const y = e.clientY - rect.top;
+
+            const noteId = Math.floor(y / pianoRollNoteHeight);
+            const step = Math.floor(x / pianoRollNoteWidth);
+
+            const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
+            const relativeStep = (step - currentSequenceIndexStartStep) * SUB_NOTE_RESOLUTION;
+            const foundStep = findNoteStep(relativeStep, noteId);
+            if (foundStep > -1) {
+                if (tool === SoundEditorTool.EDIT) {
+                    if (e.metaKey || e.ctrlKey) {
+                        if (selectedNotes.includes(foundStep)) {
+                            setSelectedNotes(prev => prev.filter(sn => sn !== foundStep).sort());
+                        } else {
+                            setSelectedNotes(prev => [...prev, foundStep].sort());
+                        }
+                    } else {
+                        const currentPattern = soundData.patterns[currentPatternId];
+                        const stepEvent = currentPattern.events[foundStep];
+                        if (stepEvent) {
+                            const instrumentId = stepEvent[SoundEvent.Instrument];
+                            setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                        }
+                        if (!selectedNotes.includes(foundStep)) {
+                            setSelectedNotes([foundStep]);
+                        }
+                        setNoteCursor(foundStep + (currentSequenceIndexStartStep * SUB_NOTE_RESOLUTION));
+                    }
+                } else if (tool === SoundEditorTool.ERASER) {
+                    setNotes({ [foundStep]: {} });
+                }
+            }
+        }
+    };
+
+    const handleMouseDownDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool === SoundEditorTool.DRAG || e.button === 1) {
+            setIsDragScrolling(true);
+        }
+    };
+
+    const handleMouseMoveDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (isDragScrolling) {
+            if (e.movementX !== 0 || e.movementY !== 0) {
+                pianoRollRef.current?.scrollBy({
+                    left: -e.movementX,
+                    top: -e.movementY,
+                });
+            }
+        }
+    };
+
+    const handleMouseUpDragScrolling = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool === SoundEditorTool.DRAG || e.button === 1) {
             setIsDragScrolling(false);
-        } else if (e.button === 2) { // Right mouse button
+        }
+    };
+
+    const handleMouseDownMarquee = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0 && tool === SoundEditorTool.MARQUEE || e.button === 2 && tool !== SoundEditorTool.DRAG) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const y = e.clientY - rect.top;
+
+            const noteId = Math.floor(y / pianoRollNoteHeight);
+            const step = Math.floor(x / pianoRollNoteWidth);
+
+            const currentPattern = soundData.patterns[currentPatternId];
+            const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
+            const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION;
+
+            // if inside current pattern
+            if (
+                currentPattern &&
+                step >= currentSequenceIndexStartStep &&
+                step < currentSequenceIndexEndStep
+            ) {
+                setMarqueeStartStep(step);
+                setMarqueeEndStep(step);
+                setMarqueeStartNote(noteId);
+                setMarqueeEndNote(noteId);
+            }
+        }
+    };
+
+    const handleMouseMoveMarquee = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (marqueeStartStep !== -1 && marqueeEndStep !== -1) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+            const y = e.clientY - rect.top;
+
+            const noteId = Math.floor(y / pianoRollNoteHeight);
+            const step = Math.floor(x / pianoRollNoteWidth);
+
+            if (step !== marqueeEndStep) {
+                const currentPattern = soundData.patterns[currentPatternId];
+                const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
+                const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION;
+
+                // if inside current pattern
+                if (
+                    currentPattern &&
+                    step >= currentSequenceIndexStartStep &&
+                    step < currentSequenceIndexEndStep
+                ) {
+                    setMarqueeEndStep(step);
+                    setMarqueeEndNote(noteId);
+                }
+            }
+        }
+    };
+
+    const handleMouseUpMarquee = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0 && tool === SoundEditorTool.MARQUEE || e.button === 2 && tool !== SoundEditorTool.DRAG) {
             if (marqueeStartStep === -1 || marqueeEndStep === -1 || marqueeStartNote === -1 || marqueeEndNote === -1) {
                 return;
             }
@@ -495,7 +615,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             ) {
                 const patternRelativeMarqueeStartStep = sortedMarqueeStartStep * SUB_NOTE_RESOLUTION - currentPatternStartStep;
                 const patternRelativeMarqueeEndStep = sortedMarqueeEndStep * SUB_NOTE_RESOLUTION - currentPatternStartStep;
-                const newSelectedNodes = Object.keys(currentPattern.events)
+                const newSelectedNotes = Object.keys(currentPattern.events)
                     .map(n => parseInt(n))
                     .filter(eventStep =>
                         currentPattern.events[eventStep][SoundEvent.Note] !== undefined &&
@@ -507,82 +627,52 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         eventStep <= patternRelativeMarqueeEndStep
                     );
 
-                // add to selected notes with ctrlcmd key
-                if (e.metaKey || e.ctrlKey) {
-                    setSelectedNotes(prev => [...prev, ...newSelectedNodes]
-                        // .filter(item => !(prev.includes(item) && newSelectedNodes.includes(item))) // unselect already selected
+                if (marqueeMode === SoundEditorMarqueeMode.ADD) {
+                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]
                         .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
                         .sort()
                     );
-                } else {
-                    setSelectedNotes(newSelectedNodes);
+                } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
+                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]
+                        .filter(item => !(prev.includes(item) && newSelectedNotes.includes(item)))
+                        .sort()
+                    );
+                } else if (marqueeMode === SoundEditorMarqueeMode.REPLACE) {
+                    setSelectedNotes(newSelectedNotes);
                 }
 
-                if (newSelectedNodes.length === 0) {
+                if (newSelectedNotes.length === 0) {
                     setNoteCursor(sortedMarqueeStartStep * SUB_NOTE_RESOLUTION);
                 }
             }
 
-            // reset
-            setMarqueeStartStep(-1);
-            setMarqueeEndStep(-1);
-            setMarqueeStartNote(-1);
-            setMarqueeEndNote(-1);
+            resetMarquee();
         }
+    };
+
+    const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+        handleMouseDownNoteDrag(e);
+        handleMouseDownDragScrolling(e);
+        handleMouseDownMarquee(e);
+    };
+
+    const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+        handleMouseUpNoteDrag(e);
+        handleMouseUpNoteSelect(e);
+        handleMouseUpDragScrolling(e);
+        handleMouseUpMarquee(e);
     };
 
     const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (isDragScrolling) {
-            if (e.movementX > 0 || e.movementY > 0) {
-                pianoRollRef.current?.scrollBy({
-                    left: -e.movementX,
-                    top: -e.movementY,
-                });
-            }
-        } else {
-            if (noteDragNoteId !== -1 && noteDragStartStep !== -1 && noteDragEndStep !== -1) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-                const y = e.clientY - rect.top;
-
-                const noteId = Math.floor(y / pianoRollNoteHeight);
-                const step = Math.floor(x / pianoRollNoteWidth);
-
-                if (noteId !== noteDragNoteId) {
-                    setNoteDragNoteId(noteId);
-                }
-                if (step !== noteDragEndStep) {
-                    setNoteDragEndStep(step);
-                }
-            } else if (marqueeStartStep !== -1 && marqueeEndStep !== -1) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-                const y = e.clientY - rect.top;
-
-                const noteId = Math.floor(y / pianoRollNoteHeight);
-                const step = Math.floor(x / pianoRollNoteWidth);
-
-                if (step !== marqueeEndStep) {
-                    const currentPattern = soundData.patterns[currentPatternId];
-                    const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION;
-                    const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size) * SEQUENCER_RESOLUTION;
-
-                    // if inside current pattern
-                    if (
-                        currentPattern &&
-                        step >= currentSequenceIndexStartStep &&
-                        step < currentSequenceIndexEndStep
-                    ) {
-                        setMarqueeEndStep(step);
-                        setMarqueeEndNote(noteId);
-                    }
-                }
-            }
-        }
+        handleMouseMoveNoteDrag(e);
+        handleMouseMoveDragScrolling(e);
+        handleMouseMoveMarquee(e);
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
-        // setIsDragScrolling(false);
+        setIsDragScrolling(false);
+        resetNoteDrag();
+        resetMarquee();
     };
 
     useEffect(() => {
@@ -604,6 +694,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     return (
         <canvas
+            style={{
+                cursor: getToolModeCursor(tool, isDragScrolling),
+            }}
             height={height}
             width={width}
             onMouseDown={onMouseDown}

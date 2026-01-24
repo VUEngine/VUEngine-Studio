@@ -5,8 +5,6 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    DEFAULT_PLAY_RANGE_SIZE,
-    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
@@ -19,15 +17,16 @@ import {
     SEQUENCER_PATTERN_WIDTH_MIN,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     TrackSettings
 } from '../SoundEditorTypes';
-import LoopIndicator from './LoopIndicator';
 import SequencerGrid from './SequencerGrid';
 import SequencerPlacedPattern from './SequencerPlacedPattern';
 import StepIndicator, { StepIndicatorPosition } from './StepIndicator';
 import TrackHeader from './TrackHeader';
 
-export const StyledSequencerContainer = styled.div`
+const StyledSequencerContainer = styled.div`
     display: flex;
     margin: 0 var(--padding);
     overflow: hidden;
@@ -35,7 +34,7 @@ export const StyledSequencerContainer = styled.div`
     user-select: none;
 `;
 
-export const StyledSequencerGridContainer = styled.div`
+const StyledSequencerGridContainer = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -74,8 +73,7 @@ const StyledAddTrackButton = styled.button`
     cursor: pointer;
     display: flex;
     justify-content: center;
-    left: 0;
-    margin-top: 2px;
+    margin-top: 3px;
     min-height: ${SEQUENCER_ADD_TRACK_BUTTON_HEIGHT}px !important;
     width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
 
@@ -89,37 +87,11 @@ const StyledAddTrackButton = styled.button`
     }
 `;
 
-const StyledScrollWindow = styled.div`
-    background-color: rgba(255, 255, 255, .1);
-    position: absolute;
-    top: 0;
-    z-index: 0;
-
-    body.theia-light &,
-    body.theia-hc & {
-        background-color: rgba(0, 0, 0, .1);
-    }
-`;
-
-const StyledCurrentlyPlacingPattern = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 10;
-`;
-
-const CurrentlyPlacingRange = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    border-bottom-width: 0;
-    box-sizing: border-box;
-    height: ${SEQUENCER_GRID_METER_HEIGHT / 2}px;
-    position: absolute;
-    top: 0;
-`;
-
 interface SequencerProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
+    tool: SoundEditorTool
+    marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
     setCurrentTrackId: Dispatch<SetStateAction<number>>
     currentPatternId: string
@@ -128,6 +100,8 @@ interface SequencerProps {
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    selectedPatterns: string[]
+    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
     toggleTrackMuted: (trackId: number) => void
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
@@ -144,7 +118,7 @@ interface SequencerProps {
     sequencerPatternWidth: number
     setSequencerPatternWidth: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
-    removePatternFromSequence: (trackId: number, step: number) => void
+    removePatternsFromSequence: (patterns: string[]) => void
     trackSettings: TrackSettings[]
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -155,16 +129,17 @@ interface SequencerProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
-    setSequencerHidden: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
+        tool, marqueeMode,
         currentTrackId, setCurrentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
+        selectedPatterns, setSelectedPatterns,
         toggleTrackMuted,
         toggleTrackSolo,
         toggleTrackSeeThrough,
@@ -176,14 +151,13 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         sequencerPatternHeight, setSequencerPatternHeight,
         sequencerPatternWidth, setSequencerPatternWidth,
         pianoRollScrollWindow,
-        removePatternFromSequence,
+        removePatternsFromSequence,
         trackSettings,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setForcePlayerRomRebuild,
-        setSequencerHidden,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
@@ -325,8 +299,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 }
                 */
                 break;
-            case SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id:
-                setSequencerHidden(prev => !prev);
+            case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
+                removePatternsFromSequence(selectedPatterns);
                 break;
             case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
                 setSequencerPatternHeight(prev =>
@@ -379,6 +353,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     }, [
         currentTrackId,
         currentSequenceIndex,
+        selectedPatterns,
         soundData,
     ]);
 
@@ -455,6 +430,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <TrackHeader
                     key={index}
                     soundData={soundData}
+                    tool={tool}
                     track={track}
                     trackId={index}
                     currentTrackId={currentTrackId}
@@ -502,17 +478,16 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
             />
-            <LoopIndicator
-                position={soundData.loopPoint}
-                hidden={!soundData.loop || soundData.loopPoint === 0}
-                sequencerPatternWidth={sequencerPatternWidth}
-            />
             <SequencerGrid
                 soundData={soundData}
+                tool={tool}
+                marqueeMode={marqueeMode}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 setCurrentSequenceIndex={setCurrentSequenceIndex}
+                selectedPatterns={selectedPatterns}
+                setSelectedPatterns={setSelectedPatterns}
                 addPattern={addPattern}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
@@ -536,40 +511,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
                 setPatternDialogOpen={setPatternDialogOpen}
-                removePatternFromSequence={removePatternFromSequence}
+                sequencerContainerRef={sequencerContainerRef}
+                pianoRollScrollWindow={pianoRollScrollWindow}
+                pianoRollNoteWidth={pianoRollNoteWidth}
+                removePatternsFromSequence={removePatternsFromSequence}
             />
-            <StyledScrollWindow
-                style={{
-                    bottom: soundData.tracks.length === VSU_NUMBER_OF_CHANNELS ? 2 : 10,
-                    left: sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.x,
-                    width: Math.min(
-                        sequencerPatternWidth / pianoRollNoteWidth / NOTE_RESOLUTION * pianoRollScrollWindow.w,
-                        // cap to song size as maximum width
-                        soundData.size * sequencerPatternWidth / SEQUENCER_RESOLUTION
-                    ),
-                }}
-            />
-            {patternDragTrackId > -1 && patternDragStartStep !== patternDragEndStep &&
-                <StyledCurrentlyPlacingPattern
-                    style={{
-                        height: sequencerPatternHeight,
-                        left: Math.min(patternDragStartStep, patternDragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION,
-                        top: SEQUENCER_GRID_METER_HEIGHT + patternDragTrackId * sequencerPatternHeight,
-                        width: sequencerPatternWidth * (Math.abs(patternDragStartStep - patternDragEndStep) + 1) / SEQUENCER_RESOLUTION,
-                    }}
-                />
-            }
-            {rangeDragStartStep > -1 &&
-                <CurrentlyPlacingRange
-                    style={{
-                        left: Math.min(rangeDragStartStep, rangeDragEndStep) * sequencerPatternWidth / SEQUENCER_RESOLUTION / SEQUENCER_RESOLUTION,
-                        width: sequencerPatternWidth / SEQUENCER_RESOLUTION * (rangeDragStartStep === rangeDragEndStep
-                            ? DEFAULT_PLAY_RANGE_SIZE
-                            : (Math.abs(rangeDragStartStep - rangeDragEndStep) + 1)) / SEQUENCER_RESOLUTION,
-                    }}
-                />
-            }
-            {soundData.patterns[currentPatternId] &&
+            {tool === SoundEditorTool.EDIT && soundData.patterns[currentPatternId] &&
                 <SequencerPlacedPattern
                     soundData={soundData}
                     updateSoundData={updateSoundData}
@@ -586,7 +533,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     sequencerPatternHeight={sequencerPatternHeight}
                     sequencerPatternWidth={sequencerPatternWidth}
                     setPatternSize={setPatternSize}
-                    removePatternFromSequence={removePatternFromSequence}
                 />
             }
         </StyledSequencerGridContainer>

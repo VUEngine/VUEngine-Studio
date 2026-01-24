@@ -3,9 +3,9 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { getTrackName } from '../SoundEditor';
+import { getToolModeCursor, getTrackName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { DEFAULT_TRACK_SETTINGS, PIANO_ROLL_KEY_WIDTH, SEQUENCER_PATTERN_HEIGHT_DEFAULT, SoundData, TrackConfig, TrackSettings } from '../SoundEditorTypes';
+import { DEFAULT_TRACK_SETTINGS, PIANO_ROLL_KEY_WIDTH, SEQUENCER_PATTERN_HEIGHT_DEFAULT, SoundData, SoundEditorTool, TrackConfig, TrackSettings } from '../SoundEditorTypes';
 import { StyledTrackHeaderContainer } from './Sequencer';
 
 const StyledTrackHeader = styled.div`
@@ -126,6 +126,7 @@ const getTrackCommand = (i: number): EditorCommand => {
 
 interface TrackHeaderProps {
     soundData: SoundData
+    tool: SoundEditorTool
     track: TrackConfig
     trackId: number
     currentTrackId: number
@@ -143,8 +144,8 @@ interface TrackHeaderProps {
 export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element {
     const {
         soundData,
-        track,
-        trackId,
+        tool,
+        track, trackId,
         currentTrackId, setCurrentTrackId,
         removeTrack,
         toggleTrackMuted, toggleTrackSolo, toggleTrackSeeThrough,
@@ -181,12 +182,10 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         : DEFAULT_COLOR_INDEX;
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.buttons === 0 || e.buttons === 2) {
-            if (e.buttons === 2 && (e.metaKey || e.ctrlKey || e.altKey)) {
-                removeTrack(trackId);
-            } else {
-                setCurrentTrackId(trackId);
-            }
+        if (tool === SoundEditorTool.ERASER) {
+            removeTrack(trackId);
+        } else {
+            setCurrentTrackId(trackId);
         }
     };
 
@@ -197,6 +196,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         onDoubleClick={() => setEditTrackDialogOpen(true)}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
+            cursor: tool === SoundEditorTool.ERASER ? getToolModeCursor(tool) : undefined,
             minHeight: sequencerPatternHeight,
         }}
     >

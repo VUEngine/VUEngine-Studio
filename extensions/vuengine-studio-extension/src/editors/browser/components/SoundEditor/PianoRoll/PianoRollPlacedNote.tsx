@@ -50,7 +50,7 @@ const StyledPianoRollPlacedNote = styled.div`
         opacity: 1;
     }
 
-    .react-resizable-handle-e {
+    .react-resizable-handle {
         border-left: 1px solid;
         bottom: 0;
         cursor: col-resize;
@@ -59,6 +59,12 @@ const StyledPianoRollPlacedNote = styled.div`
         right: 0;
         top: 0;
         width: 4px;
+    }
+    
+    &.react-draggable-dragging {
+        .react-resizable-handle {
+            display: none;
+        } 
     }
 
     .noteSlide {
@@ -417,6 +423,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 ref={nodeRef}
                 className='placedNote'
                 style={{
+                    borderColor: instrumentColor,
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                     height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                     outlineColor: instrumentColor,

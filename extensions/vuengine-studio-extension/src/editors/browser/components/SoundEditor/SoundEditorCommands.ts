@@ -2,11 +2,6 @@ import { nls } from '@theia/core';
 import { EditorCommand } from '../../ves-editors-types';
 
 export namespace SoundEditorCommands {
-    export const ADD_TRACK: EditorCommand = {
-        id: 'editors.soundEditor.addTrack',
-        label: nls.localize('vuengine/editors/sound/commands/addTrack', 'Add Track'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-    };
     export const PLAY_PAUSE: EditorCommand = {
         id: 'editors.soundEditor.playPause',
         label: nls.localize('vuengine/editors/sound/commands/playPause', 'Play / Pause'),
@@ -18,6 +13,53 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/stop', 'Stop'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+space',
+    };
+    export const TOOL_EDIT: EditorCommand = {
+        id: 'editors.soundEditor.toolEdit',
+        label: nls.localize('vuengine/editors/sound/commands/toolEdit', 'Tool: Edit'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'v',
+    };
+    export const TOOL_ERASER: EditorCommand = {
+        id: 'editors.soundEditor.toolEraser',
+        label: nls.localize('vuengine/editors/sound/commands/toolEraser', 'Tool: Eraser'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'b',
+    };
+    export const TOOL_DRAG: EditorCommand = {
+        id: 'editors.soundEditor.toolDrag',
+        label: nls.localize('vuengine/editors/sound/commands/toolDrag', 'Tool: Drag'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'n',
+    };
+    export const TOOL_MARQUEE: EditorCommand = {
+        id: 'editors.soundEditor.toolMarquee',
+        label: nls.localize('vuengine/editors/sound/commands/toolMarquee', 'Tool: Marquee'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'm',
+    };
+    export const TOOL_MARQUEE_MODE_REPLACE: EditorCommand = {
+        id: 'editors.soundEditor.toolMarqueeModeReplace',
+        label: nls.localize('vuengine/editors/sound/commands/toolMarqueeModeReplace', 'Marquee Mode: Replace Selection'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'j',
+    };
+    export const TOOL_MARQUEE_MODE_ADD: EditorCommand = {
+        id: 'editors.soundEditor.toolMarqueeModeAdd',
+        label: nls.localize('vuengine/editors/sound/commands/toolMarqueeModeAdd', 'Marquee Mode: Add To Selection'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'k',
+    };
+    export const TOOL_MARQUEE_MODE_SUBTRACT: EditorCommand = {
+        id: 'editors.soundEditor.toolMarqueeModeSubtract',
+        label: nls.localize('vuengine/editors/sound/commands/toolMarqueeModeSubtract', 'Marquee Mode: Subtract From Selection'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'l',
+    };
+    export const ADD_TRACK: EditorCommand = {
+        id: 'editors.soundEditor.addTrack',
+        label: nls.localize('vuengine/editors/sound/commands/addTrack', 'Add Track'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
     };
     export const SELECT_TRACK_1: EditorCommand = {
         id: 'editors.soundEditor.selectTrack1',
@@ -72,12 +114,6 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/addPattern', 'Add Pattern To Current Track'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: ['shift+add', 'shift+plus'],
-    };
-    export const REMOVE_CURRENT_PATTERN: EditorCommand = {
-        id: 'editors.soundEditor.removeCurrentPattern',
-        label: nls.localize('vuengine/editors/sound/commands/removeCurrentPattern', 'Remove Current Pattern From Sequence'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+backspace',
     };
     export const SELECT_NEXT_SEQUENCE_INDEX: EditorCommand = {
         id: 'editors.soundEditor.selectNextSequenceIndex',
@@ -209,9 +245,9 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+enter',
     };
-    export const REMOVE_SELECTED_NOTES: EditorCommand = {
-        id: 'editors.soundEditor.removeSelectedNotes',
-        label: nls.localize('vuengine/editors/sound/commands/removeSelectedNotes', 'Remove Selected Notes'),
+    export const REMOVE_SELECTED_NOTES_OR_PATTERNS: EditorCommand = {
+        id: 'editors.soundEditor.removeSelectedNotesOrPatterns',
+        label: nls.localize('vuengine/editors/sound/commands/removeSelectedNotesOrPatterns', 'Remove Selected Notes/Patterns'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: ['backspace', 'delete'],
     };

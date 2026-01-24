@@ -26,6 +26,8 @@ import {
     ScrollWindow,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TrackSettings
@@ -151,6 +153,8 @@ interface PianoRollProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: Dispatch<SetStateAction<number>>
+    tool: SoundEditorTool
+    marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
@@ -186,7 +190,6 @@ interface PianoRollProps {
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    removePatternFromSequence: (trackId: number, step: number) => void
     trackSettings: TrackSettings[]
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
@@ -199,6 +202,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const {
         soundData,
         noteCursor, setNoteCursor,
+        tool, marqueeMode,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
@@ -222,7 +226,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollScrollWindow, setPianoRollScrollWindow,
         setCurrentInstrumentId,
         setPatternDialogOpen,
-        removePatternFromSequence,
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
@@ -536,7 +539,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             case SoundEditorCommands.ADD_AT_CURSOR_POSITION.id:
                 selectAtCursorPosition(true);
                 break;
-            case SoundEditorCommands.REMOVE_SELECTED_NOTES.id:
+            case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
                 removeSelectedNotes();
                 break;
             case SoundEditorCommands.COPY_SELECTED_NOTES.id:
@@ -708,7 +711,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerPatternWidth={sequencerPatternWidth}
             />
-            {placedNotesCurrentPattern}
+            {tool === SoundEditorTool.EDIT &&
+                placedNotesCurrentPattern
+            }
             <StyledToggleButtonContainer>
                 <StyledToggleButton
                     onClick={() => setEventListHidden(prev => !prev)}
@@ -733,6 +738,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </StyledToggleButtonContainer>
             <PianoRollHeader
                 soundData={soundData}
+                tool={tool}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
@@ -747,8 +753,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                pianoRollRef={pianoRollRef}
                 setPatternDialogOpen={setPatternDialogOpen}
-                removePatternFromSequence={removePatternFromSequence}
                 rangeDragStartStep={rangeDragStartStep}
                 setRangeDragStartStep={setRangeDragStartStep}
                 rangeDragEndStep={rangeDragEndStep}
@@ -759,6 +765,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             />
             <PianoRollEditor
                 soundData={soundData}
+                tool={tool}
+                marqueeMode={marqueeMode}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}

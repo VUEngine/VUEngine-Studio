@@ -62,6 +62,39 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                     </VContainer>
                 </HContainer>
             </VContainer>
+            <VContainer gap={10}>
+                <label>
+                    {nls.localize('vuengine/editors/sound/utilities', 'Utilities')}
+                </label>
+                <HContainer alignItems='start' wrap='wrap'>
+                    <VContainer>
+                        <ButtonAssignment
+                            command={SoundEditorCommands.IMPORT}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.EXPORT}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.REMOVE_UNUSED_PATTERNS}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                    </VContainer>
+                </HContainer>
+            </VContainer>
         </HContainer>
         <hr />
         <HContainer alignItems='start' wrap='wrap'>
@@ -70,6 +103,52 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                     {nls.localize('vuengine/editors/sound/options', 'Options')}
                 </label>
                 <HContainer alignItems='start' wrap='wrap'>
+                    <VContainer>
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_EDIT}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_ERASER}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_DRAG}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_MARQUEE}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_MARQUEE_MODE_ADD}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                        <ButtonAssignment
+                            command={SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT}
+                            commandService={services.commandService}
+                            vesCommonService={services.vesCommonService}
+                            width={KEYBINDING_WIDTH}
+                        />
+                    </VContainer>
                     <VContainer>
                         <ButtonAssignment
                             command={SoundEditorCommands.TOGGLE_NOTE_SNAPPING}
@@ -110,39 +189,6 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                     </VContainer>
                 </HContainer>
             </VContainer>
-            <VContainer gap={10}>
-                <label>
-                    {nls.localize('vuengine/editors/sound/tools', 'Tools')}
-                </label>
-                <HContainer alignItems='start' wrap='wrap'>
-                    <VContainer>
-                        <ButtonAssignment
-                            command={SoundEditorCommands.IMPORT}
-                            commandService={services.commandService}
-                            vesCommonService={services.vesCommonService}
-                            width={KEYBINDING_WIDTH}
-                        />
-                        <ButtonAssignment
-                            command={SoundEditorCommands.EXPORT}
-                            commandService={services.commandService}
-                            vesCommonService={services.vesCommonService}
-                            width={KEYBINDING_WIDTH}
-                        />
-                        <ButtonAssignment
-                            command={SoundEditorCommands.REMOVE_UNUSED_PATTERNS}
-                            commandService={services.commandService}
-                            vesCommonService={services.vesCommonService}
-                            width={KEYBINDING_WIDTH}
-                        />
-                        <ButtonAssignment
-                            command={SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS}
-                            commandService={services.commandService}
-                            vesCommonService={services.vesCommonService}
-                            width={KEYBINDING_WIDTH}
-                        />
-                    </VContainer>
-                </HContainer>
-            </VContainer>
         </HContainer>
         <hr />
         <VContainer gap={10}>
@@ -164,7 +210,7 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
-                        command={SoundEditorCommands.REMOVE_CURRENT_PATTERN}
+                        command={SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}
@@ -324,13 +370,19 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
-                        command={SoundEditorCommands.REMOVE_SELECTED_NOTES}
+                        command={SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.COPY_SELECTED_NOTES}
+                        commandService={services.commandService}
+                        vesCommonService={services.vesCommonService}
+                        width={KEYBINDING_WIDTH}
+                    />
+                    <ButtonAssignment
+                        command={SoundEditorCommands.CUT_SELECTED_NOTES}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}

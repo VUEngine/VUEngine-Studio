@@ -1,4 +1,18 @@
-import { FadersHorizontal, Guitar, Keyboard, Magnet, Minus, Plus, Wrench } from '@phosphor-icons/react';
+import {
+    Eraser,
+    FadersHorizontal,
+    Guitar,
+    Hand,
+    Keyboard,
+    Magnet,
+    Minus,
+    PencilSimple,
+    Plus,
+    Selection,
+    SelectionBackground,
+    SelectionForeground,
+    Wrench
+} from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -21,6 +35,8 @@ import {
     SequenceMap,
     SEQUENCER_RESOLUTION,
     SoundData,
+    SoundEditorMarqueeMode,
+    SoundEditorTool,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
@@ -125,6 +141,8 @@ interface SoundEditorToolbarProps {
     selectedNotes: number[]
     playing: boolean
     noteSnapping: boolean
+    tool: SoundEditorTool
+    marqueeMode: SoundEditorMarqueeMode
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
@@ -161,6 +179,8 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentSequenceIndex,
         selectedNotes,
         playing,
+        tool,
+        marqueeMode,
         noteSnapping,
         newNoteDuration, setNewNoteDuration,
         emulatorInitialized, setEmulatorInitialized,
@@ -258,15 +278,18 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const decreaseSize = (amount: number) =>
         setSize(Math.max(MIN_SEQUENCE_SIZE, soundData.size - amount));
 
+    React.useEffect(() => {
+        // TODO
+        // focusEditor();
+    }, [tool]);
+
     return <StyledSoundEditorToolbar>
         <StyledSoundEditorToolbarSide>
             {soundData.tracks.length > 0 && <>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarWideButton
                         className={`theia-button ${isPlayingRegular ? 'primary' : 'secondary'}`}
-                        title={(isPlayingRegular
-                            ? nls.localize('vuengine/editors/sound/pause', 'Pause')
-                            : nls.localize('vuengine/editors/sound/play', 'Play')) +
+                        title={SoundEditorCommands.PLAY_PAUSE.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PLAY_PAUSE.id, true)
                         }
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.PLAY_PAUSE.id)}
@@ -277,7 +300,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     </StyledSoundEditorToolbarWideButton>
                     <StyledSoundEditorToolbarButton
                         className='theia-button secondary'
-                        title={(nls.localize('vuengine/editors/sound/stop', 'Stop')) +
+                        title={SoundEditorCommands.STOP.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.STOP.id, true)
                         }
                         onClick={() => services.commandService.executeCommand(SoundEditorCommands.STOP.id)}
@@ -323,18 +346,83 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         />
                     </StyledSoundEditorToolbarVisualization>
                 </StyledSoundEditorToolbarGroup>
-                { /* }
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarButton
-                        className={`theia-button ${ recording ? 'primary' : 'secondary'} recordButton`}
+                        className={`theia-button ${tool === SoundEditorTool.EDIT ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_EDIT.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_EDIT.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_EDIT.id)}
+                    >
+                        <PencilSimple size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${tool === SoundEditorTool.ERASER ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_ERASER.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_ERASER.id)}
+                    >
+                        <Eraser size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${tool === SoundEditorTool.DRAG ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_DRAG.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_DRAG.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_DRAG.id)}
+                    >
+                        <Hand size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${tool === SoundEditorTool.MARQUEE ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_MARQUEE.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
+                    >
+                        <Selection size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    { /* }
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${recording ? 'primary' : 'secondary'} recordButton`}
                         title='Recording Mode'
                         disabled={true}
                         onClick={() => setRecording(true)}
                     >
                         <i className='fa fa-circle' />
                     </StyledSoundEditorToolbarButton>
+                    { */ }
                 </StyledSoundEditorToolbarGroup>
-                { */}
+                <StyledSoundEditorToolbarGroup>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.REPLACE ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id)}
+                    >
+                        <Selection size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.ADD ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id)}
+                    >
+                        <SelectionBackground size={17} />
+                    </StyledSoundEditorToolbarButton>
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.SUBTRACT ? 'primary' : 'secondary'}`}
+                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id, true)
+                        }
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id)}
+                    >
+                        <SelectionForeground size={17} />
+                    </StyledSoundEditorToolbarButton>
+                </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>
                     <StyledSoundEditorToolbarButton
                         className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
@@ -366,7 +454,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             label: '1/16',
                             value: `${1 * SUB_NOTE_RESOLUTION}`
                         }]}
-                        width={56}
+                        width={67}
                     />
                 </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>
@@ -426,7 +514,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         <InputWithActionButton
                             className='theia-button secondary'
                             title={
-                                nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument') +
+                                SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.label +
                                 services.vesCommonService.getKeybindingLabel(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true)
                             }
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id)}

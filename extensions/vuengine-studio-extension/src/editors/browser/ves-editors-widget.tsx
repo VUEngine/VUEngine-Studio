@@ -289,19 +289,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
     }
 
-    protected refocus(): void {
-        setTimeout(() => {
-            if (this.commandsEnabled) {
-                this.node.focus();
-            }
-        }, 10);
+    protected focusEditor(): void {
+        this.node.focus();
     }
 
     protected bindEvents(): void {
         this.onEditorContentHasChanged = (state: Pick<JsonFormsCore, 'data' | 'errors'>) => this.handleEditorChange(state.data);
-
-        this.node.onclick = () => this.refocus;
-        this.node.onblur = () => this.refocus;
 
         this.toDispose.pushAll([
             this.vesProjectService.onDidAddProjectItem(() => this.update()),
@@ -310,7 +303,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.themeService.onDidColorThemeChange(() => {
                 this.currentThemeType = this.themeService.getCurrentTheme().type;
                 this.update();
-            })
+            }),
         ]);
     }
 
@@ -486,7 +479,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected enableCommands(): void {
         this.commandsEnabled = true;
-        this.refocus();
     }
 
     protected disableCommands(): void {
@@ -514,6 +506,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         onCommandExecute: this.onCommandExecute.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
+                        focusEditor: this.focusEditor.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         currentThemeType: this.currentThemeType,

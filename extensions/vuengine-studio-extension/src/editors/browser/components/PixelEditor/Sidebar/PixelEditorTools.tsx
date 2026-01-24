@@ -89,7 +89,7 @@ export default function PixelEditorTools(props: PixelEditorToolsProps): React.JS
     return (
         <VContainer>
             <label>
-                {nls.localize('vuengine/editors/pixel/tools/title', 'Tools')}
+                {nls.localize('vuengine/editors/sound/utilities', 'Utilities')}
             </label>
             <HContainer gap={2} wrap='wrap'>
                 <PixelEditorTool

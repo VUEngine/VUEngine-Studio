@@ -1,10 +1,8 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useRef } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getPatternName } from '../SoundEditor';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     PatternConfig,
     SEQUENCER_GRID_METER_HEIGHT,
@@ -20,7 +18,7 @@ const StyledPattern = styled.div`
     outline: 1px solid;
     overflow: hidden;
     position: absolute;
-    z-index: 10;
+    z-index: 21;
 
     &:hover {
         opacity: 1;
@@ -41,6 +39,12 @@ const StyledPattern = styled.div`
         width: 4px;
         z-index: 10;
     }
+    
+    &.react-draggable-dragging {
+        .react-resizable-handle {
+            display: none;
+        } 
+    }
 `;
 
 interface SequencerPlacedPatternProps {
@@ -59,7 +63,6 @@ interface SequencerPlacedPatternProps {
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     setPatternSize: (patternId: string, size: number) => void
-    removePatternFromSequence: (trackId: number, step: number) => void
 }
 
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
@@ -74,9 +77,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         setPatternDialogOpen,
         sequencerPatternHeight, sequencerPatternWidth,
         setPatternSize,
-        removePatternFromSequence,
     } = props;
-    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const nodeRef = useRef(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -92,13 +93,6 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const patternName = getPatternName(soundData, patternId);
     const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH * 2;
 
-    const commandListener = (commandId: string): void => {
-        switch (commandId) {
-            case SoundEditorCommands.REMOVE_CURRENT_PATTERN.id:
-                removePatternFromSequence(currentTrackId, step);
-                break;
-        }
-    };
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newSize = Math.ceil(data.size.width / sequencerPatternWidth * SEQUENCER_RESOLUTION);
         setPatternSize(patternId, newSize);
@@ -135,26 +129,13 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 0 || e.buttons === 2) {
-            if (e.buttons === 2 && (e.metaKey || e.ctrlKey || e.altKey)) {
-                removePatternFromSequence(trackId, step);
-            } else {
-                setCurrentSequenceIndex(trackId, step);
-            }
+            setCurrentSequenceIndex(trackId, step);
         }
     };
 
     const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
         setPatternDialogOpen(true);
     };
-
-    useEffect(() => {
-        const disp = onCommandExecute(commandListener);
-        return () => disp.dispose();
-    }, [
-        currentTrackId,
-        currentSequenceIndex,
-        soundData,
-    ]);
 
     return (
         <Draggable
