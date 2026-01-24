@@ -70,6 +70,7 @@ interface PianoRollEditorProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
+    setCancelNoteDrag: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -90,6 +91,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
+        setCancelNoteDrag,
     } = props;
     const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
     const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
@@ -168,6 +170,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     trackSettings={trackSettings}
                     selectedNotes={selectedNotes}
                     setSelectedNotes={setSelectedNotes}
+                    setCancelNoteDrag={setCancelNoteDrag}
                 />
             </StyledPianoRollGridContainer>
         </StyledPianoRollEditor>

@@ -164,6 +164,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [patternDragStartStep, setPatternDragStartStep] = useState<number>(-1);
     const [patternDragEndStep, setPatternDragEndStep] = useState<number>(-1);
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
+    const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
@@ -232,10 +233,11 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         }
     };
 
-    const onMouseOut = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
         setPatternDragTrackId(-1);
         setPatternDragStartStep(-1);
         setPatternDragEndStep(-1);
+        setCancelPatternDrag(true);
     };
 
     const commandListener = (commandId: string): void => {
@@ -363,7 +365,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 3 : 10),
         }}
         onWheel={onWheel}
-        onMouseOut={onMouseOut}
+        onMouseLeave={onMouseLeave}
     >
         <ScaleControls className="vertical">
             <button
@@ -533,6 +535,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setCurrentPatternId={setCurrentPatternId}
                     setPatternDialogOpen={setPatternDialogOpen}
+                    cancelPatternDrag={cancelPatternDrag}
+                    setCancelPatternDrag={setCancelPatternDrag}
                     sequencerPatternHeight={sequencerPatternHeight}
                     sequencerPatternWidth={sequencerPatternWidth}
                     setPatternSizes={setPatternSizes}

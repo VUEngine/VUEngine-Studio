@@ -23,7 +23,7 @@ const StyledPattern = styled.div`
     z-index: 21;
 
     &:hover,
-    &.react-draggable-dragging {
+    &.react-draggable-dragging:not(.cancelPatternDrag) {
         opacity: 1;
     }
 
@@ -66,6 +66,8 @@ interface SequencerPlacedPatternProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    cancelPatternDrag: boolean
+    setCancelPatternDrag: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
     sequencerPatternWidth: number
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
@@ -84,6 +86,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setPatternDialogOpen,
+        cancelPatternDrag, setCancelPatternDrag,
         sequencerPatternHeight, sequencerPatternWidth,
         setPatternSizes,
         removePatternsFromSequence,
@@ -100,6 +103,9 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         classNames.push('current selected');
     } else if (isCurrent) {
         classNames.push('current');
+    }
+    if (cancelPatternDrag) {
+        classNames.push('cancelPatternDrag');
     }
 
     const patternName = getPatternName(soundData, patternId);
@@ -235,12 +241,18 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
 
     const onDragStart = (e: DraggableEvent, data: DraggableData) => {
         setIsDragging(true);
+        setCancelPatternDrag(false);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         e.stopPropagation();
         setPatternDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
+
+        if (cancelPatternDrag) {
+            setCancelPatternDrag(false);
+            return;
+        }
 
         const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
         const newSequenceIndex = Math.floor((data.x) / sequencerPatternWidth * SEQUENCER_RESOLUTION);

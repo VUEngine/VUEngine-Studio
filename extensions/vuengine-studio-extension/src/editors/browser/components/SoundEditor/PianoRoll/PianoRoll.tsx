@@ -229,6 +229,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     } = props;
     const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
+    const [cancelNoteDrag, setCancelNoteDrag] = useState<boolean>(false);
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const currentTrack = soundData.tracks[currentTrackId];
@@ -470,6 +471,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     selectedNotes={selectedNotes}
                     setSelectedNotes={setSelectedNotes}
+                    cancelNoteDrag={cancelNoteDrag}
+                    setCancelNoteDrag={setCancelNoteDrag}
                     isSelected={selectedNotes.includes(relativeNoteCursor)}
                     noteDragDelta={noteDragDelta}
                     setNoteDragDelta={setNoteDragDelta}
@@ -780,6 +783,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
+                setCancelNoteDrag={setCancelNoteDrag}
             />
             { /* }
             <NoteProperties

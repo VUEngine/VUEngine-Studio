@@ -34,7 +34,8 @@ const StyledPianoRollPlacedNote = styled.div`
     user-select: none;
     z-index: 100;
 
-    &:hover {
+    &:hover,
+    &.react-draggable-dragging:not(.cancelNoteDrag) {
         opacity: 1;
     }
 
@@ -95,6 +96,8 @@ interface PianoRollPlacedNoteProps {
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    cancelNoteDrag: boolean
+    setCancelNoteDrag: Dispatch<SetStateAction<boolean>>
     isSelected: boolean
     noteDragDelta: { x: number, y: number }
     setNoteDragDelta: Dispatch<SetStateAction<{ x: number, y: number }>>
@@ -115,6 +118,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         pianoRollNoteHeight, pianoRollNoteWidth,
         setCurrentInstrumentId,
         selectedNotes, setSelectedNotes,
+        cancelNoteDrag, setCancelNoteDrag,
         isSelected,
         noteDragDelta, setNoteDragDelta,
         newNoteDuration,
@@ -126,6 +130,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const patternSize = pattern.size;
     const noteId = NOTES_LABELS.indexOf(noteLabel);
     const localStep = step - (currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
+
+    const classNames = ['placedNote'];
+    if (cancelNoteDrag) {
+        classNames.push('cancelNoteDrag');
+    }
 
     const left = PIANO_ROLL_KEY_WIDTH + 2 + step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
     const top = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + noteId * pianoRollNoteHeight;
@@ -319,12 +328,18 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const onDragStart = (e: DraggableEvent, data: DraggableData) => {
         setIsDragging(true);
+        setCancelNoteDrag(false);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         e.stopPropagation();
         setNoteDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
+
+        if (cancelNoteDrag) {
+            setCancelNoteDrag(false);
+            return;
+        }
 
         const newStep = (noteSnapping
             ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
@@ -423,7 +438,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         >
             <StyledPianoRollPlacedNote
                 ref={nodeRef}
-                className='placedNote'
+                className={classNames.join(' ')}
                 style={{
                     borderColor: instrumentColor,
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
