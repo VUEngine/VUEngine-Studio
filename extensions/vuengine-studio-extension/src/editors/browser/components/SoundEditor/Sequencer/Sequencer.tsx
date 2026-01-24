@@ -240,6 +240,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setCancelPatternDrag(true);
     };
 
+    const onMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
+        setCancelPatternDrag(false);
+    };
+
     const commandListener = (commandId: string): void => {
         if (soundData.tracks.length === 0) {
             return;
@@ -365,6 +369,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 3 : 10),
         }}
         onWheel={onWheel}
+        onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
     >
         <ScaleControls className="vertical">

@@ -249,7 +249,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         setPatternDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
 
-        if (cancelPatternDrag) {
+        if (cancelPatternDrag || (patternDragDelta.x === 0 && patternDragDelta.y === 0)) {
             setCancelPatternDrag(false);
             return;
         }

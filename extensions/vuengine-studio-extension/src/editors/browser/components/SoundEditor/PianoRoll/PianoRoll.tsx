@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -434,6 +434,14 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
     };
 
+    const onMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
+        setCancelNoteDrag(false);
+    };
+
+    const onMouseLeave = (e: MouseEvent<HTMLDivElement>) => {
+        setCancelNoteDrag(true);
+    };
+
     const placedNotesCurrentPattern = useMemo(() => {
         const patternId = currentTrack?.sequence[currentSequenceIndex];
         const p = soundData.patterns[patternId];
@@ -698,6 +706,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         <StyledPianoRoll
             ref={pianoRollRef}
             onScroll={getScrollWindowCoords}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
         >
             <StepIndicator
                 soundData={soundData}
@@ -783,7 +793,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
-                setCancelNoteDrag={setCancelNoteDrag}
             />
             { /* }
             <NoteProperties

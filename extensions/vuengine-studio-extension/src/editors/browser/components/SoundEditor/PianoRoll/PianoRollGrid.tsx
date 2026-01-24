@@ -58,7 +58,6 @@ interface PianoRollGridProps {
     trackSettings: TrackSettings[]
     selectedNotes: number[]
     setSelectedNotes: Dispatch<SetStateAction<number[]>>
-    setCancelNoteDrag: Dispatch<SetStateAction<boolean>>
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
@@ -87,7 +86,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollRef,
         trackSettings,
         selectedNotes, setSelectedNotes,
-        setCancelNoteDrag,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
@@ -672,7 +670,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         setIsDragScrolling(false);
         resetNoteDrag();
         resetMarquee();
-        setCancelNoteDrag(true);
     };
 
     useEffect(() => {
