@@ -27,7 +27,7 @@ interface CurrentPatternProps {
     currentPatternId: string
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
-    setPatternSize: (patternId: string, size: number) => void
+    setPatternSizes: (patterns: { [patternId: string]: number }) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
@@ -36,7 +36,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         soundData, updateSoundData,
         currentTrackId,
         currentPatternId, setCurrentPatternId,
-        setPattern, setPatternSize,
+        setPattern, setPatternSizes,
         setPatternDialogOpen,
     } = props;
 
@@ -165,7 +165,9 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 </label>
                 <Range
                     value={pattern.size}
-                    setValue={v => setPatternSize(currentPatternId, v as number)}
+                    setValue={v => setPatternSizes({
+                        [currentPatternId]: v as number,
+                    })}
                     min={MIN_PATTERN_SIZE}
                     max={MAX_PATTERN_SIZE}
                 />

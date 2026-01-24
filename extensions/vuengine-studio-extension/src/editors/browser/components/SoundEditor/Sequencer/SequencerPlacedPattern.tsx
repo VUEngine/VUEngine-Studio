@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useRef } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ import {
     SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
+import { deepClone } from '@theia/core';
 
 const StyledPattern = styled.div`
     box-sizing: border-box;
@@ -39,7 +40,7 @@ const StyledPattern = styled.div`
         width: 4px;
         z-index: 10;
     }
-    
+
     &.react-draggable-dragging {
         .react-resizable-handle {
             display: none;
@@ -50,8 +51,10 @@ const StyledPattern = styled.div`
 interface SequencerPlacedPatternProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    step: number
+    sequenceIndex: number
     pattern: PatternConfig
+    selectedPatterns: string[]
+    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
     trackId: number
     patternId: string
     currentTrackId: number
@@ -62,29 +65,32 @@ interface SequencerPlacedPatternProps {
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
     sequencerPatternWidth: number
-    setPatternSize: (patternId: string, size: number) => void
+    setPatternSizes: (patterns: { [patternId: string]: number }) => void
 }
 
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        step,
+        sequenceIndex,
         trackId,
         pattern, patternId,
+        selectedPatterns, setSelectedPatterns,
         currentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         setPatternDialogOpen,
         sequencerPatternHeight, sequencerPatternWidth,
-        setPatternSize,
+        setPatternSizes,
     } = props;
+    const [isDragging, setIsDragging] = useState(false);
+    const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const nodeRef = useRef(null);
 
     const songLength = soundData.size / SEQUENCER_RESOLUTION;
     const isCurrent = currentTrackId === trackId && currentPatternId === patternId;
 
     const classNames = ['placedPattern'];
-    if (currentTrackId === trackId && currentSequenceIndex === step) {
+    if (currentTrackId === trackId && currentSequenceIndex === sequenceIndex) {
         classNames.push('current selected');
     } else if (isCurrent) {
         classNames.push('current');
@@ -95,41 +101,91 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
         const newSize = Math.ceil(data.size.width / sequencerPatternWidth * SEQUENCER_RESOLUTION);
-        setPatternSize(patternId, newSize);
+
+        const patterns: { [patternId: string]: number } = {
+            [patternId]: newSize
+        };
+
+        const sizeDelta = newSize - pattern.size;
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            const t = soundData.tracks[tId];
+            const pId = t?.sequence[si];
+            const p = soundData.patterns[pId];
+            if (!p) {
+                return;
+            }
+            patterns[pId] = Math.max(1, p.size + sizeDelta);
+        });
+
+        setPatternSizes(patterns);
+    };
+
+    const onDrag = (e: DraggableEvent, data: DraggableData) => {
+        setPatternDragDelta(prev => ({
+            x: prev.x + data.deltaX,
+            y: prev.y + data.deltaY
+        }));
+
+        e.stopPropagation();
+    };
+
+    const onDragStart = (e: DraggableEvent, data: DraggableData) => {
+        setIsDragging(true);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
+        e.stopPropagation();
+        setPatternDragDelta({ x: 0, y: 0 });
+        setIsDragging(false);
+
         const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-        const newBar = Math.floor((data.x) / sequencerPatternWidth * SEQUENCER_RESOLUTION);
-        if (newTrackId === trackId && newBar === step) {
+        const newSequenceIndex = Math.floor((data.x) / sequencerPatternWidth * SEQUENCER_RESOLUTION);
+        if (newTrackId === trackId && newSequenceIndex === sequenceIndex) {
             return;
         }
 
-        const updatedTracks = [
-            ...soundData.tracks.slice(0, newTrackId),
-            {
-                ...soundData.tracks[newTrackId],
-                sequence: {
-                    ...soundData.tracks[newTrackId].sequence,
-                    [newBar]: soundData.tracks[trackId].sequence[step],
-                },
-            },
-            ...soundData.tracks.slice(newTrackId + 1)
-        ];
-        delete (updatedTracks[trackId].sequence[step]);
+        const newTrackDifference = newTrackId - trackId;
+        const newSequenceIndexDifference = newSequenceIndex - sequenceIndex;
+
+        const updatedTracks = deepClone(soundData.tracks);
+        const newSelectedPatterns: string[] = [];
+
+        // delete previous patterns
+        delete updatedTracks[trackId].sequence[sequenceIndex];
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            if (updatedTracks[tId].sequence[si]) {
+                delete updatedTracks[tId].sequence[si];
+            }
+        });
+
+        // set updated pattern sequence indexes
+        updatedTracks[newTrackId].sequence[newSequenceIndex] = soundData.tracks[trackId].sequence[sequenceIndex];
+        newSelectedPatterns.push(`${newTrackId}-${newSequenceIndex}`);
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            updatedTracks[tId + newTrackDifference].sequence[si + newSequenceIndexDifference] =
+                soundData.tracks[tId].sequence[si];
+            newSelectedPatterns.push(`${tId + newTrackDifference}-${si + newSequenceIndexDifference}`);
+        });
 
         updateSoundData({
             ...soundData,
             tracks: updatedTracks,
         });
 
-        setCurrentSequenceIndex(newTrackId, newBar);
+        setSelectedPatterns(newSelectedPatterns);
+        setCurrentSequenceIndex(newTrackId, newSequenceIndex);
         setCurrentPatternId(newTrackId, patternId);
     };
 
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 0 || e.buttons === 2) {
-            setCurrentSequenceIndex(trackId, step);
+            setCurrentSequenceIndex(trackId, sequenceIndex);
         }
     };
 
@@ -143,9 +199,11 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             grid={[sequencerPatternWidth / SEQUENCER_RESOLUTION, sequencerPatternHeight]}
             handle=".placedPattern"
             cancel=".react-resizable-handle"
+            onStart={onDragStart}
+            onDrag={onDrag}
             onStop={onDragStop}
             position={{
-                x: step / SEQUENCER_RESOLUTION * sequencerPatternWidth,
+                x: sequenceIndex / SEQUENCER_RESOLUTION * sequencerPatternWidth,
                 y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
@@ -159,13 +217,16 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                 ref={nodeRef}
                 className={classNames.join(' ')}
                 data-channel={trackId}
-                data-position={step}
+                data-position={sequenceIndex}
                 onClick={onClick}
                 onContextMenu={onClick}
                 onDoubleClick={onDoubleClick}
                 title={patternName}
                 style={{
                     height: sequencerPatternHeight - SEQUENCER_GRID_WIDTH,
+                    translate: !isDragging
+                        ? `${patternDragDelta.x}px ${patternDragDelta.y}px`
+                        : undefined
                 }}
             >
                 <ResizableBox

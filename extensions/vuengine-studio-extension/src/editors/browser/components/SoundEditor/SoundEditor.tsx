@@ -251,33 +251,45 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         });
     };
 
-    const setPatternSize = (patternId: string, size: number): void => {
-        const pattern = soundData.patterns[patternId];
-        if (!patternId) {
-            return;
-        }
+    const setPatternSizes = (patterns: { [patternId: string]: number }): void => {
+        const updatedPatterns = {
+            ...soundData.patterns,
+        };
 
-        // removed all events that are beyond the limits of the pattern
-        // this would come into play when resizing down
-        const updatedEvents: EventsMap = {};
-        const patternSteps = size * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-        Object.keys(pattern.events).forEach(stepStr => {
-            const step = parseInt(stepStr);
-            if (step < patternSteps) {
-                updatedEvents[step] = pattern.events[step];
-
-                // cut note duration if it would reach beyond the pattern limits
-                if (updatedEvents[step][SoundEvent.Duration] &&
-                    updatedEvents[step][SoundEvent.Duration] + step >= patternSteps
-                ) {
-                    updatedEvents[step][SoundEvent.Duration] = patternSteps - step;
-                }
+        Object.keys(patterns).forEach(pId => {
+            const size = patterns[pId];
+            const pattern = soundData.patterns[pId];
+            if (!pattern) {
+                return;
             }
+            // removed all events that are beyond the limits of the pattern
+            // this would come into play when resizing down
+            const updatedEvents: EventsMap = {};
+            const patternSteps = size * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+            Object.keys(pattern.events).forEach(stepStr => {
+                const step = parseInt(stepStr);
+                if (step < patternSteps) {
+                    updatedEvents[step] = pattern.events[step];
+
+                    // cut note duration if it would reach beyond the pattern limits
+                    if (updatedEvents[step][SoundEvent.Duration] &&
+                        updatedEvents[step][SoundEvent.Duration] + step >= patternSteps
+                    ) {
+                        updatedEvents[step][SoundEvent.Duration] = patternSteps - step;
+                    }
+                }
+            });
+
+            updatedPatterns[pId] = {
+                ...updatedPatterns[pId],
+                events: updatedEvents,
+                size: size,
+            };
         });
 
-        setPattern(patternId, {
-            events: updatedEvents,
-            size,
+        updateSoundData({
+            ...soundData,
+            patterns: updatedPatterns,
         });
     };
 
@@ -1090,7 +1102,7 @@ A total of {0} instruments will be deleted.",
                                 sequencerPatternWidth={sequencerPatternWidth}
                                 setSequencerPatternWidth={setSequencerPatternWidth}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
-                                setPatternSize={setPatternSize}
+                                setPatternSizes={setPatternSizes}
                                 removePatternsFromSequence={removePatternsFromSequence}
                                 trackSettings={trackSettings}
                                 playRangeStart={playRangeStart}
@@ -1411,7 +1423,7 @@ A total of {0} instruments will be deleted.",
                         currentPatternId={currentPatternId}
                         setCurrentPatternId={updateCurrentPatternId}
                         setPattern={setPattern}
-                        setPatternSize={setPatternSize}
+                        setPatternSizes={setPatternSizes}
                         setPatternDialogOpen={setPatternDialogOpen}
                     />
                 </PopUpDialog>

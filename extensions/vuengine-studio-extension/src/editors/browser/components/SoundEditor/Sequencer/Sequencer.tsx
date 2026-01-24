@@ -107,7 +107,7 @@ interface SequencerProps {
     toggleTrackSeeThrough: (trackId: number) => void
     removeTrack: (trackId: number) => void
     addPattern: (trackId: number, bar: number, size?: number) => void
-    setPatternSize: (patternId: string, size: number) => void
+    setPatternSizes: (patterns: { [patternId: string]: number }) => void
     setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     effectsPanelHidden: boolean
@@ -144,7 +144,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleTrackSolo,
         toggleTrackSeeThrough,
         removeTrack,
-        addPattern, setPatternSize,
+        addPattern, setPatternSizes,
         setEditTrackDialogOpen, setPatternDialogOpen,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
@@ -520,10 +520,12 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 <SequencerPlacedPattern
                     soundData={soundData}
                     updateSoundData={updateSoundData}
-                    step={currentSequenceIndex}
+                    sequenceIndex={currentSequenceIndex}
                     trackId={currentTrackId}
                     pattern={soundData.patterns[currentPatternId]}
                     patternId={currentPatternId}
+                    selectedPatterns={selectedPatterns}
+                    setSelectedPatterns={setSelectedPatterns}
                     currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
@@ -532,7 +534,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setPatternDialogOpen={setPatternDialogOpen}
                     sequencerPatternHeight={sequencerPatternHeight}
                     sequencerPatternWidth={sequencerPatternWidth}
-                    setPatternSize={setPatternSize}
+                    setPatternSizes={setPatternSizes}
                 />
             }
         </StyledSequencerGridContainer>
