@@ -343,7 +343,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         setCurrentPatternId(newPatternId);
         setCurrentSequenceIndex(newSequenceIndex);
-        setSelectedNotes([]);
+        updateSelectedNotes([]);
         setNoteCursor(newSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
         setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
     };
@@ -355,7 +355,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
         }
 
-        setSelectedNotes([]);
+        updateSelectedNotes([]);
     };
 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
@@ -371,7 +371,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         }
 
         setCurrentSequenceIndex(sequenceIndex);
-        setSelectedNotes([]);
+        updateSelectedNotes([]);
         setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
     };
 
@@ -399,7 +399,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             .map(step => parseInt(step))
             .filter(step => currentPatternEvents[step][SoundEvent.Note]);
 
-        setSelectedNotes(currentPatternNoteSteps);
+        updateSelectedNotes(currentPatternNoteSteps);
     };
 
     const addTrack = (): void => {
@@ -995,7 +995,11 @@ A total of {0} instruments will be deleted.",
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
                 if (soundData.tracks.length > 0) {
-                    selectAllNotesInCurrentPattern();
+                    if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
+                        updateSelectedNotes([]);
+                    } else {
+                        selectAllNotesInCurrentPattern();
+                    }
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_1.id:
@@ -1041,6 +1045,7 @@ A total of {0} instruments will be deleted.",
         playing,
         setPlaying,
         soundData,
+        marqueeMode,
     ]);
 
     useEffect(() => {
