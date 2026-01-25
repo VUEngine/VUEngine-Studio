@@ -41,7 +41,7 @@ interface SequencerGridProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     selectedPatterns: string[]
-    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
+    setSelectedPatterns: (sn: string[]) => void
     addPattern: (trackId: number, bar: number, size?: number) => void
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -577,9 +577,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             if (patternDragTrackId !== -1 && patternDragStartStep !== -1 && patternDragEndStep !== -1) {
                 const newPatternStep = Math.min(patternDragStartStep, patternDragEndStep);
                 const newPatternSize = Math.abs(patternDragStartStep - patternDragEndStep) + 1;
-
                 addPattern(patternDragTrackId, newPatternStep, newPatternSize);
-
                 resetPatternDrag();
             }
         }
@@ -590,12 +588,13 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const sequenceIndex = Math.floor(x / (sequencerPatternWidth / SEQUENCER_RESOLUTION));
         const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, sequenceIndex);
         const identifier = `${trackId}-${insidePatternAtSi}`;
-        if (tool === SoundEditorTool.ERASER && e.button === 0 || (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2) {
-            removePatternsFromSequence([`${trackId}-${insidePatternAtSi}`]);
-            setSelectedPatterns(prev => [...prev, identifier]);
+        if (tool === SoundEditorTool.ERASER && e.button === 0 ||
+            (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2
+        ) {
+            removePatternsFromSequence([identifier]);
         } else if (tool === SoundEditorTool.EDIT && e.button === 0) {
             setCurrentSequenceIndex(trackId, insidePatternAtSi);
-            if (selectedPatterns.length <= 1) {
+            if (insidePatternAtSi > -1 && selectedPatterns.length <= 1) {
                 setSelectedPatterns([identifier]);
             }
         }
@@ -689,9 +688,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             }
 
             if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                setSelectedPatterns(prev => [...prev, ...newSelectedPatterns]);
+                setSelectedPatterns([...selectedPatterns, ...newSelectedPatterns]);
             } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
-                setSelectedPatterns(prev => prev
+                setSelectedPatterns(selectedPatterns
                     .filter(item => !newSelectedPatterns.includes(item))
                 );
             } else if (marqueeMode === SoundEditorMarqueeMode.REPLACE) {

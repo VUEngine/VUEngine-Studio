@@ -57,7 +57,7 @@ interface PianoRollGridProps {
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
     selectedNotes: number[]
-    setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    setSelectedNotes: (sn: number[]) => void
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
@@ -490,9 +490,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 if (tool === SoundEditorTool.EDIT) {
                     if (e.metaKey || e.ctrlKey) {
                         if (selectedNotes.includes(foundStep)) {
-                            setSelectedNotes(prev => prev.filter(sn => sn !== foundStep).sort());
+                            setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep).sort());
                         } else {
-                            setSelectedNotes(prev => [...prev, foundStep].sort());
+                            setSelectedNotes([...selectedNotes, foundStep].sort());
                         }
                     } else {
                         const currentPattern = soundData.patterns[currentPatternId];
@@ -628,10 +628,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     );
 
                 if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]);
+                    setSelectedNotes([...selectedNotes, ...newSelectedNotes]);
                 } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
-                    setSelectedNotes(prev => [...prev, ...newSelectedNotes]
-                        .filter(item => !(prev.includes(item) && newSelectedNotes.includes(item)))
+                    setSelectedNotes([...selectedNotes, ...newSelectedNotes]
+                        .filter(item => !(selectedNotes.includes(item) && newSelectedNotes.includes(item)))
                         .sort()
                     );
                 } else if (marqueeMode === SoundEditorMarqueeMode.REPLACE) {

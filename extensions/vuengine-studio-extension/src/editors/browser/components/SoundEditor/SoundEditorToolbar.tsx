@@ -280,7 +280,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
 
     React.useEffect(() => {
         // TODO
-        // focusEditor();
+        // activateEditor();
     }, [tool]);
 
     return <StyledSoundEditorToolbar>

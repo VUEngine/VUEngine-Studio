@@ -71,7 +71,8 @@ interface AddPatternProps {
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
+    selectedPatterns: string[]
+    setSelectedPatterns: (sn: string[]) => void
     setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, sequenceIndex: number, size?: number }>>
 }
 
@@ -83,10 +84,11 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         trackId,
         size,
         setTrack,
-        setCurrentPatternId, setCurrentSequenceIndex, setSelectedPatterns,
+        setCurrentPatternId, setCurrentSequenceIndex,
+        selectedPatterns, setSelectedPatterns,
         setAddPatternDialogOpen,
     } = props;
-    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands, activateEditor } = useContext(EditorsContext) as EditorsContextType;
     const [filter, setFilter] = React.useState<string>('');
 
     const addPatternToSequence = async (patternId: string): Promise<void> => {
@@ -137,7 +139,8 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
         setCurrentSequenceIndex(trackId, sequenceIndex);
         setCurrentPatternId(trackId, patternId);
-        setSelectedPatterns(prev => [...prev, `${trackId}-${sequenceIndex}`]);
+        setSelectedPatterns([...selectedPatterns, `${trackId}-${sequenceIndex}`]);
+        activateEditor();
     };
 
     const trackType = soundData.tracks[trackId].type;

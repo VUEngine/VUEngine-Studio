@@ -62,7 +62,7 @@ interface PianoRollEditorProps {
     setNotes: (notes: EventsMap) => void
     playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
-    setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    setSelectedNotes: (sn: number[]) => void
     newNoteDuration: number
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number

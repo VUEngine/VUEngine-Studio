@@ -57,7 +57,7 @@ interface SequencerPlacedPatternProps {
     sequenceIndex: number
     pattern: PatternConfig
     selectedPatterns: string[]
-    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
+    setSelectedPatterns: (sn: string[]) => void
     trackId: number
     patternId: string
     currentTrackId: number
@@ -277,7 +277,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         const identifier = `${trackId}-${sequenceIndex}`;
         if (tool === SoundEditorTool.ERASER && e.button === 0 || (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2) {
             removePatternsFromSequence([`${trackId}-${sequenceIndex}`]);
-            setSelectedPatterns(prev => [...prev, identifier]);
+            setSelectedPatterns([...selectedPatterns, identifier]);
         } else if (tool === SoundEditorTool.EDIT && e.button === 0) {
             setCurrentSequenceIndex(trackId, sequenceIndex);
             if (selectedPatterns.length <= 1) {

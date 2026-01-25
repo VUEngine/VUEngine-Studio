@@ -101,7 +101,7 @@ interface SequencerProps {
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     selectedPatterns: string[]
-    setSelectedPatterns: Dispatch<SetStateAction<string[]>>
+    setSelectedPatterns: (sn: string[]) => void
     toggleTrackMuted: (trackId: number) => void
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void

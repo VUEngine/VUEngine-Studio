@@ -289,8 +289,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
     }
 
-    protected focusEditor(): void {
-        this.node.focus();
+    protected activateEditor(): void {
+        this.activate();
     }
 
     protected bindEvents(): void {
@@ -506,7 +506,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         onCommandExecute: this.onCommandExecute.bind(this),
                         enableCommands: this.enableCommands.bind(this),
                         disableCommands: this.disableCommands.bind(this),
-                        focusEditor: this.focusEditor.bind(this),
+                        activateEditor: this.activateEditor.bind(this),
                         setStatusBarItem: this.setStatusBarItem.bind(this),
                         removeStatusBarItem: this.removeStatusBarItem.bind(this),
                         currentThemeType: this.currentThemeType,

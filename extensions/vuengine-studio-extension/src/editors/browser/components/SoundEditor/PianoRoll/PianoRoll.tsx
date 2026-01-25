@@ -175,7 +175,7 @@ interface PianoRollProps {
     setNotes: (notes: EventsMap) => void
     playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
-    setSelectedNotes: Dispatch<SetStateAction<number[]>>
+    setSelectedNotes: (sn: number[]) => void
     noteSnapping: boolean
     addPattern: (trackId: number, bar: number, size?: number) => void
     newNoteDuration: number
