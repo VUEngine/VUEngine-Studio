@@ -338,13 +338,13 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
-                        command={SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR}
+                        command={SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
-                        command={SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR}
+                        command={SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}

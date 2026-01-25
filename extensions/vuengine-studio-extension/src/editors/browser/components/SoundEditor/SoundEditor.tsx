@@ -12,7 +12,7 @@ import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
-import EventList from './EventList';
+import EventList from './EventList/EventList';
 import ImportExport from './ImportExport/ImportExport';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
 import { loadUGESong } from './ImportExport/uge/ugeHelper';
@@ -24,6 +24,7 @@ import AddTrack from './Other/AddTrack';
 import CurrentPattern from './Other/CurrentPattern';
 import CurrentTrack from './Other/CurrentTrack';
 import Keybindings from './Other/Keybindings';
+import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -50,6 +51,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_DEFAULT_INSTRUMENT_NAME,
     TRACK_TYPE_LABELS,
     TrackConfig,
     TrackSettings
@@ -83,11 +85,16 @@ export const getPatternName = (soundData: SoundData, patternId: string): string 
         : `(${patternId.slice(0, 4)})`;
 
 export const getInstrumentName = (soundData: SoundData, instrumentId: string): string =>
-    soundData.instruments[instrumentId].name.length
-        ? soundData.instruments[instrumentId].name
-        : `(${instrumentId.slice(0, 4)})`;
+    instrumentId === TRACK_DEFAULT_INSTRUMENT_ID
+        ? TRACK_DEFAULT_INSTRUMENT_NAME
+        : soundData.instruments[instrumentId].name.length
+            ? soundData.instruments[instrumentId].name
+            : `(${instrumentId.slice(0, 4)})`;
 
 export const getNoteSlideLabel = (note: string, slide: number): string => {
+    if (!slide) {
+        return '–';
+    }
     const directionLabel = slide < 0 ? '↘' : '↗';
     const noteId = NOTES_LABELS.indexOf(note);
     const targetNoteLabel = NOTES_LABELS[noteId - slide];
@@ -139,7 +146,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
-    const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION * SUB_NOTE_RESOLUTION);
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
@@ -173,6 +180,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
+    const [noteDialogOpen, setNoteDialogOpen] = useState<boolean>(false);
     const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
@@ -673,18 +681,25 @@ A total of {0} instruments will be deleted.",
 
                 // remove events with empty value
                 Object.keys(updatedEvents[stepInt]).forEach(e => {
-                    if (updatedEvents[stepInt][e] === '') {
+                    if (updatedEvents[stepInt][e] === '' || updatedEvents[stepInt][e] === undefined) {
                         delete updatedEvents[stepInt][e];
                     }
                 });
 
-                // if no events remain, remove entirely
-                if (Object.keys(updatedEvents[stepInt]).length === 0) {
-                    delete updatedEvents[stepInt];
+                // remove dependent events
+                if (!updatedEvents[stepInt][SoundEvent.Note]) {
+                    delete updatedEvents[stepInt][SoundEvent.Duration];
+                    delete updatedEvents[stepInt][SoundEvent.Instrument];
+                    delete updatedEvents[stepInt][SoundEvent.NoteSlide];
                 }
 
-                // ensure clean key order
-                updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
+                if (Object.keys(updatedEvents[stepInt]).length === 0) {
+                    // if no events remain, remove entirely
+                    delete updatedEvents[stepInt];
+                } else {
+                    // ...otherwise ensure clean key order
+                    updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
+                }
             }
         });
 
@@ -1145,6 +1160,7 @@ A total of {0} instruments will be deleted.",
                                     soundData={soundData}
                                     currentTrackId={currentTrackId}
                                     currentSequenceIndex={currentSequenceIndex}
+                                    noteSnapping={noteSnapping}
                                     pattern={soundData.patterns[currentPatternId]}
                                     noteCursor={noteCursor}
                                     setNotes={setNotes}
@@ -1191,6 +1207,7 @@ A total of {0} instruments will be deleted.",
                                 setCurrentInstrumentId={setCurrentInstrumentId}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternDialogOpen={setPatternDialogOpen}
+                                setNoteDialogOpen={setNoteDialogOpen}
                                 trackSettings={trackSettings}
                                 rangeDragStartStep={rangeDragStartStep}
                                 setRangeDragStartStep={setRangeDragStartStep}
@@ -1523,6 +1540,38 @@ A total of {0} instruments will be deleted.",
                             updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
                         />
                     }
+                </PopUpDialog>
+            }
+            {noteDialogOpen &&
+                <PopUpDialog
+                    open={noteDialogOpen}
+                    onClose={() => {
+                        setNoteDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setNoteDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/noteProperties', 'Note Properties')}
+                    height='340px'
+                    width='513px'
+                >
+                    <NoteProperties
+                        soundData={soundData}
+                        currentTrackId={currentTrackId}
+                        noteSnapping={noteSnapping}
+                        noteCursor={noteCursor}
+                        setNoteCursor={updateNoteCursor}
+                        currentSequenceIndex={currentSequenceIndex}
+                        pattern={soundData.patterns[currentPatternId]}
+                        emulatorInitialized={emulatorInitialized}
+                        playingTestNote={playing && !!testNote}
+                        playNote={playNote}
+                        setNotes={setNotes}
+                    />
                 </PopUpDialog>
             }
         </HContainer >

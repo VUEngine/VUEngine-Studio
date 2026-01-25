@@ -1,23 +1,21 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
-import BasicSelect from '../Common/Base/BasicSelect';
-import Input from '../Common/Base/Input';
-import VContainer from '../Common/Base/VContainer';
-import { getInstrumentName, getNoteSlideLabel } from './SoundEditor';
+import Input from '../../Common/Base/Input';
+import VContainer from '../../Common/Base/VContainer';
+import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import {
-    BAR_NOTE_RESOLUTION,
     EventsMap,
-    NOTES_LABELS,
     PatternConfig,
     SEQUENCER_RESOLUTION,
     SOUND_EVENT_LABELS,
     SoundData,
     SoundEvent,
-    SUB_NOTE_RESOLUTION,
-    TRACK_DEFAULT_INSTRUMENT_ID,
-    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
-} from './SoundEditorTypes';
+    SUB_NOTE_RESOLUTION
+} from '../SoundEditorTypes';
+import InstrumentSelect from './InstrumentSelect';
+import NoteSelect from './NoteSelect';
+import StepInput from './StepInput';
 
 const StyledTableContainer = styled.div`
     display: flex;
@@ -124,6 +122,7 @@ interface EventListProps {
     soundData: SoundData
     currentTrackId: number
     currentSequenceIndex: number
+    noteSnapping: boolean
     pattern: PatternConfig
     noteCursor: number
     setNotes: (notes: EventsMap) => void
@@ -131,12 +130,11 @@ interface EventListProps {
 }
 
 export default function EventList(props: EventListProps): React.JSX.Element {
-    const { soundData, currentTrackId, currentSequenceIndex, pattern, noteCursor, setNotes, setNoteCursor } = props;
+    const { soundData, currentTrackId, currentSequenceIndex, noteSnapping, pattern, noteCursor, setNotes, setNoteCursor } = props;
 
-    const noteOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+    const noteOffset = currentSequenceIndex * SEQUENCER_RESOLUTION;
     const eventsKeys = Object.keys(pattern?.events ?? {});
     const formatter = new Intl.NumberFormat(nls.locale);
-    const currentTrack = soundData.tracks[currentTrackId];
 
     return (
         <VContainer
@@ -176,27 +174,24 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                 onClick={() => setNoteCursor(globalStep)}
                                             >
                                                 <td valign="top">
-                                                    {isSelectedNote && <Input
-                                                        type='number'
-                                                        min={0}
-                                                        max={pattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION - 1}
-                                                        value={localStep}
-                                                        setValue={v => {
-                                                            setNotes({
-                                                                [localStep]: {},
-                                                                [v]: {
-                                                                    ...stepEvents
-                                                                }
-                                                            });
-                                                            setNoteCursor((v as number) + noteOffset);
-                                                        }}
-                                                    />}
+                                                    {isSelectedNote &&
+                                                        <StepInput
+                                                            step={localStep}
+                                                            events={stepEvents}
+                                                            noteSnapping={noteSnapping}
+                                                            patternSize={pattern.size}
+                                                            patternStepOffset={noteOffset}
+                                                            setNotes={setNotes}
+                                                            setNoteCursor={setNoteCursor}
+                                                        />
+                                                    }
                                                     {!isSelectedNote && formatter.format(localStep)}
                                                 </td>
                                                 <td valign="top">
                                                     {isSelectedNote && <Input
                                                         type='number'
-                                                        min={1}
+                                                        min={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
+                                                        step={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
                                                         value={duration}
                                                         setValue={v => {
                                                             setNotes({
@@ -233,49 +228,13 @@ export default function EventList(props: EventListProps): React.JSX.Element {
 
                                                                 if (isSelectedNote) {
                                                                     return (
-                                                                        <BasicSelect
+                                                                        <InstrumentSelect
                                                                             key={j}
-                                                                            options={[
-                                                                                {
-                                                                                    value: TRACK_DEFAULT_INSTRUMENT_ID,
-                                                                                    label: nls.localize(
-                                                                                        'vuengine/editors/sound/trackDefaultInstrument',
-                                                                                        'Track Default Instrument'
-                                                                                    ),
-                                                                                },
-                                                                                ...Object.keys(soundData.instruments)
-                                                                                    .filter(iid => {
-                                                                                        const instr = soundData.instruments[iid];
-                                                                                        return iid ===
-                                                                                            instrumentId ||
-                                                                                            TRACK_TYPE_INSTRUMENT_COMPATIBILITY[currentTrack.type].includes(instr.type);
-                                                                                    })
-                                                                                    .sort((a, b) => (soundData.instruments[a].name.length
-                                                                                        ? soundData.instruments[a].name
-                                                                                        : 'zzz').localeCompare(
-                                                                                            (soundData.instruments[b].name.length
-                                                                                                ? soundData.instruments[b].name
-                                                                                                : 'zzz')
-                                                                                        ))
-                                                                                    .map(instrId => ({
-                                                                                        value: `${instrId}`,
-                                                                                        label: getInstrumentName(soundData, instrId),
-                                                                                    }))
-                                                                            ]}
-                                                                            title={value}
-                                                                            value={instrumentId}
-                                                                            onChange={e => {
-                                                                                setNotes({
-                                                                                    [localStep]: {
-                                                                                        ...stepEvents,
-                                                                                        [SoundEvent.Instrument]:
-                                                                                            (e.target.value === TRACK_DEFAULT_INSTRUMENT_ID ||
-                                                                                                e.target.value === currentTrack.instrument)
-                                                                                                ? ''
-                                                                                                : e.target.value
-                                                                                    }
-                                                                                });
-                                                                            }}
+                                                                            soundData={soundData}
+                                                                            currentTrackId={currentTrackId}
+                                                                            step={localStep}
+                                                                            instrumentId={instrumentId}
+                                                                            setNotes={setNotes}
                                                                         />
                                                                     );
                                                                 }
@@ -284,25 +243,11 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             case SoundEvent.Note:
                                                                 if (isSelectedNote) {
                                                                     return (
-                                                                        <BasicSelect
+                                                                        <NoteSelect
                                                                             key={j}
-                                                                            options={[
-                                                                                ...NOTES_LABELS
-                                                                                    .map(n => ({
-                                                                                        value: n,
-                                                                                        label: n,
-                                                                                    }))
-                                                                            ]}
                                                                             value={value}
-                                                                            title={value}
-                                                                            onChange={e => {
-                                                                                setNotes({
-                                                                                    [localStep]: {
-                                                                                        ...stepEvents,
-                                                                                        [SoundEvent.Note]: e.target.value
-                                                                                    }
-                                                                                });
-                                                                            }}
+                                                                            step={localStep}
+                                                                            setNotes={setNotes}
                                                                         />
                                                                     );
                                                                 }

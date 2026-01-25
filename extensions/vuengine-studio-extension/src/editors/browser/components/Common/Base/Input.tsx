@@ -183,19 +183,22 @@ export default function Input(props: InputProps): React.JSX.Element {
                         title={title}
                         placeholder={placeholder}
                     />
-                    {clearable !== false && type !== 'number' && internalValue !== '' && !disabled && !readOnly && (
+                    {clearable && !!internalValue && !disabled && !readOnly &&
                         <i
                             className="codicon codicon-x"
-                            onClick={() => updateInternalValue(defaultValue as string ?? '')}
+                            onClick={() => updateInternalValue(type === 'number'
+                                ? (defaultValue as number ?? 0)
+                                : (defaultValue as string ?? '')
+                            )}
                             title={nls.localizeByDefault('Clear')}
                         />
-                    )}
-                    {invalid && (
+                    }
+                    {invalid &&
                         <i
                             className="codicon codicon-warning invalid"
                             title={nls.localizeByDefault('Invalid')}
                         />
-                    )}
+                    }
                 </ClearableContainer>
             </div>
         </VContainer>

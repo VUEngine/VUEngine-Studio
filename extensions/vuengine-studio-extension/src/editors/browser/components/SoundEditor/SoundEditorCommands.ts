@@ -167,15 +167,15 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'left',
     };
-    export const PIANO_ROLL_SELECT_NEXT_BAR: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollSelectNextBar',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextBar', 'Select Next Bar'),
+    export const PIANO_ROLL_SELECT_NEXT_NOTE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollSelectNextNote',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextNote', 'Select Next Note'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+right',
     };
-    export const PIANO_ROLL_SELECT_PREVIOUS_BAR: EditorCommand = {
-        id: 'editors.soundEditor.pianoRollSelectPreviousBar',
-        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousBar', 'Select Previous Bar'),
+    export const PIANO_ROLL_SELECT_PREVIOUS_NOTE: EditorCommand = {
+        id: 'editors.soundEditor.pianoRollSelectPreviousNote',
+        label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousNote', 'Select Previous Note'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+left',
     };

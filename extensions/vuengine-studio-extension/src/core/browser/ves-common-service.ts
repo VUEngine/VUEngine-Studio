@@ -143,14 +143,14 @@ export class VesCommonService {
     keybindings.forEach(k => {
       if (k) {
         keybindingAccelerators.push(
-          this.keybindingRegistry.acceleratorFor(k, '+').join(', ')
+          this.keybindingRegistry.acceleratorFor(k, '').join(', ')
             .replace(/\s/, nls.localize('vuengine/general/space', 'Space'))
-            .replace(/\+\+/, nls.localize('vuengine/general/plus', '+Plus'))
+            .replace(/\+/, nls.localize('vuengine/general/plus', 'Plus'))
         );
       }
     });
 
-    let keybindingAccelerator = keybindingAccelerators.join(', ');
+    let keybindingAccelerator = keybindingAccelerators.join(` ${nls.localize('vuengine/general/or', 'or')} `);
     if (wrapInBrackets && keybindingAccelerator !== '') {
       keybindingAccelerator = ` (${keybindingAccelerator})`;
     }

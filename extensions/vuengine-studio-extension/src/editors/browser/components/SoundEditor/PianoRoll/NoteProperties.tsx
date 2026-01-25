@@ -61,7 +61,7 @@ const NotePropertiesTabs = [
 interface NotePropertiesProps {
     soundData: SoundData
     noteCursor: number
-    setNoteCursor: (noteCursor: number) => void
+    setNoteCursor: Dispatch<SetStateAction<number>>
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number

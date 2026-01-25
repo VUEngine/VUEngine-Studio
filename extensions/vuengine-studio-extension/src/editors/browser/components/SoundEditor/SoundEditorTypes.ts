@@ -262,6 +262,8 @@ export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 export const BAR_NOTE_RESOLUTION = NOTE_RESOLUTION * SUB_NOTE_RESOLUTION;
 
 export const DEFAULT_PLAY_RANGE_SIZE = 64;
+export const DEFAULT_NEW_NOTE = 'C4';
+export const DEFAULT_NEW_NOTE_DURATION = SUB_NOTE_RESOLUTION;
 
 export const SEQUENCER_RESOLUTION = 4;
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
@@ -299,10 +301,9 @@ export const VOLUME_STEPS = 16;
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
 export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
 
-export const DEFAULT_NEW_NOTE_DURATION = 1;
-
 export const NEW_PATTERN_ID = '+';
 export const TRACK_DEFAULT_INSTRUMENT_ID = 'trackDefault';
+export const TRACK_DEFAULT_INSTRUMENT_NAME = nls.localize('vuengine/editors/sound/trackDefaultInstrument', 'Track Default Instrument');
 
 export const SCROLL_BAR_WIDTH = 10;
 

@@ -41,6 +41,7 @@ import {
     SoundEvent,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_DEFAULT_INSTRUMENT_NAME,
     TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
     TrackConfig,
     TrackSettings,
@@ -462,7 +463,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             options={[
                                 {
                                     value: TRACK_DEFAULT_INSTRUMENT_ID,
-                                    label: nls.localize('vuengine/editors/sound/trackDefaultInstrument', 'Track Default Instrument'),
+                                    label: TRACK_DEFAULT_INSTRUMENT_NAME,
                                 },
                                 ...Object.keys(soundData.instruments)
                                     .filter(instrumentId => {

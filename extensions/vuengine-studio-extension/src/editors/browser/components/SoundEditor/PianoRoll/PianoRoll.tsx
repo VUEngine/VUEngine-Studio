@@ -6,6 +6,7 @@ import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     BAR_NOTE_RESOLUTION,
+    DEFAULT_NEW_NOTE,
     EventsMap,
     NOTE_RESOLUTION,
     NOTES_LABELS,
@@ -188,6 +189,7 @@ interface PianoRollProps {
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
     trackSettings: TrackSettings[]
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
@@ -223,6 +225,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollScrollWindow, setPianoRollScrollWindow,
         setCurrentInstrumentId,
         setPatternDialogOpen,
+        setNoteDialogOpen,
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
@@ -290,7 +293,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 // insert new note
                 setNotes({
                     [relativeStep]: {
-                        [SoundEvent.Note]: 'C4',
+                        [SoundEvent.Note]: DEFAULT_NEW_NOTE,
                         [SoundEvent.Duration]: newNoteDuration,
                     }
                 });
@@ -377,7 +380,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             return;
         }
 
-        const patternStepOffset = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+        const patternStepOffset = currentSequenceIndex * SEQUENCER_RESOLUTION;
         const relativeNoteCursor = noteCursor - patternStepOffset;
         const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
         Object.keys(noteClipboard).forEach(step => {
@@ -449,13 +452,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             return;
         }
 
-        const currentSequenceIndexStartStep = currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
-        const relativeNoteCursor = noteCursor - currentSequenceIndexStartStep;
-        const stepEvents = p.events[relativeNoteCursor];
+        const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+        const relativeStep = noteCursor - currentSequenceIndexStartStep;
+        const stepEvents = p.events[relativeStep];
         if (!stepEvents) {
             return;
         }
-
         const noteLabel = stepEvents[SoundEvent.Note];
         const noteDuration = stepEvents[SoundEvent.Duration];
         if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
@@ -464,10 +466,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
             return (
                 <PianoRollPlacedNote
-                    key={relativeNoteCursor}
+                    key={relativeStep}
+                    tool={tool}
                     instrumentColor={instrumentColor}
                     noteLabel={noteLabel}
-                    step={currentSequenceIndex * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION + relativeNoteCursor}
+                    step={noteCursor}
                     duration={noteDuration}
                     currentSequenceIndex={currentSequenceIndex}
                     setNoteCursor={setNoteCursor}
@@ -481,10 +484,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     setSelectedNotes={setSelectedNotes}
                     cancelNoteDrag={cancelNoteDrag}
                     setCancelNoteDrag={setCancelNoteDrag}
-                    isSelected={selectedNotes.includes(relativeNoteCursor)}
+                    isSelected={selectedNotes.includes(relativeStep)}
                     noteDragDelta={noteDragDelta}
                     setNoteDragDelta={setNoteDragDelta}
                     newNoteDuration={newNoteDuration}
+                    setNoteDialogOpen={setNoteDialogOpen}
                 />
             );
         }
@@ -505,19 +509,23 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
                 }
                 break;
-            case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_BAR.id:
-                if (noteCursor < songLength - BAR_NOTE_RESOLUTION) {
-                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + BAR_NOTE_RESOLUTION);
-                } else {
-                    setNoteCursor(soundData.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
+            case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id:
+                const patternStepOffset1 = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+                const followingEventSteps = Object.keys(currentPattern.events).map(s => parseInt(s)).filter(s => s > noteCursor - patternStepOffset1);
+                if (followingEventSteps.length === 0) {
+                    return;
                 }
+                const nextStep = Math.min(...followingEventSteps);
+                setNoteCursor(nextStep + patternStepOffset1);
                 break;
-            case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_BAR.id:
-                if (noteCursor >= BAR_NOTE_RESOLUTION) {
-                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - BAR_NOTE_RESOLUTION);
-                } else {
-                    setNoteCursor(0);
+            case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.id:
+                const patternStepOffset2 = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+                const previousEventSteps = Object.keys(currentPattern.events).map(s => parseInt(s)).filter(s => s < noteCursor - patternStepOffset2);
+                if (previousEventSteps.length === 0) {
+                    return;
                 }
+                const prevStep = Math.max(...previousEventSteps);
+                setNoteCursor(prevStep + patternStepOffset2);
                 break;
             case SoundEditorCommands.NOTES_UP.id:
                 moveSelectedNotes(-1);

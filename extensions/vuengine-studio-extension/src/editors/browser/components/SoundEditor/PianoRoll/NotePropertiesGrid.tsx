@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
@@ -16,7 +16,7 @@ interface NotePropertiesGridProps {
     currentPatternId: string
     currentSequenceIndex: number
     noteCursor: number
-    setNoteCursor: (noteCursor: number) => void
+    setNoteCursor: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
 }
