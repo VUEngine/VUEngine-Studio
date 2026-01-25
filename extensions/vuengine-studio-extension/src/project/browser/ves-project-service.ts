@@ -645,6 +645,75 @@ export class VesProjectService {
     this.knownContributors[ProjectContributor.Studio] = studioTemplatesUri;
   };
 
+  protected async warnDuplicateItemId(uri: URI, previousUri: URI): Promise<void> {
+    const openFileButtonLabel = nls.localize(
+      'vuengine/projects/openFile',
+      'Open File',
+    );
+    const generateIdButtonLabel = nls.localize(
+      'vuengine/projects/generateNewId',
+      'Generate New ID',
+    );
+
+    const answer = await this.messageService.warn(
+      nls.localize(
+        'vuengine/projects/duplicateItemIdDetected',
+        'Duplicate item ID detected in file "{0}". Previously seen in file "{1}"',
+        uri?.path.fsPath(),
+        previousUri?.path.fsPath(),
+      ),
+      openFileButtonLabel,
+      generateIdButtonLabel,
+    );
+
+    if (answer === undefined) {
+      return;
+    }
+
+    switch (answer) {
+      case openFileButtonLabel:
+        const opener = await this.openerService.getOpener(uri);
+        await opener.open(uri);
+
+      case generateIdButtonLabel:
+        this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
+    }
+  }
+
+  protected async warnMissingItemId(uri: URI): Promise<void> {
+    const openFileButtonLabel = nls.localize(
+      'vuengine/projects/openFile',
+      'Open File',
+    );
+    const generateIdButtonLabel = nls.localize(
+      'vuengine/projects/generateId',
+      'Generate ID',
+    );
+
+    const answer = await this.messageService.warn(
+      nls.localize(
+        'vuengine/projects/missingItemIdDetected',
+        'Missing item ID detected in file "{0}".',
+        uri?.path.base,
+      ),
+      openFileButtonLabel,
+      generateIdButtonLabel,
+    );
+
+    if (answer === undefined) {
+      return;
+    }
+
+    switch (answer) {
+      case openFileButtonLabel:
+        const opener = await this.openerService.getOpener(uri);
+        await opener.open(uri);
+
+      case generateIdButtonLabel:
+        this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
+    }
+  }
+
   protected async readProjectData(): Promise<void> {
     await this.workspaceService.ready;
 
@@ -680,7 +749,7 @@ export class VesProjectService {
       await Promise.all(itemFiles.map(async filename => {
         const uri = this.knownContributors[knownContributorKey].resolve(filename);
         await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
-          const type = PROJECT_TYPES[typeId] as (ProjectDataType);
+          const type = PROJECT_TYPES[typeId] as ProjectDataType;
           if ([uri.path.ext, uri.path.base].includes(type.file)) {
             if (!this._projectData.items[typeId]) {
               this._projectData.items[typeId] = {};
@@ -697,65 +766,14 @@ export class VesProjectService {
               };
               if (type.file?.startsWith('.')) {
                 if (fileContentJson._id) {
-                  // @ts-ignore
-                  if (this._projectData.items[typeId][fileContentJson._id]) {
-                    const openFileButtonLabel = nls.localize(
-                      'vuengine/projects/openFile',
-                      'Open File',
-                    );
-                    const generateIdButtonLabel = nls.localize(
-                      'vuengine/projects/generateNewId',
-                      'Generate New ID',
-                    );
-                    this.messageService.warn(
-                      nls.localize(
-                        'vuengine/projects/duplicateItemIdDetected',
-                        'Duplicate item ID detected in file "{0}". Previously seen in file "{1}"',
-                        uri?.path.fsPath(),
-                        // @ts-ignore
-                        this._projectData.items[typeId][fileContentJson._id]._fileUri?.path.fsPath(),
-                      ),
-                      openFileButtonLabel,
-                      generateIdButtonLabel,
-                    ).then(async button => {
-                      switch (button) {
-                        case openFileButtonLabel:
-                          const opener = await this.openerService.getOpener(uri);
-                          return opener.open(uri);
-
-                        case generateIdButtonLabel:
-                          return this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
-                      }
-                    });
+                  const existingItem = this._projectData.items[typeId][fileContentJson._id];
+                  const previousUri = existingItem?._fileUri;
+                  if (this._projectData.items[typeId][fileContentJson._id] && !uri.isEqual(previousUri)) {
+                    this.warnDuplicateItemId(uri, previousUri);
                   }
                   this._projectData.items[typeId][fileContentJson._id] = itemWithContributor;
                 } else {
-                  const openFileButtonLabel = nls.localize(
-                    'vuengine/projects/openFile',
-                    'Open File',
-                  );
-                  const generateIdButtonLabel = nls.localize(
-                    'vuengine/projects/generateId',
-                    'Generate ID',
-                  );
-                  this.messageService.warn(
-                    nls.localize(
-                      'vuengine/projects/missingItemIdDetected',
-                      'Missing item ID detected in file "{0}".',
-                      uri?.path.base,
-                    ),
-                    openFileButtonLabel,
-                    generateIdButtonLabel,
-                  ).then(async button => {
-                    switch (button) {
-                      case openFileButtonLabel:
-                        const opener = await this.openerService.getOpener(uri);
-                        return opener.open(uri);
-
-                      case generateIdButtonLabel:
-                        return this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
-                    }
-                  });
+                  this.warnMissingItemId(uri);
                 }
               } else {
                 this._projectData.items[typeId][knownContributorKey] = itemWithContributor;
@@ -838,9 +856,9 @@ export class VesProjectService {
       disableChecks,
     );
     if (answer === yes) {
-      this.updateFiles(ProjectUpdateMode.LowerVersionOnly);
+      await this.updateFiles(ProjectUpdateMode.LowerVersionOnly);
     } else if (answer === disableChecks) {
-      this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);
+      await this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);
     }
   }
 
