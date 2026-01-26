@@ -2,7 +2,6 @@ import React, { Dispatch, RefObject, SetStateAction, useState } from 'react';
 import styled from 'styled-components';
 import {
     EventsMap,
-    NOTE_RESOLUTION,
     NOTES_SPECTRUM,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
@@ -102,7 +101,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     return (
         <StyledPianoRollEditor
             style={{
-                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
+                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size * SEQUENCER_RESOLUTION * pianoRollNoteWidth,
             }}
         >
             <Piano

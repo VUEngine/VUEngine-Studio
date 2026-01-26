@@ -156,8 +156,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 return;
             }
 
-            const patternX = step * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION + 0.5;
-            const patternWidth = pattern.size / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH - 0.5;
+            const patternX = step * SEQUENCER_RESOLUTION * pianoRollNoteWidth + 0.5;
+            const patternWidth = pattern.size * SEQUENCER_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH - 0.5;
 
             if (pianoRollScrollWindow.x > patternX + patternWidth || patternX > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
                 return;

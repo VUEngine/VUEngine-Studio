@@ -260,7 +260,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                         const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
-                        const offset = (patternSi / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
+                        const offset = (patternSi * SEQUENCER_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
 
                         const noteX = offset + 0.5;
@@ -317,7 +317,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
                         const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
-                        const offset = (patternSi / SEQUENCER_RESOLUTION * NOTE_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
+                        const offset = (patternSi * SEQUENCER_RESOLUTION + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
 
                         const noteX = offset + 0.5;

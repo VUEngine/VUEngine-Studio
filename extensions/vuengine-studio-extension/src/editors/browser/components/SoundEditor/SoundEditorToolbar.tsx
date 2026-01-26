@@ -28,7 +28,6 @@ import { InputWithAction, InputWithActionButton } from './Instruments/Instrument
 import { getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
-    BAR_NOTE_RESOLUTION,
     EventsMap,
     MAX_SEQUENCE_SIZE,
     MIN_SEQUENCE_SIZE,
@@ -202,9 +201,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
 
-    const totalTicks = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
+    const totalSteps = soundData.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
     const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
-    const totalLengthSecs = totalTicks * tickDurationUs / 1000 / 1000;
+    const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
 
     const getTestSoundData = (): SoundData => ({
         ...soundData,

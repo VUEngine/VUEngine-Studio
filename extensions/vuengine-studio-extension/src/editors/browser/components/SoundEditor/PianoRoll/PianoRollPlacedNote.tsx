@@ -7,7 +7,6 @@ import { getMaxNoteDuration } from '../Other/Note';
 import { getNoteSlideLabel } from '../SoundEditor';
 import {
     EventsMap,
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -164,7 +163,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const rightDragBound = () => {
-        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
+        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
         let rightMostNoteDuration = duration;
 
         let rightMostNoteDifference = 0;
@@ -198,7 +197,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const leftDragBound = () => {
-        const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * NOTE_RESOLUTION * pianoRollNoteWidth / SEQUENCER_RESOLUTION;
+        const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
 
         let leftMostNoteDifference = 0;
         const smallerNotes = selectedNotes.filter(sn => sn < relativeStep);

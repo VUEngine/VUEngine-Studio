@@ -5,10 +5,8 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSel
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE,
     EventsMap,
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
@@ -237,7 +235,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     const currentTrack = soundData.tracks[currentTrackId];
     const currentPattern = soundData.patterns[currentPatternId];
-    const songLength = soundData.size / SEQUENCER_RESOLUTION * BAR_NOTE_RESOLUTION;
+    const songLength = soundData.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
 
     const findNoteAtCursorPosition = (pattern: PatternConfig, step: number): number => {
         let result = -1;
@@ -614,7 +612,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
         // auto scroll to current pattern in piano roll
         pianoRollRef?.current?.scrollTo({
-            left: currentSequenceIndex / SEQUENCER_RESOLUTION * NOTE_RESOLUTION * pianoRollNoteWidth,
+            left: currentSequenceIndex * SEQUENCER_RESOLUTION * pianoRollNoteWidth,
             top,
             behavior: 'smooth',
         });

@@ -1,8 +1,8 @@
+import { isString } from '@theia/core';
 import { crc32 } from 'crc';
 import { hexFromBitsArray, intToHex } from '../../Common/Utils';
 import { ModulationData, VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData, WaveformData } from '../Emulator/VsuTypes';
 import {
-    BAR_NOTE_RESOLUTION,
     EventsMap,
     InstrumentConfig,
     InstrumentMap,
@@ -16,7 +16,6 @@ import {
     SUB_NOTE_RESOLUTION,
     TrackConfig
 } from '../SoundEditorTypes';
-import { isString } from '@theia/core';
 
 const NOTE_SLIDE_STEP_DURATION = 10;
 
@@ -162,7 +161,7 @@ const mergePatterns = (
     let pattern: PatternConfig = {} as PatternConfig;
     for (let step = 0; step < totalSize; step++) {
         // Does a pattern start at the current step?
-        const sequenceStep = track.sequence[step / BAR_NOTE_RESOLUTION * SEQUENCER_RESOLUTION];
+        const sequenceStep = track.sequence[step / (SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION)];
         if (sequenceStep) {
             pattern = patterns[sequenceStep];
             patternStepSize = pattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION;

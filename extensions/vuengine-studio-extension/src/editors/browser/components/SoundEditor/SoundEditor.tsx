@@ -31,7 +31,6 @@ import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
-    BAR_NOTE_RESOLUTION,
     DEFAULT_NEW_NOTE_DURATION,
     DEFAULT_TRACK_SETTINGS,
     EventsMap,
@@ -287,7 +286,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             // removed all events that are beyond the limits of the pattern
             // this would come into play when resizing down
             const updatedEvents: EventsMap = {};
-            const patternSteps = size * BAR_NOTE_RESOLUTION / SEQUENCER_RESOLUTION;
+            const patternSteps = size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
             Object.keys(pattern.events).forEach(stepStr => {
                 const step = parseInt(stepStr);
                 if (step < patternSteps) {
