@@ -316,10 +316,10 @@ export class VesProjectService {
     }
 
     const baseUri = this.workspaceProjectFolderUri.resolve('assets').resolve(typeId);
-    let fileUri = baseUri?.resolve(`${filename}${type.file}`);
+    let fileUri = baseUri?.resolve(`${filename}/${filename}${type.file}`);
     let count = 1;
     while ((await this.fileService.exists(fileUri))) {
-      fileUri = baseUri?.resolve(`${filename}-${count}${type.file}`);
+      fileUri = baseUri?.resolve(`${filename}/${filename}-${count}${type.file}`);
       count++;
     }
 

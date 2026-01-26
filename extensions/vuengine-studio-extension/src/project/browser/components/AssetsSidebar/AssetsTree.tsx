@@ -47,24 +47,6 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const [treeData, setTreeData] = useState<TreeNode[]>([]);
     const treeRef = useRef();
 
-    /*
-    const open = async (type: ProjectDataType, item?: ProjectDataItem & WithFileUri): Promise<void> => {
-        if (item && item._fileUri) {
-            openEditor(item._fileUri);
-        } else if (!type.file.startsWith('.')) {
-            const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
-            const newFileUri = workspaceRootUri.resolve('config').resolve(type.file);
-
-            if (!(await fileService.exists(newFileUri))) {
-                const data = await vesProjectService.getSchemaDefaults(type);
-                await fileService.create(newFileUri, stringify(data));
-            }
-
-            openEditor(newFileUri);
-        }
-    };
-    */
-
     const openEditor = async (fileUri: URI): Promise<void> => {
         const opener = await openerService.getOpener(fileUri);
         await opener.open(fileUri);
