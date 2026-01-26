@@ -262,7 +262,7 @@ export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 
 export const DEFAULT_PLAY_RANGE_SIZE = 64;
 export const DEFAULT_NEW_NOTE = 'C4';
-export const DEFAULT_NEW_NOTE_DURATION = SUB_NOTE_RESOLUTION;
+export const DEFAULT_NEW_NOTE_DURATION = 4 * SUB_NOTE_RESOLUTION;
 
 export const SEQUENCER_RESOLUTION = 4;
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;

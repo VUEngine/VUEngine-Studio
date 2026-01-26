@@ -115,6 +115,10 @@ export const getFoundPatternSequenceIndex = (soundData: SoundData, trackId: numb
 };
 
 export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) => {
+    if (isDragging) {
+        return 'grabbing';
+    }
+
     switch (tool) {
         default:
         case SoundEditorTool.EDIT:
@@ -122,7 +126,7 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
         case SoundEditorTool.ERASER:
             return 'not-allowed';
         case SoundEditorTool.DRAG:
-            return isDragging ? 'grabbing' : 'grab';
+            return 'grab';
         case SoundEditorTool.MARQUEE:
             return 'initial';
     }
