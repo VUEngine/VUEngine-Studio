@@ -10,8 +10,7 @@ import {
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
     SoundData,
-    SoundEditorTool,
-    SUB_NOTE_RESOLUTION
+    SoundEditorTool
 } from '../SoundEditorTypes';
 
 const StyledPattern = styled.div`
@@ -302,7 +301,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             nodeRef={nodeRef}
             grid={[
                 noteSnapping
-                    ? patternNoteWidthInSequencer * newNoteDuration / SUB_NOTE_RESOLUTION
+                    ? patternNoteWidthInSequencer * newNoteDuration
                     : patternNoteWidthInSequencer,
                 sequencerPatternHeight
             ]}
@@ -343,7 +342,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     draggableOpts={{
                         grid: [
                             noteSnapping
-                                ? patternNoteWidthInSequencer * newNoteDuration / SUB_NOTE_RESOLUTION
+                                ? patternNoteWidthInSequencer * newNoteDuration
                                 : patternNoteWidthInSequencer,
                             sequencerPatternHeight
                         ]
@@ -351,7 +350,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     axis="x"
                     minConstraints={[
                         noteSnapping
-                            ? patternNoteWidthInSequencer * newNoteDuration / SUB_NOTE_RESOLUTION
+                            ? patternNoteWidthInSequencer * newNoteDuration
                             : patternNoteWidthInSequencer,
                         sequencerPatternHeight
                     ]}

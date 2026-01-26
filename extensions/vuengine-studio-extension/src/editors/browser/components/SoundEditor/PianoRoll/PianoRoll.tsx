@@ -291,7 +291,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNotes({
                     [relativeStep]: {
                         [SoundEvent.Note]: DEFAULT_NEW_NOTE,
-                        [SoundEvent.Duration]: newNoteDuration,
+                        [SoundEvent.Duration]: newNoteDuration * SUB_NOTE_RESOLUTION,
                     }
                 });
             }

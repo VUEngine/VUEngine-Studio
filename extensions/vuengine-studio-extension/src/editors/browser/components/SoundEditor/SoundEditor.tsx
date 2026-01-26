@@ -1007,27 +1007,27 @@ A total of {0} instruments will be deleted.",
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_1.id:
                 if (soundData.tracks.length > 0) {
-                    setNewNoteDuration(16 * SUB_NOTE_RESOLUTION);
+                    setNewNoteDuration(16);
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_2.id:
                 if (soundData.tracks.length > 0) {
-                    setNewNoteDuration(8 * SUB_NOTE_RESOLUTION);
+                    setNewNoteDuration(8);
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_4.id:
                 if (soundData.tracks.length > 0) {
-                    setNewNoteDuration(4 * SUB_NOTE_RESOLUTION);
+                    setNewNoteDuration(4);
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_8.id:
                 if (soundData.tracks.length > 0) {
-                    setNewNoteDuration(2 * SUB_NOTE_RESOLUTION);
+                    setNewNoteDuration(2);
                 }
                 break;
             case SoundEditorCommands.SET_NOTE_LENGTH_16.id:
                 if (soundData.tracks.length > 0) {
-                    setNewNoteDuration(1 * SUB_NOTE_RESOLUTION);
+                    setNewNoteDuration(1);
                 }
                 break;
         }

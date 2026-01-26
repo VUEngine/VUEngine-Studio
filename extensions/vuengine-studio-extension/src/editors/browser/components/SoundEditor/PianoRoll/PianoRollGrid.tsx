@@ -410,7 +410,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             if (foundStep === -1) {
                 setNoteDragNoteId(noteId);
                 setNoteDragStartStep(step);
-                setNoteDragEndStep(step + newNoteDuration / SUB_NOTE_RESOLUTION - 1);
+                setNoteDragEndStep(step + newNoteDuration - 1);
             }
         }
     };

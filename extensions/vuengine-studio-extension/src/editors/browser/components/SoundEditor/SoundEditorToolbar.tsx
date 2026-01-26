@@ -439,19 +439,19 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         onChange={options => setNewNoteDuration(parseInt(options[0]))}
                         options={[{
                             label: '1',
-                            value: `${16 * SUB_NOTE_RESOLUTION}`
+                            value: '16'
                         }, {
                             label: '1/2',
-                            value: `${8 * SUB_NOTE_RESOLUTION}`
+                            value: '8'
                         }, {
                             label: '1/4',
-                            value: `${4 * SUB_NOTE_RESOLUTION}`
+                            value: '4'
                         }, {
                             label: '1/8',
-                            value: `${2 * SUB_NOTE_RESOLUTION}`
+                            value: '2'
                         }, {
                             label: '1/16',
-                            value: `${1 * SUB_NOTE_RESOLUTION}`
+                            value: '1'
                         }]}
                         width={67}
                     />

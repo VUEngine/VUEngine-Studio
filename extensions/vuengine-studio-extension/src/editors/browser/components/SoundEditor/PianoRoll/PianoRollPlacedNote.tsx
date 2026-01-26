@@ -209,7 +209,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const gridWidth = noteSnapping
-        ? pianoRollNoteWidth * newNoteDuration / SUB_NOTE_RESOLUTION
+        ? pianoRollNoteWidth * newNoteDuration
         : 1;
     const maxWidth = pianoRollNoteWidth * getMaxNoteDuration(events, relativeStep, patternSize) / SUB_NOTE_RESOLUTION;
 
