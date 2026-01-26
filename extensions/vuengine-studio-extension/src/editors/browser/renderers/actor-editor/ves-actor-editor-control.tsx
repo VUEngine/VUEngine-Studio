@@ -19,7 +19,6 @@ const VesActorEditorControl = ({ data, handleChange, path }: VesActorEditorContr
                     handleChange(path, newValue);
                 }
             }}
-            context={context}
         />}
     </EditorsContext.Consumer>;
 

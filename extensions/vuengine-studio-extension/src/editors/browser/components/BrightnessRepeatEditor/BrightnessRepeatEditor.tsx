@@ -13,42 +13,34 @@ interface BrightnessRepeatEditorProps {
     updateData: (data: BrightnessRepeatData) => void
 }
 
-interface BrightnessRepeatState {
-}
+export default function BrightnessRepeatEditor(props: BrightnessRepeatEditorProps): React.JSX.Element {
+    const { data, updateData } = props;
 
-export default class BrightnessRepeatEditor extends React.Component<BrightnessRepeatEditorProps, BrightnessRepeatState> {
-    constructor(props: BrightnessRepeatEditorProps) {
-        super(props);
-        this.state = {};
-    }
-
-    protected onChangeDescription(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
+    const onChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+        updateData({
+            ...data,
             description: e.target.value
         });
-    }
+    };
 
-    protected onChangeMirror(): void {
-        this.props.updateData({
-            ...this.props.data,
-            mirror: !this.props.data.mirror
+    const onChangeMirror = (): void => {
+        updateData({
+            ...data,
+            mirror: !data.mirror
         });
-    }
+    };
 
-    protected setValue(index: number, value: number): void {
-        const updatedValues = [...this.props.data.values];
+    const setValue = (index: number, value: number): void => {
+        const updatedValues = [...data.values];
         updatedValues[index] = value;
-        this.props.updateData({
-            ...this.props.data,
+        updateData({
+            ...data,
             values: updatedValues
         });
-    }
+    };
 
-    render(): React.JSX.Element {
-        const { data } = this.props;
-
-        return <VContainer gap={20}>
+    return (
+        <VContainer gap={20}>
             <HContainer gap={15} alignItems='start'>
                 <VContainer grow={1} gap={15} style={{ maxWidth: 500 }}>
                     <VContainer>
@@ -60,14 +52,14 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                             value={data.description}
                             minRows={2}
                             maxRows={4}
-                            onChange={this.onChangeDescription.bind(this)}
+                            onChange={onChangeDescription}
                             style={{ resize: 'none' }}
                         />
                     </VContainer>
                     <Checkbox
                         sideLabel={nls.localize('vuengine/editors/brightnessRepeat/mirror', 'Mirror')}
                         checked={data.mirror}
-                        setChecked={this.onChangeMirror.bind(this)}
+                        setChecked={onChangeMirror}
                     />
                 </VContainer>
                 <VContainer>
@@ -81,8 +73,8 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
             <Editor
                 mirror={data.mirror}
                 values={data.values}
-                setValue={this.setValue.bind(this)}
+                setValue={setValue}
             />
-        </VContainer>;
-    }
+        </VContainer>
+    );
 }

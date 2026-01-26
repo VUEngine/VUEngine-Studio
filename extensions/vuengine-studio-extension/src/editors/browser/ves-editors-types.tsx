@@ -21,6 +21,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -45,6 +46,7 @@ export interface EditorsServices {
     vesCodeGenService: VesCodeGenService
     vesCommonService: VesCommonService
     vesImagesService: VesImagesService
+    vesPluginsService: VesPluginsService,
     vesProcessService: VesProcessService,
     vesProcessWatcher: VesProcessWatcher,
     vesProjectService: VesProjectService,

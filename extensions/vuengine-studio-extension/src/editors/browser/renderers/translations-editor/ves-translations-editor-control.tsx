@@ -13,13 +13,12 @@ interface VesTranslationsEditorControlProps {
 const VesTranslationsEditorControl = ({ data, handleChange, path }: VesTranslationsEditorControlProps) =>
     <EditorsContext.Consumer>
         {context => <TranslationsEditor
-            data={data}
-            updateData={(newValue: TranslationsData) => {
+            translationsData={data}
+            updateTranslationsData={(newValue: TranslationsData) => {
                 if (!context.isReadonly) {
                     handleChange(path, newValue);
                 }
             }}
-            context={context}
         />}
     </EditorsContext.Consumer>;
 

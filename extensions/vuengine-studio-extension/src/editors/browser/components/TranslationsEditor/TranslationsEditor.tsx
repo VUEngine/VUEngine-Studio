@@ -1,55 +1,61 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { useContext } from 'react';
 import { WithContributor } from '../../../../project/browser/ves-project-types';
-import { EditorsContextType } from '../../ves-editors-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import LanguagesTable from './LanguagesTable';
 import { LANGUAGES, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
+import HContainer from '../Common/Base/HContainer';
+
+const I18N_PLUGIN_ID = 'vuengine//other/I18n';
 
 interface TranslationsEditorProps {
-    data: TranslationsData
-    updateData: (data: TranslationsData) => void
-    context: EditorsContextType
+    translationsData: TranslationsData
+    updateTranslationsData: (data: TranslationsData) => void
 }
 
-interface TranslationsEditorState {
-}
+export default function TranslationsEditor(props: TranslationsEditorProps): React.JSX.Element {
+    const { translationsData, updateTranslationsData } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { languages, translations } = translationsData;
+    const combinedTranslations = services.vesProjectService.getProjectDataItemsForType('Translations') || {} as Translations & WithContributor;
 
-export default class TranslationsEditor extends React.Component<TranslationsEditorProps, TranslationsEditorState> {
-    constructor(props: TranslationsEditorProps) {
-        super(props);
-        this.state = {};
-    }
+    const installedPlugins = services.vesPluginsService.getInstalledPlugins();
+    const hasI18nPlugin = installedPlugins.includes(I18N_PLUGIN_ID);
 
-    protected onChangeFlag(index: number, flag: string): void {
-        const updatedLanguages = [...this.props.data.languages];
+    const installPlugin = async () => {
+        await services.vesPluginsService.installPlugin(I18N_PLUGIN_ID);
+    };
+
+    const onChangeFlag = (index: number, flag: string): void => {
+        const updatedLanguages = [...translationsData.languages];
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             flag,
         };
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             languages: updatedLanguages
         });
     };
 
-    protected onChangeLocalizedName(index: number, localizedName: string): void {
-        const updatedLanguages = [...this.props.data.languages];
+    const onChangeLocalizedName = (index: number, localizedName: string): void => {
+        const updatedLanguages = [...translationsData.languages];
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             localizedName: localizedName,
         };
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             languages: updatedLanguages
         });
     };
 
-    protected onChangeLanguage(index: number, code: string): void {
-        const updatedLanguages = [...this.props.data.languages];
+    const onChangeLanguage = (index: number, code: string): void => {
+        const updatedLanguages = [...translationsData.languages];
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             code: code,
@@ -57,19 +63,19 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
             name: LANGUAGES[code],
         };
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             languages: updatedLanguages
         });
     };
 
-    protected addLanguage(): void {
-        const existingLanguageCodes = this.props.data.languages.map(lang => lang.code);
+    const addLanguage = (): void => {
+        const existingLanguageCodes = translationsData.languages.map(lang => lang.code);
         const filteredLanguageCodes = Object.keys(LANGUAGES).filter(c => !existingLanguageCodes.includes(c));
         const newLanguageCode = filteredLanguageCodes[0];
 
         // add language itself
-        const updatedLanguages = [...this.props.data.languages];
+        const updatedLanguages = [...translationsData.languages];
         updatedLanguages.push({
             code: newLanguageCode,
             flag: '',
@@ -79,19 +85,19 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
 
         // add translations for language
         const updatedTranslations: Translations = {};
-        Object.keys(this.props.data.translations).map(translationKey => {
-            updatedTranslations[translationKey] = this.props.data.translations[translationKey];
+        Object.keys(translationsData.translations).map(translationKey => {
+            updatedTranslations[translationKey] = translationsData.translations[translationKey];
             updatedTranslations[translationKey][newLanguageCode] = '';
         });
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             languages: updatedLanguages,
             translations: updatedTranslations,
         });
-    }
+    };
 
-    protected async removeLanguage(code: string): Promise<void> {
+    const removeLanguage = async (code: string): Promise<void> => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/translations/deleteLanguageQuestion', 'Delete Language?'),
             msg: nls.localize(
@@ -103,34 +109,34 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         const remove = await dialog.open();
         if (remove) {
             // remove language itself
-            const updatedLanguages = [...this.props.data.languages].filter(l => l.code !== code);
+            const updatedLanguages = [...translationsData.languages].filter(l => l.code !== code);
             // remove translations for language
             const updatedTranslations: Translations = {};
-            Object.keys(this.props.data.translations).map(translationKey => {
+            Object.keys(translationsData.translations).map(translationKey => {
                 const updatedTranslation: Translation = {};
-                Object.keys(this.props.data.translations[translationKey]).map(languageId => {
+                Object.keys(translationsData.translations[translationKey]).map(languageId => {
                     if (languageId !== code) {
-                        updatedTranslation[languageId] = this.props.data.translations[translationKey][languageId];
+                        updatedTranslation[languageId] = translationsData.translations[translationKey][languageId];
                     }
                 });
                 updatedTranslations[translationKey] = updatedTranslation;
             });
 
-            this.props.updateData({
-                ...this.props.data,
+            updateTranslationsData({
+                ...translationsData,
                 languages: updatedLanguages,
                 translations: updatedTranslations,
             });
         }
-    }
+    };
 
-    protected onChangeTranslationId(oldId: string, newId: string): void {
+    const onChangeTranslationId = (oldId: string, newId: string): void => {
         const updatedTranslations: Translations = {};
         const cleanedNewId = newId.replace(/[^A-Za-z0-9]/g, '');
-        if (!Object.keys(this.props.data.translations).includes(cleanedNewId)) {
-            Object.keys(this.props.data.translations).map(key => {
+        if (!Object.keys(translationsData.translations).includes(cleanedNewId)) {
+            Object.keys(translationsData.translations).map(key => {
                 const keyToUse = (key === oldId) ? cleanedNewId : key;
-                updatedTranslations[keyToUse] = this.props.data.translations[key];
+                updatedTranslations[keyToUse] = translationsData.translations[key];
             });
 
             // TODO: do not sort translations on the fly because that messes with a user's typing
@@ -142,85 +148,90 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
             });
             */
 
-            this.props.updateData({
-                ...this.props.data,
+            updateTranslationsData({
+                ...translationsData,
                 translations: updatedTranslations
             });
         }
-    }
+    };
 
-    protected onChangeTranslation(id: string, languageCode: string, translation: string): void {
-        this.props.updateData({
-            ...this.props.data,
+    const onChangeTranslation = (id: string, languageCode: string, translation: string): void => {
+        updateTranslationsData({
+            ...translationsData,
             translations: {
-                ...this.props.data.translations,
+                ...translationsData.translations,
                 [id]: {
-                    ...this.props.data.translations[id],
+                    ...translationsData.translations[id],
                     [languageCode]: translation,
                 }
             }
         });
-    }
+    };
 
-    protected addTranslation(): void {
-        const updatedTranslations = { ...this.props.data.translations };
+    const addTranslation = (): void => {
+        const updatedTranslations = { ...translationsData.translations };
         updatedTranslations[''] = {};
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             translations: updatedTranslations
         });
-    }
+    };
 
-    protected async removeTranslation(id: string): Promise<void> {
+    const removeTranslation = async (id: string): Promise<void> => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/translations/deleteTranslationQuestion', 'Delete Translation?'),
             msg: nls.localize('vuengine/editors/translations/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', id),
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedTranslations = { ...this.props.data.translations };
+            const updatedTranslations = { ...translationsData.translations };
             delete updatedTranslations[id];
 
-            this.props.updateData({
-                ...this.props.data,
+            updateTranslationsData({
+                ...translationsData,
                 translations: updatedTranslations
             });
         }
-    }
+    };
 
-    protected moveLanguage(from: number, to: number): void {
-        const updatedLanguages = [...this.props.data.languages];
+    const moveLanguage = (from: number, to: number): void => {
+        const updatedLanguages = [...translationsData.languages];
         const removedLanguage = updatedLanguages.splice(from, 1).pop();
         updatedLanguages.splice(to > from ? to - 1 : to, 0, removedLanguage!);
 
-        this.props.updateData({
-            ...this.props.data,
+        updateTranslationsData({
+            ...translationsData,
             languages: updatedLanguages
         });
     };
 
-    render(): React.JSX.Element {
-        const { services } = this.props.context;
-        const { languages, translations } = this.props.data;
-        const combinedTranslations = services.vesProjectService.getProjectDataItemsForType('Translations') || {} as Translations & WithContributor;
-
-        return <div
-            tabIndex={0}
-            className='translationsEditor'
-        >
+    return (
+        <div className='translationsEditor'>
+            {!hasI18nPlugin &&
+                <HContainer alignItems='center'>
+                    <i className="codicon codicon-warning invalid" />
+                    {nls.localize('vuengine/editors/translations/pluginMissing', 'The I18n plugin is required in order to use these translations.')}
+                    <button
+                        className="theia-button secondary"
+                        onClick={installPlugin}
+                    >
+                        {nls.localizeByDefault('Install')}
+                    </button>
+                </HContainer>
+            }
             <div>
                 <h3>
                     {nls.localize('vuengine/editors/translations/languages', 'Languages')}
                 </h3>
                 <LanguagesTable
                     languages={languages}
-                    addLanguage={this.addLanguage.bind(this)}
-                    removeLanguage={this.removeLanguage.bind(this)}
-                    moveLanguage={this.moveLanguage.bind(this)}
-                    onChangeLanguage={this.onChangeLanguage.bind(this)}
-                    onChangeFlag={this.onChangeFlag.bind(this)}
-                    onChangeLocalizedName={this.onChangeLocalizedName.bind(this)}
+                    addLanguage={addLanguage}
+                    removeLanguage={removeLanguage}
+                    moveLanguage={moveLanguage}
+                    onChangeLanguage={onChangeLanguage}
+                    onChangeFlag={onChangeFlag}
+                    onChangeLocalizedName={onChangeLocalizedName}
                 />
             </div>
 
@@ -232,33 +243,35 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
                 <TranslationsTable
                     languages={languages}
                     translations={translations}
-                    addTranslation={this.addTranslation.bind(this)}
-                    removeTranslation={this.removeTranslation.bind(this)}
-                    onChangeTranslationId={this.onChangeTranslationId.bind(this)}
-                    onChangeTranslation={this.onChangeTranslation.bind(this)}
+                    addTranslation={addTranslation}
+                    removeTranslation={removeTranslation}
+                    onChangeTranslationId={onChangeTranslationId}
+                    onChangeTranslation={onChangeTranslation}
                 />
             </div>
 
             <br />
-            {combinedTranslations && Object.values(combinedTranslations).map((c, i) => c._contributor !== 'project' &&
-                <div key={`extra-translations-${i}`}>
-                    <h3>
-                        {c._contributor.replace('plugin:', '')}
-                    </h3>
-                    <TranslationsTable
-                        addable={false}
-                        removeable={false}
-                        editIds={false}
-                        editTranslations={false}
-                        languages={languages}
-                        translations={c.translations}
-                        addTranslation={this.addTranslation.bind(this)}
-                        removeTranslation={this.removeTranslation.bind(this)}
-                        onChangeTranslationId={this.onChangeTranslationId.bind(this)}
-                        onChangeTranslation={this.onChangeTranslation.bind(this)}
-                    />
-                </div>
-            )}
-        </div>;
-    }
+            {
+                combinedTranslations && Object.values(combinedTranslations).map((c, i) => c._contributor !== 'project' &&
+                    <div key={`extra-translations-${i}`}>
+                        <h3>
+                            {c._contributor.replace('plugin:', '')}
+                        </h3>
+                        <TranslationsTable
+                            addable={false}
+                            removeable={false}
+                            editIds={false}
+                            editTranslations={false}
+                            languages={languages}
+                            translations={c.translations}
+                            addTranslation={addTranslation}
+                            removeTranslation={removeTranslation}
+                            onChangeTranslationId={onChangeTranslationId}
+                            onChangeTranslation={onChangeTranslation}
+                        />
+                    </div>
+                )
+            }
+        </div>
+    );
 }

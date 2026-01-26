@@ -54,7 +54,6 @@ export const HideTreeButton = styled.button`
 interface ActorEditorProps {
     data: ActorData;
     updateData: (actorData: ActorData) => void;
-    context: EditorsContextType
 }
 
 export interface ActorEditorSaveDataOptions {
@@ -73,6 +72,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         setGeneratingProgress,
         enableCommands,
         setCommands,
+        activateEditor,
         onCommandExecute,
         services
     } = useContext(EditorsContext) as EditorsContextType;
@@ -589,115 +589,124 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                 }}
             >
                 <ActorEditorContext.Consumer>
-                    {context =>
+                    {context => <>
                         <Preview
                             hasAnyComponent={hasAnyComponent}
                             updateComponent={updateComponent}
                             setCurrentComponentDisplacement={setCurrentComponentDisplacement}
                         />
-                    }
-                </ActorEditorContext.Consumer>
-                {hasAnyComponent &&
-                    <ActorEditorContext.Consumer>
-                        {context => <HContainer
-                            alignItems='start'
-                            grow={1}
-                            justifyContent='space-between'
-                            overflow='hidden'
-                        >
-                            <Sidebar
-                                open={leftSidebarOpen}
-                                side='left'
-                                width={320}
+                        {hasAnyComponent &&
+                            <HContainer
+                                alignItems='start'
+                                grow={1}
+                                justifyContent='space-between'
+                                overflow='hidden'
                             >
-                                <HideTreeButton
-                                    className="theia-button secondary"
-                                    title={nls.localize('vuengine/editors/actor/hideComponentsTree', 'Hide Components Tree')}
-                                    onClick={() => setLeftSidebarOpen(false)}
+                                <Sidebar
+                                    open={leftSidebarOpen}
+                                    side='left'
+                                    width={320}
                                 >
-                                    <i className="codicon codicon-chevron-left" />
-                                </HideTreeButton>
-                                <VContainer gap={10}>
-                                    <ActorMeta />
-                                    <ActorSettings />
-                                    <ComponentTree />
-                                </VContainer>
-                            </Sidebar>
-                            {!leftSidebarOpen &&
-                                <ShowTreeButton
-                                    style={{
-                                        opacity: leftSidebarOpen ? 0 : 1,
-                                    }}
-                                    className="theia-button secondary"
-                                    title={nls.localize('vuengine/editors/actor/showComponentsTree', 'Show Components Tree')}
-                                    onClick={() => setLeftSidebarOpen(true)}
+                                    <HideTreeButton
+                                        className="theia-button secondary"
+                                        title={nls.localize('vuengine/editors/actor/hideComponentsTree', 'Hide Components Tree')}
+                                        onClick={() => setLeftSidebarOpen(false)}
+                                    >
+                                        <i className="codicon codicon-chevron-left" />
+                                    </HideTreeButton>
+                                    <VContainer gap={10} style={{
+                                        padding: 'var(--padding) 0',
+                                    }}>
+                                        <ActorMeta />
+                                        <ActorSettings />
+                                        <ComponentTree />
+                                    </VContainer>
+                                </Sidebar>
+                                {!leftSidebarOpen &&
+                                    <ShowTreeButton
+                                        style={{
+                                            opacity: leftSidebarOpen ? 0 : 1,
+                                        }}
+                                        className="theia-button secondary"
+                                        title={nls.localize('vuengine/editors/actor/showComponentsTree', 'Show Components Tree')}
+                                        onClick={() => setLeftSidebarOpen(true)}
+                                    >
+                                        <i className="codicon codicon-list-tree" />
+                                    </ShowTreeButton>
+                                }
+                                <Sidebar
+                                    open={currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'logic', 'sprites'].includes(currentComponent)}
+                                    side='right'
+                                    width={320}
                                 >
-                                    <i className="codicon codicon-list-tree" />
-                                </ShowTreeButton>
-                            }
-                            <Sidebar
-                                open={currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'logic', 'sprites'].includes(currentComponent)}
-                                side='right'
-                                width={320}
-                            >
-                                <CurrentComponent
-                                    isMultiFileAnimation={isMultiFileAnimation}
-                                    updateComponent={updateComponent}
-                                    spriteProcessingDialog={spriteProcessingDialog}
-                                    setSpriteProcessingDialog={setSpriteProcessingDialog}
-                                />
-                            </Sidebar>
-                            {addComponentDialogOpen &&
-                                <PopUpDialog
-                                    open={addComponentDialogOpen}
-                                    onClose={() => {
-                                        setAddComponentDialogOpen(false);
-                                        enableCommands();
-                                    }}
-                                    onOk={() => {
-                                        setAddComponentDialogOpen(false);
-                                        enableCommands();
-                                    }}
-                                    title={nls.localize('vuengine/editors/sound/addComponent', 'Add Component')}
-                                    height='400px'
-                                    width='585px'
-                                    cancelButton={true}
-                                    okButton={false}
-                                >
-                                    <AddComponent
-                                        data={data}
-                                        setAddComponentDialogOpen={setAddComponentDialogOpen}
-                                        addComponent={doAddComponent}
+                                    <CurrentComponent
+                                        isMultiFileAnimation={isMultiFileAnimation}
+                                        updateComponent={updateComponent}
+                                        spriteProcessingDialog={spriteProcessingDialog}
+                                        setSpriteProcessingDialog={setSpriteProcessingDialog}
                                     />
-                                </PopUpDialog>
-                            }
-                            {spriteProcessingDialog !== false && (
-                                <PopUpDialog
-                                    open={true}
-                                    onClose={() => setSpriteProcessingDialog(false)}
-                                    onOk={() => setSpriteProcessingDialog(false)}
-                                    title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
-                                    height='100%'
-                                    width='100%'
-                                >
-                                    <ImageProcessingSettingsForm
-                                        image={(spriteProcessingDialog as ImageProcessingSettingsFormProps).image}
-                                        setFiles={(spriteProcessingDialog as ImageProcessingSettingsFormProps).setFiles}
-                                        imageData={(spriteProcessingDialog as ImageProcessingSettingsFormProps).imageData}
-                                        processingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).processingSettings}
-                                        updateProcessingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateProcessingSettings}
-                                        colorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).colorMode}
-                                        updateColorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateColorMode}
-                                        allowFrameBlendMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).allowFrameBlendMode}
-                                        compression={(spriteProcessingDialog as ImageProcessingSettingsFormProps).compression}
-                                        convertImage={(spriteProcessingDialog as ImageProcessingSettingsFormProps).convertImage}
-                                    />
-                                </PopUpDialog>
-                            )}
-                        </HContainer>
+                                </Sidebar>
+                                {spriteProcessingDialog !== false && (
+                                    <PopUpDialog
+                                        open={true}
+                                        onClose={() => {
+                                            setSpriteProcessingDialog(false);
+                                            enableCommands();
+                                            activateEditor();
+                                        }}
+                                        onOk={() => {
+                                            setSpriteProcessingDialog(false);
+                                            enableCommands();
+                                            activateEditor();
+                                        }}
+                                        title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
+                                        height='100%'
+                                        width='100%'
+                                    >
+                                        <ImageProcessingSettingsForm
+                                            image={(spriteProcessingDialog as ImageProcessingSettingsFormProps).image}
+                                            setFiles={(spriteProcessingDialog as ImageProcessingSettingsFormProps).setFiles}
+                                            imageData={(spriteProcessingDialog as ImageProcessingSettingsFormProps).imageData}
+                                            processingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).processingSettings}
+                                            updateProcessingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateProcessingSettings}
+                                            colorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).colorMode}
+                                            updateColorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateColorMode}
+                                            allowFrameBlendMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).allowFrameBlendMode}
+                                            compression={(spriteProcessingDialog as ImageProcessingSettingsFormProps).compression}
+                                            convertImage={(spriteProcessingDialog as ImageProcessingSettingsFormProps).convertImage}
+                                        />
+                                    </PopUpDialog>
+                                )}
+                            </HContainer>
                         }
-                    </ActorEditorContext.Consumer>
-                }
+                        {addComponentDialogOpen &&
+                            <PopUpDialog
+                                open={addComponentDialogOpen}
+                                onClose={() => {
+                                    setAddComponentDialogOpen(false);
+                                    enableCommands();
+                                    activateEditor();
+                                }}
+                                onOk={() => {
+                                    setAddComponentDialogOpen(false);
+                                    enableCommands();
+                                    activateEditor();
+                                }}
+                                title={nls.localize('vuengine/editors/sound/addComponent', 'Add Component')}
+                                height='400px'
+                                width='588px'
+                                cancelButton={true}
+                                okButton={false}
+                            >
+                                <AddComponent
+                                    data={data}
+                                    setAddComponentDialogOpen={setAddComponentDialogOpen}
+                                    addComponent={doAddComponent}
+                                />
+                            </PopUpDialog>
+                        }
+                    </>}
+                </ActorEditorContext.Consumer>
             </ActorEditorContext.Provider>
         </div>
     );

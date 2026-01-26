@@ -182,12 +182,7 @@ export default function ComponentTree(): React.JSX.Element {
             }}>
                 {nls.localize('vuengine/editors/actor/components', 'Components')}
             </label>
-            <VContainer
-                style={{
-                    overflow: 'auto',
-                    paddingBottom: 'var(--padding)',
-                }}
-            >
+            <VContainer overflow='auto'>
                 <div
                     className='ves-tree'
                     ref={treeContainerRef}

@@ -11,70 +11,59 @@ interface ColumnTableEditorProps {
     updateData: (data: ColumnTableData) => void
 }
 
-interface ColumnTableState {
-}
+export default function ColumnTableEditor(props: ColumnTableEditorProps): React.JSX.Element {
+    const { data, updateData } = props;
 
-export default class ColumnTableEditor extends React.Component<ColumnTableEditorProps, ColumnTableState> {
-    constructor(props: ColumnTableEditorProps) {
-        super(props);
-        this.state = {
-        };
-    }
-
-    protected onChangeDescription(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
+    const onChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+        updateData({
+            ...data,
             description: e.target.value
         });
-    }
+    };
 
-    protected onChangeMirror(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            mirror: !this.props.data.mirror
+    const onChangeMirror = (): void => {
+        updateData({
+            ...data,
+            mirror: !data.mirror
         });
-    }
+    };
 
-    protected setValue(index: number, value: ColumnTableEntry): void {
-        const updatedValues = [...this.props.data.values];
+    const setValue = (index: number, value: ColumnTableEntry): void => {
+        const updatedValues = [...data.values];
         updatedValues[index] = value;
-        this.props.updateData({
-            ...this.props.data,
+        updateData({
+            ...data,
             values: updatedValues
         });
-    }
+    };
 
-    render(): React.JSX.Element {
-        const { data } = this.props;
-
-        return (
-            <VContainer gap={20}>
-                <VContainer gap={15} style={{ maxWidth: 500 }}>
-                    <VContainer>
-                        <label>
-                            {nls.localizeByDefault('Description')}
-                        </label>
-                        <ReactTextareaAutosize
-                            className="theia-input"
-                            value={data.description}
-                            minRows={2}
-                            maxRows={4}
-                            onChange={this.onChangeDescription.bind(this)}
-                            style={{ resize: 'none' }}
-                        />
-                    </VContainer>
-                    <Checkbox
-                        sideLabel={nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
-                        checked={data.mirror}
-                        setChecked={this.onChangeMirror.bind(this)}
+    return (
+        <VContainer gap={20}>
+            <VContainer gap={15} style={{ maxWidth: 500 }}>
+                <VContainer>
+                    <label>
+                        {nls.localizeByDefault('Description')}
+                    </label>
+                    <ReactTextareaAutosize
+                        className="theia-input"
+                        value={data.description}
+                        minRows={2}
+                        maxRows={4}
+                        onChange={onChangeDescription}
+                        style={{ resize: 'none' }}
                     />
                 </VContainer>
-                <Editor
-                    mirror={data.mirror}
-                    values={data.values}
-                    setValue={this.setValue.bind(this)}
+                <Checkbox
+                    sideLabel={nls.localize('vuengine/editors/columnTable/mirror', 'Mirror')}
+                    checked={data.mirror}
+                    setChecked={onChangeMirror}
                 />
             </VContainer>
-        );
-    }
+            <Editor
+                mirror={data.mirror}
+                values={data.values}
+                setValue={setValue}
+            />
+        </VContainer>
+    );
 }

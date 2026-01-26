@@ -38,6 +38,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
@@ -110,6 +111,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesImagesService)
     protected readonly vesImagesService: VesImagesService;
+    @inject(VesPluginsService)
+    protected readonly vesPluginsService: VesPluginsService;
     @inject(VesProcessService)
     protected readonly vesProcessService: VesProcessService;
     @inject(VesProcessWatcher)
@@ -529,6 +532,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
+                            vesPluginsService: this.vesPluginsService,
                             vesProcessService: this.vesProcessService,
                             vesProcessWatcher: this.vesProcessWatcher,
                             vesProjectService: this.vesProjectService,

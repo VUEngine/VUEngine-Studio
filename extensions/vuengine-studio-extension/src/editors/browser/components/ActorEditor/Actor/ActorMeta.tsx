@@ -39,7 +39,7 @@ export default function ActorMeta(): React.JSX.Element {
                 gap={15}
                 style={{
                     overflow: 'visible',
-                    padding: 'var(--padding) var(--padding) 0',
+                    padding: '0 var(--padding)',
                     zIndex: 1,
                 }}
             >

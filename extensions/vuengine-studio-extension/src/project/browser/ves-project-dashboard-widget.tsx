@@ -25,6 +25,7 @@ import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
 import { VesImagesService } from '../../images/browser/ves-images-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
@@ -82,6 +83,8 @@ export class VesProjectDashboardWidget extends ReactWidget {
     protected readonly vesCommonService: VesCommonService;
     @inject(VesImagesService)
     protected readonly vesImagesService: VesImagesService;
+    @inject(VesPluginsService)
+    protected readonly vesPluginsService: VesPluginsService;
     @inject(VesProcessService)
     protected readonly vesProcessService: VesProcessService;
     @inject(VesProcessWatcher)
@@ -216,6 +219,7 @@ export class VesProjectDashboardWidget extends ReactWidget {
                             vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
                             vesImagesService: this.vesImagesService,
+                            vesPluginsService: this.vesPluginsService,
                             vesProcessService: this.vesProcessService,
                             vesProcessWatcher: this.vesProcessWatcher,
                             vesProjectService: this.vesProjectService,

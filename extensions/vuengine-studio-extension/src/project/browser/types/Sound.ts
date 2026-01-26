@@ -83,7 +83,7 @@ export const SoundType: ProjectDataType = {
                         },
                         size: {
                             type: 'number',
-                            default: 4
+                            default: 16
                         },
                         events: {
                             type: 'object',
@@ -258,7 +258,7 @@ export const SoundType: ProjectDataType = {
             },
             size: {
                 type: 'number',
-                default: 64
+                default: 256
             },
             speed: {
                 type: 'object',

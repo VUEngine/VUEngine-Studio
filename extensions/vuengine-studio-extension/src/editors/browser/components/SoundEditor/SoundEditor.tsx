@@ -1242,7 +1242,7 @@ A total of {0} instruments will be deleted.",
                     }}
                     title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
                     height='300px'
-                    width='435px'
+                    width='438px'
                     cancelButton={true}
                     okButton={false}
                 >
