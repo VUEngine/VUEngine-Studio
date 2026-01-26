@@ -1,22 +1,27 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { PATTERN_SIZE_MAX, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
+import { MAX_TICK_DURATION, MIN_TICK_DURATION, NOTE_RESOLUTION, PATTERN_SIZE_MAX, SoundData } from '../SoundEditorTypes';
 
 interface PropertiesProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
+    setNewNoteDuration: Dispatch<SetStateAction<number>>
 }
 
 export default function Properties(props: PropertiesProps): React.JSX.Element {
+    const { soundData, updateSoundData, setNewNoteDuration } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { soundData, updateSoundData } = props;
+
+    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
+    const bar = soundData.timeSignature[0].split('/')[1] ?? '4';
 
     const handleOnFocus = () => {
         disableCommands();
@@ -56,6 +61,15 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
             updateSoundData({ ...soundData, speed: { 0: s } });
         }
+    };
+
+    const setBeats = (b: number): void => {
+        updateSoundData({ ...soundData, timeSignature: { 0: `${b}/${bar}` } });
+    };
+
+    const setBar = (b: number): void => {
+        updateSoundData({ ...soundData, timeSignature: { 0: `${beats}/${b}` } });
+        setNewNoteDuration(NOTE_RESOLUTION / b);
     };
 
     return <VContainer gap={15}>
@@ -100,6 +114,43 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         </VContainer>
 
         <HContainer gap={20}>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature')}
+                </label>
+                <HContainer alignItems='center'>
+                    <Input
+                        type='number'
+                        value={beats}
+                        setValue={setBeats}
+                        min={1}
+                        max={NOTE_RESOLUTION}
+                        width={64}
+                    />
+                    /
+                    <AdvancedSelect
+                        defaultValue={bar}
+                        onChange={b => setBar(parseInt(b[0]))}
+                        options={[{
+                            value: '1',
+                            label: '1',
+                        }, {
+                            value: '2',
+                            label: '2',
+                        }, {
+                            value: '4',
+                            label: '4',
+                        }, {
+                            value: '8',
+                            label: '8',
+                        }, {
+                            value: '16',
+                            label: '16',
+                        }]}
+                        width={64}
+                    />
+                </HContainer>
+            </VContainer>
             <Checkbox
                 label={nls.localize('vuengine/editors/sound/loop', 'Loop')}
                 checked={soundData.loop}

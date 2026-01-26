@@ -31,10 +31,10 @@ import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
-    DEFAULT_NEW_NOTE_DURATION,
     DEFAULT_TRACK_SETTINGS,
     EventsMap,
     InstrumentMap,
+    NOTE_RESOLUTION,
     NOTES_LABELS,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
@@ -148,7 +148,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
-    const [newNoteDuration, setNewNoteDuration] = useState<number>(DEFAULT_NEW_NOTE_DURATION);
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(NOTE_RESOLUTION / parseInt(soundData.timeSignature[0].split('/')[1] ?? 4));
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
@@ -1348,6 +1348,7 @@ A total of {0} instruments will be deleted.",
                         <Properties
                             soundData={soundData}
                             updateSoundData={updateSoundData}
+                            setNewNoteDuration={setNewNoteDuration}
                         />
                     </VContainer>
                 </PopUpDialog>
@@ -1582,6 +1583,7 @@ A total of {0} instruments will be deleted.",
                         playingTestNote={playing && !!testNote}
                         playNote={playNote}
                         setNotes={setNotes}
+                        newNoteDuration={newNoteDuration}
                     />
                 </PopUpDialog>
             }

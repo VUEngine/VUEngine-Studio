@@ -274,6 +274,20 @@ export const SoundType: ProjectDataType = {
                     0: 64
                 }
             },
+            timeSignature: {
+                type: 'object',
+                properties: {},
+                additionalProperties: {
+                    type: 'object',
+                    properties: {},
+                    additionalProperties: {
+                        type: 'string'
+                    }
+                },
+                default: {
+                    0: '4/4'
+                }
+            },
             loop: {
                 type: 'boolean',
                 default: false

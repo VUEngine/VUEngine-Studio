@@ -13,6 +13,7 @@ export interface SoundData {
     instruments: InstrumentMap
     size: number
     speed: SpeedMap
+    timeSignature: TimeSignatureMap
     loop: boolean
     loopPoint: number
     section: DataSection
@@ -70,6 +71,7 @@ export type EventsMap = Record<number, SoundEventMap>;
 export type PatternMap = Record<string, PatternConfig>;
 export type SequenceMap = Record<number, string>;
 export type SpeedMap = Record<number, number>;
+export type TimeSignatureMap = Record<number, string>;
 
 export interface PatternConfig {
     name: string
@@ -263,7 +265,6 @@ export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 
 export const DEFAULT_PLAY_RANGE_SIZE = 64;
 export const DEFAULT_NEW_NOTE = 'C4';
-export const DEFAULT_NEW_NOTE_DURATION = 4 * SUB_NOTE_RESOLUTION;
 
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
 export const SEQUENCER_PATTERN_HEIGHT_MAX = 64;

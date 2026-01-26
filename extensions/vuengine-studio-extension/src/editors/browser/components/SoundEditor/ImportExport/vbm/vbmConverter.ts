@@ -91,6 +91,9 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         speed: {
             0: 2 * song.SongSettings.Speed, // TODO
         },
+        timeSignature: {
+            0: '4/4'
+        },
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,

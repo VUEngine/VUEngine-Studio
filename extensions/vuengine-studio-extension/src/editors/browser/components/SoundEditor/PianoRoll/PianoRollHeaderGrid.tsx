@@ -64,11 +64,14 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const songLength = soundData.size / NOTE_RESOLUTION;
+    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
+    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
+    const stepsPerBar = NOTE_RESOLUTION / bar;
+    const totalStepsPerBar = beats * stepsPerBar;
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
     const width = Math.min(
         pianoRollScrollWindow.w,
-        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+        soundData.size * pianoRollNoteWidth
     );
 
     const draw = (): void => {
@@ -85,28 +88,31 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         const c = currentThemeType === 'light' ? 0 : 255;
 
-        context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.fillStyle = `rgba(${c}, ${c}, ${c}, .4)`;
         context.lineWidth = 1;
         context.font = '10px monospace';
 
-        // vertical lines
-        for (let x = 0; x < songLength; x++) {
-            const offsetElement = x * NOTE_RESOLUTION * pianoRollNoteWidth;
+        // vertical lines & meter numbers
+        for (let x = 0; x < soundData.size; x++) {
+            const offsetElement = x * pianoRollNoteWidth;
             if (offsetElement < pianoRollScrollWindow.x) {
                 continue;
             }
             if (offsetElement > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
                 break;
             }
+            if (x % totalStepsPerBar !== 0) {
+                continue;
+            }
+
             const offset = offsetElement - 0.5 - pianoRollScrollWindow.x;
             context.beginPath();
-            context.moveTo(offset, 0);
-            context.lineTo(offset, height);
+            context.moveTo(offset, height);
+            context.lineTo(offset, 0);
+            context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
             context.stroke();
 
-            // meter numbers
-            context.fillText(x.toString(), offset + 4, 12);
+            context.fillText((x / totalStepsPerBar).toString(), offset + 4, 12);
         }
 
         // middle line

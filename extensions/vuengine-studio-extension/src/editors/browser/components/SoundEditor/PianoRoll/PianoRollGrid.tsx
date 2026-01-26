@@ -91,6 +91,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLength = soundData.size / NOTE_RESOLUTION;
+    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
+    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
+    const stepsPerBar = NOTE_RESOLUTION / bar;
+    const totalStepsPerBar = beats * stepsPerBar;
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
     const width = Math.min(
         pianoRollScrollWindow.w,
@@ -195,9 +199,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             context.beginPath();
             context.moveTo(offset, 0);
             context.lineTo(offset, height);
-            context.strokeStyle = x % NOTE_RESOLUTION === 0
+            context.strokeStyle = x % totalStepsPerBar === 0
                 ? hiColor
-                : x % 4 === 0
+                : x % stepsPerBar === 0
                     ? medColor
                     : lowColor;
             context.stroke();

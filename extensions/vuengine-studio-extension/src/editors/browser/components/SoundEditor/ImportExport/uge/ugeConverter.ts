@@ -67,6 +67,9 @@ export const convertUgeSong = (song: Song): SoundData => {
         speed: {
             0: 18 * song.ticks_per_row
         },
+        timeSignature: {
+            0: '4/4'
+        },
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,

@@ -13,7 +13,6 @@ import { getNoteSlideLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_NEW_NOTE,
-    DEFAULT_NEW_NOTE_DURATION,
     PATTERN_SIZE_DEFAULT,
     EventsMap,
     PatternConfig,
@@ -41,6 +40,7 @@ interface NotePropertiesProps {
     playingTestNote: boolean
     playNote: (note: string, instrumentId?: string) => void
     setNotes: (notes: EventsMap) => void
+    newNoteDuration: number
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -55,6 +55,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         playingTestNote,
         playNote,
         setNotes,
+        newNoteDuration,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -74,7 +75,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         setNotes({
             [relativeStep]: {
                 [SoundEvent.Note]: DEFAULT_NEW_NOTE,
-                [SoundEvent.Duration]: DEFAULT_NEW_NOTE_DURATION,
+                [SoundEvent.Duration]: newNoteDuration,
             }
         });
 

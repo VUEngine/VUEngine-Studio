@@ -107,6 +107,11 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const songLengthInNotes = soundData.size / NOTE_RESOLUTION;
+    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
+    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
+    const stepsPerBar = NOTE_RESOLUTION / bar;
+    const totalStepsPerBar = beats * stepsPerBar;
+
     const height = soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
     const width = Math.min(
         sequencerScrollWindow.w - SCROLL_BAR_WIDTH,
@@ -229,25 +234,28 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
             const offset = lineX - sequencerScrollWindow.x - 0.5;
             context.beginPath();
-            context.moveTo(offset, x % NOTE_RESOLUTION ? SEQUENCER_GRID_METER_HEIGHT : 0);
-            context.lineTo(offset, height);
-            context.strokeStyle = x === soundData.size
-                ? strongColor
-                : x % NOTE_RESOLUTION === 0
-                    ? hiColor
-                    : x % 4 === 0
-                        ? medColor
-                        : lowColor;
-            context.stroke();
+            context.moveTo(offset, height);
 
             // meter numbers
-            if (x % NOTE_RESOLUTION === 0) {
+            if (x % totalStepsPerBar === 0) {
                 context.fillStyle = hiColor;
                 context.font = '9px monospace';
                 if (!soundData.loop || x !== soundData.loopPoint) {
-                    context.fillText((x / NOTE_RESOLUTION).toString(), offset + 3, 10);
+                    context.fillText((x / totalStepsPerBar).toString(), offset + 3, 10);
                 }
+                context.strokeStyle = hiColor;
+                context.lineTo(offset, 0);
+            } else {
+                context.strokeStyle = x === soundData.size
+                    ? strongColor
+                    : x % stepsPerBar === 0
+                        ? medColor
+                        : lowColor;
+                context.lineTo(offset, x % totalStepsPerBar ? SEQUENCER_GRID_METER_HEIGHT : 0);
             }
+
+            context.stroke();
+
         }
 
         // horizontal lines
