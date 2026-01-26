@@ -261,10 +261,18 @@ export const SoundType: ProjectDataType = {
                 default: 64
             },
             speed: {
-                type: 'integer',
-                default: 64,
-                minimum: 1,
-                maximum: 128
+                type: 'object',
+                properties: {},
+                additionalProperties: {
+                    type: 'object',
+                    properties: {},
+                    additionalProperties: {
+                        type: 'integer'
+                    }
+                },
+                default: {
+                    0: 64
+                }
             },
             loop: {
                 type: 'boolean',

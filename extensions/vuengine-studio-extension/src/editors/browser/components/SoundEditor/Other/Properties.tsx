@@ -54,7 +54,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
 
     const setSpeed = (s: number): void => {
         if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
-            updateSoundData({ ...soundData, speed: s });
+            updateSoundData({ ...soundData, speed: { 0: s } });
         }
     };
 
@@ -92,7 +92,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                 {nls.localize('vuengine/editors/sound/sixteenthNoteDurationMs', '1/16 note duration (in milliseconds)')}
             </label>
             <Range
-                value={soundData.speed}
+                value={soundData.speed[0]}
                 max={MAX_TICK_DURATION}
                 min={MIN_TICK_DURATION}
                 setValue={setSpeed}

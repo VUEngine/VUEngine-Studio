@@ -202,7 +202,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const instrument = soundData.instruments[currentInstrumentId];
 
     const totalSteps = soundData.size * SUB_NOTE_RESOLUTION;
-    const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
+    const tickDurationUs = soundData.speed[0] * 1000 / SUB_NOTE_RESOLUTION;
     const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
 
     const getTestSoundData = (): SoundData => ({
@@ -313,9 +313,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <StyledSoundEditorToolbarTime>
                         <span>
                             {currentPlayerPosition > -1
-                                ? Math.floor(currentPlayerPosition * soundData.speed / 1000 / 60) + ':' +
-                                Math.floor((currentPlayerPosition * soundData.speed / 1000) % 60).toString().padStart(2, '0') + ',' +
-                                Math.floor((currentPlayerPosition * soundData.speed / 100) % 10)
+                                ? Math.floor(currentPlayerPosition * soundData.speed[0] / 1000 / 60) + ':' +
+                                Math.floor((currentPlayerPosition * soundData.speed[0] / 1000) % 60).toString().padStart(2, '0') + ',' +
+                                Math.floor((currentPlayerPosition * soundData.speed[0] / 100) % 10)
                                 : '0:00,0'
                             }
                         </span>

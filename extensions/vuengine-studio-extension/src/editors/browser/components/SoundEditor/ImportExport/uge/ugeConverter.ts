@@ -64,7 +64,9 @@ export const convertUgeSong = (song: Song): SoundData => {
         patterns: {},
         instruments: {},
         size: 0,
-        speed: 18 * song.ticks_per_row,
+        speed: {
+            0: 18 * song.ticks_per_row
+        },
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,

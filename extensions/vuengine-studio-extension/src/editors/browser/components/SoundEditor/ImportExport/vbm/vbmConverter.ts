@@ -88,7 +88,9 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         patterns: {},
         instruments: {},
         size: 0,
-        speed: 2 * song.SongSettings.Speed, // TODO
+        speed: {
+            0: 2 * song.SongSettings.Speed, // TODO
+        },
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,

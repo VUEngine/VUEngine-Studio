@@ -12,7 +12,7 @@ export interface SoundData {
     patterns: PatternMap
     instruments: InstrumentMap
     size: number
-    speed: number
+    speed: SpeedMap
     loop: boolean
     loopPoint: number
     section: DataSection
@@ -69,6 +69,7 @@ export type SoundEventMap = Record<string, any>;
 export type EventsMap = Record<number, SoundEventMap>;
 export type PatternMap = Record<string, PatternConfig>;
 export type SequenceMap = Record<number, string>;
+export type SpeedMap = Record<number, number>;
 
 export interface PatternConfig {
     name: string

@@ -2,7 +2,6 @@
 
 {%- set notesLookup = {'B9': 0,'A#9': 0,'A9': 0,'G#9': 0,'G9': 0,'F#9': 0,'F9': 0,'E9': 0,'D#9': 0,'D9': 0,'C#9': 0,'C9': 2029,'B8': 2028,'A#8': 2027,'A8': 2026,'G#8': 2024,'G8': 2023,'F#8': 2022,'F8': 2020,'E8': 2018,'D#8': 2017,'D8': 2015,'C#8': 2013,'C8': 2011,'B7': 2008,'A#7': 2006,'A7': 2004,'G#7': 2001,'G7': 1998,'F#7': 1995,'F7': 1992,'E7': 1989,'D#7': 1985,'D7': 1981,'C#7': 1978,'C7': 1973,'B6': 1969,'A#6': 1964,'A6': 1960,'G#6': 1954,'G6': 1948,'F#6': 1942,'F6': 1936,'E6': 1930,'D#6': 1922,'D6': 1915,'C#6': 1907,'C6': 1899,'B5': 1890,'A#5': 1880,'A5': 1870,'G#5': 1860,'G5': 1849,'F#5': 1837,'F5': 1824,'E5': 1811,'D#5': 1797,'D5': 1782,'C#5': 1766,'C5': 1749,'B4': 1732,'A#4': 1713,'A4': 1693,'G#4': 1672,'G4': 1650,'F#4': 1625,'F4': 1600,'E4': 1574,'D#4': 1547,'D4': 1516,'C#4': 1484,'C4': 1451,'B3': 1415,'A#3': 1378,'A3': 1338,'G#3': 1296,'G3': 1251,'F#3': 1203,'F3': 1153,'E3': 1100,'D#3': 1044,'D3': 984,'C#3': 921,'C3': 854,'B2': 783,'A#2': 707,'A2': 628,'G#2': 543,'G2': 454,'F#2': 359,'F2': 258,'E2': 152,'D#2': 39,'D2': 0,'C#2': 0,'C2': 0,'B1': 0,'A#1': 0,'A1': 0,'G#1': 0,'G1': 0,'F#1': 0,'F1': 0,'E1': 0,'D#1': 0,'D1': 0,'C#1': 0,'C1': 0,'B0': 0,'A#0': 0,'A0': 0,'G#0': 0,'G0': 0,'F#0': 0,'F0': 0,'E0': 0,'D#0': 0,'D0': 0,'C#0': 0,'C0': 0} -%}
 {%- set noteResolution = 16 -%}
-{%- set sequencerResolution = 4 -%}
 {%- set subNoteResolution = 50 -%}
 {%- set barNoteResolution = noteResolution * subNoteResolution -%}
 
@@ -11,7 +10,7 @@
 {%- set waveforms = {} -%}
 {%- set modulationData = {} -%}
 
-{%- set totalSize = item.size * barNoteResolution / sequencerResolution -%}
+{%- set totalSize = item.size * subNoteResolution -%}
 {%- set loopPoint = item.loopPoint -%}
 {%- set soloTrack = -1 -%}
 {%- set playInLoop = item.loop -%}
@@ -69,10 +68,10 @@
 	{%- set startTick = 0  -%}
 	{%- if playRangeStart is defined and playRangeStart > -1 -%}
 		{%- set startTick = playRangeStart * subNoteResolution -%}
-		{%- set loopPoint = playRangeStart / sequencerResolution -%}
+		{%- set loopPoint = playRangeStart -%}
 		{%- set playInLoop = true -%}
 		{%- if playRangeEnd is defined and playRangeEnd > -1 and playRangeEnd > playRangeStart -%}
-			{%- set totalSize = playRangeEnd / sequencerResolution * barNoteResolution / sequencerResolution -%}
+			{%- set totalSize = playRangeEnd * subNoteResolution -%}
 		{%- endif -%}
 	{%- elseif currentPlayerPosition > -1 -%}
 		{%- set startTick = currentPlayerPosition * subNoteResolution -%}
@@ -277,7 +276,7 @@ SoundROMSpec {{ sanitizedSpecName }}SoundSpec =
 	{{ playInLoop }},
 
 	// Tick duration in US
-	{{ item.speed * 1000 / subNoteResolution }},
+	{{ item.speed[0] * 1000 / subNoteResolution }},
 
 	// Tracks
 	(SoundTrackSpec**){{ sanitizedSpecName }}SoundTracks,
