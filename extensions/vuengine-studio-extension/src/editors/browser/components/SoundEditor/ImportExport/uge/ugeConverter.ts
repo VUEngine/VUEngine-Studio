@@ -19,7 +19,6 @@ import {
     NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -31,7 +30,7 @@ import { DutyInstrument, NoiseInstrument, PatternCell, Song, WaveInstrument } fr
 import { EffectCommandType } from './ugeTypes';
 
 const GB_NOTE_OFFSET = 9 - 12; // adjust for frequency ranges (+9) and transpose down an octave (-12)
-const CONVERTED_PATTERN_SIZE = 64 / SEQUENCER_RESOLUTION;
+const CONVERTED_PATTERN_SIZE = 64;
 
 const WAVE_CHANNEL_VOLUME_LOOKUP = [0, 15, 7, 3];
 

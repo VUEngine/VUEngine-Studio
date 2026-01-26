@@ -2,7 +2,6 @@ import React, { Dispatch, SetStateAction } from 'react';
 import Input from '../../Common/Base/Input';
 import {
     EventsMap,
-    SEQUENCER_RESOLUTION,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
 
@@ -26,7 +25,7 @@ export default function StepInput(props: StepInputProps): React.JSX.Element {
             label={label}
             type='number'
             min={0}
-            max={patternSize * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION - 1}
+            max={patternSize * SUB_NOTE_RESOLUTION - 1}
             step={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
             value={step}
             setValue={v => {

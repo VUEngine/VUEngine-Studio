@@ -29,11 +29,11 @@ import { getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
     EventsMap,
-    MAX_SEQUENCE_SIZE,
-    MIN_SEQUENCE_SIZE,
+    PATTERN_SIZE_MAX,
+    PATTERN_SIZE_MIN,
+    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     SequenceMap,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -43,7 +43,7 @@ import {
     TRACK_DEFAULT_INSTRUMENT_NAME,
     TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
     TrackConfig,
-    TrackSettings,
+    TrackSettings
 } from './SoundEditorTypes';
 
 export const StyledSoundEditorToolbar = styled.div`
@@ -201,7 +201,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
 
-    const totalSteps = soundData.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+    const totalSteps = soundData.size * SUB_NOTE_RESOLUTION;
     const tickDurationUs = soundData.speed * 1000 / SUB_NOTE_RESOLUTION;
     const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
 
@@ -217,7 +217,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 events: {
                     0: {
                         note: testNote,
-                        duration: 64 * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION
+                        duration: 64 * SUB_NOTE_RESOLUTION
                     }
                 },
                 name: 'testPattern',
@@ -240,7 +240,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     });
 
     const setSize = (size: number): void => {
-        if (size > MAX_SEQUENCE_SIZE || size < MIN_SEQUENCE_SIZE) {
+        if (size > PATTERN_SIZE_MAX || size < PATTERN_SIZE_MIN) {
             return;
         }
 
@@ -256,7 +256,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         if (!pattern) {
                             return;
                         }
-                        const patternSize = pattern.size / SEQUENCER_RESOLUTION;
+                        const patternSize = pattern.size / NOTE_RESOLUTION;
                         if (step + patternSize <= size) {
                             updatedSequence[step] = patternId;
                         }
@@ -272,10 +272,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     };
 
     const increaseSize = (amount: number) =>
-        setSize(Math.min(MAX_SEQUENCE_SIZE, soundData.size + amount));
+        setSize(Math.min(PATTERN_SIZE_MAX, soundData.size + amount));
 
     const decreaseSize = (amount: number) =>
-        setSize(Math.max(MIN_SEQUENCE_SIZE, soundData.size - amount));
+        setSize(Math.max(PATTERN_SIZE_MIN, soundData.size - amount));
 
     React.useEffect(() => {
         // TODO
@@ -531,42 +531,42 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <VContainer gap={2}>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => decreaseSize(1)}
-                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                        >
-                            <Minus size={10} />1
-                        </StyledSoundEditorToolbarSizeButton>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
                             onClick={() => decreaseSize(4)}
                             title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
                         >
                             <Minus size={10} />4
+                        </StyledSoundEditorToolbarSizeButton>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => decreaseSize(16)}
+                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
+                        >
+                            <Minus size={10} />16
                         </StyledSoundEditorToolbarSizeButton>
                     </VContainer>
                     <Input
                         type="number"
                         value={soundData.size}
                         setValue={setSize}
-                        min={MIN_SEQUENCE_SIZE}
-                        max={MAX_SEQUENCE_SIZE}
+                        min={PATTERN_SIZE_MIN}
+                        max={PATTERN_SIZE_MAX}
                         title={nls.localize('vuengine/editors/sound/Length', 'Length')}
                         width={48}
                     />
                     <VContainer gap={2}>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => increaseSize(1)}
-                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                        >
-                            <Plus size={10} />1
-                        </StyledSoundEditorToolbarSizeButton>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
                             onClick={() => increaseSize(4)}
                             title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
                         >
                             <Plus size={10} />4
+                        </StyledSoundEditorToolbarSizeButton>
+                        <StyledSoundEditorToolbarSizeButton
+                            className="theia-button secondary"
+                            onClick={() => increaseSize(16)}
+                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
+                        >
+                            <Plus size={10} />16
                         </StyledSoundEditorToolbarSizeButton>
                     </VContainer>
                 </StyledSoundEditorToolbarGroup>

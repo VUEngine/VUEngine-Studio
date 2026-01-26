@@ -9,7 +9,6 @@ import {
     NOTES,
     PatternConfig,
     PatternMap,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -161,10 +160,10 @@ const mergePatterns = (
     let pattern: PatternConfig = {} as PatternConfig;
     for (let step = 0; step < totalSize; step++) {
         // Does a pattern start at the current step?
-        const sequenceStep = track.sequence[step / (SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION)];
+        const sequenceStep = track.sequence[step / SUB_NOTE_RESOLUTION];
         if (sequenceStep) {
             pattern = patterns[sequenceStep];
-            patternStepSize = pattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION;
+            patternStepSize = pattern.size * SUB_NOTE_RESOLUTION;
             patternStartStep = step;
         }
 
@@ -495,7 +494,7 @@ const applyLoopPoint = (
 ): TrackKeyframes => {
     const result = { ...trackKeyframes };
 
-    const loopPointStep = loopPoint * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION;
+    const loopPointStep = loopPoint * SUB_NOTE_RESOLUTION;
 
     // create dummy event if none exists at loop point
     if (result.keyframeMap[loopPointStep] === undefined) {

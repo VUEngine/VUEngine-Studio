@@ -7,7 +7,6 @@ import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import {
     EventsMap,
     PatternConfig,
-    SEQUENCER_RESOLUTION,
     SOUND_EVENT_LABELS,
     SoundData,
     SoundEvent,
@@ -132,7 +131,6 @@ interface EventListProps {
 export default function EventList(props: EventListProps): React.JSX.Element {
     const { soundData, currentTrackId, currentSequenceIndex, noteSnapping, pattern, noteCursor, setNotes, setNoteCursor } = props;
 
-    const noteOffset = currentSequenceIndex * SEQUENCER_RESOLUTION;
     const eventsKeys = Object.keys(pattern?.events ?? {});
     const formatter = new Intl.NumberFormat(nls.locale);
 
@@ -161,7 +159,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                 <>
                                     {eventsKeys.map((k, i) => {
                                         const localStep = parseInt(k);
-                                        const globalStep = noteOffset + localStep;
+                                        const globalStep = currentSequenceIndex + localStep;
                                         const stepEvents = pattern.events[localStep];
                                         const stepEventsKeys = Object.keys(stepEvents);
                                         const isSelectedNote = noteCursor === globalStep;
@@ -180,7 +178,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             events={stepEvents}
                                                             noteSnapping={noteSnapping}
                                                             patternSize={pattern.size}
-                                                            patternStepOffset={noteOffset}
+                                                            patternStepOffset={currentSequenceIndex}
                                                             setNotes={setNotes}
                                                             setNoteCursor={setNoteCursor}
                                                         />

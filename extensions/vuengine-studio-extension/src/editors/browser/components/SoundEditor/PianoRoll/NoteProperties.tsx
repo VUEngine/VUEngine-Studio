@@ -10,7 +10,6 @@ import {
     NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
-    SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
 import NotePropertiesGrid from './NotePropertiesGrid';
@@ -85,7 +84,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
 
-    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const songLength = soundData.size / NOTE_RESOLUTION;
     const width = Math.min(
         pianoRollScrollWindow.w,
         songLength * NOTE_RESOLUTION * pianoRollNoteWidth

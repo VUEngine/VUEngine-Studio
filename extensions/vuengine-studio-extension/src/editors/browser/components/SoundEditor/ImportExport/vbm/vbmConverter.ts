@@ -18,7 +18,6 @@ import {
     NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -79,7 +78,7 @@ interface ConvertedPattern {
 const NOTE_OFFSET = 39;
 
 export const convertVbmSong = (song: VBMusicFile): SoundData => {
-    const convertedPatternSize = song.SongSettings.Rows / SEQUENCER_RESOLUTION;
+    const convertedPatternSize = song.SongSettings.Rows;
 
     const result: SoundData = {
         name: song.SongSettings.Title,

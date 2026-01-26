@@ -42,7 +42,6 @@ import {
     ScrollWindow,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -290,7 +289,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             // removed all events that are beyond the limits of the pattern
             // this would come into play when resizing down
             const updatedEvents: EventsMap = {};
-            const patternSteps = size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+            const patternSteps = size * SUB_NOTE_RESOLUTION;
             Object.keys(pattern.events).forEach(stepStr => {
                 const step = parseInt(stepStr);
                 if (step < patternSteps) {
@@ -347,7 +346,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentPatternId(newPatternId);
         setCurrentSequenceIndex(newSequenceIndex);
         updateSelectedNotes([]);
-        setNoteCursor(newSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
+        setNoteCursor(newSequenceIndex * SUB_NOTE_RESOLUTION);
         setCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
     };
 
@@ -376,7 +375,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         setCurrentSequenceIndex(sequenceIndex);
         updateSelectedNotes([]);
-        setNoteCursor(sequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION);
+        setNoteCursor(sequenceIndex * SUB_NOTE_RESOLUTION);
     };
 
     const updateNoteCursor = (step: number): void => {
@@ -384,7 +383,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         // Select note at note cursor step, if there is one
         const updatedSelectedNotes: number[] = [];
-        const currentPatternStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+        const currentPatternStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
         const patternRelativeStep = step - currentPatternStartStep;
         const currentPattern = soundData.patterns[currentPatternId];
         const currentPatternEvents = currentPattern?.events;
@@ -711,7 +710,7 @@ A total of {0} instruments will be deleted.",
         let prevStep = -1;
         [
             ...Object.keys(updatedEvents),
-            (currentPattern.size * SUB_NOTE_RESOLUTION * SEQUENCER_RESOLUTION).toString(), // pattern size is last note's limit
+            (currentPattern.size * SUB_NOTE_RESOLUTION).toString(), // pattern size is last note's limit
         ].forEach(step => {
             const stepInt = parseInt(step);
             if (
@@ -953,7 +952,7 @@ A total of {0} instruments will be deleted.",
                 break;
             case SoundEditorCommands.ADD_PATTERN.id:
                 if (soundData.tracks.length > 0) {
-                    const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION / SEQUENCER_RESOLUTION);
+                    const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION);
                     addPattern(currentTrackId, noteCursorStep);
                 }
                 break;
@@ -1141,6 +1140,8 @@ A total of {0} instruments will be deleted.",
                                 addPattern={addPattern}
                                 setEditTrackDialogOpen={setEditTrackDialogOpen}
                                 setPatternDialogOpen={setPatternDialogOpen}
+                                noteSnapping={noteSnapping}
+                                newNoteDuration={newNoteDuration}
                                 effectsPanelHidden={effectsPanelHidden}
                                 pianoRollNoteHeight={pianoRollNoteHeight}
                                 pianoRollNoteWidth={pianoRollNoteWidth}

@@ -14,10 +14,9 @@ import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_NEW_NOTE,
     DEFAULT_NEW_NOTE_DURATION,
-    DEFAULT_PATTERN_SIZE,
+    PATTERN_SIZE_DEFAULT,
     EventsMap,
     PatternConfig,
-    SEQUENCER_RESOLUTION,
     SOUND_EVENT_LABELS,
     SoundData,
     SoundEvent,
@@ -59,7 +58,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const patternStepOffset = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+    const patternStepOffset = currentSequenceIndex * SUB_NOTE_RESOLUTION;
     const relativeStep = noteCursor - patternStepOffset;
     const events = pattern?.events[relativeStep] ?? {};
     const note = events[SoundEvent.Note];
@@ -68,8 +67,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     const duration = events[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
 
     const currentPatternSize = pattern
-        ? pattern.size * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION
-        : DEFAULT_PATTERN_SIZE;
+        ? pattern.size * SUB_NOTE_RESOLUTION
+        : PATTERN_SIZE_DEFAULT;
 
     const addNote = () =>
         setNotes({

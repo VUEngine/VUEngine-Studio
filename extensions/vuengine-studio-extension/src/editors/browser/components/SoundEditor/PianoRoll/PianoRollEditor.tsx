@@ -5,7 +5,6 @@ import {
     NOTES_SPECTRUM,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -101,7 +100,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     return (
         <StyledPianoRollEditor
             style={{
-                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size * SEQUENCER_RESOLUTION * pianoRollNoteWidth,
+                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size * pianoRollNoteWidth,
             }}
         >
             <Piano

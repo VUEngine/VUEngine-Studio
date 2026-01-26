@@ -7,7 +7,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { MAX_SEQUENCE_SIZE, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
+import { PATTERN_SIZE_MAX, MAX_TICK_DURATION, MIN_TICK_DURATION, SoundData } from '../SoundEditorTypes';
 
 interface PropertiesProps {
     soundData: SoundData
@@ -112,7 +112,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                     setValue={setLoopPoint}
                     type='number'
                     min={0}
-                    max={MAX_SEQUENCE_SIZE - 1}
+                    max={PATTERN_SIZE_MAX - 1}
                     width={64}
                 />
             }

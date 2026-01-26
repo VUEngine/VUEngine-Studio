@@ -14,7 +14,6 @@ import {
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
     PIANO_ROLL_KEY_WIDTH,
-    SEQUENCER_RESOLUTION,
     SoundEditorTool,
     SoundEvent,
     SUB_NOTE_RESOLUTION,
@@ -132,7 +131,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const events = pattern.events;
     const patternSize = pattern.size;
     const noteId = NOTES_LABELS.indexOf(noteLabel);
-    const currentSequenceIndexStartStep = currentSequenceIndex * SEQUENCER_RESOLUTION * SUB_NOTE_RESOLUTION;
+    const currentSequenceIndexStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
     const relativeStep = step - currentSequenceIndexStartStep;
 
     const classNames = ['placedNote'];
@@ -163,7 +162,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const rightDragBound = () => {
-        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
+        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * pianoRollNoteWidth;
         let rightMostNoteDuration = duration;
 
         let rightMostNoteDifference = 0;
@@ -197,7 +196,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const leftDragBound = () => {
-        const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * SEQUENCER_RESOLUTION * pianoRollNoteWidth;
+        const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * pianoRollNoteWidth;
 
         let leftMostNoteDifference = 0;
         const smallerNotes = selectedNotes.filter(sn => sn < relativeStep);

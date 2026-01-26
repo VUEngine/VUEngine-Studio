@@ -9,7 +9,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import PatternCanvas from '../Sequencer/PatternCanvas';
 import { getPatternName } from '../SoundEditor';
-import { DEFAULT_PATTERN_SIZE, NEW_PATTERN_ID, SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
+import { PATTERN_SIZE_DEFAULT, NEW_PATTERN_ID, SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
 
 const StyledPattern = styled.button`
     background-color: var(--theia-secondaryButton-background);
@@ -92,7 +92,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const [filter, setFilter] = React.useState<string>('');
 
     const addPatternToSequence = async (patternId: string): Promise<void> => {
-        const patternSize = size !== undefined && size > 1 ? size : DEFAULT_PATTERN_SIZE;
+        const patternSize = size !== undefined && size > 1 ? size : PATTERN_SIZE_DEFAULT;
         const track = soundData.tracks[trackId];
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
@@ -207,7 +207,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                     {
                         size !== undefined && size > 1
                             ? size
-                            : DEFAULT_PATTERN_SIZE
+                            : PATTERN_SIZE_DEFAULT
                     }
                 </div>
             </HContainer>

@@ -9,8 +9,8 @@ import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import { getPatternName } from '../SoundEditor';
 import {
-    MAX_PATTERN_SIZE,
-    MIN_PATTERN_SIZE,
+    PATTERN_SIZE_MAX,
+    PATTERN_SIZE_MIN,
     PatternConfig,
     SequenceMap,
     SoundData,
@@ -168,8 +168,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     setValue={v => setPatternSizes({
                         [currentPatternId]: v as number,
                     })}
-                    min={MIN_PATTERN_SIZE}
-                    max={MAX_PATTERN_SIZE}
+                    min={PATTERN_SIZE_MIN}
+                    max={PATTERN_SIZE_MAX}
                 />
             </VContainer>
         </VContainer>

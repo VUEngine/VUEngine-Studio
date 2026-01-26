@@ -10,7 +10,6 @@ import {
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
     ScrollWindow,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorTool,
     SUB_NOTE_RESOLUTION
@@ -65,7 +64,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const songLength = soundData.size / NOTE_RESOLUTION;
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
     const width = Math.min(
         pianoRollScrollWindow.w,
@@ -156,8 +155,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 return;
             }
 
-            const patternX = step * SEQUENCER_RESOLUTION * pianoRollNoteWidth + 0.5;
-            const patternWidth = pattern.size * SEQUENCER_RESOLUTION * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH - 0.5;
+            const patternX = step * pianoRollNoteWidth + 0.5;
+            const patternWidth = pattern.size * pianoRollNoteWidth - PIANO_ROLL_GRID_WIDTH - 0.5;
 
             if (pianoRollScrollWindow.x > patternX + patternWidth || patternX > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
                 return;
@@ -311,7 +310,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = Math.floor(x / pianoRollNoteWidth / SEQUENCER_RESOLUTION);
+            const step = Math.floor(x / pianoRollNoteWidth / NOTE_RESOLUTION);
 
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, currentTrackId, step);
             if (insidePatternAtSi > -1) {

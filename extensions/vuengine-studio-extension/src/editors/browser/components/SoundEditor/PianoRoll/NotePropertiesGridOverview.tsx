@@ -5,7 +5,6 @@ import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
     NOTE_RESOLUTION,
     ScrollWindow,
-    SEQUENCER_RESOLUTION,
     SoundData
 } from '../SoundEditorTypes';
 
@@ -67,7 +66,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     const { currentThemeType } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const songLength = soundData.size / NOTE_RESOLUTION;
     const width = Math.min(
         pianoRollScrollWindow.w,
         songLength * NOTE_RESOLUTION * pianoRollNoteWidth

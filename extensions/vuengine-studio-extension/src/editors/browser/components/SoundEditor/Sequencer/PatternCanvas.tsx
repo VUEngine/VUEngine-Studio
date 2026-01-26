@@ -9,7 +9,6 @@ import {
     NOTES_SPECTRUM,
     PatternConfig,
     SEQUENCER_GRID_WIDTH,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEvent,
     SUB_NOTE_RESOLUTION
@@ -40,7 +39,7 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
     const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
 
     const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
-    const width = pattern.size / SEQUENCER_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
+    const width = pattern.size / NOTE_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
     const widthCeil = Math.ceil(width);
 
     useEffect(() => {

@@ -5,6 +5,7 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
@@ -15,7 +16,6 @@ import {
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_MAX,
     SEQUENCER_PATTERN_WIDTH_MIN,
-    SEQUENCER_RESOLUTION,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -110,6 +110,8 @@ interface SequencerProps {
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
     setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    noteSnapping: boolean
+    newNoteDuration: number
     effectsPanelHidden: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
@@ -146,6 +148,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         removeTrack,
         addPattern, setPatternSizes,
         setEditTrackDialogOpen, setPatternDialogOpen,
+        noteSnapping,
+        newNoteDuration,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
@@ -167,7 +171,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
 
-    const songLength = soundData.size / SEQUENCER_RESOLUTION;
+    const songLength = soundData.size / NOTE_RESOLUTION;
     const width = songLength * sequencerPatternWidth;
 
     const soloTrack = useMemo(() => {
@@ -540,6 +544,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setCurrentPatternId={setCurrentPatternId}
                     setPatternDialogOpen={setPatternDialogOpen}
+                    noteSnapping={noteSnapping}
+                    newNoteDuration={newNoteDuration}
                     cancelPatternDrag={cancelPatternDrag}
                     setCancelPatternDrag={setCancelPatternDrag}
                     sequencerPatternHeight={sequencerPatternHeight}
