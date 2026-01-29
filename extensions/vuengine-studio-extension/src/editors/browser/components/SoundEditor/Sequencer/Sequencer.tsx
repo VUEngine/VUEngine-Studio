@@ -170,6 +170,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
+    const sequencerGridContainerRef = useRef<HTMLDivElement>(null);
 
     const width = soundData.size * sequencerNoteWidth;
 
@@ -187,7 +188,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     ]);
 
     const mapVerticalToHorizontalScroll = (e: React.WheelEvent): void => {
-        if (e.deltaY === 0) {
+        if (e.deltaY === 0 || e.ctrlKey || e.metaKey) {
             return;
         }
         e.currentTarget.scrollTo({
@@ -196,16 +197,23 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     };
 
     const getScrollWindowCoords = () => {
-        if (!sequencerContainerRef.current) {
+        if (!sequencerGridContainerRef.current) {
             return;
         }
 
         setSequencerScrollWindow({
-            x: sequencerContainerRef.current.scrollLeft,
-            y: sequencerContainerRef.current.scrollTop,
-            w: sequencerContainerRef.current.offsetWidth,
-            h: sequencerContainerRef.current.offsetHeight,
+            x: sequencerGridContainerRef.current.scrollLeft,
+            y: sequencerGridContainerRef.current.scrollTop,
+            w: sequencerGridContainerRef.current.offsetWidth,
+            h: sequencerGridContainerRef.current.offsetHeight,
         });
+    };
+
+    // I am just here to prevent scrolling while resizing with the below event
+    const onWheelNative = (e: WheelEvent): void => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+        }
     };
 
     const onWheel = (e: React.WheelEvent): void => {
@@ -348,12 +356,18 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
-        if (!sequencerContainerRef.current) {
+        sequencerContainerRef.current?.addEventListener('wheel', onWheelNative, { passive: false });
+
+        if (!sequencerGridContainerRef.current) {
             return;
         }
         const resizeObserver = new ResizeObserver(() => getScrollWindowCoords());
-        resizeObserver.observe(sequencerContainerRef.current);
-        return () => resizeObserver.disconnect();
+        resizeObserver.observe(sequencerGridContainerRef.current);
+
+        return () => {
+            resizeObserver.disconnect();
+            sequencerContainerRef.current?.removeEventListener('wheel', onWheelNative);
+        };
     }, []);
 
     useEffect(() => {
@@ -371,6 +385,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             minHeight: sequencerPatternHeight * soundData.tracks.length + SEQUENCER_GRID_METER_HEIGHT +
                 (soundData.tracks.length < VSU_NUMBER_OF_CHANNELS ? SEQUENCER_ADD_TRACK_BUTTON_HEIGHT + 3 : 10),
         }}
+        ref={sequencerContainerRef}
         onWheel={onWheel}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -468,7 +483,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             }
         </StyledTrackHeaderContainer>
         <StyledSequencerGridContainer
-            ref={sequencerContainerRef}
+            ref={sequencerGridContainerRef}
             onWheel={mapVerticalToHorizontalScroll}
             onScroll={getScrollWindowCoords}
         >
@@ -517,7 +532,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
                 setPatternDialogOpen={setPatternDialogOpen}
-                sequencerContainerRef={sequencerContainerRef}
+                sequencerContainerRef={sequencerGridContainerRef}
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 removePatternsFromSequence={removePatternsFromSequence}

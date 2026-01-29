@@ -396,6 +396,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         }
     };
 
+    // I am just here to prevent scrolling while resizing with the below event
+    const onWheelNative = (e: WheelEvent): void => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+        }
+    };
+
     const onWheel = (e: React.WheelEvent): void => {
         if (e.ctrlKey || e.metaKey) {
             if (e.altKey) {
@@ -638,7 +645,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         }
         const resizeObserver = new ResizeObserver(() => getScrollWindowCoords());
         resizeObserver.observe(pianoRollRef.current);
-        return () => resizeObserver.disconnect();
+
+        pianoRollRef.current.addEventListener('wheel', onWheelNative, { passive: false });
+
+        return () => {
+            resizeObserver.disconnect();
+            pianoRollRef.current?.removeEventListener('wheel', onWheelNative);
+        };
     }, []);
 
     return <StyledPianoRollContainer
