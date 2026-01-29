@@ -9,7 +9,15 @@ import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import PatternCanvas from '../Sequencer/PatternCanvas';
 import { getPatternName } from '../SoundEditor';
-import { PATTERN_SIZE_DEFAULT, NEW_PATTERN_ID, SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
+import {
+    DEFAULT_BARS_PER_PATTERN,
+    NEW_PATTERN_ID,
+    SoundData,
+    SoundEditorTrackType,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
+    TRACK_TYPE_LABELS,
+    TrackConfig
+} from '../SoundEditorTypes';
 
 const StyledPattern = styled.button`
     background-color: var(--theia-secondaryButton-background);
@@ -66,7 +74,7 @@ interface AddPatternProps {
     sequenceIndex: number
     trackId: number
     sequencerPatternHeight: number
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     size?: number
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     setCurrentPatternId: (trackId: number, patternId: string) => void
@@ -74,12 +82,13 @@ interface AddPatternProps {
     selectedPatterns: string[]
     setSelectedPatterns: (sn: string[]) => void
     setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, sequenceIndex: number, size?: number }>>
+    stepsPerBar: number,
 }
 
 export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        sequencerPatternHeight, sequencerPatternWidth,
+        sequencerPatternHeight, sequencerNoteWidth,
         sequenceIndex,
         trackId,
         size,
@@ -87,12 +96,13 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setCurrentPatternId, setCurrentSequenceIndex,
         selectedPatterns, setSelectedPatterns,
         setAddPatternDialogOpen,
+        stepsPerBar,
     } = props;
-    const { services, disableCommands, enableCommands, activateEditor } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [filter, setFilter] = React.useState<string>('');
 
     const addPatternToSequence = async (patternId: string): Promise<void> => {
-        const patternSize = size !== undefined && size > 1 ? size : PATTERN_SIZE_DEFAULT;
+        const patternSize = size !== undefined && size > 1 ? size : stepsPerBar * DEFAULT_BARS_PER_PATTERN;
         const track = soundData.tracks[trackId];
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
@@ -140,7 +150,8 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setCurrentSequenceIndex(trackId, sequenceIndex);
         setCurrentPatternId(trackId, patternId);
         setSelectedPatterns([...selectedPatterns, `${trackId}-${sequenceIndex}`]);
-        activateEditor();
+        enableCommands();
+        focusEditor();
     };
 
     const trackType = soundData.tracks[trackId].type;
@@ -207,7 +218,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                     {
                         size !== undefined && size > 1
                             ? size
-                            : PATTERN_SIZE_DEFAULT
+                            : stepsPerBar * DEFAULT_BARS_PER_PATTERN
                     }
                 </div>
             </HContainer>
@@ -235,7 +246,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                                                 pattern={soundData.patterns[p.id]}
                                                 trackId={trackId}
                                                 sequencerPatternHeight={sequencerPatternHeight}
-                                                sequencerPatternWidth={sequencerPatternWidth}
+                                                sequencerNoteWidth={sequencerNoteWidth}
                                             />
                                         </VContainer>
                                         <HContainer justifyContent='space-between'>

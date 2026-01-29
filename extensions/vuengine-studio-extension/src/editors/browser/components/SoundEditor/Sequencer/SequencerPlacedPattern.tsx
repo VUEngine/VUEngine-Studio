@@ -5,7 +5,6 @@ import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
 import { getPatternName } from '../SoundEditor';
 import {
-    NOTE_RESOLUTION,
     PatternConfig,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
@@ -67,13 +66,13 @@ interface SequencerPlacedPatternProps {
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     noteSnapping: boolean
-    newNoteDuration: number
     cancelPatternDrag: boolean
     setCancelPatternDrag: Dispatch<SetStateAction<boolean>>
     sequencerPatternHeight: number
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
     removePatternsFromSequence: (patterns: string[]) => void
+    stepsPerBar: number
 }
 
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
@@ -89,18 +88,16 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         currentSequenceIndex, setCurrentSequenceIndex,
         setPatternDialogOpen,
         noteSnapping,
-        newNoteDuration,
         cancelPatternDrag, setCancelPatternDrag,
-        sequencerPatternHeight, sequencerPatternWidth,
+        sequencerPatternHeight, sequencerNoteWidth,
         setPatternSizes,
         removePatternsFromSequence,
+        stepsPerBar,
     } = props;
     const [isDragging, setIsDragging] = useState(false);
     const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const nodeRef = useRef(null);
 
-    const songLengthInNotes = soundData.size / NOTE_RESOLUTION;
-    const patternNoteWidthInSequencer = sequencerPatternWidth / NOTE_RESOLUTION;
     const isCurrent = currentTrackId === trackId && currentPatternId === patternId;
 
     const classNames = ['placedPattern'];
@@ -114,8 +111,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     }
 
     const patternName = getPatternName(soundData, patternId);
-    const patternSizeInNotes = pattern.size / NOTE_RESOLUTION;
-    const width = patternSizeInNotes * sequencerPatternWidth - SEQUENCER_GRID_WIDTH * 2;
+    const width = pattern.size * sequencerNoteWidth - SEQUENCER_GRID_WIDTH * 2;
 
     const topDragBound = () => {
         const topBound = SEQUENCER_GRID_METER_HEIGHT;
@@ -133,7 +129,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     const rightDragBound = () => {
-        const rightBound = songLengthInNotes * sequencerPatternWidth;
+        const rightBound = soundData.size * sequencerNoteWidth;
         let rightMostPatternSize = pattern.size;
 
         let rightMostPatternDifference = 0;
@@ -143,7 +139,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         if (rightMostPattern !== undefined) {
             const rightMostPatternTrackId = parseInt(rightMostPattern.split('-')[0]);
             const rightMostPatternSequenceIndex = parseInt(rightMostPattern.split('-')[1]);
-            rightMostPatternDifference = (rightMostPatternSequenceIndex - sequenceIndex) / NOTE_RESOLUTION * sequencerPatternWidth;
+            rightMostPatternDifference = (rightMostPatternSequenceIndex - sequenceIndex) * sequencerNoteWidth;
             if (soundData.tracks[rightMostPatternTrackId]) {
                 const t = soundData.tracks[rightMostPatternTrackId];
                 const pId = t.sequence[rightMostPatternSequenceIndex];
@@ -154,7 +150,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             }
         }
 
-        const rightMostPatternWidth = rightMostPatternSize / NOTE_RESOLUTION * sequencerPatternWidth;
+        const rightMostPatternWidth = rightMostPatternSize * sequencerNoteWidth;
 
         return rightBound - rightMostPatternDifference - rightMostPatternWidth;
     };
@@ -183,14 +179,14 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             .filter(sp => sp < sequenceIndex)
             .sort()[0];
         if (leftMostPatternSi !== undefined) {
-            leftMostPatternDifference = (sequenceIndex - leftMostPatternSi) / NOTE_RESOLUTION * sequencerPatternWidth;
+            leftMostPatternDifference = (sequenceIndex - leftMostPatternSi) * sequencerNoteWidth;
         }
 
         return leftBound + leftMostPatternDifference;
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newSize = Math.ceil(data.size.width / sequencerPatternWidth * NOTE_RESOLUTION);
+        const newSize = Math.ceil(data.size.width / sequencerNoteWidth);
 
         const patterns: { [patternId: string]: number } = {
             [patternId]: newSize
@@ -237,7 +233,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         }
 
         const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-        const newSequenceIndex = Math.floor(data.x / sequencerPatternWidth * NOTE_RESOLUTION);
+        const newSequenceIndex = Math.floor(data.x / sequencerNoteWidth);
         if (newTrackId === trackId && newSequenceIndex === sequenceIndex) {
             return;
         }
@@ -301,8 +297,8 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             nodeRef={nodeRef}
             grid={[
                 noteSnapping
-                    ? patternNoteWidthInSequencer * newNoteDuration
-                    : patternNoteWidthInSequencer,
+                    ? stepsPerBar * sequencerNoteWidth
+                    : sequencerNoteWidth,
                 sequencerPatternHeight
             ]}
             handle=".placedPattern"
@@ -311,7 +307,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
             onDrag={onDrag}
             onStop={onDragStop}
             position={{
-                x: sequenceIndex / NOTE_RESOLUTION * sequencerPatternWidth,
+                x: sequenceIndex * sequencerNoteWidth,
                 y: SEQUENCER_GRID_METER_HEIGHT + trackId * sequencerPatternHeight,
             }}
             bounds={{
@@ -342,19 +338,19 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                     draggableOpts={{
                         grid: [
                             noteSnapping
-                                ? patternNoteWidthInSequencer * newNoteDuration
-                                : patternNoteWidthInSequencer,
+                                ? stepsPerBar * sequencerNoteWidth
+                                : sequencerNoteWidth,
                             sequencerPatternHeight
                         ]
                     }}
                     axis="x"
                     minConstraints={[
                         noteSnapping
-                            ? patternNoteWidthInSequencer * newNoteDuration
-                            : patternNoteWidthInSequencer,
+                            ? stepsPerBar * sequencerNoteWidth
+                            : sequencerNoteWidth,
                         sequencerPatternHeight
                     ]}
-                    maxConstraints={[sequencerPatternWidth * songLengthInNotes, sequencerPatternHeight]}
+                    maxConstraints={[sequencerNoteWidth * soundData.size, sequencerPatternHeight]}
                     resizeHandles={['e']}
                     onResizeStop={onResize}
                 />

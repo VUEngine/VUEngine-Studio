@@ -18,19 +18,19 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.toolEdit',
         label: nls.localize('vuengine/editors/sound/commands/toolEdit', 'Tool: Edit'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'v',
+        keybinding: 'b',
     };
     export const TOOL_ERASER: EditorCommand = {
         id: 'editors.soundEditor.toolEraser',
         label: nls.localize('vuengine/editors/sound/commands/toolEraser', 'Tool: Eraser'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'b',
+        keybinding: 'e',
     };
     export const TOOL_DRAG: EditorCommand = {
         id: 'editors.soundEditor.toolDrag',
         label: nls.localize('vuengine/editors/sound/commands/toolDrag', 'Tool: Drag'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'n',
+        keybinding: 'g',
     };
     export const TOOL_MARQUEE: EditorCommand = {
         id: 'editors.soundEditor.toolMarquee',

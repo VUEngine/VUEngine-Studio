@@ -264,7 +264,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const durationDelta = newDuration - duration;
         const notes: EventsMap = {};
         selectedNotes.forEach(sn => {
-            const adjustedDuration = events[sn][SoundEvent.Duration]
+            const noteEvents = events[sn];
+            if (!noteEvents) {
+                return;
+            }
+            const adjustedDuration = noteEvents[SoundEvent.Duration]
                 ? noteSnapping
                     ? Math.max(SUB_NOTE_RESOLUTION, events[sn][SoundEvent.Duration] + durationDelta)
                     : Math.max(1, events[sn][SoundEvent.Duration] + durationDelta)

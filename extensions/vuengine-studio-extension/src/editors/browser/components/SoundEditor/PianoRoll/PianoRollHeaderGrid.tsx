@@ -4,7 +4,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getFoundPatternSequenceIndex, getPatternName, getToolModeCursor } from '../SoundEditor';
 import {
-    DEFAULT_PLAY_RANGE_SIZE,
+    DEFAULT_BARS_PER_PATTERN,
     NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
@@ -41,6 +41,7 @@ interface PianoRollHeaderGridProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
+    stepsPerBar: number
 }
 
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
@@ -59,15 +60,12 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         setPatternDialogOpen,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
+        stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
-    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
-    const stepsPerBar = NOTE_RESOLUTION / bar;
-    const totalStepsPerBar = beats * stepsPerBar;
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
     const width = Math.min(
         pianoRollScrollWindow.w,
@@ -101,7 +99,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             if (offsetElement > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
                 break;
             }
-            if (x % totalStepsPerBar !== 0) {
+            if (x % stepsPerBar !== 0) {
                 continue;
             }
 
@@ -112,7 +110,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
             context.stroke();
 
-            context.fillText((x / totalStepsPerBar).toString(), offset + 4, 12);
+            context.fillText((x / stepsPerBar).toString(), offset + 4, 12);
         }
 
         // middle line
@@ -239,7 +237,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         if (e.button === 0 && rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
             const startStep = Math.min(rangeDragStartStep, rangeDragEndStep);
             const endStep = rangeDragStartStep === rangeDragEndStep
-                ? startStep + DEFAULT_PLAY_RANGE_SIZE
+                ? startStep + stepsPerBar * DEFAULT_BARS_PER_PATTERN
                 : Math.max(rangeDragStartStep, rangeDragEndStep) + 1;
 
             setPlayRangeStart(startStep);

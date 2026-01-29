@@ -315,13 +315,14 @@ export class VesProjectService {
       return;
     }
 
-    const baseUri = this.workspaceProjectFolderUri.resolve('assets').resolve(typeId);
-    let fileUri = baseUri?.resolve(`${filename}/${filename}${type.file}`);
+    const typeBaseUri = this.workspaceProjectFolderUri.resolve('assets').resolve(typeId);
+    let folderUri = typeBaseUri.resolve(filename);
     let count = 1;
-    while ((await this.fileService.exists(fileUri))) {
-      fileUri = baseUri?.resolve(`${filename}/${filename}-${count}${type.file}`);
+    while ((await this.fileService.exists(folderUri))) {
+      folderUri = typeBaseUri.resolve(`${filename}-${count}`);
       count++;
     }
+    const fileUri = folderUri.resolve(`${filename}${type.file}`);
 
     let data = await this.getSchemaDefaults(type);
     if (cloneItem) {

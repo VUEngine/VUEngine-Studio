@@ -72,7 +72,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         setGeneratingProgress,
         enableCommands,
         setCommands,
-        activateEditor,
+        focusEditor,
         onCommandExecute,
         services
     } = useContext(EditorsContext) as EditorsContextType;
@@ -652,12 +652,12 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                         onClose={() => {
                                             setSpriteProcessingDialog(false);
                                             enableCommands();
-                                            activateEditor();
+                                            focusEditor();
                                         }}
                                         onOk={() => {
                                             setSpriteProcessingDialog(false);
                                             enableCommands();
-                                            activateEditor();
+                                            focusEditor();
                                         }}
                                         title={nls.localize('vuengine/editors/general/imageProcessingSettings', 'Image Processing Settings')}
                                         height='100%'
@@ -685,12 +685,12 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                 onClose={() => {
                                     setAddComponentDialogOpen(false);
                                     enableCommands();
-                                    activateEditor();
+                                    focusEditor();
                                 }}
                                 onOk={() => {
                                     setAddComponentDialogOpen(false);
                                     enableCommands();
-                                    activateEditor();
+                                    focusEditor();
                                 }}
                                 title={nls.localize('vuengine/editors/sound/addComponent', 'Add Component')}
                                 height='400px'

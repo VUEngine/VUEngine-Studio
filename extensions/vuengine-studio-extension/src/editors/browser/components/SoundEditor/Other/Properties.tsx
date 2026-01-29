@@ -12,16 +12,15 @@ import { MAX_TICK_DURATION, MIN_TICK_DURATION, NOTE_RESOLUTION, PATTERN_SIZE_MAX
 
 interface PropertiesProps {
     soundData: SoundData
+    beats: number
+    bar: number
     updateSoundData: (soundData: SoundData) => void
     setNewNoteDuration: Dispatch<SetStateAction<number>>
 }
 
 export default function Properties(props: PropertiesProps): React.JSX.Element {
-    const { soundData, updateSoundData, setNewNoteDuration } = props;
+    const { soundData, beats, bar, updateSoundData, setNewNoteDuration } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
-
-    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
-    const bar = soundData.timeSignature[0].split('/')[1] ?? '4';
 
     const handleOnFocus = () => {
         disableCommands();
@@ -129,7 +128,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                     />
                     /
                     <AdvancedSelect
-                        defaultValue={bar}
+                        defaultValue={`${bar}`}
                         onChange={b => setBar(parseInt(b[0]))}
                         options={[{
                             value: '1',
@@ -147,6 +146,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                             value: '16',
                             label: '16',
                         }]}
+                        menuPlacement='top'
                         width={64}
                     />
                 </HContainer>

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NOTE_RESOLUTION } from '../SoundEditorTypes';
 
 export const StyledLoopIndicator = styled.div`
     background-color: var(--theia-editor-foreground);
@@ -14,13 +13,13 @@ export const StyledLoopIndicator = styled.div`
 interface LoopIndicatorProps {
     position: number
     hidden: boolean
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
 }
 
 export default function LoopIndicator(props: LoopIndicatorProps): React.JSX.Element {
-    const { position, hidden, sequencerPatternWidth } = props;
+    const { position, hidden, sequencerNoteWidth } = props;
 
-    const offset = position * sequencerPatternWidth / NOTE_RESOLUTION;
+    const offset = position * sequencerNoteWidth;
 
     return <StyledLoopIndicator style={{
         display: hidden ? 'none' : undefined,

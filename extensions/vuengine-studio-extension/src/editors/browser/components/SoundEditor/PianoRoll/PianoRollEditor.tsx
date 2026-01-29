@@ -68,6 +68,8 @@ interface PianoRollEditorProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -88,6 +90,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
+        stepsPerNote, stepsPerBar,
     } = props;
     const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
     const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
@@ -166,6 +169,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     trackSettings={trackSettings}
                     selectedNotes={selectedNotes}
                     setSelectedNotes={setSelectedNotes}
+                    stepsPerNote={stepsPerNote}
+                    stepsPerBar={stepsPerBar}
                 />
             </StyledPianoRollGridContainer>
         </StyledPianoRollEditor>

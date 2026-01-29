@@ -181,7 +181,7 @@ interface PianoRollProps {
     pianoRollNoteWidth: number
     setPianoRollNoteWidth: Dispatch<SetStateAction<number>>
     sequencerPatternHeight: number
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
@@ -192,6 +192,8 @@ interface PianoRollProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -218,7 +220,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         newNoteDuration,
         pianoRollNoteHeight, setPianoRollNoteHeight,
         pianoRollNoteWidth, setPianoRollNoteWidth,
-        sequencerPatternHeight, sequencerPatternWidth,
+        sequencerPatternHeight, sequencerNoteWidth,
         pianoRollScrollWindow, setPianoRollScrollWindow,
         setCurrentInstrumentId,
         setPatternDialogOpen,
@@ -226,6 +228,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
+        stepsPerNote, stepsPerBar,
     } = props;
     const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
@@ -395,18 +398,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     const onWheel = (e: React.WheelEvent): void => {
         if (e.ctrlKey || e.metaKey) {
-            if (e.shiftKey) {
-                let newNoteWidth = Math.round(pianoRollNoteWidth - (e.deltaX / 8));
-
-                if (newNoteWidth > PIANO_ROLL_NOTE_WIDTH_MAX) {
-                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MAX;
-                } else if (newNoteWidth < PIANO_ROLL_NOTE_WIDTH_MIN) {
-                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MIN;
-                }
-
-                setPianoRollNoteWidth(newNoteWidth);
-            } else {
-                let newNoteHeight = Math.round(pianoRollNoteHeight - (e.deltaY / 4));
+            if (e.altKey) {
+                let newNoteHeight = Math.round(pianoRollNoteHeight - (e.deltaY / 8));
 
                 if (newNoteHeight > PIANO_ROLL_NOTE_HEIGHT_MAX) {
                     newNoteHeight = PIANO_ROLL_NOTE_HEIGHT_MAX;
@@ -415,6 +408,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 }
 
                 setPianoRollNoteHeight(newNoteHeight);
+            } else {
+                let newNoteWidth = Math.round(pianoRollNoteWidth - (e.deltaY / 64));
+
+                if (newNoteWidth > PIANO_ROLL_NOTE_WIDTH_MAX) {
+                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MAX;
+                } else if (newNoteWidth < PIANO_ROLL_NOTE_WIDTH_MIN) {
+                    newNoteWidth = PIANO_ROLL_NOTE_WIDTH_MIN;
+                }
+
+                setPianoRollNoteWidth(newNoteWidth);
             }
 
             e.stopPropagation();
@@ -626,7 +629,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         songLength,
         effectsPanelHidden,
         pianoRollNoteWidth,
-        sequencerPatternWidth,
+        sequencerNoteWidth,
     ]);
 
     useEffect(() => {
@@ -714,7 +717,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
-                sequencerPatternWidth={sequencerPatternWidth}
+                sequencerNoteWidth={sequencerNoteWidth}
             />
             {tool === SoundEditorTool.EDIT &&
                 placedNotesCurrentPattern()
@@ -765,8 +768,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 rangeDragEndStep={rangeDragEndStep}
                 setRangeDragEndStep={setRangeDragEndStep}
                 effectsPanelHidden={effectsPanelHidden}
-                sequencerPatternWidth={sequencerPatternWidth}
+                sequencerNoteWidth={sequencerNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
+                stepsPerBar={stepsPerBar}
             />
             <PianoRollEditor
                 soundData={soundData}
@@ -789,6 +793,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
+                stepsPerNote={stepsPerNote}
+                stepsPerBar={stepsPerBar}
             />
             { /* }
             <NoteProperties

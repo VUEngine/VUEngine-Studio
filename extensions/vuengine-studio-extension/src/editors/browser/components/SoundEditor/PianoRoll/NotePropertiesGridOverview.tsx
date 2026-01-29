@@ -28,7 +28,7 @@ export const drawGrid = (
     const h = canvas.height;
 
     // vertical lines
-    for (let x = 1; x <= bars * NOTE_RESOLUTION; x++) {
+    for (let x = 1; x <= bars; x++) {
         const offsetElement = x * noteWidth;
         if (offsetElement < scrollOffset) {
             continue;
@@ -66,10 +66,9 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     const { currentThemeType } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const songLength = soundData.size / NOTE_RESOLUTION;
     const width = Math.min(
         pianoRollScrollWindow.w,
-        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+        soundData.size * pianoRollNoteWidth
     );
 
     const draw = (): void => {
@@ -82,7 +81,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
             return;
         }
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_COLLAPSED_HEIGHT);
-        drawGrid(canvas, context, currentThemeType, songLength, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
+        drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
     };
 
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -94,7 +93,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
     }, [
         currentThemeType,
         soundData.tracks,
-        songLength,
+        soundData.size,
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,
         pianoRollScrollWindow.w,

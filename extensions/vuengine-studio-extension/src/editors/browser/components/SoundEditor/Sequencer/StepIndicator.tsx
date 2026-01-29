@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-    NOTE_RESOLUTION,
     NOTES_SPECTRUM,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
@@ -48,7 +47,7 @@ interface StepIndicatorProps {
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     sequencerPatternHeight: number
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     pianoRollScrollWindow?: ScrollWindow
 }
 
@@ -60,7 +59,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         effectsPanelHidden,
         hidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
-        sequencerPatternHeight, sequencerPatternWidth,
+        sequencerPatternHeight, sequencerNoteWidth,
         pianoRollScrollWindow,
     } = props;
 
@@ -70,7 +69,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
     const style = {
         display: hidden ? 'none' : undefined,
         left: position === StepIndicatorPosition.SEQUENCER
-            ? currentPlayerPosition * sequencerPatternWidth / NOTE_RESOLUTION
+            ? currentPlayerPosition * sequencerNoteWidth
             : position === StepIndicatorPosition.PIANO_ROLL_HEADER
                 ? PIANO_ROLL_KEY_WIDTH + 2 + currentPlayerPosition * pianoRollNoteWidth - (pianoRollScrollWindow?.x ?? 0)
                 : PIANO_ROLL_KEY_WIDTH + 2 + currentPlayerPosition * pianoRollNoteWidth,

@@ -263,19 +263,18 @@ export const NOTES_PER_OCTAVE = 12;
 export const NOTE_RESOLUTION = 16; // 1/16 note
 export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 
-export const DEFAULT_PLAY_RANGE_SIZE = 64;
+export const DEFAULT_BARS_PER_PATTERN = 4;
 export const DEFAULT_NEW_NOTE = 'C4';
 
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
 export const SEQUENCER_PATTERN_HEIGHT_MAX = 64;
 export const SEQUENCER_PATTERN_HEIGHT_DEFAULT = 40;
-export const SEQUENCER_PATTERN_WIDTH_MIN = 8;
-export const SEQUENCER_PATTERN_WIDTH_MAX = 120;
-export const SEQUENCER_PATTERN_WIDTH_DEFAULT = 32;
+export const SEQUENCER_PATTERN_WIDTH_MIN = .25;
+export const SEQUENCER_PATTERN_WIDTH_MAX = 64;
+export const SEQUENCER_PATTERN_WIDTH_DEFAULT = 2;
 export const SEQUENCER_NOTE_HEIGHT = 3;
 export const PATTERN_SIZE_MIN = 1;
 export const PATTERN_SIZE_MAX = 2048;
-export const PATTERN_SIZE_DEFAULT = 16;
 export const SEQUENCER_GRID_METER_HEIGHT = 14;
 export const SEQUENCER_GRID_WIDTH = 1;
 export const SEQUENCER_ADD_TRACK_BUTTON_HEIGHT = 16;

@@ -4,7 +4,6 @@ import CanvasImage from '../../Common/CanvasImage';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import {
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -19,7 +18,7 @@ interface PatternCanvasProps {
     trackId: number
     pattern: PatternConfig
     sequencerPatternHeight: number
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     style?: Object
 }
 
@@ -28,7 +27,7 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
         soundData,
         trackId,
         pattern,
-        sequencerPatternHeight, sequencerPatternWidth,
+        sequencerPatternHeight, sequencerNoteWidth,
         style,
     } = props;
     const [patternPixels, setPatternPixels] = useState<number[][][]>([]);
@@ -38,8 +37,7 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
     const trackDefaultInstrument = soundData.instruments[track.instrument];
     const defaultColor = COLOR_PALETTE[trackDefaultInstrument?.color ?? DEFAULT_COLOR_INDEX];
 
-    const patternNoteWidth = sequencerPatternWidth / NOTE_RESOLUTION;
-    const width = pattern.size / NOTE_RESOLUTION * sequencerPatternWidth - SEQUENCER_GRID_WIDTH;
+    const width = pattern.size * sequencerNoteWidth - SEQUENCER_GRID_WIDTH;
     const widthCeil = Math.ceil(width);
 
     useEffect(() => {
@@ -59,8 +57,8 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
                 pixels[y] = [];
                 colors[y] = [];
             }
-            for (let k = 0; k < patternNoteWidth; k++) {
-                const xPos = Math.round(x * patternNoteWidth + k);
+            for (let k = 0; k < sequencerNoteWidth; k++) {
+                const xPos = Math.round(x * sequencerNoteWidth + k);
                 pixels[y][xPos] = 1;
                 colors[y][xPos] = color;
                 if (pixels[y - 1]) {
@@ -83,7 +81,7 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
             const color = instrumentId
                 ? COLOR_PALETTE[soundData.instruments[instrumentId].color ?? DEFAULT_COLOR_INDEX]
                 : defaultColor;
-            if (noteLabel !== '') {
+            if (noteLabel) {
                 const noteId = NOTES_LABELS.indexOf(noteLabel);
                 const duration = event[SoundEvent.Duration]
                     ? Math.floor(event[SoundEvent.Duration] / SUB_NOTE_RESOLUTION)
@@ -103,7 +101,7 @@ export default function PatternCanvas(props: PatternCanvasProps): React.JSX.Elem
         soundData.instruments[track.instrument],
         pattern.events,
         sequencerPatternHeight,
-        sequencerPatternWidth,
+        sequencerNoteWidth,
     ]);
 
     return (

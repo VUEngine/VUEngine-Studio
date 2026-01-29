@@ -2,7 +2,7 @@ import React, { Dispatch, RefObject, SetStateAction } from 'react';
 import styled from 'styled-components';
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import {
-    DEFAULT_PLAY_RANGE_SIZE,
+    DEFAULT_BARS_PER_PATTERN,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
@@ -80,8 +80,9 @@ interface PianoRollHeaderProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     effectsPanelHidden: boolean
-    sequencerPatternWidth: number
+    sequencerNoteWidth: number
     sequencerPatternHeight: number
+    stepsPerBar: number
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -101,7 +102,8 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         effectsPanelHidden,
-        sequencerPatternWidth, sequencerPatternHeight,
+        sequencerNoteWidth, sequencerPatternHeight,
+        stepsPerBar,
     } = props;
 
     return <MetaLine
@@ -116,7 +118,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
                 style={{
                     left: PIANO_ROLL_KEY_WIDTH + 2 + Math.min(rangeDragStartStep, rangeDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
                     width: pianoRollNoteWidth * (rangeDragStartStep === rangeDragEndStep
-                        ? DEFAULT_PLAY_RANGE_SIZE
+                        ? stepsPerBar * DEFAULT_BARS_PER_PATTERN
                         : (Math.abs(rangeDragStartStep - rangeDragEndStep) + 1)),
                 }}
             />
@@ -130,7 +132,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             pianoRollNoteHeight={pianoRollNoteHeight}
             pianoRollNoteWidth={pianoRollNoteWidth}
             sequencerPatternHeight={sequencerPatternHeight}
-            sequencerPatternWidth={sequencerPatternWidth}
+            sequencerNoteWidth={sequencerNoteWidth}
             pianoRollScrollWindow={pianoRollScrollWindow}
         />
         <PianoRollHeaderGrid
@@ -154,6 +156,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             setRangeDragStartStep={setRangeDragStartStep}
             rangeDragEndStep={rangeDragEndStep}
             setRangeDragEndStep={setRangeDragEndStep}
+            stepsPerBar={stepsPerBar}
         />
     </MetaLine>;
 };

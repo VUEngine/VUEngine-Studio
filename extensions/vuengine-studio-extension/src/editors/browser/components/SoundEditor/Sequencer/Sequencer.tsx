@@ -5,7 +5,6 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
-    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
@@ -111,14 +110,13 @@ interface SequencerProps {
     setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     noteSnapping: boolean
-    newNoteDuration: number
     effectsPanelHidden: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     sequencerPatternHeight: number
     setSequencerPatternHeight: Dispatch<SetStateAction<number>>
-    sequencerPatternWidth: number
-    setSequencerPatternWidth: Dispatch<SetStateAction<number>>
+    sequencerNoteWidth: number
+    setSequencerNoteWidth: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
     removePatternsFromSequence: (patterns: string[]) => void
     trackSettings: TrackSettings[]
@@ -131,6 +129,8 @@ interface SequencerProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -149,11 +149,10 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         addPattern, setPatternSizes,
         setEditTrackDialogOpen, setPatternDialogOpen,
         noteSnapping,
-        newNoteDuration,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
-        sequencerPatternWidth, setSequencerPatternWidth,
+        sequencerNoteWidth, setSequencerNoteWidth,
         pianoRollScrollWindow,
         removePatternsFromSequence,
         trackSettings,
@@ -162,6 +161,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setForcePlayerRomRebuild,
+        stepsPerNote, stepsPerBar,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
@@ -171,8 +171,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
 
-    const songLength = soundData.size / NOTE_RESOLUTION;
-    const width = songLength * sequencerPatternWidth;
+    const width = soundData.size * sequencerNoteWidth;
 
     const soloTrack = useMemo(() => {
         let st = -1;
@@ -211,18 +210,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
 
     const onWheel = (e: React.WheelEvent): void => {
         if (e.ctrlKey || e.metaKey) {
-            if (e.shiftKey) {
-                let newPatternWidth = Math.round(sequencerPatternWidth - (e.deltaX / 8));
-
-                if (newPatternWidth > SEQUENCER_PATTERN_WIDTH_MAX) {
-                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MAX;
-                } else if (newPatternWidth < SEQUENCER_PATTERN_WIDTH_MIN) {
-                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MIN;
-                }
-
-                setSequencerPatternWidth(newPatternWidth);
-            } else {
-                let newPatternHeight = Math.round(sequencerPatternHeight - (e.deltaY / 4));
+            if (e.altKey) {
+                let newPatternHeight = Math.round(sequencerPatternHeight - (e.deltaY / 8));
 
                 if (newPatternHeight > SEQUENCER_PATTERN_HEIGHT_MAX) {
                     newPatternHeight = SEQUENCER_PATTERN_HEIGHT_MAX;
@@ -231,6 +220,16 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 }
 
                 setSequencerPatternHeight(newPatternHeight);
+            } else {
+                let newPatternWidth = Math.round(sequencerNoteWidth - (e.deltaY / 64));
+
+                if (newPatternWidth > SEQUENCER_PATTERN_WIDTH_MAX) {
+                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MAX;
+                } else if (newPatternWidth < SEQUENCER_PATTERN_WIDTH_MIN) {
+                    newPatternWidth = SEQUENCER_PATTERN_WIDTH_MIN;
+                }
+
+                setSequencerNoteWidth(newPatternWidth);
             }
 
             e.stopPropagation();
@@ -326,17 +325,17 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setSequencerPatternHeight(SEQUENCER_PATTERN_HEIGHT_DEFAULT);
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id:
-                setSequencerPatternWidth(prev =>
-                    prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - 2 : prev
+                setSequencerNoteWidth(prev =>
+                    prev > SEQUENCER_PATTERN_WIDTH_MIN ? prev - .25 : prev
                 );
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id:
-                setSequencerPatternWidth(prev =>
-                    prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + 2 : prev
+                setSequencerNoteWidth(prev =>
+                    prev < SEQUENCER_PATTERN_WIDTH_MAX ? prev + .25 : prev
                 );
                 break;
             case SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id:
-                setSequencerPatternWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
+                setSequencerNoteWidth(SEQUENCER_PATTERN_WIDTH_DEFAULT);
                 break;
         }
     };
@@ -344,8 +343,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     useEffect(() => {
         getScrollWindowCoords();
     }, [
-        songLength,
-        sequencerPatternWidth,
+        soundData.size,
+        sequencerNoteWidth,
     ]);
 
     useEffect(() => {
@@ -473,11 +472,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             onWheel={mapVerticalToHorizontalScroll}
             onScroll={getScrollWindowCoords}
         >
-            <div
-                style={{
-                    width: width,
-                }}
-            />
+            <div style={{ width: width }} />
             <StepIndicator
                 soundData={soundData}
                 currentPlayerPosition={currentPlayerPosition}
@@ -487,7 +482,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
-                sequencerPatternWidth={sequencerPatternWidth}
+                sequencerNoteWidth={sequencerNoteWidth}
             />
             <SequencerGrid
                 soundData={soundData}
@@ -505,7 +500,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 playRangeEnd={playRangeEnd}
                 setPlayRangeEnd={setPlayRangeEnd}
                 sequencerPatternHeight={sequencerPatternHeight}
-                sequencerPatternWidth={sequencerPatternWidth}
+                sequencerNoteWidth={sequencerNoteWidth}
                 patternDragTrackId={patternDragTrackId}
                 setPatternDragTrackId={setPatternDragTrackId}
                 patternDragStartStep={patternDragStartStep}
@@ -526,6 +521,9 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 removePatternsFromSequence={removePatternsFromSequence}
+                noteSnapping={noteSnapping}
+                stepsPerNote={stepsPerNote}
+                stepsPerBar={stepsPerBar}
             />
             {tool === SoundEditorTool.EDIT && soundData.patterns[currentPatternId] &&
                 <SequencerPlacedPattern
@@ -545,13 +543,13 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentPatternId={setCurrentPatternId}
                     setPatternDialogOpen={setPatternDialogOpen}
                     noteSnapping={noteSnapping}
-                    newNoteDuration={newNoteDuration}
                     cancelPatternDrag={cancelPatternDrag}
                     setCancelPatternDrag={setCancelPatternDrag}
                     sequencerPatternHeight={sequencerPatternHeight}
-                    sequencerPatternWidth={sequencerPatternWidth}
+                    sequencerNoteWidth={sequencerNoteWidth}
                     setPatternSizes={setPatternSizes}
                     removePatternsFromSequence={removePatternsFromSequence}
+                    stepsPerBar={stepsPerBar}
                 />
             }
         </StyledSequencerGridContainer>

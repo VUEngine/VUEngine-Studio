@@ -166,6 +166,8 @@ interface SoundEditorToolbarProps {
     setNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
@@ -195,6 +197,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setNotes,
         setTrack,
         forcePlayerRomRebuild,
+        stepsPerNote, stepsPerBar,
     } = props;
     const isPlayingRegular = playing && !testNote;
 
@@ -276,11 +279,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
 
     const decreaseSize = (amount: number) =>
         setSize(Math.max(PATTERN_SIZE_MIN, soundData.size - amount));
-
-    React.useEffect(() => {
-        // TODO
-        // activateEditor();
-    }, [tool]);
 
     return <StyledSoundEditorToolbar>
         <StyledSoundEditorToolbarSide>
@@ -531,17 +529,17 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <VContainer gap={2}>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => decreaseSize(4)}
+                            onClick={() => decreaseSize(stepsPerNote)}
                             title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
                         >
-                            <Minus size={10} />4
+                            <Minus size={10} />{stepsPerNote}
                         </StyledSoundEditorToolbarSizeButton>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => decreaseSize(16)}
+                            onClick={() => decreaseSize(stepsPerBar)}
                             title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
                         >
-                            <Minus size={10} />16
+                            <Minus size={10} />{stepsPerBar}
                         </StyledSoundEditorToolbarSizeButton>
                     </VContainer>
                     <Input
@@ -556,17 +554,17 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <VContainer gap={2}>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => increaseSize(4)}
+                            onClick={() => increaseSize(stepsPerNote)}
                             title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
                         >
-                            <Plus size={10} />4
+                            <Plus size={10} />{stepsPerNote}
                         </StyledSoundEditorToolbarSizeButton>
                         <StyledSoundEditorToolbarSizeButton
                             className="theia-button secondary"
-                            onClick={() => increaseSize(16)}
+                            onClick={() => increaseSize(stepsPerBar)}
                             title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
                         >
-                            <Plus size={10} />16
+                            <Plus size={10} />{stepsPerBar}
                         </StyledSoundEditorToolbarSizeButton>
                     </VContainer>
                 </StyledSoundEditorToolbarGroup>

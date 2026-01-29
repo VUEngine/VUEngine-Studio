@@ -6,7 +6,6 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
 import {
     EventsMap,
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
@@ -57,6 +56,8 @@ interface PianoRollGridProps {
     trackSettings: TrackSettings[]
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
@@ -85,20 +86,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollRef,
         trackSettings,
         selectedNotes, setSelectedNotes,
+        stepsPerNote, stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const songLength = soundData.size / NOTE_RESOLUTION;
-    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
-    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
-    const stepsPerBar = NOTE_RESOLUTION / bar;
-    const totalStepsPerBar = beats * stepsPerBar;
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
     const width = Math.min(
         pianoRollScrollWindow.w,
-        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+        soundData.size * pianoRollNoteWidth
     );
 
     const getNoteLabel = (events: EventsMap, step: number) => {
@@ -144,14 +141,13 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         // highlight current pattern
         const currentPattern = soundData.patterns[currentPatternId];
         if (currentPattern && currentSequenceIndex > -1) {
-            const currentPatternSize = currentPattern.size / NOTE_RESOLUTION;
             const highlightColor = services.colorRegistry.getCurrentColor('focusBorder') ?? 'red';
             const mutedHighlightColor = chroma(highlightColor).alpha(0.1).toString();
             context.fillStyle = mutedHighlightColor;
             context.fillRect(
                 currentSequenceIndex * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
                 0,
-                currentPatternSize * NOTE_RESOLUTION * pianoRollNoteWidth - 0.5,
+                currentPattern.size * pianoRollNoteWidth - 0.5,
                 height,
             );
 
@@ -187,7 +183,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // vertical lines
-        for (let x = 1; x <= songLength * NOTE_RESOLUTION; x++) {
+        for (let x = 1; x <= soundData.size; x++) {
             const offsetElement = x * pianoRollNoteWidth;
             if (offsetElement < pianoRollScrollWindow.x) {
                 continue;
@@ -199,9 +195,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             context.beginPath();
             context.moveTo(offset, 0);
             context.lineTo(offset, height);
-            context.strokeStyle = x % totalStepsPerBar === 0
+            context.strokeStyle = x % stepsPerBar === 0
                 ? hiColor
-                : x % stepsPerBar === 0
+                : x % stepsPerNote === 0
                     ? medColor
                     : lowColor;
             context.stroke();

@@ -7,7 +7,6 @@ import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
     EFFECTS_PANEL_EXPANDED_HEIGHT,
-    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SoundData
@@ -84,10 +83,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
 
-    const songLength = soundData.size / NOTE_RESOLUTION;
     const width = Math.min(
         pianoRollScrollWindow.w,
-        songLength * NOTE_RESOLUTION * pianoRollNoteWidth
+        soundData.size * pianoRollNoteWidth
     );
 
     const toggleEffectsPanel = () => {

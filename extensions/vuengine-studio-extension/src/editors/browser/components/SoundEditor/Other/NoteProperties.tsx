@@ -12,8 +12,8 @@ import StepInput from '../EventList/StepInput';
 import { getNoteSlideLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    DEFAULT_BARS_PER_PATTERN,
     DEFAULT_NEW_NOTE,
-    PATTERN_SIZE_DEFAULT,
     EventsMap,
     PatternConfig,
     SOUND_EVENT_LABELS,
@@ -41,6 +41,7 @@ interface NotePropertiesProps {
     playNote: (note: string, instrumentId?: string) => void
     setNotes: (notes: EventsMap) => void
     newNoteDuration: number
+    stepsPerBar: number
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -56,6 +57,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         playNote,
         setNotes,
         newNoteDuration,
+        stepsPerBar,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -69,7 +71,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     const currentPatternSize = pattern
         ? pattern.size * SUB_NOTE_RESOLUTION
-        : PATTERN_SIZE_DEFAULT;
+        : stepsPerBar * DEFAULT_BARS_PER_PATTERN;
 
     const addNote = () =>
         setNotes({
