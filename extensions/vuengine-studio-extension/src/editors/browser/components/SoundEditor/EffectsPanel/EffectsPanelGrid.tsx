@@ -6,9 +6,9 @@ import {
     ScrollWindow,
     SoundData
 } from '../SoundEditorTypes';
-import { drawGrid } from './NotePropertiesGridOverview';
+import { drawGrid } from './EffectsPanelGridOverview';
 
-interface NotePropertiesGridProps {
+interface EffectsPanelGridProps {
     soundData: SoundData
     currentTrackId: number
     currentPatternId: string
@@ -17,9 +17,11 @@ interface NotePropertiesGridProps {
     setNoteCursor: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
-export default function NotePropertiesGrid(props: NotePropertiesGridProps): React.JSX.Element {
+export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JSX.Element {
     const {
         soundData,
         currentTrackId,
@@ -28,6 +30,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         noteCursor, setNoteCursor,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
+        stepsPerNote, stepsPerBar,
     } = props;
     const { currentThemeType } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,7 +51,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         }
 
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_EXPANDED_HEIGHT);
-        drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
+        drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w, stepsPerNote, stepsPerBar);
     };
 
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -67,8 +70,7 @@ export default function NotePropertiesGrid(props: NotePropertiesGridProps): Reac
         draw();
     }, [
         currentThemeType,
-        soundData.tracks,
-        soundData.size,
+        soundData,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,

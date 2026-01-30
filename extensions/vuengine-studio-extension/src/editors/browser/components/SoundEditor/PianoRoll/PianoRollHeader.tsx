@@ -13,6 +13,7 @@ import PianoRollHeaderGrid from './PianoRollHeaderGrid';
 
 export const MetaLine = styled.div`
     background: var(--theia-editor-background);
+    border-bottom: 1px solid rgba(255, 255, 255, .6);
     border-top: 1px solid rgba(255, 255, 255, .6);
     box-sizing: border-box;
     cursor: crosshair;
@@ -25,6 +26,7 @@ export const MetaLine = styled.div`
 
     body.theia-light &,
     body.theia-hc & {
+        border-bottom-color: rgba(0, 0, 0, .6);
         border-top-color: rgba(0, 0, 0, .6);
     }
 `;
@@ -108,6 +110,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
 
     return <MetaLine
         style={{
+            borderBottomWidth: 0,
             borderTopWidth: 0,
             paddingLeft: PIANO_ROLL_KEY_WIDTH + 2,
             top: 0,

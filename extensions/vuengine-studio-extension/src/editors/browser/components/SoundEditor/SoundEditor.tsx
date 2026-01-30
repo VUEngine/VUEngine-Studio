@@ -174,7 +174,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, sequenceIndex: number, size?: number }>({ trackId: -1, sequenceIndex: -1 });
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
     const [instrumentDialogOpen, setInstrumentDialogOpen] = useState<boolean>(false);
-    const [toolsDialogOpen, setToolsDialogOpen] = useState<boolean>(false);
+    const [utilitiesDialogOpen, setUtilitiesDialogOpen] = useState<boolean>(false);
     const [keyBindingsDialogOpen, setKeyBindingsDialogOpen] = useState<boolean>(false);
     const [propertiesDialogOpen, setPropertiesDialogOpen] = useState<boolean>(false);
     const [editTrackDialogOpen, setEditTrackDialogOpen] = useState<boolean>(false);
@@ -937,7 +937,7 @@ A total of {0} instruments will be deleted.",
             updateSoundData({ ...soundData, ...importedSoundData });
             updateCurrentSequenceIndex(0, 0);
 
-            setToolsDialogOpen(false);
+            setUtilitiesDialogOpen(false);
             enableCommands();
             focusEditor();
         }
@@ -1017,7 +1017,7 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedPatterns();
-                    setToolsDialogOpen(false);
+                    setUtilitiesDialogOpen(false);
                     enableCommands();
                     focusEditor();
                 }
@@ -1025,7 +1025,7 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedInstruments();
-                    setToolsDialogOpen(false);
+                    setUtilitiesDialogOpen(false);
                     enableCommands();
                     focusEditor();
                 }
@@ -1141,8 +1141,8 @@ A total of {0} instruments will be deleted.",
                     playerRomBuilder={playerRomBuilder}
                     currentInstrumentId={currentInstrumentId}
                     setCurrentInstrumentId={setCurrentInstrumentId}
-                    toolsDialogOpen={toolsDialogOpen}
-                    setToolsDialogOpen={setToolsDialogOpen}
+                    utilitiesDialogOpen={utilitiesDialogOpen}
+                    setUtilitiesDialogOpen={setUtilitiesDialogOpen}
                     propertiesDialogOpen={propertiesDialogOpen}
                     setPropertiesDialogOpen={setPropertiesDialogOpen}
                     keyBindingsDialogOpen={keyBindingsDialogOpen}
@@ -1428,20 +1428,20 @@ A total of {0} instruments will be deleted.",
                     <Keybindings />
                 </PopUpDialog>
             }
-            {toolsDialogOpen &&
+            {utilitiesDialogOpen &&
                 <PopUpDialog
-                    open={toolsDialogOpen}
+                    open={utilitiesDialogOpen}
                     onClose={() => {
-                        setToolsDialogOpen(false);
+                        setUtilitiesDialogOpen(false);
                         enableCommands();
                         focusEditor();
                     }}
                     onOk={() => {
-                        setToolsDialogOpen(false);
+                        setUtilitiesDialogOpen(false);
                         enableCommands();
                         focusEditor();
                     }}
-                    title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
+                    title={nls.localize('vuengine/editors/sound/utilities', 'Utilities')}
                     height='260px'
                     width='460px'
                     overflow='visible'

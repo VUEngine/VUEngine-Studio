@@ -157,8 +157,8 @@ interface SoundEditorToolbarProps {
     playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
-    toolsDialogOpen: boolean
-    setToolsDialogOpen: Dispatch<SetStateAction<boolean>>
+    utilitiesDialogOpen: boolean
+    setUtilitiesDialogOpen: Dispatch<SetStateAction<boolean>>
     keyBindingsDialogOpen: boolean
     setKeyBindingsDialogOpen: Dispatch<SetStateAction<boolean>>
     propertiesDialogOpen: boolean
@@ -191,7 +191,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         trackSettings,
         playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
-        toolsDialogOpen, setToolsDialogOpen,
+        utilitiesDialogOpen, setUtilitiesDialogOpen,
         keyBindingsDialogOpen, setKeyBindingsDialogOpen,
         propertiesDialogOpen, setPropertiesDialogOpen,
         setNotes,
@@ -578,9 +578,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <FadersHorizontal size={17} />
                 </StyledSoundEditorToolbarButton>
                 <StyledSoundEditorToolbarButton
-                    className={`theia-button ${toolsDialogOpen ? 'primary' : 'secondary'}`}
-                    title={nls.localize('vuengine/editors/sound/tools', 'Tools')}
-                    onClick={() => setToolsDialogOpen(prev => !prev)}
+                    className={`theia-button ${utilitiesDialogOpen ? 'primary' : 'secondary'}`}
+                    title={nls.localize('vuengine/editors/sound/utilities', 'Utilities')}
+                    onClick={() => setUtilitiesDialogOpen(prev => !prev)}
                 >
                     <Wrench size={17} />
                 </StyledSoundEditorToolbarButton>
@@ -592,7 +592,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     <Keyboard size={17} />
                 </StyledSoundEditorToolbarButton>
                 <StyledSoundEditorToolbarButton
-                    className={`theia-button ${toolsDialogOpen ? 'primary' : 'secondary'}`}
+                    className={`theia-button ${utilitiesDialogOpen ? 'primary' : 'secondary'}`}
                     title={nls.localizeByDefault('Documentation')}
                     onClick={() => services.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/sound-editor', false)}
                 >

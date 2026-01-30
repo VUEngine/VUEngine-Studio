@@ -3,6 +3,7 @@ import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, use
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import EffectsPanel from '../EffectsPanel/EffectsPanel';
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
@@ -211,7 +212,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
-        effectsPanelHidden, /* setEffectsPanelHidden, */
+        effectsPanelHidden, setEffectsPanelHidden,
         eventListHidden, setEventListHidden,
         setNotes,
         playNote,
@@ -810,8 +811,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 stepsPerNote={stepsPerNote}
                 stepsPerBar={stepsPerBar}
             />
-            { /* }
-            <NoteProperties
+            <EffectsPanel
                 soundData={soundData}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}
@@ -822,8 +822,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setEffectsPanelHidden={setEffectsPanelHidden}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                stepsPerNote={stepsPerNote}
+                stepsPerBar={stepsPerBar}
             />
-            { */ }
         </StyledPianoRoll>
     </StyledPianoRollContainer>;
 }

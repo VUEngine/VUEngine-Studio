@@ -3,13 +3,20 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
-    NOTE_RESOLUTION,
     ScrollWindow,
     SoundData
 } from '../SoundEditorTypes';
 
 export const drawGrid = (
-    canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, themeType: string, bars: number, noteWidth: number, scrollOffset: number, scrollWidth: number
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    themeType: string,
+    bars: number,
+    noteWidth: number,
+    scrollOffset: number,
+    scrollWidth: number,
+    stepsPerNote: number,
+    stepsPerBar: number,
 ) => {
     const highContrastTheme = ['hc', 'hcLight'].includes(themeType);
     const c = ['light', 'hcLight'].includes(themeType) ? 0 : 255;
@@ -40,28 +47,31 @@ export const drawGrid = (
         context.beginPath();
         context.moveTo(offset, 0);
         context.lineTo(offset, h);
-        context.strokeStyle = x % NOTE_RESOLUTION === 0
+        context.strokeStyle = x % stepsPerBar === 0
             ? hiColor
-            : x % 4 === 0
+            : x % stepsPerNote === 0
                 ? medColor
                 : lowColor;
         context.stroke();
     }
 };
 
-interface NotePropertiesGridOverviewProps {
+interface EffectsPanelGridOverviewProps {
     soundData: SoundData
     expandPanel: () => void
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
-export default function NotePropertiesGridOverview(props: NotePropertiesGridOverviewProps): React.JSX.Element {
+export default function EffectsPanelGridOverview(props: EffectsPanelGridOverviewProps): React.JSX.Element {
     const {
         soundData,
         expandPanel,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
+        stepsPerNote, stepsPerBar,
     } = props;
     const { currentThemeType } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,8 +90,9 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         if (!context) {
             return;
         }
+
         scaleCanvasAccountForDpi(canvas, context, width, EFFECTS_PANEL_COLLAPSED_HEIGHT);
-        drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w);
+        drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w, stepsPerNote, stepsPerBar);
     };
 
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -92,8 +103,7 @@ export default function NotePropertiesGridOverview(props: NotePropertiesGridOver
         draw();
     }, [
         currentThemeType,
-        soundData.tracks,
-        soundData.size,
+        soundData,
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,
         pianoRollScrollWindow.w,

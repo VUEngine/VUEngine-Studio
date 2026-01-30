@@ -11,9 +11,9 @@ import {
     ScrollWindow,
     SoundData
 } from '../SoundEditorTypes';
-import NotePropertiesGrid from './NotePropertiesGrid';
-import NotePropertiesGridOverview from './NotePropertiesGridOverview';
-import { MetaLine, MetaLineHeader } from './PianoRollHeader';
+import EffectsPanelGrid from './EffectsPanelGrid';
+import EffectsPanelGridOverview from './EffectsPanelGridOverview';
+import { MetaLine, MetaLineHeader } from '../PianoRoll/PianoRollHeader';
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -50,13 +50,14 @@ const StyledTabList = styled(TabList)`
     }
 `;
 
-const NotePropertiesTabs = [
+const EffectsPanelTabs = [
+    nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
     nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
     nls.localize('vuengine/editors/sound/trackVolume', 'Track Volume'),
     nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
 ];
 
-interface NotePropertiesProps {
+interface EffectsPanelProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: Dispatch<SetStateAction<number>>
@@ -67,9 +68,11 @@ interface NotePropertiesProps {
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
+    stepsPerNote: number
+    stepsPerBar: number
 }
 
-export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
+export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Element {
     const {
         soundData,
         noteCursor: noteCursor, setNoteCursor,
@@ -79,6 +82,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         effectsPanelHidden, setEffectsPanelHidden,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
+        stepsPerNote, stepsPerBar
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
@@ -102,17 +106,19 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     let grid = <></>;
     if (effectsPanelHidden) {
-        grid = <NotePropertiesGridOverview
+        grid = <EffectsPanelGridOverview
             soundData={soundData}
             expandPanel={toggleEffectsPanel}
             pianoRollNoteWidth={pianoRollNoteWidth}
             pianoRollScrollWindow={pianoRollScrollWindow}
+            stepsPerNote={stepsPerNote}
+            stepsPerBar={stepsPerBar}
         />;
     } else {
         switch (tab) {
             default:
             case 0:
-                grid = <NotePropertiesGrid
+                grid = <EffectsPanelGrid
                     soundData={soundData}
                     noteCursor={noteCursor}
                     currentTrackId={currentTrackId}
@@ -121,6 +127,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     setNoteCursor={setNoteCursor}
                     pianoRollNoteWidth={pianoRollNoteWidth}
                     pianoRollScrollWindow={pianoRollScrollWindow}
+                    stepsPerNote={stepsPerNote}
+                    stepsPerBar={stepsPerBar}
                 />;
                 break;
         }
@@ -167,7 +175,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         >
             {!effectsPanelHidden &&
                 <StyledTabList>
-                    {NotePropertiesTabs.map(n => <Tab>{n}</Tab>)}
+                    {EffectsPanelTabs.map(n => <Tab>{n}</Tab>)}
                 </StyledTabList>
             }
             {grid}

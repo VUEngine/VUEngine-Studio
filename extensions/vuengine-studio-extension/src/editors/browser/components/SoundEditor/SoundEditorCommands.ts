@@ -109,21 +109,23 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'shift+up',
     };
+    export const SELECT_NEXT_PATTERN: EditorCommand = {
+        id: 'editors.soundEditor.nextPattern',
+        label: nls.localize('vuengine/editors/sound/commands/nextPattern', 'Select Next Pattern'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+right',
+    };
+    export const SELECT_PREVIOUS_PATTERN: EditorCommand = {
+        id: 'editors.soundEditor.previousPattern',
+        label: nls.localize('vuengine/editors/sound/commands/previousPattern', 'Select Previous Pattern'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'shift+left',
+    };
     export const ADD_PATTERN: EditorCommand = {
         id: 'editors.soundEditor.addPattern',
         label: nls.localize('vuengine/editors/sound/commands/addPattern', 'Add Pattern To Current Track'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: ['shift+add', 'shift+plus'],
-    };
-    export const SELECT_NEXT_SEQUENCE_INDEX: EditorCommand = {
-        id: 'editors.soundEditor.selectNextSequenceIndex',
-        label: nls.localize('vuengine/editors/sound/commands/selectNextSequenceIndex', 'Select Next Sequence Index'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-    };
-    export const SELECT_PREVIOUS_SEQUENCE_INDEX: EditorCommand = {
-        id: 'editors.soundEditor.selectPreviousSequenceIndex',
-        label: nls.localize('vuengine/editors/sound/commands/selectPreviousSequenceIndex', 'Select Previous Sequence Index'),
-        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
     };
     export const SEQUENCER_VERTICAL_SCALE_REDUCE: EditorCommand = {
         id: 'editors.soundEditor.sequencerVerticalScaleReduce',
@@ -171,13 +173,13 @@ export namespace SoundEditorCommands {
         id: 'editors.soundEditor.pianoRollSelectNextNote',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectNextNote', 'Select Next Note'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+right',
+        keybinding: 'down',
     };
     export const PIANO_ROLL_SELECT_PREVIOUS_NOTE: EditorCommand = {
         id: 'editors.soundEditor.pianoRollSelectPreviousNote',
         label: nls.localize('vuengine/editors/sound/commands/pianoRollSelectPreviousNote', 'Select Previous Note'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
-        keybinding: 'shift+left',
+        keybinding: 'up',
     };
     export const PIANO_ROLL_VERTICAL_SCALE_REDUCE: EditorCommand = {
         id: 'editors.soundEditor.pianoRollVerticalScaleReduce',
@@ -274,7 +276,6 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/toggleEffectsPanelVisibility', 'Toggle Effects Panel Visibility'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'f',
-        disabled: true,
     };
     export const OPEN_INSTRUMENT_EDITOR: EditorCommand = {
         id: 'editors.soundEditor.openInstrumentEditor',

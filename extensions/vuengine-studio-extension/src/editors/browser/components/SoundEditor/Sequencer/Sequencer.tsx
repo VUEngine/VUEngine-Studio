@@ -300,21 +300,21 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentTrackId(currentTrackId - 1);
                 }
                 break;
-            case SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX.id:
-                // TODO
-                /*
-                if (currentSequenceIndex < soundData.channels[currentTrackId].sequence.length - 1) {
-                    setCurrentSequenceIndex(currentTrackId, currentSequenceIndex + 1);
+            case SoundEditorCommands.SELECT_NEXT_PATTERN.id:
+                const followingPatterns = Object.keys(soundData.tracks[currentTrackId].sequence)
+                    .map(si => parseInt(si))
+                    .filter(si => si > currentSequenceIndex);
+                if (followingPatterns.length) {
+                    setCurrentSequenceIndex(currentTrackId, Math.min(...followingPatterns));
                 }
-                */
                 break;
-            case SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX.id:
-                // TODO
-                /*
-                if (currentSequenceIndex > 0) {
-                    setCurrentSequenceIndex(currentTrackId, currentSequenceIndex - 1);
+            case SoundEditorCommands.SELECT_PREVIOUS_PATTERN.id:
+                const previousPatterns = Object.keys(soundData.tracks[currentTrackId].sequence)
+                    .map(si => parseInt(si))
+                    .filter(si => si < currentSequenceIndex);
+                if (previousPatterns.length) {
+                    setCurrentSequenceIndex(currentTrackId, Math.max(...previousPatterns));
                 }
-                */
                 break;
             case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
                 removePatternsFromSequence(selectedPatterns);

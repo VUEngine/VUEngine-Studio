@@ -215,18 +215,6 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}
                     />
-                    <ButtonAssignment
-                        command={SoundEditorCommands.SELECT_NEXT_SEQUENCE_INDEX}
-                        commandService={services.commandService}
-                        vesCommonService={services.vesCommonService}
-                        width={KEYBINDING_WIDTH}
-                    />
-                    <ButtonAssignment
-                        command={SoundEditorCommands.SELECT_PREVIOUS_SEQUENCE_INDEX}
-                        commandService={services.commandService}
-                        vesCommonService={services.vesCommonService}
-                        width={KEYBINDING_WIDTH}
-                    />
                 </VContainer>
                 <VContainer>
                     <ButtonAssignment
@@ -273,6 +261,18 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.SELECT_PREVIOUS_TRACK}
+                        commandService={services.commandService}
+                        vesCommonService={services.vesCommonService}
+                        width={KEYBINDING_WIDTH}
+                    />
+                    <ButtonAssignment
+                        command={SoundEditorCommands.SELECT_NEXT_PATTERN}
+                        commandService={services.commandService}
+                        vesCommonService={services.vesCommonService}
+                        width={KEYBINDING_WIDTH}
+                    />
+                    <ButtonAssignment
+                        command={SoundEditorCommands.SELECT_PREVIOUS_PATTERN}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}

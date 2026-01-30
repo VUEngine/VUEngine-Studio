@@ -50,7 +50,7 @@ const StyledTable = styled.table`
             td {
                 border-bottom: 1px solid rgba(255, 255, 255, .1);
                 cursor: pointer;
-                padding: 2px 4px;
+                padding: 1px 4px;
 
                 body.theia-light &,
                 body.theia-hc & {
@@ -63,7 +63,7 @@ const StyledTable = styled.table`
                 }
 
                 div, input, select {
-                    margin-bottom: 4px;
+                    margin-bottom: 1px;
                     max-width: 120px;
                     overflow: hidden;
                     text-overflow: ellipsis;
