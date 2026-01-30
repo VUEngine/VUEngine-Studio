@@ -25,7 +25,7 @@ export default function MethodsTree(): React.JSX.Element {
 
         if (type === parentId) {
             // @ts-ignore
-            const updatedMethods = [...data.methods];
+            const updatedMethods = deepClone(data.methods);
             updatedMethods.splice(targetIndex > currentIndex
                 ? targetIndex - 1
                 : targetIndex, 0,

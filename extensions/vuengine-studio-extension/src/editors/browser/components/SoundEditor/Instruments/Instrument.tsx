@@ -1,5 +1,5 @@
 import { ArrowBendRightDown, Clipboard, Copy, Trash } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
 import styled from 'styled-components';
@@ -100,7 +100,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         updateSoundData({
             ...soundData,
             instruments: updatedInstruments,
-            tracks: [...soundData.tracks].map(t => {
+            tracks: deepClone(soundData.tracks).map(t => {
                 if (t.type !== type && t.instrument === instrumentId) {
                     t.instrument = '';
                 } else if (t.type === type && t.instrument === '') {
@@ -305,8 +305,11 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedInstruments = { ...soundData.instruments };
-            delete updatedInstruments[instrumentId];
+            // filter out instrument
+            const updatedInstruments = Object.fromEntries(
+                Object.entries({ ...soundData.instruments })
+                    .filter(([iId, i]) => iId !== instrumentId)
+            );
 
             // remove references in tracks
             const updatedTracks = [

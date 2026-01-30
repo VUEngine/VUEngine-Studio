@@ -1,12 +1,14 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
+import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getPatternName } from '../SoundEditor';
 import {
     PATTERN_SIZE_MAX,
@@ -18,7 +20,6 @@ import {
     TRACK_TYPE_LABELS,
     TrackConfig
 } from '../SoundEditorTypes';
-import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 
 interface CurrentPatternProps {
     soundData: SoundData
@@ -39,6 +40,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         setPattern, setPatternSizes,
         setPatternDialogOpen,
     } = props;
+    const { enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
 
     const pattern = soundData.patterns[currentPatternId];
 
@@ -91,8 +93,11 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
             updateSoundData(updatedSoundData);
             const firstPatternId = Object.keys(soundData.patterns)[0] ?? '';
             setCurrentPatternId(currentTrackId, firstPatternId);
+
             if (firstPatternId === '') {
                 setPatternDialogOpen(false);
+                enableCommands();
+                focusEditor();
             }
         }
     };

@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
@@ -361,7 +362,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 if (selectedNotes.includes(step)) {
                     setSelectedNotes(selectedNotes.filter(sn => sn !== step).sort());
                 } else {
-                    setSelectedNotes([...selectedNotes, step].sort());
+                    setSelectedNotes([...deepClone(selectedNotes), step].sort());
                 }
             } else {
                 const stepEvent = events[relativeStep];
@@ -380,7 +381,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             } else if (selectedNotes.includes(step)) {
                 setSelectedNotes(selectedNotes.filter(sn => sn !== step).sort());
             } else {
-                setSelectedNotes([...selectedNotes, step].sort());
+                setSelectedNotes([...deepClone(selectedNotes), step].sort());
             }
         }
 

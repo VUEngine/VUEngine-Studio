@@ -1,12 +1,12 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { WithContributor } from '../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/Base/HContainer';
 import LanguagesTable from './LanguagesTable';
 import { LANGUAGES, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
-import HContainer from '../Common/Base/HContainer';
 
 const I18N_PLUGIN_ID = 'vuengine//other/I18n';
 
@@ -29,7 +29,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
     };
 
     const onChangeFlag = (index: number, flag: string): void => {
-        const updatedLanguages = [...translationsData.languages];
+        const updatedLanguages = deepClone(translationsData.languages);
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             flag,
@@ -42,7 +42,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
     };
 
     const onChangeLocalizedName = (index: number, localizedName: string): void => {
-        const updatedLanguages = [...translationsData.languages];
+        const updatedLanguages = deepClone(translationsData.languages);
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             localizedName: localizedName,
@@ -55,7 +55,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
     };
 
     const onChangeLanguage = (index: number, code: string): void => {
-        const updatedLanguages = [...translationsData.languages];
+        const updatedLanguages = deepClone(translationsData.languages);
         updatedLanguages[index] = {
             ...updatedLanguages[index],
             code: code,
@@ -75,7 +75,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
         const newLanguageCode = filteredLanguageCodes[0];
 
         // add language itself
-        const updatedLanguages = [...translationsData.languages];
+        const updatedLanguages = deepClone(translationsData.languages);
         updatedLanguages.push({
             code: newLanguageCode,
             flag: '',
@@ -109,7 +109,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
         const remove = await dialog.open();
         if (remove) {
             // remove language itself
-            const updatedLanguages = [...translationsData.languages].filter(l => l.code !== code);
+            const updatedLanguages = deepClone(translationsData.languages).filter(l => l.code !== code);
             // remove translations for language
             const updatedTranslations: Translations = {};
             Object.keys(translationsData.translations).map(translationKey => {
@@ -196,7 +196,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
     };
 
     const moveLanguage = (from: number, to: number): void => {
-        const updatedLanguages = [...translationsData.languages];
+        const updatedLanguages = deepClone(translationsData.languages);
         const removedLanguage = updatedLanguages.splice(from, 1).pop();
         updatedLanguages.splice(to > from ? to - 1 : to, 0, removedLanguage!);
 

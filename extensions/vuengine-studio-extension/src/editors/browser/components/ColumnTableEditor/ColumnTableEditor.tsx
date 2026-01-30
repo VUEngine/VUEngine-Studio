@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import Checkbox from '../Common/Base/Checkbox';
@@ -29,7 +29,7 @@ export default function ColumnTableEditor(props: ColumnTableEditorProps): React.
     };
 
     const setValue = (index: number, value: ColumnTableEntry): void => {
-        const updatedValues = [...data.values];
+        const updatedValues = deepClone(data.values);
         updatedValues[index] = value;
         updateData({
             ...data,

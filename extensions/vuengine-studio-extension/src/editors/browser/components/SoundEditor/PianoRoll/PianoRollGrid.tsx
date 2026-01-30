@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -487,7 +488,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         if (selectedNotes.includes(foundStep)) {
                             setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep).sort());
                         } else {
-                            setSelectedNotes([...selectedNotes, foundStep].sort());
+                            setSelectedNotes([...deepClone(selectedNotes), foundStep].sort());
                         }
                     } else {
                         const currentPattern = soundData.patterns[currentPatternId];
@@ -622,9 +623,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     );
 
                 if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                    setSelectedNotes([...selectedNotes, ...newSelectedNotes]);
+                    setSelectedNotes([...deepClone(selectedNotes), ...newSelectedNotes]);
                 } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
-                    setSelectedNotes([...selectedNotes, ...newSelectedNotes]
+                    setSelectedNotes([...deepClone(selectedNotes), ...newSelectedNotes]
                         .filter(item => !(selectedNotes.includes(item) && newSelectedNotes.includes(item)))
                         .sort()
                     );

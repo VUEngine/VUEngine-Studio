@@ -1,5 +1,5 @@
 import { Trash } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -71,7 +71,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                 </label>
                 <InputWithAction>
                     <AdvancedSelect
-                        options={[...soundData.tracks.map((c, i) => {
+                        options={deepClone(soundData.tracks).map((c, i) => {
                             switch (c.type) {
                                 default:
                                 case SoundEditorTrackType.WAVE:
@@ -90,7 +90,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                         value: i.toString(),
                                     };
                             }
-                        })]}
+                        })}
                         defaultValue={`${currentTrackId}`}
                         onChange={options => onSelectTrack(parseInt(options[0]))}
                     />

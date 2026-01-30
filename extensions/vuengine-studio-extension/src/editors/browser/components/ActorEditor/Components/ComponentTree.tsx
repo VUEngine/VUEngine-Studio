@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Tree } from 'react-arborist';
 import { WithFileUri } from '../../../../../project/browser/ves-project-types';
@@ -39,7 +39,7 @@ export default function ComponentTree(): React.JSX.Element {
 
         if (type === parentId) {
             // @ts-ignore
-            const componentsOfType = [...data.components[type]];
+            const componentsOfType = deepClone(data.components[type]);
             const removedItem = componentsOfType.splice(currentIndex, 1).pop();
             componentsOfType.splice(targetIndex > currentIndex
                 ? targetIndex - 1

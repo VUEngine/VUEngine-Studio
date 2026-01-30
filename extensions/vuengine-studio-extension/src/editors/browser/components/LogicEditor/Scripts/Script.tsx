@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import React, { useContext } from 'react';
 import { WHEEL_SENSITIVITY } from '../../ActorEditor/ActorEditorTypes';
 import Scalable from '../../Common/Editor/Scalable';
@@ -21,7 +22,7 @@ export default function Script(props: ScriptProps): React.JSX.Element {
     const script = scriptConfig?.script ?? [];
 
     const updateScript = (s: ScriptedActionData[]) => {
-        const updatedMethods = [...data.methods || []];
+        const updatedMethods = deepClone(data.methods || []);
         updatedMethods[currentScriptIndex] = {
             ...updatedMethods[currentScriptIndex],
             ...{ script: s },

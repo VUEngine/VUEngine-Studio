@@ -465,7 +465,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                 ...Object.keys(soundData.instruments)
                                     .filter(instrumentId => {
                                         const instr = soundData.instruments[instrumentId];
-                                        return TRACK_TYPE_INSTRUMENT_COMPATIBILITY[currentTrack.type].includes(instr.type);
+                                        return instr && TRACK_TYPE_INSTRUMENT_COMPATIBILITY[currentTrack.type].includes(instr.type);
                                     })
                                     .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
                                         (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')

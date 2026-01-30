@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
 import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -126,7 +126,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     };
 
     const setCurrentCharacterData = (character: number[][]): void => {
-        const updatedCharacters = [...(data.characters || [])];
+        const updatedCharacters = deepClone(data.characters || []);
         updatedCharacters[currentCharacterIndex] = character;
         updateFontData({ characters: updatedCharacters });
     };
@@ -215,7 +215,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     };
 
     const applyPixelChanges = (modifiedPixels: PixelModifyItem[]): void => {
-        const updatedCharacter = [...(characters[currentCharacterIndex] ?? [])];
+        const updatedCharacter = [...deepClone(characters[currentCharacterIndex] ?? [])];
         modifiedPixels.forEach(mp => {
             if (updatedCharacter[mp.rowIndex] === null || updatedCharacter[mp.rowIndex] === undefined) {
                 updatedCharacter[mp.rowIndex] = [];

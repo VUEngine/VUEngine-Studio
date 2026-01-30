@@ -1,4 +1,4 @@
-import { environment, nls, URI } from '@theia/core';
+import { deepClone, environment, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
@@ -198,11 +198,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        setSelectedNotes(sn
+        const updatedSelectedNotes = sn
             .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-            .sort()
-        );
-        setSelectedPatterns([]);
+            .sort();
+
+        setSelectedNotes(updatedSelectedNotes);
+
+        if (updatedSelectedNotes.length) {
+            setSelectedPatterns([]);
+        }
     };
 
     const updateSelectedPatterns = (sp: string[]) => {
@@ -210,11 +214,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        setSelectedNotes([]);
-        setSelectedPatterns(sp
+        const updatedSelectedPatterns = sp
             .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-            .sort()
-        );
+            .sort();
+
+        setSelectedPatterns(updatedSelectedPatterns);
+
+        if (updatedSelectedPatterns.length) {
+            setSelectedNotes([]);
+        }
     };
 
     const setTrack = (trackId: number, track: Partial<TrackConfig>): void => {
@@ -263,7 +271,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 ...soundData.tracks.slice(trackId + 1)
             ]
         });
+
         setEditTrackDialogOpen(false);
+        enableCommands();
+        focusEditor();
     };
 
     const setPattern = (patternId: string, pattern: Partial<PatternConfig>): void => {
@@ -421,13 +432,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        const updatedTracks = [...soundData.tracks];
+        const updatedTracks = deepClone(soundData.tracks);
         patterns.forEach(identifier => {
             const trackId = parseInt(identifier.split('-')[0]);
             const sequenceIndex = parseInt(identifier.split('-')[1]);
 
             if (updatedTracks[trackId] && updatedTracks[trackId].sequence[sequenceIndex]) {
-                delete updatedTracks[trackId].sequence[sequenceIndex];
+                // filter out at sequenceIndex
+                updatedTracks[trackId].sequence = Object.fromEntries(
+                    Object.entries(updatedTracks[trackId].sequence)
+                        .filter(([si, v]) => parseInt(si) !== sequenceIndex)
+                );
 
                 // Select previous, next or no pattern if deleted currently selected pattern
                 if (currentTrackId === trackId && currentSequenceIndex === sequenceIndex) {
@@ -504,12 +519,13 @@ A total of {0} patterns will be deleted.',
 
         const confirmed = await dialog.open();
         if (confirmed) {
-            const updatedPatterns = { ...soundData.patterns };
-
             const unusedPatternsIds = Object.keys(unusedPatterns);
-            unusedPatternsIds.forEach(patternId => {
-                delete updatedPatterns[patternId];
-            });
+
+            // filter out unused patterns
+            const updatedPatterns = Object.fromEntries(
+                Object.entries({ ...soundData.patterns })
+                    .filter(([pId, p]) => !unusedPatternsIds.includes(pId))
+            );
 
             updateSoundData({
                 ...soundData,
@@ -579,11 +595,11 @@ A total of {0} instruments will be deleted.",
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            const updatedInstruments = { ...soundData.instruments };
-
-            unusedInstrumentIds.forEach(instrumentId => {
-                delete updatedInstruments[instrumentId];
-            });
+            // filter out unused
+            const updatedInstruments = Object.fromEntries(
+                Object.entries({ ...soundData.instruments })
+                    .filter(([iId, i]) => !unusedInstrumentIds.includes(iId))
+            );
 
             updateSoundData({
                 ...soundData,
@@ -643,7 +659,7 @@ A total of {0} instruments will be deleted.",
             return;
         }
 
-        const updatedEvents: EventsMap = {
+        let updatedEvents: EventsMap = {
             ...sortObjectByKeys(currentPattern.events),
         };
 
@@ -653,14 +669,22 @@ A total of {0} instruments will be deleted.",
             }
 
             // remove all note-related events
-            delete updatedEvents[stepToRemove][SoundEvent.Note];
-            delete updatedEvents[stepToRemove][SoundEvent.Instrument];
-            delete updatedEvents[stepToRemove][SoundEvent.Duration];
-            delete updatedEvents[stepToRemove][SoundEvent.NoteSlide];
+            updatedEvents[stepToRemove] = Object.fromEntries(
+                Object.entries({ ...updatedEvents[stepToRemove] })
+                    .filter(([e, v]) => ![
+                        SoundEvent.Note,
+                        SoundEvent.Instrument,
+                        SoundEvent.Duration,
+                        SoundEvent.NoteSlide,
+                    ].includes(e as SoundEvent))
+            );
 
             // if no events remain, remove entirely
             if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
-                delete updatedEvents[stepToRemove];
+                updatedEvents = Object.fromEntries(
+                    Object.entries({ ...updatedEvents })
+                        .filter(([s, e]) => parseInt(s) !== stepToRemove)
+                );
             }
         };
 
@@ -684,26 +708,37 @@ A total of {0} instruments will be deleted.",
                 // remove explicit default instrument
                 const currentTrack = soundData.tracks[currentTrackId];
                 if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined && updatedEvents[stepInt][SoundEvent.Instrument] === currentTrack?.instrument) {
-                    delete (updatedEvents[stepInt][SoundEvent.Instrument]);
+                    updatedEvents[stepInt] = Object.fromEntries(
+                        Object.entries({ ...updatedEvents[stepInt] })
+                            .filter(([e, v]) => e !== SoundEvent.Instrument)
+                    );
                 }
 
                 // remove events with empty value
-                Object.keys(updatedEvents[stepInt]).forEach(e => {
-                    if (updatedEvents[stepInt][e] === '' || updatedEvents[stepInt][e] === undefined) {
-                        delete updatedEvents[stepInt][e];
-                    }
-                });
+                updatedEvents[stepInt] = Object.fromEntries(
+                    Object.entries({ ...updatedEvents[stepInt] })
+                        .filter(([e, v]) => v !== '' && v !== undefined)
+                );
 
                 // remove dependent events
                 if (!updatedEvents[stepInt][SoundEvent.Note]) {
-                    delete updatedEvents[stepInt][SoundEvent.Duration];
-                    delete updatedEvents[stepInt][SoundEvent.Instrument];
-                    delete updatedEvents[stepInt][SoundEvent.NoteSlide];
+                    updatedEvents[stepInt] = Object.fromEntries(
+                        Object.entries({ ...updatedEvents[stepInt] })
+                            .filter(([e, v]) => ![
+                                SoundEvent.Duration,
+                                SoundEvent.Instrument,
+                                SoundEvent.NoteSlide,
+                            ].includes(e as SoundEvent))
+                    );
                 }
 
                 if (Object.keys(updatedEvents[stepInt]).length === 0) {
                     // if no events remain, remove entirely
-                    delete updatedEvents[stepInt];
+                    updatedEvents = Object.fromEntries(
+                        Object.entries({ ...updatedEvents })
+                            .filter(([s, e]) => parseInt(s) !== stepInt)
+                    );
+
                 } else {
                     // ...otherwise ensure clean key order
                     updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
@@ -900,8 +935,11 @@ A total of {0} instruments will be deleted.",
 
             setTrackSettings([...importedSoundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
             updateSoundData({ ...soundData, ...importedSoundData });
-            setToolsDialogOpen(false);
             updateCurrentSequenceIndex(0, 0);
+
+            setToolsDialogOpen(false);
+            enableCommands();
+            focusEditor();
         }
     };
 
@@ -980,12 +1018,16 @@ A total of {0} instruments will be deleted.",
                 if (soundData.tracks.length > 0) {
                     removeUnusedPatterns();
                     setToolsDialogOpen(false);
+                    enableCommands();
+                    focusEditor();
                 }
                 break;
             case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedInstruments();
                     setToolsDialogOpen(false);
+                    enableCommands();
+                    focusEditor();
                 }
                 break;
             case SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id:

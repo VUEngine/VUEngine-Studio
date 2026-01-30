@@ -1,5 +1,5 @@
 import { Waveform, WaveSine, WaveTriangle } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { SoundType } from '../../../../../project/browser/types/Sound';
@@ -63,7 +63,7 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
         trackSettings, setTrackSettings,
         isTrackAvailable,
     } = props;
-    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
 
     const waveAvailable = isTrackAvailable(SoundEditorTrackType.WAVE, soundData.tracks);
     const sweepModAvailable = isTrackAvailable(SoundEditorTrackType.SWEEPMOD, soundData.tracks);
@@ -102,7 +102,7 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
             return;
         }
 
-        const updatedTracks = [...soundData.tracks];
+        const updatedTracks = deepClone(soundData.tracks);
         const updatedTrackSettings = [...updatedTracks.map((track, trackId) => ({
             ...trackSettings[trackId] ?? DEFAULT_TRACK_SETTINGS,
             type: track.type,
@@ -131,6 +131,8 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
 
         setEditTrackDialogOpen(false);
         setAddTrackDialogOpen(false);
+        enableCommands();
+        focusEditor();
     };
 
     return <HContainer gap={10} wrap='wrap' overflow='auto' style={{ padding: 2 }}>

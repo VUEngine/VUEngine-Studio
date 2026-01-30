@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { getPatternName } from '../SoundEditor';
 import {
     PatternConfig,
+    SequenceMap,
     SEQUENCER_GRID_METER_HEIGHT,
     SEQUENCER_GRID_WIDTH,
     SoundData,
@@ -241,18 +242,37 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         const newTrackDifference = newTrackId - trackId;
         const newSequenceIndexDifference = newSequenceIndex - sequenceIndex;
 
-        const updatedTracks = deepClone(soundData.tracks);
-        const newSelectedPatterns: string[] = [];
+        // filter out previous patterns
+        const updatedTracks = deepClone(soundData.tracks).map((t, index) => {
+            const updatedSequence: SequenceMap = {};
+            Object.keys(t.sequence).forEach(s => {
+                const sInt = parseInt(s);
+                let keep = true;
 
-        // delete previous patterns
-        delete updatedTracks[trackId].sequence[sequenceIndex];
-        selectedPatterns.forEach(identifier => {
-            const tId = parseInt(identifier.split('-')[0]);
-            const si = parseInt(identifier.split('-')[1]);
-            if (updatedTracks[tId].sequence[si]) {
-                delete updatedTracks[tId].sequence[si];
-            }
+                if (trackId === index && sequenceIndex === sInt) {
+                    keep = false;
+                }
+
+                selectedPatterns.forEach(identifier => {
+                    const tId = parseInt(identifier.split('-')[0]);
+                    const si = parseInt(identifier.split('-')[1]);
+                    if (tId === index && si === sInt) {
+                        keep = false;
+                    }
+                });
+
+                if (keep) {
+                    updatedSequence[sInt] = t.sequence[sInt];
+                }
+            });
+
+            return {
+                ...t,
+                sequence: updatedSequence
+            };
         });
+
+        const newSelectedPatterns: string[] = [];
 
         // set updated pattern sequence indexes
         updatedTracks[newTrackId].sequence[newSequenceIndex] = soundData.tracks[trackId].sequence[sequenceIndex];
@@ -279,10 +299,11 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         const identifier = `${trackId}-${sequenceIndex}`;
         if (tool === SoundEditorTool.ERASER && e.button === 0 || (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2) {
             removePatternsFromSequence([`${trackId}-${sequenceIndex}`]);
-            setSelectedPatterns([...selectedPatterns, identifier]);
+            setSelectedPatterns([...deepClone(selectedPatterns), identifier]);
         } else if (tool === SoundEditorTool.EDIT && e.button === 0) {
             setCurrentSequenceIndex(trackId, sequenceIndex);
             if (selectedPatterns.length <= 1) {
+
                 setSelectedPatterns([identifier]);
             }
         }

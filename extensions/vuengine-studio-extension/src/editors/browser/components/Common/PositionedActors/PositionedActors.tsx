@@ -1,9 +1,9 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { PositionedActorData } from '../../ActorEditor/ActorEditorTypes';
-import { showItemSelection } from '../Utils';
 import VContainer from '../Base/VContainer';
+import { showItemSelection } from '../Utils';
 import PositionedActor from './PositionedActor';
 
 export interface PositionedActorsProps {
@@ -54,7 +54,7 @@ export default function PositionedActors(props: PositionedActorsProps): React.JS
     };
 
     const updatePositionedActor = (index: number, partialPositionedActorData: Partial<PositionedActorData>): void => {
-        const updatedPositionedActorArray = [...positionedActors];
+        const updatedPositionedActorArray = deepClone(positionedActors);
         updatedPositionedActorArray[index] = {
             ...updatedPositionedActorArray[index],
             ...partialPositionedActorData,

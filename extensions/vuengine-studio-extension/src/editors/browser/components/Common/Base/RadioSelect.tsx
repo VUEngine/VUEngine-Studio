@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
@@ -85,7 +86,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
             if (currentIndexes.includes(i)) {
                 updateValue(currentIndexes.filter(ci => ci !== i));
             } else {
-                updateValue([...currentIndexes, i]);
+                updateValue([...deepClone(currentIndexes), i]);
             }
         } else {
             updateValue([i]);

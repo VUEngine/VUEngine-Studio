@@ -155,11 +155,10 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                     <tbody>
                         {pattern
                             ? eventsKeys.length > 0
-                                ?
-                                <>
+                                ? <>
                                     {eventsKeys.map((k, i) => {
                                         const localStep = parseInt(k);
-                                        const globalStep = currentSequenceIndex + localStep;
+                                        const globalStep = currentSequenceIndex * SUB_NOTE_RESOLUTION + localStep;
                                         const stepEvents = pattern.events[localStep];
                                         const stepEventsKeys = Object.keys(stepEvents);
                                         const isSelectedNote = noteCursor === globalStep;

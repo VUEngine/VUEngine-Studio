@@ -1,12 +1,12 @@
-import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
+import { QuickPickItem, QuickPickOptions, QuickPickSeparator, deepClone, nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { ConfirmDialog } from '@theia/core/lib/browser';
+import { LogicEditorContext, LogicEditorContextType } from '../LogicEditorTypes';
 import { AVAILABLE_ACTIONS, ActionConfigType, ActionData } from './AvailableActions';
 import { ScriptedActionData } from './ScriptTypes';
-import { LogicEditorContext, LogicEditorContextType } from '../LogicEditorTypes';
 
 interface ScriptedActionProps {
     id: string
@@ -96,7 +96,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     };
 
     const updateBranchScript = (branchIndex: number, branchScript: ScriptedActionData[]) => {
-        const updatedScript = [...script];
+        const updatedScript = deepClone(script);
 
         const updatedBranches = updatedScript[index].branches ?? [];
         updatedBranches[branchIndex] = {

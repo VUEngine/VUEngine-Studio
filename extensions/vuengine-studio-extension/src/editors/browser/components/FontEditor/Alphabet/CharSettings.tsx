@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
@@ -18,7 +18,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
     const { currentCharacter, charHeight, charWidth, variableSize, setCharSize } = props;
 
     const setVariablePixelWidth = (size: number) => {
-        const updatedVariableSizeX = [...variableSize.x];
+        const updatedVariableSizeX = deepClone(variableSize.x);
         updatedVariableSizeX[currentCharacter] = size;
         setCharSize(undefined, {
             ...variableSize,
@@ -44,7 +44,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
             const currentVariableSizeDifference = charWidth - currentVariableSize;
             const newVariableSize = newSize - currentVariableSizeDifference;
 
-            const updatedVariableSizeX = [...variableSize.x];
+            const updatedVariableSizeX = deepClone(variableSize.x);
             updatedVariableSizeX[currentCharacter] = newVariableSize;
 
             updatedVariableSize = {

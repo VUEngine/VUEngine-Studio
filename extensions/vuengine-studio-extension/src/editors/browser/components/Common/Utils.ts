@@ -1,4 +1,4 @@
-import { MessageService, QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
+import { MessageService, QuickPickItem, QuickPickOptions, QuickPickService, deepClone, isNumber, nls } from '@theia/core';
 import { EolStyle, Formatter, FracturedJsonOptions, NumberListAlignment } from 'fracturedjsonjs';
 import { customAlphabet } from 'nanoid';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
@@ -108,7 +108,7 @@ export const stringify = (input: any) => {
 };
 
 export const arrayMove = (arr: any[], oldIndex: number, newIndex: number) => {
-    const result = [...arr];
+    const result = deepClone(arr);
     if (newIndex >= result.length) {
         let k = newIndex - result.length + 1;
         while (k--) {

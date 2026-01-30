@@ -1,9 +1,9 @@
-import { CommandService, nls, PreferenceService } from '@theia/core';
+import { CommandService, deepClone, nls, PreferenceService } from '@theia/core';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React from 'react';
+import IMAGE_HYPERFLASH32_LABEL from '../../../../src/flash-cart/browser/images/hyperflash32-label.png';
 import { VesBuildService } from '../../../build/browser/ves-build-service';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import IMAGE_HYPERFLASH32_LABEL from '../../../../src/flash-cart/browser/images/hyperflash32-label.png';
 import { VesFlashCartCommands } from '../ves-flash-cart-commands';
 import { VesFlashCartService } from '../ves-flash-cart-service';
 import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from '../ves-flash-cart-types';
@@ -32,7 +32,7 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
     const lastBuildMode = vesBuildService.lastBuildMode;
 
     const toggleLog = (index: number) => {
-        const updatedShowLog = [...showLog];
+        const updatedShowLog = deepClone(showLog);
         updatedShowLog[index] = !showLog[index];
         setShowLog(updatedShowLog);
     };

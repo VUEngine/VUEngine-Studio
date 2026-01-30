@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
@@ -77,7 +77,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const setFrame = (i: number, frame: number): void => {
-        const frames = [...animation.frames];
+        const frames = deepClone(animation.frames);
         frames[i] = clamp(frame, 0, totalFrames - 1);
         updateAnimation({ frames });
     };

@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import React, { Dispatch, Fragment, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { SoundType } from '../../../../../project/browser/types/Sound';
@@ -110,7 +110,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
             const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.patterns?.additionalProperties);
 
-            const updatedTracks = [...soundData.tracks];
+            const updatedTracks = deepClone(soundData.tracks);
             updatedTracks[trackId].sequence = {
                 ...track.sequence,
                 [sequenceIndex.toString()]: patternId,
@@ -149,7 +149,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
         setCurrentSequenceIndex(trackId, sequenceIndex);
         setCurrentPatternId(trackId, patternId);
-        setSelectedPatterns([...selectedPatterns, `${trackId}-${sequenceIndex}`]);
+        setSelectedPatterns([...deepClone(selectedPatterns), `${trackId}-${sequenceIndex}`]);
         enableCommands();
         focusEditor();
     };

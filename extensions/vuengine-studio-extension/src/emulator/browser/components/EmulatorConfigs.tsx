@@ -1,4 +1,4 @@
-import { CommandService, PreferenceService, URI, isWindows, nls } from '@theia/core';
+import { CommandService, PreferenceService, URI, deepClone, isWindows, nls } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -53,7 +53,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
     );
 
     const setEmulatorConfig = (index: number, emulatorConfig: Partial<EmulatorConfig>, persist = true) => {
-        const updatedEmulatorConfigs = [...emulatorConfigs];
+        const updatedEmulatorConfigs = deepClone(emulatorConfigs);
         updatedEmulatorConfigs[index] = {
             ...updatedEmulatorConfigs[index],
             ...emulatorConfig

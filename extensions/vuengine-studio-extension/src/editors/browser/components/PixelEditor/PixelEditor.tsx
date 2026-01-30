@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
 import {
     CanvasDataChangeHandler,
@@ -90,7 +91,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     };
 
     const setCurrentFrameData = (updatedFrame: LayerPixelData[]): void => {
-        const updatedFrames = [...data.frames];
+        const updatedFrames = deepClone(data.frames);
         updatedFrames[currentFrame] = updatedFrame;
 
         setFrames(updatedFrames);
@@ -111,11 +112,11 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
 
         /*
         if (change.delta?.modifiedPixels) {
-            const updatedFrames = [...data.frames];
+            const updatedFrames = deepClone(data.frames);
             updatedFrames[currentFrame] = [
                 ...updatedFrames[currentFrame].map((layer, index) => ({
                     ...data.frames[currentFrame].find(l => l.id === change.layerId)!,
-                    data: [...change.data].sort((a, b) => {
+                    data: deepClone(change.data).sort((a, b) => {
                         if (a[0] < b[0]) {
                             return -1;
                         }
@@ -139,7 +140,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         */
 
         if (change.delta?.modifiedPixels) {
-            const updatedFrames = [...data.frames];
+            const updatedFrames = deepClone(data.frames);
             updatedFrames[currentFrame] = [
                 ...updatedFrames[currentFrame].map(layer => ({
                     ...layer,

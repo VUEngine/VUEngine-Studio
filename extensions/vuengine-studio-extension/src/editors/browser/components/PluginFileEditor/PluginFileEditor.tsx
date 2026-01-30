@@ -1,10 +1,10 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useEffect, useState } from 'react';
 import { PluginConfigurationDataType } from '../../../../plugins/browser/ves-plugins-types';
 import { EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/Base/HContainer';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
+import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import PluginConfiguration from './PluginConfiguration';
 import { PluginConfigurationData, PluginFileData, PluginFileTranslatedField } from './PluginFileEditorTypes';
@@ -77,12 +77,12 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
         setData({ dependencies });
     };
     const setTag = (tag: PluginFileTranslatedField, index: number): void => {
-        const tags = [...data.tags];
+        const tags = deepClone(data.tags);
         tags[index] = tag;
         setData({ tags });
     };
     const setConfiguration = (configuration: PluginConfigurationData, index: number): void => {
-        const updatedConfiguration = [...data.configuration];
+        const updatedConfiguration = deepClone(data.configuration);
         updatedConfiguration[index] = configuration;
         setData({ configuration: updatedConfiguration });
     };

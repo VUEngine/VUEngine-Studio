@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import SortableList from 'react-easy-sort';
@@ -32,7 +32,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     const { wireframe, updateWireframe } = props;
 
     const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
-        const updatedSegments = [...wireframe.segments];
+        const updatedSegments = deepClone(wireframe.segments);
         updatedSegments[segmentIndex] = {
             ...updatedSegments[segmentIndex],
             ...segmentData,

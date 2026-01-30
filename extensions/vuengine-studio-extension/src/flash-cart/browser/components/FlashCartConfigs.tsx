@@ -1,4 +1,4 @@
-import { nls, PreferenceService } from '@theia/core';
+import { deepClone, nls, PreferenceService } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -63,7 +63,7 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
     );
 
     const setFlashCartConfig = (index: number, config: Partial<FlashCartConfig>, persist = true) => {
-        const updatedConfigs = [...flashCartConfigs];
+        const updatedConfigs = deepClone(flashCartConfigs);
         updatedConfigs[index] = {
             ...updatedConfigs[index],
             ...config

@@ -1,14 +1,14 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';
-import { LOGIC_FUNCTIONS } from './LogicFunctions';
 import InfoLabel from '../../Common/InfoLabel';
 import { LogicEditorContext, LogicEditorContextType, ScriptData } from '../LogicEditorTypes';
+import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';
+import { LOGIC_FUNCTIONS } from './LogicFunctions';
 import { ScriptType } from './ScriptTypes';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
@@ -33,7 +33,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
     const currentAction = AVAILABLE_ACTIONS[currentScriptedAction?.id ?? 0];
 
     const updateScript = (partialScriptData: Partial<ScriptData>): void => {
-        const updatedMethods = [...data.methods || []];
+        const updatedMethods = deepClone(data.methods || []);
         updatedMethods[currentScriptIndex] = {
             ...updatedMethods[currentScriptIndex],
             ...partialScriptData,

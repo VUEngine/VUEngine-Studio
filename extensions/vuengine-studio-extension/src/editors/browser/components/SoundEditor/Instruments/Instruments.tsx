@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -142,7 +142,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     name: `${newNameLabel} ${newNameNumber}`,
                 },
             },
-            tracks: [...soundData.tracks].map(t => {
+            tracks: deepClone(soundData.tracks).map(t => {
                 if (t.type === newInstrument.type && t.instrument === '') {
                     t.instrument = newId;
                 }

@@ -1,5 +1,5 @@
 import { DotsSixVertical } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { DottingRef, useDotting } from 'dotting';
 import React, { useEffect } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
@@ -101,7 +101,7 @@ export const mergeLayers = (layers: LayerPixelData[]): number[][] => {
         result.push(row);
     }
 
-    [...layers].reverse().forEach(layer => {
+    deepClone(layers).reverse().forEach(layer => {
         layer.data.forEach((row, rowIndex) => row.forEach((color, columnIndex) => {
             if (color !== null) {
                 if (result[rowIndex] !== undefined && result[rowIndex][columnIndex] !== undefined) {

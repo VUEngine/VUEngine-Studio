@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -665,7 +666,9 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     };
 
     const handleMouseUpMarquee = (e: MouseEvent<HTMLCanvasElement>, x: number, y: number) => {
-        if (e.button === 0 && tool === SoundEditorTool.MARQUEE || e.button === 2 && tool !== SoundEditorTool.DRAG) {
+        if (e.button === 0 && tool === SoundEditorTool.MARQUEE ||
+            e.button === 2 && tool !== SoundEditorTool.DRAG
+        ) {
             const newSelectedPatterns: string[] = [];
 
             if (marqueeStartStep > -1 && marqueeEndStep > -1 && marqueeStartTrack > -1 && marqueeEndTrack > -1) {
@@ -704,7 +707,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             }
 
             if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                setSelectedPatterns([...selectedPatterns, ...newSelectedPatterns]);
+                setSelectedPatterns([...deepClone(selectedPatterns), ...newSelectedPatterns]);
             } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                 setSelectedPatterns(selectedPatterns
                     .filter(item => !newSelectedPatterns.includes(item))

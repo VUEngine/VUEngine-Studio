@@ -1,4 +1,4 @@
-import { PreferenceService, URI, isWindows, nls } from '@theia/core';
+import { PreferenceService, URI, deepClone, isWindows, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
@@ -104,7 +104,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
 
     const setDeviceCode = (index: number, config: Partial<FlashCartDeviceCode>, persist = true) => {
         const updatedFlashCartConfig = { ...flashCartConfig };
-        const updatedDeviceCodes = [...updatedFlashCartConfig.deviceCodes];
+        const updatedDeviceCodes = deepClone(updatedFlashCartConfig.deviceCodes);
         updatedDeviceCodes[index] = {
             ...updatedDeviceCodes[index],
             ...config

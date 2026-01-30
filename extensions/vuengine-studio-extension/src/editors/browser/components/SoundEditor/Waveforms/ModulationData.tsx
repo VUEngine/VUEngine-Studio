@@ -1,6 +1,7 @@
+import { deepClone } from '@theia/core';
 import React from 'react';
-import VerticalRangeInput from '../../Common/Base/VerticalRangeInput';
 import styled from 'styled-components';
+import VerticalRangeInput from '../../Common/Base/VerticalRangeInput';
 
 interface ModulationDataProps {
     value: number[]
@@ -17,7 +18,7 @@ export default function ModulationData(props: ModulationDataProps): React.JSX.El
     const { value, setValue } = props;
 
     const setIndividualValue = (index: number, v: number): void => {
-        const updatedValue = [...value];
+        const updatedValue = deepClone(value);
         updatedValue[index] = v;
         setValue(updatedValue);
     };

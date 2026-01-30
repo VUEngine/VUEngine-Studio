@@ -1,7 +1,8 @@
+import { deepClone } from '@theia/core';
 import React from 'react';
+import styled from 'styled-components';
 import VerticalRangeInput from '../../Common/Base/VerticalRangeInput';
 import { WAVEFORM_MAX, WAVEFORM_MIN } from '../SoundEditorTypes';
-import styled from 'styled-components';
 
 const StyledWaveform = styled.div`
     display: flex;
@@ -29,7 +30,7 @@ export default function WaveForm(props: WaveFormProps): React.JSX.Element {
     const { value, setValue } = props;
 
     const setIndividualValue = (index: number, v: number): void => {
-        const updatedValue = [...value];
+        const updatedValue = deepClone(value);
         updatedValue[index] = v;
         setValue(updatedValue);
     };

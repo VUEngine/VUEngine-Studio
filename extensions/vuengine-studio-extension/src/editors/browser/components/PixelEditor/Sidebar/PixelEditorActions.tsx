@@ -1,7 +1,7 @@
 import {
     ArrowDown, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowsOut, ArrowUp, ArrowUpLeft, ArrowUpRight, Circle, FileArrowDown, Trash
 } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { DottingRef, useDotting, useGrids } from 'dotting';
 import React, { useEffect, useState } from 'react';
@@ -117,7 +117,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
                     : 0
             : 0;
 
-        const updatedFrames = [...frames];
+        const updatedFrames = deepClone(frames);
 
         if (addColumnsLeft || addColumnsRight || removeColumnsLeft || removeColumnsRight) {
             frames.forEach((frame, frameIndex) =>

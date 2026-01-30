@@ -1,4 +1,4 @@
-import { isBoolean, isNumber, nls } from '@theia/core';
+import { deepClone, isBoolean, isNumber, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -324,7 +324,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
             components: {
                 ...data.components,
                 [componentKey]: [
-                    ...(data.components && data.components[componentKey] ? [...data.components[componentKey]] : []),
+                    ...(data.components && data.components[componentKey] ? deepClone(data.components[componentKey]) : []),
                     {
                         ...newComponentData,
                         name,
@@ -345,7 +345,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
             [data._id]
         );
         if (itemToAdd !== undefined) {
-            const updatedChildren = [...data.components?.children || []];
+            const updatedChildren = deepClone(data.components?.children || []);
             updatedChildren.push({
                 itemId: itemToAdd.id!,
                 onScreenPosition: {
@@ -389,7 +389,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
             [data._id]
         );
         if (itemToAdd !== undefined) {
-            const updatedSounds = [...data.components?.sounds || []];
+            const updatedSounds = deepClone(data.components?.sounds || []);
             updatedSounds.push({
                 itemId: itemToAdd.id!,
             });
@@ -430,7 +430,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     };
 
     const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: ActorEditorSaveDataOptions): void => {
-        const componentsArray = [...data.components[key]];
+        const componentsArray = deepClone(data.components[key]);
         // @ts-ignore
         componentsArray[index] = {
             ...componentsArray[index],

@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -275,7 +276,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 if (addNote) {
                     if (!selectedNotes.includes(s)) {
                         // add to selected notes
-                        setSelectedNotes([...selectedNotes, s]);
+                        setSelectedNotes([...deepClone(selectedNotes), s]);
                     } else {
                         // remove from selected notes
                         setSelectedNotes(selectedNotes.filter(sn => sn !== s));
