@@ -123,9 +123,9 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesEmulatorPreferenceIds.DEFAULT_EMULATOR) {
-                setDefaultEmulator(change.newValue as string);
+                setDefaultEmulator(props.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) as string);
             } else if (change.preferenceName === VesEmulatorPreferenceIds.EMULATORS) {
-                setEmulatorConfigs(change.newValue as unknown as EmulatorConfig[] || []);
+                setEmulatorConfigs(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS) as unknown as EmulatorConfig[] || []);
             }
         });
         return () => preflistener.dispose();

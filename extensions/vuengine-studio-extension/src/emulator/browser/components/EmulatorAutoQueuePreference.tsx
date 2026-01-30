@@ -13,7 +13,7 @@ export default function EmulatorAutoQueuePreference(props: EmulatorAutoQueuePref
     React.useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE) {
-                setAutoQueue(change.newValue as boolean);
+                setAutoQueue(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE) as boolean);
             }
         });
         return () => preflistener.dispose();

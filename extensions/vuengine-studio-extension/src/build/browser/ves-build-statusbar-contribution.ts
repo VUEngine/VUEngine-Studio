@@ -28,7 +28,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
         this.setBuildModeStatusBar();
 
         this.vesBuildService.onDidChangeBuildStatus(() => this.setBuildModeStatusBar());
-        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+        this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
             if (preferenceName === VesBuildPreferenceIds.BUILD_MODE) {
                 this.setBuildModeStatusBar();
             }

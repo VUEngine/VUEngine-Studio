@@ -177,11 +177,11 @@ export default function BuildArchive(props: BuildArchiveProps): React.JSX.Elemen
     React.useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE) {
-                setBuildArchiveEnabled(change.newValue as boolean);
+                setBuildArchiveEnabled(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE) as boolean);
             } else if (change.preferenceName === VesBuildPreferenceIds.BUILD_ARCHIVE_FREQUENCY) {
-                setBuildArchiveFrequency(change.newValue as BuildArchiveFrequency);
+                setBuildArchiveFrequency(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_FREQUENCY) as BuildArchiveFrequency);
             } else if (change.preferenceName === VesBuildPreferenceIds.BUILD_ARCHIVE_RETENTION) {
-                setBuildArchiveRetention(change.newValue as number);
+                setBuildArchiveRetention(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_RETENTION) as number);
             }
         });
         return () => preflistener.dispose();

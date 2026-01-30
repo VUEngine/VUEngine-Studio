@@ -119,7 +119,7 @@ export class VesBuildWidget extends ReactWidget {
         this.update();
       }
     });
-    this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+    this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
         case VesBuildPreferenceIds.BUILD_MODE:
         case VesBuildPreferenceIds.DUMP_ELF:
@@ -130,11 +130,11 @@ export class VesBuildWidget extends ReactWidget {
           this.update();
           break;
         case VesBuildPreferenceIds.LOG_LINE_WRAP:
-          this.state.lineWrap = newValue as boolean;
+          this.state.lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) as boolean;
           this.update();
           break;
         case VesBuildPreferenceIds.USE_WSL:
-          this.state.useWsl = newValue as boolean;
+          this.state.useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
           this.update();
           break;
       }

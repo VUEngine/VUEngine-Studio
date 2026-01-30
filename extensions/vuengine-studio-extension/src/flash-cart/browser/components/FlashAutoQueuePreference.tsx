@@ -13,7 +13,7 @@ export default function FlashAutoQueuePreference(props: FlashAutoQueuePreference
     React.useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE) {
-                setAutoQueue(change.newValue as boolean);
+                setAutoQueue(props.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE) as boolean);
             }
         });
         return () => preflistener.dispose();

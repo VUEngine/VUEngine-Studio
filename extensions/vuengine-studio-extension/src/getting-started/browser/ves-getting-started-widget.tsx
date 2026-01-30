@@ -311,7 +311,7 @@ function VesWelcomePreferences(props: PreferencesProps): React.JSX.Element {
     React.useEffect(() => {
         const prefListener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === 'workbench.startupEditor') {
-                const prefValue = change.newValue;
+                const prefValue = props.preferenceService.get('workbench.startupEditor');
                 setStartupEditor(prefValue as string);
             }
         });

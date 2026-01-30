@@ -22,7 +22,7 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesFlashCartPreferenceIds.FLASH_CARTS) {
-                setFlashCartConfigs(change.newValue as unknown as FlashCartConfig[] || []);
+                setFlashCartConfigs(props.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS) as FlashCartConfig[] || []);
             }
         });
         return () => preflistener.dispose();

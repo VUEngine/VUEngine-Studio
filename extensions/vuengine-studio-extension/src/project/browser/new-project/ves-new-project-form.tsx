@@ -140,7 +140,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
         this.preferenceService.ready.then(async () => this.setStateFromPreferences());
 
-        this.preferenceService.onPreferenceChanged(async ({ preferenceName, newValue }) => {
+        this.preferenceService.onPreferenceChanged(async ({ preferenceName }) => {
             switch (preferenceName) {
                 case VesProjectPreferenceIds.BASE_PATH:
                 case VesProjectPreferenceIds.AUTHOR:

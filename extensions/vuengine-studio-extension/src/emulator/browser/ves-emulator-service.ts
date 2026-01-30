@@ -142,7 +142,7 @@ export class VesEmulatorService {
   protected bindEvents(): void {
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue }) => {
+      ({ preferenceName }) => {
         switch (preferenceName) {
           case VesEmulatorPreferenceIds.EMULATORS:
             this.onDidChangeEmulatorConfigsEmitter.fire(

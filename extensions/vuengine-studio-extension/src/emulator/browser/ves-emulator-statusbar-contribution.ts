@@ -24,7 +24,7 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
         this.setVbLinkStatusBar();
 
         this.vesEmulatorService.onDidChangeEmulator(() => this.setCurrentEmulatorStatusBar());
-        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+        this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
             if (preferenceName === VesEmulatorPreferenceIds.DEFAULT_EMULATOR) {
                 this.setCurrentEmulatorStatusBar();
             }

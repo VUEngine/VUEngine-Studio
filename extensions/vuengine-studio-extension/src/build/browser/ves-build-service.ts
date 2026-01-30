@@ -370,12 +370,11 @@ export class VesBuildService {
 
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue, oldValue }) => {
+      ({ preferenceName }) => {
         switch (preferenceName) {
           case VesBuildPreferenceIds.BUILD_MODE:
-            if (newValue !== oldValue) {
-              this.onDidChangeBuildModeEmitter.fire(newValue as BuildMode);
-            }
+            const newValue = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
+            this.onDidChangeBuildModeEmitter.fire(newValue);
             break;
         }
       }
