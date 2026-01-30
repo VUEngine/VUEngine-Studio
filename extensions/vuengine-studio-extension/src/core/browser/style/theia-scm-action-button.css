@@ -1,0 +1,16 @@
+.theia-scm-action-button-container {
+    border-radius: 2px;
+    margin-top: calc(-1 * var(--theia-ui-padding));
+
+    :first-child {
+        background-color: transparent;
+    }
+
+    :last-child {
+        background-color: transparent;
+    }
+}
+
+.theia-scm-action-button-container:has(.theia-scm-action-button:disabled) {
+    background-color: var(--theia-button-disabledBackground);
+}

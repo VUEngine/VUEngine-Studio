@@ -16,6 +16,7 @@
 @import "sidepanel.css";
 @import "statusbar.css";
 @import "tabbar.css";
+@import "theia-scm-action-button.css";
 @import "tree.css";
 /* @import "tabs.css"; */
 @import "toolbar.css";
