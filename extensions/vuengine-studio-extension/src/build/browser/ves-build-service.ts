@@ -942,6 +942,9 @@ export class VesBuildService {
     const path = await this.fileService.fsPath(uri);
     let envPath = path
       .replace(/\\/g, '/')
+      .replace(/^[a-zA-Z]:/, '');
+/*
+
       .replace(/^[a-zA-Z]:\//, function (x): string {
         return `/${x.substring(0, 1).toLowerCase()}/`;
       });
@@ -949,7 +952,7 @@ export class VesBuildService {
     if (isWslInstalled) {
       envPath = '/mnt' + envPath;
     }
-
+*/
     return envPath;
   }
 
