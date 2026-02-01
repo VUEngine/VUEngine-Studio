@@ -940,9 +940,7 @@ export class VesBuildService {
 
   async convertToEnvPath(isWslInstalled: boolean, uri: URI): Promise<string> {
     const path = await this.fileService.fsPath(uri);
-      let converted = path.replace(/\\/g, '/');
-
-    return converted.replace(/^[a-zA-Z]:\//, '/');
+      return path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, '/');
   }
 
   protected getThreads(): number {
