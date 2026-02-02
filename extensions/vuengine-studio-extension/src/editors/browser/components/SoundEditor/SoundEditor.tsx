@@ -1218,6 +1218,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
                     width='100%'
+                    maxWidth='1212px'
                 >
                     <Instruments
                         soundData={soundData}
@@ -1457,7 +1458,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         enableCommands();
                         focusEditor();
                     }}
-                    title={nls.localize('vuengine/editors/sound/noteProperties', 'Note Properties')}
+                    title={nls.localize('vuengine/editors/sound/editNote', 'Edit Note')}
                     height='340px'
                     width='513px'
                 >

@@ -846,23 +846,21 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                     }
                 </VContainer>
                 {instrument.type !== SoundEditorTrackType.NOISE &&
-                    <VContainer gap={20} style={{ minWidth: 260 }}>
+                    <VContainer gap={20} style={{ minWidth: 256 }}>
                         <VContainer>
                             <InfoLabel
                                 label={nls.localize('vuengine/editors/sound/waveform', 'Waveform')}
                             // subLabel={nls.localize('vuengine/editors/sound/onlyRelevantOnWaveTracks', 'Only relevant on wave tracks')}
                             />
-                            <VContainer>
-                                { /* TODO: switch to canvas */}
-                                <NumberArrayPreview
-                                    active={true}
-                                    height={WAVEFORM_MAX * 2}
-                                    width={WAVEFORM_MAX * 4}
-                                    maximum={WAVEFORM_MAX}
-                                    data={soundData.instruments[instrumentId].waveform}
-                                    onClick={() => setWaveformDialogOpen(instrumentId)}
-                                />
-                            </VContainer>
+                            { /* TODO: switch to canvas */}
+                            <NumberArrayPreview
+                                active={true}
+                                height={WAVEFORM_MAX * 2}
+                                width={WAVEFORM_MAX * 4}
+                                maximum={WAVEFORM_MAX}
+                                data={soundData.instruments[instrumentId].waveform}
+                                onClick={() => setWaveformDialogOpen(instrumentId)}
+                            />
                         </VContainer>
                     </VContainer>
                 }

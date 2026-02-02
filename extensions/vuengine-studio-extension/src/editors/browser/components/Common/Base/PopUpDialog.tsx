@@ -11,13 +11,14 @@ interface PopUpDialogProps {
     error?: string
     height?: string
     width?: string
+    maxWidth?: string
     okButton?: boolean
     cancelButton?: boolean
     overflow?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, onClose, onOk, okLabel, title, error, height, width, okButton, cancelButton, children, overflow } = props;
+    const { open, onClose, onOk, okLabel, title, error, height, width, maxWidth, okButton, cancelButton, children, overflow } = props;
 
     const onKeyDown = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -46,7 +47,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
     >
         <div className="dialogBlock" style={{
             height,
-            maxWidth: '100%',
+            maxWidth: maxWidth ?? '100%',
             minWidth: '100px',
             overflow: 'hidden',
             width,

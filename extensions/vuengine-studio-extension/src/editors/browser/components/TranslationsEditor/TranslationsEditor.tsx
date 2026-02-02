@@ -185,8 +185,10 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedTranslations = { ...translationsData.translations };
-            delete updatedTranslations[id];
+            const updatedTranslations = Object.fromEntries(
+                Object.entries({ ...translationsData.translations })
+                    .filter(([i]) => i !== id)
+            );
 
             updateTranslationsData({
                 ...translationsData,

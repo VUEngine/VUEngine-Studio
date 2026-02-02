@@ -72,7 +72,7 @@ A total of {0} patterns will be deleted.',
             // filter out unused patterns
             const updatedPatterns = Object.fromEntries(
                 Object.entries({ ...soundData.patterns })
-                    .filter(([pId, p]) => !unusedPatternsIds.includes(pId))
+                    .filter(([pId]) => !unusedPatternsIds.includes(pId))
             );
 
             updateSoundData({
@@ -136,7 +136,7 @@ A total of {0} instruments will be deleted.",
             // filter out unused
             const updatedInstruments = Object.fromEntries(
                 Object.entries({ ...soundData.instruments })
-                    .filter(([iId, i]) => !unusedInstrumentIds.includes(iId))
+                    .filter(([iId]) => !unusedInstrumentIds.includes(iId))
             );
 
             updateSoundData({
@@ -157,7 +157,7 @@ A total of {0} instruments will be deleted.",
         const processedPatternIds: string[] = [];
         const duplicatePatternsMap: Record<string, string[]> = {};
         const sortedPatternEntries = Object.entries(soundData.patterns)
-            .sort(([patternIdA, patternConfigA], [patternIdB, patternConfigB]) =>
+            .sort(([patternIdA], [patternIdB]) =>
                 getPatternName(soundData, patternIdA).localeCompare(getPatternName(soundData, patternIdB))
             );
 

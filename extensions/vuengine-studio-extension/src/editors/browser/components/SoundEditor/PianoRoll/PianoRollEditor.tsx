@@ -169,6 +169,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     trackSettings={trackSettings}
                     selectedNotes={selectedNotes}
                     setSelectedNotes={setSelectedNotes}
+                    playNote={playNote}
                     stepsPerNote={stepsPerNote}
                     stepsPerBar={stepsPerBar}
                 />

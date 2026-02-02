@@ -92,7 +92,7 @@ const StyledTable = styled.table`
 
             &.selected,
             &:hover {
-                td {
+                td:not(.lightLabel) {
                     background-color: rgba(255, 255, 255, .1);
 
                     body.theia-light &,

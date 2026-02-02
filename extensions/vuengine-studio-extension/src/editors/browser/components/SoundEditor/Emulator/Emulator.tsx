@@ -98,8 +98,10 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
 
     const buildAndPlay = async (): Promise<void> => {
         const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, currentPlayerPosition, playRangeStart, playRangeEnd, trackSettings, true);
-        await loadRom(romFileUri);
-        setEmulatorRomReady(true);
+        if (await services.fileService.exists(romFileUri)) {
+            await loadRom(romFileUri);
+            setEmulatorRomReady(true);
+        }
     };
 
     // visually reads total elapsed ticks from canvas bit by bit

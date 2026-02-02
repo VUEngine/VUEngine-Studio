@@ -1,6 +1,7 @@
 .jsonforms-container button {
   align-items: center;
   display: flex;
+  gap: 5px;
   justify-content: center;
   margin-left: 0;
   min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);

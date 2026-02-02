@@ -306,3 +306,5 @@ export const SCROLL_BAR_WIDTH = 10;
 
 export const WAVEFORM_MIN = 0;
 export const WAVEFORM_MAX = 63;
+
+export const NOTE_PLAY_STOP_DELAY = 300;

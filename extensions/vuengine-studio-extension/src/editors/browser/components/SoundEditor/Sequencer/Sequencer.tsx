@@ -92,7 +92,7 @@ interface SequencerProps {
     tool: SoundEditorTool
     marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
-    setCurrentTrackId: Dispatch<SetStateAction<number>>
+    setCurrentTrackId: (id: number) => void
     currentPatternId: string
     setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number

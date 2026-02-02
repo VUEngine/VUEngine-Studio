@@ -28,10 +28,11 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            const updatedData = {
-                ...data
-            };
-            delete updatedData[key];
+            const updatedData = Object.fromEntries(
+                Object.entries({ ...data })
+                    .filter(([k]) => k !== key)
+            );
+
             updateData(updatedData);
         }
     };

@@ -74,8 +74,11 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedSoundData = { ...soundData };
-            delete updatedSoundData.patterns[currentPatternId];
+            const updatedPatterns = Object.fromEntries(
+                Object.entries({ ...soundData.patterns })
+                    .filter(([pId]) => pId !== currentPatternId)
+            );
+
             const cleanedTracks: TrackConfig[] = [];
             soundData.tracks.forEach(t => {
                 const cleanedSequence: SequenceMap = {};
@@ -90,7 +93,12 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     sequence: cleanedSequence,
                 });
             });
-            updateSoundData(updatedSoundData);
+
+            updateSoundData({
+                ...soundData,
+                patterns: updatedPatterns,
+                tracks: cleanedTracks,
+            });
             const firstPatternId = Object.keys(soundData.patterns)[0] ?? '';
             setCurrentPatternId(currentTrackId, firstPatternId);
 

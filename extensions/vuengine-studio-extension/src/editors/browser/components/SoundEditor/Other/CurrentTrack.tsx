@@ -16,7 +16,7 @@ interface CurrentTrackProps {
     soundData: SoundData
     setSoundData: Dispatch<SetStateAction<SoundData>>
     currentTrackId: number
-    setCurrentTrackId: Dispatch<SetStateAction<number>>
+    setCurrentTrackId: (id: number) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     removeTrack: (trackId: number) => void
     editInstrument: (instrument: string) => void

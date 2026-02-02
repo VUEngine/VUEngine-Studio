@@ -1,8 +1,9 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { Tab, TabList, Tabs } from 'react-tabs';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { MetaLine, MetaLineHeader } from '../PianoRoll/PianoRollHeader';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
@@ -13,7 +14,15 @@ import {
 } from '../SoundEditorTypes';
 import EffectsPanelGrid from './EffectsPanelGrid';
 import EffectsPanelGridOverview from './EffectsPanelGridOverview';
-import { MetaLine, MetaLineHeader } from '../PianoRoll/PianoRollHeader';
+
+const NotYetImplementedLabel = styled.div`
+    font-size: 14px;
+    font-style: italic;
+    left: ${PIANO_ROLL_KEY_WIDTH + 15}px;
+    opacity: .5;
+    position: absolute;
+    top: ${EFFECTS_PANEL_COLLAPSED_HEIGHT + 15}px;
+`;
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -84,7 +93,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
         pianoRollScrollWindow,
         stepsPerNote, stepsPerBar
     } = props;
-    const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
+    const { services, onCommandExecute, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
 
     const width = Math.min(
@@ -94,6 +103,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
 
     const toggleEffectsPanel = () => {
         setEffectsPanelHidden(prev => !prev);
+        focusEditor();
     };
 
     const commandListener = (commandId: string): void => {
@@ -173,12 +183,18 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
             selectedIndex={tab}
             onSelect={i => setTab(i)}
         >
-            {!effectsPanelHidden &&
+            {!effectsPanelHidden && <>
                 <StyledTabList>
-                    {EffectsPanelTabs.map(n => <Tab>{n}</Tab>)}
+                    {EffectsPanelTabs.map(n => <Tab key={`tab-${n}`}>{n}</Tab>)}
                 </StyledTabList>
-            }
+                {EffectsPanelTabs.map(n => <TabPanel key={`tabpanel-${n}`}></TabPanel>)}
+            </>}
             {grid}
+            {!effectsPanelHidden &&
+                <NotYetImplementedLabel>
+                    Not yet implemented
+                </NotYetImplementedLabel>
+            }
         </Tabs>
     </MetaLine>;
 }

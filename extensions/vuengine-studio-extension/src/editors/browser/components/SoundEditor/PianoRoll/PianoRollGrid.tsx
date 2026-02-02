@@ -7,6 +7,7 @@ import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
 import {
     EventsMap,
+    NOTE_PLAY_STOP_DELAY,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
@@ -57,6 +58,7 @@ interface PianoRollGridProps {
     trackSettings: TrackSettings[]
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
+    playNote: (note: string, instrumentId?: string) => void
     stepsPerNote: number
     stepsPerBar: number
 }
@@ -87,6 +89,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollRef,
         trackSettings,
         selectedNotes, setSelectedNotes,
+        playNote,
         stepsPerNote, stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
@@ -385,6 +388,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const resetNoteDrag = () => {
+        setTimeout(() => playNote(''), NOTE_PLAY_STOP_DELAY);
         setNoteDragNoteId(-1);
         setNoteDragStartStep(-1);
         setNoteDragEndStep(-1);
@@ -409,6 +413,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const relativeStep = (step - currentSequenceIndex) * SUB_NOTE_RESOLUTION;
             const foundStep = findNoteStep(relativeStep, noteId);
             if (foundStep === -1) {
+                playNote(NOTES_LABELS[noteId]);
                 setNoteDragNoteId(noteId);
                 setNoteDragStartStep(step);
                 setNoteDragEndStep(step + newNoteDuration - 1);
@@ -427,6 +432,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
             if (noteId !== noteDragNoteId) {
                 setNoteDragNoteId(noteId);
+                playNote(NOTES_LABELS[noteId]);
             }
             if (step !== noteDragEndStep) {
                 setNoteDragEndStep(step);
@@ -447,7 +453,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const newNoteCursor = newNoteStep * SUB_NOTE_RESOLUTION;
 
             const currentPattern = soundData.patterns[currentPatternId];
-            const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size);
+            const currentSequenceIndexEndStep = (currentSequenceIndex + (currentPattern?.size ?? 0));
 
             // if inside current pattern
             if (

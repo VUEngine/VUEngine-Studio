@@ -584,13 +584,16 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 >
                     <Wrench size={17} />
                 </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${keyBindingsDialogOpen ? 'primary' : 'secondary'}`}
-                    title={nls.localizeByDefault('Keybindings')}
-                    onClick={() => setKeyBindingsDialogOpen(prev => !prev)}
-                >
-                    <Keyboard size={17} />
-                </StyledSoundEditorToolbarButton>
+
+                {soundData.tracks.length > 0 &&
+                    <StyledSoundEditorToolbarButton
+                        className={`theia-button ${keyBindingsDialogOpen ? 'primary' : 'secondary'}`}
+                        title={nls.localizeByDefault('Keybindings')}
+                        onClick={() => setKeyBindingsDialogOpen(prev => !prev)}
+                    >
+                        <Keyboard size={17} />
+                    </StyledSoundEditorToolbarButton>
+                }
                 <StyledSoundEditorToolbarButton
                     className={`theia-button ${utilitiesDialogOpen ? 'primary' : 'secondary'}`}
                     title={nls.localizeByDefault('Documentation')}
