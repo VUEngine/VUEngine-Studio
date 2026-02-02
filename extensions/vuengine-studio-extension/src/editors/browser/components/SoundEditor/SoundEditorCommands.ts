@@ -293,6 +293,11 @@ export namespace SoundEditorCommands {
         label: nls.localize('vuengine/editors/sound/commands/removeUnusedInstruments', 'Remove Unused Instruments'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
     };
+    export const CLEAN_DUPLICATE_PATTERNS: EditorCommand = {
+        id: 'editors.soundEditor.cleanDuplicatePatterns',
+        label: nls.localize('vuengine/editors/sound/commands/cleanDuplicatePatterns', 'Clean Duplicate Patterns'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+    };
     export const IMPORT: EditorCommand = {
         id: 'editors.soundEditor.import',
         label: nls.localize('vuengine/editors/sound/commands/import', 'Import'),
