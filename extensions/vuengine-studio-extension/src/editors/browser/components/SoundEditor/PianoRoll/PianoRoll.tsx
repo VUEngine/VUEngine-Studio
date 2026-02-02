@@ -173,6 +173,8 @@ interface PianoRollProps {
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNotes: (notes: EventsMap) => void
     playNote: (note: string, instrumentId?: string) => void
+    playing: boolean
+    testNote: string
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
     noteSnapping: boolean
@@ -216,6 +218,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         eventListHidden, setEventListHidden,
         setNotes,
         playNote,
+        playing, testNote,
         selectedNotes, setSelectedNotes,
         noteSnapping,
         addPattern,
@@ -785,6 +788,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 effectsPanelHidden={effectsPanelHidden}
                 sequencerNoteWidth={sequencerNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
+                noteSnapping={noteSnapping}
                 stepsPerBar={stepsPerBar}
             />
             <PianoRollEditor
@@ -799,6 +803,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNoteCursor={setNoteCursor}
                 setNotes={setNotes}
                 playNote={playNote}
+                playing={playing}
+                testNote={testNote}
                 selectedNotes={selectedNotes}
                 setSelectedNotes={setSelectedNotes}
                 newNoteDuration={newNoteDuration}

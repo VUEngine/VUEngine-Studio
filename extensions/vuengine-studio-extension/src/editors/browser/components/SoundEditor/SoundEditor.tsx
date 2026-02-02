@@ -131,6 +131,10 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
     }
 };
 
+export const getSnappedStep = (step: number, noteSnapping: boolean, stepsPerBar: number) => noteSnapping
+    ? Math.floor(step / stepsPerBar) * stepsPerBar
+    : step;
+
 interface SoundEditorProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
@@ -1101,6 +1105,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 playRangeEnd={playRangeEnd}
                                 setPlayRangeEnd={setPlayRangeEnd}
                                 playNote={playNote}
+                                playing={playing}
+                                testNote={testNote}
                                 setNotes={setNotes}
                                 addPattern={addPattern}
                                 sequencerHidden={sequencerHidden}
@@ -1218,7 +1224,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     title={nls.localize('vuengine/editors/sound/editInstrument', 'Edit Instrument')}
                     height='100%'
                     width='100%'
-                    maxWidth='1212px'
+                    maxWidth='1251px'
                 >
                     <Instruments
                         soundData={soundData}

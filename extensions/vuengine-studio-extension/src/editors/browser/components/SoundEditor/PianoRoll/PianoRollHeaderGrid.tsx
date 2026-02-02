@@ -2,7 +2,7 @@ import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, use
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { getFoundPatternSequenceIndex, getPatternName, getToolModeCursor } from '../SoundEditor';
+import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_BARS_PER_PATTERN,
     NOTE_RESOLUTION,
@@ -41,6 +41,7 @@ interface PianoRollHeaderGridProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
+    noteSnapping: boolean
     stepsPerBar: number
 }
 
@@ -60,6 +61,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         setPatternDialogOpen,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
+        noteSnapping,
         stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
@@ -258,9 +260,20 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                     setForcePlayerRomRebuild(prev => prev + 1);
                 }
             }
-        } else {
+        }
+    };
+
+    const handleMouseUpSelect = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool !== SoundEditorTool.EDIT) {
+            return;
+        }
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+
+        if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = Math.floor(x / pianoRollNoteWidth);
+            const step = getSnappedStep(Math.floor(x / pianoRollNoteWidth), noteSnapping, stepsPerBar);
             setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION);
         }
     };
@@ -295,6 +308,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
     const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
         handleMouseUpPlayRange(e);
+        handleMouseUpSelect(e);
         handleMouseUpDragScrolling(e);
     };
 

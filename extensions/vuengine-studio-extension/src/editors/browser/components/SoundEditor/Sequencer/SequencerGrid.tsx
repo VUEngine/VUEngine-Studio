@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
-import { getFoundPatternSequenceIndex, getPatternName, getToolModeCursor } from '../SoundEditor';
+import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_BARS_PER_PATTERN,
     NOTES_LABELS,
@@ -118,14 +118,6 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     );
 
     const noteHeightOverlap = (SEQUENCER_NOTE_HEIGHT - 1) / 2;
-
-    const getStep = (x: number) => {
-        const step = Math.floor(x / sequencerNoteWidth);
-
-        return noteSnapping
-            ? Math.floor(step / stepsPerBar) * stepsPerBar
-            : step;
-    };
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -505,7 +497,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
     const handleMouseDownPlayRange = (e: MouseEvent<HTMLCanvasElement>, x: number) => {
         if (e.button === 0 && tool === SoundEditorTool.EDIT) {
-            const step = getStep(x);
+            const step = getSnappedStep(Math.round(x / sequencerNoteWidth), noteSnapping, stepsPerBar);
             setRangeDragStartStep(step);
             setRangeDragEndStep(step);
 
@@ -517,11 +509,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         if (rangeDragStartStep > -1 && rangeDragEndStep > -1) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + sequencerScrollWindow.x;
+            const step = getSnappedStep(Math.round(x / sequencerNoteWidth), noteSnapping, stepsPerBar);
 
-            const sequenceIndex = Math.floor(x / sequencerNoteWidth);
-
-            if (sequenceIndex !== rangeDragEndStep) {
-                setRangeDragEndStep(sequenceIndex);
+            if (step !== rangeDragEndStep) {
+                setRangeDragEndStep(step);
             }
         }
     };
@@ -548,7 +539,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             if (playRangeStart !== -1 && playRangeEnd !== -1) {
                 resetPlayRange();
             } else {
-                const step = Math.floor(x / sequencerNoteWidth);
+                const step = Math.round(x / sequencerNoteWidth);
                 setCurrentPlayerPosition(step);
                 setForcePlayerRomRebuild(prev => prev + 1);
             }
@@ -558,12 +549,13 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const handleMouseDownPatternDrag = (e: MouseEvent<HTMLCanvasElement>, trackId: number, x: number) => {
         if (e.button === 0 && tool === SoundEditorTool.EDIT) {
             if (!e.metaKey && !e.ctrlKey && !e.altKey) {
-                const step = getStep(x);
+                const step = Math.round(x / sequencerNoteWidth);
                 const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, step);
                 if (insidePatternAtSi === -1) {
+                    const gridStep = getSnappedStep(Math.round(x / sequencerNoteWidth), noteSnapping, stepsPerBar);
                     setPatternDragTrackId(trackId);
-                    setPatternDragStartStep(step);
-                    setPatternDragEndStep(step);
+                    setPatternDragStartStep(gridStep);
+                    setPatternDragEndStep(gridStep);
                 }
             }
         }
@@ -575,7 +567,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const x = e.clientX - rect.left + sequencerScrollWindow.x;
             const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
 
-            const step = getStep(x);
+            const step = getSnappedStep(Math.round(x / sequencerNoteWidth), noteSnapping, stepsPerBar);
             const trackId = Math.floor(y / sequencerPatternHeight);
 
             if (trackId !== patternDragTrackId) {
@@ -601,7 +593,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
     const handleMouseUpPatternSelect = (e: MouseEvent<HTMLCanvasElement>, x: number, y: number) => {
         const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-        const sequenceIndex = Math.floor(x / sequencerNoteWidth);
+        const sequenceIndex = Math.round(x / sequencerNoteWidth);
         const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, sequenceIndex);
         const identifier = `${trackId}-${insidePatternAtSi}`;
         if (tool === SoundEditorTool.ERASER && e.button === 0 ||
@@ -641,7 +633,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
     const handleMouseDownMarquee = (e: MouseEvent<HTMLCanvasElement>, trackId: number, x: number) => {
         if (e.button === 0 && tool === SoundEditorTool.MARQUEE || e.button === 2 && tool !== SoundEditorTool.DRAG) {
-            const step = getStep(x);
+            const step = getSnappedStep(Math.round(x / sequencerNoteWidth), noteSnapping, stepsPerBar);
             setMarqueeStartStep(step);
             setMarqueeEndStep(step);
             setMarqueeStartTrack(trackId);
@@ -655,7 +647,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const x = e.clientX - rect.left + sequencerScrollWindow.x;
             const y = e.clientY - rect.top - SEQUENCER_GRID_METER_HEIGHT;
 
-            const sequenceIndex = Math.floor(x / sequencerNoteWidth);
+            const sequenceIndex = Math.round(x / sequencerNoteWidth);
             const trackId = Math.floor(y / sequencerPatternHeight);
 
             if (sequenceIndex !== marqueeEndStep) {
@@ -698,7 +690,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                     });
                 } else {
                     const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-                    const sequenceIndex = Math.floor(x / sequencerNoteWidth);
+                    const sequenceIndex = Math.round(x / sequencerNoteWidth);
                     const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, sequenceIndex);
                     if (insidePatternAtSi > -1) {
                         newSelectedPatterns.push(`${trackId}-${insidePatternAtSi}`);
@@ -771,7 +763,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         if (y > SEQUENCER_GRID_METER_HEIGHT) {
             const trackId = Math.floor((y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-            const step = Math.floor(x / sequencerNoteWidth);
+            const step = Math.round(x / sequencerNoteWidth);
 
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, step);
 

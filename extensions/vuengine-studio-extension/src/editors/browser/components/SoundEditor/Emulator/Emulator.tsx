@@ -91,9 +91,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const cleanUp = async (): Promise<void> => {
-        sim.delete();
-        core.suspend(sim);
-        return playerRomBuilder.cleanUp();
+        await core.suspend(sim);
+        await sim.delete();
+        await playerRomBuilder.cleanUp();
     };
 
     const buildAndPlay = async (): Promise<void> => {

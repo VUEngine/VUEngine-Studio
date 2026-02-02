@@ -22,7 +22,7 @@
 			{%- endif -%}
 			{%- for patternId in track.sequence | values -%}
 				{%- set pattern = item.patterns[patternId] -%}
-				{%- if pattern -%}
+				{%- if pattern is defined and pattern.events | length -%}
 					{%- for step in pattern.events | values -%}
 						{%- if step.instrument is defined and step.instrument == instrumentId -%}
 							{%- set result = true -%}

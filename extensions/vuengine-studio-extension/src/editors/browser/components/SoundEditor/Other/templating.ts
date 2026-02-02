@@ -207,8 +207,12 @@ const applyTrackInitialVolume = (
         .map(step => parseInt(step))
         .filter(step => result[step][SoundEvent.Note] !== undefined)
         .sort((a, b) => a - b);
-    const firstStepWithNote: number = sortedTrackStepsWithNote[0];
-    if (firstStepWithNote !== undefined && firstStepWithNote > 0) {
+    if (sortedTrackStepsWithNote.length === 0) {
+        return result;
+    }
+
+    const firstStepWithNote: number = Math.min(...sortedTrackStepsWithNote);
+    if (firstStepWithNote && firstStepWithNote > 0) {
         result[0] = {
             [SoundEvent.Volume]: zeroVolume,
         };
@@ -230,7 +234,7 @@ const applyTrackInitialInstrument = (
 ): EventsMap => {
     const result: EventsMap = { ...trackEventsMap };
 
-    if (result[0][SoundEvent.Instrument] === undefined) {
+    if (result[0] !== undefined && result[0][SoundEvent.Instrument] === undefined) {
         result[0][SoundEvent.Instrument] = initialInstrumentId;
     }
 

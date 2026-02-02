@@ -84,6 +84,7 @@ interface PianoRollHeaderProps {
     effectsPanelHidden: boolean
     sequencerNoteWidth: number
     sequencerPatternHeight: number
+    noteSnapping: boolean
     stepsPerBar: number
 }
 
@@ -105,6 +106,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         rangeDragEndStep, setRangeDragEndStep,
         effectsPanelHidden,
         sequencerNoteWidth, sequencerPatternHeight,
+        noteSnapping,
         stepsPerBar,
     } = props;
 
@@ -159,6 +161,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             setRangeDragStartStep={setRangeDragStartStep}
             rangeDragEndStep={rangeDragEndStep}
             setRangeDragEndStep={setRangeDragEndStep}
+            noteSnapping={noteSnapping}
             stepsPerBar={stepsPerBar}
         />
     </MetaLine>;

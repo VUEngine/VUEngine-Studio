@@ -14,6 +14,7 @@ import { nanoid } from '../../Common/Utils';
 import { getInstrumentName } from '../SoundEditor';
 import { InstrumentConfig, InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
 import Instrument from './Instrument';
+import { Waveform, WaveSine, WaveTriangle } from '@phosphor-icons/react';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -68,14 +69,18 @@ export const StyledInstrument = styled.button`
     display: flex;
     justify-content: center;
     min-height: var(--theia-content-line-height) !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
     &.current {
         outline: 1px solid var(--theia-focusBorder);
         outline-offset: 1px;
         z-index: 1;
+    }
+
+    div {
+        /* flex-grow: 1; */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 `;
 
@@ -239,7 +244,18 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                                             color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                                         }}
                                     >
-                                        {getInstrumentName(soundData, instrumentId)}
+                                        {instr.type === SoundEditorTrackType.WAVE &&
+                                            <WaveSine size={16} />
+                                        }
+                                        {instr.type === SoundEditorTrackType.SWEEPMOD &&
+                                            <WaveTriangle size={16} />
+                                        }
+                                        {instr.type === SoundEditorTrackType.NOISE &&
+                                            <Waveform size={16} />
+                                        }
+                                        <div>
+                                            {getInstrumentName(soundData, instrumentId)}
+                                        </div>
                                     </StyledInstrument>;
                                 })}
                             <button
