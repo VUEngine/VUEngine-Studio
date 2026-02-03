@@ -4,6 +4,7 @@ import { NOTES_LABELS } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 
 const StyledPiano = styled.div`
+    background-color: #eee;
     border-left: 1px solid rgba(255, 255, 255, .6); 
     border-right: 1px solid rgba(255, 255, 255, .6); 
     display: flex;
