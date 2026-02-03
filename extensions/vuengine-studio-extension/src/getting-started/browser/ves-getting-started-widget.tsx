@@ -39,6 +39,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     }
 
     protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectCommands.NEW.id);
+    protected gitClone = async () => this.commandRegistry.executeCommand('git.clone');
 
     protected async vesGetRecentWorkspaces(): Promise<void> {
         for (const workspace of this.recentWorkspaces.slice(0, this.recentLimit)) {
@@ -170,7 +171,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 className="theia-button large"
                 onClick={this.doOpenWorkspace}
             >
-                <i className="codicon codicon-folder-library"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
+                <i className="codicon codicon-folder-library"></i> {nls.localizeByDefault('Open Workspace')}
             </button>
         );
 
@@ -179,7 +180,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 className="theia-button large"
                 onClick={this.doOpenFolder}
             >
-                <i className="codicon codicon-folder"></i> {nls.localize('vuengine/projects/commands/openFolder', 'Open Folder...')}
+                <i className="codicon codicon-folder"></i> {nls.localizeByDefault('Open Folder')}
             </button>
         );
 
@@ -191,6 +192,16 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 <i className="codicon codicon-add"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
             </button>
         );
+
+        const gitClone = (
+            <button
+                className="theia-button large"
+                onClick={this.gitClone}
+            >
+                <i className="codicon codicon-repo-clone"></i> {nls.localize('vuengine/gettingStarted/gitClone', 'Git: Clone')}
+            </button>
+        );
+
         const documentation = (
             <button
                 className="theia-button secondary large"
@@ -207,6 +218,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         return <div className="gs-section">
             {openWorkspace}
             {openFolder}
+            {gitClone}
             {newProject}
             {documentation}
             <br />
