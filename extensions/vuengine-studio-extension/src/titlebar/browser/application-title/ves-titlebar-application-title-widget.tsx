@@ -4,6 +4,7 @@ import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 
 @injectable()
@@ -12,6 +13,8 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected readonly commandService: CommandService;
   @inject(WindowTitleService)
   private readonly windowTitleService: WindowTitleService;
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
   @inject(VesWorkspaceService)
   private readonly workspaceService: VesWorkspaceService;
 
@@ -47,14 +50,28 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
 
   protected render(): React.ReactNode {
     return <div onDoubleClick={this.maximizeWindow}>
-      <div className="applicationTitle" onClick={this.openRecentWorkspace}>
+      <div
+        className="applicationTitle"
+        onClick={this.openRecentWorkspace}
+        title={WorkspaceCommands.OPEN_RECENT_WORKSPACE.label +
+          this.vesCommonService.getKeybindingLabel(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id, true)
+        }
+      >
         {this.workspaceService.isCollaboration() && <>
           <i className="codicon codicon-broadcast"></i>
         </>}
         {this.applicationTitle}
-        <div className="closeButton" onClick={this.closeWorkspace}>
-          <i className="codicon codicon-close" />
-        </div>
+        {this.workspaceService.opened &&
+          <div
+            className="closeButton"
+            onClick={this.closeWorkspace}
+            title={WorkspaceCommands.CLOSE.label +
+              this.vesCommonService.getKeybindingLabel(WorkspaceCommands.CLOSE.id, true)
+            }
+          >
+            <i className="codicon codicon-close" />
+          </div>
+        }
       </div>
     </div>;
   }
