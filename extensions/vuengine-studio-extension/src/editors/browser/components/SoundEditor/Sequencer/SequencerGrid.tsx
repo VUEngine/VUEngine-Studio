@@ -596,14 +596,25 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const sequenceIndex = Math.round(x / sequencerNoteWidth);
         const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, sequenceIndex);
         const identifier = `${trackId}-${insidePatternAtSi}`;
-        if (tool === SoundEditorTool.ERASER && e.button === 0 ||
+        if (
+            tool === SoundEditorTool.ERASER && e.button === 0 ||
             (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2
         ) {
             removePatternsFromSequence([identifier]);
         } else if (tool === SoundEditorTool.EDIT && e.button === 0) {
-            setCurrentSequenceIndex(trackId, insidePatternAtSi);
-            if (insidePatternAtSi > -1 && selectedPatterns.length <= 1) {
-                setSelectedPatterns([identifier]);
+            if (insidePatternAtSi > -1) {
+                if (e.metaKey || e.ctrlKey) {
+                    if (selectedPatterns.includes(identifier)) {
+                        setSelectedPatterns(selectedPatterns.filter(sp => sp !== identifier).sort());
+                    } else {
+                        setSelectedPatterns([...deepClone(selectedPatterns), identifier].sort());
+                    }
+                } else {
+                    setCurrentSequenceIndex(trackId, insidePatternAtSi);
+                    if (selectedPatterns.length <= 1) {
+                        setSelectedPatterns([identifier]);
+                    }
+                }
             }
         }
     };

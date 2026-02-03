@@ -494,7 +494,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const handleMouseUpNoteSelect = (e: MouseEvent<HTMLCanvasElement>) => {
-        if ((tool === SoundEditorTool.EDIT || tool === SoundEditorTool.ERASER) && e.button === 0) {
+        if (tool === SoundEditorTool.EDIT || tool === SoundEditorTool.ERASER) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const y = e.clientY - rect.top;
@@ -505,7 +505,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const relativeStep = (step - currentSequenceIndex) * SUB_NOTE_RESOLUTION;
             const foundStep = findNoteStep(relativeStep, noteId);
             if (foundStep > -1) {
-                if (tool === SoundEditorTool.EDIT) {
+                if (tool === SoundEditorTool.EDIT && e.button === 0) {
                     if (e.metaKey || e.ctrlKey) {
                         if (selectedNotes.includes(foundStep)) {
                             setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep).sort());
@@ -524,7 +524,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         }
                         setNoteCursor(foundStep + (currentSequenceIndex * SUB_NOTE_RESOLUTION));
                     }
-                } else if (tool === SoundEditorTool.ERASER) {
+                } else if (
+                    tool === SoundEditorTool.ERASER && e.button === 0 ||
+                    (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2
+                ) {
                     setNotes({ [foundStep]: {} });
                 }
             }
