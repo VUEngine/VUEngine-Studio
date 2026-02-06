@@ -280,6 +280,16 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
+    const toggleSetInt = () => {
+        const updatedInstruments = { ...soundData.instruments };
+        updatedInstruments[instrumentId] = {
+            ...updatedInstruments[instrumentId],
+            setInt: !instrument.setInt,
+        };
+
+        setInstruments(updatedInstruments);
+    };
+
     const cloneInstrument = () => {
         const newId = nanoid();
         setInstruments({
@@ -688,9 +698,16 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                     selectWidth={96}
                                 />
                             </BorderedVContainer>
+                            <BorderedVContainer>
+                                <Checkbox
+                                    label={nls.localize('vuengine/editors/sound/resetInternalCountersForEachNote', 'Reset Internal Counters For Each Note?')}
+                                    checked={instrument?.setInt ?? false}
+                                    setChecked={toggleSetInt}
+                                />
+                            </BorderedVContainer>
                         </VContainer>
                         <VContainer gap={20}>
-                            <BorderedVContainer gap={10} style={{ minWidth: 276 }}>
+                            <BorderedVContainer gap={10} style={{ maxWidth: 276, minWidth: 276 }}>
                                 <VContainer>
                                     <InfoLabel
                                         label={nls.localize('vuengine/editors/sound/volumeEnvelope', 'Volume Envelope')}
@@ -776,7 +793,7 @@ a pre-configured value and repeat the grow/decay process.'
                         </VContainer>
                         <VContainer gap={20}>
                             {instrument.type === SoundEditorTrackType.SWEEPMOD &&
-                                <BorderedVContainer gap={10} style={{ minWidth: 321 }}>
+                                <BorderedVContainer gap={10} style={{ maxWidth: 321, minWidth: 321 }}>
                                     <VContainer>
                                         <InfoLabel
                                             label={nls.localize('vuengine/editors/sound/frequencyEnvelope', 'Frequency Envelope')}

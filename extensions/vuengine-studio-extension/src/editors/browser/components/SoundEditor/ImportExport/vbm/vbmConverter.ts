@@ -63,6 +63,7 @@ const DEFAULT_INSTRUMENT = {
     waveform: [
         63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Pulse (50%)
     ],
+    setInt: false,
 };
 
 interface ConvertedInstrument {
@@ -315,6 +316,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
+                setInt: false,
             },
         });
     });

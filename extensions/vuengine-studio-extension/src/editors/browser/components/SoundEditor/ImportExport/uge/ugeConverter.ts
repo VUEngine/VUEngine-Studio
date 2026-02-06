@@ -282,6 +282,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                     right: 15
                 },
                 waveform: DUTY_WAVEFORMS[i.duty_cycle],
+                setInt: false,
             },
         });
     });
@@ -336,6 +337,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
                     right: 15
                 },
                 waveform: convertWaveform(waves[(i as WaveInstrument).wave_index]),
+                setInt: false,
             },
         });
     });
@@ -397,6 +399,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
+                setInt: false,
             },
         });
     });

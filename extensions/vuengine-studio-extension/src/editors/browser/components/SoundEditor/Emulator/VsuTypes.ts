@@ -41,25 +41,8 @@ export interface VsuChannelStereoLevelsData {
     right: number
 }
 
-export interface VsuChannelData {
-    enabled: boolean
-    interval: VsuChannelIntervalData
-    frequency: number
-    waveform: number
-    stereoLevels: VsuChannelStereoLevelsData
-    envelope: VsuChannelEnvelopeData
-    sweepMod: VsuChannelSweepModulationData
-    tap: number
-}
-
 export type WaveformData = number[];
 export type ModulationData = number[];
-
-export interface VsuData {
-    channels: VsuChannelData[]
-    waveforms: WaveformData[]
-    modulation: ModulationData
-}
 
 export const VSU_SAMPLE_RATE = 41667;
 export const VSU_NUMBER_OF_WAVEFORM_BANKS = 5;

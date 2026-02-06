@@ -98,6 +98,7 @@ export interface InstrumentConfig {
     sweepMod: VsuChannelSweepModulationData
     modulationData: number[]
     tap: number
+    setInt: boolean
 }
 
 export interface ScrollWindow {

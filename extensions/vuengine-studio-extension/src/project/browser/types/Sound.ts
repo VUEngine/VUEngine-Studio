@@ -251,7 +251,11 @@ export const SoundType: ProjectDataType = {
                             type: 'integer',
                             minimum: 0,
                             maximum: VSU_NOISE_TAP.length,
-                        }
+                        },
+                        setInt: {
+                            type: 'boolean',
+                            default: false
+                        },
                     },
                     additionalProperties: false
                 }

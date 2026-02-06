@@ -74,8 +74,11 @@ const zeroVolume = {
     right: 0
 } as VsuChannelStereoLevelsData;
 
-const SxINT = (channelEnabled: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
-    [Number(channelEnabled), 1],
+const SxINT = (setInt: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
+    // VUEngine's sound player handles channel enablement internally to reduce pops caused by
+    // resetting the VSU's internal counter due to SxINT being set. We can set the flag manually
+    // to force the counter reset.
+    [Number(setInt), 1],
     [undefined, 1],
     [Number(interval.enabled), 1],
     [interval.value, 5]
@@ -417,7 +420,7 @@ const transformToKeyframes = (
 
             const newInstrument = instruments[currentInstrumentId ?? track.instrument];
 
-            keyframe.SxINT = SxINT(true, newInstrument.interval);
+            keyframe.SxINT = SxINT(newInstrument.setInt, newInstrument.interval);
             keyframe.SxLRV = SxLRV(newInstrument.volume);
             keyframe.SxEV0 = SxEV0(newInstrument.envelope);
             keyframe.SxEV1 = SxEV1(newInstrument.envelope, newInstrument.sweepMod, newInstrument.tap, track.type);
