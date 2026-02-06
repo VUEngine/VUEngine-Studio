@@ -4,6 +4,20 @@ import { NodeRendererProps } from 'react-arborist';
 import { ProjectContributor } from '../../ves-project-types';
 import styled from 'styled-components';
 
+const CountLabel = styled.span`
+    background-color: rgba(255, 255, 255, .1);
+    border-radius: 50px;
+    font-size: 60%;
+    margin-left: 5px;
+    padding: 1px 5px;
+    vertical-align: middle;
+
+    body.theia-light &,
+    body.theia-hc & {
+        background-color: rgba(0, 0, 0, .1);
+    }
+`;
+
 const ContributorLabel = styled.span`
     opacity: .3;
 `;
@@ -16,12 +30,18 @@ export default function AssetsTreeNode(props: NodeRendererProps<any>): React.JSX
             if (node.isOpen) {
                 return <>
                     <i className='codicon codicon-chevron-down' />
-                    <i className='codicon codicon-folder-opened' />
+                    {node.data.icon !== undefined
+                        ? <i className={node.data.icon} />
+                        : <i className='codicon codicon-folder-opened' />
+                    }
                 </>;
             } else {
                 return <>
                     <i className='codicon codicon-chevron-right' />
-                    <i className='codicon codicon-folder' />
+                    {node.data.icon !== undefined
+                        ? <i className={node.data.icon} />
+                        : <i className='codicon codicon-folder' />
+                    }
                 </>;
             }
         } else if (node.data.icon) {
@@ -96,6 +116,11 @@ export default function AssetsTreeNode(props: NodeRendererProps<any>): React.JSX
                                 })
                             </ContributorLabel>
                         </>}
+                        {!node.data.isLeaf &&
+                            <CountLabel>
+                                {node.children?.length ?? 0}
+                            </CountLabel>
+                        }
                     </>
                 )}
             </div>

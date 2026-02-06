@@ -92,68 +92,96 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     ]);
 
     const getIcon = (): React.JSX.Element => {
+        const icon: React.JSX.Element[] = [];
+
         if (showPreview === false) {
             return <i className='fa fa-eye-slash' />;
         }
         if (node.id === 'addComponent') {
             return <Plus size={16} />;
-        } else if (node.isLeaf) {
+        } else {
+            if (!node.isLeaf) {
+                if (node.isOpen) {
+                    icon.push(<i className='codicon codicon-chevron-down' />);
+                } else {
+                    icon.push(<i className='codicon codicon-chevron-right' />);
+                }
+            }
+
             switch (type) {
                 default:
-                    return <File size={16} />;
+                    if (node.isLeaf) {
+                        icon.push(<File size={16} />);
+                    } else {
+                        if (node.isOpen) {
+                            icon.push(<i className='codicon codicon-folder-opened' />);
+                        } else {
+                            icon.push(<i className='codicon codicon-folder' />);
+                        }
+                    }
+                    break;
                 case 'animations':
-                    return <FilmStrip size={16} />;
+                    icon.push(<FilmStrip size={16} />);
+                    break;
                 case 'bodies':
-                    return <Atom size={16} />;
+                    icon.push(<Atom size={16} />);
+                    break;
                 case 'children':
-                    return <UserFocus size={16} />;
+                    icon.push(<UserFocus size={16} />);
+                    break;
                 case 'colliders':
-                    switch (data.components.colliders[index].type) {
+                    const collider = data.components.colliders[index];
+                    switch (collider?.type) {
                         default:
                         case ColliderType.Ball:
-                            return <CircleDashed size={16} />;
+                            icon.push(<CircleDashed size={16} />);
+                            break;
                         case ColliderType.Box:
-                            return <Selection size={16} />;
+                            icon.push(<Selection size={16} />);
+                            break;
                         case ColliderType.InverseBox:
-                            return <SelectionInverse size={16} />;
+                            icon.push(<SelectionInverse size={16} />);
+                            break;
                         case ColliderType.LineField:
-                            return <DotsThreeOutline size={16} />;
+                            icon.push(<DotsThreeOutline size={16} />);
+                            break;
                     }
+                    break;
                 case 'mutators':
-                    return <SneakerMove size={16} />;
+                    icon.push(<SneakerMove size={16} />);
+                    break;
                 case 'sounds':
-                    return <MusicNotes size={16} />;
+                    icon.push(<MusicNotes size={16} />);
+                    break;
                 case 'sprites':
-                    if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
-                        ((data.components.sprites[index].texture?.files?.length ?? 0) +
-                            (data.components.sprites[index].texture?.files2?.length ?? 0) > 1)) {
-                        return <Images size={16} />;
+                    const sprite = data.components.sprites[index];
+                    if (sprite?.displayMode === DisplayMode.Stereo ||
+                        ((sprite?.texture?.files?.length ?? 0) +
+                            (sprite?.texture?.files2?.length ?? 0) > 1)) {
+                        icon.push(<Images size={16} />);
+                    } else {
+                        icon.push(<Image size={16} />);
                     }
-                    return <Image size={16} />;
+                    break;
                 case 'wireframes':
-                    switch (data.components.wireframes[index].type) {
+                    const wireframe = data.components.wireframes[index];
+                    switch (wireframe?.type) {
                         default:
                         case WireframeType.Mesh:
-                            return <Hexagon size={16} />;
+                            icon.push(<Hexagon size={16} />);
+                            break;
                         case WireframeType.Sphere:
-                            return <Circle size={16} />;
+                            icon.push(<Circle size={16} />);
+                            break;
                         case WireframeType.Asterisk:
-                            return <Asterisk size={16} />;
+                            icon.push(<Asterisk size={16} />);
+                            break;
                     }
-            }
-        } else {
-            if (node.isOpen) {
-                return <>
-                    <i className='codicon codicon-chevron-down' />
-                    <i className='codicon codicon-folder-opened' />
-                </>;
-            } else {
-                return <>
-                    <i className='codicon codicon-chevron-right' />
-                    <i className='codicon codicon-folder' />
-                </>;
+                    break;
             }
         }
+
+        return <>{icon.map(i => i)}</>;
     };
 
     const handleClick = (e: React.MouseEvent) => {
