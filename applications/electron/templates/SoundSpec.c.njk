@@ -35,10 +35,10 @@
 	{{ result }}
 {%- endmacro -%}
 
-{%- macro printValueList(values, columnWidth=16) -%}
+{%- macro printValueList(values, columnWidth, valueWhenEmpty) -%}
 	{% set count = 0 -%}
 	{%- if values | length == 0-%}
-		{{- 'NULL' -}}
+		{{- valueWhenEmpty -}}
 	{%- else -%}
 		{%- for value in values -%}
 			{{- value | safe -}}{{- ', ' -}}
@@ -152,42 +152,42 @@ const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[] =
 
 const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT[] =
 {
-	{{ printValueList(trackKeyframes.values.SxINT, 22) }}
+	{{ printValueList(trackKeyframes.values.SxINT, 22, '0x00') }}
 };
 
 const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxLRV[] =
 {
-	{{ printValueList(trackKeyframes.values.SxLRV, 22) }}
+	{{ printValueList(trackKeyframes.values.SxLRV, 22, '0x00') }}
 };
 
 const uint16 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxFQ[] =
 {
-	{{ printValueList(trackKeyframes.values.SxFQ, 16) }}
+	{{ printValueList(trackKeyframes.values.SxFQ, 16, '0x00') }}
 };
 
 const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV0[] =
 {
-	{{ printValueList(trackKeyframes.values.SxEV0, 22) }}
+	{{ printValueList(trackKeyframes.values.SxEV0, 22, '0x00') }}
 };
 
 const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV1[] =
 {
-	{{ printValueList(trackKeyframes.values.SxEV1, 22) }}
+	{{ printValueList(trackKeyframes.values.SxEV1, 22, '0x00') }}
 };
 
 const WaveformData* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxRAM[] =
 {
-	{{ printValueList(trackKeyframes.values.SxRAM, 4) }}
+	{{ printValueList(trackKeyframes.values.SxRAM, 4, 'NULL') }}
 };
 
 const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxSWP[] =
 {
-	{{ printValueList(trackKeyframes.values.SxSWP, 22) }}
+	{{ printValueList(trackKeyframes.values.SxSWP, 22, '0x00') }}
 };
 
 const int8* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxMOD[] =
 {
-	{{ printValueList(trackKeyframes.values.SxMOD, 4) }}
+	{{ printValueList(trackKeyframes.values.SxMOD, 4, 'NULL') }}
 };
 
 const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes[] =
