@@ -11,6 +11,11 @@
     padding: 0 var(--padding);
 }
 
+.ves-tree > [role=treeitem],
+.ves-tree [role=treeitem][aria-level="1"] {
+    font-size: var(--theia-ui-font-size2);
+}
+
 .ves-tree [role=treeitem][aria-selected=true] {
     background: var(--theia-list-inactiveSelectionBackground);
     color: var(--theia-list-inactiveSelectionForeground);

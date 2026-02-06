@@ -26,7 +26,8 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
   static readonly ID = 'vesProjectAssetsSidebarWidget';
   static readonly LABEL = nls.localize('vuengine/projects/assets', 'Assets');
 
-  public allExpanded: boolean = true;
+  public allExpanded: boolean = false;
+  public forceRefresh: boolean = false;
 
   @postConstruct()
   protected init(): void {
@@ -53,6 +54,11 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
     this.title.caption = this.title.label;
   }
 
+  public refresh(): void {
+    this.forceRefresh = !this.forceRefresh;
+    this.update();
+  }
+
   public setAllExpanded(allExpanded: boolean): void {
     this.allExpanded = allExpanded;
     this.update();
@@ -74,7 +80,7 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
         fileService={this.fileService}
         openerService={this.openerService}
         vesProjectService={this.vesProjectService}
-        workspaceService={this.workspaceService}
+        forceRefresh={this.forceRefresh}
       />;
   }
 }

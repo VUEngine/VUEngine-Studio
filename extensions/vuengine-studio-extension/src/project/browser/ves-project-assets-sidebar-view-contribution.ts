@@ -13,6 +13,15 @@ export namespace VesProjectAssetsSidebarCommands {
         'vuengine/projects/assetsSidebar/commands/toggleView',
         'vuengine/projects/assetsSidebar/commands/category'
     );
+    export const REFRESH: Command = Command.toLocalizedCommand(
+        {
+            id: 'assetsSidebar.refresh',
+            label: 'Refresh',
+            iconClass: 'codicon codicon-refresh',
+        },
+        'vuengine/projects/assetsSidebar/commands/refresh',
+        'vuengine/projects/assetsSidebar/commands/category'
+    );
     export const EXPAND_ALL: Command = Command.toLocalizedCommand(
         {
             id: 'assetsSidebar.expandAll',
@@ -59,6 +68,11 @@ export class VesProjectAssetsSidebarViewContribution extends AbstractViewContrib
         commandRegistry.registerCommand(VesProjectAssetsSidebarCommands.WIDGET_TOGGLE, {
             execute: () => this.toggleView()
         });
+        commandRegistry.registerCommand(VesProjectAssetsSidebarCommands.REFRESH, {
+            isEnabled: () => this.shell.currentWidget instanceof VesProjectAssetsSidebarWidget,
+            isVisible: () => this.shell.currentWidget instanceof VesProjectAssetsSidebarWidget,
+            execute: () => (this.shell.currentWidget as VesProjectAssetsSidebarWidget).refresh(),
+        });
         commandRegistry.registerCommand(VesProjectAssetsSidebarCommands.EXPAND_ALL, {
             isEnabled: () => this.shell.currentWidget instanceof VesProjectAssetsSidebarWidget,
             isVisible: () => this.shell.currentWidget instanceof VesProjectAssetsSidebarWidget,
@@ -91,16 +105,22 @@ export class VesProjectAssetsSidebarViewContribution extends AbstractViewContrib
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
         toolbar.registerItem({
+            id: VesProjectAssetsSidebarCommands.REFRESH.id,
+            command: VesProjectAssetsSidebarCommands.REFRESH.id,
+            tooltip: VesProjectAssetsSidebarCommands.REFRESH.label,
+            priority: 0,
+        });
+        toolbar.registerItem({
             id: VesProjectAssetsSidebarCommands.COLLAPSE_ALL.id,
             command: VesProjectAssetsSidebarCommands.COLLAPSE_ALL.id,
             tooltip: VesProjectAssetsSidebarCommands.COLLAPSE_ALL.label,
-            priority: 0,
+            priority: 1,
         });
         toolbar.registerItem({
             id: VesProjectAssetsSidebarCommands.EXPAND_ALL.id,
             command: VesProjectAssetsSidebarCommands.EXPAND_ALL.id,
             tooltip: VesProjectAssetsSidebarCommands.EXPAND_ALL.label,
-            priority: 1,
+            priority: 2,
         });
     }
 }

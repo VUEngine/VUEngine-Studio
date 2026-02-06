@@ -1,7 +1,6 @@
 import { nls, URI } from '@theia/core';
 import { ConfirmDialog, open, OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useEffect, useRef, useState } from 'react';
 import { Tree } from 'react-arborist';
 import Input from '../../../../editors/browser/components/Common/Base/Input';
@@ -30,13 +29,14 @@ interface AssetsTreeProps {
     fileService: FileService
     openerService: OpenerService
     vesProjectService: VesProjectService
-    workspaceService: WorkspaceService
+    forceRefresh: boolean
 }
 
 export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const {
         allExpanded,
-        fileService, openerService, vesProjectService, // workspaceService,
+        fileService, openerService, vesProjectService,
+        forceRefresh
     } = props;
     const treeContainerRef = useRef<HTMLDivElement>(null);
     const [treeHeight, setTreeHeight] = useState<number>(300);
@@ -45,11 +45,18 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const [selection, setSelection] = useState<string>('');
     const [contributorsFilter, setContributorsFilter] = useState<ProjectContributor[]>([ProjectContributor.Project]);
     const [treeData, setTreeData] = useState<TreeNode[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const treeRef = useRef();
 
     const openEditor = async (fileUri: URI): Promise<void> => {
         const opener = await openerService.getOpener(fileUri);
         await opener.open(fileUri);
+    };
+
+    const refresh = async () => {
+        setLoading(true);
+        await getItems();
+        setTimeout(() => setLoading(false), 100);
     };
 
     const getItems = async () => {
@@ -132,7 +139,15 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     };
 
     useEffect(() => {
-        getItems();
+        refresh();
+    }, [
+        forceRefresh
+    ]);
+
+    useEffect(() => {
+        setLoading(true);
+        getItems().then(() => setLoading(false));
+
         const addObserver = vesProjectService.onDidAddProjectItem(() => getItems());
         const deleteObserver = vesProjectService.onDidDeleteProjectItem(() => getItems());
         const updateObserver = vesProjectService.onDidUpdateProjectItem(() => getItems());
@@ -202,26 +217,37 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
                         flexGrow: 1,
                     }}
                 >
-                    {treeData.length === 0
+                    {loading
                         ? <div style={{ padding: '0 calc(2 * var(--theia-ui-padding))' }}>
-                            {nls.localize('vuengine/editors/project/noAssetsFound', 'No Assets Found')}
+                            {nls.localize('vuengine/editors/project/loadingAssets', 'Loading Assets')}...
+                            <i
+                                className='codicon codicon-loading codicon-modifier-spin'
+                                style={{
+                                    marginLeft: 5,
+                                    verticalAlign: 'text-bottom',
+                                }}
+                            />
                         </div>
-                        : <Tree
-                            ref={treeRef}
-                            data={treeData}
-                            indent={20}
-                            rowHeight={24}
-                            height={treeHeight}
-                            width={treeWidth}
-                            openByDefault={allExpanded}
-                            disableDrag
-                            disableDrop
-                            disableMultiSelection
-                            selection={selection}
-                            searchTerm={searchTerm}
-                        >
-                            {AssetsTreeNode}
-                        </Tree>
+                        : treeData.length === 0
+                            ? <div style={{ padding: '0 calc(2 * var(--theia-ui-padding))' }}>
+                                {nls.localize('vuengine/editors/project/noAssetsFound', 'No Assets Found')}
+                            </div>
+                            : <Tree
+                                ref={treeRef}
+                                data={treeData}
+                                indent={20}
+                                rowHeight={24}
+                                height={treeHeight}
+                                width={treeWidth}
+                                openByDefault={allExpanded}
+                                disableDrag
+                                disableDrop
+                                disableMultiSelection
+                                selection={selection}
+                                searchTerm={searchTerm}
+                            >
+                                {AssetsTreeNode}
+                            </Tree>
                     }
                 </div>
             </VContainer>
