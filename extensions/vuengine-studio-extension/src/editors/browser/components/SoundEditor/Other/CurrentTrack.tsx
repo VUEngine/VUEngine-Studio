@@ -158,6 +158,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         defaultValue={`${track.instrument}`}
                         onChange={options => setTrackInstrument(options[0])}
                         backgroundColor={soundData.instruments[track.instrument] ? COLOR_PALETTE[soundData.instruments[track.instrument].color] : undefined}
+                        maxMenuHeight={115}
                     />
                     <InputWithActionButton
                         className='theia-button secondary'

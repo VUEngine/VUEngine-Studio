@@ -3,23 +3,27 @@ import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import InstrumentSelect from '../EventList/InstrumentSelect';
-import NoteSelect from '../EventList/NoteSelect';
+import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepInput from '../EventList/StepInput';
-import { getNoteSlideLabel } from '../SoundEditor';
+import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_BARS_PER_PATTERN,
     DEFAULT_NEW_NOTE,
     EventsMap,
+    NOTES_LABELS,
     PatternConfig,
     SOUND_EVENT_LABELS,
     SoundData,
     SoundEvent,
-    SUB_NOTE_RESOLUTION
+    SUB_NOTE_RESOLUTION,
+    TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_DEFAULT_INSTRUMENT_NAME,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY
 } from '../SoundEditorTypes';
 
 const NoNote = styled.div`
@@ -91,7 +95,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         });
 
     return (
-        <VContainer gap={15}>
+        <VContainer gap={15} grow={1}>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/noteCursor', 'Note Cursor')}
@@ -101,8 +105,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                         type='number'
                         value={noteCursor}
                         setValue={nc => setNoteCursor(nc as number)}
-                        min={0}
-                        max={currentPatternSize - SUB_NOTE_RESOLUTION}
+                        min={patternStepOffset}
+                        max={currentPatternSize - SUB_NOTE_RESOLUTION + patternStepOffset}
                         step={SUB_NOTE_RESOLUTION}
                         grow={1}
                     />
@@ -212,12 +216,32 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                 {SOUND_EVENT_LABELS[SoundEvent.Note]}
                             </label>
                             <HContainer>
-                                <NoteSelect
-                                    value={note}
-                                    step={relativeStep}
-                                    setNotes={setNotes}
-                                    width={64}
-                                />
+                                <VContainer>
+                                    <AdvancedSelect
+                                        options={[
+                                            {
+                                                value: '',
+                                                label: nls.localizeByDefault('none'),
+                                            },
+                                            ...NOTES_LABELS
+                                                .map(n => ({
+                                                    value: n,
+                                                    label: n,
+                                                }))
+                                        ]}
+                                        defaultValue={note}
+                                        title={note}
+                                        onChange={options => {
+                                            setNotes({
+                                                [relativeStep]: {
+                                                    [SoundEvent.Note]: options[0] ?? undefined
+                                                }
+                                            });
+                                        }}
+                                        maxMenuHeight={104}
+                                        style={{ width: 64 }}
+                                    />
+                                </VContainer>
                                 <button
                                     className={`theia-button ${playingTestNote ? 'primary' : 'secondary'}`}
                                     onClick={testNote}
@@ -257,15 +281,51 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                             </VContainer>
                         }
                     </HContainer>
-                    <InstrumentSelect
-                        label={SOUND_EVENT_LABELS[SoundEvent.Instrument]}
-                        soundData={soundData}
-                        currentTrackId={currentTrackId}
-                        step={relativeStep}
-                        instrumentId={instrumentId}
-                        setNotes={setNotes}
-                        grow={1}
-                    />
+                    <VContainer grow={1}>
+                        <label>{SOUND_EVENT_LABELS[SoundEvent.Instrument]}</label>
+                        <AdvancedSelect
+                            options={[
+                                {
+                                    value: TRACK_DEFAULT_INSTRUMENT_ID,
+                                    label: TRACK_DEFAULT_INSTRUMENT_NAME,
+                                },
+                                ...Object.keys(soundData.instruments)
+                                    .filter(iid => {
+                                        const instr = soundData.instruments[iid];
+                                        return iid ===
+                                            instrumentId ||
+                                            TRACK_TYPE_INSTRUMENT_COMPATIBILITY[soundData.tracks[currentTrackId].type].includes(instr.type);
+                                    })
+                                    .sort((a, b) => (soundData.instruments[a].name.length
+                                        ? soundData.instruments[a].name
+                                        : 'zzz').localeCompare(
+                                            (soundData.instruments[b].name.length
+                                                ? soundData.instruments[b].name
+                                                : 'zzz')
+                                        ))
+                                    .map(instrId => ({
+                                        value: `${instrId}`,
+                                        label: getInstrumentName(soundData, instrId),
+                                        backgroundColor: COLOR_PALETTE[soundData.instruments[instrId].color ?? DEFAULT_COLOR_INDEX],
+                                    }))
+                            ]}
+                            title={getInstrumentName(soundData, instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID)}
+                            defaultValue={instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID}
+                            onChange={options => {
+                                setNotes({
+                                    [relativeStep]: {
+                                        [SoundEvent.Instrument]:
+                                            (options[0] === TRACK_DEFAULT_INSTRUMENT_ID ||
+                                                options[0] === soundData.tracks[currentTrackId].instrument)
+                                                ? ''
+                                                : options[0]
+                                    }
+                                });
+                            }}
+                            menuPlacement='top'
+                        />
+                    </VContainer>
+
                 </VContainer>
             ) : (
                 <VContainer gap={15} style={{ alignSelf: 'start' }}>
