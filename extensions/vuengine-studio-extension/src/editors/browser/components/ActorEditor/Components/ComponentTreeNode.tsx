@@ -17,7 +17,7 @@ import {
     UserFocus
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ColliderType, DisplayMode, WireframeType } from '../../Common/VUEngineTypes';
@@ -181,7 +181,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             }
         }
 
-        return <>{icon.map(i => i)}</>;
+        return <>{icon.map((x, i) => <Fragment key={i}>{x}</Fragment>)}</>;
     };
 
     const handleClick = (e: React.MouseEvent) => {
@@ -292,6 +292,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                             } else if (e.key === 'Enter') {
                                 node.submit(e.currentTarget.value);
                                 setName(e.currentTarget.value);
+                                enableCommands();
                             };
                         }}
                         autoFocus
