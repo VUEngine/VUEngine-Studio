@@ -254,7 +254,7 @@ export const SoundType: ProjectDataType = {
                         },
                         setInt: {
                             type: 'boolean',
-                            default: false
+                            default: true
                         },
                     },
                     additionalProperties: false

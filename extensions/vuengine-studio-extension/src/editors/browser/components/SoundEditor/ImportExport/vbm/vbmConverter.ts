@@ -63,7 +63,7 @@ const DEFAULT_INSTRUMENT = {
     waveform: [
         63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Pulse (50%)
     ],
-    setInt: false,
+    setInt: true,
 };
 
 interface ConvertedInstrument {
@@ -76,7 +76,7 @@ interface ConvertedPattern {
     patternConfig: PatternConfig
 }
 
-const NOTE_OFFSET = 39;
+const NOTE_OFFSET = 42;
 
 export const convertVbmSong = (song: VBMusicFile): SoundData => {
     const convertedPatternSize = song.SongSettings.Rows;
@@ -316,7 +316,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
-                setInt: false,
+                setInt: true,
             },
         });
     });

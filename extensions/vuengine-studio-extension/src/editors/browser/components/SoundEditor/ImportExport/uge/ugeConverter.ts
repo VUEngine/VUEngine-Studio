@@ -29,7 +29,7 @@ import {
 import { DutyInstrument, NoiseInstrument, PatternCell, Song, WaveInstrument } from './ugeHelper';
 import { EffectCommandType } from './ugeTypes';
 
-const GB_NOTE_OFFSET = 9 - 12; // adjust for frequency ranges (+9) and transpose down an octave (-12)
+const GB_NOTE_OFFSET = 12 - 12; // adjust for frequency ranges (+12) and transpose down an octave (-12)
 const CONVERTED_PATTERN_SIZE = 64;
 
 const WAVE_CHANNEL_VOLUME_LOOKUP = [0, 15, 7, 3];
@@ -282,7 +282,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                     right: 15
                 },
                 waveform: DUTY_WAVEFORMS[i.duty_cycle],
-                setInt: false,
+                setInt: true,
             },
         });
     });
@@ -337,7 +337,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
                     right: 15
                 },
                 waveform: convertWaveform(waves[(i as WaveInstrument).wave_index]),
-                setInt: false,
+                setInt: true,
             },
         });
     });
@@ -399,7 +399,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
-                setInt: false,
+                setInt: true,
             },
         });
     });
