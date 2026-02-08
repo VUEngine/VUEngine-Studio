@@ -178,7 +178,6 @@ A total of {0} instruments will be deleted.",
             });
         });
         const duplicatePatterns = Object.entries(duplicatePatternsMap);
-        console.log('duplicatePatternsMap', duplicatePatternsMap);
 
         // stop if no unused patterns found
         if (duplicatePatterns.length === 0) {

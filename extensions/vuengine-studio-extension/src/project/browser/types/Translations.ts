@@ -16,15 +16,12 @@ export const TranslationsType: ProjectDataType = {
                         name: {
                             type: 'string'
                         },
-                        localizedName: {
-                            type: 'string'
-                        },
                         code: {
                             type: 'string',
                             maxLength: 2,
                             minLength: 2
                         },
-                        flag: {
+                        flagActorId: {
                             type: 'string'
                         }
                     },

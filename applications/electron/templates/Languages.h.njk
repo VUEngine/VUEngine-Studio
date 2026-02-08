@@ -8,18 +8,7 @@
 
 {{ macros.sectionHeader('Definitions') }}
 
-{% if projectTranslations.languages | length -%}
-enum LanguageIdentifiers
-{
-	{% for language in projectTranslations.languages|sort(attribute='order') -%}
-	kLanguage{{ language.name | sanitizeSpecName }},
-	{%- if not loop.last -%}{{ '\n	' }}{%- endif -%}
-	{%- endfor %}
-};
-
-{% endif -%}
-
-{%- set strings = [] -%}
+{% set strings = [] -%}
 {%- for language in allLanguages -%}
     {%- for translationId, translation in language.translations %}
         {%- set strings = (strings.push(translationId), strings) %}

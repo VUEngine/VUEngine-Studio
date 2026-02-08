@@ -478,7 +478,9 @@ export class VesCodeGenService {
       return 0;
     }
 
-    const encoding = template.encoding ? template.encoding : ProjectDataTemplateEncoding.utf8;
+    const encoding = template.encoding
+      ? template.encoding
+      : ProjectDataTemplateEncoding.utf8;
     const projectData = this.vesProjectService.getProjectData();
 
     let numberOfGeneratedFiles = 0;

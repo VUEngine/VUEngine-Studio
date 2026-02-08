@@ -1,4 +1,9 @@
 import { nls } from '@theia/core';
+import { ProjectContributor, WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
+
+export interface AllTranslationsData {
+    [id: string]: TranslationsData & WithContributor & WithFileUri
+}
 
 export interface TranslationsData {
     languages: Language[]
@@ -7,9 +12,8 @@ export interface TranslationsData {
 
 export interface Language {
     name: string
-    localizedName: string
     code: string
-    flag: string
+    flagActorId: string
 }
 
 export interface Translations {
@@ -19,6 +23,194 @@ export interface Translations {
 export interface Translation {
     [id: string]: string
 }
+
+export interface TranslationsWithContributors {
+    [id: string]: TranslationWithContributor
+}
+
+export interface TranslationWithContributor {
+    translation: Translation,
+    _isOverriden: boolean
+    _contributor: ProjectContributor,
+}
+
+export const LANGUAGE_PRESETS: { [code: string]: Language } = {
+    'az': {
+        code: 'az',
+        name: nls.localize('vuengine/general/languages/az', 'Azerbaijani'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'bg': {
+        code: 'bg',
+        name: 'Bŭlgarski',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'bs': {
+        code: 'bs',
+        name: 'Bosanac',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'cs': {
+        code: 'cs',
+        name: 'Český',
+        flagActorId: 'mHeymnDIz3hIl7m4',
+    },
+    'cy': {
+        code: 'cy',
+        name: 'Cymraeg',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'da': {
+        code: 'da',
+        name: 'Dansk',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'de': {
+        code: 'de',
+        name: 'Deutsch',
+        flagActorId: '8N3qMrFmfimZtdG9',
+    },
+    'el': {
+        code: 'el',
+        name: 'Ellinikí',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'en': {
+        code: 'en',
+        name: 'English',
+        flagActorId: 'y00jkkvzi3Ah6KaR',
+    },
+    'es': {
+        code: 'es',
+        name: 'Español',
+        flagActorId: 'Ce8LW23XBQx4Tkbl',
+    },
+    'et': {
+        code: 'et',
+        name: 'Eesti',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'fi': {
+        code: 'fi',
+        name: 'Suomi',
+        flagActorId: 'kojqfXs2N5P0liyW',
+    },
+    'fr': {
+        code: 'fr',
+        name: 'Français',
+        flagActorId: '8uaehoYBaiePjsGy',
+    },
+    'ga': {
+        code: 'ga',
+        name: nls.localize('vuengine/general/languages/ga', 'Irish'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'hr': {
+        code: 'hr',
+        name: 'Hrvatski',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'hu': {
+        code: 'hu',
+        name: 'Magyar',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'hy': {
+        code: 'hy',
+        name: nls.localize('vuengine/general/languages/hy', 'Armenian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'is': {
+        code: 'is',
+        name: nls.localize('vuengine/general/languages/is', 'Icelandic'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'it': {
+        code: 'it',
+        name: 'Italiano',
+        flagActorId: 'YdFcBq89avlT4SrL',
+    },
+    'ja': {
+        code: 'ja',
+        name: 'Nihongo',
+        flagActorId: 'UDruoXS7PbWBJGru',
+    },
+    'ka': {
+        code: 'ka',
+        name: nls.localize('vuengine/general/languages/ka', 'Georgian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'ko': {
+        code: 'ko',
+        name: 'Hangugeo',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'lt': {
+        code: 'lt',
+        name: nls.localize('vuengine/general/languages/lt', 'Lithuanian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'lv': {
+        code: 'lv',
+        name: nls.localize('vuengine/general/languages/lv', 'Latvian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'nl': {
+        code: 'nl',
+        name: 'Nederlands',
+        flagActorId: 'GvDim0haCvEagsTC',
+    },
+    'no': {
+        code: 'no',
+        name: 'Norsk',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'pl': {
+        code: 'pl',
+        name: 'Polski',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'pt': {
+        code: 'pt',
+        name: 'Português',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'ro': {
+        code: 'ro',
+        name: nls.localize('vuengine/general/languages/ro', 'Romanian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'sk': {
+        code: 'sk',
+        name: nls.localize('vuengine/general/languages/sk', 'Slovak'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'sl': {
+        code: 'sl',
+        name: nls.localize('vuengine/general/languages/sl', 'Slovenian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'sq': {
+        code: 'sq',
+        name: nls.localize('vuengine/general/languages/sq', 'Albanian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'sr': {
+        code: 'sr',
+        name: nls.localize('vuengine/general/languages/sr', 'Serbian'),
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+    'sv': {
+        code: 'sv',
+        name: 'Svensk',
+        flagActorId: 'wGVxxx547gd8qhk3',
+    },
+    'tr': {
+        code: 'tr',
+        name: 'Türkçe',
+        flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
+    },
+};
 
 export const LANGUAGES: { [code: string]: string } = {
     'aa': nls.localize('vuengine/general/languages/aa', 'Afar'),

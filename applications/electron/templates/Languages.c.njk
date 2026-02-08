@@ -21,9 +21,13 @@
 {{ macros.sectionHeader('Declarations') }}
 
 {% for language in projectTranslations.languages|sort(attribute='order') -%}
-extern LangROMSpec {{ language.name | sanitizeSpecName }}LanguageSpec;
-{% if language.flag -%}
-extern ActorSpec {{ language.flag }};
+{%- set flagActor = project.items.Actor[language.flagActorId] -%}
+{%- if flagActor is defined -%}
+	{%- set flagActorName = flagActor._fileUri | basename(false) | sanitizeSpecName ~ 'ActorSpec' -%}
+{%- endif -%}
+extern LangROMSpec {{ language.code }}LanguageSpec;
+{% if flagActorName is defined -%}
+extern ActorSpec {{ flagActorName }};
 {% endif -%}
 {% endfor %}
 {% endif -%}
@@ -32,13 +36,17 @@ extern ActorSpec {{ language.flag }};
 LangROMSpec* const _languages[] =
 {
 	{% for language in projectTranslations.languages|sort(attribute='order') -%}
-	&{{ language.name | sanitizeSpecName }}LanguageSpec,
+	&{{ language.code }}LanguageSpec,
 	{% endfor %}
 	NULL
 };
-{%- for language in projectTranslations.languages %}
+{%- for language in projectTranslations.languages -%}
+{%- set flagActor = project.items.Actor[language.flagActorId] -%}
+{%- if flagActor is defined -%}
+	{%- set flagActorName = flagActor._fileUri | basename(false) | sanitizeSpecName ~ 'ActorSpec' -%}
+{%- endif %}
 
-const char* const {{ language.name | sanitizeSpecName }}LanguageStrings[] =
+const char* const {{ language.code }}LanguageStrings[] =
 {
     {%- for translationId in translationIds %}
     /* kString{{ translationId | sanitizeSpecName }}: */
@@ -46,19 +54,19 @@ const char* const {{ language.name | sanitizeSpecName }}LanguageStrings[] =
     {%- endfor %}
 };
 
-const LangROMSpec {{ language.name | sanitizeSpecName }}LanguageSpec =
+const LangROMSpec {{ language.code }}LanguageSpec =
 {
 	// language name
-	"{{ language.localizedName }}",
+	"{{ language.name }}",
 
 	// flag actor
-	{% if language.flag -%}
-	&{{ language.flag }},
+	{% if flagActorName is defined -%}
+	&{{ flagActorName }},
 	{% else -%}
 	NULL,
 	{% endif %}
 	// strings
-	(const char**){{ language.name | sanitizeSpecName }}LanguageStrings
+	(const char**){{ language.code }}LanguageStrings
 };
 
 {%- endfor %}

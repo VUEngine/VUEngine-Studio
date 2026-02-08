@@ -34,6 +34,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   const { hasAnyComponent, setCurrentComponentDisplacement } = props;
   const {
     currentComponent, setCurrentComponent,
+    data,
     isAnimationPlaying,
     currentAnimationStep, setCurrentAnimationStep,
     previewBackgroundColor,
@@ -45,7 +46,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     previewShowWireframes,
     previewZoom, setPreviewZoom,
   } = useContext(ActorEditorContext) as ActorEditorContextType;
-  const { data } = useContext(ActorEditorContext) as ActorEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [offsetX, setOffsetX] = useState<number>(0);

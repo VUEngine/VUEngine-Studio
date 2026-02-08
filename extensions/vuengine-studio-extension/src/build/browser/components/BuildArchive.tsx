@@ -3,7 +3,7 @@ import { Disposable, PreferenceScope, PreferenceService, nls } from '@theia/core
 import { ConfirmDialog, HoverService, OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import AdvancedSelect from '../../../editors/browser/components/Common/Base/AdvancedSelect';
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
@@ -101,14 +101,14 @@ const BuildArchiveActions = styled.div`
 
 export default function BuildArchive(props: BuildArchiveProps): React.JSX.Element {
     const { fileService, hoverService, openerService, preferenceService, vesBuildService } = props;
-    const [panelExpanded, setPanelExpanded] = React.useState<boolean>(false);
-    const [buildArchiveEnabled, setBuildArchiveEnabled] = React.useState<boolean>(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE, false));
-    const [buildArchiveFrequency, setBuildArchiveFrequency] = React.useState<BuildArchiveFrequency>(
+    const [panelExpanded, setPanelExpanded] = useState<boolean>(false);
+    const [buildArchiveEnabled, setBuildArchiveEnabled] = useState<boolean>(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE, false));
+    const [buildArchiveFrequency, setBuildArchiveFrequency] = useState<BuildArchiveFrequency>(
         preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_FREQUENCY, BuildArchiveFrequency.ALL)
     );
-    const [buildArchiveRetention, setBuildArchiveRetention] = React.useState<number>(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_RETENTION, 14));
-    const [archiveFiles, setArchiveFiles] = React.useState<string[]>([]);
-    const [fileWatcherDisposable, setFileWatcherDisposable] = React.useState<Disposable>();
+    const [buildArchiveRetention, setBuildArchiveRetention] = useState<number>(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_RETENTION, 14));
+    const [archiveFiles, setArchiveFiles] = useState<string[]>([]);
+    const [fileWatcherDisposable, setFileWatcherDisposable] = useState<Disposable>();
 
     const getArchivedFiles = async () => {
         setArchiveFiles(await vesBuildService.getBuildArchiveFiles());
@@ -174,7 +174,7 @@ export default function BuildArchive(props: BuildArchiveProps): React.JSX.Elemen
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         const preflistener = preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE) {
                 setBuildArchiveEnabled(preferenceService.get(VesBuildPreferenceIds.BUILD_ARCHIVE_ENABLE) as boolean);
@@ -187,7 +187,7 @@ export default function BuildArchive(props: BuildArchiveProps): React.JSX.Elemen
         return () => preflistener.dispose();
     }, [preferenceService]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         getArchivedFiles();
         setFileWatcher();
 

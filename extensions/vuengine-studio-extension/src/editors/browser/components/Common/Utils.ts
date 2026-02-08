@@ -1,4 +1,4 @@
-import { MessageService, QuickPickItem, QuickPickOptions, QuickPickService, deepClone, isNumber, nls } from '@theia/core';
+import { MessageService, QuickPickItem, QuickPickItemOrSeparator, QuickPickOptions, QuickPickService, deepClone, isNumber, nls } from '@theia/core';
 import { EolStyle, Formatter, FracturedJsonOptions, NumberListAlignment } from 'fracturedjsonjs';
 import { customAlphabet } from 'nanoid';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
@@ -14,13 +14,14 @@ export const showItemSelection = async (
     quickPickService: QuickPickService,
     messageService: MessageService,
     vesProjectService: VesProjectService,
-    ignoreIds?: string[]
+    ignoreIds?: string[],
+    additionalItems?: QuickPickItemOrSeparator[]
 ): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
         title: nls.localize('vuengine/editors/general/selectItem', 'Select Item'),
         placeholder: nls.localize('vuengine/editors/general/selectItemOfTypeToAdd', 'Select item of type {0} to add...', type),
     };
-    const quickPickItems: QuickPickItem[] = [];
+    const quickPickItems: QuickPickItemOrSeparator[] = additionalItems ?? [];
     const projectItems = vesProjectService.getProjectDataItemsForType(type);
     if (projectItems === undefined || Object.keys(projectItems).length === 0) {
         messageService.error(

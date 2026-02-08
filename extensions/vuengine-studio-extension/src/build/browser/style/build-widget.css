@@ -26,7 +26,7 @@
 }
 
 .buildWidget .buildButtons .theia-button {
-  font-size: 90%;
+  font-size: var(--theia-ui-font-size1);
   width: 20%;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .buildWidget .theia-button.build {
-  font-size: 100%;
+  font-size: var(--theia-ui-font-size1);
   width: 100%;
 }
 
@@ -80,7 +80,7 @@
 }
 
 .buildWidget .buildStatus>div:last-child {
-  font-size: 80%;
+  font-size: var(--theia-ui-font-size0);
 }
 
 .buildWidget .buildStatusMeta span {
@@ -104,7 +104,7 @@
 }
 .buildWidget .buildLogButtons .theia-button {
   flex-grow: 0;
-  font-size: 90%;
+  font-size: var(--theia-ui-font-size0);
   min-width: 36px;
   padding: 0;
   white-space: nowrap;
@@ -123,7 +123,7 @@
   box-sizing: border-box;
   flex-grow: 1;
   font-family: monospace;
-  font-size: 90%;
+  font-size: var(--theia-ui-font-size0);
   line-height: 130%;
   overflow: auto;
 }
@@ -156,7 +156,7 @@
 }
 
 .buildWidget .buildLogLine .icon .codicon {
-  font-size: 100%;
+  font-size: var(--theia-ui-font-size1);
   vertical-align: text-bottom;
 }
 

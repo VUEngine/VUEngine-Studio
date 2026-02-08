@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import { debounce, isInteger } from 'lodash';
-import React, { FocusEventHandler, MouseEventHandler, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FocusEventHandler, MouseEventHandler, RefObject, useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
@@ -32,6 +32,7 @@ interface InputProps {
     className?: string
     onClick?: MouseEventHandler<HTMLInputElement>
     onBlur?: FocusEventHandler<HTMLInputElement>
+    inputRef?: RefObject<HTMLInputElement>
 }
 
 const ClearableContainer = styled.div`
@@ -74,6 +75,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         id, className, style, width, grow,
         tabIndex, autoFocus,
         onClick, onBlur,
+        inputRef,
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [internalValue, setInternalValue] = useState<string | number>(value ?? defaultValue);
@@ -156,6 +158,7 @@ export default function Input(props: InputProps): React.JSX.Element {
                 >
                     <input
                         id={id}
+                        ref={inputRef}
                         className={`theia-input${size ? ` ${size}` : ''}${className ? ` ${className}` : ''}`}
                         type={type}
                         min={min}

@@ -1122,13 +1122,18 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
                 </div>
               </EmulatorHeader>
             )}
-            <EmulatorIframeWrapper>
+            <EmulatorIframeWrapper
+              style={{
+                width: canvasDimensions.width,
+                height: canvasDimensions.height,
+              }}
+            >
               <div className='focusBlocker' />
               <iframe
                 ref={this.iframeRef}
                 src={this.resource}
-                width={canvasDimensions.width}
-                height={canvasDimensions.height}
+                width="100%"
+                height="100%"
                 onLoad={this.startEmulator}
                 tabIndex={0}
                 allow="gamepad"

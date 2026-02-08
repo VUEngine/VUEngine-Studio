@@ -1,4 +1,4 @@
-import { QuickPickItem, QuickPickOptions, QuickPickSeparator, deepClone, nls } from '@theia/core';
+import { QuickPickItem, QuickPickItemOrSeparator, QuickPickOptions, deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -34,7 +34,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             placeholder: nls.localize('vuengine/editors/general/selectActionToAdd', 'Select an action to add...'),
         };
         let previousCategory = '';
-        const items: (QuickPickItem | QuickPickSeparator)[] = [];
+        const items: QuickPickItemOrSeparator[] = [];
         Object.values(AVAILABLE_ACTIONS)
             .sort((a, b) => {
                 if (a.category > b.category) { return -1; }

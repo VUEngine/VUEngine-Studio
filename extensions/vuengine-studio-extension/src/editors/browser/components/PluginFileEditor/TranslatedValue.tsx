@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import HContainer from '../Common/Base/HContainer';
-import { LANGUAGES } from '../TranslationsEditor/TranslationsEditorTypes';
+import { LANGUAGE_PRESETS, LANGUAGES } from '../TranslationsEditor/TranslationsEditorTypes';
 import { PluginFileTranslatedField } from './PluginFileEditorTypes';
 
 interface TranslatedValueProps {
@@ -36,7 +36,7 @@ export default function TranslatedValue(props: TranslatedValueProps): React.JSX.
     };
 
     const addTranslation = (): void => {
-        const availableLangCodes = Object.keys(LANGUAGES)
+        const availableLangCodes = Object.keys(LANGUAGE_PRESETS)
             .filter(k => !usedLangIds.includes(k));
         if (availableLangCodes.length === 0) {
             return;
