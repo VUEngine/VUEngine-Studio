@@ -2,7 +2,7 @@ import { deepClone, isString } from '@theia/core';
 import { crc32 } from 'crc';
 import { hexFromBitsArray, intToHex } from '../../Common/Utils';
 import { ModulationData, VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData, WaveformData } from '../Emulator/VsuTypes';
-import { getVolumeEventValueFromStereoLevels } from '../SoundEditor';
+import { getStereoLevelsFromVolumeEventValue, getVolumeEventValueFromStereoLevels } from '../SoundEditor';
 import {
     EventsMap,
     InstrumentConfig,
@@ -430,7 +430,7 @@ const transformToKeyframes = (
 
         // volume event
         if (stepEvents[SoundEvent.Volume] !== undefined) {
-            keyframe.SxLRV = SxLRV(stepEvents[SoundEvent.Volume]);
+            keyframe.SxLRV = SxLRV(getStereoLevelsFromVolumeEventValue(stepEvents[SoundEvent.Volume]));
         }
 
         keyframeMap[step] = keyframe;

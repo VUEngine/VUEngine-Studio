@@ -7,7 +7,6 @@ import { SoundData, SUB_NOTE_RESOLUTION, TrackSettings } from '../SoundEditorTyp
 import PlayerRomBuilder from './PlayerRomBuilder.js';
 
 const EmulatorContainer = styled.div`
-    background-color: #000;
     height: 15px;
     overflow: hidden;
     width: 48px;

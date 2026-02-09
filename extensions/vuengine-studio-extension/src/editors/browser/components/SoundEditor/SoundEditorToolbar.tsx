@@ -115,8 +115,19 @@ export const StyledSoundEditorToolbarTime = styled.div`
 `;
 
 export const StyledSoundEditorToolbarVisualization = styled(StyledSoundEditorToolbarTime)`
-    background-color: black;
     width: 56px;
+    
+    canvas {
+        visibility: hidden;
+    }
+
+    &.playing {
+        background-color: black;
+
+        canvas {
+            visibility: visible;
+        }
+    }
 `;
 
 export const SidebarCollapseButton = styled.button`
@@ -329,7 +340,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             }
                         </span>
                     </StyledSoundEditorToolbarTime>
-                    <StyledSoundEditorToolbarVisualization>
+                    <StyledSoundEditorToolbarVisualization className={playing ? 'playing' : undefined}>
                         <Emulator
                             playing={playing}
                             testNote={testNote}

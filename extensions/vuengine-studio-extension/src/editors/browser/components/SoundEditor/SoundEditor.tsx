@@ -547,9 +547,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             return;
         }
 
-        let updatedEvents: EventsMap = {
-            ...sortObjectByKeys(currentPattern.events),
-        };
+        let updatedEvents: EventsMap = deepClone(currentPattern.events);
+        updatedEvents = sortObjectByKeys(updatedEvents);
 
         const removeNoteFromEvents = (stepToRemove: number) => {
             if (updatedEvents[stepToRemove] === undefined) {
