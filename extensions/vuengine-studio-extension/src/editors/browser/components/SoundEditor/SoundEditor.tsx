@@ -12,6 +12,7 @@ import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
+import { VsuChannelStereoLevelsData } from './Emulator/VsuTypes';
 import EventList from './EventList/EventList';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
 import { loadUGESong } from './ImportExport/uge/ugeHelper';
@@ -134,6 +135,17 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
 export const getSnappedStep = (step: number, noteSnapping: boolean, stepsPerBar: number) => noteSnapping
     ? Math.floor(step / stepsPerBar) * stepsPerBar
     : step;
+
+export const getVolumeEventValueFromStereoLevels = (volume: VsuChannelStereoLevelsData) => volume
+    ? ((volume.left ?? 0) << 4) + (volume.right ?? 0)
+    : 0;
+
+export const getStereoLevelsFromVolumeEventValue = (volume: number) => {
+    const left = volume >> 4;
+    const right = volume - (left << 4);
+
+    return { left, right };
+};
 
 interface SoundEditorProps {
     soundData: SoundData

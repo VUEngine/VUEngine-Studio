@@ -1,7 +1,8 @@
-import { isString } from '@theia/core';
+import { deepClone, isString } from '@theia/core';
 import { crc32 } from 'crc';
 import { hexFromBitsArray, intToHex } from '../../Common/Utils';
 import { ModulationData, VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData, WaveformData } from '../Emulator/VsuTypes';
+import { getVolumeEventValueFromStereoLevels } from '../SoundEditor';
 import {
     EventsMap,
     InstrumentConfig,
@@ -69,11 +70,6 @@ enum EventName {
     'SxRAM' = 'kSoundTrackEventSxRAM',
     'SxSWP' = 'kSoundTrackEventSxSWP',
 }
-
-const zeroVolume = {
-    left: 0,
-    right: 0
-} as VsuChannelStereoLevelsData;
 
 const SxINT = (setInt: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
     // VUEngine's sound player handles channel enablement internally to reduce pops caused by
@@ -193,7 +189,7 @@ const filterEmptyEvents = (
 
     sortedTrackSteps.forEach(step => {
         if (Object.keys(trackEventsMap[step]).length) {
-            result[step] = { ...trackEventsMap[step] };
+            result[step] = deepClone(trackEventsMap[step]);
         }
     });
 
@@ -205,7 +201,7 @@ const applyTrackInitialVolume = (
     trackEventsMap: EventsMap,
     initialInstrument: InstrumentConfig,
 ): EventsMap => {
-    const result: EventsMap = { ...trackEventsMap };
+    const result: EventsMap = deepClone(trackEventsMap);
 
     const sortedTrackStepsWithNote: number[] = Object.keys(result)
         .map(step => parseInt(step))
@@ -218,13 +214,13 @@ const applyTrackInitialVolume = (
     const firstStepWithNote: number = Math.min(...sortedTrackStepsWithNote);
     if (firstStepWithNote && firstStepWithNote > 0) {
         result[0] = {
-            [SoundEvent.Volume]: zeroVolume,
+            [SoundEvent.Volume]: 0,
         };
         // set initial instrument volume on first step only if it does not set the volume explicitly
         if (result[firstStepWithNote][SoundEvent.Instrument] === undefined &&
             result[firstStepWithNote][SoundEvent.Volume] === undefined
         ) {
-            result[firstStepWithNote][SoundEvent.Volume] = initialInstrument?.volume ?? zeroVolume;
+            result[firstStepWithNote][SoundEvent.Volume] = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
         }
     }
 
@@ -236,7 +232,7 @@ const applyTrackInitialInstrument = (
     trackEventsMap: EventsMap,
     initialInstrumentId: string,
 ): EventsMap => {
-    const result: EventsMap = { ...trackEventsMap };
+    const result: EventsMap = deepClone(trackEventsMap);
 
     if (result[0] !== undefined && result[0][SoundEvent.Instrument] === undefined) {
         result[0][SoundEvent.Instrument] = initialInstrumentId;
@@ -252,10 +248,10 @@ const applyNoteDuration = (
     instruments: InstrumentMap,
     totalSize: number,
 ): EventsMap => {
-    const result: EventsMap = { ...trackEventsMap };
+    const result: EventsMap = deepClone(trackEventsMap);
 
     const trackSteps: number[] = Object.keys(result).map(step => parseInt(step)).sort((a, b) => a - b);
-    let lastVolume = initialInstrument?.volume ?? zeroVolume;
+    let lastVolume = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
 
     trackSteps.forEach((step, stepIndex) => {
         const stepEvents = result[step];
@@ -266,8 +262,7 @@ const applyNoteDuration = (
         if (instrumentId !== undefined) {
             const instrument = instruments[instrumentId];
             if (instrument !== undefined) {
-
-                lastVolume = instrument.volume;
+                lastVolume = getVolumeEventValueFromStereoLevels(instrument.volume);
             }
         }
         const volume = stepEvents[SoundEvent.Volume];
@@ -297,7 +292,7 @@ const applyNoteDuration = (
                     // ... then set volume to 0
                     result[i] = {
                         ...(result[i] ?? {}),
-                        [SoundEvent.Volume]: zeroVolume,
+                        [SoundEvent.Volume]: 0,
                     };
 
                     // if there's a next step and it doesn't set the volume, reset it there
@@ -326,7 +321,7 @@ const applyNoteDuration = (
 const notesToFrequencies = (
     trackEventsMap: EventsMap,
 ): EventsMap => {
-    const result: EventsMap = { ...trackEventsMap };
+    const result: EventsMap = deepClone(trackEventsMap);
 
     const trackSteps: number[] = Object.keys(result)
         .map(step => parseInt(step));
@@ -348,7 +343,7 @@ const notesToFrequencies = (
 const applyNoteSlide = (
     trackEventsMap: EventsMap,
 ): EventsMap => {
-    const result: EventsMap = { ...trackEventsMap };
+    const result: EventsMap = deepClone(trackEventsMap);
 
     const sortedTrackSteps: number[] = Object.keys(result)
         .map(step => parseInt(step))
@@ -452,7 +447,7 @@ const transformToKeyframes = (
 const reduceKeyframes = (
     trackKeyframes: TrackKeyframes,
 ): TrackKeyframes => {
-    const result = { ...trackKeyframes };
+    const result = deepClone(trackKeyframes);
 
     const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step))
         .sort((a, b) => a - b)
@@ -499,7 +494,7 @@ const applyLoopPoint = (
     trackKeyframes: TrackKeyframes,
     loopPoint: number,
 ): TrackKeyframes => {
-    const result = { ...trackKeyframes };
+    const result = deepClone(trackKeyframes);
 
     const loopPointStep = loopPoint * SUB_NOTE_RESOLUTION;
 
@@ -521,7 +516,7 @@ const setStartEvent = (
     trackKeyframesPrepared: TrackKeyframesPrepared,
     trackType: SoundEditorTrackType,
 ): TrackKeyframesPrepared => {
-    const result = { ...trackKeyframesPrepared };
+    const result = deepClone(trackKeyframesPrepared);
 
     // if there's no note on the first keyframe, set initial frequency to 0x00
     if (!result.keyframes[0].flags.includes(EventName.SxFQ)) {
@@ -610,31 +605,31 @@ export const getTrackKeyframes = (
 
     // console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
-    // console.log('mergePatterns', { ...trackEventsMap });
+    // console.log('mergePatterns', deepClone(trackEventsMap));
     trackEventsMap = filterEmptyEvents(trackEventsMap);
-    // console.log('filterEmptyEvents', { ...trackEventsMap });
+    // console.log('filterEmptyEvents', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    // console.log('applyTrackInitialVolume', { ...trackEventsMap });
+    // console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
-    // console.log('applyTrackInitialInstrument', { ...trackEventsMap });
+    // console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
     trackEventsMap = notesToFrequencies(trackEventsMap);
-    // console.log('notesToFrequencies', { ...trackEventsMap });
+    // console.log('notesToFrequencies', deepClone(trackEventsMap));
     trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
-    // console.log('applyNoteDuration', { ...trackEventsMap });
+    // console.log('applyNoteDuration', deepClone(trackEventsMap));
     trackEventsMap = applyNoteSlide(trackEventsMap);
-    // console.log('applyNoteSlide', { ...trackEventsMap });
+    // console.log('applyNoteSlide', deepClone(trackEventsMap));
 
     let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
-    // console.log('transformToKeyframes', trackKeyframes);
+    // console.log('transformToKeyframes', deepClone(trackKeyframes));
     trackKeyframes = reduceKeyframes(trackKeyframes);
-    // console.log('reduceKeyframes', trackKeyframes);
+    // console.log('reduceKeyframes', deepClone(trackKeyframes));
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
-    // console.log('applyLoopPoint', trackKeyframes);
+    // console.log('applyLoopPoint', deepClone(trackKeyframes));
 
     let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
-    // console.log('transformToKeyframesPrepared', trackKeyframesPrepared);
+    // console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
-    // console.log('setStartEvent', trackKeyframesPrepared);
+    // console.log('setStartEvent', deepClone(trackKeyframesPrepared));
 
     return trackKeyframesPrepared;
 };

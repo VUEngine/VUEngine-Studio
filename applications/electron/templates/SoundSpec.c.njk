@@ -9,9 +9,9 @@
 {%- set modulationData = {} -%}
 
 {%- set totalSize = item.size * subNoteResolution -%}
+{%- set playInLoop = item.loop -%}
 {%- set loopPoint = item.loopPoint -%}
 {%- set soloTrack = -1 -%}
-{%- set playInLoop = item.loop -%}
 
 {%- macro instrumentIsUsed(instrumentId) -%}
 	{%- set result = false -%}

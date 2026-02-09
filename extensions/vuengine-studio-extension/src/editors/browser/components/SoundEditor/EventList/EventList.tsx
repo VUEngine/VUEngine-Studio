@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
+import { getInstrumentName, getNoteSlideLabel, getStereoLevelsFromVolumeEventValue } from '../SoundEditor';
 import {
     EventsMap,
     PatternConfig,
@@ -255,10 +255,8 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 break;
 
                                                             case SoundEvent.Volume:
-                                                                const volume = stepEvents[SoundEvent.Volume];
-                                                                const volumeLeft = volume >> 4;
-                                                                const volumeRight = volume - (volumeLeft << 4);
-                                                                value = `${volumeLeft}/${volumeRight}`;
+                                                                const volume = getStereoLevelsFromVolumeEventValue(stepEvents[SoundEvent.Volume]);
+                                                                value = `${volume.left}/${volume.right}`;
                                                                 break;
                                                         }
 
