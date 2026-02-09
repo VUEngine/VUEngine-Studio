@@ -129,7 +129,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             elapsedSteps += playRangeStart;
         }
 
-        if (elapsedSteps === soundData.size) {
+        if (elapsedSteps >= soundData.size && !soundData.loop && playRangeStart === -1) {
             elapsedSteps = -1;
             setPlaying(false);
         }
