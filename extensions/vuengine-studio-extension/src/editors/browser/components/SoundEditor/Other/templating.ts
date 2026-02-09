@@ -9,6 +9,7 @@ import {
     NOTES,
     PatternConfig,
     PatternMap,
+    SET_INT_DEFAULT,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -385,7 +386,6 @@ const applyNoteSlide = (
             result[artificialStep][SoundEvent.Note] = note + (i * changePerStep);
             result[artificialStep][SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
         }
-
     });
 
     return result;
@@ -405,6 +405,7 @@ const transformToKeyframes = (
     const keyframeMap: KeyframeMap = {};
 
     let currentInstrumentId: string | undefined;
+    let currentInstrument: InstrumentConfig = instruments[track.instrument];
     trackSteps.forEach(step => {
         const stepEvents = trackEventsMap[step];
         const keyframe: Keyframe = {};
@@ -417,19 +418,18 @@ const transformToKeyframes = (
         // instrument event
         if (stepEvents[SoundEvent.Instrument] !== currentInstrumentId) {
             currentInstrumentId = stepEvents[SoundEvent.Instrument];
+            currentInstrument = instruments[currentInstrumentId ?? track.instrument];
 
-            const newInstrument = instruments[currentInstrumentId ?? track.instrument];
-
-            keyframe.SxINT = SxINT(newInstrument.setInt, newInstrument.interval);
-            keyframe.SxLRV = SxLRV(newInstrument.volume);
-            keyframe.SxEV0 = SxEV0(newInstrument.envelope);
-            keyframe.SxEV1 = SxEV1(newInstrument.envelope, newInstrument.sweepMod, newInstrument.tap, track.type);
+            keyframe.SxINT = SxINT(currentInstrument.setInt ?? SET_INT_DEFAULT, currentInstrument.interval);
+            keyframe.SxLRV = SxLRV(currentInstrument.volume);
+            keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
+            keyframe.SxEV1 = SxEV1(currentInstrument.envelope, currentInstrument.sweepMod, currentInstrument.tap, track.type);
             if (track.type !== SoundEditorTrackType.NOISE) {
-                keyframe.SxRAM = SxRAM(specName, waveformRegistry, newInstrument.waveform, track.type);
+                keyframe.SxRAM = SxRAM(specName, waveformRegistry, currentInstrument.waveform, track.type);
             }
             if (track.type === SoundEditorTrackType.SWEEPMOD) {
-                keyframe.SxSWP = S5SWP(newInstrument.sweepMod);
-                keyframe.SxMOD = S5MOD(specName, modulationDataRegistry, newInstrument.modulationData, newInstrument.sweepMod, track.type);
+                keyframe.SxSWP = S5SWP(currentInstrument.sweepMod);
+                keyframe.SxMOD = S5MOD(specName, modulationDataRegistry, currentInstrument.modulationData, currentInstrument.sweepMod, track.type);
             }
         }
 

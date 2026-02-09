@@ -2,6 +2,7 @@ import { ArrowBendRightDown, Clipboard, Copy, Trash } from '@phosphor-icons/reac
 import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useMemo } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -42,6 +43,7 @@ import { getInstrumentName } from '../SoundEditor';
 import {
     InstrumentConfig,
     InstrumentMap,
+    SET_INT_DEFAULT,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -49,7 +51,6 @@ import {
     TRACK_TYPE_LABELS,
     WAVEFORM_MAX
 } from '../SoundEditorTypes';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 const ColoredDiv = styled.div`
     cursor: pointer;
@@ -701,7 +702,7 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                             <BorderedVContainer>
                                 <Checkbox
                                     label={nls.localize('vuengine/editors/sound/resetInternalCountersForEachNote', 'Reset Internal Counters For Each Note?')}
-                                    checked={instrument?.setInt ?? false}
+                                    checked={instrument?.setInt ?? SET_INT_DEFAULT}
                                     setChecked={toggleSetInt}
                                 />
                             </BorderedVContainer>

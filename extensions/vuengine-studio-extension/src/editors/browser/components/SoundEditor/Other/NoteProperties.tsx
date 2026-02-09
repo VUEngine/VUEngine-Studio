@@ -9,6 +9,7 @@ import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepInput from '../EventList/StepInput';
+import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
@@ -46,6 +47,7 @@ interface NotePropertiesProps {
     setNotes: (notes: EventsMap) => void
     newNoteDuration: number
     stepsPerBar: number
+    setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -62,6 +64,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         setNotes,
         newNoteDuration,
         stepsPerBar,
+        setNoteDialogOpen,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -283,47 +286,62 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     </HContainer>
                     <VContainer grow={1}>
                         <label>{SOUND_EVENT_LABELS[SoundEvent.Instrument]}</label>
-                        <AdvancedSelect
-                            options={[
-                                {
-                                    value: TRACK_DEFAULT_INSTRUMENT_ID,
-                                    label: TRACK_DEFAULT_INSTRUMENT_NAME,
-                                },
-                                ...Object.keys(soundData.instruments)
-                                    .filter(iid => {
-                                        const instr = soundData.instruments[iid];
-                                        return iid ===
-                                            instrumentId ||
-                                            TRACK_TYPE_INSTRUMENT_COMPATIBILITY[soundData.tracks[currentTrackId].type].includes(instr.type);
-                                    })
-                                    .sort((a, b) => (soundData.instruments[a].name.length
-                                        ? soundData.instruments[a].name
-                                        : 'zzz').localeCompare(
-                                            (soundData.instruments[b].name.length
-                                                ? soundData.instruments[b].name
-                                                : 'zzz')
-                                        ))
-                                    .map(instrId => ({
-                                        value: `${instrId}`,
-                                        label: getInstrumentName(soundData, instrId),
-                                        backgroundColor: COLOR_PALETTE[soundData.instruments[instrId].color ?? DEFAULT_COLOR_INDEX],
-                                    }))
-                            ]}
-                            title={getInstrumentName(soundData, instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID)}
-                            defaultValue={instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID}
-                            onChange={options => {
-                                setNotes({
-                                    [relativeStep]: {
-                                        [SoundEvent.Instrument]:
-                                            (options[0] === TRACK_DEFAULT_INSTRUMENT_ID ||
-                                                options[0] === soundData.tracks[currentTrackId].instrument)
-                                                ? ''
-                                                : options[0]
-                                    }
-                                });
-                            }}
-                            menuPlacement='top'
-                        />
+                        <InputWithAction>
+                            <AdvancedSelect
+                                options={[
+                                    {
+                                        value: TRACK_DEFAULT_INSTRUMENT_ID,
+                                        label: TRACK_DEFAULT_INSTRUMENT_NAME,
+                                    },
+                                    ...Object.keys(soundData.instruments)
+                                        .filter(iid => {
+                                            const instr = soundData.instruments[iid];
+                                            return iid ===
+                                                instrumentId ||
+                                                TRACK_TYPE_INSTRUMENT_COMPATIBILITY[soundData.tracks[currentTrackId].type].includes(instr.type);
+                                        })
+                                        .sort((a, b) => (soundData.instruments[a].name.length
+                                            ? soundData.instruments[a].name
+                                            : 'zzz').localeCompare(
+                                                (soundData.instruments[b].name.length
+                                                    ? soundData.instruments[b].name
+                                                    : 'zzz')
+                                            ))
+                                        .map(instrId => ({
+                                            value: `${instrId}`,
+                                            label: getInstrumentName(soundData, instrId),
+                                            backgroundColor: COLOR_PALETTE[soundData.instruments[instrId].color ?? DEFAULT_COLOR_INDEX],
+                                        }))
+                                ]}
+                                title={getInstrumentName(soundData, instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID)}
+                                defaultValue={instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID}
+                                onChange={options => {
+                                    setNotes({
+                                        [relativeStep]: {
+                                            [SoundEvent.Instrument]:
+                                                (options[0] === TRACK_DEFAULT_INSTRUMENT_ID ||
+                                                    options[0] === soundData.tracks[currentTrackId].instrument)
+                                                    ? ''
+                                                    : options[0]
+                                        }
+                                    });
+                                }}
+                                menuPlacement='top'
+                            />
+                            <InputWithActionButton
+                                className='theia-button secondary'
+                                title={
+                                    SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.label +
+                                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true)
+                                }
+                                onClick={() => {
+                                    services.commandService.executeCommand(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id);
+                                    setNoteDialogOpen(false);
+                                }}
+                            >
+                                <i className='codicon codicon-settings-gear' />
+                            </InputWithActionButton>
+                        </InputWithAction>
                     </VContainer>
 
                 </VContainer>

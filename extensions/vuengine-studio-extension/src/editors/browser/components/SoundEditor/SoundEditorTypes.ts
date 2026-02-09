@@ -296,6 +296,8 @@ export const MAX_TICK_DURATION = 256;
 
 export const VOLUME_STEPS = 16;
 
+export const SET_INT_DEFAULT = true;
+
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
 export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
 

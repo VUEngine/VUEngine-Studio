@@ -1482,6 +1482,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         setNotes={setNotes}
                         newNoteDuration={newNoteDuration}
                         stepsPerBar={stepsPerBar}
+                        setNoteDialogOpen={setNoteDialogOpen}
                     />
                 </PopUpDialog>
             }

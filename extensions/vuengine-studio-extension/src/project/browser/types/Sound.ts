@@ -24,7 +24,7 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
-import { SoundEditorTrackType } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import { SET_INT_DEFAULT, SoundEditorTrackType } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
@@ -254,7 +254,7 @@ export const SoundType: ProjectDataType = {
                         },
                         setInt: {
                             type: 'boolean',
-                            default: true
+                            default: SET_INT_DEFAULT
                         },
                     },
                     additionalProperties: false
