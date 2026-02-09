@@ -247,8 +247,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
             return;
         }
 
+        setCurrentPlayerPosition(-1);
         updateSoundData({
             ...soundData,
+            loopPoint: Math.min(size, soundData.loopPoint),
             tracks: [
                 ...soundData.tracks.map(t => {
                     const updatedSequence: SequenceMap = {};
