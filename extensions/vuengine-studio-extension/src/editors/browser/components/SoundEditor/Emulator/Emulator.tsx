@@ -31,6 +31,7 @@ interface EmulatorProps {
     trackSettings: TrackSettings[]
     playerRomBuilder: PlayerRomBuilder
     forcePlayerRomRebuild: number
+    setPlaying: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Emulator(props: EmulatorProps): React.JSX.Element {
@@ -46,6 +47,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         trackSettings,
         playerRomBuilder,
         forcePlayerRomRebuild,
+        setPlaying,
     } = props;
     const [core, setCore] = useState<any>();
     const [sim, setSim] = useState<any>();
@@ -126,6 +128,11 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         let elapsedSteps = Math.round(currentElapsedTicks / SUB_NOTE_RESOLUTION);
         if (playRangeStart > -1 && playRangeEnd > -1 && elapsedSteps < playRangeStart) {
             elapsedSteps += playRangeStart;
+        }
+
+        if (elapsedSteps === soundData.size) {
+            elapsedSteps = -1;
+            setPlaying(false);
         }
 
         setCurrentPlayerPosition(elapsedSteps);

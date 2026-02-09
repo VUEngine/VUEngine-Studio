@@ -1025,6 +1025,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     forcePlayerRomRebuild={forcePlayerRomRebuild}
                     stepsPerNote={stepsPerNote}
                     stepsPerBar={stepsPerBar}
+                    setPlaying={setPlaying}
                 />
                 {soundData.tracks.length === 0
                     ? <VContainer grow={1} style={{ position: 'relative' }}>

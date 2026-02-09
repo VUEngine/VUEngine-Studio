@@ -168,6 +168,7 @@ interface SoundEditorToolbarProps {
     forcePlayerRomRebuild: number
     stepsPerNote: number
     stepsPerBar: number
+    setPlaying: Dispatch<SetStateAction<boolean>>
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
@@ -198,6 +199,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setTrack,
         forcePlayerRomRebuild,
         stepsPerNote, stepsPerBar,
+        setPlaying,
     } = props;
     const isPlayingRegular = playing && !testNote;
 
@@ -342,6 +344,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             playRangeEnd={playRangeEnd}
                             trackSettings={trackSettings}
                             forcePlayerRomRebuild={forcePlayerRomRebuild}
+                            setPlaying={setPlaying}
                         />
                     </StyledSoundEditorToolbarVisualization>
                 </StyledSoundEditorToolbarGroup>
