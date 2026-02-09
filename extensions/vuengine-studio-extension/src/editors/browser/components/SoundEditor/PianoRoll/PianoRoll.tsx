@@ -36,11 +36,12 @@ import PianoRollHeader from './PianoRollHeader';
 import PianoRollPlacedNote from './PianoRollPlacedNote';
 
 const StyledPianoRollContainer = styled.div`
+    align-self: start;
+    box-sizing: border-box;
     display: flex;
-    flex-grow: 1;
     height: 100%;
+    max-width: 100%;
     position: relative;
-    width: 1px;
 `;
 
 const StyledPianoRoll = styled.div`

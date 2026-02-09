@@ -26,8 +26,11 @@ import StepIndicator, { StepIndicatorPosition } from './StepIndicator';
 import TrackHeader from './TrackHeader';
 
 const StyledSequencerContainer = styled.div`
+    align-self: start;
+    box-sizing: border-box;
     display: flex;
     margin: 0 var(--padding);
+    max-width: calc(100% - var(--padding) * 2);
     overflow: hidden;
     position: relative;
     user-select: none;
