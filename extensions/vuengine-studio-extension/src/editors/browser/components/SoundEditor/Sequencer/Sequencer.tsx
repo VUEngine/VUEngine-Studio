@@ -41,6 +41,7 @@ const StyledSequencerGridContainer = styled.div`
     flex-direction: column;
     flex-grow: 1;
     overflow: scroll;
+    padding-right: var(--theia-ui-padding);
     position: relative;
 `;
 

@@ -48,6 +48,7 @@ const StyledPianoRoll = styled.div`
     flex-grow: 1;
     font-size: 10px;
     overflow: scroll;
+    padding-right: var(--theia-ui-padding);
     position: relative;
 
     body.theia-light &,
