@@ -3,15 +3,12 @@ import { OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React, { useEffect, useState } from 'react';
 import { VesWorkspaceService } from '../../../../core/browser/ves-workspace-service';
-import AdvancedSelect from '../../../../editors/browser/components/Common/Base/AdvancedSelect';
-import HContainer from '../../../../editors/browser/components/Common/Base/HContainer';
 import Input from '../../../../editors/browser/components/Common/Base/Input';
 import VContainer from '../../../../editors/browser/components/Common/Base/VContainer';
 import { stringify } from '../../../../editors/browser/components/Common/Utils';
 import { PROJECT_TYPES } from '../../ves-project-data';
 import { VesProjectService } from '../../ves-project-service';
 import { GameConfig, ProjectContributor, ProjectDataItem, ProjectDataType, WithFileUri } from '../../ves-project-types';
-import { MOCK_STAGES } from '../StagesDashboard/ProjectDashboard';
 
 interface ConfigType {
     typeId: string,
@@ -32,7 +29,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
     const [gameConfig, setGameConfig] = useState<GameConfig>();
     const [types, setTypes] = useState<ConfigType[]>([]);
 
-    const startStage = MOCK_STAGES['1234'];
+    // const startStage = MOCK_STAGES['1234'];
 
     const updateGameConfig = async (partialGameConfig: Partial<GameConfig>) => {
         vesProjectService.setGameConfig(partialGameConfig);
@@ -58,12 +55,14 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
         }
     };
 
+    /*
     const openStageEditor = async (stageId: string): Promise<void> => {
         const item = vesProjectService.getProjectDataItemById(stageId, 'Stage') as ProjectDataItem & WithFileUri;
         if (item && item._fileUri) {
             openEditor(item._fileUri);
         }
     };
+    */
 
     const openEditor = async (fileUri: URI): Promise<void> => {
         const opener = await openerService.getOpener(fileUri);
@@ -121,7 +120,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                         projectAuthor: v as string
                     })}
                 />
-                {MOCK_STAGES && Object.keys(MOCK_STAGES).length > 0 && <>
+                {/* MOCK_STAGES && Object.keys(MOCK_STAGES).length > 0 && <>
                     <hr />
                     <VContainer>
                         <label>
@@ -152,7 +151,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
                             </button>
                         </HContainer>
                     </VContainer>
-                </>}
+                </> */}
                 <hr />
 
                 {types.length > 0 && <>
