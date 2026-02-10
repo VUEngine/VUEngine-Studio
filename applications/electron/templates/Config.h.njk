@@ -221,10 +221,10 @@
 
 #define __EAR_DISPLACEMENT						 {% if config.sound.earDisplacement %}{{ config.sound.earDisplacement }}{% else %}384{% endif %}
 #define __SOUND_STEREO_ATTENUATION_DISTANCE		 {% if config.sound.stereoAttenuationDistance %}{{ config.sound.stereoAttenuationDistance }}{% else %}1024{% endif %}
-#define __MAXIMUM_VOLUME_GROUP_NONE		 		 {% if config.sound.groups.none %}{{ config.sound.groups.none }}{% else %}__MAXIMUM_VOLUME{% endif %}
-#define __MAXIMUM_VOLUME_GROUP_MUSIC		 	 {% if config.sound.groups.music %}{{ config.sound.groups.music }}{% else %}__MAXIMUM_VOLUME{% endif %}
-#define __MAXIMUM_VOLUME_GROUP_EFFECTS			 {% if config.sound.groups.effects %}{{ config.sound.groups.effects }}{% else %}__MAXIMUM_VOLUME{% endif %}
-#define __MAXIMUM_VOLUME_GROUP_OTHERS		 	 {% if config.sound.groups.other %}{{ config.sound.groups.other }}{% else %}__MAXIMUM_VOLUME{% endif %}
+#define __MAXIMUM_VOLUME_GROUP_GENERAL		     {% if config.sound.groups.general %}{{ config.sound.groups.general }}{% else %}__MAXIMUM_VOLUME{% endif %}
+#define __MAXIMUM_VOLUME_GROUP_EFFECTS		     {% if config.sound.groups.effects %}{{ config.sound.groups.effects }}{% else %}__MAXIMUM_VOLUME{% endif %}
+#define __MAXIMUM_VOLUME_GROUP_MUSIC		     {% if config.sound.groups.music %}{{ config.sound.groups.music }}{% else %}__MAXIMUM_VOLUME{% endif %}
+#define __MAXIMUM_VOLUME_GROUP_OTHER		     {% if config.sound.groups.other %}{{ config.sound.groups.other }}{% else %}__MAXIMUM_VOLUME{% endif %}
 
 {{ macros.sectionHeader('Brightness') }}
 

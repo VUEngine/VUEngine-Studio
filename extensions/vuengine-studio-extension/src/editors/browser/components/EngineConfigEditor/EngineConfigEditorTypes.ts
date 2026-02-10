@@ -121,7 +121,7 @@ export interface EngineConfigDataSound {
     earDisplacement: number
     stereoAttenuationDistance: number
     groups: {
-        none: number
+        general: number
         music: number
         effects: number
         other: number
