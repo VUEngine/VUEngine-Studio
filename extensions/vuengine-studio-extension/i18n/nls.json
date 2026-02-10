@@ -1673,13 +1673,21 @@
       "animation": {
         "availableChars": "Available Tiles",
         "availableCharsDescription": "The total number of available chars in char memory.",
-        "earDisplacement": "Ear Displacement",
         "maxAnimationFunctionNameLength": "Maximum Animation Function Name Length",
         "maxAnimationFunctionNameLengthDescription": "The maximum length of an animation function name.",
         "maxFramesPerAnimationFunction": "Maximum Number of Frames per Animation Function",
-        "maxFramesPerAnimationFunctionDescription": "The maximum number of frames that any animation function can consist of.",
+        "maxFramesPerAnimationFunctionDescription": "The maximum number of frames that any animation function can consist of."
+      },
+      "sound": {
+        "earDisplacement": "Ear Displacement",
         "stereoAttenuationDistance": "Stereo Attenuation Distance",
-        "stereoAttenuationDistanceDescription": "affects the amount of attenuation caused by the distance between the x coordinate and each ear's                             position defined by \"Ear Displacement\"."
+        "stereoAttenuationDistanceDescription": "affects the amount of attenuation caused by the distance between the x coordinate and each ear's                             position defined by \"Ear Displacement\".",
+        "groups":{
+          "none": "None",
+          "music": "Music",
+          "effects": "Effects",
+          "other": "Other"
+        }
       },
       "brightness": {
         "brightness": "Brightness (Bright, Medium, Dark)",
@@ -1791,7 +1799,6 @@
         "printableArea": "Printable Area",
         "printingAreaOffset": "Printing Area Offset (x, y, parallax)"
       },
-      "sound": "Sound",
       "sprite": {
         "hackBgmapSpriteHeight": "Hack: BGMap Sprite Height",
         "hackBgmapSpriteHeightDescription": "Account for VIP's design to draw 8 pixel when BGMAP WORLD's height is less than 8.",
