@@ -1268,9 +1268,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
-                    height='460px'
+                    height='540px'
                     width='460px'
-                    overflow='visible'
                 >
                     <VContainer gap={15}>
                         <Properties

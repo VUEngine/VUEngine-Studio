@@ -99,7 +99,9 @@
 // Waveforms
 {%- endif %}
 
-const WaveformData {{ sanitizedSpecName }}Waveform{{ waveformsKey }} =
+const WaveformData {{ sanitizedSpecName }}Waveform{{ waveformsKey }}
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	// Data
 	{
@@ -131,7 +133,9 @@ const WaveformData {{ sanitizedSpecName }}Waveform{{ waveformsKey }} =
 // Modulation Data
 {%- endif %}
 
-const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[] =
+const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{% for value in instrument.modulationData -%}
 		{{- (value ~ '') ~ ', ' -}} 
@@ -150,47 +154,65 @@ const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[] =
 
 // Track {{ loop.index }}
 
-const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT[] =
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxINT, 22, '0x00') }}
 };
 
-const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxLRV[] =
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxLRV[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxLRV, 22, '0x00') }}
 };
 
-const uint16 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxFQ[] =
+const uint16 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxFQ[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxFQ, 16, '0x00') }}
 };
 
-const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV0[] =
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV0[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxEV0, 22, '0x00') }}
 };
 
-const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV1[] =
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxEV1[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxEV1, 22, '0x00') }}
 };
 
-const WaveformData* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxRAM[] =
+const WaveformData* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxRAM[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxRAM, 4, 'NULL') }}
 };
 
-const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxSWP[] =
+const uint8 {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxSWP[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxSWP, 22, '0x00') }}
 };
 
-const int8* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxMOD[] =
+const int8* const {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxMOD[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{{ printValueList(trackKeyframes.values.SxMOD, 4, 'NULL') }}
 };
 
-const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes[] =
+const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{% for keyframe in trackKeyframes.keyframes -%}
 	{{-'{'}}{{ keyframe.duration }}, {% if keyframe.flags | length == 0 %}0{% else %}{{ keyframe.flags | join(' | ') }}{% endif %}{{'},'}}
@@ -198,7 +220,9 @@ const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyfr
 	{0, kSoundTrackEventEnd}, 
 };
 
-SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }} =
+SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	// kTrackNative, kTrackPCM
 	kTrackNative,
@@ -244,7 +268,9 @@ SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }} =
 
 {{ macros.sectionHeader('Definitions') }}
 
-SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[] =
+SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{%- for track in item.tracks %}
 	{%- if track.sequence | length and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) %}
@@ -254,7 +280,9 @@ SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[] =
 	NULL
 };
 
-SoundROMSpec {{ sanitizedSpecName }}SoundSpec =
+SoundROMSpec {{ sanitizedSpecName }}SoundSpec
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	// Component
 	{
@@ -282,4 +310,7 @@ SoundROMSpec {{ sanitizedSpecName }}SoundSpec =
 
 	// Tracks
 	(SoundTrackSpec**){{ sanitizedSpecName }}SoundTracks,
+
+	// Sound group
+	kSoundGroup{{- item.group | capitalize -}},
 };

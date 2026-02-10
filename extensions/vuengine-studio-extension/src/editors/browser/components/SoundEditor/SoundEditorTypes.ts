@@ -8,6 +8,7 @@ export interface SoundData {
     name: string
     author: string
     comment: string
+    group: SoundGroup
     tracks: TrackConfig[]
     patterns: PatternMap
     instruments: InstrumentMap
@@ -18,6 +19,20 @@ export interface SoundData {
     loopPoint: number
     section: DataSection
 }
+
+export enum SoundGroup {
+    General = 'none',
+    Music = 'music',
+    Effects = 'effects',
+    Other = 'other',
+}
+
+export const SOUND_GROUP_LABELS = {
+    [SoundGroup.General]: nls.localize('vuengine/editors/sound/groups/general', 'General'),
+    [SoundGroup.Music]: nls.localize('vuengine/editors/sound/groups/music', 'Music'),
+    [SoundGroup.Effects]: nls.localize('vuengine/editors/sound/groups/effects', 'Effects'),
+    [SoundGroup.Other]: nls.localize('vuengine/editors/sound/groups/other', 'Other'),
+};
 
 export enum SoundEditorTool {
     EDIT,

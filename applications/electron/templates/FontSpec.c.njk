@@ -75,7 +75,7 @@ const uint32 {{ sanitizedSpecName }}FontTiles[] __attribute__((aligned(4)))
 {%- if tilesFrameOffsetsData is defined %}
 
 const uint32 {{ sanitizedSpecName }} FontTilesFrameOffsets[] __attribute__((aligned(4)))
-{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %} =
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{% for tilesFrameOffset in tilesFrameOffsetsData -%}

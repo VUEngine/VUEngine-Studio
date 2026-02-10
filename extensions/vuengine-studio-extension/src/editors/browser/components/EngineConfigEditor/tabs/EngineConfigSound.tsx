@@ -1,18 +1,19 @@
 import { nls } from '@theia/core';
 import { default as React } from 'react';
 import Input from '../../Common/Base/Input';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import {
     EAR_DISPLACEMENT_DEFAULT_VALUE,
     EAR_DISPLACEMENT_MAX_VALUE,
     EAR_DISPLACEMENT_MIN_VALUE,
     EngineConfigData,
+    MAXIMUM_VOLUME_DEFAULT_VALUE,
+    MAXIMUM_VOLUME_MAX_VALUE,
+    MAXIMUM_VOLUME_MIN_VALUE,
     STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE,
     STEREO_ATTENUATION_DISTANCE_MAX_VALUE,
-    STEREO_ATTENUATION_DISTANCE_MIN_VALUE,
-    MAXIMUM_VOLUME_MIN_VALUE,
-    MAXIMUM_VOLUME_MAX_VALUE,
-    MAXIMUM_VOLUME_DEFAULT_VALUE
+    STEREO_ATTENUATION_DISTANCE_MIN_VALUE
 } from '../EngineConfigEditorTypes';
 
 interface EngineConfigSoundProps {
@@ -58,7 +59,7 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
     const setGroupOtherMaximumVolume = (value: number): void => {
         setMaximumVolume(value, 'other');
     };
-    
+
     const setMaximumVolume = (value: number, group: 'general' | 'music' | 'effects' | 'other'): void => {
         updateData({
             ...data,
@@ -70,7 +71,7 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
                 }
             }
         });
-    }
+    };
 
     return (
         <VContainer gap={15}>
@@ -102,59 +103,72 @@ position defined by \"Ear Displacement\"."
                 defaultValue={STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE}
                 width={64}
             />
-            <Input
-                label={nls.localize(
-                    'vuengine/editors/engineConfig/sound/groups/general',
-                    'Group General Maximum Volume'
-                )}
-                type="number"
-                value={data.sound?.groups?.general ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
-                setValue={setGroupGeneralMaximumVolume}
-                min={MAXIMUM_VOLUME_MIN_VALUE}
-                max={MAXIMUM_VOLUME_MAX_VALUE}
-                defaultValue={MAXIMUM_VOLUME_DEFAULT_VALUE}
-                width={64}
-            />
-            <Input
-                label={nls.localize(
-                    'vuengine/editors/engineConfig/sound/groups/effects',
-                    'Group Effects Maximum Volume'
-                )}
-                type="number"
-                value={data.sound?.groups?.effects ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
-                setValue={setGroupEffectsMaximumVolume}
-                min={MAXIMUM_VOLUME_MIN_VALUE}
-                max={MAXIMUM_VOLUME_MAX_VALUE}
-                defaultValue={MAXIMUM_VOLUME_DEFAULT_VALUE}
-                width={64}
-            />
-            <Input
-                label={nls.localize(
-                    'vuengine/editors/engineConfig/sound/groups/music',
-                    'Group Music Maximum Volume'
-                )}
-                type="number"
-                value={data.sound?.groups?.music ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
-                setValue={setGroupMusicMaximumVolume}
-                min={MAXIMUM_VOLUME_MIN_VALUE}
-                max={MAXIMUM_VOLUME_MAX_VALUE}
-                defaultValue={MAXIMUM_VOLUME_DEFAULT_VALUE}
-                width={64}
-            />
-            <Input
-                label={nls.localize(
-                    'vuengine/editors/engineConfig/sound/groups/other',
-                    'Group Other Maximum Volume'
-                )}
-                type="number"
-                value={data.sound?.groups?.other ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
-                setValue={setGroupOtherMaximumVolume}
-                min={MAXIMUM_VOLUME_MIN_VALUE}
-                max={MAXIMUM_VOLUME_MAX_VALUE}
-                defaultValue={MAXIMUM_VOLUME_DEFAULT_VALUE}
-                width={64}
-            />
-
+            <VContainer style={{ alignSelf: 'start' }}>
+                <label>
+                    {nls.localize(
+                        'vuengine/editors/engineConfig/sound/soundGroupsMaximumVolume',
+                        'Sound Groups Maximum Volume'
+                    )}
+                </label>
+                <table style={{ borderSpacing: 'var(--padding) 2px' }}>
+                    <tr>
+                        <td>
+                            {nls.localize('vuengine/editors/engineConfig/sound/groups/general', 'General')}
+                        </td>
+                        <td>
+                            <Range
+                                value={data.sound?.groups?.general ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
+                                setValue={setGroupGeneralMaximumVolume}
+                                min={MAXIMUM_VOLUME_MIN_VALUE}
+                                max={MAXIMUM_VOLUME_MAX_VALUE}
+                                width={200}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {nls.localize('vuengine/editors/engineConfig/sound/groups/effects', 'Effects')}
+                        </td>
+                        <td>
+                            <Range
+                                value={data.sound?.groups?.effects ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
+                                setValue={setGroupEffectsMaximumVolume}
+                                min={MAXIMUM_VOLUME_MIN_VALUE}
+                                max={MAXIMUM_VOLUME_MAX_VALUE}
+                                width={200}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {nls.localize('vuengine/editors/engineConfig/sound/groups/music', 'Music')}
+                        </td>
+                        <td>
+                            <Range
+                                value={data.sound?.groups?.music ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
+                                setValue={setGroupMusicMaximumVolume}
+                                min={MAXIMUM_VOLUME_MIN_VALUE}
+                                max={MAXIMUM_VOLUME_MAX_VALUE}
+                                width={200}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {nls.localize('vuengine/editors/engineConfig/sound/groups/other', 'Other')}
+                        </td>
+                        <td>
+                            <Range
+                                value={data.sound?.groups?.other ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
+                                setValue={setGroupOtherMaximumVolume}
+                                min={MAXIMUM_VOLUME_MIN_VALUE}
+                                max={MAXIMUM_VOLUME_MAX_VALUE}
+                                width={200}
+                            />
+                        </td>
+                    </tr>
+                </table>
+            </VContainer>
         </VContainer>
     );
 }

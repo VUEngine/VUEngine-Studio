@@ -8,7 +8,11 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
-import { MAX_TICK_DURATION, MIN_TICK_DURATION, NOTE_RESOLUTION, PATTERN_SIZE_MAX, SoundData } from '../SoundEditorTypes';
+import { MAX_TICK_DURATION, MIN_TICK_DURATION, NOTE_RESOLUTION, PATTERN_SIZE_MAX, SOUND_GROUP_LABELS, SoundData, SoundGroup } from '../SoundEditorTypes';
+import SectionSelect from '../../Common/SectionSelect';
+import { DataSection } from '../../Common/CommonTypes';
+import InfoLabel from '../../Common/InfoLabel';
+import RadioSelect from '../../Common/Base/RadioSelect';
 
 interface PropertiesProps {
     soundData: SoundData
@@ -49,11 +53,9 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         });
     };
 
-    /*
     const setSection = (section: DataSection): void => {
         updateSoundData({ ...soundData, section });
     };
-    */
 
     const toggleLoop = (): void => {
         updateSoundData({ ...soundData, loop: !soundData.loop });
@@ -63,6 +65,10 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
             updateSoundData({ ...soundData, speed: { 0: s } });
         }
+    };
+
+    const setGroup = (group: SoundGroup): void => {
+        updateSoundData({ ...soundData, group });
     };
 
     const setBeats = (b: number): void => {
@@ -154,28 +160,48 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                     />
                 </HContainer>
             </VContainer>
-            <Checkbox
-                label={nls.localize('vuengine/editors/sound/loop', 'Loop')}
-                checked={soundData.loop}
-                setChecked={toggleLoop}
-            />
-            {soundData.loop &&
-                <Input
-                    label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}
-                    value={soundData.loopPoint}
-                    setValue={setLoopPoint}
-                    type='number'
-                    min={0}
-                    max={PATTERN_SIZE_MAX - 1}
-                    width={64}
+            <HContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/sound/loop', 'Loop')}
+                    checked={soundData.loop}
+                    setChecked={toggleLoop}
                 />
-            }
+                {soundData.loop &&
+                    <Input
+                        label={nls.localize('vuengine/editors/sound/loopPoint', 'LoopPoint')}
+                        value={soundData.loopPoint}
+                        setValue={setLoopPoint}
+                        type='number'
+                        min={0}
+                        max={PATTERN_SIZE_MAX - 1}
+                        width={64}
+                    />
+                }
+            </HContainer>
         </HContainer>
-        { /* }
-        <SectionSelect
-            value={soundData.section}
-            setValue={setSection}
-        />
-        { */ }
+        <HContainer gap={20} wrap='wrap'>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/sound/group', 'Group')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/sound/groupDescription',
+                        'Sounds can be grouped by type. The maximum volume for each group can be set in the EngineConfig \
+to allow for fine-tuning the relative volumes of e.g. background music and sound effects.'
+                    )}
+                />
+                <RadioSelect
+                    defaultValue={soundData.group}
+                    options={Object.values(SoundGroup).map(g => ({
+                        label: SOUND_GROUP_LABELS[g as SoundGroup],
+                        value: g,
+                    }))}
+                    onChange={options => setGroup(options[0].value as SoundGroup)}
+                />
+            </VContainer>
+            <SectionSelect
+                value={soundData.section}
+                setValue={setSection}
+            />
+        </HContainer>
     </VContainer>;
 }
