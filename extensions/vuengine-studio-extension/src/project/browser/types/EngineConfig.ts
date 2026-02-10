@@ -429,6 +429,36 @@ export const EngineConfigType: ProjectDataType = {
                         type: 'integer',
                         default: 2048,
                         minimum: 0
+                    },
+                    groups: {
+                        type: 'object',
+                        properties: {
+                            none: {
+                                type: 'integer',
+                                default: 15,
+                                minimum: 0,
+                                maximun: 15
+                            },
+                            music: {
+                                type: 'integer',
+                                default: 15,
+                                minimum: 0,
+                                maximum: 15
+                            },
+                            effects: {
+                                type: 'integer',
+                                default: 15,
+                                minimum: 0,
+                                maximum: 15
+                            },
+                            other: {
+                                type: 'integer',
+                                default: 15,
+                                minimum: 0,
+                                maximum: 15
+                            }
+                        },
+                        additionalProperties: false
                     }
                 },
                 additionalProperties: false

@@ -120,6 +120,12 @@ export interface EngineConfigDataRandom {
 export interface EngineConfigDataSound {
     earDisplacement: number
     stereoAttenuationDistance: number
+    groups: {
+        none: number
+        music: number
+        effects: number
+        other: number
+    }
 }
 
 export interface EngineConfigDataSprite {
@@ -339,6 +345,10 @@ export const EAR_DISPLACEMENT_DEFAULT_VALUE = 384;
 export const STEREO_ATTENUATION_DISTANCE_MIN_VALUE = 0;
 export const STEREO_ATTENUATION_DISTANCE_MAX_VALUE = 16384;
 export const STEREO_ATTENUATION_DISTANCE_DEFAULT_VALUE = 2048;
+
+export const MAXIMUM_VOLUME_MIN_VALUE = 0;
+export const MAXIMUM_VOLUME_MAX_VALUE = 15;
+export const MAXIMUM_VOLUME_DEFAULT_VALUE = 15;
 
 export const ANGLE_TO_PREVENT_COLLIDER_DISPLACEMENT_MIN_VALUE = 0;
 export const ANGLE_TO_PREVENT_COLLIDER_DISPLACEMENT_MAX_VALUE = 128;
