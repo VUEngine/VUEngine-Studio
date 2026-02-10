@@ -22,6 +22,7 @@ import {
     SoundEditorTrackType,
     SoundEvent,
     SoundEventMap,
+    SoundGroup,
     SUB_NOTE_RESOLUTION,
     TrackConfig
 } from '../../SoundEditorTypes';
@@ -98,6 +99,7 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,
+        group: SoundGroup.General,
     };
 
     const instrumentsLookup = convertInstruments(song);

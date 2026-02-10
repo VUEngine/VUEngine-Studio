@@ -23,6 +23,7 @@ import {
     SoundEditorTrackType,
     SoundEvent,
     SoundEventMap,
+    SoundGroup,
     SUB_NOTE_RESOLUTION,
     TrackConfig
 } from '../../SoundEditorTypes';
@@ -73,6 +74,7 @@ export const convertUgeSong = (song: Song): SoundData => {
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,
+        group: SoundGroup.General,
     };
 
     const dutyInstrumentsLookup = convertDutyInstruments(song.duty_instruments);
