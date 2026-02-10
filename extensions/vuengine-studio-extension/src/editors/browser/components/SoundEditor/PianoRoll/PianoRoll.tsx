@@ -160,6 +160,8 @@ interface PianoRollProps {
     currentPatternId: string
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
+    currentInstrumentId: string
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
@@ -190,7 +192,6 @@ interface PianoRollProps {
     sequencerNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
     setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
     trackSettings: TrackSettings[]
@@ -211,6 +212,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentTrackId,
         currentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
+        currentInstrumentId, setCurrentInstrumentId,
         currentPlayerPosition, setCurrentPlayerPosition,
         setForcePlayerRomRebuild,
         playRangeStart, setPlayRangeStart,
@@ -229,7 +231,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollNoteWidth, setPianoRollNoteWidth,
         sequencerPatternHeight, sequencerNoteWidth,
         pianoRollScrollWindow, setPianoRollScrollWindow,
-        setCurrentInstrumentId,
         setPatternDialogOpen,
         setNoteDialogOpen,
         trackSettings,
@@ -800,6 +801,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
+                currentInstrumentId={currentInstrumentId}
                 setCurrentInstrumentId={setCurrentInstrumentId}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}

@@ -1112,6 +1112,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 currentTrackId={currentTrackId}
                                 currentSequenceIndex={currentSequenceIndex}
                                 setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                                currentInstrumentId={currentInstrumentId}
+                                setCurrentInstrumentId={setCurrentInstrumentId}
                                 playRangeStart={playRangeStart}
                                 setPlayRangeStart={setPlayRangeStart}
                                 playRangeEnd={playRangeEnd}
@@ -1138,7 +1140,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 sequencerPatternHeight={sequencerPatternHeight}
                                 sequencerNoteWidth={sequencerNoteWidth}
                                 setPianoRollScrollWindow={setPianoRollScrollWindow}
-                                setCurrentInstrumentId={setCurrentInstrumentId}
                                 pianoRollScrollWindow={pianoRollScrollWindow}
                                 setPatternDialogOpen={setPatternDialogOpen}
                                 setNoteDialogOpen={setNoteDialogOpen}

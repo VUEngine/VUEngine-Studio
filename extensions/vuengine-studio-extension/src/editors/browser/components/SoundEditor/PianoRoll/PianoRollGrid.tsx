@@ -19,6 +19,7 @@ import {
     SoundEditorMarqueeMode,
     SoundEditorTool,
     SoundEvent,
+    SoundEventMap,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
     TrackSettings
@@ -31,6 +32,7 @@ interface PianoRollGridProps {
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
+    currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     noteCursor: number
     setNoteCursor: Dispatch<SetStateAction<number>>
@@ -74,6 +76,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,
+        currentInstrumentId,
         setCurrentInstrumentId,
         noteCursor, setNoteCursor,
         setNotes,
@@ -477,12 +480,18 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 newNoteStep >= currentSequenceIndex &&
                 newNoteStep < currentSequenceIndexEndStep
             ) {
-                setNotes({
-                    [(newNoteStep - currentSequenceIndex) * SUB_NOTE_RESOLUTION]: {
-                        [SoundEvent.Note]: newNoteLabel,
-                        [SoundEvent.Duration]: newNoteDur,
-                    }
-                });
+                const step = (newNoteStep - currentSequenceIndex) * SUB_NOTE_RESOLUTION;
+                const stepEvents: SoundEventMap = {
+                    [SoundEvent.Note]: newNoteLabel,
+                    [SoundEvent.Duration]: newNoteDur,
+                };
+
+                console.log('currentInstrumentId', currentInstrumentId);
+                if (currentInstrumentId && currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID) {
+                    stepEvents[SoundEvent.Instrument] = currentInstrumentId;
+                }
+
+                setNotes({ [step]: stepEvents });
                 setNoteCursor(newNoteCursor);
             } else {
                 const newPatternSize = Math.abs(noteDragStartStep - noteDragEndStep) + 1;

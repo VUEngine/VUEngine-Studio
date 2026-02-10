@@ -54,6 +54,7 @@ interface PianoRollEditorProps {
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
+    currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     noteCursor: number
     setNoteCursor: (note: number) => void
@@ -81,6 +82,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,
+        currentInstrumentId,
         setCurrentInstrumentId,
         noteCursor, setNoteCursor,
         setNotes,
@@ -146,6 +148,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     currentTrackId={currentTrackId}
                     currentPatternId={currentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
+                    currentInstrumentId={currentInstrumentId}
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     setNoteCursor={setNoteCursor}
                     setNotes={setNotes}
