@@ -433,7 +433,7 @@ export const EngineConfigType: ProjectDataType = {
                     groups: {
                         type: 'object',
                         properties: {
-                            none: {
+                            general: {
                                 type: 'integer',
                                 default: 15,
                                 minimum: 0,

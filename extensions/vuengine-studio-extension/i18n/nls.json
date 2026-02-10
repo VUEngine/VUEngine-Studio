@@ -1683,7 +1683,7 @@
         "stereoAttenuationDistance": "Stereo Attenuation Distance",
         "stereoAttenuationDistanceDescription": "affects the amount of attenuation caused by the distance between the x coordinate and each ear's                             position defined by \"Ear Displacement\".",
         "groups":{
-          "none": "None",
+          "general": "General",
           "music": "Music",
           "effects": "Effects",
           "other": "Other"

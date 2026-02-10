@@ -43,8 +43,8 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
         });
     };
 
-    const setGroupNoneMaximumVolume = (value: number): void => {
-        setMaximumVolume(value, 'none');
+    const setGroupGeneralMaximumVolume = (value: number): void => {
+        setMaximumVolume(value, 'general');
     };
 
     const setGroupEffectsMaximumVolume = (value: number): void => {
@@ -59,7 +59,7 @@ export default function EngineConfigSound(props: EngineConfigSoundProps): React.
         setMaximumVolume(value, 'other');
     };
     
-    const setMaximumVolume = (value: number, group: 'none' | 'music' | 'effects' | 'other'): void => {
+    const setMaximumVolume = (value: number, group: 'general' | 'music' | 'effects' | 'other'): void => {
         updateData({
             ...data,
             sound: {
@@ -104,12 +104,12 @@ position defined by \"Ear Displacement\"."
             />
             <Input
                 label={nls.localize(
-                    'vuengine/editors/engineConfig/sound/groups/none',
-                    'Group None Maximum Volume'
+                    'vuengine/editors/engineConfig/sound/groups/general',
+                    'Group General Maximum Volume'
                 )}
                 type="number"
-                value={data.sound?.groups?.none ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
-                setValue={setGroupNoneMaximumVolume}
+                value={data.sound?.groups?.general ?? MAXIMUM_VOLUME_DEFAULT_VALUE}
+                setValue={setGroupGeneralMaximumVolume}
                 min={MAXIMUM_VOLUME_MIN_VALUE}
                 max={MAXIMUM_VOLUME_MAX_VALUE}
                 defaultValue={MAXIMUM_VOLUME_DEFAULT_VALUE}
