@@ -171,13 +171,13 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
             </VContainer>
 
             <Checkbox
-                label={nls.localize('vuengine/editors/sound/lowPriority', 'Low Priority')}
+                label={nls.localize('vuengine/editors/sound/highPriority', 'High Priority')}
                 tooltip={nls.localize(
-                    'vuengine/editors/sound/allowSkipDescription',
-                    'Allow to skip notes of this track during play back, \
-if no other sound source is available when requested by e.g. a sound effect.'
+                    'vuengine/editors/sound/highPriorityDescription',
+                    'Allow notes of this track to supersede notes of another track in-game, \
+if no other sound source is available when requested. Useful, for instance, for sound effects.'
                 )}
-                checked={track.allowSkip}
+                checked={!track.allowSkip}
                 setChecked={toggleTrackAllowSkip}
             />
         </VContainer>

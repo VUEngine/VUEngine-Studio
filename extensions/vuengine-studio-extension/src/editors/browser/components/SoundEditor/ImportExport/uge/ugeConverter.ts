@@ -98,28 +98,28 @@ export const convertUgeSong = (song: Song): SoundData => {
     const tracks: TrackConfig[] = [
         // Duty 1
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.SWEEPMOD
         },
         // Duty 2
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Wave
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Noise
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.NOISE

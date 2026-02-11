@@ -66,7 +66,7 @@ export const SoundType: ProjectDataType = {
                         },
                         allowSkip: {
                             type: 'boolean',
-                            default: false
+                            default: true
                         }
                     },
                     additionalProperties: false

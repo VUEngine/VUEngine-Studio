@@ -107,37 +107,37 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
 
     const tracks: TrackConfig[] = [
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.SWEEPMOD
         },
         {
-            allowSkip: false,
+            allowSkip: true,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.NOISE
