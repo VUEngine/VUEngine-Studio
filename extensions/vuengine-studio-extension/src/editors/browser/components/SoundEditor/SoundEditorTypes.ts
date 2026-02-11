@@ -21,7 +21,7 @@ export interface SoundData {
 }
 
 export enum SoundGroup {
-    General = 'none',
+    General = 'general',
     Music = 'music',
     Effects = 'effects',
     Other = 'other',
