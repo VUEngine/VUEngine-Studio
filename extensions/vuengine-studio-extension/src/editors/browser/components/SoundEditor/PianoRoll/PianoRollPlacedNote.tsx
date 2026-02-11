@@ -126,7 +126,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         newNoteDuration,
         setNoteDialogOpen,
     } = props;
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
     const nodeRef = useRef(null);
 
     const events = pattern.events;
@@ -140,7 +141,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         classNames.push('cancelNoteDrag');
     }
 
-    const left = PIANO_ROLL_KEY_WIDTH + 2 + step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
+    const left = step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
     const top = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + noteId * pianoRollNoteHeight;
     const width = Math.max(
         duration * (pianoRollNoteWidth / SUB_NOTE_RESOLUTION) - PIANO_ROLL_GRID_WIDTH,
@@ -299,12 +300,19 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onDragStart = (e: DraggableEvent, data: DraggableData) => {
+        if (noteSnapping) {
+            setXOffsetFromGrid(-1 * left % gridWidth);
+        }
         setIsDragging(true);
         setCancelNoteDrag(false);
     };
 
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         e.stopPropagation();
+
+        if (noteSnapping) {
+            setXOffsetFromGrid(0);
+        }
         setNoteDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
 
@@ -314,7 +322,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         }
 
         const newStep = (noteSnapping
-            ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
+            ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2 + xOffsetFromGrid) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
             : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
         ) - currentSequenceIndexStartStep;
         const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
@@ -400,12 +408,13 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             grid={[gridWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
+            positionOffset={{ x: xOffsetFromGrid, y: 0 }}
             onStart={onDragStart}
             onDrag={onDrag}
             onStop={onDragStop}
             onMouseDown={onMouseDown}
             position={{
-                x: left,
+                x: PIANO_ROLL_KEY_WIDTH + left + 2,
                 y: top,
             }}
             bounds={{
