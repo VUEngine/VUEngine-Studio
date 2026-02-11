@@ -113,7 +113,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             return;
         }
         shadowCanvasElementContext?.drawImage(canvas, 0, 0);
-        const topLineImageData = shadowCanvasElementContext?.getImageData(0, 0, 256, 1).data;
+        const topLineImageData = shadowCanvasElementContext?.getImageData(0, 1, 256, 1).data;
 
         let currentElapsedTicks = 0;
         if (topLineImageData) {
