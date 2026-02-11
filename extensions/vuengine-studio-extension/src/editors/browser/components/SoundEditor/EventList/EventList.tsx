@@ -50,6 +50,8 @@ const StyledTable = styled.table`
             td {
                 border-bottom: 1px solid rgba(255, 255, 255, .1);
                 cursor: pointer;
+                max-width: 56px;
+                min-width: 56px;
                 padding: 1px 4px;
 
                 body.theia-light &,
@@ -65,6 +67,7 @@ const StyledTable = styled.table`
                 div, input, select {
                     margin-bottom: 1px;
                     max-width: 120px;
+                    min-width: 56px !important;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -77,11 +80,23 @@ const StyledTable = styled.table`
                 input, select {
                     height: 16px;
                     min-height: 16px;
-                    padding-bottom: 0;
-                    padding-top: 0;
+                    padding: 0 2px;
+                }
+
+                &:nth-child(3) {
+                    max-width: 72px;
+                    min-width: 72px;
+                }
+
+                &:nth-child(4) {
+                    max-width: 114px;
+                    min-width: 114px;
                 }
 
                 &:last-child {
+                    max-width: 22px;
+                    min-width: 22px;
+
                     button {
                         min-width: 20px;
                         padding: 0;
@@ -138,18 +153,19 @@ export default function EventList(props: EventListProps): React.JSX.Element {
         <VContainer
             overflow="hidden"
             style={{
-                minWidth: 300,
+                maxWidth: 360,
+                minWidth: 360,
             }}
         >
             <StyledTableContainer>
                 <StyledTable>
                     <thead>
                         <tr>
-                            <td width={56}>{nls.localize('vuengine/editors/sound/step', 'Step')}</td>
-                            <td width={56}>{nls.localize('vuengine/editors/sound/durationShort', 'Dur.')}</td>
-                            <td width={72}>{nls.localize('vuengine/editors/sound/event', 'Event')}</td>
-                            <td width={120}>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
-                            <td width={10}></td>
+                            <td>{nls.localize('vuengine/editors/sound/step', 'Step')}</td>
+                            <td>{nls.localize('vuengine/editors/sound/duration', 'Duration')}</td>
+                            <td>{nls.localize('vuengine/editors/sound/event', 'Event')}</td>
+                            <td>{nls.localize('vuengine/editors/sound/value', 'Value')}</td>
+                            <td></td>
                         </tr>
                     </thead>
                     <tbody>
