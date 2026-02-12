@@ -22,6 +22,7 @@
     "@theia/filesystem": "1.68.2",
     "@theia/getting-started": "1.68.2",
     "@theia/keymaps": "1.68.2",
+    "@theia/markers": "1.68.2",
     "@theia/monaco": "1.68.2",
     "@theia/monaco-editor-core": "1.83.101",
     "@theia/navigator": "1.68.2",

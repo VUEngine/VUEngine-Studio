@@ -24,6 +24,7 @@ import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
 import { KeymapsFrontendContribution } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
+import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
@@ -61,6 +62,7 @@ import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import './ves-preferences-monaco-contribution';
+import { VesProblemContribution } from './ves-problem-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
@@ -139,6 +141,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // custom file extensions
     rebind(FileSystemFrontendContribution).to(VesFileSystemFrontendContribution).inSingletonScope();
+
+    // show problems status bar only when project openend
+    rebind(ProblemContribution).to(VesProblemContribution).inSingletonScope();
 
     // customize collaboration functionality
     rebind(CollaborationFrontendContribution).to(VesCollaborationFrontendContribution).inSingletonScope();

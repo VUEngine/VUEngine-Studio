@@ -4,7 +4,7 @@
   "type": "light",
   "colors": {
     "activityBar.activeBorder": "#000000",
-    "activityBar.background": "#ececec",
+    "activityBar.background": "#dcdcdc",
     "activityBar.foreground": "#000000",
     "activityBar.hoverBackground": "#e8e8e8",
     "activityBarBadge.background": "#d31422",
@@ -37,7 +37,8 @@
     "statusBar.background": "#cecece",
     "statusBar.foreground": "#333",
     "statusBar.border": "#cecece",
-    "statusBar.noFolderBackground": "#cecece",
+    "statusBar.noFolderBackground": "#ececec",
+    "statusBar.noFolderBorder": "#ececec",
     "statusBarItem.hoverBackground": "#b8b8b84f",
     "tab.inactiveBackground": "#d3d3d3",
     "textBlockQuote.border": "#d3142280",

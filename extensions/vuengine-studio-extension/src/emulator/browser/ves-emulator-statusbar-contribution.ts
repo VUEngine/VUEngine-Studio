@@ -1,6 +1,7 @@
 import { nls, PreferenceService } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -14,9 +15,14 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
     protected readonly statusBar: StatusBar;
     @inject(VesEmulatorService)
     protected readonly vesEmulatorService: VesEmulatorService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
-    onStart(app: FrontendApplication): void {
-        this.updateStatusBar();
+    async onStart(app: FrontendApplication): Promise<void> {
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            this.updateStatusBar();
+        }
     };
 
     updateStatusBar(): void {
