@@ -1,11 +1,13 @@
 import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getMaxNoteDuration } from '../Other/Note';
 import { getNoteSlideLabel } from '../SoundEditor';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EventsMap,
     NOTES_LABELS,
@@ -39,9 +41,11 @@ const StyledPianoRollPlacedNote = styled.div`
         opacity: 1;
     }
 
+    /*
     canvas.hasMarquee + & {
         display: none;
     }
+    */
 
     .react-resizable-handle-e {
         border-left: 1px solid;
@@ -131,6 +135,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         newNoteDuration,
         setNoteDialogOpen,
     } = props;
+    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
@@ -441,6 +446,19 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             setNoteDialogOpen(true);
         }
     };
+
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
+            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
+                setCancelNoteDrag(true);
+                break;
+        }
+    };
+
+    useEffect(() => {
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
+    }, []);
 
     return (
         <Draggable

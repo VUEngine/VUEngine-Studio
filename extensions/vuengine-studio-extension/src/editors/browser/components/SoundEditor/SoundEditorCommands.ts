@@ -362,4 +362,10 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: ['0', '6'],
     };
+    export const CANCEL_CURRENT_ACTION: EditorCommand = {
+        id: 'editors.soundEditor.cancelCurrentAction',
+        label: nls.localize('vuengine/editors/sound/commands/cancelCurrentAction', 'Cancel Current Action'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 'Escape',
+    };
 };

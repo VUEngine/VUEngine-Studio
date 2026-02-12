@@ -349,6 +349,12 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         vesCommonService={services.vesCommonService}
                         width={KEYBINDING_WIDTH}
                     />
+                    <ButtonAssignment
+                        command={SoundEditorCommands.CANCEL_CURRENT_ACTION}
+                        commandService={services.commandService}
+                        vesCommonService={services.vesCommonService}
+                        width={KEYBINDING_WIDTH}
+                    />
                 </VContainer>
                 <VContainer>
                     <ButtonAssignment

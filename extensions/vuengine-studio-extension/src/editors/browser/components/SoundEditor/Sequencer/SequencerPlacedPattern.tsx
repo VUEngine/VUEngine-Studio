@@ -1,9 +1,11 @@
 import { deepClone } from '@theia/core';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getPatternName } from '../SoundEditor';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     PatternConfig,
     SequenceMap,
@@ -99,6 +101,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         removePatternsFromSequence,
         stepsPerBar,
     } = props;
+    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState(false);
     const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const nodeRef = useRef(null);
@@ -316,6 +319,19 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
         setPatternDialogOpen(true);
     };
+
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
+            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
+                setCancelPatternDrag(true);
+                break;
+        }
+    };
+
+    useEffect(() => {
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
+    }, []);
 
     return (
         <Draggable

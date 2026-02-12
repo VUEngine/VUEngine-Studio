@@ -6,6 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_BARS_PER_PATTERN,
     NOTES_LABELS,
@@ -105,7 +106,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         noteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
-    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
     const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
@@ -830,6 +831,21 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         selectedPatterns,
         noteCursor,
     ]);
+
+    const commandListener = (commandId: string): void => {
+        switch (commandId) {
+            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
+                resetPatternDrag();
+                resetRangeDrag();
+                resetMarquee();
+                break;
+        }
+    };
+
+    useEffect(() => {
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
+    }, []);
 
     return (
         <StyledSequencerCanvas
