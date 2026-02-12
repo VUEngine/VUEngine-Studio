@@ -38,11 +38,11 @@ const StyledPianoRollPlacedNote = styled.div`
     &.react-draggable-dragging:not(.cancelNoteDrag) {
         opacity: 1;
     }
-/*
+
     canvas.hasMarquee + & {
         display: none;
     }
-*/
+
     .react-resizable-handle-e {
         border-left: 1px solid;
         bottom: 1px;

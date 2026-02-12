@@ -100,9 +100,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
+    const [noteDragInitialX, setNoteDragInitialX] = useState<number>(-1);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const classNames = ['hmm'];
+    const classNames = [];
     if (marqueeStartStep !== -1) {
         classNames.push('hasMarquee');
     }
@@ -405,6 +406,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         setNoteDragNoteId(-1);
         setNoteDragStartStep(-1);
         setNoteDragEndStep(-1);
+        setNoteDragInitialX(-1);
     };
 
     const resetMarquee = () => {
@@ -428,6 +430,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             if (foundStep === -1) {
                 setNoteDragNoteId(noteId);
                 setNoteDragStartStep(step);
+                setNoteDragInitialX(e.clientX);
                 setNoteDragEndStep(step + newNoteDuration - 1);
 
                 if (!playing || !!testNote) {
@@ -446,13 +449,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const handleMouseMoveNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (noteDragInitialX === 1 || Math.abs(noteDragInitialX - e.clientX) < pianoRollNoteWidth) {
+            return;
+        }
+
         if (noteDragNoteId !== -1 && noteDragStartStep !== -1 && noteDragEndStep !== -1) {
+            setNoteDragInitialX(-1);
+
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const y = e.clientY - rect.top;
-
-            console.log('e.movementX', e.movementX);
-            console.log('e.movementY', e.movementY);
 
             const noteId = Math.floor(y / pianoRollNoteHeight);
             const step = Math.floor(x / pianoRollNoteWidth);
@@ -703,7 +709,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
-        console.log('onMouseLeave', onMouseLeave);
         setIsDragScrolling(false);
         resetNoteDrag();
         resetMarquee();

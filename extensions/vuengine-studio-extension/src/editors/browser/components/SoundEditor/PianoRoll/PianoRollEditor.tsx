@@ -35,7 +35,7 @@ const CurrentlyPlacingNote = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
-    z-index: 10;
+    z-index: 9;
 `;
 
 const Marquee = styled.div`
@@ -44,7 +44,7 @@ const Marquee = styled.div`
     border: 1px dashed var(--theia-focusBorder);
     box-sizing: border-box;
     position: absolute;
-    z-index: 10;
+    z-index: 9;
 `;
 
 interface PianoRollEditorProps {
