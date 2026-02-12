@@ -1082,6 +1082,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 rangeDragEndStep={rangeDragEndStep}
                                 setRangeDragEndStep={setRangeDragEndStep}
                                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                noteCursor={noteCursor}
                                 stepsPerNote={stepsPerNote}
                                 stepsPerBar={stepsPerBar}
                             />

@@ -102,6 +102,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    const classNames = ['hmm'];
+    if (marqueeStartStep !== -1) {
+        classNames.push('hasMarquee');
+    }
+
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
     const width = Math.min(
         pianoRollScrollWindow.w,
@@ -446,6 +451,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const y = e.clientY - rect.top;
 
+            console.log('e.movementX', e.movementX);
+            console.log('e.movementY', e.movementY);
+
             const noteId = Math.floor(y / pianoRollNoteHeight);
             const step = Math.floor(x / pianoRollNoteWidth);
 
@@ -486,7 +494,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     [SoundEvent.Duration]: newNoteDur,
                 };
 
-                console.log('currentInstrumentId', currentInstrumentId);
                 if (currentInstrumentId && currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID) {
                     stepEvents[SoundEvent.Instrument] = currentInstrumentId;
                 }
@@ -696,6 +703,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
+        console.log('onMouseLeave', onMouseLeave);
         setIsDragScrolling(false);
         resetNoteDrag();
         resetMarquee();
@@ -720,6 +728,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     return (
         <canvas
+            className={classNames.join(' ')}
             style={{
                 cursor: getToolModeCursor(tool, isDragScrolling),
             }}

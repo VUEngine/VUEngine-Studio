@@ -27,6 +27,10 @@ const StyledPattern = styled.div`
         opacity: 1;
     }
 
+    canvas.hasMarquee + & {
+        display: none;
+    }
+
     canvas {
         box-sizing: border-box;
     }

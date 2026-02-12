@@ -25,7 +25,7 @@ import {
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 2;
 
-const StyledCanvas = styled.canvas`
+const StyledSequencerCanvas = styled.canvas`
     left: 0;
     position: sticky;
     z-index: 20;
@@ -69,6 +69,7 @@ interface SequencerGridProps {
     pianoRollNoteWidth: number
     removePatternsFromSequence: (patterns: string[]) => void
     noteSnapping: boolean
+    noteCursor: number
     stepsPerNote: number
     stepsPerBar: number
 }
@@ -101,6 +102,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         pianoRollNoteWidth,
         removePatternsFromSequence,
         noteSnapping,
+        noteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
@@ -110,6 +112,11 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
     const [marqueeStartTrack, setMarqueeStartTrack] = useState<number>(-1);
     const [marqueeEndTrack, setMarqueeEndTrack] = useState<number>(-1);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const classNames = [];
+    if (marqueeStartStep !== -1) {
+        classNames.push('hasMarquee');
+    }
 
     const height = soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT;
     const width = Math.min(
@@ -267,6 +274,16 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                 : hiColor;
             context.stroke();
         }
+
+        // note cursor
+        context.strokeStyle = highlightColor;
+        context.setLineDash([3, 2]);
+        context.beginPath();
+        const noteCursorXPos = noteCursor / SUB_NOTE_RESOLUTION * sequencerNoteWidth;
+        context.moveTo(noteCursorXPos, 0.5);
+        context.lineTo(noteCursorXPos, height - 0.5);
+        context.stroke();
+        context.setLineDash([]);
 
         // patterns
         soundData.tracks.forEach((track, trackId) => {
@@ -811,10 +828,12 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         marqueeStartTrack,
         marqueeEndTrack,
         selectedPatterns,
+        noteCursor,
     ]);
 
     return (
-        <StyledCanvas
+        <StyledSequencerCanvas
+            className={classNames.join(' ')}
             style={{
                 cursor: getToolModeCursor(tool, isDragScrolling),
             }}

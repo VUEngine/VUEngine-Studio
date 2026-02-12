@@ -120,26 +120,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     height: NOTES_SPECTRUM * pianoRollNoteHeight
                 }}
             >
-                {noteDragNoteId > -1 &&
-                    <CurrentlyPlacingNote
-                        style={{
-                            height: pianoRollNoteHeight,
-                            left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                            top: noteDragNoteId * pianoRollNoteHeight,
-                            width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
-                        }}
-                    />
-                }
-                {marqueeStartStep > -1 &&
-                    <Marquee
-                        style={{
-                            height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
-                            left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                            top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
-                            width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
-                        }}
-                    />
-                }
                 <PianoRollGrid
                     soundData={soundData}
                     tool={tool}
@@ -181,6 +161,26 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     stepsPerNote={stepsPerNote}
                     stepsPerBar={stepsPerBar}
                 />
+                {noteDragNoteId > -1 &&
+                    <CurrentlyPlacingNote
+                        style={{
+                            height: pianoRollNoteHeight,
+                            left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
+                            top: noteDragNoteId * pianoRollNoteHeight,
+                            width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
+                        }}
+                    />
+                }
+                {marqueeStartStep > -1 &&
+                    <Marquee
+                        style={{
+                            height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
+                            left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
+                            top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
+                            width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
+                        }}
+                    />
+                }
             </StyledPianoRollGridContainer>
         </StyledPianoRollEditor>
     );

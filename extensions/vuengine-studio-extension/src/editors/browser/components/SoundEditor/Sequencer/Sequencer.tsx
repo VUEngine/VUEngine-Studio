@@ -133,6 +133,7 @@ interface SequencerProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    noteCursor: number
     stepsPerNote: number
     stepsPerBar: number
 }
@@ -165,6 +166,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setForcePlayerRomRebuild,
+        noteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
@@ -541,6 +543,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 removePatternsFromSequence={removePatternsFromSequence}
                 noteSnapping={noteSnapping}
+                noteCursor={noteCursor}
                 stepsPerNote={stepsPerNote}
                 stepsPerBar={stepsPerBar}
             />
