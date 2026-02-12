@@ -263,7 +263,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setCurrentPlayerPosition(-1);
         updateSoundData({
             ...soundData,
-            loopPoint: Math.min(size, soundData.loopPoint),
+            loopPoint: size > soundData.loopPoint ? soundData.loopPoint : 0,
             tracks: [
                 ...soundData.tracks.map(t => {
                     const updatedSequence: SequenceMap = {};

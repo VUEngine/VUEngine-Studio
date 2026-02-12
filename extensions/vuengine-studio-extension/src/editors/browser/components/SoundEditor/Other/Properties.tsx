@@ -49,7 +49,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
     const setLoopPoint = (loopPoint: number): void => {
         updateSoundData({
             ...soundData,
-            loopPoint: Math.min(loopPoint, soundData.size),
+            loopPoint: Math.min(loopPoint, soundData.size - 1),
         });
     };
 
