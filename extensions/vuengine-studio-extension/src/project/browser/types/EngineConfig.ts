@@ -582,7 +582,7 @@ export const EngineConfigType: ProjectDataType = {
         type: 'EngineConfigEditor',
         scope: '#'
     },
-    icon: 'codicon codicon-settings',
+    icon: 'codicon codicon-gear',
     templates: [
         ConfigTemplate
     ]

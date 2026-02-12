@@ -29,7 +29,7 @@ export class VesProjectSidebarWidget extends ReactWidget {
   @postConstruct()
   protected init(): void {
     this.id = VesProjectSidebarWidget.ID;
-    this.title.iconClass = 'codicon codicon-home';
+    this.title.iconClass = 'codicon codicon-repo';
     this.title.closable = false;
     this.node.style.outline = 'none';
     this.bindEvents();

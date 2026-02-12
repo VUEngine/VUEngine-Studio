@@ -30,7 +30,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
             widgetName: VesPluginsViewContainer.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 200,
+                rank: 300,
             },
         });
     }

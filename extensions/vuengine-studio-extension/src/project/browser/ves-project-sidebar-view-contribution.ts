@@ -25,7 +25,7 @@ export class VesProjectSidebarViewContribution extends AbstractViewContribution<
             widgetName: VesProjectSidebarWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: -20000,
+                rank: 800,
             },
         });
     }
