@@ -120,7 +120,8 @@ const WaveformData {{ sanitizedSpecName }}Waveform{{ waveformsKey }}
 
 {#- Render modulation data for all instruments -#}
 {%- set isFirstModulationData = true -%}
-{%- for instrument in item.instruments | values -%}
+{%- for instrumentId in item.instruments | keys -%}
+{%- set instrument = item.instruments[instrumentId] -%}
 {%- set isUsed = instrumentIsUsed(instrumentId) -%}
 {%- if isUsed == 'true' -%}
 {%- set checksum = instrument.modulationData | crc32 | string -%}
