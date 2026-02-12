@@ -34,18 +34,19 @@ const StyledPianoRollPlacedNote = styled.div`
     z-index: 100;
 
     &:hover,
+    &.resizing,
     &.react-draggable-dragging:not(.cancelNoteDrag) {
         opacity: 1;
     }
 
     .react-resizable-handle-e {
         border-left: 1px solid;
-        bottom: 0;
+        bottom: 1px;
         cursor: col-resize;
         opacity: .7;
         position: absolute;
         right: 0;
-        top: 0;
+        top: 1px;
         width: 4px;
     }
     
@@ -127,6 +128,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         setNoteDialogOpen,
     } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [isResizing, setIsResizing] = useState<boolean>(false);
     const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
     const nodeRef = useRef(null);
 
@@ -137,6 +139,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const relativeStep = step - currentSequenceIndexStartStep;
 
     const classNames = ['placedNote'];
+    if (isResizing) {
+        classNames.push('resizing');
+    }
     if (cancelNoteDrag) {
         classNames.push('cancelNoteDrag');
     }
@@ -256,6 +261,12 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
+        setIsResizing(true);
+    };
+
+    const onResizeStop = (event: SyntheticEvent, data: ResizeCallbackData) => {
+        setIsResizing(false);
+
         const newDuration = noteSnapping
             ? Math.ceil(data.size.width / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
             : Math.ceil(data.size.width * SUB_NOTE_RESOLUTION / pianoRollNoteWidth);
@@ -449,7 +460,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     minConstraints={[gridWidth, pianoRollNoteHeight]}
                     maxConstraints={[maxWidth, pianoRollNoteHeight]}
                     resizeHandles={['e']}
-                    onResizeStop={onResize}
+                    onResize={onResize}
+                    onResizeStop={onResizeStop}
                 >
                     <>
                         <ResizableBox
