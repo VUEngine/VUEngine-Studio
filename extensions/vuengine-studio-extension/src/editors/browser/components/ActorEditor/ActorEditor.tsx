@@ -25,7 +25,7 @@ import {
     LocalStorageActorEditorState,
     MAX_PREVIEW_SPRITE_ZOOM,
     MIN_PREVIEW_SPRITE_ZOOM,
-    SpriteImageData,
+    SpriteImageData
 } from './ActorEditorTypes';
 import AddComponent from './Components/AddComponent';
 import ComponentTree from './Components/ComponentTree';
@@ -292,22 +292,32 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     const doAddComponent = async (t: string): Promise<void> => {
         switch (t) {
             case 'animations':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/animation', 'Animation'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/animation', 'Animation'));
+                break;
             case 'bodies':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/body', 'Body'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/body', 'Body'));
+                break;
             case 'children':
-                return addPositionedActor();
+                await addPositionedActor();
+                break;
             case 'colliders':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/collider', 'Collider'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/collider', 'Collider'));
+                break;
             case 'mutators':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/mutation', 'Mutation'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/mutation', 'Mutation'));
+                break;
             case 'sounds':
-                return addSound();
+                await addSound();
+                break;
             case 'sprites':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/sprite', 'Sprite'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/sprite', 'Sprite'));
+                break;
             case 'wireframes':
-                return addComponentByType(t, nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'));
+                await addComponentByType(t, nls.localize('vuengine/editors/actor/wireframe', 'Wireframe'));
+                break;
         }
+
+        enableCommands();
     };
 
     const addComponentByType = async (componentKey: ComponentKey, name: string): Promise<void> => {
@@ -418,7 +428,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     };
 
     const doRemoveComponent = async (key: ComponentKey, index: number): Promise<void> => {
-        setData({
+        const updatedData = {
+            ...data,
             components: {
                 ...data.components,
                 [key]: [
@@ -426,7 +437,15 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                     ...data.components[key as ComponentKey].slice(index + 1)
                 ],
             }
-        });
+        };
+
+        if (key === 'animations') {
+            if (data.animations.default === index || data.animations.default >= updatedData.components.animations.length) {
+                updatedData.animations.default = 0;
+            }
+        };
+
+        setData(updatedData);
     };
 
     const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: ActorEditorSaveDataOptions): void => {
