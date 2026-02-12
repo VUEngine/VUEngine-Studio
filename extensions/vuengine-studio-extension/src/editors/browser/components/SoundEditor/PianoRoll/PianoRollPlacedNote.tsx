@@ -316,7 +316,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         setNoteDragDelta({ x: 0, y: 0 });
         setIsDragging(false);
 
-        if (cancelNoteDrag || (noteDragDelta.x === 0 && noteDragDelta.y === 0)) {
+        if (cancelNoteDrag) {
             setCancelNoteDrag(false);
             return;
         }
