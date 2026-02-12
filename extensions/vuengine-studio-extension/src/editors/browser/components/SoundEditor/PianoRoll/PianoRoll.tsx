@@ -453,11 +453,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     };
 
     const onMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
-        setCancelNoteDrag(false);
+        if (cancelNoteDrag) {
+            setCancelNoteDrag(false);
+        }
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLDivElement>) => {
-        setCancelNoteDrag(true);
+        if (!cancelNoteDrag && (noteDragDelta.x !== 0 || noteDragDelta.y !== 0)) {
+            setCancelNoteDrag(true);
+            setNoteDragDelta({ x: 0, y: 0 });
+        }
     };
 
     const placedNotesCurrentPattern = () => {

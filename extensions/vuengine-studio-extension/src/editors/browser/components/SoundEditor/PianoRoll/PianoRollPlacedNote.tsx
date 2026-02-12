@@ -1,6 +1,6 @@
 import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
@@ -132,8 +132,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
     const nodeRef = useRef(null);
 
-    const events = pattern.events;
-    const patternSize = pattern.size;
     const noteId = NOTES_LABELS.indexOf(noteLabel);
     const currentSequenceIndexStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
     const relativeStep = step - currentSequenceIndexStartStep;
@@ -153,12 +151,13 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         1
     );
 
-    const topDragBound = () => {
+    const topDragBound = useMemo(() => {
         const topPianoRollBound = PIANO_ROLL_GRID_METER_HEIGHT + pianoRollNoteHeight + 2;
 
         let topMostNoteDifference = 0;
         const smallerNotes = selectedNotes
-            .map(sn => events[sn] !== undefined ? NOTES_LABELS.indexOf(events[sn][SoundEvent.Note]) : noteId)
+            .filter(sn => pattern.events[sn] !== undefined)
+            .map(sn => NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]))
             .filter(snId => snId < noteId);
         if (smallerNotes.length) {
             const topMostNote = Math.min(...smallerNotes);
@@ -166,33 +165,47 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         }
 
         return topPianoRollBound + topMostNoteDifference;
-    };
+    }, [
+        selectedNotes,
+        pianoRollNoteHeight,
+        pattern.events,
+        noteId
+    ]);
 
-    const rightDragBound = () => {
-        const rightPatternBound = (currentSequenceIndex + patternSize + 1) * pianoRollNoteWidth;
+    const rightDragBound = useMemo(() => {
+        const rightPatternBound = PIANO_ROLL_KEY_WIDTH + (currentSequenceIndex + pattern.size) * pianoRollNoteWidth;
         let rightMostNoteDuration = duration;
 
         let rightMostNoteDifference = 0;
-        const largerNotes = selectedNotes.filter(sn => sn > relativeStep);
+        const largerNotes = selectedNotes
+            .filter(sn => pattern.events[sn] !== undefined && sn > relativeStep);
         if (largerNotes.length) {
             const rightMostNote = Math.max(...largerNotes);
             rightMostNoteDifference = (rightMostNote - relativeStep) / SUB_NOTE_RESOLUTION * pianoRollNoteWidth;
-            if (events[rightMostNote] !== undefined && events[rightMostNote][SoundEvent.Duration] !== undefined) {
-                rightMostNoteDuration = events[rightMostNote][SoundEvent.Duration];
+            if (pattern.events[rightMostNote] !== undefined && pattern.events[rightMostNote][SoundEvent.Duration] !== undefined) {
+                rightMostNoteDuration = pattern.events[rightMostNote][SoundEvent.Duration];
             }
         }
 
         const rightMostNoteWidth = (rightMostNoteDuration / SUB_NOTE_RESOLUTION * pianoRollNoteWidth);
 
-        return rightPatternBound - rightMostNoteDifference - rightMostNoteWidth - 3;
-    };
+        return rightPatternBound - rightMostNoteDifference - rightMostNoteWidth + 2;
+    }, [
+        currentSequenceIndex,
+        pattern.events,
+        pattern.size,
+        pianoRollNoteWidth,
+        duration,
+        relativeStep,
+        selectedNotes,
+    ]);
 
-    const bottomDragBound = () => {
+    const bottomDragBound = useMemo(() => {
         const bottomPianoRollBound = NOTES_SPECTRUM * pianoRollNoteHeight + PIANO_ROLL_GRID_METER_HEIGHT + 2;
 
         let bottomMostNoteDifference = 0;
         const largerNotes = selectedNotes
-            .map(sn => events[sn] !== undefined ? NOTES_LABELS.indexOf(events[sn][SoundEvent.Note]) : noteId)
+            .map(sn => pattern.events[sn] !== undefined ? NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]) : noteId)
             .filter(snId => snId > noteId);
         if (largerNotes.length) {
             const bottomMostNote = Math.max(...largerNotes);
@@ -200,28 +213,40 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         }
 
         return bottomPianoRollBound - bottomMostNoteDifference;
-    };
+    }, [
+        selectedNotes,
+        pianoRollNoteHeight,
+        pattern.events,
+        noteId
+    ]);
 
-    const leftDragBound = () => {
+    const leftDragBound = useMemo(() => {
         const leftPatternBound = PIANO_ROLL_KEY_WIDTH + 2 + currentSequenceIndex * pianoRollNoteWidth;
 
         let leftMostNoteDifference = 0;
-        const smallerNotes = selectedNotes.filter(sn => sn < relativeStep);
+        const smallerNotes = selectedNotes
+            .filter(sn => pattern.events[sn] !== undefined && sn < relativeStep);
         if (smallerNotes.length) {
             const leftMostNote = Math.min(...smallerNotes);
             leftMostNoteDifference = (relativeStep - leftMostNote) / SUB_NOTE_RESOLUTION * pianoRollNoteWidth;
         }
 
         return leftPatternBound + leftMostNoteDifference;
-    };
+    }, [
+        currentSequenceIndex,
+        pianoRollNoteWidth,
+        pattern.events,
+        relativeStep,
+        selectedNotes,
+    ]);
 
     const gridWidth = noteSnapping
         ? pianoRollNoteWidth * newNoteDuration
         : 1;
-    const maxWidth = pianoRollNoteWidth * getMaxNoteDuration(events, relativeStep, patternSize) / SUB_NOTE_RESOLUTION;
+    const maxWidth = pianoRollNoteWidth * getMaxNoteDuration(pattern.events, relativeStep, pattern.size) / SUB_NOTE_RESOLUTION;
 
     const getNoteSlide = () => {
-        const event = events[relativeStep];
+        const event = pattern.events[relativeStep];
         if (event) {
             return event[SoundEvent.NoteSlide] ?? 0;
         }
@@ -233,7 +258,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         let l = noteLabel;
         const slide = getNoteSlide();
         if (slide) {
-            l += getNoteSlideLabel(events[relativeStep][SoundEvent.Note], slide);
+            l += getNoteSlideLabel(pattern.events[relativeStep][SoundEvent.Note], slide);
         }
         return l;
     };
@@ -277,14 +302,14 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         const durationDelta = newDuration - duration;
         const notes: EventsMap = {};
         selectedNotes.forEach(sn => {
-            const noteEvents = events[sn];
+            const noteEvents = pattern.events[sn];
             if (!noteEvents) {
                 return;
             }
             const adjustedDuration = noteEvents[SoundEvent.Duration]
                 ? noteSnapping
-                    ? Math.max(SUB_NOTE_RESOLUTION, events[sn][SoundEvent.Duration] + durationDelta)
-                    : Math.max(1, events[sn][SoundEvent.Duration] + durationDelta)
+                    ? Math.max(SUB_NOTE_RESOLUTION, pattern.events[sn][SoundEvent.Duration] + durationDelta)
+                    : Math.max(1, pattern.events[sn][SoundEvent.Duration] + durationDelta)
                 : newDuration;
             notes[sn] = {
                 [SoundEvent.Duration]: adjustedDuration,
@@ -350,21 +375,21 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         // add previous notes to delete
         notes[relativeStep] = {};
         selectedNotes.forEach(sn => {
-            if (sn !== relativeStep && events[sn] !== undefined && events[sn][SoundEvent.Note] !== undefined) {
+            if (sn !== relativeStep && pattern.events[sn] !== undefined && pattern.events[sn][SoundEvent.Note] !== undefined) {
                 notes[sn] = {};
             }
         });
 
         // add notes to set
         notes[newStep] = {
-            ...events[relativeStep],
+            ...pattern.events[relativeStep],
             [SoundEvent.Note]: NOTES_LABELS[newNoteId],
         };
         selectedNotes.forEach(sn => {
-            if (sn !== relativeStep && events[sn] !== undefined && events[sn][SoundEvent.Note] !== undefined) {
-                const snNoteId = NOTES_LABELS.indexOf(events[sn][SoundEvent.Note]);
+            if (sn !== relativeStep && pattern.events[sn] !== undefined && pattern.events[sn][SoundEvent.Note] !== undefined) {
+                const snNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]);
                 notes[sn + newStepDifference] = {
-                    ...events[sn],
+                    ...pattern.events[sn],
                     [SoundEvent.Note]: NOTES_LABELS[snNoteId + newNoteDifference],
                 };
             }
@@ -384,7 +409,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     setSelectedNotes([...deepClone(selectedNotes), step].sort());
                 }
             } else {
-                const stepEvent = events[relativeStep];
+                const stepEvent = pattern.events[relativeStep];
                 if (stepEvent) {
                     const instrumentId = stepEvent[SoundEvent.Instrument];
                     setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
@@ -429,10 +454,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                 y: top,
             }}
             bounds={{
-                bottom: bottomDragBound(),
-                left: leftDragBound(),
-                right: rightDragBound(),
-                top: topDragBound(),
+                bottom: bottomDragBound,
+                left: leftDragBound,
+                right: rightDragBound,
+                top: topDragBound,
             }}
         >
             <StyledPianoRollPlacedNote
