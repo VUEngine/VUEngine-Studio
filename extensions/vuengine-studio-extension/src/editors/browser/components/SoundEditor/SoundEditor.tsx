@@ -55,7 +55,7 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
-import ModulationData from './Waveforms/ModulationData';
+import ModulationDataWithPresets from './Waveforms/ModulationDataWithPresets';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
 const StyledLowerContainer = styled.div` 
@@ -1407,6 +1407,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     }
                     height='100%'
                     width='100%'
+                    maxWidth='1600px'
                 >
                     <WaveformWithPresets
                         value={soundData.instruments[waveformDialogOpen].waveform}
@@ -1430,9 +1431,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
                     height='100%'
                     width='100%'
+                    maxWidth='1600px'
                 >
                     {soundData.instruments[modulationDataDialogOpen] &&
-                        <ModulationData
+                        <ModulationDataWithPresets
                             value={soundData.instruments[modulationDataDialogOpen].modulationData}
                             setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
                         />

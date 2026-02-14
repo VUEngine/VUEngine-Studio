@@ -1,6 +1,8 @@
+import { WaveformData } from '../Emulator/VsuTypes';
+
 export interface WaveformPreset {
     name: string
-    values: number[]
+    values: WaveformData
 }
 
 export const WAVEFORM_PRESETS = [{
