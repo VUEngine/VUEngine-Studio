@@ -128,7 +128,8 @@ export const SoundType: ProjectDataType = {
                                 minimum: 0
                             },
                             maxItems: 32,
-                            minItems: 32
+                            minItems: 32,
+                            default: [62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0]
                         },
                         volume: {
                             type: 'object',
