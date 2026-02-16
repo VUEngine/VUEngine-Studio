@@ -28,6 +28,16 @@
       }
     }
 
+    @keyframes containerFadeIn {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
     @keyframes infoFadeIn {
       0% {
         opacity: 0;
@@ -42,21 +52,37 @@
       }
     }
 
-    @keyframes logoPulse {
+    @keyframes logoSpin {
       0% {
-        opacity: 1;
+        transform: rotateY(0deg);
       }
 
       50% {
-        opacity: 0.5;
+        transform: rotateY(180deg);
       }
 
       100% {
-        opacity: 1;
+        transform: rotateY(360deg);
+      }
+    }
+
+    @keyframes LoaderBar {
+      0% {
+        left: -100px;
+        right: 100%;
+      }
+
+      100% {
+        left: 100%;
+        right: 660px;
       }
     }
 
     .splash-container {
+      animation-name: containerFadeIn;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
       border-radius: 10px;
       overflow: hidden;
       height: 260px;
@@ -101,49 +127,69 @@
     .logo {
       /*
       animation-delay: 4s;
-      animation-duration: 2s;
+      animation-duration: 4s;
       animation-iteration-count: infinite;
-      animation-name: logoPulse;
+      animation-name: logoSpin;
       animation-timing-function: linear;
       */
-      left: 14px;
+      left: 22px;
       position: absolute;
-      top: 30px;
+      top: 28px;
     }
 
     .title {
       font-size: 27px;
       font-weight: bold;
-      left: 236px;
+      left: 247px;
       position: absolute;
-      top: 38px;
+      top: 32px;
       white-space: nowrap;
     }
 
     .slogan {
-      left: 236px;
+      left: 247px;
       position: absolute;
-      top: 76px;
+      top: 70px;
     }
 
     .copyright {
       color: #fff;
       font-size: 11px;
-      left: 236px;
+      left: 247px;
       opacity: .6;
       position: absolute;
-      top: 140px;
+      top: 134px;
     }
 
     .thanks {
       color: #fff;
       font-size: 9px;
-      left: 236px;
+      left: 247px;
       opacity: .6;
       position: absolute;
-      top: 158px;
+      top: 155px;
       width: 280px;
       line-height: 9px;
+    }
+
+    .loader {
+      background-color: rgba(221, 221, 221, .5);
+      position: absolute;
+      bottom: 0;
+      height: 4px;
+      left: 0;
+      right: 0;
+    }
+
+    .loader .loaderBar {
+      position: absolute;
+      top: 0;
+      right: 100%;
+      bottom: 0;
+      left: 0;
+      background: #fff;
+      width: 100px;
+      animation: LoaderBar 2s linear infinite;
     }
   </style>
 </head>
@@ -163,13 +209,19 @@
           © 2022-2026 Christian Radke and Jorge Andres Eremiev
         </div>
         <div class="thanks">
-          Made possible by our supporters on Patreon. Thank you!<br>
+          Thanks to:
+
+          Tronimal,
+
           RetroOnyx, Patrick Fenton, Randy Jeffery, Alec Kafka, David Baisley, Christopher Garland, NeGiZON, Sean
           Machan, Patrick-VB, Cameron Hollaway, Eric Freeman, Adam Wannamaker, Gregory VanNostrand, Benjamin Stevens,
           Simon Gellis, Jose Zagal, tydyedsyko, Michael Ortega, Richard Corlett, Bnjmn Mrph, Studio Kerga, Jonathan
           Kade, Luke Gerhardt, Ash, chairodactyl, norty, animesuperj, IanelGreenleaf, Tomaydo, Tony, Steven Hagelgans,
           et al.
         </div>
+      </div>
+      <div class="loader">
+        <div class="loaderBar"></div>
       </div>
     </div>
   </div>
