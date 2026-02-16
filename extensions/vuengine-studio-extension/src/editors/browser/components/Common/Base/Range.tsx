@@ -11,6 +11,7 @@ interface RangeProps {
     max: number
     step?: number
     value: number
+    disabled?: boolean
     options?: BasicSelectOption[]
     setValue: (value: number) => void
     width?: string | number
@@ -19,7 +20,7 @@ interface RangeProps {
 
 export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { min, max, step, value, options, setValue, width, selectWidth } = props;
+    const { min, max, step, value, disabled, options, setValue, width, selectWidth } = props;
 
     let inputWidth = 32;
     if (!Number.isInteger(step)) {
@@ -51,40 +52,45 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
         }
     };
 
-    return <HContainer alignItems="center" style={{ width }}>
-        <input
-            type="range"
-            className={`value-${Math.ceil(100 / (max - min) * ((value ?? max) - min))}`}
-            style={{ flexGrow: 1 }}
-            min={min}
-            max={max}
-            step={step}
-            value={value ?? max}
-            onChange={e => onChange(e.target.value)}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-        />
-        {
-            options
-                ? <AdvancedSelect
-                    options={options.map(o => ({
-                        ...o,
-                        value: o.value?.toString(),
-                    })) as AdvancedSelectOption[]}
-                    defaultValue={value?.toString() ?? max?.toString()}
-                    onChange={opts => onChange(opts[0])}
-                    width={selectWidth}
-                />
-                : <Input
-                    type="number"
-                    style={{ minWidth: inputWidth, width: inputWidth }}
-                    value={value ?? max}
-                    setValue={setValue}
-                    min={min}
-                    max={max}
-                    step={step}
-                />
-        }
-    </HContainer>;
+    return (
+        <HContainer alignItems="center" style={{ width }}>
+            <input
+                type="range"
+                className={`value-${Math.ceil(100 / (max - min) * ((value ?? max) - min))}`}
+                style={{ flexGrow: 1 }}
+                min={min}
+                max={max}
+                step={step}
+                value={value ?? max}
+                onChange={e => onChange(e.target.value)}
+                onFocus={handleOnFocus}
+                onBlur={handleOnBlur}
+                disabled={disabled}
+            />
+            {
+                options
+                    ? <AdvancedSelect
+                        options={options.map(o => ({
+                            ...o,
+                            value: o.value?.toString(),
+                        })) as AdvancedSelectOption[]}
+                        defaultValue={value?.toString() ?? max?.toString()}
+                        onChange={opts => onChange(opts[0])}
+                        width={selectWidth}
+                        disabled={disabled}
+                    />
+                    : <Input
+                        type="number"
+                        style={{ minWidth: inputWidth, width: inputWidth }}
+                        value={value ?? max}
+                        setValue={setValue}
+                        min={min}
+                        max={max}
+                        step={step}
+                        disabled={disabled}
+                    />
+            }
+        </HContainer>
+    );
 }
 

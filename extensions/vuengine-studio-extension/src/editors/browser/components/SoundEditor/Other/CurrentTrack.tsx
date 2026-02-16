@@ -10,7 +10,20 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getInstrumentName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { SoundData, SoundEditorTrackType, TRACK_TYPE_INSTRUMENT_COMPATIBILITY, TRACK_TYPE_LABELS, TrackConfig } from '../SoundEditorTypes';
+import {
+    SoundData,
+    SoundEditorTrackType,
+    TRACK_PRIORITY_DEFAULT,
+    TRACK_PRIORITY_MAX,
+    TRACK_PRIORITY_MIN,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
+    TRACK_TYPE_LABELS,
+    TrackConfig
+} from '../SoundEditorTypes';
+import InfoLabel from '../../Common/InfoLabel';
+import Range from '../../Common/Base/Range';
+import { clamp } from '../../Common/Utils';
+import HContainer from '../../Common/Base/HContainer';
 
 interface CurrentTrackProps {
     soundData: SoundData
@@ -35,17 +48,23 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
 
     const track = soundData.tracks[currentTrackId];
 
-    const onSelectTrack = (trackId: number): void => {
+    const onSelectTrack = (trackId: number): void =>
         setCurrentTrackId(trackId);
-    };
 
-    const setTrackInstrument = (instrumentId: string): void => {
+    const setTrackInstrument = (instrumentId: string): void =>
+        setTrack(currentTrackId, { instrument: instrumentId });
+
+    const setPriority = (priority: number): void =>
         setTrack(currentTrackId, {
-            instrument: instrumentId,
+            priority: clamp(
+                priority,
+                TRACK_PRIORITY_MIN,
+                TRACK_PRIORITY_MAX,
+                TRACK_PRIORITY_DEFAULT,
+            )
         });
-    };
 
-    const setTrackType = (type: SoundEditorTrackType): void => {
+    const setTrackType = (type: SoundEditorTrackType): void =>
         setSoundData({
             ...soundData,
             tracks: soundData.tracks
@@ -55,13 +74,11 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                 }))
                 .sort((a, b) => b.type.localeCompare(a.type)),
         });
-    };
 
-    const toggleTrackAllowSkip = (): void => {
+    const toggleTrackSkippable = (): void =>
         setTrack(currentTrackId, {
-            allowSkip: !soundData.tracks[currentTrackId].allowSkip,
+            skippable: !soundData.tracks[currentTrackId].skippable,
         });
-    };
 
     return (
         <VContainer gap={15}>
@@ -170,16 +187,36 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                 </InputWithAction>
             </VContainer>
 
-            <Checkbox
-                label={nls.localize('vuengine/editors/sound/highPriority', 'High Priority')}
-                tooltip={nls.localize(
-                    'vuengine/editors/sound/highPriorityDescription',
-                    'Allow notes of this track to supersede notes of another track in-game, \
-if no other sound source is available when requested. Useful, for instance, for sound effects.'
-                )}
-                checked={!track.allowSkip}
-                setChecked={toggleTrackAllowSkip}
-            />
+            <HContainer gap={10}>
+                <VContainer grow={1}>
+                    <InfoLabel
+                        label={nls.localize('vuengine/editors/sound/priority', 'Priority')}
+                        tooltip={nls.localize(
+                            'vuengine/editors/sound/priorityDescription',
+                            'If no sound source is available when a note of this track is requested, \
+it can steal the sound source from a lower priority track (if "Skip" is not enabled). \
+If a track has the highest priority, but all sound sources are used by other tracks with the highest priority, \
+then notes of the former are queued (if "Skip" is not enabled).'
+                        )}
+                    />
+                    <Range
+                        value={track.priority}
+                        min={TRACK_PRIORITY_MIN}
+                        max={TRACK_PRIORITY_MAX}
+                        setValue={setPriority}
+                    />
+                </VContainer>
+                <Checkbox
+                    label={nls.localize('vuengine/editors/sound/skip', 'Skip')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/sound/skipDescription',
+                        'If no sound source is available when a note of this track is requested, \
+do not queue, but skip it.'
+                    )}
+                    checked={track.skippable}
+                    setChecked={toggleTrackSkippable}
+                />
+            </HContainer>
         </VContainer>
     );
 }

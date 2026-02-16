@@ -25,6 +25,7 @@ import {
     SoundEventMap,
     SoundGroup,
     SUB_NOTE_RESOLUTION,
+    TRACK_PRIORITY_DEFAULT,
     TrackConfig
 } from '../../SoundEditorTypes';
 import { DutyInstrument, NoiseInstrument, PatternCell, Song, WaveInstrument } from './ugeHelper';
@@ -98,28 +99,32 @@ export const convertUgeSong = (song: Song): SoundData => {
     const tracks: TrackConfig[] = [
         // Duty 1
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.SWEEPMOD
         },
         // Duty 2
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Wave
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         // Noise
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: '',
             sequence: {},
             type: SoundEditorTrackType.NOISE

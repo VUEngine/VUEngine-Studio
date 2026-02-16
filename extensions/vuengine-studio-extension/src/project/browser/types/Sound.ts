@@ -24,7 +24,7 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
-import { SET_INT_DEFAULT, SoundEditorTrackType, SoundGroup } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import { SET_INT_DEFAULT, SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
@@ -64,7 +64,11 @@ export const SoundType: ProjectDataType = {
                                 type: 'string'
                             }
                         },
-                        allowSkip: {
+                        priority: {
+                            type: 'number',
+                            default: TRACK_PRIORITY_DEFAULT
+                        },
+                        skippable: {
                             type: 'boolean',
                             default: true
                         }

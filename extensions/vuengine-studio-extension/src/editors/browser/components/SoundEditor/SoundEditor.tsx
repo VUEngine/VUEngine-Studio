@@ -1346,7 +1346,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         focusEditor();
                     }}
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
-                    height='340px'
+                    height='380px'
                     width='320px'
                     overflow='visible'
                 >
@@ -1504,6 +1504,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     />
                 </PopUpDialog>
             }
-        </HContainer >
+        </HContainer>
     );
 }

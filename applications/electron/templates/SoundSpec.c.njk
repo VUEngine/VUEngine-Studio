@@ -225,14 +225,11 @@ SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 {%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-	// kTrackNative, kTrackPCM
-	kTrackNative,
+	// Priority for sound channel usage
+	{{ track.priority }},
 
 	// Skip if no sound source available?
-	{{ track.allowSkip }},
-
-	// Total number of samples (0 if not PCM)
-	0,
+	{{ track.skippable }},
 
 	// Loop back point (cursor)
 	{{ trackKeyframes.loopKeyframe }},
@@ -295,13 +292,10 @@ SoundROMSpec {{ sanitizedSpecName }}SoundSpec
 	},
 
 	// Name
-	"
-		{%- if item.author -%}
-			{{- item.author | safe -}}
-			{{- ' - ' -}}
-		{%- endif -%}
-		{{- item.name | safe -}}
-	",
+	"{{- item.name | safe -}}",
+
+	// Author
+	"{{- item.author | safe -}}",
 
 	// Play in loop
 	{{ playInLoop }},

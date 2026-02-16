@@ -60,7 +60,7 @@ export const StyledSoundEditorToolbar = styled.div`
 
 export const StyledSoundEditorToolbarNoteDurationOption = styled.div`
     font-family: "Bravura Text";
-    font-size: 25px;
+    font-size: 23px;
     height: 22px;
     line-height: 41px;
     width: 10px;

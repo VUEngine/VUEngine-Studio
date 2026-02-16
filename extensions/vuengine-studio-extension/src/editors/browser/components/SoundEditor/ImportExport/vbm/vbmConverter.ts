@@ -24,6 +24,7 @@ import {
     SoundEventMap,
     SoundGroup,
     SUB_NOTE_RESOLUTION,
+    TRACK_PRIORITY_DEFAULT,
     TrackConfig
 } from '../../SoundEditorTypes';
 import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
@@ -107,37 +108,43 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
 
     const tracks: TrackConfig[] = [
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.WAVE
         },
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.SWEEPMOD
         },
         {
-            allowSkip: true,
+            skippable: true,
+            priority: TRACK_PRIORITY_DEFAULT,
             instrument: DEFAULT_INSTRUMENT_ID,
             sequence: {},
             type: SoundEditorTrackType.NOISE

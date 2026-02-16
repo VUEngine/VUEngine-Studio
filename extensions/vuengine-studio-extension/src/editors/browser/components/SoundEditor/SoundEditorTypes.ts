@@ -99,7 +99,8 @@ export interface TrackConfig {
     type: SoundEditorTrackType
     instrument: string
     sequence: SequenceMap
-    allowSkip: boolean
+    priority: number
+    skippable: boolean
 }
 
 export interface InstrumentConfig {
@@ -281,6 +282,10 @@ export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 
 export const DEFAULT_BARS_PER_PATTERN = 4;
 export const DEFAULT_NEW_NOTE = 'C4';
+
+export const TRACK_PRIORITY_MIN = 0;
+export const TRACK_PRIORITY_MAX = 100;
+export const TRACK_PRIORITY_DEFAULT = 10;
 
 export const SEQUENCER_PATTERN_HEIGHT_MIN = 28;
 export const SEQUENCER_PATTERN_HEIGHT_MAX = 64;
