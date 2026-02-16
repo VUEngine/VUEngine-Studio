@@ -45,6 +45,7 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
+import RadioSelect from '../Common/Base/RadioSelect';
 
 export const StyledSoundEditorToolbar = styled.div`
     align-items: center;
@@ -55,6 +56,14 @@ export const StyledSoundEditorToolbar = styled.div`
     justify-content: space-between;
     margin: var(--padding);
     row-gap: 10px;
+`;
+
+export const StyledSoundEditorToolbarNoteDurationOption = styled.div`
+    font-family: "Bravura Text";
+    font-size: 25px;
+    height: 22px;
+    line-height: 41px;
+    width: 10px;
 `;
 
 export const StyledSoundEditorToolbarSide = styled.div`
@@ -91,6 +100,7 @@ export const StyledSoundEditorToolbarSizeButton = styled(StyledSoundEditorToolba
     font-size: 11px;
     letter-spacing: -1px;
     font-size: 9px;
+    gap: 0 !important;
     max-height: 12px !important;
     min-height: 12px !important;
     min-width: 26px !important;
@@ -152,8 +162,11 @@ interface SoundEditorToolbarProps {
     selectedNotes: number[]
     playing: boolean
     noteSnapping: boolean
+    setNoteSnapping: Dispatch<SetStateAction<boolean>>
     tool: SoundEditorTool
+    setTool: Dispatch<SetStateAction<SoundEditorTool>>
     marqueeMode: SoundEditorMarqueeMode
+    setMarqueeMode: Dispatch<SetStateAction<SoundEditorMarqueeMode>>
     newNoteDuration: number
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     emulatorInitialized: boolean
@@ -192,9 +205,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         currentPlayerPosition, setCurrentPlayerPosition,
         selectedNotes,
         playing,
-        tool,
-        marqueeMode,
-        noteSnapping,
+        tool, setTool,
+        marqueeMode, setMarqueeMode,
+        noteSnapping, setNoteSnapping,
         newNoteDuration, setNewNoteDuration,
         emulatorInitialized, setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
@@ -359,115 +372,96 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         />
                     </StyledSoundEditorToolbarVisualization>
                 </StyledSoundEditorToolbarGroup>
+                <RadioSelect
+                    defaultValue={tool}
+                    onChange={options => setTool(options[0].value as SoundEditorTool)}
+                    options={[{
+                        label: <PencilSimple size={17} />,
+                        title: SoundEditorCommands.TOOL_EDIT.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_EDIT.id, true),
+                        value: SoundEditorTool.EDIT
+                    }, {
+                        label: <Eraser size={17} />,
+                        title: SoundEditorCommands.TOOL_ERASER.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true),
+                        value: SoundEditorTool.ERASER
+                    }, {
+                        label: <Hand size={17} />,
+                        title: SoundEditorCommands.TOOL_DRAG.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_DRAG.id, true),
+                        value: SoundEditorTool.DRAG
+                    }, {
+                        label: <Selection size={17} />,
+                        title: SoundEditorCommands.TOOL_MARQUEE.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true),
+                        value: SoundEditorTool.MARQUEE
+                    }, /* {
+                        label: <i className='fa fa-circle' />,
+                        title: SoundEditorCommands.TOOL_RECORD.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_RECORD.id, true),
+                        value: SoundEditorTool.RECORD
+                    } */ ]}
+                />
+                <RadioSelect
+                    defaultValue={marqueeMode}
+                    onChange={options => setMarqueeMode(options[0].value as SoundEditorMarqueeMode)}
+                    options={[{
+                        label: <Selection size={17} />,
+                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id, true),
+                        value: SoundEditorMarqueeMode.REPLACE
+                    }, {
+                        label: <SelectionBackground size={17} />,
+                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id, true),
+                        value: SoundEditorMarqueeMode.ADD
+                    }, {
+                        label: <SelectionForeground size={17} />,
+                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
+                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id, true),
+                        value: SoundEditorMarqueeMode.SUBTRACT
+                    }]}
+                />
                 <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.EDIT ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_EDIT.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_EDIT.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_EDIT.id)}
-                    >
-                        <PencilSimple size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.ERASER ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_ERASER.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_ERASER.id)}
-                    >
-                        <Eraser size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.DRAG ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_DRAG.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_DRAG.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_DRAG.id)}
-                    >
-                        <Hand size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${tool === SoundEditorTool.MARQUEE ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_MARQUEE.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE.id)}
-                    >
-                        <Selection size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    { /* }
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${recording ? 'primary' : 'secondary'} recordButton`}
-                        title='Recording Mode'
-                        disabled={true}
-                        onClick={() => setRecording(true)}
-                    >
-                        <i className='fa fa-circle' />
-                    </StyledSoundEditorToolbarButton>
-                    { */ }
-                </StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.REPLACE ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id)}
-                    >
-                        <Selection size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.ADD ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id)}
-                    >
-                        <SelectionBackground size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${marqueeMode === SoundEditorMarqueeMode.SUBTRACT ? 'primary' : 'secondary'}`}
-                        title={SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
-                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id, true)
-                        }
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id)}
-                    >
-                        <SelectionForeground size={17} />
-                    </StyledSoundEditorToolbarButton>
-                </StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarGroup>
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
-                        title={`${SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label}${services.vesCommonService.getKeybindingLabel(
-                            SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
-                            true
-                        )}`}
-                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id)}
-                    >
-                        <Magnet size={17} />
-                    </StyledSoundEditorToolbarButton>
-                    <AdvancedSelect
-                        title={nls.localize('vuengine/editors/sound/noteLength', 'Note Length')}
-                        defaultValue={newNoteDuration.toString()}
-                        onChange={options => setNewNoteDuration(parseInt(options[0]))}
+                    <RadioSelect
+                        defaultValue={noteSnapping}
+                        onChange={() => setNoteSnapping(!noteSnapping)}
                         options={[{
-                            label: '1',
-                            value: '16'
-                        }, {
-                            label: '1/2',
-                            value: '8'
-                        }, {
-                            label: '1/4',
-                            value: '4'
-                        }, {
-                            label: '1/8',
-                            value: '2'
-                        }, {
-                            label: '1/16',
-                            value: '1'
+                            label: <Magnet size={17} />,
+                            title: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
+                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
+                            value: true
                         }]}
-                        width={67}
+                    />
+                    <RadioSelect
+                        defaultValue={newNoteDuration}
+                        onChange={options => setNewNoteDuration(options[0].value as number)}
+                        options={[{
+                            label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
+                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_1.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.SET_NOTE_LENGTH_1.id, true)}`,
+                            value: 16
+                        }, {
+                            label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
+                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_2.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.SET_NOTE_LENGTH_2.id, true)}`,
+                            value: 8
+                        }, {
+                            label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
+                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_4.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.SET_NOTE_LENGTH_4.id, true)}`,
+                            value: 4
+                        }, {
+                            label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
+                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_8.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.SET_NOTE_LENGTH_8.id, true)}`,
+                            value: 2
+                        }, {
+                            label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
+                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_16.label}${services.vesCommonService.getKeybindingLabel(
+                                SoundEditorCommands.SET_NOTE_LENGTH_16.id, true)}`,
+                            value: 1
+                        }]}
                     />
                 </StyledSoundEditorToolbarGroup>
                 <StyledSoundEditorToolbarGroup>

@@ -1000,8 +1000,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     emulatorRomReady={emulatorRomReady}
                     setEmulatorRomReady={setEmulatorRomReady}
                     noteSnapping={noteSnapping}
+                    setNoteSnapping={setNoteSnapping}
                     tool={tool}
+                    setTool={setTool}
                     marqueeMode={marqueeMode}
+                    setMarqueeMode={setMarqueeMode}
                     newNoteDuration={newNoteDuration}
                     setNewNoteDuration={setNewNoteDuration}
                     testNote={testNote}

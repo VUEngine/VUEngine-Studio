@@ -139,6 +139,7 @@ const StyledToggleButton = styled.button`
     cursor: pointer;
     display: flex;
     font-size: 10px;
+    gap: 0 !important;
     justify-content: center;
     min-height: ${PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 2}px !important;
     outline-width: 0 !important;

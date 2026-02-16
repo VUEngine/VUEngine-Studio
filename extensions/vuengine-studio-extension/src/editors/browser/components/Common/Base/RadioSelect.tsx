@@ -1,10 +1,76 @@
 import { deepClone } from '@theia/core';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+
+const StyledRadioSelect = styled.div`
+    border-radius: 2px;
+    display: flex;
+    flex-direction: row;
+    outline: none !important;
+    user-select: none;
+
+    & .canSelectMany {
+        gap: 4px;
+    }
+
+    & .disabled {
+        opacity: .5;
+    }
+`;
+
+const StyledRadioSelectOption = styled.div`
+    align-items: center;
+    // background-color: var(--theia-secondaryButton-background);
+    border: 1px solid var(--theia-dropdown-border);
+    // color: var(--theia-secondaryButton-foreground);
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    display: flex;
+    font-family: var(--theia-ui-font-family);
+    font-size: var(--theia-ui-font-size1);
+    height: 22px;
+    justify-content: center;
+    line-height: var(--theia-content-line-height);
+    margin-right: -1px;
+    padding: 1px 8px;
+    text-align: center;
+    white-space: nowrap;
+
+    &.selected {
+        // background-color: var(--theia-focusBorder);
+        background-color: var(--theia-activityBar-background);
+        // border-color: var(--theia-focusBorder);
+        color: var(--theia-input-foreground);
+        position: relative;
+    }
+
+    &:first-child {
+        border-bottom-left-radius: 2px;
+        border-top-left-radius: 2px;
+    }
+
+    &:last-child {
+        border-bottom-right-radius: 2px;
+        border-top-right-radius: 2px;
+        margin-right: 0;
+    }
+
+    ${StyledRadioSelect}.disabled & {
+        cursor: default;
+    }
+
+    ${StyledRadioSelect}:focus &.selected {
+        // border-radius: 1px;
+        outline: 1px solid var(--theia-button-background);
+        // outline-offset: 1px;
+    }
+`;
 
 export interface RadioSelectOption {
     value: string | number | boolean
-    label?: string
+    label?: string | ReactElement
+    title?: string
 }
 
 interface RadioSelectProps {
@@ -21,7 +87,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     const { allowBlank, options, canSelectMany, defaultValue, onChange, fitSpace, disabled } = props;
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
-    const [classes, setClasses] = useState<string>('radioSelect');
+    const [classes, setClasses] = useState<string>();
     const numberOfOptions = options.length;
 
     const getValues = () => {
@@ -41,7 +107,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     };
 
     const getClasses = () => {
-        const c: string[] = ['radioSelect'];
+        const c: string[] = [];
         if (canSelectMany) {
             c.push('canSelectMany');
         }
@@ -127,7 +193,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         disabled,
     ]);
 
-    return <div
+    return <StyledRadioSelect
         className={classes}
         onKeyDown={handleKeyPress}
         onFocus={handleOnFocus}
@@ -135,14 +201,15 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         tabIndex={0}
     >
         {options.map((o, i) =>
-            <div
+            <StyledRadioSelectOption
                 key={`radio-select-option-${i}`}
                 className={currentIndexes.includes(i) ? 'selected' : ''}
                 onClick={() => toggleValue(i)}
                 style={{ flexGrow: fitSpace ? 1 : 0 }}
+                title={o.title}
             >
                 {o.label ? o.label : o.value}
-            </div>
+            </StyledRadioSelectOption>
         )}
-    </div>;
+    </StyledRadioSelect>;
 }
