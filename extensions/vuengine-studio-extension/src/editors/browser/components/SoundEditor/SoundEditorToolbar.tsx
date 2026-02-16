@@ -377,23 +377,27 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     onChange={options => setTool(options[0].value as SoundEditorTool)}
                     options={[{
                         label: <PencilSimple size={17} />,
-                        title: SoundEditorCommands.TOOL_EDIT.label +
+                        tooltip: SoundEditorCommands.TOOL_EDIT.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_EDIT.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.EDIT
                     }, {
                         label: <Eraser size={17} />,
-                        title: SoundEditorCommands.TOOL_ERASER.label +
+                        tooltip: SoundEditorCommands.TOOL_ERASER.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.ERASER
                     }, {
                         label: <Hand size={17} />,
-                        title: SoundEditorCommands.TOOL_DRAG.label +
+                        tooltip: SoundEditorCommands.TOOL_DRAG.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_DRAG.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.DRAG
                     }, {
                         label: <Selection size={17} />,
-                        title: SoundEditorCommands.TOOL_MARQUEE.label +
+                        tooltip: SoundEditorCommands.TOOL_MARQUEE.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.MARQUEE
                     }, /* {
                         label: <i className='fa fa-circle' />,
@@ -407,18 +411,21 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     onChange={options => setMarqueeMode(options[0].value as SoundEditorMarqueeMode)}
                     options={[{
                         label: <Selection size={17} />,
-                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
+                        tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.REPLACE
                     }, {
                         label: <SelectionBackground size={17} />,
-                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
+                        tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.ADD
                     }, {
                         label: <SelectionForeground size={17} />,
-                        title: SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
+                        tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id, true),
+                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.SUBTRACT
                     }]}
                 />
@@ -428,8 +435,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         onChange={() => setNoteSnapping(!noteSnapping)}
                         options={[{
                             label: <Magnet size={17} />,
-                            title: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
+                            tooltip: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
                                 services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
+                            tooltipPosition: 'bottom',
                             value: true
                         }]}
                     />
@@ -438,28 +446,33 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         onChange={options => setNewNoteDuration(options[0].value as number)}
                         options={[{
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
-                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_1.label}${services.vesCommonService.getKeybindingLabel(
+                            tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_1.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_1.id, true)}`,
+                            tooltipPosition: 'bottom',
                             value: 16
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
-                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_2.label}${services.vesCommonService.getKeybindingLabel(
+                            tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_2.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_2.id, true)}`,
+                            tooltipPosition: 'bottom',
                             value: 8
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
-                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_4.label}${services.vesCommonService.getKeybindingLabel(
+                            tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_4.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_4.id, true)}`,
+                            tooltipPosition: 'bottom',
                             value: 4
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
-                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_8.label}${services.vesCommonService.getKeybindingLabel(
+                            tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_8.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_8.id, true)}`,
+                            tooltipPosition: 'bottom',
                             value: 2
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
-                            title: `${SoundEditorCommands.SET_NOTE_LENGTH_16.label}${services.vesCommonService.getKeybindingLabel(
+                            tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_16.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_16.id, true)}`,
+                            tooltipPosition: 'bottom',
                             value: 1
                         }]}
                     />

@@ -4,14 +4,14 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface HoverInfoProps {
-    value: string | ReactElement
+    tooltip: string | ReactElement
     position?: HoverPosition
     hoverService?: HoverService
 }
 
 export default function HoverInfo(props: PropsWithChildren<HoverInfoProps>): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { value: tooltip, position, hoverService } = props;
+    const { tooltip, position, hoverService } = props;
 
     let content: string | HTMLElement = tooltip as string;
     if (tooltip && typeof tooltip !== 'string') {

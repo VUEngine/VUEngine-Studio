@@ -252,7 +252,7 @@ export default function EngineConfigMemoryPools(props: EngineConfigMemoryPoolsPr
                                         ? <HContainer>
                                             {nls.localizeByDefault('Unknown')}
                                             <HoverInfo
-                                                value={nls.localize(
+                                                tooltip={nls.localize(
                                                     'vuengine/editors/engineConfig/memoryPools/unknownEngineSizeDescription',
                                                     'The total size of static and global variables can only be determined after a successful build.'
                                                 )}

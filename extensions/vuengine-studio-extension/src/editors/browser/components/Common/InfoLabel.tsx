@@ -22,7 +22,7 @@ export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): Rea
         </>}
         {tooltip &&
             <HoverInfo
-                value={tooltip}
+                tooltip={tooltip}
                 position={tooltipPosition}
                 hoverService={hoverService}
             />

@@ -1,5 +1,7 @@
 import { deepClone } from '@theia/core';
+import { HoverPosition, HoverService } from '@theia/core/lib/browser';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
@@ -70,7 +72,8 @@ const StyledRadioSelectOption = styled.div`
 export interface RadioSelectOption {
     value: string | number | boolean
     label?: string | ReactElement
-    title?: string
+    tooltip?: string | ReactElement
+    tooltipPosition?: HoverPosition
 }
 
 interface RadioSelectProps {
@@ -81,11 +84,12 @@ interface RadioSelectProps {
     onChange: (options: RadioSelectOption[]) => void
     fitSpace?: boolean
     disabled?: boolean
+    hoverService?: HoverService
 }
 
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
-    const { allowBlank, options, canSelectMany, defaultValue, onChange, fitSpace, disabled } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { allowBlank, options, canSelectMany, defaultValue, onChange, fitSpace, disabled, hoverService } = props;
+    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
     const [classes, setClasses] = useState<string>();
     const numberOfOptions = options.length;
@@ -206,7 +210,29 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
                 className={currentIndexes.includes(i) ? 'selected' : ''}
                 onClick={() => toggleValue(i)}
                 style={{ flexGrow: fitSpace ? 1 : 0 }}
-                title={o.title}
+                onMouseEnter={event => {
+                    if (o.tooltip) {
+                        const hs = hoverService ? hoverService : services.hoverService;
+                        let content: string | HTMLElement = o.tooltip as string;
+                        if (o.tooltip && typeof o.tooltip !== 'string') {
+                            content = document.createElement('div');
+                            // eslint-disable-next-line no-unsanitized/property
+                            content.innerHTML = renderToStaticMarkup(o.tooltip);
+                        }
+                        hs.requestHover({
+                            content,
+                            target: event.currentTarget,
+                            position: o.tooltipPosition ?? 'top',
+                        });
+                    }
+                }}
+                onMouseLeave={event => {
+                    if (o.tooltip) {
+                        const hs = hoverService ? hoverService : services.hoverService;
+                        hs.cancelHover();
+                    }
+                }}
+
             >
                 {o.label ? o.label : o.value}
             </StyledRadioSelectOption>
