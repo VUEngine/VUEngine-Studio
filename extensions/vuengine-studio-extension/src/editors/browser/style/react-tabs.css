@@ -20,6 +20,7 @@
     line-height: 30px;
     list-style: none;
     margin-right: 15px;
+    opacity: .3;
     user-select: none;
 }
 
@@ -29,11 +30,13 @@
 
 .react-tabs__tab:focus {
     border-color: var(--theia-button-background);
+    opacity: 1;
     outline: none;
 }
 
 .react-tabs__tab--selected {
     border-color: var(--theia-editor-foreground);
+    opacity: 1;
 }
 
 .react-tabs__tab .count {
