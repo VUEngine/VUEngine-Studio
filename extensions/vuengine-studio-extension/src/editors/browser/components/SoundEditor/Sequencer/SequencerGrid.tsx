@@ -64,7 +64,7 @@ interface SequencerGridProps {
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     trackSettings: TrackSettings[]
     soloTrack: number
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentPattern: () => void
     sequencerContainerRef: RefObject<HTMLDivElement>
     pianoRollScrollWindow: ScrollWindow
     pianoRollNoteWidth: number
@@ -97,7 +97,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         setForcePlayerRomRebuild,
         trackSettings,
         soloTrack,
-        setPatternDialogOpen,
+        editCurrentPattern,
         sequencerContainerRef,
         pianoRollScrollWindow,
         pianoRollNoteWidth,
@@ -797,7 +797,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, trackId, step);
 
             if (insidePatternAtSi > -1) {
-                setPatternDialogOpen(true);
+                editCurrentPattern();
             }
         }
     };

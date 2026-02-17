@@ -1,4 +1,4 @@
-import { Waveform, WaveSine, WaveTriangle } from '@phosphor-icons/react';
+import { Waveform, WaveSawtooth, WaveSine } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
@@ -49,7 +49,6 @@ const AllAvailable = styled(StyledChannel)`
 interface AddTrackProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     setAddTrackDialogOpen: Dispatch<SetStateAction<boolean>>
     trackSettings: TrackSettings[]
     setTrackSettings: Dispatch<SetStateAction<TrackSettings[]>>
@@ -59,7 +58,7 @@ interface AddTrackProps {
 export default function AddTrack(props: AddTrackProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        setEditTrackDialogOpen, setAddTrackDialogOpen,
+        setAddTrackDialogOpen,
         trackSettings, setTrackSettings,
         isTrackAvailable,
     } = props;
@@ -129,7 +128,6 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
         });
         setTrackSettings(updatedTrackSettings.sort((a, b) => b.type.localeCompare(a.type)));
 
-        setEditTrackDialogOpen(false);
         setAddTrackDialogOpen(false);
         enableCommands();
         focusEditor();
@@ -186,7 +184,7 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
             onBlur={enableCommands}
         >
             <VContainer justifyContent='center' grow={1}>
-                <WaveTriangle size={48} />
+                <WaveSawtooth size={48} />
             </VContainer>
             {TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD]}
         </StyledChannel>

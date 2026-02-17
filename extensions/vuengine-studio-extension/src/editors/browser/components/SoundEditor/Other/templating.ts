@@ -10,7 +10,6 @@ import {
     NOTES,
     PatternConfig,
     PatternMap,
-    SET_INT_DEFAULT,
     SoundData,
     SoundEditorTrackType,
     SoundEvent,
@@ -71,11 +70,8 @@ enum EventName {
     'SxSWP' = 'kSoundTrackEventSxSWP',
 }
 
-const SxINT = (setInt: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
-    // VUEngine's sound player handles channel enablement internally to reduce pops caused by
-    // resetting the VSU's internal counter due to SxINT being set. We can set the flag manually
-    // to force the counter reset.
-    [Number(setInt), 1],
+const SxINT = (enableChannel: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
+    [Number(enableChannel), 1],
     [undefined, 1],
     [Number(interval.enabled), 1],
     [interval.value, 5]
@@ -415,7 +411,7 @@ const transformToKeyframes = (
             currentInstrumentId = stepEvents[SoundEvent.Instrument];
             currentInstrument = instruments[currentInstrumentId ?? track.instrument];
 
-            keyframe.SxINT = SxINT(currentInstrument.setInt ?? SET_INT_DEFAULT, currentInstrument.interval);
+            keyframe.SxINT = SxINT(true, currentInstrument.interval);
             keyframe.SxLRV = SxLRV(currentInstrument.volume);
             keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
             keyframe.SxEV1 = SxEV1(currentInstrument.envelope, currentInstrument.sweepMod, currentInstrument.tap, track.type);

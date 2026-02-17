@@ -161,6 +161,8 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         } else {
             updateValue([i]);
         }
+
+        enableCommands();
     };
 
     const updateValue = (i: number[]): void => {

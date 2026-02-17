@@ -36,7 +36,7 @@ interface PianoRollHeaderGridProps {
     setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentPattern: () => void
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
@@ -58,7 +58,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
         pianoRollRef,
-        setPatternDialogOpen,
+        editCurrentPattern,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         noteSnapping,
@@ -332,7 +332,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, currentTrackId, step);
             if (insidePatternAtSi > -1) {
-                setPatternDialogOpen(true);
+                editCurrentPattern();
             }
         }
     };

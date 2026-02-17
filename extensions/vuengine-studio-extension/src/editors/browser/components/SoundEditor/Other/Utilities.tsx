@@ -1,6 +1,7 @@
 import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction, useContext, useEffect } from 'react';
+import { isEqual } from 'lodash';
+import React, { useContext, useEffect } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
@@ -8,7 +9,6 @@ import ImportExport from '../ImportExport/ImportExport';
 import { getPatternName } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import { SoundData, SoundEvent } from '../SoundEditorTypes';
-import { isEqual } from 'lodash';
 
 const MAX_UNUSED_PATTERNS_TO_LIST = 15;
 const MAX_UNUSED_INSTRUMENTS_TO_LIST = 15;
@@ -17,12 +17,11 @@ const MAX_DUPLICATE_PATTERNS_TO_LIST = 5;
 interface UtilitiesProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    setUtilitiesDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Utilities(props: UtilitiesProps): React.JSX.Element {
-    const { soundData, updateSoundData, setUtilitiesDialogOpen } = props;
-    const { services, setCommands, onCommandExecute, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
+    const { soundData, updateSoundData } = props;
+    const { services, setCommands, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
 
     const removeUnusedPatterns = async (): Promise<void> => {
         // find all unused patterns
@@ -251,25 +250,16 @@ A total of {0} instruments will be deleted.",
             case SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedPatterns();
-                    setUtilitiesDialogOpen(false);
-                    enableCommands();
-                    focusEditor();
                 }
                 break;
             case SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id:
                 if (soundData.tracks.length > 0) {
                     removeUnusedInstruments();
-                    setUtilitiesDialogOpen(false);
-                    enableCommands();
-                    focusEditor();
                 }
                 break;
             case SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.id:
                 if (soundData.tracks.length > 0) {
                     cleanDuplicatePatterns();
-                    setUtilitiesDialogOpen(false);
-                    enableCommands();
-                    focusEditor();
                 }
                 break;
         }
@@ -289,7 +279,7 @@ A total of {0} instruments will be deleted.",
     ]);
 
     return (
-        <VContainer gap={15}>
+        <VContainer gap={20}>
             <ImportExport
                 soundData={soundData}
             />

@@ -12,14 +12,12 @@ export const COLOR_PALETTE = [
 export const DEFAULT_COLOR_INDEX = 4;
 
 const ColorSquare = styled.div`
+    aspect-ratio: 1;
     cursor: pointer;
-    height: 16px;
     width: calc(6.667% - 1px);
 
     &.active {
-        border-radius: 1px;
-        outline: 2px solid var(--theia-focusBorder);
-        outline-offset: 1px;
+        outline: 3px solid var(--theia-focusBorder);
         position: relative;
         z-index: 1;
     }

@@ -7,6 +7,7 @@ import {
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
+    VSU_VOLUME_DEFAULT,
     VsuChannelStereoLevelsData,
     VsuEnvelopeDirection,
     VsuSweepDirection,
@@ -59,13 +60,12 @@ const DEFAULT_INSTRUMENT = {
     tap: 0,
     type: SoundEditorTrackType.WAVE,
     volume: {
-        left: 15,
-        right: 15
+        left: VSU_VOLUME_DEFAULT,
+        right: VSU_VOLUME_DEFAULT
     },
     waveform: [
         63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Pulse (50%)
     ],
-    setInt: true,
 };
 
 interface ConvertedInstrument {
@@ -319,13 +319,12 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                 tap: 0,
                 type: SoundEditorTrackType.WAVE,
                 volume: {
-                    left: 15,
-                    right: 15
+                    left: VSU_VOLUME_DEFAULT,
+                    right: VSU_VOLUME_DEFAULT
                 },
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
-                setInt: true,
             },
         });
     });

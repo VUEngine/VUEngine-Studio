@@ -48,7 +48,6 @@ const StyledPianoRoll = styled.div`
     flex-grow: 1;
     font-size: 10px;
     overflow: scroll;
-    padding-right: var(--theia-ui-padding);
     position: relative;
 
     body.theia-light &,
@@ -193,8 +192,8 @@ interface PianoRollProps {
     sequencerNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
-    setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentPattern: () => void
+    editCurrentNote: () => void
     trackSettings: TrackSettings[]
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
@@ -232,8 +231,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollNoteWidth, setPianoRollNoteWidth,
         sequencerPatternHeight, sequencerNoteWidth,
         pianoRollScrollWindow, setPianoRollScrollWindow,
-        setPatternDialogOpen,
-        setNoteDialogOpen,
+        editCurrentPattern,
+        editCurrentNote,
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
@@ -509,7 +508,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     noteDragDelta={noteDragDelta}
                     setNoteDragDelta={setNoteDragDelta}
                     newNoteDuration={newNoteDuration}
-                    setNoteDialogOpen={setNoteDialogOpen}
+                    editCurrentNote={editCurrentNote}
                 />
             );
         }
@@ -789,7 +788,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setPatternAtCursorPosition={setPatternAtCursorPosition}
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
-                setPatternDialogOpen={setPatternDialogOpen}
+                editCurrentPattern={editCurrentPattern}
                 rangeDragStartStep={rangeDragStartStep}
                 setRangeDragStartStep={setRangeDragStartStep}
                 rangeDragEndStep={rangeDragEndStep}

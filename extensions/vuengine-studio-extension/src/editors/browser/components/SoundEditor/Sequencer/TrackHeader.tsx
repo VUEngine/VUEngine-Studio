@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -136,7 +136,7 @@ interface TrackHeaderProps {
     toggleTrackSolo: (trackId: number) => void
     toggleTrackSeeThrough: (trackId: number) => void
     otherSolo: boolean
-    setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentTrack: () => void
     sequencerPatternHeight: number
     trackSettings: TrackSettings[]
 }
@@ -150,7 +150,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         removeTrack,
         toggleTrackMuted, toggleTrackSolo, toggleTrackSeeThrough,
         otherSolo,
-        setEditTrackDialogOpen,
+        editCurrentTrack,
         sequencerPatternHeight,
         trackSettings,
     } = props;
@@ -193,7 +193,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         className={classNames.join(' ')}
         onClick={onClick}
         onContextMenu={onClick}
-        onDoubleClick={() => setEditTrackDialogOpen(true)}
+        onDoubleClick={editCurrentTrack}
         title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
             cursor: tool === SoundEditorTool.ERASER ? getToolModeCursor(tool) : undefined,
@@ -264,7 +264,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
                 <StyledTrackHeaderButton
                     title={nls.localize('vuengine/editors/sound/editTrack', 'Edit Track')}
                     onDoubleClick={e => e.stopPropagation()}
-                    onClick={() => setEditTrackDialogOpen(true)}
+                    onClick={editCurrentTrack}
                 >
                     <i className="fa fa-cog" />
                 </StyledTrackHeaderButton>

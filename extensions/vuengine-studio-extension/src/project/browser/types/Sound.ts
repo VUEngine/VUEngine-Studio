@@ -20,11 +20,14 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_DEFAULT,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
+    VSU_VOLUME_DEFAULT,
+    VSU_VOLUME_MAX,
+    VSU_VOLUME_MIN,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
-import { SET_INT_DEFAULT, SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import { SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
@@ -140,15 +143,15 @@ export const SoundType: ProjectDataType = {
                             properties: {
                                 left: {
                                     type: 'integer',
-                                    default: 15,
-                                    minimum: 0,
-                                    maximum: 15
+                                    default: VSU_VOLUME_DEFAULT,
+                                    minimum: VSU_VOLUME_MIN,
+                                    maximum: VSU_VOLUME_MAX
                                 },
                                 right: {
                                     type: 'integer',
-                                    default: 15,
-                                    minimum: 0,
-                                    maximum: 15
+                                    default: VSU_VOLUME_DEFAULT,
+                                    minimum: VSU_VOLUME_MIN,
+                                    maximum: VSU_VOLUME_MAX
                                 }
                             },
                             additionalProperties: false
@@ -260,10 +263,6 @@ export const SoundType: ProjectDataType = {
                             type: 'integer',
                             minimum: 0,
                             maximum: VSU_NOISE_TAP.length,
-                        },
-                        setInt: {
-                            type: 'boolean',
-                            default: SET_INT_DEFAULT
                         },
                     },
                     additionalProperties: false

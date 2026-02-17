@@ -76,7 +76,7 @@ interface PianoRollHeaderProps {
     setPatternAtCursorPosition: (cursor?: number, size?: number) => void
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentPattern: () => void
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
@@ -101,7 +101,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         setPatternAtCursorPosition,
         pianoRollScrollWindow,
         pianoRollRef,
-        setPatternDialogOpen,
+        editCurrentPattern,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         effectsPanelHidden,
@@ -156,7 +156,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             setPatternAtCursorPosition={setPatternAtCursorPosition}
             pianoRollScrollWindow={pianoRollScrollWindow}
             pianoRollRef={pianoRollRef}
-            setPatternDialogOpen={setPatternDialogOpen}
+            editCurrentPattern={editCurrentPattern}
             rangeDragStartStep={rangeDragStartStep}
             setRangeDragStartStep={setRangeDragStartStep}
             rangeDragEndStep={rangeDragEndStep}

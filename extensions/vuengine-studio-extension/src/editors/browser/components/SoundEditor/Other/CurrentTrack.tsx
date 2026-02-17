@@ -4,11 +4,15 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
+import HContainer from '../../Common/Base/HContainer';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
+import { clamp } from '../../Common/Utils';
 import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
-import { getInstrumentName } from '../SoundEditor';
+import { getInstrumentLabel, getTrackTypeLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     SoundData,
@@ -20,10 +24,6 @@ import {
     TRACK_TYPE_LABELS,
     TrackConfig
 } from '../SoundEditorTypes';
-import InfoLabel from '../../Common/InfoLabel';
-import Range from '../../Common/Base/Range';
-import { clamp } from '../../Common/Utils';
-import HContainer from '../../Common/Base/HContainer';
 
 interface CurrentTrackProps {
     soundData: SoundData
@@ -81,7 +81,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
         });
 
     return (
-        <VContainer gap={15}>
+        <VContainer gap={20}>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/currentTrack', 'Current Track')}
@@ -145,7 +145,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         .filter(type => type === track.type || isTrackAvailable(type, soundData.tracks))
                         .map(type => ({
                             value: type,
-                            label: TRACK_TYPE_LABELS[type],
+                            label: getTrackTypeLabel(type),
                         }))}
                     defaultValue={`${track.type}`}
                     onChange={options => setTrackType(options[0] as SoundEditorTrackType)}
@@ -168,13 +168,14 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                 const instrument = soundData.instruments[instrumentId];
                                 return {
                                     value: `${instrumentId}`,
-                                    label: getInstrumentName(soundData, instrumentId),
+                                    label: getInstrumentLabel(soundData, instrumentId),
                                     backgroundColor: COLOR_PALETTE[instrument.color ?? DEFAULT_COLOR_INDEX],
                                 };
                             })}
                         defaultValue={`${track.instrument}`}
                         onChange={options => setTrackInstrument(options[0])}
                         backgroundColor={soundData.instruments[track.instrument] ? COLOR_PALETTE[soundData.instruments[track.instrument].color] : undefined}
+                        borderColor={soundData.instruments[track.instrument] ? COLOR_PALETTE[soundData.instruments[track.instrument].color] : undefined}
                         maxMenuHeight={115}
                     />
                     <InputWithActionButton

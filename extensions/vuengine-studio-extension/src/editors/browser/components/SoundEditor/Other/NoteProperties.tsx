@@ -6,11 +6,12 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
+import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import StepInput from '../EventList/StepInput';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
-import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
+import { getInstrumentLabel, getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_BARS_PER_PATTERN,
@@ -37,6 +38,7 @@ interface NotePropertiesProps {
     soundData: SoundData
     currentTrackId: number
     noteSnapping: boolean
+    setNoteSnapping: Dispatch<SetStateAction<boolean>>
     noteCursor: number
     setNoteCursor: Dispatch<SetStateAction<number>>
     currentSequenceIndex: number
@@ -47,14 +49,13 @@ interface NotePropertiesProps {
     setNotes: (notes: EventsMap) => void
     newNoteDuration: number
     stepsPerBar: number
-    setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
         soundData,
         currentTrackId,
-        noteSnapping,
+        noteSnapping, setNoteSnapping,
         noteCursor, setNoteCursor,
         currentSequenceIndex,
         pattern,
@@ -64,7 +65,6 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         setNotes,
         newNoteDuration,
         stepsPerBar,
-        setNoteDialogOpen,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
@@ -98,7 +98,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         });
 
     return (
-        <VContainer gap={15} grow={1}>
+        <VContainer gap={20} grow={1}>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/noteCursor', 'Note Cursor')}
@@ -155,10 +155,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     </button>
                 </HContainer>
             </VContainer>
-            <hr />
             {Object.keys(events).length > 0 ? (
                 <VContainer gap={20}>
-                    <HContainer gap={20}>
+                    <HContainer gap={20} wrap='wrap'>
                         <VContainer>
                             <label>
                                 {nls.localize('vuengine/editors/sound/step', 'Step')}
@@ -172,7 +171,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                     patternStepOffset={patternStepOffset}
                                     setNotes={setNotes}
                                     setNoteCursor={setNoteCursor}
-                                    width={64}
+                                    width={80}
                                 />
                                 <button
                                     className="theia-button secondary"
@@ -200,18 +199,18 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                             }
                                         });
                                     }}
-                                    width={64}
+                                    width={80}
                                 />
-                                <button
-                                    className={`theia-button ${noteSnapping ? 'primary' : 'secondary'}`}
-                                    title={`${SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label}${services.vesCommonService.getKeybindingLabel(
-                                        SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id,
-                                        true
-                                    )}`}
-                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id)}
-                                >
-                                    <Magnet size={17} />
-                                </button>
+                                <RadioSelect
+                                    defaultValue={noteSnapping}
+                                    onChange={() => setNoteSnapping(!noteSnapping)}
+                                    options={[{
+                                        label: <Magnet size={17} />,
+                                        tooltip: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
+                                            services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
+                                        value: true
+                                    }]}
+                                />
                             </HContainer>
                         </VContainer>
                         <VContainer>
@@ -241,8 +240,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                                 }
                                             });
                                         }}
-                                        maxMenuHeight={104}
-                                        style={{ width: 64 }}
+                                        style={{ width: 80 }}
                                     />
                                 </VContainer>
                                 <button
@@ -272,7 +270,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                                 }
                                             });
                                         }}
-                                        width={64}
+                                        width={80}
                                     />
                                     <Input
                                         value={getNoteSlideLabel(note, noteSlide)}
@@ -309,7 +307,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                             ))
                                         .map(instrId => ({
                                             value: `${instrId}`,
-                                            label: getInstrumentName(soundData, instrId),
+                                            label: getInstrumentLabel(soundData, instrId),
                                             backgroundColor: COLOR_PALETTE[soundData.instruments[instrId].color ?? DEFAULT_COLOR_INDEX],
                                         }))
                                 ]}
@@ -326,7 +324,8 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                         }
                                     });
                                 }}
-                                menuPlacement='top'
+                                backgroundColor={instrumentId ? COLOR_PALETTE[soundData.instruments[instrumentId].color] : undefined}
+                                borderColor={instrumentId ? COLOR_PALETTE[soundData.instruments[instrumentId].color] : undefined}
                             />
                             <InputWithActionButton
                                 className='theia-button secondary'
@@ -336,7 +335,6 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                 }
                                 onClick={() => {
                                     services.commandService.executeCommand(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id);
-                                    setNoteDialogOpen(false);
                                 }}
                             >
                                 <i className='codicon codicon-settings-gear' />
@@ -346,7 +344,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
                 </VContainer>
             ) : (
-                <VContainer gap={15} style={{ alignSelf: 'start' }}>
+                <VContainer gap={20} style={{ alignSelf: 'start' }}>
                     <NoNote>
                         {nls.localize('vuengine/editors/sound/noNoteAtNoteCursor', 'No Note At Note Cursor')}
                     </NoNote>

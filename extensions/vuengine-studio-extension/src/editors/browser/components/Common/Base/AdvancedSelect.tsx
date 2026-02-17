@@ -1,14 +1,15 @@
 import chroma from 'chroma-js';
-import React, { FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent, ReactElement, useContext } from 'react';
 import Select, { GroupBase, MenuPlacement, OptionProps } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
 export interface AdvancedSelectOption {
     value: string
-    label: string
+    label: string | ReactElement
     disabled?: boolean
     backgroundColor?: string
+    borderColor?: string
 };
 
 const CustomClearIndicator: FunctionComponent<OptionProps<AdvancedSelectOption, true, GroupBase<AdvancedSelectOption>>> = ({ innerProps, isDisabled }) => <>{
@@ -45,6 +46,7 @@ interface AdvancedSelectProps {
     width?: number
     title?: string
     backgroundColor?: string
+    borderColor?: string
     maxMenuHeight?: number
 }
 
@@ -64,6 +66,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
         onCreateOption,
         title,
         backgroundColor,
+        borderColor,
         maxMenuHeight
     } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
@@ -135,6 +138,7 @@ export default function AdvancedSelect(props: AdvancedSelectProps): React.JSX.El
                     ...styles,
                     width,
                     backgroundColor,
+                    borderColor,
                     color: !backgroundColor
                         ? undefined
                         : chroma.contrast(backgroundColor, 'white') > 2

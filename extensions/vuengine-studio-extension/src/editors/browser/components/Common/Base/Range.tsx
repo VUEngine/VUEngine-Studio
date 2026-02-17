@@ -16,11 +16,12 @@ interface RangeProps {
     setValue: (value: number) => void
     width?: string | number
     selectWidth?: number
+    containerStyle?: object
 }
 
 export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { min, max, step, value, disabled, options, setValue, width, selectWidth } = props;
+    const { min, max, step, value, disabled, options, setValue, width, selectWidth, containerStyle } = props;
 
     let inputWidth = 32;
     if (!Number.isInteger(step)) {
@@ -53,7 +54,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
     };
 
     return (
-        <HContainer alignItems="center" style={{ width }}>
+        <HContainer alignItems="center" style={{ ...(containerStyle ?? {}), width }}>
             <input
                 type="range"
                 className={`value-${Math.ceil(100 / (max - min) * ((value ?? max) - min))}`}

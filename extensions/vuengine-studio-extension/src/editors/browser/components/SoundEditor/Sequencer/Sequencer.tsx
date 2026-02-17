@@ -41,7 +41,6 @@ const StyledSequencerGridContainer = styled.div`
     flex-direction: column;
     flex-grow: 1;
     overflow: scroll;
-    padding-right: var(--theia-ui-padding);
     position: relative;
 `;
 
@@ -111,8 +110,8 @@ interface SequencerProps {
     removeTrack: (trackId: number) => void
     addPattern: (trackId: number, bar: number, size?: number) => void
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
-    setEditTrackDialogOpen: Dispatch<SetStateAction<boolean>>
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentTrack: () => void
+    editCurrentPattern: () => void
     noteSnapping: boolean
     effectsPanelHidden: boolean
     pianoRollNoteHeight: number
@@ -152,7 +151,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         toggleTrackSeeThrough,
         removeTrack,
         addPattern, setPatternSizes,
-        setEditTrackDialogOpen, setPatternDialogOpen,
+        editCurrentTrack, editCurrentPattern,
         noteSnapping,
         effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
@@ -471,7 +470,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     toggleTrackSolo={toggleTrackSolo}
                     toggleTrackSeeThrough={toggleTrackSeeThrough}
                     otherSolo={soloTrack > -1 && soloTrack !== index}
-                    setEditTrackDialogOpen={setEditTrackDialogOpen}
+                    editCurrentTrack={editCurrentTrack}
                     sequencerPatternHeight={sequencerPatternHeight}
                     trackSettings={trackSettings}
                 />
@@ -537,7 +536,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
-                setPatternDialogOpen={setPatternDialogOpen}
+                editCurrentPattern={editCurrentPattern}
                 sequencerContainerRef={sequencerGridContainerRef}
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollNoteWidth={pianoRollNoteWidth}
@@ -563,7 +562,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     currentSequenceIndex={currentSequenceIndex}
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setCurrentPatternId={setCurrentPatternId}
-                    setPatternDialogOpen={setPatternDialogOpen}
+                    editCurrentPattern={editCurrentPattern}
                     noteSnapping={noteSnapping}
                     cancelPatternDrag={cancelPatternDrag}
                     setCancelPatternDrag={setCancelPatternDrag}

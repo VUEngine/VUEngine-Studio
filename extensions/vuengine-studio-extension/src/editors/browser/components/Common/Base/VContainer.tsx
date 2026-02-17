@@ -3,7 +3,7 @@ import React, { MouseEventHandler, PropsWithChildren } from 'react';
 interface VContainerProps {
     alignItems?: string
     className?: string
-    gap?: number
+    gap?: number | string
     grow?: number
     justifyContent?: string
     onClick?: MouseEventHandler;
@@ -19,7 +19,7 @@ export default function VContainer(props: PropsWithChildren<VContainerProps>): R
             alignItems,
             display: 'flex',
             flexDirection: 'column',
-            gap: gap !== undefined ? `${gap}px` : '5px',
+            gap: gap !== undefined ? gap : 5,
             flexGrow: grow,
             justifyContent,
             overflow,

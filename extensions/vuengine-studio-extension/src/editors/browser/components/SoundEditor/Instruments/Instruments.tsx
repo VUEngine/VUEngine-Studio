@@ -1,5 +1,5 @@
+import { Waveform, WaveSawtooth, WaveSine } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
-import chroma from 'chroma-js';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { SoundType } from '../../../../../project/browser/types/Sound';
@@ -11,10 +11,17 @@ import VContainer from '../../Common/Base/VContainer';
 import EmptyContainer from '../../Common/EmptyContainer';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { nanoid } from '../../Common/Utils';
-import { getInstrumentName } from '../SoundEditor';
-import { InstrumentConfig, InstrumentMap, NOTES_LABELS_REVERSED, SoundData, SoundEditorTrackType, TRACK_DEFAULT_INSTRUMENT_ID } from '../SoundEditorTypes';
+import { getInstrumentLabel, getInstrumentName } from '../SoundEditor';
+import {
+    InstrumentConfig,
+    InstrumentMap,
+    NOTES_LABELS_REVERSED,
+    SoundData,
+    SoundEditorTrackType,
+    TRACK_DEFAULT_INSTRUMENT_ID,
+    TRACK_TYPE_LABELS
+} from '../SoundEditorTypes';
 import Instrument from './Instrument';
-import { Waveform, WaveSine, WaveTriangle } from '@phosphor-icons/react';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -35,60 +42,11 @@ export const InputWithActionButton = styled.button`
     width: 26px;
 `;
 
-export const StyledInstrumentsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    max-width: 240px;
-    min-width: 240px;
-`;
-
-export const StyledInstrumentsListWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-
-    >* {
-        padding: 3px;
-    }
-`;
-
-export const StyledInstrumentsList = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 4px;
-    overflow: auto;
-`;
-
-export const StyledInstrument = styled.button`
-    align-items: center;
-    border: none;
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    min-height: var(--theia-content-line-height) !important;
-
-    &.current {
-        outline: 1px solid var(--theia-focusBorder);
-        outline-offset: 1px;
-        z-index: 1;
-    }
-
-    div {
-        /* flex-grow: 1; */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-`;
-
 interface InstrumentsProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
-    currentTrackId: number
-    currentInstrumentId: string
+    currentEditedInstrumentId: string
+    setCurrentEditedInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
@@ -102,8 +60,7 @@ interface InstrumentsProps {
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
     const {
         soundData, updateSoundData,
-        currentTrackId,
-        currentInstrumentId,
+        currentEditedInstrumentId, setCurrentEditedInstrumentId,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen, setInstrumentColorDialogOpen,
         playingTestNote,
@@ -118,10 +75,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         SoundEditorTrackType.NOISE
     ]);
     const [testNote, setTestNote] = useState<string>(NOTES_LABELS_REVERSED[24]);
-    const [selectedInstrumentId, setSelectedInstrumentId] = useState<string>(currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
-        ? currentInstrumentId
-        : soundData.tracks[currentTrackId].instrument
-    );
+
+    const currentEditedInstrument = soundData.instruments[currentEditedInstrumentId];
 
     const addInstrument = async () => {
         const schema = await window.electronVesCore.dereferenceJsonSchema(SoundType.schema);
@@ -154,66 +109,35 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 return t;
             })
         });
-        setSelectedInstrumentId(newId);
+        setCurrentEditedInstrumentId(newId);
     };
 
     useEffect(() => {
         if (playingTestNote) {
-            playNote(testNote, selectedInstrumentId);
+            playNote(testNote, currentEditedInstrumentId);
         }
-    }, [selectedInstrumentId]);
+    }, [currentEditedInstrumentId]);
 
     return Object.keys(soundData.instruments).length > 0
         ? (
-            <HContainer
-                gap={20}
-                grow={1}
-                overflow='hidden'
-            >
-                <StyledInstrumentsContainer>
-                    <VContainer style={{ padding: 3 }}>
-                        <label>
-                            {nls.localize('vuengine/editors/sound/test', 'Test')}
-                        </label>
-                        <HContainer>
-                            <AdvancedSelect
-                                options={NOTES_LABELS_REVERSED.map(n => ({
-                                    label: n,
-                                    value: n,
-                                }))}
-                                defaultValue={testNote}
-                                onChange={options => setTestNote(options[0])}
-                                containerStyle={{ flexGrow: 1 }}
-                            />
-                            <button
-                                className={`theia-button ${playingTestNote ? 'primary' : 'secondary'}`}
-                                onClick={() => playingTestNote ? playNote('') : playNote(testNote, selectedInstrumentId)}
-                                disabled={!emulatorInitialized}
-                            >
-                                <i className={`codicon codicon-debug-${playingTestNote ? 'pause' : 'start'}`} />
-                            </button>
-                            <button
-                                className="theia-button secondary"
-                                onClick={() => setForcePlayerRomRebuild(prev => prev + 1)}
-                                disabled={!emulatorInitialized || !playingTestNote}
-                            >
-                                <i className="codicon codicon-debug-restart" />
-                            </button>
-                        </HContainer>
-                    </VContainer>
-                    <StyledInstrumentsListWrapper>
-                        <label>
-                            {nls.localize('vuengine/editors/sound/selectInstrument', 'Select Instrument')}
-                        </label>
+            <VContainer gap={20} grow={1}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/selectInstrument', 'Select Instrument')}
+                    </label>
+                    <HContainer>
                         <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/editors/sound/wave', 'Wave'),
+                                label: <WaveSine size={16} />,
+                                tooltip: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
                                 value: SoundEditorTrackType.WAVE,
                             }, {
-                                label: nls.localize('vuengine/editors/sound/waveSm', 'Wave+SM'),
+                                label: <WaveSawtooth size={16} />,
+                                tooltip: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
                                 value: SoundEditorTrackType.SWEEPMOD,
                             }, {
-                                label: nls.localize('vuengine/editors/sound/Noise', 'Noise'),
+                                label: <Waveform size={16} />,
+                                tooltip: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
                                 value: SoundEditorTrackType.NOISE,
                             }]}
                             canSelectMany={true}
@@ -222,65 +146,85 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                             onChange={options => setTypeFilter(options.map(o => o.value) as SoundEditorTrackType[])}
                             fitSpace
                         />
-                        <StyledInstrumentsList>
-                            {Object.keys(soundData.instruments)
-                                .filter(instrumentId => {
-                                    const instrument = soundData.instruments[instrumentId];
-                                    return typeFilter.includes(instrument.type);
-                                })
-                                // sort alphabetically, empty names to end
-                                .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
-                                    (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')
-                                ))
-                                .map((instrumentId, i) => {
-                                    const instr = soundData.instruments[instrumentId];
-                                    const instrumentColor = COLOR_PALETTE[instr?.color ?? DEFAULT_COLOR_INDEX];
-                                    return <StyledInstrument
-                                        key={i}
-                                        className={selectedInstrumentId === instrumentId ? 'current' : undefined}
-                                        onClick={() => setSelectedInstrumentId(instrumentId)}
-                                        style={{
+                        <AdvancedSelect
+                            options={[
+                                ...Object.keys(soundData.instruments)
+                                    .filter(instrumentId => {
+                                        const instrument = soundData.instruments[instrumentId];
+                                        return typeFilter.includes(instrument.type);
+                                    })
+                                    // sort alphabetically, empty names to end
+                                    .sort((a, b) => (soundData.instruments[a].name.length ? soundData.instruments[a].name : 'zzz').localeCompare(
+                                        (soundData.instruments[b].name.length ? soundData.instruments[b].name : 'zzz')
+                                    ))
+                                    .map((instrumentId, i) => {
+                                        const instr = soundData.instruments[instrumentId];
+                                        return {
+                                            value: `${instrumentId}`,
+                                            label: getInstrumentLabel(soundData, instrumentId),
                                             backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
-                                            color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
-                                        }}
-                                    >
-                                        {instr.type === SoundEditorTrackType.WAVE &&
-                                            <WaveSine size={16} />
-                                        }
-                                        {instr.type === SoundEditorTrackType.SWEEPMOD &&
-                                            <WaveTriangle size={16} />
-                                        }
-                                        {instr.type === SoundEditorTrackType.NOISE &&
-                                            <Waveform size={16} />
-                                        }
-                                        <div>
-                                            {getInstrumentName(soundData, instrumentId)}
-                                        </div>
-                                    </StyledInstrument>;
-                                })}
-                            <button
-                                className='theia-button add-button'
-                                onClick={addInstrument}
-                                title={nls.localizeByDefault('Add')}
-                            >
-                                <i className='codicon codicon-plus' />
-                            </button>
-                        </StyledInstrumentsList>
-                    </StyledInstrumentsListWrapper>
-                </StyledInstrumentsContainer>
-                <VContainer grow={1} style={{ padding: 3 }}>
+                                        };
+                                    })
+                            ]}
+                            title={getInstrumentName(soundData, currentEditedInstrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID)}
+                            defaultValue={currentEditedInstrumentId}
+                            onChange={options => setCurrentEditedInstrumentId(options[0])}
+                            backgroundColor={currentEditedInstrument ? COLOR_PALETTE[currentEditedInstrument.color] : undefined}
+                            borderColor={currentEditedInstrument ? COLOR_PALETTE[currentEditedInstrument.color] : undefined}
+                            containerStyle={{ flexGrow: 1 }}
+                        />
+                        <button
+                            className='theia-button secondary'
+                            onClick={addInstrument}
+                            title={nls.localizeByDefault('Add')}
+                        >
+                            <i className='codicon codicon-plus' />
+                        </button>
+                    </HContainer>
+                </VContainer>
+                <VContainer grow={1} overflow='auto'>
                     <Instrument
                         soundData={soundData}
                         updateSoundData={updateSoundData}
-                        instrumentId={selectedInstrumentId}
-                        setInstrumentId={setSelectedInstrumentId}
+                        instrumentId={currentEditedInstrumentId}
+                        setInstrumentId={setCurrentEditedInstrumentId}
                         setInstruments={setInstruments}
                         setWaveformDialogOpen={setWaveformDialogOpen}
                         setModulationDataDialogOpen={setModulationDataDialogOpen}
                         setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
                     />
                 </VContainer>
-            </HContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/test', 'Test')}
+                    </label>
+                    <HContainer>
+                        <AdvancedSelect
+                            options={NOTES_LABELS_REVERSED.map(n => ({
+                                label: n,
+                                value: n,
+                            }))}
+                            defaultValue={testNote}
+                            onChange={options => setTestNote(options[0])}
+                            containerStyle={{ flexGrow: 1 }}
+                        />
+                        <button
+                            className={`theia-button ${playingTestNote ? 'primary' : 'secondary'}`}
+                            onClick={() => playingTestNote ? playNote('') : playNote(testNote, currentEditedInstrumentId)}
+                            disabled={!emulatorInitialized}
+                        >
+                            <i className={`codicon codicon-debug-${playingTestNote ? 'pause' : 'start'}`} />
+                        </button>
+                        <button
+                            className="theia-button secondary"
+                            onClick={() => setForcePlayerRomRebuild(prev => prev + 1)}
+                            disabled={!emulatorInitialized || !playingTestNote}
+                        >
+                            <i className="codicon codicon-debug-restart" />
+                        </button>
+                    </HContainer>
+                </VContainer>
+            </VContainer >
         )
         : (
             <EmptyContainer

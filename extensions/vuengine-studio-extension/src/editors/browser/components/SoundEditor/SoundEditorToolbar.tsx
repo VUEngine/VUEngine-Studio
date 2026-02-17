@@ -1,39 +1,29 @@
 import {
+    BookmarkSimple,
     Eraser,
-    FadersHorizontal,
-    Guitar,
     Hand,
-    Keyboard,
     Magnet,
-    Minus,
     PencilSimple,
-    Plus,
     Selection,
     SelectionBackground,
     SelectionForeground,
-    Wrench
+    SidebarSimple
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
-import { VesCoreCommands } from '../../../../core/browser/ves-core-commands';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import AdvancedSelect from '../Common/Base/AdvancedSelect';
-import Input from '../Common/Base/Input';
-import VContainer from '../Common/Base/VContainer';
+import RadioSelect from '../Common/Base/RadioSelect';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
 import Emulator from './Emulator/Emulator';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
-import { getInstrumentName } from './SoundEditor';
+import { getInstrumentLabel, getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
     EventsMap,
-    PATTERN_SIZE_MAX,
-    PATTERN_SIZE_MIN,
-    NOTE_RESOLUTION,
     PIANO_ROLL_KEY_WIDTH,
-    SequenceMap,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -45,13 +35,11 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
-import RadioSelect from '../Common/Base/RadioSelect';
 
 export const StyledSoundEditorToolbar = styled.div`
-    align-items: center;
+    align-items: start;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     gap: 20px;
     justify-content: space-between;
     margin: var(--padding);
@@ -94,17 +82,6 @@ export const StyledSoundEditorToolbarButton = styled.button`
 
 export const StyledSoundEditorToolbarWideButton = styled(StyledSoundEditorToolbarButton)`
     width: ${PIANO_ROLL_KEY_WIDTH + 1}px;
-`;
-
-export const StyledSoundEditorToolbarSizeButton = styled(StyledSoundEditorToolbarButton)`
-    font-size: 11px;
-    letter-spacing: -1px;
-    font-size: 9px;
-    gap: 0 !important;
-    max-height: 12px !important;
-    min-height: 12px !important;
-    min-width: 26px !important;
-    width: 26px;
 `;
 
 export const StyledSoundEditorToolbarTime = styled.div`
@@ -154,7 +131,6 @@ export const SidebarCollapseButton = styled.button`
 
 interface SoundEditorToolbarProps {
     soundData: SoundData
-    updateSoundData: (soundData: SoundData) => void
     currentTrackId: number
     currentPatternId: string
     currentPlayerPosition: number
@@ -181,25 +157,18 @@ interface SoundEditorToolbarProps {
     playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: Dispatch<SetStateAction<string>>
-    utilitiesDialogOpen: boolean
-    setUtilitiesDialogOpen: Dispatch<SetStateAction<boolean>>
-    keyBindingsDialogOpen: boolean
-    setKeyBindingsDialogOpen: Dispatch<SetStateAction<boolean>>
-    propertiesDialogOpen: boolean
-    setPropertiesDialogOpen: Dispatch<SetStateAction<boolean>>
     setNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
-    stepsPerNote: number
-    stepsPerBar: number
     setPlaying: Dispatch<SetStateAction<boolean>>
+    showSidebar: boolean
+    toggleSidebar: () => void
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         soundData,
-        updateSoundData,
         currentTrackId,
         currentPatternId,
         currentPlayerPosition, setCurrentPlayerPosition,
@@ -216,14 +185,11 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         trackSettings,
         playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
-        utilitiesDialogOpen, setUtilitiesDialogOpen,
-        keyBindingsDialogOpen, setKeyBindingsDialogOpen,
-        propertiesDialogOpen, setPropertiesDialogOpen,
         setNotes,
         setTrack,
         forcePlayerRomRebuild,
-        stepsPerNote, stepsPerBar,
         setPlaying,
+        showSidebar, toggleSidebar,
     } = props;
     const isPlayingRegular = playing && !testNote;
 
@@ -267,46 +233,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
             }
         }]
     });
-
-    const setSize = (size: number): void => {
-        if (size > PATTERN_SIZE_MAX || size < PATTERN_SIZE_MIN) {
-            return;
-        }
-
-        setCurrentPlayerPosition(-1);
-        updateSoundData({
-            ...soundData,
-            loopPoint: size > soundData.loopPoint ? soundData.loopPoint : 0,
-            tracks: [
-                ...soundData.tracks.map(t => {
-                    const updatedSequence: SequenceMap = {};
-                    Object.keys(t.sequence).map(k => {
-                        const step = parseInt(k);
-                        const patternId = t.sequence[step];
-                        const pattern = soundData.patterns[patternId];
-                        if (!pattern) {
-                            return;
-                        }
-                        const patternSize = pattern.size / NOTE_RESOLUTION;
-                        if (step + patternSize <= size) {
-                            updatedSequence[step] = patternId;
-                        }
-                    });
-                    return {
-                        ...t,
-                        sequence: updatedSequence
-                    };
-                })
-            ],
-            size,
-        });
-    };
-
-    const increaseSize = (amount: number) =>
-        setSize(Math.min(PATTERN_SIZE_MAX, soundData.size + amount));
-
-    const decreaseSize = (amount: number) =>
-        setSize(Math.max(PATTERN_SIZE_MIN, soundData.size - amount));
 
     return <StyledSoundEditorToolbar>
         <StyledSoundEditorToolbarSide>
@@ -379,25 +305,21 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         label: <PencilSimple size={17} />,
                         tooltip: SoundEditorCommands.TOOL_EDIT.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_EDIT.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.EDIT
                     }, {
                         label: <Eraser size={17} />,
                         tooltip: SoundEditorCommands.TOOL_ERASER.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_ERASER.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.ERASER
                     }, {
                         label: <Hand size={17} />,
                         tooltip: SoundEditorCommands.TOOL_DRAG.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_DRAG.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.DRAG
                     }, {
                         label: <Selection size={17} />,
                         tooltip: SoundEditorCommands.TOOL_MARQUEE.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorTool.MARQUEE
                     }, /* {
                         label: <i className='fa fa-circle' />,
@@ -413,19 +335,16 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         label: <Selection size={17} />,
                         tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.REPLACE
                     }, {
                         label: <SelectionBackground size={17} />,
                         tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_ADD.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.ADD
                     }, {
                         label: <SelectionForeground size={17} />,
                         tooltip: SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.label +
                             services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT.id, true),
-                        tooltipPosition: 'bottom',
                         value: SoundEditorMarqueeMode.SUBTRACT
                     }]}
                 />
@@ -437,7 +356,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             label: <Magnet size={17} />,
                             tooltip: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
                                 services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
-                            tooltipPosition: 'bottom',
                             value: true
                         }]}
                     />
@@ -448,31 +366,26 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
                             tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_1.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_1.id, true)}`,
-                            tooltipPosition: 'bottom',
                             value: 16
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
                             tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_2.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_2.id, true)}`,
-                            tooltipPosition: 'bottom',
                             value: 8
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
                             tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_4.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_4.id, true)}`,
-                            tooltipPosition: 'bottom',
                             value: 4
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
                             tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_8.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_8.id, true)}`,
-                            tooltipPosition: 'bottom',
                             value: 2
                         }, {
                             label: <StyledSoundEditorToolbarNoteDurationOption></StyledSoundEditorToolbarNoteDurationOption>,
                             tooltip: `${SoundEditorCommands.SET_NOTE_LENGTH_16.label}${services.vesCommonService.getKeybindingLabel(
                                 SoundEditorCommands.SET_NOTE_LENGTH_16.id, true)}`,
-                            tooltipPosition: 'bottom',
                             value: 1
                         }]}
                     />
@@ -497,11 +410,12 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                         const instr = soundData.instruments[instrumentId];
                                         return {
                                             value: `${instrumentId}`,
-                                            label: getInstrumentName(soundData, instrumentId),
+                                            label: getInstrumentLabel(soundData, instrumentId),
                                             backgroundColor: COLOR_PALETTE[instr.color ?? DEFAULT_COLOR_INDEX],
                                         };
                                     })
                             ]}
+                            title={getInstrumentName(soundData, currentInstrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID)}
                             defaultValue={currentInstrumentId}
                             onChange={v => {
                                 const instrumentId = v[0] as string;
@@ -526,6 +440,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                                 }
                             }}
                             backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}
+                            borderColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}
                             width={180}
                         />
                         <InputWithActionButton
@@ -544,86 +459,23 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             disabled={currentTrack?.instrument === currentInstrumentId || currentInstrumentId === TRACK_DEFAULT_INSTRUMENT_ID}
                             onClick={() => setTrack(currentTrackId, { instrument: currentInstrumentId })}
                         >
-                            <Guitar size={17} />
+                            <BookmarkSimple size={17} />
                         </InputWithActionButton>
                     </InputWithAction>
                 </StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarGroup>
-                    <VContainer gap={2}>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
-                            onClick={() => decreaseSize(stepsPerNote)}
-                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                        >
-                            <Minus size={10} />{stepsPerNote}
-                        </StyledSoundEditorToolbarSizeButton>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
-                            onClick={() => decreaseSize(stepsPerBar)}
-                            title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                        >
-                            <Minus size={10} />{stepsPerBar}
-                        </StyledSoundEditorToolbarSizeButton>
-                    </VContainer>
-                    <Input
-                        type="number"
-                        value={soundData.size}
-                        setValue={setSize}
-                        min={PATTERN_SIZE_MIN}
-                        max={PATTERN_SIZE_MAX}
-                        title={nls.localize('vuengine/editors/sound/Length', 'Length')}
-                        width={48}
-                    />
-                    <VContainer gap={2}>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
-                            onClick={() => increaseSize(stepsPerNote)}
-                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                        >
-                            <Plus size={10} />{stepsPerNote}
-                        </StyledSoundEditorToolbarSizeButton>
-                        <StyledSoundEditorToolbarSizeButton
-                            className="theia-button secondary"
-                            onClick={() => increaseSize(stepsPerBar)}
-                            title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                        >
-                            <Plus size={10} />{stepsPerBar}
-                        </StyledSoundEditorToolbarSizeButton>
-                    </VContainer>
-                </StyledSoundEditorToolbarGroup>
             </>}
-            <StyledSoundEditorToolbarGroup>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${propertiesDialogOpen ? 'primary' : 'secondary'}`}
-                    title={nls.localize('vuengine/editors/sound/properties', 'Properties')}
-                    onClick={() => setPropertiesDialogOpen(prev => !prev)}
-                >
-                    <FadersHorizontal size={17} />
-                </StyledSoundEditorToolbarButton>
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${utilitiesDialogOpen ? 'primary' : 'secondary'}`}
-                    title={nls.localize('vuengine/editors/sound/utilities', 'Utilities')}
-                    onClick={() => setUtilitiesDialogOpen(prev => !prev)}
-                >
-                    <Wrench size={17} />
-                </StyledSoundEditorToolbarButton>
-                {soundData.tracks.length > 0 &&
-                    <StyledSoundEditorToolbarButton
-                        className={`theia-button ${keyBindingsDialogOpen ? 'primary' : 'secondary'}`}
-                        title={nls.localizeByDefault('Keybindings')}
-                        onClick={() => setKeyBindingsDialogOpen(prev => !prev)}
-                    >
-                        <Keyboard size={17} />
-                    </StyledSoundEditorToolbarButton>
-                }
-                <StyledSoundEditorToolbarButton
-                    className={`theia-button ${utilitiesDialogOpen ? 'primary' : 'secondary'}`}
-                    title={nls.localizeByDefault('Documentation')}
-                    onClick={() => services.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/sound-editor', false)}
-                >
-                    <i className="codicon codicon-book" />
-                </StyledSoundEditorToolbarButton>
-            </StyledSoundEditorToolbarGroup>
+        </StyledSoundEditorToolbarSide>
+        <StyledSoundEditorToolbarSide>
+            <RadioSelect
+                defaultValue={showSidebar}
+                onChange={toggleSidebar}
+                options={[{
+                    label: <SidebarSimple mirrored size={17} />,
+                    tooltip: SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.label +
+                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id, true),
+                    value: true
+                }]}
+            />
         </StyledSoundEditorToolbarSide>
     </StyledSoundEditorToolbar>;
 }

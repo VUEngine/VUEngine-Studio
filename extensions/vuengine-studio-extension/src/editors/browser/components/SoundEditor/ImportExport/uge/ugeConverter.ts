@@ -9,6 +9,7 @@ import {
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
+    VSU_VOLUME_DEFAULT,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction,
@@ -285,11 +286,10 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                     ? SoundEditorTrackType.SWEEPMOD
                     : SoundEditorTrackType.WAVE,
                 volume: {
-                    left: 15,
-                    right: 15
+                    left: VSU_VOLUME_DEFAULT,
+                    right: VSU_VOLUME_DEFAULT
                 },
                 waveform: DUTY_WAVEFORMS[i.duty_cycle],
-                setInt: true,
             },
         });
     });
@@ -340,11 +340,10 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
                 tap: 0,
                 type: SoundEditorTrackType.WAVE,
                 volume: {
-                    left: 15,
-                    right: 15
+                    left: VSU_VOLUME_DEFAULT,
+                    right: VSU_VOLUME_DEFAULT
                 },
                 waveform: convertWaveform(waves[(i as WaveInstrument).wave_index]),
-                setInt: true,
             },
         });
     });
@@ -400,13 +399,12 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
                 tap: 0,
                 type: SoundEditorTrackType.NOISE,
                 volume: {
-                    left: 15,
-                    right: 15
+                    left: VSU_VOLUME_DEFAULT,
+                    right: VSU_VOLUME_DEFAULT
                 },
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],
-                setInt: true,
             },
         });
     });

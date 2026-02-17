@@ -3,7 +3,7 @@ import React, { KeyboardEventHandler, MouseEventHandler, PropsWithChildren } fro
 interface HContainerProps {
     alignItems?: string
     className?: string
-    gap?: number
+    gap?: number | string
     grow?: number
     justifyContent?: string
     onClick?: MouseEventHandler;
@@ -26,7 +26,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
             flexDirection: 'row',
             flexGrow: grow,
             flexWrap: wrap !== undefined ? wrap : 'nowrap',
-            gap: gap !== undefined ? `${gap}px` : '5px',
+            gap: gap !== undefined ? gap : 5,
             justifyContent,
             overflow,
             ...(style || {}),

@@ -111,7 +111,7 @@ interface PianoRollPlacedNoteProps {
     noteDragDelta: { x: number, y: number }
     setNoteDragDelta: Dispatch<SetStateAction<{ x: number, y: number }>>
     newNoteDuration: number
-    setNoteDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentNote: () => void
 }
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
@@ -133,7 +133,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         isSelected,
         noteDragDelta, setNoteDragDelta,
         newNoteDuration,
-        setNoteDialogOpen,
+        editCurrentNote,
     } = props;
     const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -443,7 +443,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
     const onDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (tool === SoundEditorTool.EDIT) {
-            setNoteDialogOpen(true);
+            editCurrentNote();
         }
     };
 

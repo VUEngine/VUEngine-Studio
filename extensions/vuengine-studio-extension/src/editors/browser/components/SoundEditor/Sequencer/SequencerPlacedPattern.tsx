@@ -71,7 +71,7 @@ interface SequencerPlacedPatternProps {
     setCurrentPatternId: (trackId: number, patternId: string) => void
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
+    editCurrentPattern: () => void
     noteSnapping: boolean
     cancelPatternDrag: boolean
     setCancelPatternDrag: Dispatch<SetStateAction<boolean>>
@@ -93,7 +93,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         currentTrackId,
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
-        setPatternDialogOpen,
+        editCurrentPattern,
         noteSnapping,
         cancelPatternDrag, setCancelPatternDrag,
         sequencerPatternHeight, sequencerNoteWidth,
@@ -317,7 +317,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     const onDoubleClick = (e: React.MouseEvent<HTMLElement>) => {
-        setPatternDialogOpen(true);
+        editCurrentPattern();
     };
 
     const commandListener = (commandId: string): void => {

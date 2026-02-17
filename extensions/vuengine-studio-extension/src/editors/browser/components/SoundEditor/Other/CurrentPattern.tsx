@@ -1,15 +1,14 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import React from 'react';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { nanoid } from '../../Common/Utils';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
-import { getPatternName } from '../SoundEditor';
+import { getPatternName, getTrackTypeLabel } from '../SoundEditor';
 import {
     PATTERN_SIZE_MAX,
     PATTERN_SIZE_MIN,
@@ -17,7 +16,6 @@ import {
     SequenceMap,
     SoundData,
     SoundEditorTrackType,
-    TRACK_TYPE_LABELS,
     TrackConfig
 } from '../SoundEditorTypes';
 
@@ -29,7 +27,6 @@ interface CurrentPatternProps {
     setCurrentPatternId: (trackId: number, patternId: string) => void
     setPattern: (patternId: string, pattern: Partial<PatternConfig>) => void
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
-    setPatternDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
@@ -38,9 +35,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         currentTrackId,
         currentPatternId, setCurrentPatternId,
         setPattern, setPatternSizes,
-        setPatternDialogOpen,
     } = props;
-    const { enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
 
     const pattern = soundData.patterns[currentPatternId];
 
@@ -101,17 +96,11 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
             });
             const firstPatternId = Object.keys(soundData.patterns)[0] ?? '';
             setCurrentPatternId(currentTrackId, firstPatternId);
-
-            if (firstPatternId === '') {
-                setPatternDialogOpen(false);
-                enableCommands();
-                focusEditor();
-            }
         }
     };
 
     return pattern
-        ? <VContainer gap={15} style={{ userSelect: 'none' }}>
+        ? <VContainer gap={20} style={{ userSelect: 'none' }}>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}
@@ -159,13 +148,13 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 <AdvancedSelect
                     options={[{
                         value: SoundEditorTrackType.WAVE,
-                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE],
+                        label: getTrackTypeLabel(SoundEditorTrackType.WAVE),
                     }, {
                         value: SoundEditorTrackType.SWEEPMOD,
-                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
+                        label: getTrackTypeLabel(SoundEditorTrackType.SWEEPMOD),
                     }, {
                         value: SoundEditorTrackType.NOISE,
-                        label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
+                        label: getTrackTypeLabel(SoundEditorTrackType.NOISE),
                     }]}
                     defaultValue={pattern.type}
                     onChange={options => setPatternType(options[0] as SoundEditorTrackType)}
