@@ -280,9 +280,7 @@ A total of {0} instruments will be deleted.",
 
     return (
         <VContainer gap={20}>
-            <ImportExport
-                soundData={soundData}
-            />
+            <ImportExport />
             {soundData.tracks.length > 0 &&
                 <VContainer>
                     <label>

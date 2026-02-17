@@ -5,14 +5,11 @@ import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { SoundData } from '../SoundEditorTypes';
 
 interface ImportExportProps {
-    soundData: SoundData
 }
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
-    const { soundData } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
 
     return <VContainer>
@@ -61,15 +58,12 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             >
                 {nls.localize('vuengine/editors/sound/import', 'Import')}
             </button>
-
-            {soundData.tracks.length > 0 &&
-                <button
-                    className='theia-button secondary'
-                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
-                >
-                    {nls.localize('vuengine/editors/sound/export', 'Export')}
-                </button>
-            }
+            <button
+                className='theia-button secondary'
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
+            >
+                {nls.localize('vuengine/editors/sound/export', 'Export')}
+            </button>
         </HContainer>
     </VContainer>;
 }

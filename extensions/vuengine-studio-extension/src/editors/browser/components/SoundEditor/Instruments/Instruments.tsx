@@ -47,6 +47,7 @@ interface InstrumentsProps {
     updateSoundData: (soundData: SoundData) => void
     currentEditedInstrumentId: string
     setCurrentEditedInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
     setInstruments: (instruments: InstrumentMap) => void
     setWaveformDialogOpen: Dispatch<SetStateAction<string>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<string>>
@@ -61,6 +62,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     const {
         soundData, updateSoundData,
         currentEditedInstrumentId, setCurrentEditedInstrumentId,
+        setCurrentInstrumentId,
         setInstruments,
         setWaveformDialogOpen, setModulationDataDialogOpen, setInstrumentColorDialogOpen,
         playingTestNote,
@@ -186,8 +188,9 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     <Instrument
                         soundData={soundData}
                         updateSoundData={updateSoundData}
-                        instrumentId={currentEditedInstrumentId}
-                        setInstrumentId={setCurrentEditedInstrumentId}
+                        currentEditedInstrumentId={currentEditedInstrumentId}
+                        setCurrentEditedInstrumentId={setCurrentEditedInstrumentId}
+                        setCurrentInstrumentId={setCurrentInstrumentId}
                         setInstruments={setInstruments}
                         setWaveformDialogOpen={setWaveformDialogOpen}
                         setModulationDataDialogOpen={setModulationDataDialogOpen}

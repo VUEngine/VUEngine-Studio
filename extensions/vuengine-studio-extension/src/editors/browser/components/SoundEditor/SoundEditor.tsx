@@ -137,7 +137,7 @@ export const getInstrumentName = (soundData: SoundData, instrumentId: string): s
     const instrument = soundData.instruments[instrumentId];
     const name = instrumentId === TRACK_DEFAULT_INSTRUMENT_ID
         ? TRACK_DEFAULT_INSTRUMENT_NAME
-        : instrument.name.length
+        : instrument?.name.length
             ? instrument.name
             : `(${instrumentId.slice(0, 4)})`;
 
@@ -1098,448 +1098,461 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             overflow="hidden"
             style={{ padding: 0 }}
         >
-            <VContainer gap={0} grow={1} overflow="hidden" style={{ minWidth: '50%' }}>
-                <SoundEditorToolbar
-                    soundData={soundData}
-                    currentTrackId={currentTrackId}
-                    currentPatternId={currentPatternId}
-                    currentPlayerPosition={currentPlayerPosition}
-                    setCurrentPlayerPosition={setCurrentPlayerPosition}
-                    playing={playing}
-                    emulatorInitialized={emulatorInitialized}
-                    setEmulatorInitialized={setEmulatorInitialized}
-                    emulatorRomReady={emulatorRomReady}
-                    setEmulatorRomReady={setEmulatorRomReady}
-                    noteSnapping={noteSnapping}
-                    setNoteSnapping={setNoteSnapping}
-                    tool={tool}
-                    setTool={setTool}
-                    marqueeMode={marqueeMode}
-                    setMarqueeMode={setMarqueeMode}
-                    newNoteDuration={newNoteDuration}
-                    setNewNoteDuration={setNewNoteDuration}
-                    testNote={testNote}
-                    testInstrumentId={testInstrumentId}
-                    playRangeStart={playRangeStart}
-                    playRangeEnd={playRangeEnd}
-                    trackSettings={trackSettings}
-                    playerRomBuilder={playerRomBuilder}
-                    currentInstrumentId={currentInstrumentId}
-                    setCurrentInstrumentId={updateCurrentInstrumentId}
-                    selectedNotes={selectedNotes}
-                    setNotes={setNotes}
-                    setTrack={setTrack}
-                    forcePlayerRomRebuild={forcePlayerRomRebuild}
-                    setPlaying={setPlaying}
-                    showSidebar={showSidebar}
-                    toggleSidebar={toggleSidebar}
-                />
-                {soundData.tracks.length === 0
-                    ? <VContainer grow={1} style={{ position: 'relative' }}>
-                        <EmptyContainer
-                            title={nls.localize('vuengine/editors/sound/soundIsEmpty', 'This sound is empty')}
-                            description={nls.localize(
-                                'vuengine/editors/sound/clickBelowToAddFirstTrack',
-                                'Click below to add the first track',
-                            )}
-                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
-                        />
-                    </VContainer>
-                    : <>
-                        {!sequencerHidden &&
-                            <Sequencer
-                                soundData={soundData}
-                                tool={tool}
-                                marqueeMode={marqueeMode}
-                                updateSoundData={updateSoundData}
-                                currentPlayerPosition={currentPlayerPosition}
-                                setCurrentPlayerPosition={setCurrentPlayerPosition}
-                                currentPatternId={currentPatternId}
-                                setCurrentPatternId={updateCurrentPatternId}
-                                currentTrackId={currentTrackId}
-                                setCurrentTrackId={updateCurrentTrackId}
-                                currentSequenceIndex={currentSequenceIndex}
-                                setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                                selectedPatterns={selectedPatterns}
-                                setSelectedPatterns={updateSelectedPatterns}
-                                toggleTrackMuted={toggleTrackMuted}
-                                toggleTrackSolo={toggleTrackSolo}
-                                toggleTrackSeeThrough={toggleTrackSeeThrough}
-                                removeTrack={removeTrack}
-                                addPattern={addPattern}
-                                editCurrentTrack={editCurrentTrack}
-                                editCurrentPattern={editCurrentPattern}
-                                noteSnapping={noteSnapping}
-                                effectsPanelHidden={effectsPanelHidden}
-                                pianoRollNoteHeight={pianoRollNoteHeight}
-                                pianoRollNoteWidth={pianoRollNoteWidth}
-                                sequencerPatternHeight={sequencerPatternHeight}
-                                setSequencerPatternHeight={setSequencerPatternHeight}
-                                sequencerNoteWidth={sequencerNoteWidth}
-                                setSequencerNoteWidth={setSequencerNoteWidth}
-                                pianoRollScrollWindow={pianoRollScrollWindow}
-                                setPatternSizes={setPatternSizes}
-                                removePatternsFromSequence={removePatternsFromSequence}
-                                trackSettings={trackSettings}
-                                playRangeStart={playRangeStart}
-                                setPlayRangeStart={setPlayRangeStart}
-                                playRangeEnd={playRangeEnd}
-                                setPlayRangeEnd={setPlayRangeEnd}
-                                rangeDragStartStep={rangeDragStartStep}
-                                setRangeDragStartStep={setRangeDragStartStep}
-                                rangeDragEndStep={rangeDragEndStep}
-                                setRangeDragEndStep={setRangeDragEndStep}
-                                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
-                                noteCursor={noteCursor}
-                                stepsPerNote={stepsPerNote}
-                                stepsPerBar={stepsPerBar}
-                            />
-                        }
-                        <StyledLowerContainer>
-                            {!eventListHidden &&
-                                <EventList
-                                    soundData={soundData}
-                                    currentTrackId={currentTrackId}
-                                    currentSequenceIndex={currentSequenceIndex}
-                                    noteSnapping={noteSnapping}
-                                    pattern={soundData.patterns[currentPatternId]}
-                                    noteCursor={noteCursor}
-                                    setNotes={setNotes}
-                                    setNoteCursor={updateNoteCursor}
-                                />
-                            }
-                            <PianoRoll
-                                soundData={soundData}
-                                tool={tool}
-                                marqueeMode={marqueeMode}
-                                currentPlayerPosition={currentPlayerPosition}
-                                setCurrentPlayerPosition={setCurrentPlayerPosition}
-                                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
-                                noteCursor={noteCursor}
-                                setNoteCursor={updateNoteCursor}
-                                currentPatternId={currentPatternId}
-                                currentTrackId={currentTrackId}
-                                currentSequenceIndex={currentSequenceIndex}
-                                setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                                currentInstrumentId={currentInstrumentId}
-                                setCurrentInstrumentId={updateCurrentInstrumentId}
-                                playRangeStart={playRangeStart}
-                                setPlayRangeStart={setPlayRangeStart}
-                                playRangeEnd={playRangeEnd}
-                                setPlayRangeEnd={setPlayRangeEnd}
-                                playNote={playNote}
-                                playing={playing}
-                                testNote={testNote}
-                                setNotes={setNotes}
-                                addPattern={addPattern}
-                                sequencerHidden={sequencerHidden}
-                                setSequencerHidden={setSequencerHidden}
-                                effectsPanelHidden={effectsPanelHidden}
-                                setEffectsPanelHidden={setEffectsPanelHidden}
-                                eventListHidden={eventListHidden}
-                                setEventListHidden={setEventListHidden}
-                                selectedNotes={selectedNotes}
-                                setSelectedNotes={updateSelectedNotes}
-                                noteSnapping={noteSnapping}
-                                newNoteDuration={newNoteDuration}
-                                pianoRollNoteHeight={pianoRollNoteHeight}
-                                setPianoRollNoteHeight={setPianoRollNoteHeight}
-                                pianoRollNoteWidth={pianoRollNoteWidth}
-                                setPianoRollNoteWidth={setPianoRollNoteWidth}
-                                sequencerPatternHeight={sequencerPatternHeight}
-                                sequencerNoteWidth={sequencerNoteWidth}
-                                setPianoRollScrollWindow={setPianoRollScrollWindow}
-                                pianoRollScrollWindow={pianoRollScrollWindow}
-                                editCurrentPattern={editCurrentPattern}
-                                editCurrentNote={editCurrentNote}
-                                trackSettings={trackSettings}
-                                rangeDragStartStep={rangeDragStartStep}
-                                setRangeDragStartStep={setRangeDragStartStep}
-                                rangeDragEndStep={rangeDragEndStep}
-                                setRangeDragEndStep={setRangeDragEndStep}
-                                stepsPerNote={stepsPerNote}
-                                stepsPerBar={stepsPerBar}
-                            />
-                        </StyledLowerContainer>
-                    </>}
-            </VContainer>
-            <StyledSidebar className={showSidebar ? undefined : 'collapsed'}>
-                <Tabs
-                    selectedIndex={sidebarTab}
-                    onSelect={setSidebarTab}
-                >
-                    <TabList>
-                        {([
-                            {
-                                tooltip: nls.localize('vuengine/editors/sound/properties', 'Properties'),
-                                icon: <FadersHorizontal size={22} />
-                            },
-                            {
-                                tooltip: `${nls.localize('vuengine/editors/sound/instrumentEditor', 'Instrument Editor')}${services.vesCommonService.getKeybindingLabel(
-                                    SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true
-                                )}`,
-                                icon: <Guitar size={22} />
-                            },
-                            {
-                                tooltip: nls.localize('vuengine/editors/sound/currentTrack', 'Current Track'),
-                                icon: <RoadHorizon size={22} />
-                            },
-                            {
-                                tooltip: nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern'),
-                                icon: <Rectangle size={22} />
-                            },
-                            {
-                                tooltip: nls.localize('vuengine/editors/sound/currentNote', 'Current Note'),
-                                icon: <MusicNote size={22} />
-                            },
-                            {
-                                tooltip: nls.localize('vuengine/editors/sound/utilities', 'Utilities'),
-                                icon: <Wrench size={22} />
-                            },
-                            {
-                                tooltip: nls.localizeByDefault('Keybindings'),
-                                icon: <Keyboard size={22} />
-                            }
-                        ] as { tooltip: string, icon: ReactElement }[]).map((t, i) =>
-                            <Tab
-                                key={i}
-                                onMouseEnter={event => {
-                                    services.hoverService.requestHover({
-                                        content: t.tooltip,
-                                        target: event.currentTarget,
-                                        position: 'top',
-                                    });
-                                }}
-                                onMouseLeave={event => {
-                                    services.hoverService.cancelHover();
-                                }}
-                            >
-                                {t.icon}
-                            </Tab>
+            {soundData.tracks.length === 0
+                ? (
+                    <EmptyContainer
+                        title={nls.localize('vuengine/editors/sound/soundIsEmpty', 'This sound is empty')}
+                        description={nls.localize(
+                            'vuengine/editors/sound/clickBelowToAddFirstTrack',
+                            'Click below to add the first track',
                         )}
-                    </TabList>
-                    <TabPanel>
-                        <Properties
+                        onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
+                    />
+                ) : <>
+                    <VContainer gap={0} grow={1} overflow="hidden" style={{ minWidth: '50%' }}>
+                        <SoundEditorToolbar
                             soundData={soundData}
-                            beats={beats}
-                            bar={bar}
-                            updateSoundData={updateSoundData}
-                            setNewNoteDuration={setNewNoteDuration}
-                            setCurrentPlayerPosition={setCurrentPlayerPosition}
-                            stepsPerNote={stepsPerNote}
-                            stepsPerBar={stepsPerBar}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <Instruments
-                            soundData={soundData}
-                            updateSoundData={updateSoundData}
-                            currentEditedInstrumentId={currentEditedInstrumentId}
-                            setCurrentEditedInstrumentId={setCurrentEditedInstrumentId}
-                            setInstruments={setInstruments}
-                            setWaveformDialogOpen={setWaveformDialogOpen}
-                            setModulationDataDialogOpen={setModulationDataDialogOpen}
-                            setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
-                            playingTestNote={playing && !!testNote}
-                            playNote={playNote}
-                            emulatorInitialized={emulatorInitialized}
-                            setForcePlayerRomRebuild={setForcePlayerRomRebuild}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <CurrentTrack
-                            soundData={soundData}
-                            setSoundData={updateSoundData}
-                            currentTrackId={currentTrackId}
-                            setCurrentTrackId={updateCurrentTrackId}
-                            setTrack={setTrack}
-                            removeTrack={removeTrack}
-                            editInstrument={editInstrument}
-                            isTrackAvailable={isTrackAvailable}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <CurrentPattern
-                            soundData={soundData}
-                            updateSoundData={updateSoundData}
                             currentTrackId={currentTrackId}
                             currentPatternId={currentPatternId}
-                            setCurrentPatternId={updateCurrentPatternId}
-                            setPattern={setPattern}
-                            setPatternSizes={setPatternSizes}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <NoteProperties
-                            soundData={soundData}
-                            currentTrackId={currentTrackId}
+                            currentPlayerPosition={currentPlayerPosition}
+                            setCurrentPlayerPosition={setCurrentPlayerPosition}
+                            playing={playing}
+                            emulatorInitialized={emulatorInitialized}
+                            setEmulatorInitialized={setEmulatorInitialized}
+                            emulatorRomReady={emulatorRomReady}
+                            setEmulatorRomReady={setEmulatorRomReady}
                             noteSnapping={noteSnapping}
                             setNoteSnapping={setNoteSnapping}
-                            noteCursor={noteCursor}
-                            setNoteCursor={updateNoteCursor}
-                            currentSequenceIndex={currentSequenceIndex}
-                            pattern={soundData.patterns[currentPatternId]}
-                            emulatorInitialized={emulatorInitialized}
-                            playingTestNote={playing && !!testNote}
-                            playNote={playNote}
-                            setNotes={setNotes}
+                            tool={tool}
+                            setTool={setTool}
+                            marqueeMode={marqueeMode}
+                            setMarqueeMode={setMarqueeMode}
                             newNoteDuration={newNoteDuration}
-                            stepsPerBar={stepsPerBar}
+                            setNewNoteDuration={setNewNoteDuration}
+                            testNote={testNote}
+                            testInstrumentId={testInstrumentId}
+                            playRangeStart={playRangeStart}
+                            playRangeEnd={playRangeEnd}
+                            trackSettings={trackSettings}
+                            playerRomBuilder={playerRomBuilder}
+                            currentInstrumentId={currentInstrumentId}
+                            setCurrentInstrumentId={updateCurrentInstrumentId}
+                            selectedNotes={selectedNotes}
+                            setNotes={setNotes}
+                            setTrack={setTrack}
+                            forcePlayerRomRebuild={forcePlayerRomRebuild}
+                            setPlaying={setPlaying}
+                            showSidebar={showSidebar}
+                            toggleSidebar={toggleSidebar}
                         />
-                    </TabPanel>
-                    <TabPanel>
-                        <Utilities
-                            soundData={soundData}
-                            updateSoundData={updateSoundData}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <Keybindings />
-                    </TabPanel>
-                </Tabs>
-            </StyledSidebar>
-            {addTrackDialogOpen &&
-                <PopUpDialog
-                    open={addTrackDialogOpen}
-                    onClose={() => {
-                        setAddTrackDialogOpen(false);
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    onOk={() => {
-                        setAddTrackDialogOpen(false);
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
-                    height='300px'
-                    width='438px'
-                    cancelButton={true}
-                    okButton={false}
-                >
-                    <AddTrack
-                        soundData={soundData}
-                        updateSoundData={updateSoundData}
-                        trackSettings={trackSettings}
-                        setTrackSettings={setTrackSettings}
-                        isTrackAvailable={isTrackAvailable}
-                        setAddTrackDialogOpen={setAddTrackDialogOpen}
-                    />
-                </PopUpDialog>
-            }
-            {addPatternDialogOpen.trackId > -1 &&
-                <PopUpDialog
-                    open={addPatternDialogOpen.trackId > -1}
-                    onClose={() => {
-                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    onOk={() => {
-                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
-                    height='100%'
-                    width='100%'
-                    cancelButton={true}
-                    okButton={false}
-                >
-                    <AddPattern
-                        soundData={soundData}
-                        updateSoundData={updateSoundData}
-                        sequenceIndex={addPatternDialogOpen.sequenceIndex}
-                        trackId={addPatternDialogOpen.trackId}
-                        size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
-                        sequencerPatternHeight={sequencerPatternHeight}
-                        sequencerNoteWidth={sequencerNoteWidth}
-                        setCurrentPatternId={updateCurrentPatternId}
-                        setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                        setTrack={setTrack}
-                        selectedPatterns={selectedPatterns}
-                        setSelectedPatterns={updateSelectedPatterns}
-                        setAddPatternDialogOpen={setAddPatternDialogOpen}
-                        stepsPerBar={stepsPerBar}
-                    />
-                </PopUpDialog>
-            }
-            {waveformDialogOpen !== '' &&
-                <PopUpDialog
-                    open={waveformDialogOpen !== ''}
-                    onClose={() => {
-                        setWaveformDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    onOk={() => {
-                        setWaveformDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
+                        {soundData.tracks.length === 0
+                            ? <VContainer grow={1} style={{ position: 'relative' }}>
+                                <EmptyContainer
+                                    title={nls.localize('vuengine/editors/sound/soundIsEmpty', 'This sound is empty')}
+                                    description={nls.localize(
+                                        'vuengine/editors/sound/clickBelowToAddFirstTrack',
+                                        'Click below to add the first track',
+                                    )}
+                                    onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
+                                />
+                            </VContainer>
+                            : <>
+                                {!sequencerHidden &&
+                                    <Sequencer
+                                        soundData={soundData}
+                                        tool={tool}
+                                        marqueeMode={marqueeMode}
+                                        updateSoundData={updateSoundData}
+                                        currentPlayerPosition={currentPlayerPosition}
+                                        setCurrentPlayerPosition={setCurrentPlayerPosition}
+                                        currentPatternId={currentPatternId}
+                                        setCurrentPatternId={updateCurrentPatternId}
+                                        currentTrackId={currentTrackId}
+                                        setCurrentTrackId={updateCurrentTrackId}
+                                        currentSequenceIndex={currentSequenceIndex}
+                                        setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                                        selectedPatterns={selectedPatterns}
+                                        setSelectedPatterns={updateSelectedPatterns}
+                                        toggleTrackMuted={toggleTrackMuted}
+                                        toggleTrackSolo={toggleTrackSolo}
+                                        toggleTrackSeeThrough={toggleTrackSeeThrough}
+                                        removeTrack={removeTrack}
+                                        addPattern={addPattern}
+                                        editCurrentTrack={editCurrentTrack}
+                                        editCurrentPattern={editCurrentPattern}
+                                        noteSnapping={noteSnapping}
+                                        effectsPanelHidden={effectsPanelHidden}
+                                        pianoRollNoteHeight={pianoRollNoteHeight}
+                                        pianoRollNoteWidth={pianoRollNoteWidth}
+                                        sequencerPatternHeight={sequencerPatternHeight}
+                                        setSequencerPatternHeight={setSequencerPatternHeight}
+                                        sequencerNoteWidth={sequencerNoteWidth}
+                                        setSequencerNoteWidth={setSequencerNoteWidth}
+                                        pianoRollScrollWindow={pianoRollScrollWindow}
+                                        setPatternSizes={setPatternSizes}
+                                        removePatternsFromSequence={removePatternsFromSequence}
+                                        trackSettings={trackSettings}
+                                        playRangeStart={playRangeStart}
+                                        setPlayRangeStart={setPlayRangeStart}
+                                        playRangeEnd={playRangeEnd}
+                                        setPlayRangeEnd={setPlayRangeEnd}
+                                        rangeDragStartStep={rangeDragStartStep}
+                                        setRangeDragStartStep={setRangeDragStartStep}
+                                        rangeDragEndStep={rangeDragEndStep}
+                                        setRangeDragEndStep={setRangeDragEndStep}
+                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        noteCursor={noteCursor}
+                                        stepsPerNote={stepsPerNote}
+                                        stepsPerBar={stepsPerBar}
+                                    />
+                                }
+                                <StyledLowerContainer>
+                                    {!eventListHidden &&
+                                        <EventList
+                                            soundData={soundData}
+                                            currentTrackId={currentTrackId}
+                                            currentSequenceIndex={currentSequenceIndex}
+                                            noteSnapping={noteSnapping}
+                                            pattern={soundData.patterns[currentPatternId]}
+                                            noteCursor={noteCursor}
+                                            setNotes={setNotes}
+                                            setNoteCursor={updateNoteCursor}
+                                        />
+                                    }
+                                    <PianoRoll
+                                        soundData={soundData}
+                                        tool={tool}
+                                        marqueeMode={marqueeMode}
+                                        currentPlayerPosition={currentPlayerPosition}
+                                        setCurrentPlayerPosition={setCurrentPlayerPosition}
+                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        noteCursor={noteCursor}
+                                        setNoteCursor={updateNoteCursor}
+                                        currentPatternId={currentPatternId}
+                                        currentTrackId={currentTrackId}
+                                        currentSequenceIndex={currentSequenceIndex}
+                                        setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                                        currentInstrumentId={currentInstrumentId}
+                                        setCurrentInstrumentId={updateCurrentInstrumentId}
+                                        playRangeStart={playRangeStart}
+                                        setPlayRangeStart={setPlayRangeStart}
+                                        playRangeEnd={playRangeEnd}
+                                        setPlayRangeEnd={setPlayRangeEnd}
+                                        playNote={playNote}
+                                        playing={playing}
+                                        testNote={testNote}
+                                        setNotes={setNotes}
+                                        addPattern={addPattern}
+                                        sequencerHidden={sequencerHidden}
+                                        setSequencerHidden={setSequencerHidden}
+                                        effectsPanelHidden={effectsPanelHidden}
+                                        setEffectsPanelHidden={setEffectsPanelHidden}
+                                        eventListHidden={eventListHidden}
+                                        setEventListHidden={setEventListHidden}
+                                        selectedNotes={selectedNotes}
+                                        setSelectedNotes={updateSelectedNotes}
+                                        noteSnapping={noteSnapping}
+                                        newNoteDuration={newNoteDuration}
+                                        pianoRollNoteHeight={pianoRollNoteHeight}
+                                        setPianoRollNoteHeight={setPianoRollNoteHeight}
+                                        pianoRollNoteWidth={pianoRollNoteWidth}
+                                        setPianoRollNoteWidth={setPianoRollNoteWidth}
+                                        sequencerPatternHeight={sequencerPatternHeight}
+                                        sequencerNoteWidth={sequencerNoteWidth}
+                                        setPianoRollScrollWindow={setPianoRollScrollWindow}
+                                        pianoRollScrollWindow={pianoRollScrollWindow}
+                                        editCurrentPattern={editCurrentPattern}
+                                        editCurrentNote={editCurrentNote}
+                                        trackSettings={trackSettings}
+                                        rangeDragStartStep={rangeDragStartStep}
+                                        setRangeDragStartStep={setRangeDragStartStep}
+                                        rangeDragEndStep={rangeDragEndStep}
+                                        setRangeDragEndStep={setRangeDragEndStep}
+                                        stepsPerNote={stepsPerNote}
+                                        stepsPerBar={stepsPerBar}
+                                    />
+                                </StyledLowerContainer>
+                            </>}
+                    </VContainer>
+                    <StyledSidebar className={showSidebar ? undefined : 'collapsed'}>
+                        <Tabs
+                            selectedIndex={sidebarTab}
+                            onSelect={setSidebarTab}
+                        >
+                            <TabList>
+                                {([
+                                    {
+                                        tooltip: nls.localize('vuengine/editors/sound/properties', 'Properties'),
+                                        icon: <FadersHorizontal size={22} />
+                                    },
+                                    {
+                                        tooltip: `${nls.localize('vuengine/editors/sound/instrumentEditor', 'Instrument Editor')}${services.vesCommonService.getKeybindingLabel(
+                                            SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true
+                                        )}`,
+                                        icon: <Guitar size={22} />
+                                    },
+                                    {
+                                        tooltip: nls.localize('vuengine/editors/sound/currentTrack', 'Current Track'),
+                                        icon: <RoadHorizon size={22} />
+                                    },
+                                    {
+                                        tooltip: nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern'),
+                                        icon: <Rectangle size={22} />
+                                    },
+                                    {
+                                        tooltip: nls.localize('vuengine/editors/sound/currentNote', 'Current Note'),
+                                        icon: <MusicNote size={22} />
+                                    },
+                                    {
+                                        tooltip: nls.localize('vuengine/editors/sound/utilities', 'Utilities'),
+                                        icon: <Wrench size={22} />
+                                    },
+                                    {
+                                        tooltip: nls.localizeByDefault('Keybindings'),
+                                        icon: <Keyboard size={22} />
+                                    }
+                                ] as { tooltip: string, icon: ReactElement }[]).map((t, i) =>
+                                    <Tab
+                                        key={i}
+                                        onMouseEnter={event => {
+                                            services.hoverService.requestHover({
+                                                content: t.tooltip,
+                                                target: event.currentTarget,
+                                                position: 'top',
+                                            });
+                                        }}
+                                        onMouseLeave={event => {
+                                            services.hoverService.cancelHover();
+                                        }}
+                                    >
+                                        {t.icon}
+                                    </Tab>
+                                )}
+                            </TabList>
+                            <TabPanel>
+                                <Properties
+                                    soundData={soundData}
+                                    beats={beats}
+                                    bar={bar}
+                                    updateSoundData={updateSoundData}
+                                    setNewNoteDuration={setNewNoteDuration}
+                                    setCurrentPlayerPosition={setCurrentPlayerPosition}
+                                    stepsPerNote={stepsPerNote}
+                                    stepsPerBar={stepsPerBar}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <Instruments
+                                    soundData={soundData}
+                                    updateSoundData={updateSoundData}
+                                    currentEditedInstrumentId={currentEditedInstrumentId}
+                                    setCurrentEditedInstrumentId={setCurrentEditedInstrumentId}
+                                    setCurrentInstrumentId={setCurrentInstrumentId}
+                                    setInstruments={setInstruments}
+                                    setWaveformDialogOpen={setWaveformDialogOpen}
+                                    setModulationDataDialogOpen={setModulationDataDialogOpen}
+                                    setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
+                                    playingTestNote={playing && !!testNote}
+                                    playNote={playNote}
+                                    emulatorInitialized={emulatorInitialized}
+                                    setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <CurrentTrack
+                                    soundData={soundData}
+                                    setSoundData={updateSoundData}
+                                    currentTrackId={currentTrackId}
+                                    setCurrentTrackId={updateCurrentTrackId}
+                                    setTrack={setTrack}
+                                    removeTrack={removeTrack}
+                                    editInstrument={editInstrument}
+                                    isTrackAvailable={isTrackAvailable}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <CurrentPattern
+                                    soundData={soundData}
+                                    updateSoundData={updateSoundData}
+                                    currentTrackId={currentTrackId}
+                                    currentPatternId={currentPatternId}
+                                    setCurrentPatternId={updateCurrentPatternId}
+                                    setPattern={setPattern}
+                                    setPatternSizes={setPatternSizes}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <NoteProperties
+                                    soundData={soundData}
+                                    currentTrackId={currentTrackId}
+                                    noteSnapping={noteSnapping}
+                                    setNoteSnapping={setNoteSnapping}
+                                    noteCursor={noteCursor}
+                                    setNoteCursor={updateNoteCursor}
+                                    currentSequenceIndex={currentSequenceIndex}
+                                    pattern={soundData.patterns[currentPatternId]}
+                                    emulatorInitialized={emulatorInitialized}
+                                    playingTestNote={playing && !!testNote}
+                                    playNote={playNote}
+                                    setNotes={setNotes}
+                                    newNoteDuration={newNoteDuration}
+                                    stepsPerBar={stepsPerBar}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <Utilities
+                                    soundData={soundData}
+                                    updateSoundData={updateSoundData}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                <Keybindings />
+                            </TabPanel>
+                        </Tabs>
+                    </StyledSidebar>
+                    {addTrackDialogOpen &&
+                        <PopUpDialog
+                            open={addTrackDialogOpen}
+                            onClose={() => {
+                                setAddTrackDialogOpen(false);
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            onOk={() => {
+                                setAddTrackDialogOpen(false);
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
+                            height='300px'
+                            width='438px'
+                            cancelButton={true}
+                            okButton={false}
+                        >
+                            <AddTrack
+                                soundData={soundData}
+                                updateSoundData={updateSoundData}
+                                trackSettings={trackSettings}
+                                setTrackSettings={setTrackSettings}
+                                isTrackAvailable={isTrackAvailable}
+                                setAddTrackDialogOpen={setAddTrackDialogOpen}
+                            />
+                        </PopUpDialog>
                     }
-                    height='100%'
-                    width='100%'
-                    maxWidth='1600px'
-                >
-                    <WaveformWithPresets
-                        value={soundData.instruments[waveformDialogOpen].waveform}
-                        setValue={value => setInstrumentWaveForm(waveformDialogOpen, value)}
-                    />
-                </PopUpDialog>
-            }
-            {modulationDataDialogOpen !== '' &&
-                <PopUpDialog
-                    open={modulationDataDialogOpen !== ''}
-                    onClose={() => {
-                        setModulationDataDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    onOk={() => {
-                        setModulationDataDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
-                    height='100%'
-                    width='100%'
-                    maxWidth='1600px'
-                >
-                    {soundData.instruments[modulationDataDialogOpen] &&
-                        <ModulationDataWithPresets
-                            value={soundData.instruments[modulationDataDialogOpen].modulationData}
-                            setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
-                        />
+                    {addPatternDialogOpen.trackId > -1 &&
+                        <PopUpDialog
+                            open={addPatternDialogOpen.trackId > -1}
+                            onClose={() => {
+                                setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            onOk={() => {
+                                setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
+                            height='100%'
+                            width='100%'
+                            cancelButton={true}
+                            okButton={false}
+                        >
+                            <AddPattern
+                                soundData={soundData}
+                                updateSoundData={updateSoundData}
+                                sequenceIndex={addPatternDialogOpen.sequenceIndex}
+                                trackId={addPatternDialogOpen.trackId}
+                                size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
+                                sequencerPatternHeight={sequencerPatternHeight}
+                                sequencerNoteWidth={sequencerNoteWidth}
+                                setCurrentPatternId={updateCurrentPatternId}
+                                setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                                setTrack={setTrack}
+                                selectedPatterns={selectedPatterns}
+                                setSelectedPatterns={updateSelectedPatterns}
+                                setAddPatternDialogOpen={setAddPatternDialogOpen}
+                                stepsPerBar={stepsPerBar}
+                            />
+                        </PopUpDialog>
                     }
-                </PopUpDialog>
-            }
-            {instrumentColorDialogOpen !== '' &&
-                <PopUpDialog
-                    open={instrumentColorDialogOpen !== ''}
-                    onClose={() => {
-                        setInstrumentColorDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    onOk={() => {
-                        setInstrumentColorDialogOpen('');
-                        enableCommands();
-                        focusEditor();
-                    }}
-                    title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
-                    height='240px'
-                    width='534px'
-                >
-                    {soundData.instruments[instrumentColorDialogOpen] &&
-                        <PaletteColorSelect
-                            color={soundData.instruments[instrumentColorDialogOpen].color}
-                            updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
-                        />
+                    {waveformDialogOpen !== '' &&
+                        <PopUpDialog
+                            open={waveformDialogOpen !== ''}
+                            onClose={() => {
+                                setWaveformDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            onOk={() => {
+                                setWaveformDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
+                            }
+                            height='100%'
+                            width='100%'
+                            maxWidth='1600px'
+                        >
+                            <WaveformWithPresets
+                                value={soundData.instruments[waveformDialogOpen].waveform}
+                                setValue={value => setInstrumentWaveForm(waveformDialogOpen, value)}
+                            />
+                        </PopUpDialog>
                     }
-                </PopUpDialog>
-            }
+                    {modulationDataDialogOpen !== '' &&
+                        <PopUpDialog
+                            open={modulationDataDialogOpen !== ''}
+                            onClose={() => {
+                                setModulationDataDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            onOk={() => {
+                                setModulationDataDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
+                            height='100%'
+                            width='100%'
+                            maxWidth='1600px'
+                        >
+                            {soundData.instruments[modulationDataDialogOpen] &&
+                                <ModulationDataWithPresets
+                                    value={soundData.instruments[modulationDataDialogOpen].modulationData}
+                                    setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
+                                />
+                            }
+                        </PopUpDialog>
+                    }
+                    {instrumentColorDialogOpen !== '' &&
+                        <PopUpDialog
+                            open={instrumentColorDialogOpen !== ''}
+                            onClose={() => {
+                                setInstrumentColorDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            onOk={() => {
+                                setInstrumentColorDialogOpen('');
+                                enableCommands();
+                                focusEditor();
+                            }}
+                            title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
+                            height='240px'
+                            width='534px'
+                        >
+                            {soundData.instruments[instrumentColorDialogOpen] &&
+                                <PaletteColorSelect
+                                    color={soundData.instruments[instrumentColorDialogOpen].color}
+                                    updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
+                                />
+                            }
+                        </PopUpDialog>
+                    }
+                </>}
         </HContainer>
     );
 }

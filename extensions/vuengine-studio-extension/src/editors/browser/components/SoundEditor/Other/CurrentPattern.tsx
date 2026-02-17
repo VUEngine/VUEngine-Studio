@@ -1,11 +1,13 @@
 import { Copy, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
+import EmptyContainer from '../../Common/EmptyContainer';
 import { nanoid } from '../../Common/Utils';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
 import { getPatternName, getTrackTypeLabel } from '../SoundEditor';
@@ -18,6 +20,7 @@ import {
     SoundEditorTrackType,
     TrackConfig
 } from '../SoundEditorTypes';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 
 interface CurrentPatternProps {
     soundData: SoundData
@@ -36,6 +39,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         currentPatternId, setCurrentPatternId,
         setPattern, setPatternSizes,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const pattern = soundData.patterns[currentPatternId];
 
@@ -99,81 +103,101 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         }
     };
 
-    return pattern
-        ? <VContainer gap={20} style={{ userSelect: 'none' }}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}
-                </label>
-                <InputWithAction>
-                    <AdvancedSelect
-                        options={Object.keys(soundData.patterns).map((patternId, i) => ({
-                            label: getPatternName(soundData, patternId),
-                            value: patternId,
-                        }))}
-                        defaultValue={currentPatternId.toString()}
-                        onChange={options => setCurrentPatternId(currentTrackId, options[0])}
-                    />
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
-                        onClick={cloneCurrentPattern}
-                        disabled={!pattern}
-                    >
-                        <Copy size={16} />
-                    </InputWithActionButton>
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localizeByDefault('Remove')}
-                        onClick={removeCurrentPattern}
-                        disabled={!pattern}
-                    >
-                        <Trash size={16} />
-                    </InputWithActionButton>
-                </InputWithAction>
+    return Object.keys(soundData.patterns).length === 0
+        ? (
+            <EmptyContainer
+                title={nls.localize('vuengine/editors/sound/noPatterns', 'There are no patterns')}
+                description={nls.localize(
+                    'vuengine/editors/sound/clickBelowToAddFirstPattern',
+                    'Click below to add the first pattern',
+                )}
+                onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_PATTERN.id)}
+            />
+        )
+        : (
+            <VContainer gap={20} grow={1} style={{ userSelect: 'none' }}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/sound/currentPattern', 'Current Pattern')}
+                    </label>
+                    <InputWithAction>
+                        <AdvancedSelect
+                            options={Object.keys(soundData.patterns).map((patternId, i) => ({
+                                label: getPatternName(soundData, patternId),
+                                value: patternId,
+                            }))}
+                            defaultValue={currentPatternId.toString()}
+                            onChange={options => setCurrentPatternId(currentTrackId, options[0])}
+                        />
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localize('vuengine/editors/sound/clone', 'Clone')}
+                            onClick={cloneCurrentPattern}
+                            disabled={!pattern}
+                        >
+                            <Copy size={16} />
+                        </InputWithActionButton>
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localizeByDefault('Remove')}
+                            onClick={removeCurrentPattern}
+                            disabled={!pattern}
+                        >
+                            <Trash size={16} />
+                        </InputWithActionButton>
+                    </InputWithAction>
+                </VContainer>
+                {pattern
+                    ? (<>
+                        <VContainer>
+                            <label>
+                                {nls.localizeByDefault('Name')}
+                            </label>
+                            <Input
+                                value={pattern.name ?? ''}
+                                setValue={setPatternName}
+                            />
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/editors/sound/type', 'Type')}
+                            </label>
+                            <AdvancedSelect
+                                options={[{
+                                    value: SoundEditorTrackType.WAVE,
+                                    label: getTrackTypeLabel(SoundEditorTrackType.WAVE),
+                                }, {
+                                    value: SoundEditorTrackType.SWEEPMOD,
+                                    label: getTrackTypeLabel(SoundEditorTrackType.SWEEPMOD),
+                                }, {
+                                    value: SoundEditorTrackType.NOISE,
+                                    label: getTrackTypeLabel(SoundEditorTrackType.NOISE),
+                                }]}
+                                defaultValue={pattern.type}
+                                onChange={options => setPatternType(options[0] as SoundEditorTrackType)}
+                                containerStyle={{ flexGrow: 1 }}
+                            />
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/editors/sound/size', 'Size')}
+                            </label>
+                            <Range
+                                value={pattern.size}
+                                setValue={v => setPatternSizes({
+                                    [currentPatternId]: v as number,
+                                })}
+                                min={PATTERN_SIZE_MIN}
+                                max={PATTERN_SIZE_MAX}
+                            />
+                        </VContainer>
+                    </>)
+                    : (
+                        <VContainer alignItems='center' grow={1} justifyContent='center' className='lightLabel'>
+                            {nls.localize('vuengine/editors/sound/selectPatternToEdit', 'Select a pattern to edit')}
+                        </VContainer>
+                    )
+                }
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localizeByDefault('Name')}
-                </label>
-                <Input
-                    value={pattern.name ?? ''}
-                    setValue={setPatternName}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/sound/type', 'Type')}
-                </label>
-                <AdvancedSelect
-                    options={[{
-                        value: SoundEditorTrackType.WAVE,
-                        label: getTrackTypeLabel(SoundEditorTrackType.WAVE),
-                    }, {
-                        value: SoundEditorTrackType.SWEEPMOD,
-                        label: getTrackTypeLabel(SoundEditorTrackType.SWEEPMOD),
-                    }, {
-                        value: SoundEditorTrackType.NOISE,
-                        label: getTrackTypeLabel(SoundEditorTrackType.NOISE),
-                    }]}
-                    defaultValue={pattern.type}
-                    onChange={options => setPatternType(options[0] as SoundEditorTrackType)}
-                    containerStyle={{ flexGrow: 1 }}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/editors/sound/size', 'Size')}
-                </label>
-                <Range
-                    value={pattern.size}
-                    setValue={v => setPatternSizes({
-                        [currentPatternId]: v as number,
-                    })}
-                    min={PATTERN_SIZE_MIN}
-                    max={PATTERN_SIZE_MAX}
-                />
-            </VContainer>
-        </VContainer>
-        : <></>;
+        );
 }

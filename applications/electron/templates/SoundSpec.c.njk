@@ -226,13 +226,13 @@ SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	// Priority for sound channel usage
-	{{ track.priority }},
+	{{ track.priority | default(0) }},
 
 	// Skip if no sound source available?
-	{{ track.skippable }},
+	{{ track.skippable | default(true) }},
 
 	// Loop back point (cursor)
-	{{ trackKeyframes.loopKeyframe }},
+	{{ trackKeyframes.loopKeyframe | default(0) }},
 
 	// Keyframes that define the track
 	(SoundTrackKeyframe*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes,
