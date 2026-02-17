@@ -1410,149 +1410,150 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             </TabPanel>
                         </Tabs>
                     </StyledSidebar>
-                    {addTrackDialogOpen &&
-                        <PopUpDialog
-                            open={addTrackDialogOpen}
-                            onClose={() => {
-                                setAddTrackDialogOpen(false);
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            onOk={() => {
-                                setAddTrackDialogOpen(false);
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
-                            height='300px'
-                            width='438px'
-                            cancelButton={true}
-                            okButton={false}
-                        >
-                            <AddTrack
-                                soundData={soundData}
-                                updateSoundData={updateSoundData}
-                                trackSettings={trackSettings}
-                                setTrackSettings={setTrackSettings}
-                                isTrackAvailable={isTrackAvailable}
-                                setAddTrackDialogOpen={setAddTrackDialogOpen}
-                            />
-                        </PopUpDialog>
-                    }
-                    {addPatternDialogOpen.trackId > -1 &&
-                        <PopUpDialog
-                            open={addPatternDialogOpen.trackId > -1}
-                            onClose={() => {
-                                setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            onOk={() => {
-                                setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
-                            height='100%'
-                            width='100%'
-                            cancelButton={true}
-                            okButton={false}
-                        >
-                            <AddPattern
-                                soundData={soundData}
-                                updateSoundData={updateSoundData}
-                                sequenceIndex={addPatternDialogOpen.sequenceIndex}
-                                trackId={addPatternDialogOpen.trackId}
-                                size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
-                                sequencerPatternHeight={sequencerPatternHeight}
-                                sequencerNoteWidth={sequencerNoteWidth}
-                                setCurrentPatternId={updateCurrentPatternId}
-                                setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                                setTrack={setTrack}
-                                selectedPatterns={selectedPatterns}
-                                setSelectedPatterns={updateSelectedPatterns}
-                                setAddPatternDialogOpen={setAddPatternDialogOpen}
-                                stepsPerBar={stepsPerBar}
-                            />
-                        </PopUpDialog>
-                    }
-                    {waveformDialogOpen !== '' &&
-                        <PopUpDialog
-                            open={waveformDialogOpen !== ''}
-                            onClose={() => {
-                                setWaveformDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            onOk={() => {
-                                setWaveformDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
-                            }
-                            height='100%'
-                            width='100%'
-                            maxWidth='1600px'
-                        >
-                            <WaveformWithPresets
-                                value={soundData.instruments[waveformDialogOpen].waveform}
-                                setValue={value => setInstrumentWaveForm(waveformDialogOpen, value)}
-                            />
-                        </PopUpDialog>
-                    }
-                    {modulationDataDialogOpen !== '' &&
-                        <PopUpDialog
-                            open={modulationDataDialogOpen !== ''}
-                            onClose={() => {
-                                setModulationDataDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            onOk={() => {
-                                setModulationDataDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
-                            height='100%'
-                            width='100%'
-                            maxWidth='1600px'
-                        >
-                            {soundData.instruments[modulationDataDialogOpen] &&
-                                <ModulationDataWithPresets
-                                    value={soundData.instruments[modulationDataDialogOpen].modulationData}
-                                    setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
-                                />
-                            }
-                        </PopUpDialog>
-                    }
-                    {instrumentColorDialogOpen !== '' &&
-                        <PopUpDialog
-                            open={instrumentColorDialogOpen !== ''}
-                            onClose={() => {
-                                setInstrumentColorDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            onOk={() => {
-                                setInstrumentColorDialogOpen('');
-                                enableCommands();
-                                focusEditor();
-                            }}
-                            title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
-                            height='240px'
-                            width='534px'
-                        >
-                            {soundData.instruments[instrumentColorDialogOpen] &&
-                                <PaletteColorSelect
-                                    color={soundData.instruments[instrumentColorDialogOpen].color}
-                                    updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
-                                />
-                            }
-                        </PopUpDialog>
-                    }
                 </>}
+
+            {addTrackDialogOpen &&
+                <PopUpDialog
+                    open={addTrackDialogOpen}
+                    onClose={() => {
+                        setAddTrackDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setAddTrackDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/addTrack', 'Add Track')}
+                    height='300px'
+                    width='438px'
+                    cancelButton={true}
+                    okButton={false}
+                >
+                    <AddTrack
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        trackSettings={trackSettings}
+                        setTrackSettings={setTrackSettings}
+                        isTrackAvailable={isTrackAvailable}
+                        setAddTrackDialogOpen={setAddTrackDialogOpen}
+                    />
+                </PopUpDialog>
+            }
+            {addPatternDialogOpen.trackId > -1 &&
+                <PopUpDialog
+                    open={addPatternDialogOpen.trackId > -1}
+                    onClose={() => {
+                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setAddPatternDialogOpen({ trackId: -1, sequenceIndex: -1 });
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/addPattern', 'Add Pattern')}
+                    height='100%'
+                    width='100%'
+                    cancelButton={true}
+                    okButton={false}
+                >
+                    <AddPattern
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        sequenceIndex={addPatternDialogOpen.sequenceIndex}
+                        trackId={addPatternDialogOpen.trackId}
+                        size={addPatternDialogOpen.size !== undefined && addPatternDialogOpen.size > -1 ? addPatternDialogOpen.size : undefined}
+                        sequencerPatternHeight={sequencerPatternHeight}
+                        sequencerNoteWidth={sequencerNoteWidth}
+                        setCurrentPatternId={updateCurrentPatternId}
+                        setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                        setTrack={setTrack}
+                        selectedPatterns={selectedPatterns}
+                        setSelectedPatterns={updateSelectedPatterns}
+                        setAddPatternDialogOpen={setAddPatternDialogOpen}
+                        stepsPerBar={stepsPerBar}
+                    />
+                </PopUpDialog>
+            }
+            {waveformDialogOpen !== '' &&
+                <PopUpDialog
+                    open={waveformDialogOpen !== ''}
+                    onClose={() => {
+                        setWaveformDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setWaveformDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/editWaveform', 'Edit Waveform')
+                    }
+                    height='100%'
+                    width='100%'
+                    maxWidth='1600px'
+                >
+                    <WaveformWithPresets
+                        value={soundData.instruments[waveformDialogOpen].waveform}
+                        setValue={value => setInstrumentWaveForm(waveformDialogOpen, value)}
+                    />
+                </PopUpDialog>
+            }
+            {modulationDataDialogOpen !== '' &&
+                <PopUpDialog
+                    open={modulationDataDialogOpen !== ''}
+                    onClose={() => {
+                        setModulationDataDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setModulationDataDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/editModulationData', 'Edit Modulation Data')}
+                    height='100%'
+                    width='100%'
+                    maxWidth='1600px'
+                >
+                    {soundData.instruments[modulationDataDialogOpen] &&
+                        <ModulationDataWithPresets
+                            value={soundData.instruments[modulationDataDialogOpen].modulationData}
+                            setValue={value => setInstrumentModulationData(modulationDataDialogOpen, value)}
+                        />
+                    }
+                </PopUpDialog>
+            }
+            {instrumentColorDialogOpen !== '' &&
+                <PopUpDialog
+                    open={instrumentColorDialogOpen !== ''}
+                    onClose={() => {
+                        setInstrumentColorDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        setInstrumentColorDialogOpen('');
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/editInstrumentColor', 'Edit Instrument Color')}
+                    height='240px'
+                    width='534px'
+                >
+                    {soundData.instruments[instrumentColorDialogOpen] &&
+                        <PaletteColorSelect
+                            color={soundData.instruments[instrumentColorDialogOpen].color}
+                            updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
+                        />
+                    }
+                </PopUpDialog>
+            }
         </HContainer>
     );
 }
