@@ -1,11 +1,9 @@
 import { deepClone } from '@theia/core';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getPatternName } from '../SoundEditor';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     PatternConfig,
     SequenceMap,
@@ -101,7 +99,6 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         removePatternsFromSequence,
         stepsPerBar,
     } = props;
-    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState(false);
     const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const nodeRef = useRef(null);
@@ -320,18 +317,18 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         editCurrentPattern();
     };
 
-    const commandListener = (commandId: string): void => {
-        switch (commandId) {
-            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
-                setCancelPatternDrag(true);
-                break;
+    const onKeyDown = (e: KeyboardEvent): void => {
+        if (isDragging && !e.repeat && e.code === 'Escape') {
+            setCancelPatternDrag(true);
+            setPatternDragDelta({ x: 0, y: 0 });
+            setIsDragging(false);
         }
     };
 
     useEffect(() => {
-        const disp = onCommandExecute(commandListener);
-        return () => disp.dispose();
-    }, []);
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [isDragging]);
 
     return (
         <Draggable

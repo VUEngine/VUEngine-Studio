@@ -5,7 +5,6 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EventsMap,
     NOTE_PLAY_STOP_DELAY,
@@ -99,7 +98,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         playing, testNote,
         stepsPerNote, stepsPerBar,
     } = props;
-    const { currentThemeType, services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const [noteDragInitialX, setNoteDragInitialX] = useState<number>(-1);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -732,22 +731,21 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         trackSettings,
     ]);
 
-    const commandListener = (commandId: string): void => {
-        if (soundData.tracks.length === 0) {
-            return;
-        }
-        switch (commandId) {
-            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
-                resetMarquee();
-                resetNoteDrag();
-                break;
+    const onKeyDown = (e: KeyboardEvent): void => {
+        if (!e.repeat && e.code === 'Escape' &&
+            (noteDragStartStep !== -1 || marqueeStartStep !== -1)) {
+            resetMarquee();
+            resetNoteDrag();
         }
     };
 
     useEffect(() => {
-        const disp = onCommandExecute(commandListener);
-        return () => disp.dispose();
-    }, []);
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [
+        noteDragStartStep,
+        marqueeStartStep,
+    ]);
 
     return (
         <canvas

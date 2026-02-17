@@ -1,13 +1,11 @@
 import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { getMaxNoteDuration } from '../Other/Note';
 import { getNoteSlideLabel } from '../SoundEditor';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EventsMap,
     NOTES_LABELS,
@@ -135,7 +133,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         newNoteDuration,
         editCurrentNote,
     } = props;
-    const { onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
@@ -447,18 +444,18 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         }
     };
 
-    const commandListener = (commandId: string): void => {
-        switch (commandId) {
-            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
-                setCancelNoteDrag(true);
-                break;
+    const onKeyDown = (e: KeyboardEvent): void => {
+        if (isDragging && !e.repeat && e.code === 'Escape') {
+            setCancelNoteDrag(true);
+            setNoteDragDelta({ x: 0, y: 0 });
+            setIsDragging(false);
         }
     };
 
     useEffect(() => {
-        const disp = onCommandExecute(commandListener);
-        return () => disp.dispose();
-    }, []);
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [isDragging]);
 
     return (
         <Draggable

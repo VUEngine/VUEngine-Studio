@@ -6,7 +6,6 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
-import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     DEFAULT_BARS_PER_PATTERN,
     NOTES_LABELS,
@@ -106,7 +105,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         noteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
-    const { currentThemeType, services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
     const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
@@ -832,20 +831,23 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         noteCursor,
     ]);
 
-    const commandListener = (commandId: string): void => {
-        switch (commandId) {
-            case SoundEditorCommands.CANCEL_CURRENT_ACTION.id:
-                resetPatternDrag();
-                resetRangeDrag();
-                resetMarquee();
-                break;
+    const onKeyDown = (e: KeyboardEvent): void => {
+        if (!e.repeat && e.code === 'Escape' &&
+            (rangeDragStartStep !== -1 || patternDragStartStep !== -1 || marqueeStartStep !== -1)) {
+            resetPatternDrag();
+            resetRangeDrag();
+            resetMarquee();
         }
     };
 
     useEffect(() => {
-        const disp = onCommandExecute(commandListener);
-        return () => disp.dispose();
-    }, []);
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [
+        rangeDragStartStep,
+        patternDragStartStep,
+        marqueeStartStep,
+    ]);
 
     return (
         <StyledSequencerCanvas
