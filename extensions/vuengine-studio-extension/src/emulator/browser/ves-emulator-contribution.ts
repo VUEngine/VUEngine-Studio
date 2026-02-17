@@ -17,10 +17,12 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(EmulatorCommands.RUN, {
+      isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.run(),
     });
     commandRegistry.registerCommand(EmulatorCommands.SELECT, {
+      isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.selectEmulator(),
     });

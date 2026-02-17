@@ -20,6 +20,7 @@ export class VesProjectContribution implements CommandContribution {
             execute: () => !this.vesNewProjectDialog.isVisible && this.vesNewProjectDialog.open()
         });
         commandRegistry.registerCommand(VesProjectCommands.UPDATE_FILES, {
+            isEnabled: () => this.workspaceService.opened,
             isVisible: () => this.workspaceService.opened,
             execute: () => this.vesProjectService.showUpdateModeSelection(),
         });

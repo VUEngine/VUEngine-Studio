@@ -17,6 +17,7 @@ export class VesExportContribution implements CommandContribution, KeybindingCon
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesExportCommands.EXPORT, {
+      isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: async () => this.vesExportService.doExport(),
     });

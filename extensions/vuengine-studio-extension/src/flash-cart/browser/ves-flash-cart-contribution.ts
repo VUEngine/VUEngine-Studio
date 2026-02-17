@@ -17,6 +17,7 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesFlashCartCommands.FLASH, {
+      isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesFlashCartService.doFlash(),
     });

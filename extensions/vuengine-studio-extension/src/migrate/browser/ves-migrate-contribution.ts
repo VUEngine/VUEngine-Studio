@@ -14,6 +14,7 @@ export class VesMigrateContribution implements CommandContribution, MenuContribu
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesMigrateCommands.MIGRATE, {
+      isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesMigrateService.migrate(),
     });

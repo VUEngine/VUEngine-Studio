@@ -27,18 +27,18 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCommands.CLEAN, {
-      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isEnabled: () => this.workspaceService.opened && !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesBuildService.doClean(),
     });
     commandRegistry.registerCommand(VesBuildCommands.BUILD, {
-      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isEnabled: () => this.workspaceService.opened && !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       execute: (force: boolean = false) => this.vesBuildService.doBuild(force),
     });
 
     commandRegistry.registerCommand(VesBuildCommands.SET_MODE, {
-      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isEnabled: () => this.workspaceService.opened && !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       execute: async (buildMode?: BuildMode) => {
         if (buildMode) {
@@ -50,7 +50,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_DUMP_ELF, {
-      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isEnabled: () => this.workspaceService.opened && !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF),
       execute: () => {
@@ -60,7 +60,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS, {
-      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isEnabled: () => this.workspaceService.opened && !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
       execute: () => {

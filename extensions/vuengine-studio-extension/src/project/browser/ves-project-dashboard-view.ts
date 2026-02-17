@@ -25,6 +25,8 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesProjectCommands.DASHBOARD_SHOW, {
+            isEnabled: () => this.workspaceService.opened,
+            isVisible: () => this.workspaceService.opened,
             execute: async () => {
                 if (this.workspaceService.opened) {
                     await this.openView({
