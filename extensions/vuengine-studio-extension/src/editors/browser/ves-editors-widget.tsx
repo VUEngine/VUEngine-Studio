@@ -10,6 +10,7 @@ import {
     LocalStorageService,
     lock,
     NavigatableWidget,
+    NavigatableWidgetOptions,
     OpenerService,
     Saveable,
     SaveableSource,
@@ -50,9 +51,8 @@ import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EditorsContext } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
-export interface VesEditorsWidgetOptions {
+export interface VesEditorsWidgetOptions extends NavigatableWidgetOptions {
     typeId: string
-    uri: string
 }
 
 export interface ItemData {

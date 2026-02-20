@@ -1,4 +1,4 @@
-import { WidgetOpenHandler } from '@theia/core/lib/browser';
+import { NavigatableWidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
@@ -6,7 +6,7 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 
 @injectable()
-export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsWidget> {
+export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEditorsWidget> {
     @inject(VesProjectService)
     protected vesProjectService: VesProjectService;
 
@@ -29,6 +29,7 @@ export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsWidget> {
         return {
             typeId: this.typeId,
             uri: uri.withoutFragment().toString(),
+            kind: 'navigatable',
         };
     }
 }

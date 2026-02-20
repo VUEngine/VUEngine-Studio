@@ -7,6 +7,7 @@ import '../../../src/editors/browser/style/index.css';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsContribution } from './ves-editors-contribution';
 import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
+import { VesEditorsNavigationContribution } from './ves-editors-navigation-contribution';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
 import { VesEditorsPreferenceSchema } from './ves-editors-preferences';
 import { VesEditorsViewContribution } from './ves-editors-view';
@@ -27,8 +28,15 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesEditorsContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(VesEditorsContribution);
 
+    // add to navigation history, e.g. "recently opened"
+    bind(VesEditorsNavigationContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesEditorsNavigationContribution);
+
+    // open handler
+    bind(VesEditorsOpenHandler).toSelf().inSingletonScope();
+    bind(OpenHandler).toService(VesEditorsOpenHandler);
+
     // editors view
-    bind(OpenHandler).to(VesEditorsOpenHandler).inSingletonScope();
     bind(VesEditorsViewContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesEditorsViewContribution);
     bind(KeybindingContribution).toService(VesEditorsViewContribution);
