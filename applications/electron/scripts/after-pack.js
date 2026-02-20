@@ -11,14 +11,18 @@ const asyncRimraf = util.promisify(rimraf);
 const DELETE_PATHS = [
     'node_modules/unzip-stream/aa.zip',
     'node_modules/unzip-stream/testData*',
-    'vuengine/core/.git',
-    'vuengine/core/.gitattributes',
-    'vuengine/core/.github',
-    'vuengine/core/.gitignore',
-    'vuengine/plugins/.git',
-    'vuengine/plugins/.gitattributes',
-    'vuengine/plugins/.github',
-    'vuengine/plugins/.gitignore',
+    'vb/vuengine/core/.git',
+    'vb/vuengine/core/.gitattributes',
+    'vb/vuengine/core/.github',
+    'vb/vuengine/core/.gitignore',
+    'vb/vuengine/plugins/.git',
+    'vb/vuengine/plugins/.gitattributes',
+    'vb/vuengine/plugins/.github',
+    'vb/vuengine/plugins/.gitignore',
+    'vb/libgccvb/.git',
+    'vb/libgccvb/.gitattributes',
+    'vb/libgccvb/.github',
+    'vb/libgccvb/.gitignore',
 ];
 
 const EXECUTABLE_PATHS = [
@@ -30,11 +34,11 @@ const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/hf-cli/hfcli',
     'binaries/vuengine-studio-tools/${os}/make/make',
     'binaries/vuengine-studio-tools/${os}/prog-vb/prog-vb',
-    'vuengine/core/lib/compiler/preprocessor',
+    'vb/vuengine/core/lib/compiler/preprocessor',
 ];
 
 const LIBRARY_PATHS = [
-    'vuengine',
+    'vb',
 ];
 
 const signCommand = path.join(__dirname, 'sign.sh');

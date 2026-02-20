@@ -33,8 +33,8 @@ files:
     to: documentation
   - from: templates
     to: templates
-  - from: vuengine
-    to: vuengine
+  - from: vb
+    to: vb
 extraResources:
   - from: ../../plugins
     to: app/plugins

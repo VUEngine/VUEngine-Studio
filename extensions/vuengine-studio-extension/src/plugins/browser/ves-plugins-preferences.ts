@@ -19,9 +19,9 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
                 'vuengine/plugins/preferences/libraryPathDescription',
                 'Full path to plugins library. Must be a folder named "plugins" inside a parent folder named "vuengine". \
 Must not live inside the VUEngine Core or user plugins directories. Must not contain repeated occurences of any of the terms "core", \
-"plugins", "user" or "vuengine". Uses built-in VUEngine Plugins library when left blank.'
+"plugins", "user" or "vuengine".'
             ),
-            default: '',
+            default: '%BUILTIN%/vuengine/plugins',
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,
@@ -44,6 +44,7 @@ Must not live inside the VUEngine Core or user plugins directories. Must not con
 Must not live inside the VUEngine Plugins or Core directories. Must not contain repeated occurences of any of the terms "core", \
 "plugins", "user" or "vuengine". Defaults to [HOME]/vuengine/plugins if left blank.'
             ),
+            default: '',
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,
