@@ -288,7 +288,7 @@ export class VesCodeGenService {
           }
 
           await Promise.all(type.templates.map(async template => {
-            const count = await this.renderTemplate(template, generationMode, fileUri ?? inferredFileUri);
+            const count = await this.renderTemplate(typeId, template, generationMode, fileUri ?? inferredFileUri);
             numberOfGeneratedFiles += count;
           }));
         };
@@ -460,7 +460,7 @@ export class VesCodeGenService {
     return result;
   }
 
-  protected async renderTemplate(template: ProjectDataTemplate, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
+  protected async renderTemplate(typeId: string, template: ProjectDataTemplate, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
     await this.vesProjectService.projectDataReady;
 
     if (template.enabled === false) {
@@ -496,9 +496,11 @@ export class VesCodeGenService {
 
           const fileContents = await this.fileService.readFile(i._fileUri);
           const fileContentsJson = JSON.parse(fileContents.value.toString());
+          const data = await this.vesProjectService.getSchemaDefaults(PROJECT_TYPES[typeId], fileContentsJson);
+
           toRender.push({
             item: {
-              ...fileContentsJson,
+              ...data,
               _filename: i._fileUri.path.name,
               _folder: i._fileUri.parent.path.name,
             },
