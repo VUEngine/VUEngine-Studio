@@ -1,5 +1,5 @@
 import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, MessageService, PreferenceScope, PreferenceService, isWindows, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, PreferenceScope, PreferenceService, isOSX, isWindows, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -282,7 +282,7 @@ export class VesEmulatorService {
         : defaultEmulatorConfig.path;
       const emulatorUri = new URI(emulatorPath).withScheme('file');
       const romPath = await this.fileService.fsPath(romUri);
-      const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
+      let args = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
       if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         this.messageService.error(
@@ -291,10 +291,18 @@ export class VesEmulatorService {
         return;
       }
 
-      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command: await this.fileService.fsPath(emulatorUri),
-        args: emulatorArgs,
-      });
+      let command = await this.fileService.fsPath(emulatorUri);
+
+      if (isOSX && command.endsWith('.app')) {
+        args = [
+          '-n', command,
+          '--args',
+          ...args,
+        ];
+        command = 'open';
+      }
+
+      await this.vesProcessService.launchProcess(VesProcessType.Raw, { command, args });
     }
   }
 

@@ -192,7 +192,7 @@ export class VesFlashCartService {
 
       const projectName = await this.vesProjectsService.getProjectName();
 
-      const flasherArgs = connectedFlashCart.config.args
+      let args = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
           .replace(NAME_PLACEHOLDER, projectName)
           .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
@@ -201,10 +201,18 @@ export class VesFlashCartService {
           .split(' ')
         : [];
 
-      const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
-        command: flasherPath,
-        args: flasherArgs,
-      });
+      let command = flasherPath;
+
+      if (isOSX && command.endsWith('.app')) {
+        args = [
+          '-n', command,
+          '--args',
+          ...args,
+        ];
+        command = 'open';
+      }
+
+      const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, { command, args });
 
       return {
         ...connectedFlashCart,
