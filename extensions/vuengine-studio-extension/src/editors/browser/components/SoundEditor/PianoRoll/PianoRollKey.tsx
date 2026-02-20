@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
-import { NOTE_PLAY_STOP_DELAY, NOTES_LABELS, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
+import { NOTE_PLAY_STOP_DELAY, NOTES_SPECTRUM, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
 export const StyledPianoKey = styled.div`
     align-items: center;
@@ -77,7 +77,7 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
     if (note.startsWith('C') && note.length === 2) {
         classNames.push('cNote');
     }
-    if (noteId === NOTES_LABELS.length - 1) {
+    if (noteId === NOTES_SPECTRUM - 1) {
         classNames.push('last');
     }
 

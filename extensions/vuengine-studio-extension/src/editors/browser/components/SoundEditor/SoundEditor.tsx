@@ -28,6 +28,7 @@ import CurrentTrack from './Other/CurrentTrack';
 import Keybindings from './Other/Keybindings';
 import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
+import Transpose, { DEFAULT_TRANSPOSE_OPTIONS, TransposeOptions, TransposeOverflowBehavior, TransposeScope } from './Other/Transpose';
 import Utilities from './Other/Utilities';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -39,6 +40,7 @@ import {
     InstrumentMap,
     NOTE_RESOLUTION,
     NOTES_LABELS,
+    NOTES_SPECTRUM,
     PatternConfig,
     PIANO_ROLL_NOTE_HEIGHT_DEFAULT,
     PIANO_ROLL_NOTE_WIDTH_DEFAULT,
@@ -50,6 +52,7 @@ import {
     SoundEditorTool,
     SoundEditorTrackType,
     SoundEvent,
+    SoundEventMap,
     SUB_NOTE_RESOLUTION,
     TRACK_DEFAULT_INSTRUMENT_ID,
     TRACK_DEFAULT_INSTRUMENT_NAME,
@@ -274,6 +277,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, sequenceIndex: number, size?: number }>({ trackId: -1, sequenceIndex: -1 });
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
+    const [transposeDialogOpen, setTransposeDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
@@ -283,6 +287,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
     const [showSidebar, setShowSidebar] = useState<boolean>(false);
     const [sidebarTab, setSidebarTab] = useState<number>(0);
+    const [transposeOptions, setTransposeOptions] = useState<TransposeOptions>(DEFAULT_TRANSPOSE_OPTIONS);
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length
         ? soundData.tracks[0].instrument ?? TRACK_DEFAULT_INSTRUMENT_ID
         : TRACK_DEFAULT_INSTRUMENT_ID);
@@ -744,8 +749,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             if (stepEvents[SoundEvent.NoteSlide] !== undefined && stepEvents[SoundEvent.Note] !== undefined) {
                 const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note]);
                 const noteSlide = stepEvents[SoundEvent.NoteSlide];
-                if (noteId - noteSlide >= NOTES_LABELS.length) {
-                    stepEvents[SoundEvent.NoteSlide] = noteId - NOTES_LABELS.length + 1;
+                if (noteId - noteSlide >= NOTES_SPECTRUM) {
+                    stepEvents[SoundEvent.NoteSlide] = noteId - NOTES_SPECTRUM + 1;
                 } else if (noteId - noteSlide <= 0) {
                     stepEvents[SoundEvent.NoteSlide] = noteId;
                 }
@@ -844,6 +849,109 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const addPattern = (trackId: number, step: number, size?: number): void => {
         setAddPatternDialogOpen({ trackId, sequenceIndex: step, size });
+    };
+
+    const transposeNote = (note: string): string | undefined => {
+        let transposedNoteIndex = NOTES_LABELS.indexOf(note);
+        transposedNoteIndex -= transposeOptions.halfTones;
+
+        let result: string | undefined = NOTES_LABELS[transposedNoteIndex];
+
+        if (transposedNoteIndex < 0) {
+            switch (transposeOptions.overflowBehavior) {
+                case TransposeOverflowBehavior.BOUND:
+                    result = NOTES_LABELS[0];
+                    break;
+                case TransposeOverflowBehavior.CUT:
+                    result = undefined;
+                    break;
+                case TransposeOverflowBehavior.WRAP:
+                    result = NOTES_LABELS[NOTES_SPECTRUM - Math.abs(transposedNoteIndex) % NOTES_SPECTRUM];
+                    break;
+            }
+        } else if (transposedNoteIndex > (NOTES_SPECTRUM - 1)) {
+            switch (transposeOptions.overflowBehavior) {
+                case TransposeOverflowBehavior.BOUND:
+                    result = NOTES_LABELS[NOTES_SPECTRUM - 1];
+                    break;
+                case TransposeOverflowBehavior.CUT:
+                    result = undefined;
+                    break;
+                case TransposeOverflowBehavior.WRAP:
+                    result = NOTES_LABELS[transposedNoteIndex % NOTES_SPECTRUM];
+                    break;
+            }
+        }
+
+        return result;
+    };
+
+    const transposeEventsMap = (e: EventsMap): EventsMap => {
+        const result: EventsMap = {};
+
+        Object.keys(e).forEach(step => {
+            const stepInt = parseInt(step);
+            const r: SoundEventMap | undefined = { ...e[stepInt] };
+
+            if (r[SoundEvent.Note] !== undefined) {
+                const transposedNote = transposeNote(r[SoundEvent.Note]);
+                r[SoundEvent.Note] = transposedNote;
+
+                if (transposedNote === undefined) {
+                    delete r[SoundEvent.Duration];
+                    delete r[SoundEvent.Instrument];
+                    delete r[SoundEvent.Note];
+                    delete r[SoundEvent.NoteSlide];
+                }
+            }
+
+            if (Object.values(r).length) {
+                result[stepInt] = r;
+            }
+        });
+
+        return result;
+    };
+
+    const transposePattern = (pattern: PatternConfig): PatternConfig => ({
+        ...pattern,
+        events: transposeEventsMap(pattern.events)
+    });
+
+    const transpose = (): void => {
+        switch (transposeOptions.scope) {
+            case TransposeScope.EVERYTHING:
+                updateSoundData({
+                    ...soundData,
+                    patterns: Object.fromEntries(Object.entries(soundData.patterns).map(([pId, p]) => ([
+                        pId,
+                        transposePattern(p)
+                    ]))),
+                });
+                break;
+            case TransposeScope.TRACK:
+                updateSoundData({
+                    ...soundData,
+                    patterns: Object.fromEntries(Object.entries(soundData.patterns).map(([pId, p]) => ([
+                        pId,
+                        Object.values(soundData.tracks[currentTrackId].sequence).includes(pId)
+                            ? transposePattern(p)
+                            : p
+                    ]))),
+                });
+                break;
+            case TransposeScope.PATTERN:
+                updateSoundData({
+                    ...soundData,
+                    patterns: Object.fromEntries(Object.entries(soundData.patterns).map(([pId, p]) => ([
+                        pId,
+                        pId === currentPatternId
+                            ? transposePattern(p)
+                            : p
+                    ]))),
+                });
+                break;
+        };
     };
 
     const confirmOverwrite = async (uri: URI): Promise<boolean> => {
@@ -954,6 +1062,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
+            case SoundEditorCommands.TRANSPOSE.id:
+                if (soundData.tracks.length > 0) {
+                    setTransposeDialogOpen(true);
+                }
+                break;
             case SoundEditorCommands.ADD_TRACK.id:
                 addTrack();
                 break;
@@ -1416,7 +1529,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         </Tabs>
                     </StyledSidebar>
                 </>}
-
             {addTrackDialogOpen &&
                 <PopUpDialog
                     open={addTrackDialogOpen}
@@ -1480,6 +1592,33 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         setSelectedPatterns={updateSelectedPatterns}
                         setAddPatternDialogOpen={setAddPatternDialogOpen}
                         stepsPerBar={stepsPerBar}
+                    />
+                </PopUpDialog>
+            }
+            {transposeDialogOpen &&
+                <PopUpDialog
+                    open={transposeDialogOpen}
+                    onClose={() => {
+                        setTransposeDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        transpose();
+                        setTransposeDialogOpen(false);
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/transposeOptions', 'Transpose Options')}
+                    height='320px'
+                    width='360px'
+                    cancelButton={true}
+                    okButton={true}
+                    okLabel={nls.localize('vuengine/editors/sound/transpose', 'Transpose')}
+                >
+                    <Transpose
+                        transposeOptions={transposeOptions}
+                        setTransposeOptions={setTransposeOptions}
                     />
                 </PopUpDialog>
             }

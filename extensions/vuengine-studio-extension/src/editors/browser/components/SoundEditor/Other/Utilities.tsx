@@ -282,34 +282,57 @@ A total of {0} instruments will be deleted.",
         <VContainer gap={20}>
             <ImportExport />
             {soundData.tracks.length > 0 &&
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/sound/clean', 'Clean')}
-                    </label>
-                    <HContainer>
-                        <button
-                            className='theia-button secondary'
-                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id)}
-                        >
-                            {SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label}
-                        </button>
-                        <button
-                            className='theia-button secondary'
-                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id)}
-                        >
-                            {SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label}
-                        </button>
-                    </HContainer>
-                    <HContainer>
-                        <button
-                            className='theia-button secondary'
-                            onClick={() => services.commandService.executeCommand(SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.id)}
-                        >
-                            {SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.label}
-                        </button>
-                    </HContainer>
-                </VContainer>
+                <>
+                    <VContainer>
+                        <label>
+                            {nls.localizeByDefault('Edit')}
+                        </label>
+                        <HContainer>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => services.commandService.executeCommand(SoundEditorCommands.TRANSPOSE.id)}
+                                title={SoundEditorCommands.TRANSPOSE.label +
+                                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TRANSPOSE.id, true)}
+                            >
+                                {SoundEditorCommands.TRANSPOSE.label}
+                            </button>
+                        </HContainer>
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/sound/clean', 'Clean')}
+                        </label>
+                        <HContainer>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id)}
+                                title={SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label +
+                                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.REMOVE_UNUSED_PATTERNS.id, true)}
+                            >
+                                {SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label}
+                            </button>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => services.commandService.executeCommand(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id)}
+                                title={SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label +
+                                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.id, true)}
+                            >
+                                {SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS.label}
+                            </button>
+                        </HContainer>
+                        <HContainer>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => services.commandService.executeCommand(SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.id)}
+                                title={SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.label +
+                                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.id, true)}
+                            >
+                                {SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.label}
+                            </button>
+                        </HContainer>
+                    </VContainer>
+                </>
             }
-        </VContainer>
+        </VContainer >
     );
 }

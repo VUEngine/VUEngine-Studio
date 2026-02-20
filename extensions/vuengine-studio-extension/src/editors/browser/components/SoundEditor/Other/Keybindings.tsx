@@ -79,6 +79,12 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
+                        command={SoundEditorCommands.TRANSPOSE}
+                        commandService={services.commandService}
+                        vesCommonService={services.vesCommonService}
+                        width={KEYBINDING_WIDTH}
+                    />
+                    <ButtonAssignment
                         command={SoundEditorCommands.REMOVE_UNUSED_PATTERNS}
                         commandService={services.commandService}
                         vesCommonService={services.vesCommonService}

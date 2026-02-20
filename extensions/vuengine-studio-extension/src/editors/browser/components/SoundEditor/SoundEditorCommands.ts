@@ -289,6 +289,12 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'i',
     };
+    export const TRANSPOSE: EditorCommand = {
+        id: 'editors.soundEditor.transpose',
+        label: nls.localize('vuengine/editors/sound/commands/transpose', 'Transpose'),
+        category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
+        keybinding: 't',
+    };
     export const REMOVE_UNUSED_PATTERNS: EditorCommand = {
         id: 'editors.soundEditor.removeUnusedPatterns',
         label: nls.localize('vuengine/editors/sound/commands/removeUnusedPatterns', 'Remove Unused Patterns'),

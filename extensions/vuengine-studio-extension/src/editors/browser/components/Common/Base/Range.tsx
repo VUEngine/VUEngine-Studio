@@ -11,6 +11,7 @@ interface RangeProps {
     max: number
     step?: number
     value: number
+    clearable?: boolean
     disabled?: boolean
     options?: BasicSelectOption[]
     setValue: (value: number) => void
@@ -21,7 +22,7 @@ interface RangeProps {
 
 export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { min, max, step, value, disabled, options, setValue, width, selectWidth, containerStyle } = props;
+    const { min, max, step, value, clearable, disabled, options, setValue, width, selectWidth, containerStyle } = props;
 
     let inputWidth = 32;
     if (!Number.isInteger(step)) {
@@ -57,7 +58,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
         <HContainer alignItems="center" style={{ ...(containerStyle ?? {}), width }}>
             <input
                 type="range"
-                className={`value-${Math.ceil(100 / (max - min) * ((value ?? max) - min))}`}
+                className={`value-${clamp(Math.ceil(100 / (max - min) * ((value ?? max) - min)), 0, 100)}`}
                 style={{ flexGrow: 1 }}
                 min={min}
                 max={max}
@@ -88,6 +89,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
                         min={min}
                         max={max}
                         step={step}
+                        clearable={clearable}
                         disabled={disabled}
                     />
             }
