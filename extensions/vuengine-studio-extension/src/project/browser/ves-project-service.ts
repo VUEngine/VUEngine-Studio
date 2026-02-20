@@ -513,8 +513,20 @@ export class VesProjectService {
         return;
       }
 
+      // if one of the changed files is the git index, we know the changes were triggered by a git operation and don't process further
+      const gitIndexUri = this.workspaceProjectFolderUri?.resolve('.git/index');
+      let isGit = false;
+      fileChangesEvent.changes.forEach(change => {
+        if (gitIndexUri && change.resource.isEqual(gitIndexUri)) {
+          isGit = true;
+        }
+      });
+      if (isGit) {
+        return;
+      }
+
       fileChangesEvent.changes.map(change => {
-        // ignore files changes by git, etc
+        // mind only changes on files
         if (change.resource.scheme !== 'file') {
           return;
         }
