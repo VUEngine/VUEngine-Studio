@@ -410,9 +410,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         if (e.button === 0) {
             if (e.metaKey || e.ctrlKey) {
                 if (selectedNotes.includes(step)) {
-                    setSelectedNotes(selectedNotes.filter(sn => sn !== step).sort());
+                    setSelectedNotes(selectedNotes.filter(sn => sn !== step));
                 } else {
-                    setSelectedNotes([...deepClone(selectedNotes), step].sort());
+                    setSelectedNotes([...deepClone(selectedNotes), step]);
                 }
             } else {
                 const stepEvent = pattern.events[relativeStep];
@@ -429,9 +429,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             if ((e.metaKey || e.ctrlKey || e.altKey)) {
                 setNotes({ [relativeStep]: {} });
             } else if (selectedNotes.includes(step)) {
-                setSelectedNotes(selectedNotes.filter(sn => sn !== step).sort());
+                setSelectedNotes(selectedNotes.filter(sn => sn !== step));
             } else {
-                setSelectedNotes([...deepClone(selectedNotes), step].sort());
+                setSelectedNotes([...deepClone(selectedNotes), step]);
             }
         }
 

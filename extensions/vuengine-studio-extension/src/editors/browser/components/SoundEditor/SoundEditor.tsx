@@ -299,7 +299,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
         const updatedSelectedNotes = sn
             .filter((item, pos, self) => self.indexOf(item) === pos) // remove double
-            .sort();
+            .sort((a, b) => a - b);
 
         setSelectedNotes(updatedSelectedNotes);
 
@@ -753,6 +753,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
             return stepEvents;
         });
+
+        // filter out no longer existing notes from selected notes
+        setSelectedNotes(prev => prev
+            .filter(sn => updatedEvents[sn] !== undefined)
+            .sort((a, b) => a - b));
 
         setPattern(currentPatternId, {
             events: updatedEvents,

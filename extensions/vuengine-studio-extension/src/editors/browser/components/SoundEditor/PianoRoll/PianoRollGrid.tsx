@@ -530,9 +530,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 if (tool === SoundEditorTool.EDIT && e.button === 0) {
                     if (e.metaKey || e.ctrlKey) {
                         if (selectedNotes.includes(foundStep)) {
-                            setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep).sort());
+                            setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep));
                         } else {
-                            setSelectedNotes([...deepClone(selectedNotes), foundStep].sort());
+                            setSelectedNotes([...deepClone(selectedNotes), foundStep]);
                         }
                     } else {
                         const currentPattern = soundData.patterns[currentPatternId];
