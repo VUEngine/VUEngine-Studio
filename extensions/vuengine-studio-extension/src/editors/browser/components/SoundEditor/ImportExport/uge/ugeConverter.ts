@@ -76,7 +76,7 @@ export const convertUgeSong = (song: Song): SoundData => {
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,
-        group: SoundGroup.General,
+        group: SoundGroup.None,
     };
 
     const dutyInstrumentsLookup = convertDutyInstruments(song.duty_instruments);

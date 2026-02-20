@@ -21,6 +21,7 @@ export interface SoundData {
 }
 
 export enum SoundGroup {
+    None = 'none',
     General = 'general',
     Music = 'music',
     Effects = 'effects',
@@ -28,6 +29,7 @@ export enum SoundGroup {
 }
 
 export const SOUND_GROUP_LABELS = {
+    [SoundGroup.None]: nls.localize('vuengine/editors/sound/groups/none', 'None'),
     [SoundGroup.General]: nls.localize('vuengine/editors/sound/groups/general', 'General'),
     [SoundGroup.Music]: nls.localize('vuengine/editors/sound/groups/music', 'Music'),
     [SoundGroup.Effects]: nls.localize('vuengine/editors/sound/groups/effects', 'Effects'),

@@ -47,7 +47,7 @@ export const SoundType: ProjectDataType = {
             },
             group: {
                 type: 'string',
-                default: SoundGroup.General
+                default: SoundGroup.None
             },
             tracks: {
                 type: 'array',

@@ -100,7 +100,7 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         loop: false,
         loopPoint: 0,
         section: DataSection.ROM,
-        group: SoundGroup.General,
+        group: SoundGroup.None,
     };
 
     const instrumentsLookup = convertInstruments(song);
