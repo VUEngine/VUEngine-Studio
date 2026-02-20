@@ -3,8 +3,8 @@ import { deepClone, nls, QuickPickItem, QuickPickItemOrSeparator, QuickPickOptio
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
-import { WithContributor, WithFileUri } from 'src/project/browser/ves-project-types';
 import styled from 'styled-components';
+import { WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { ActorData, ActorEditorContext } from '../ActorEditor/ActorEditorTypes';
 import SpritePreview from '../ActorEditor/Preview/SpritePreview';
