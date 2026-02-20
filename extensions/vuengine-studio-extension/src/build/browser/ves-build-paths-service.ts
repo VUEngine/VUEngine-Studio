@@ -16,15 +16,25 @@ export class VesBuildPathsService {
 
   async getEngineCoreUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const builtInFolderPath = resourcesUri.resolve('vb').path.fsPath();
+    const builtInFolderUri = resourcesUri.resolve('vb');
+    const builtInFolderPath = builtInFolderUri.path.fsPath();
 
-    const preference = (this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH) as string)
+    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('core');
+    let coreUri = fallbackUri;
+
+    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH)}`
       .replace('%BUILTIN%', builtInFolderPath);
 
-    const coreUri = new URI(isWindows && !preference.startsWith('/')
-      ? `/${preference}`
-      : preference
-    ).withScheme('file');
+    if (preference !== '') {
+      const preferenceUri = new URI(isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+      ).withScheme('file');
+
+      if (!preferenceUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(preferenceUri)) {
+        coreUri = preferenceUri;
+      }
+    }
 
     return coreUri;
   }

@@ -19,15 +19,25 @@ export class VesPluginsPathsService {
 
   async getEnginePluginsUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const builtInFolderPath = resourcesUri.resolve('vb').path.fsPath();
+    const builtInFolderUri = resourcesUri.resolve('vb');
+    const builtInFolderPath = builtInFolderUri.path.fsPath();
 
-    const preference = (this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH) as string)
+    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('plugins');
+    let pluginsUri = fallbackUri;
+
+    const preference = `${this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}`
       .replace('%BUILTIN%', builtInFolderPath);
 
-    const pluginsUri = new URI(isWindows && !preference.startsWith('/')
-      ? `/${preference}`
-      : preference
-    ).withScheme('file');
+    if (preference !== '') {
+      const preferenceUri = new URI(isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+      ).withScheme('file');
+
+      if (!preferenceUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(preferenceUri)) {
+        pluginsUri = preferenceUri;
+      }
+    }
 
     return pluginsUri;
   }
@@ -39,7 +49,7 @@ export class VesPluginsPathsService {
       .resolve('vuengine')
       .resolve('plugins');
 
-    const preference = this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH) as string;
+    const preference = `${this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH)}`;
     if (preference !== '') {
       const customUri = new URI(isWindows && !preference?.startsWith('/')
         ? `/${preference}`
