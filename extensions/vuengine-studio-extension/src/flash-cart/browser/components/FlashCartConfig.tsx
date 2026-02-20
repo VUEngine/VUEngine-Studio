@@ -133,12 +133,17 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
         className='flashCartConfig'
         gap={10}
     >
-        <VContainer>
+        <HContainer alignItems='start' justifyContent='space-between'>
             <img
                 src={flashCartConfig.image ? vesFlashCartService.replaceImagePlaceholders(flashCartConfig.image) : IMAGE_FLASH_CART}
                 width={75}
             />
-        </VContainer>
+            {readOnly &&
+                <div className='secondaryText'>
+                    {nls.localizeByDefault('Built-in')}
+                </div>
+            }
+        </HContainer>
         <VContainer grow={1}>
             <HContainer alignItems='end'>
                 <VContainer grow={1}>

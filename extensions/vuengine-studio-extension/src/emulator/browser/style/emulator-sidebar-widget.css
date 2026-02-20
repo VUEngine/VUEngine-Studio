@@ -43,16 +43,17 @@
 }
 
 .emulatorSidebarWidget .emulatorConfigs {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  gap: calc(var(--theia-ui-padding) * 2);
   overflow: auto;
-}
-
-.emulatorSidebarWidget .emulatorConfigs .emulatorConfigsActions {
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
 .emulatorSidebarWidget .emulatorConfig {
-  border-bottom: 1px solid var(--theia-activityBar-background);
+  border: 1px solid var(--theia-activityBar-background);
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--theia-ui-padding);

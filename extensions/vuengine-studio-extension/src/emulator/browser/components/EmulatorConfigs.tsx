@@ -6,6 +6,7 @@ import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { WINDOWS_EXECUTABLE_EXTENSIONS } from '../../../core/browser/ves-common-types';
 import { VesCoreCommands } from '../../../core/browser/ves-core-commands';
+import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { EmulatorConfig } from '../ves-emulator-types';
 
@@ -160,15 +161,20 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                         </button>
                     </div>
                 </div>
-                <label>
-                    {nls.localize('vuengine/emulator/default', 'Default')}
-                    <input
-                        type="checkbox"
-                        className="theia-input"
-                        onChange={() => updateDefaultEmulator('')}
-                        checked={!defaultEmulator}
-                    />
-                </label>
+                <HContainer alignItems='end' justifyContent='space-between'>
+                    <label>
+                        {nls.localize('vuengine/emulator/default', 'Default')}
+                        <input
+                            type="checkbox"
+                            className="theia-input"
+                            onChange={() => updateDefaultEmulator('')}
+                            checked={!defaultEmulator}
+                        />
+                    </label>
+                    <div className='secondaryText'>
+                        {nls.localizeByDefault('Built-in')}
+                    </div>
+                </HContainer>
             </div>
             <div className='emulatorConfig'>
                 <div>
@@ -197,15 +203,20 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                         />
                     </label>
                 </div>
-                <label>
-                    {nls.localize('vuengine/emulator/default', 'Default')}
-                    <input
-                        type="checkbox"
-                        className="theia-input"
-                        onChange={() => updateDefaultEmulator('Red Viper')}
-                        checked={defaultEmulator === 'Red Viper'}
-                    />
-                </label>
+                <HContainer alignItems='end' justifyContent='space-between'>
+                    <label>
+                        {nls.localize('vuengine/emulator/default', 'Default')}
+                        <input
+                            type="checkbox"
+                            className="theia-input"
+                            onChange={() => updateDefaultEmulator('Red Viper')}
+                            checked={defaultEmulator === 'Red Viper'}
+                        />
+                    </label>
+                    <div className='secondaryText'>
+                        {nls.localizeByDefault('Built-in')}
+                    </div>
+                </HContainer>
             </div>
             {emulatorConfigs && emulatorConfigs.map((config, index) => <div className='emulatorConfig' key={`emulatorConfig-${index}`}>
                 <div>
