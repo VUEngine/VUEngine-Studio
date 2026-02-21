@@ -16,7 +16,7 @@
 {%- macro instrumentIsUsed(instrumentId) -%}
 	{%- set result = false -%}
 	{%- for track in item.tracks -%}
-		{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+		{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and ((trackSettings[loop.index0] is defined and trackSettings[loop.index0].muted) or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
 			{%- if track.instrument == instrumentId -%}
 				{%- set result = true -%}
 			{%- endif -%}
@@ -149,7 +149,7 @@ const int8 {{ sanitizedSpecName }}ModulationData{{ modulationDataKey }}[]
 
 {#- Render all tracks -#}
 {%- for track in item.tracks -%}
-{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and ((trackSettings[loop.index0] is defined and trackSettings[loop.index0].muted) or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
 
 {%- set trackKeyframes = getTrackKeyframes(track, sanitizedSpecName, totalSize, loopPoint, waveforms, modulationData, item) %}
 
@@ -271,7 +271,7 @@ SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{%- for track in item.tracks %}
-	{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and (trackSettings[loop.index0].muted or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+	{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and ((trackSettings[loop.index0] is defined and trackSettings[loop.index0].muted) or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
 	&{{ sanitizedSpecName }}SoundTrack{{ loop.index0 }},
 	{%- endif %}
 	{%- endfor %}

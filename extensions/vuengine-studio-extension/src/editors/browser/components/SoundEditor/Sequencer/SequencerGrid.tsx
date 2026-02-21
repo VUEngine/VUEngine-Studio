@@ -287,7 +287,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
 
         // patterns
         soundData.tracks.forEach((track, trackId) => {
-            const trackMuted = trackSettings[trackId].muted || (soloTrack > -1 && soloTrack !== trackId);
+            const ts = trackSettings[trackId];
+            const trackMuted = ts?.muted || (soloTrack > -1 && soloTrack !== trackId);
             Object.keys(track.sequence).forEach(si => {
                 const sequenceIndex = parseInt(si);
                 const patternId = track.sequence[sequenceIndex];
