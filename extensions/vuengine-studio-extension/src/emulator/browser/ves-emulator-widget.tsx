@@ -332,7 +332,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
         fileChangesEvent.changes.map(change => {
           if (change.type !== FileChangeType.DELETED && resourceUri && change.resource.isEqual(resourceUri)) {
-            this.doInit();
+            this.startEmulator();
           }
         });
       })
