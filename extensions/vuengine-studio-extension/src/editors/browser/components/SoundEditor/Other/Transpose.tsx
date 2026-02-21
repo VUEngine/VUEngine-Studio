@@ -5,6 +5,7 @@ import RadioSelect from '../../Common/Base/RadioSelect';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import { clamp } from '../../Common/Utils';
+import { ArrowDown, ArrowFatDown, ArrowFatUp, ArrowUp } from '@phosphor-icons/react';
 
 export enum TransposeScope {
     EVERYTHING = 'everything',
@@ -54,6 +55,13 @@ const TRANSPOSE_AMOUNT_MIN = TRANSPOSE_AMOUNT_MAX * -1;
 export default function Transpose(props: TransposeProps): React.JSX.Element {
     const { transposeOptions, setTransposeOptions } = props;
 
+    const setHalftones = (ht: number) => {
+        setTransposeOptions({
+            ...transposeOptions,
+            halfTones: clamp(ht, TRANSPOSE_AMOUNT_MIN, TRANSPOSE_AMOUNT_MAX),
+        });
+    };
+
     return <VContainer gap={20}>
         <VContainer>
             <label>
@@ -92,22 +100,9 @@ export default function Transpose(props: TransposeProps): React.JSX.Element {
                 {nls.localize('vuengine/editors/sound/amount', 'Amount')}
             </label>
             <HContainer>
-                <button
-                    className='theia-button secondary'
-                    onClick={() => setTransposeOptions({
-                        ...transposeOptions,
-                        halfTones: clamp(transposeOptions.halfTones - OCTAVE_HALF_TONES, TRANSPOSE_AMOUNT_MIN, TRANSPOSE_AMOUNT_MAX)
-                    })}
-                    disabled={transposeOptions.halfTones <= TRANSPOSE_AMOUNT_MIN}
-                >
-                    - {nls.localize('vuengine/editors/sound/octave', 'Octave')}
-                </button>
                 <Range
                     value={transposeOptions.halfTones}
-                    setValue={v => setTransposeOptions({
-                        ...transposeOptions,
-                        halfTones: clamp(v, TRANSPOSE_AMOUNT_MIN, TRANSPOSE_AMOUNT_MAX),
-                    })}
+                    setValue={v => setHalftones(v)}
                     min={TRANSPOSE_AMOUNT_MIN}
                     max={TRANSPOSE_AMOUNT_MAX}
                     clearable
@@ -115,13 +110,35 @@ export default function Transpose(props: TransposeProps): React.JSX.Element {
                 />
                 <button
                     className='theia-button secondary'
-                    onClick={() => setTransposeOptions({
-                        ...transposeOptions,
-                        halfTones: clamp(transposeOptions.halfTones + OCTAVE_HALF_TONES, TRANSPOSE_AMOUNT_MIN, TRANSPOSE_AMOUNT_MAX)
-                    })}
-                    disabled={transposeOptions.halfTones >= TRANSPOSE_AMOUNT_MAX}
+                    onClick={() => setHalftones(transposeOptions.halfTones - OCTAVE_HALF_TONES)}
+                    disabled={transposeOptions.halfTones <= TRANSPOSE_AMOUNT_MIN}
+                    title={nls.localize('vuengine/editors/sound/upAnOctave', 'Down An Octave')}
                 >
-                    + {nls.localize('vuengine/editors/sound/octave', 'Octave')}
+                    <ArrowFatDown size={17} />
+                </button>
+                <button
+                    className='theia-button secondary'
+                    onClick={() => setHalftones(transposeOptions.halfTones - 1)}
+                    disabled={transposeOptions.halfTones <= TRANSPOSE_AMOUNT_MIN}
+                    title={nls.localize('vuengine/editors/sound/upAnOctave', 'Down A Half-Tone')}
+                >
+                    <ArrowDown size={17} />
+                </button>
+                <button
+                    className='theia-button secondary'
+                    onClick={() => setHalftones(transposeOptions.halfTones + 1)}
+                    disabled={transposeOptions.halfTones >= TRANSPOSE_AMOUNT_MAX}
+                    title={nls.localize('vuengine/editors/sound/upAnOctave', 'Up A Half-Tone')}
+                >
+                    <ArrowUp size={17} />
+                </button>
+                <button
+                    className='theia-button secondary'
+                    onClick={() => setHalftones(transposeOptions.halfTones + OCTAVE_HALF_TONES)}
+                    disabled={transposeOptions.halfTones >= TRANSPOSE_AMOUNT_MAX}
+                    title={nls.localize('vuengine/editors/sound/upAnOctave', 'Up An Octave')}
+                >
+                    <ArrowFatUp size={17} />
                 </button>
             </HContainer>
         </VContainer>
