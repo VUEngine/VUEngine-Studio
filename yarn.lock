@@ -2911,6 +2911,16 @@
     semver "^7.5.4"
     tslib "^2.6.2"
 
+"@theia/plugin-ext-headless@1.68.2":
+  version "1.68.2"
+  resolved "https://registry.yarnpkg.com/@theia/plugin-ext-headless/-/plugin-ext-headless-1.68.2.tgz#28c5fe3f49764705eeef8fc1a8ee2ad03262ca22"
+  integrity sha512-094VW0Jpe+K09i4zVl6rKV7/Lqwt6wNeyZnl0B2pbTSwc++wfCUg2kCXTn5gSKRigJK1SBOValwGDyyEjs6TJQ==
+  dependencies:
+    "@theia/core" "1.68.2"
+    "@theia/plugin-ext" "1.68.2"
+    "@theia/terminal" "1.68.2"
+    tslib "^2.6.2"
+
 "@theia/plugin-ext-vscode@1.68.2":
   version "1.68.2"
   resolved "https://registry.yarnpkg.com/@theia/plugin-ext-vscode/-/plugin-ext-vscode-1.68.2.tgz#14855b1358a29ecc8718deb80c79818cc0ee252d"
@@ -3135,6 +3145,15 @@
     jsonc-parser "^2.2.0"
     p-debounce "^2.1.0"
     tslib "^2.6.2"
+
+"@theia/terminal-manager@1.68.2":
+  version "1.68.2"
+  resolved "https://registry.yarnpkg.com/@theia/terminal-manager/-/terminal-manager-1.68.2.tgz#48d35054008aec10177fa6595f28ad1408312203"
+  integrity sha512-7zkj7WAZ+Zb+R2lng8LSITx4KzYE3Ru1orUCglPs/dRW2zAVU7dfe8WJUNSGu2OCczSHi3M3LE4cD1dT/wP6yw==
+  dependencies:
+    "@theia/core" "1.68.2"
+    "@theia/preferences" "1.68.2"
+    "@theia/terminal" "1.68.2"
 
 "@theia/terminal@1.68.2":
   version "1.68.2"
