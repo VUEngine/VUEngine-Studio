@@ -12,7 +12,6 @@ import VContainer from '../Common/Base/VContainer';
 import { DataSection } from '../Common/CommonTypes';
 import InfoLabel from '../Common/InfoLabel';
 import SectionSelect from '../Common/SectionSelect';
-import { PixelEditorCommands } from '../PixelEditor/PixelEditorCommands';
 import PixelEditorStatus from '../PixelEditor/PixelEditorStatus';
 import PaletteSelect from '../PixelEditor/Sidebar/PaletteSelect';
 import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCurrentToolSettings';
@@ -254,7 +253,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     useEffect(() => {
         setCommands([
             ...Object.values(FontEditorCommands).map(c => c.id),
-            ...Object.values(PixelEditorCommands).map(c => c.id),
         ]);
     }, []);
 
@@ -268,8 +266,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             return;
         }
         const resizeObserver = new ResizeObserver(() => {
-            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasHeight);
-            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasWidth);
+            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasWidth);
+            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasHeight);
         });
         resizeObserver.observe(canvasContainerRef.current);
         return () => resizeObserver.disconnect();

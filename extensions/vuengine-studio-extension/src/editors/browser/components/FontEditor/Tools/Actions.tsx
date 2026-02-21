@@ -130,7 +130,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     return (
         <VContainer>
             <label>
-                {nls.localizeByDefault('Actions')}
+                {nls.localize('vuengine/editors/font/actions/title', 'Actions')}
             </label>
             <HContainer gap={2} wrap='wrap'>
                 {/* }

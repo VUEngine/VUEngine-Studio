@@ -318,8 +318,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
 
         const patternIdMap: Record<string, string> = {};
         Object.keys(patternClipboard).forEach(identifier => {
-            const tId = parseInt(identifier.split('-')[0]);
-            const si = parseInt(identifier.split('-')[1]);
             patternIdMap[identifier] = patternClipboard[identifier];
         });
 

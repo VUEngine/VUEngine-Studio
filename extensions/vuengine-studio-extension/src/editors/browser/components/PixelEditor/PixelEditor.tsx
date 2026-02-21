@@ -191,7 +191,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
 
     useEffect(() => {
         setCommands([
-            ...Object.values(PixelEditorCommands).map(c => c.id)
+            ...Object.values(PixelEditorCommands).map(c => c.id),
         ]);
     }, []);
 
@@ -210,8 +210,8 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
             return;
         }
         const resizeObserver = new ResizeObserver(() => {
-            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasHeight);
-            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasWidth);
+            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasWidth);
+            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasHeight);
         });
         resizeObserver.observe(canvasContainerRef.current);
         return () => resizeObserver.disconnect();

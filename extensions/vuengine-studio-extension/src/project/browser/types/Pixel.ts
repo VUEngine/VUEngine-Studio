@@ -6,7 +6,7 @@ import { DEFAULT_IMAGE_SIZE } from '../../../editors/browser/components/PixelEdi
 import { ProjectDataType } from '../ves-project-types';
 
 export const PixelType: ProjectDataType = {
-    enabled: false,
+    enabled: true,
     file: '.pixel',
     schema: {
         title: nls.localize('vuengine/projects/typeLabels/pixel', 'Pixel Art'),

@@ -8,6 +8,7 @@ import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { PixelEditorCommands } from '../PixelEditorCommands';
 import { PixelEditorTool } from './PixelEditorTool';
+import { FontEditorCommands } from '../../FontEditor/FontEditorCommands';
 
 const PALETTE_COMMANDS: EditorCommand[] = [
     PixelEditorCommands.PALETTE_SELECT_INDEX_0,
@@ -99,36 +100,45 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
+            case FontEditorCommands.SWAP_COLORS.id:
             case PixelEditorCommands.SWAP_COLORS.id:
                 const secColorIndex = secondaryColorIndex;
                 setSecondaryColorIndex(primaryColorIndex);
                 setPrimaryColorIndex(secColorIndex);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_0.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_0.id:
                 setPrimaryColorIndex(0);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_1.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_1.id:
                 setPrimaryColorIndex(includeTransparent ? 1 : 0);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_2.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_2.id:
                 setPrimaryColorIndex(includeTransparent ? 2 : 1);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_3.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_3.id:
                 setPrimaryColorIndex(includeTransparent ? 3 : 2);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_4.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_4.id:
                 setPrimaryColorIndex(includeTransparent ? 4 : 3);
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_5.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_5.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 5 : 4);
                 }
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_6.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_6.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 6 : 5);
                 }
                 break;
+            case FontEditorCommands.PALETTE_SELECT_INDEX_7.id:
             case PixelEditorCommands.PALETTE_SELECT_INDEX_7.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(includeTransparent ? 7 : 6);
