@@ -326,21 +326,21 @@ export namespace SoundEditorCommands {
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+a',
     };
-    export const COPY_SELECTED_NOTES: EditorCommand = {
-        id: 'editors.soundEditor.copySelectedNotes',
-        label: nls.localize('vuengine/editors/sound/commands/copySelectedNotes', 'Copy Selected Notes'),
+    export const COPY_SELECTION: EditorCommand = {
+        id: 'editors.soundEditor.copySelection',
+        label: nls.localize('vuengine/editors/sound/commands/copySelection', 'Copy Selection'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+c',
     };
-    export const CUT_SELECTED_NOTES: EditorCommand = {
-        id: 'editors.soundEditor.cutSelectedNotes',
-        label: nls.localize('vuengine/editors/sound/commands/cutSelectedNotes', 'Cut Selected Notes'),
+    export const CUT_SELECTION: EditorCommand = {
+        id: 'editors.soundEditor.cutSelection',
+        label: nls.localize('vuengine/editors/sound/commands/cutSelection', 'Cut Selection'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+x',
     };
-    export const PASTE_SELECTED_NOTES: EditorCommand = {
-        id: 'editors.soundEditor.pasteSelectedNotes',
-        label: nls.localize('vuengine/editors/sound/commands/pasteSelectedNotes', 'Paste Selected Notes'),
+    export const PASTE_SELECTION: EditorCommand = {
+        id: 'editors.soundEditor.pasteSelection',
+        label: nls.localize('vuengine/editors/sound/commands/pasteSelection', 'Paste Selection'),
         category: nls.localize('vuengine/editors/sound/commands/category', 'Sound Editor'),
         keybinding: 'ctrlcmd+v',
     };

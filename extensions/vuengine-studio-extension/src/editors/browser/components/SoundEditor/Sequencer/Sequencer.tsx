@@ -1,3 +1,4 @@
+import { deepClone } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -18,12 +19,15 @@ import {
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
+    SUB_NOTE_RESOLUTION,
     TrackSettings
 } from '../SoundEditorTypes';
 import SequencerGrid from './SequencerGrid';
 import SequencerPlacedPattern from './SequencerPlacedPattern';
 import StepIndicator, { StepIndicatorPosition } from './StepIndicator';
 import TrackHeader from './TrackHeader';
+
+type PatternClipboard = Record<string, string>;
 
 const StyledSequencerContainer = styled.div`
     align-self: start;
@@ -133,6 +137,7 @@ interface SequencerProps {
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     noteCursor: number
+    setNoteCursor: Dispatch<SetStateAction<number>>
     stepsPerNote: number
     stepsPerBar: number
 }
@@ -165,7 +170,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setForcePlayerRomRebuild,
-        noteCursor,
+        noteCursor, setNoteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
@@ -174,6 +179,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [patternDragEndStep, setPatternDragEndStep] = useState<number>(-1);
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
     const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
+    const [patternClipboard, setPatternClipboard] = useState<PatternClipboard>({});
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
     const sequencerGridContainerRef = useRef<HTMLDivElement>(null);
 
@@ -260,6 +266,80 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setCancelPatternDrag(false);
     };
 
+    const removeSelectedPatterns = () => {
+        const patternsToDelete: Record<number, number[]> = {};
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            if (patternsToDelete[tId] === undefined) {
+                patternsToDelete[tId] = [];
+            }
+            patternsToDelete[tId].push(si);
+        });
+
+        setSelectedPatterns([]);
+        updateSoundData({
+            ...soundData,
+            tracks: soundData.tracks.map((t, tId) => ({
+                ...t,
+                sequence: Object.fromEntries(Object.entries(t.sequence).filter(([si, pId]) =>
+                    patternsToDelete[tId] === undefined || !patternsToDelete[tId].includes(parseInt(si))
+                ))
+            }))
+        });
+    };
+
+    const copySelectedPatterns = (): void => {
+        const patterns: PatternClipboard = {};
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            if (soundData.tracks[tId] !== undefined && soundData.tracks[tId].sequence[si] !== undefined) {
+                patterns[identifier] = soundData.tracks[tId].sequence[si];
+            }
+        });
+
+        setPatternClipboard(patterns);
+    };
+
+    const cutSelectedPatterns = (): void => {
+        copySelectedPatterns();
+        removeSelectedPatterns();
+    };
+
+    const pastePatterns = (): void => {
+        let smallestSequenceIndex = -1;
+        Object.keys(patternClipboard).forEach(identifier => {
+            const si = parseInt(identifier.split('-')[1]);
+            if (smallestSequenceIndex === -1 || si < smallestSequenceIndex) {
+                smallestSequenceIndex = si;
+            }
+        });
+
+        const patternIdMap: Record<string, string> = {};
+        Object.keys(patternClipboard).forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            patternIdMap[identifier] = patternClipboard[identifier];
+        });
+
+        const updatedTracks = deepClone(soundData.tracks);
+        const noteCursorStep = noteCursor / SUB_NOTE_RESOLUTION;
+        Object.keys(patternClipboard).forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            const adjustedSequenceIndex = noteCursorStep + si - smallestSequenceIndex;
+            if (adjustedSequenceIndex < soundData.size) {
+                updatedTracks[tId].sequence[adjustedSequenceIndex] = patternIdMap[identifier];
+            }
+        });
+
+        updateSoundData({
+            ...soundData,
+            tracks: updatedTracks,
+        });
+    };
+
     const commandListener = (commandId: string): void => {
         if (soundData.tracks.length === 0) {
             return;
@@ -320,6 +400,15 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 if (previousPatterns.length) {
                     setCurrentSequenceIndex(currentTrackId, Math.max(...previousPatterns));
                 }
+                break;
+            case SoundEditorCommands.COPY_SELECTION.id:
+                copySelectedPatterns();
+                break;
+            case SoundEditorCommands.CUT_SELECTION.id:
+                cutSelectedPatterns();
+                break;
+            case SoundEditorCommands.PASTE_SELECTION.id:
+                pastePatterns();
                 break;
             case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
                 removePatternsFromSequence(selectedPatterns);
@@ -382,6 +471,8 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentTrackId,
         currentSequenceIndex,
         selectedPatterns,
+        patternClipboard,
+        noteCursor,
         soundData,
     ]);
 
@@ -543,6 +634,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 removePatternsFromSequence={removePatternsFromSequence}
                 noteSnapping={noteSnapping}
                 noteCursor={noteCursor}
+                setNoteCursor={setNoteCursor}
                 stepsPerNote={stepsPerNote}
                 stepsPerBar={stepsPerBar}
             />

@@ -359,19 +359,19 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
-                    command={SoundEditorCommands.COPY_SELECTED_NOTES}
+                    command={SoundEditorCommands.COPY_SELECTION}
                     commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
-                    command={SoundEditorCommands.CUT_SELECTED_NOTES}
+                    command={SoundEditorCommands.CUT_SELECTION}
                     commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
-                    command={SoundEditorCommands.PASTE_SELECTED_NOTES}
+                    command={SoundEditorCommands.PASTE_SELECTION}
                     commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
                     width={KEYBINDING_WIDTH}

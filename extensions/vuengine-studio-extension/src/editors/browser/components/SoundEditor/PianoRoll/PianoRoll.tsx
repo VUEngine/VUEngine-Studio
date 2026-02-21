@@ -568,13 +568,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
                 removeSelectedNotes();
                 break;
-            case SoundEditorCommands.COPY_SELECTED_NOTES.id:
+            case SoundEditorCommands.COPY_SELECTION.id:
                 copySelectedNotes();
                 break;
-            case SoundEditorCommands.CUT_SELECTED_NOTES.id:
+            case SoundEditorCommands.CUT_SELECTION.id:
                 cutSelectedNotes();
                 break;
-            case SoundEditorCommands.PASTE_SELECTED_NOTES.id:
+            case SoundEditorCommands.PASTE_SELECTION.id:
                 pasteNotes();
                 break;
             case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
