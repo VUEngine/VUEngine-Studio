@@ -7,6 +7,7 @@ import {
     VsuChannelIntervalData,
     VsuChannelStereoLevelsData,
     VsuChannelSweepModulationData,
+    VsuSweepModulationFunction,
     WaveformData
 } from '../Emulator/VsuTypes';
 import {
@@ -36,7 +37,6 @@ type EventsMapWithArtificialNotes = Record<number, SoundEventMapWithArtificialNo
 const NOTE_SLIDE_STEP_DURATION = 10;
 
 interface Keyframe {
-    requiresReset?: true
     SxINT?: string
     SxLRV?: string
     SxFQ?: string
@@ -87,9 +87,10 @@ enum EventName {
     'SxSWP' = 'kSoundTrackEventSxSWP',
 }
 
-const SxINT = (enableChannel: boolean, interval: VsuChannelIntervalData): string => hexFromBitsArray([
+const SxINT = (enableChannel: boolean, interval: VsuChannelIntervalData, resetSxINT: boolean): string => hexFromBitsArray([
     [Number(enableChannel), 1],
-    [undefined, 1],
+    // We utilize the following, otherwise unused bit to signal to the engine to force-write to SxINT in order to reset the VSU's internal counters
+    [Number(resetSxINT), 1],
     [Number(interval.enabled), 1],
     [interval.value, 5]
 ]);
@@ -107,22 +108,35 @@ const SxEV0 = (envelope: VsuChannelEnvelopeData): string => hexFromBitsArray([
     [envelope.stepTime, 3]
 ]);
 
-const SxEV1 = (envelope: VsuChannelEnvelopeData, sweepMod: VsuChannelSweepModulationData, tap: number, type: SoundEditorTrackType): string => {
+const SxEV1 = (
+    envelope: VsuChannelEnvelopeData,
+    sweepMod: VsuChannelSweepModulationData,
+    tap: number,
+    type: SoundEditorTrackType,
+    resetSxEV: boolean,
+    resetS5SWP: boolean
+): string => {
     if (type === SoundEditorTrackType.NOISE) {
         return hexFromBitsArray([
-            [undefined, 1],
+            // We utilize the following, otherwise unused bit to signal to the engine to force-write to SxEV0/1 in order to reset the VSU's internal counters
+            [Number(resetSxEV), 1],
             [tap, 3],
-            [undefined, 2],
+            // We utilize the following, otherwise unused bit to signal to the engine to force-write to S5SWP in order to reset the VSU's internal counters
+            [Number(resetS5SWP), 1],
+            [undefined, 1],
             [Number(envelope.repeat), 1],
             [Number(envelope.enabled), 1]
         ]);
     } else {
         return hexFromBitsArray([
-            [undefined, 1],
+            // We utilize the following, otherwise unused bit to signal to the engine to force-write to SxEV0/1 in order to reset the VSU's internal counters
+            [Number(resetSxEV), 1],
             [Number(sweepMod.enabled), 1],
             [Number(sweepMod.repeat), 1],
             [Number(sweepMod.function), 1],
-            [undefined, 2],
+            // We utilize the following, otherwise unused bit to signal to the engine to force-write to S5SWP in order to reset the VSU's internal counters
+            [Number(resetS5SWP), 1],
+            [undefined, 1],
             [Number(envelope.repeat), 1],
             [Number(envelope.enabled), 1]
         ]);
@@ -425,20 +439,30 @@ const transformToKeyframes = (
         const stepEvents = trackEventsMap[step];
         const keyframe: Keyframe = {};
 
+        const sweepEnabled = track.type === SoundEditorTrackType.SWEEPMOD
+            && currentInstrument.sweepMod.enabled
+            && currentInstrument.sweepMod.function === VsuSweepModulationFunction.Sweep;
+
         // note event
         if (stepEvents[SoundEvent.Note] !== undefined) {
             keyframe.SxFQ = SxFQ(stepEvents[SoundEvent.Note]);
 
             // explicity set registers to reset the VSU's internal counters for hardware envelopes
-            if (stepIndex !== 0 && !stepEvents.artificial && (currentInstrument.envelope.enabled || currentInstrument.interval.enabled)
-            ) {
-                keyframe.requiresReset = true;
-                if (currentInstrument.interval.enabled) {
-                    keyframe.SxINT = SxINT(true, currentInstrument.interval);
-                }
-                if (currentInstrument.envelope.enabled) {
+            if (stepIndex !== 0) {
+                keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
+                if (currentInstrument.envelope.enabled || sweepEnabled) {
                     keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
-                    keyframe.SxEV1 = SxEV1(currentInstrument.envelope, currentInstrument.sweepMod, currentInstrument.tap, track.type);
+                    keyframe.SxEV1 = SxEV1(
+                        currentInstrument.envelope,
+                        currentInstrument.sweepMod,
+                        currentInstrument.tap,
+                        track.type,
+                        !stepEvents.artificial,
+                        !stepEvents.artificial && sweepEnabled
+                    );
+                }
+                if (sweepEnabled) {
+                    keyframe.SxSWP = S5SWP(currentInstrument.sweepMod);
                 }
             }
         }
@@ -448,10 +472,17 @@ const transformToKeyframes = (
             currentInstrumentId = stepEvents[SoundEvent.Instrument];
             currentInstrument = instruments[currentInstrumentId ?? track.instrument];
 
-            keyframe.SxINT = SxINT(true, currentInstrument.interval);
+            keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
             keyframe.SxLRV = SxLRV(currentInstrument.volume);
             keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
-            keyframe.SxEV1 = SxEV1(currentInstrument.envelope, currentInstrument.sweepMod, currentInstrument.tap, track.type);
+            keyframe.SxEV1 = SxEV1(
+                currentInstrument.envelope,
+                currentInstrument.sweepMod,
+                currentInstrument.tap,
+                track.type,
+                !stepEvents.artificial,
+                !stepEvents.artificial && sweepEnabled
+            );
             if (track.type !== SoundEditorTrackType.NOISE) {
                 keyframe.SxRAM = SxRAM(specName, waveformRegistry, currentInstrument.waveform, track.type);
             }
@@ -490,8 +521,7 @@ const reduceKeyframes = (
     trackSteps.forEach(step => {
         const stepValues = trackKeyframes.keyframeMap[step];
 
-        // don't touch SxINT, SxEV0 and SxEV1, as these need to be changed to reset the VSU's internal counters for hardware envelopes
-        ['SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
+        ['SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
             // @ts-ignore
             if (stepValues[v] !== undefined) {
                 let foundPrev = false;
@@ -537,16 +567,11 @@ const applyLoopPoint = (
         result.keyframeMap[loopPointStep] = {};
     }
 
-    const loopKeyframeIndex = Object.keys(result.keyframeMap).indexOf(`${loopPointStep}`);
-    const numberOfResetKeyframes = Object.values(result.keyframeMap)
-        .filter((k, i) => i < loopKeyframeIndex && k.requiresReset)
-        .length;
-
-    const loopKeyframeNumber = loopKeyframeIndex + numberOfResetKeyframes;
+    const loopKeyframe = Object.keys(result.keyframeMap).indexOf(`${loopPointStep}`);
 
     return {
         ...result,
-        loopKeyframe: loopKeyframeNumber,
+        loopKeyframe,
     };
 };
 
@@ -582,23 +607,6 @@ const transformToKeyframesPrepared = (
         const stepKeyframe = trackKeyframes.keyframeMap[step];
         const duration: number = (keyFrameSteps[stepIndex + 1] ?? trackKeyframes.totalSize) - step;
         const flags: EventName[] = [];
-
-        if (stepKeyframe.requiresReset) {
-            const resetFlags: EventName[] = [];
-            if (stepKeyframe.SxINT !== undefined) {
-                trackKeyframesPrepared.values.SxINT.push('0x00');
-                resetFlags.push(EventName.SxINT);
-            }
-            if (stepKeyframe.SxEV0 !== undefined) {
-                trackKeyframesPrepared.values.SxEV0.push('0x00');
-                trackKeyframesPrepared.values.SxEV1.push('0x00');
-                resetFlags.push(EventName.SxEV0);
-                resetFlags.push(EventName.SxEV1);
-            }
-            trackKeyframesPrepared.keyframes.push({
-                duration: 0, flags: resetFlags
-            });
-        }
 
         ['SxFQ', 'SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
             // @ts-ignore
@@ -659,33 +667,33 @@ export const getTrackKeyframes = (
 ): TrackKeyframesPrepared => {
     const initialInstrument = soundData.instruments[track.instrument];
 
-    // console.log('-----------------------------------------------------');
+    console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
-    // console.log('mergePatterns', deepClone(trackEventsMap));
+    console.log('mergePatterns', deepClone(trackEventsMap));
     trackEventsMap = filterEmptyEvents(trackEventsMap);
-    // console.log('filterEmptyEvents', deepClone(trackEventsMap));
+    console.log('filterEmptyEvents', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    // console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
+    console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
-    // console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
+    console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
     trackEventsMap = notesToFrequencies(trackEventsMap);
-    // console.log('notesToFrequencies', deepClone(trackEventsMap));
+    console.log('notesToFrequencies', deepClone(trackEventsMap));
     trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
-    // console.log('applyNoteDuration', deepClone(trackEventsMap));
+    console.log('applyNoteDuration', deepClone(trackEventsMap));
     trackEventsMap = applyNoteSlide(trackEventsMap);
-    // console.log('applyNoteSlide', deepClone(trackEventsMap));
+    console.log('applyNoteSlide', deepClone(trackEventsMap));
 
     let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
-    // console.log('transformToKeyframes', deepClone(trackKeyframes));
+    console.log('transformToKeyframes', deepClone(trackKeyframes));
     trackKeyframes = reduceKeyframes(trackKeyframes);
-    // console.log('reduceKeyframes', deepClone(trackKeyframes));
+    console.log('reduceKeyframes', deepClone(trackKeyframes));
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
-    // console.log('applyLoopPoint', deepClone(trackKeyframes));
+    console.log('applyLoopPoint', deepClone(trackKeyframes));
 
     let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
-    // console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
+    console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
-    // console.log('setStartEvent', deepClone(trackKeyframesPrepared));
+    console.log('setStartEvent', deepClone(trackKeyframesPrepared));
 
     return trackKeyframesPrepared;
 };

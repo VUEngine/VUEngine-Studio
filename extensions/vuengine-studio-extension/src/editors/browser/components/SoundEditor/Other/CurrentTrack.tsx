@@ -197,8 +197,8 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                 'vuengine/editors/sound/priorityDescription',
                                 'If no sound source is available when a note of this track is requested, \
 it can steal the sound source from a lower priority track (if "Skip" is not enabled). \
-If a track has the highest priority, but all sound sources are used by other tracks with the highest priority, \
-then notes of the former are queued (if "Skip" is not enabled).'
+If all sound sources are used by other tracks with the same priority, \
+then notes are queued to be played once a sound source is freed (if "Skip" is not enabled).'
                             )}
                         />
                         <Range
