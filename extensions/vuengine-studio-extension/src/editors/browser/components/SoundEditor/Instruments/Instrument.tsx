@@ -427,7 +427,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             const stepDecrease = instrument?.envelope.initialValue / cycleDuration;
             const stepIncrease = numberOfStepsPerCycle / cycleDuration;
             const cutOff = instrument?.interval.enabled
-                ? (instrument?.interval.value + 1) / 4 * numberOfStepsPerCycle - 1
+                ? (instrument?.interval.value + 1) / numberOfStepsPerCycle * 4
                 : ENVELOPE_PREVIEW_SIZE;
 
             for (let index = 0; index < ENVELOPE_PREVIEW_SIZE; index++) {
