@@ -11,7 +11,7 @@ export class VesProblemContribution extends ProblemContribution {
   async onStart(app: FrontendApplication): Promise<void> {
     await this.workspaceService.ready;
     if (this.workspaceService.opened) {
-      super.onStart(app);
+      // super.onStart(app);
     }
   }
 }
