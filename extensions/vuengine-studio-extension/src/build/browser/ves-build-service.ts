@@ -682,21 +682,21 @@ export class VesBuildService {
     }
 
     if (isWindows) {
-      const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(p)));
-      let projectPath = this.convertToEnvPath(workspaceRootUri);
+      const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(buildWithWsl, p)));
+      let projectPath = this.convertToEnvPath(buildWithWsl, workspaceRootUri);
       if (buildWithWsl) {
         const projectPathSha1 = window.electronVesCore.sha1(projectPath);
         projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}`;
       }
       const engineCorePath = buildWithWsl
         ? WSL_ENGINE_CORE_PATH
-        : this.convertToEnvPath(engineCoreUri);
+        : this.convertToEnvPath(buildWithWsl, engineCoreUri);
       const enginePluginsPath = buildWithWsl
         ? WSL_PROJECTS_PATH
-        : this.convertToEnvPath(enginePluginsUri);
+        : this.convertToEnvPath(buildWithWsl, enginePluginsUri);
       const userPluginsPath = buildWithWsl
         ? WSL_USER_PLUGINS_PATH
-        : this.convertToEnvPath(userPluginsUri);
+        : this.convertToEnvPath(buildWithWsl, userPluginsUri);
 
       const preMakeArgs = [
         'cd', projectPath, '&&',
@@ -714,7 +714,7 @@ export class VesBuildService {
         `ENGINE_FOLDER=${engineCorePath}`,
         `PLUGINS_FOLDER=${enginePluginsPath}`,
         `USER_PLUGINS_FOLDER=${userPluginsPath}`,
-        '-f', this.convertToEnvPath(makefileUri),
+        '-f', this.convertToEnvPath(buildWithWsl, makefileUri),
       ];
 
       if (buildWithWsl) {
@@ -763,8 +763,8 @@ export class VesBuildService {
     let args = [
       'all',
       '-e', `TYPE=${buildMode}`,
-      '-f', this.convertToEnvPath(makefileUri),
-      '-C', this.convertToEnvPath(workspaceRootUri),
+      '-f', this.convertToEnvPath(buildWithWsl, makefileUri),
+      '-C', this.convertToEnvPath(buildWithWsl, workspaceRootUri),
     ];
 
     if (isLinux) {
@@ -784,13 +784,13 @@ export class VesBuildService {
         env: {
           BUILD_ALL: buildAll ? 1 : 0,
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: this.convertToEnvPath(engineCoreUri),
+          ENGINE_FOLDER: this.convertToEnvPath(buildWithWsl, engineCoreUri),
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
           PATH: paths.join(':'),
-          PLUGINS_FOLDER: this.convertToEnvPath(enginePluginsUri),
-          USER_PLUGINS_FOLDER: this.convertToEnvPath(userPluginsUri),
+          PLUGINS_FOLDER: this.convertToEnvPath(buildWithWsl, enginePluginsUri),
+          USER_PLUGINS_FOLDER: this.convertToEnvPath(buildWithWsl, userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },
@@ -961,13 +961,17 @@ export class VesBuildService {
     await this.resetBuildStatus(BuildResult.aborted);
   }
 
-  convertToEnvPath(uri: URI): string {
+  convertToEnvPath(isWslInstalled: boolean, uri: URI): string {
     const path = uri.path.fsPath();
-    const envPath = path
+    let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
         return `/${x.substring(0, 1).toLowerCase()}/`;
       });
+
+    if (isWslInstalled) {
+      envPath = '/mnt' + envPath;
+    }
 
     return envPath;
   }
@@ -1275,18 +1279,18 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-    const enginePath = this.convertToEnvPath(engineCoreUri);
-    const pluginsPath = this.convertToEnvPath(enginePluginsUri);
+    const enginePath = this.convertToEnvPath(true, engineCoreUri);
+    const pluginsPath = this.convertToEnvPath(true, enginePluginsUri);
     await this.rsyncToWsl(`/mnt${enginePath}`, WSL_ENGINE_CORE_PATH);
     await this.rsyncToWsl(`/mnt${pluginsPath}`, WSL_ENGINE_PLUGINS_PATH);
 
-    const projectPath = this.convertToEnvPath(workspaceRootUri);
+    const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
     await this.rsyncToWsl(`/mnt${projectPath}`, `${WSL_PROJECTS_PATH}${projectPathSha1}`);
 
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     if (await this.fileService.exists(userPluginsUri)) {
-      const userPluginsPath = this.convertToEnvPath(userPluginsUri);
+      const userPluginsPath = this.convertToEnvPath(true, userPluginsUri);
       await this.rsyncToWsl(`/mnt${userPluginsPath}`, WSL_USER_PLUGINS_PATH);
     }
 
@@ -1319,9 +1323,9 @@ Beware! This is usually not necessary and will result in the next build taking l
       timestamp: Date.now(),
     });
 
-    const projectPath = this.convertToEnvPath(workspaceRootUri);
+    const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-    const projectBuildPath = this.convertToEnvPath(workspaceRootUri.resolve('build'));
+    const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
     await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${projectPathSha1}/build/`, `/mnt${projectBuildPath}`);
 
     this.pushBuildLogLine({
