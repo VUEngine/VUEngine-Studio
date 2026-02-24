@@ -212,7 +212,7 @@ export class VesBuildService {
   }
 
   async afterBuild(step?: string): Promise<void> {
-    await this.preBuildSyncWsl();
+    await this.postBuildSyncWsl();
 
     if (step !== BuildResult.done) {
       this.onDidFailBuildEmitter.fire();
