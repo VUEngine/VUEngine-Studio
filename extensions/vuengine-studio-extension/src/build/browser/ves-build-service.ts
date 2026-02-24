@@ -966,8 +966,9 @@ export class VesBuildService {
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
-        return `/${x.substring(0, 1).toLowerCase()}`;
-      });
+        return `/${x.substring(0, 1).toLowerCase()}/`;
+      })
+      .replace(/\/(?!.*\/)/, '');
 
     if (isWslInstalled) {
       envPath = '/mnt' + envPath;
