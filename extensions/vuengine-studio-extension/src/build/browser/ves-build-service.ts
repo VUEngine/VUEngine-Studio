@@ -47,7 +47,11 @@ import {
   BuildStatus,
   GccMatchedProblem,
   PrePostBuildTask,
-  PrePostBuildTaskType
+  PrePostBuildTaskType,
+  WSL_ENGINE_CORE_PATH,
+  WSL_ENGINE_PLUGINS_PATH,
+  WSL_PROJECTS_PATH,
+  WSL_USER_PLUGINS_PATH
 } from './ves-build-types';
 
 @injectable()
@@ -208,6 +212,8 @@ export class VesBuildService {
   }
 
   async afterBuild(step?: string): Promise<void> {
+    await this.preBuildSyncWsl();
+
     if (step !== BuildResult.done) {
       this.onDidFailBuildEmitter.fire();
     } else {
@@ -599,6 +605,8 @@ export class VesBuildService {
     await this.runPreBuildTasks();
 
     try {
+      await this.preBuildSyncWsl();
+
       this.onDidStartBuildEmitter.fire();
 
       this.buildStatus = {
@@ -644,8 +652,8 @@ export class VesBuildService {
     await this.preferenceService.ready;
     await this.workspaceService.ready;
 
-    const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
-    const isWslInstalled = useWsl && this.vesCommonService.isWslInstalled;
+    const useWslPreference = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
+    const buildWithWsl = useWslPreference && this.vesCommonService.isWslInstalled;
 
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
@@ -655,8 +663,8 @@ export class VesBuildService {
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-    const compilerUri = await this.vesBuildPathsService.getCompilerUri(isWslInstalled);
-    const makeUri = await this.vesBuildPathsService.getMakeUri(isWslInstalled);
+    const compilerUri = await this.vesBuildPathsService.getCompilerUri(buildWithWsl);
+    const makeUri = await this.vesBuildPathsService.getMakeUri(buildWithWsl);
     const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
@@ -669,14 +677,29 @@ export class VesBuildService {
     ];
 
     if (isOSX) {
-      const sedUri = await this.vesBuildPathsService.getSedUri(isWslInstalled);
+      const sedUri = await this.vesBuildPathsService.getSedUri(false);
       pathUris.push(sedUri);
     }
 
     if (isWindows) {
-      const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(isWslInstalled, p)));
+      const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(p)));
+      let projectPath = this.convertToEnvPath(workspaceRootUri);
+      if (buildWithWsl) {
+        const projectPathSha1 = window.electronVesCore.sha1(projectPath);
+        projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}/`;
+      }
+      const engineCorePath = buildWithWsl
+        ? WSL_ENGINE_CORE_PATH
+        : this.convertToEnvPath(engineCoreUri);
+      const enginePluginsPath = buildWithWsl
+        ? WSL_PROJECTS_PATH
+        : this.convertToEnvPath(enginePluginsUri);
+      const userPluginsPath = buildWithWsl
+        ? WSL_USER_PLUGINS_PATH
+        : this.convertToEnvPath(userPluginsUri);
+
       const preMakeArgs = [
-        'cd', await this.convertToEnvPath(isWslInstalled, workspaceRootUri), '&&',
+        'cd', projectPath, '&&',
         'export', `PATH=${winPaths.join(':')}:$PATH`,
         'LC_ALL=C',
         `BUILD_ALL=${buildAll ? 1 : 0}`,
@@ -688,13 +711,13 @@ export class VesBuildService {
       const makeArgs = [
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
-        `ENGINE_FOLDER=${await this.convertToEnvPath(isWslInstalled, engineCoreUri)}`,
-        `PLUGINS_FOLDER=${await this.convertToEnvPath(isWslInstalled, enginePluginsUri)}`,
-        `USER_PLUGINS_FOLDER=${await this.convertToEnvPath(isWslInstalled, userPluginsUri)}`,
-        '-f', await this.convertToEnvPath(isWslInstalled, makefileUri),
+        `ENGINE_FOLDER=${engineCorePath}`,
+        `PLUGINS_FOLDER=${enginePluginsPath}`,
+        `USER_PLUGINS_FOLDER=${userPluginsPath}`,
+        '-f', this.convertToEnvPath(makefileUri),
       ];
 
-      if (isWslInstalled) {
+      if (buildWithWsl) {
         return {
           command: 'wsl.exe',
           args: [
@@ -740,8 +763,8 @@ export class VesBuildService {
     let args = [
       'all',
       '-e', `TYPE=${buildMode}`,
-      '-f', await this.convertToEnvPath(isWslInstalled, makefileUri),
-      '-C', await this.convertToEnvPath(isWslInstalled, workspaceRootUri),
+      '-f', this.convertToEnvPath(makefileUri),
+      '-C', this.convertToEnvPath(workspaceRootUri),
     ];
 
     if (isLinux) {
@@ -761,13 +784,13 @@ export class VesBuildService {
         env: {
           BUILD_ALL: buildAll ? 1 : 0,
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: await this.convertToEnvPath(isWslInstalled, engineCoreUri),
+          ENGINE_FOLDER: this.convertToEnvPath(engineCoreUri),
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
           PATH: paths.join(':'),
-          PLUGINS_FOLDER: await this.convertToEnvPath(isWslInstalled, enginePluginsUri),
-          USER_PLUGINS_FOLDER: await this.convertToEnvPath(isWslInstalled, userPluginsUri),
+          PLUGINS_FOLDER: this.convertToEnvPath(enginePluginsUri),
+          USER_PLUGINS_FOLDER: this.convertToEnvPath(userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },
@@ -938,17 +961,13 @@ export class VesBuildService {
     await this.resetBuildStatus(BuildResult.aborted);
   }
 
-  async convertToEnvPath(isWslInstalled: boolean, uri: URI): Promise<string> {
-    const path = await this.fileService.fsPath(uri);
-    let envPath = path
+  convertToEnvPath(uri: URI): string {
+    const path = uri.path.fsPath();
+    const envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
         return `/${x.substring(0, 1).toLowerCase()}/`;
       });
-
-    if (isWslInstalled) {
-      envPath = '/mnt' + envPath;
-    }
 
     return envPath;
   }
@@ -1190,6 +1209,119 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     const tasks = this.preferenceService.get(VesBuildPreferenceIds.PRE_BUILD_TASKS, []) as Array<PrePostBuildTask>;
     await this.runTasks(tasks);
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
+  }
+
+  protected async rsyncToWsl(from: string, to: string): Promise<void> {
+    const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command: 'wsl.exe',
+      args: [
+        'rsync',
+        '-zrmu',
+        '--delete',
+        '--force',
+        '--exclude="build"',
+        '--exclude=".git"',
+        '--include="*/"',
+        '--include="*.c"',
+        '--include="*.h"',
+        '--exclude="*"',
+        from,
+        to,
+      ]
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
+        if (checkProcess.processManagerId === pId) {
+          resolve();
+        }
+      });
+      this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
+        if (checkProcess.processManagerId === pId) {
+          resolve();
+        }
+      });
+    });
+  };
+
+  protected async preBuildSyncWsl(): Promise<void> {
+    const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
+    if (!isWindows || !useWsl || !this.vesCommonService.isWslInstalled) {
+      return;
+    }
+
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      throw new Error;
+    }
+
+    this.buildStatus = {
+      ...this.buildStatus,
+      step: nls.localize('vuengine/build/syncingWsl', 'Syncing WSL'),
+    };
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Headline,
+      text: nls.localize('vuengine/build/syncingWsl', 'Syncing WSL'),
+      timestamp: Date.now(),
+    });
+
+    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const enginePath = this.convertToEnvPath(engineCoreUri);
+    const pluginsPath = this.convertToEnvPath(enginePluginsUri);
+    await this.rsyncToWsl('/mnt' + enginePath, WSL_ENGINE_CORE_PATH);
+    await this.rsyncToWsl('/mnt' + pluginsPath, WSL_ENGINE_PLUGINS_PATH);
+
+    const projectPath = this.convertToEnvPath(workspaceRootUri);
+    const projectPathSha1 = window.electronVesCore.sha1(projectPath);
+    await this.rsyncToWsl('/mnt' + projectPath, `${WSL_PROJECTS_PATH}${projectPathSha1}/`);
+
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+    if (await this.fileService.exists(userPluginsUri)) {
+      const userPluginsPath = this.convertToEnvPath(userPluginsUri);
+      await this.rsyncToWsl('/mnt' + userPluginsPath, WSL_USER_PLUGINS_PATH);
+    }
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
+  }
+
+  protected async postBuildSyncWsl(): Promise<void> {
+    const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
+    if (!isWindows || !useWsl || !this.vesCommonService.isWslInstalled) {
+      return;
+    }
+
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      throw new Error;
+    }
+
+    this.buildStatus = {
+      ...this.buildStatus,
+      step: nls.localize('vuengine/build/syncingWsl', 'Syncing WSL'),
+    };
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Headline,
+      text: nls.localize('vuengine/build/syncingWsl', 'Syncing WSL'),
+      timestamp: Date.now(),
+    });
+
+    const projectPath = this.convertToEnvPath(workspaceRootUri);
+    const projectPathSha1 = window.electronVesCore.sha1(projectPath);
+    const projectBuildPath = this.convertToEnvPath(workspaceRootUri.resolve('build'));
+    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${projectPathSha1}/build/`, '/mnt' + projectBuildPath);
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
