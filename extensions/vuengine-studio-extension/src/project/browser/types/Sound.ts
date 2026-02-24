@@ -28,6 +28,7 @@ import {
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
 import { SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import { DEFAULT_WAVEFORM } from '../../../editors/browser/components/SoundEditor/Waveforms/WaveFormPresets';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
 
@@ -136,7 +137,7 @@ export const SoundType: ProjectDataType = {
                             },
                             maxItems: 32,
                             minItems: 32,
-                            default: [62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0]
+                            default: DEFAULT_WAVEFORM,
                         },
                         volume: {
                             type: 'object',

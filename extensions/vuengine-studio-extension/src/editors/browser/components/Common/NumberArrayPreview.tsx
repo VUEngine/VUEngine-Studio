@@ -15,7 +15,7 @@ const ColumnContainer = styled.div`
     z-index: 1;
 
     &.editable {
-    cursor: pointer;
+        cursor: pointer;
     }
 
     &.editable:hover {

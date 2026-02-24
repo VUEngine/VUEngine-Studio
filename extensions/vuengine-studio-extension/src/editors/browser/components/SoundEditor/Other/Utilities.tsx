@@ -14,6 +14,132 @@ const MAX_UNUSED_PATTERNS_TO_LIST = 15;
 const MAX_UNUSED_INSTRUMENTS_TO_LIST = 15;
 const MAX_DUPLICATE_PATTERNS_TO_LIST = 5;
 
+export const getUnusedPatternsMaps = (sd: SoundData): Record<string, string> => {
+    const unusedPatterns: Record<string, string> = {};
+    Object.keys(sd.patterns).forEach(patternId => {
+        let found = false;
+        sd.tracks.forEach(track => {
+            if (Object.values(track.sequence).includes(patternId)) {
+                found = true;
+            }
+        });
+
+        if (!found) {
+            unusedPatterns[patternId] = getPatternName(sd, patternId);
+        }
+    });
+
+    return unusedPatterns;
+};
+
+export const filterUnusedPatterns = (sd: SoundData, unusedPatternsMap: Record<string, string>): SoundData => {
+    const unusedPatternsIds = Object.keys(unusedPatternsMap);
+
+    const updatedPatterns = Object.fromEntries(
+        Object.entries({ ...sd.patterns })
+            .filter(([pId]) => !unusedPatternsIds.includes(pId))
+    );
+
+    return {
+        ...sd,
+        patterns: updatedPatterns,
+    };
+};
+
+export const getUnusedInstrumentIds = (sd: SoundData): string[] => {
+    // get all instruments used on placed patterns or set as track default instrument
+    const usedInstruments: string[] = [];
+    sd.tracks.forEach(track => {
+        usedInstruments.push(track.instrument);
+
+        Object.values(track.sequence).forEach(patternId => {
+            const pattern = sd.patterns[patternId];
+            Object.values(pattern?.events ?? {}).forEach(event => {
+                if (event[SoundEvent.Instrument]) {
+                    usedInstruments.push(event[SoundEvent.Instrument]);
+                }
+            });
+        });
+    });
+
+    // get all instruments, then filter out used ones
+    const unusedInstrumentIds = Object.keys(sd.instruments)
+        .filter(instrumentId => !usedInstruments.includes(instrumentId));
+
+    return unusedInstrumentIds;
+};
+
+export const filterUnusedInstruments = (sd: SoundData, unusedInstrumentIds: string[]): SoundData => {
+    // filter out unused
+    const updatedInstruments = Object.fromEntries(
+        Object.entries({ ...sd.instruments })
+            .filter(([iId]) => !unusedInstrumentIds.includes(iId))
+    );
+
+    return {
+        ...sd,
+        instruments: updatedInstruments,
+    };
+};
+
+// get a map of all duplicate patterns, first appearances being the keys
+export const getDuplicatePatternsMap = (sd: SoundData): Record<string, string[]> => {
+    // get a map of all duplicate patterns, first appearances being the keys
+    const processedPatternIds: string[] = [];
+    const duplicatePatternsMap: Record<string, string[]> = {};
+    const sortedPatternEntries = Object.entries(sd.patterns)
+        .sort(([patternIdA], [patternIdB]) =>
+            getPatternName(sd, patternIdA).localeCompare(getPatternName(sd, patternIdB))
+        );
+
+    sortedPatternEntries.forEach(([patternId, patternConfig]) => {
+        processedPatternIds.push(patternId);
+        sortedPatternEntries.forEach(([comparePatternId, comparePatternConfig]) => {
+            if (!processedPatternIds.includes(comparePatternId) && isEqual(
+                { ...patternConfig, name: '' },
+                { ...comparePatternConfig, name: '' }
+            )) {
+                processedPatternIds.push(comparePatternId);
+                if (!duplicatePatternsMap[patternId]) {
+                    duplicatePatternsMap[patternId] = [];
+                }
+
+                duplicatePatternsMap[patternId].push(comparePatternId);
+            }
+        });
+    });
+
+    return duplicatePatternsMap;
+};
+
+export const filterDuplicatePatterns = (sd: SoundData, duplicatePatternsMap: Record<string, string[]>): SoundData => {
+    const duplicatePatterns = Object.entries(duplicatePatternsMap);
+    let updatedTracks = deepClone(sd.tracks);
+    let updatedPatterns = Object.entries({ ...sd.patterns });
+
+    Object.values(duplicatePatterns).forEach(([patternId, duplicatePatternIds]) => {
+        // filter out duplicate patterns
+        duplicatePatternIds.forEach(duplicatePatternId => {
+            updatedPatterns = updatedPatterns.filter(([pId]) => pId !== duplicatePatternId);
+        });
+
+        // replace all references with original pattern ID
+        updatedTracks = updatedTracks.map(track => ({
+            ...track,
+            sequence: Object.fromEntries(Object.entries(track.sequence).map(([step, pId]) => ([
+                step,
+                duplicatePatternIds.includes(pId) ? patternId : pId
+            ])))
+        }));
+    });
+
+    return {
+        ...sd,
+        patterns: Object.fromEntries(updatedPatterns),
+        tracks: updatedTracks,
+    };
+};
+
 interface UtilitiesProps {
     soundData: SoundData
     updateSoundData: (soundData: SoundData) => void
@@ -25,20 +151,8 @@ export default function Utilities(props: UtilitiesProps): React.JSX.Element {
 
     const removeUnusedPatterns = async (): Promise<void> => {
         // find all unused patterns
-        const unusedPatterns: Record<string, string> = {};
-        Object.keys(soundData.patterns).forEach(patternId => {
-            let found = false;
-            soundData.tracks.forEach(track => {
-                if (Object.values(track.sequence).includes(patternId)) {
-                    found = true;
-                }
-            });
-
-            if (!found) {
-                unusedPatterns[patternId] = getPatternName(soundData, patternId);
-            }
-        });
-        const unusedPatternsNames = Object.values(unusedPatterns);
+        const unusedPatternsMap = getUnusedPatternsMaps(soundData);
+        const unusedPatternsNames = Object.values(unusedPatternsMap);
 
         // stop if no unused patterns found
         if (unusedPatternsNames.length === 0) {
@@ -66,18 +180,8 @@ A total of {0} patterns will be deleted.',
 
         const confirmed = await dialog.open();
         if (confirmed) {
-            const unusedPatternsIds = Object.keys(unusedPatterns);
-
-            // filter out unused patterns
-            const updatedPatterns = Object.fromEntries(
-                Object.entries({ ...soundData.patterns })
-                    .filter(([pId]) => !unusedPatternsIds.includes(pId))
-            );
-
-            updateSoundData({
-                ...soundData,
-                patterns: updatedPatterns,
-            });
+            const updatedSoundData = filterUnusedPatterns(soundData, unusedPatternsMap);
+            updateSoundData(updatedSoundData);
 
             services.messageService.info(nls.localize(
                 'vuengine/editors/sound/unusedPatternsDeleted',
@@ -88,24 +192,7 @@ A total of {0} patterns will be deleted.',
     };
 
     const removeUnusedInstruments = async (): Promise<void> => {
-        // get all instruments used on placed patterns or set as track default instrument
-        const usedInstruments: string[] = [];
-        soundData.tracks.forEach(track => {
-            usedInstruments.push(track.instrument);
-
-            Object.values(track.sequence).forEach(patternId => {
-                const pattern = soundData.patterns[patternId];
-                Object.values(pattern?.events ?? {}).forEach(event => {
-                    if (event[SoundEvent.Instrument]) {
-                        usedInstruments.push(event[SoundEvent.Instrument]);
-                    }
-                });
-            });
-        });
-
-        // get all instruments, then filter out used ones
-        const unusedInstrumentIds = Object.keys(soundData.instruments)
-            .filter(instrumentId => !usedInstruments.includes(instrumentId));
+        const unusedInstrumentIds = getUnusedInstrumentIds(soundData);
 
         // stop if no unused instruments found
         if (unusedInstrumentIds.length === 0) {
@@ -132,16 +219,8 @@ A total of {0} instruments will be deleted.",
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            // filter out unused
-            const updatedInstruments = Object.fromEntries(
-                Object.entries({ ...soundData.instruments })
-                    .filter(([iId]) => !unusedInstrumentIds.includes(iId))
-            );
-
-            updateSoundData({
-                ...soundData,
-                instruments: updatedInstruments,
-            });
+            const updatedSoundData = filterUnusedInstruments(soundData, unusedInstrumentIds);
+            updateSoundData(updatedSoundData);
 
             services.messageService.info(nls.localize(
                 'vuengine/editors/sound/unusedInstrumentsDeleted',
@@ -152,30 +231,7 @@ A total of {0} instruments will be deleted.",
     };
 
     const cleanDuplicatePatterns = async (): Promise<void> => {
-        // get a map of all duplicate patterns, first appearances being the keys
-        const processedPatternIds: string[] = [];
-        const duplicatePatternsMap: Record<string, string[]> = {};
-        const sortedPatternEntries = Object.entries(soundData.patterns)
-            .sort(([patternIdA], [patternIdB]) =>
-                getPatternName(soundData, patternIdA).localeCompare(getPatternName(soundData, patternIdB))
-            );
-
-        sortedPatternEntries.forEach(([patternId, patternConfig]) => {
-            processedPatternIds.push(patternId);
-            sortedPatternEntries.forEach(([comparePatternId, comparePatternConfig]) => {
-                if (!processedPatternIds.includes(comparePatternId) && isEqual(
-                    { ...patternConfig, name: '' },
-                    { ...comparePatternConfig, name: '' }
-                )) {
-                    processedPatternIds.push(comparePatternId);
-                    if (!duplicatePatternsMap[patternId]) {
-                        duplicatePatternsMap[patternId] = [];
-                    }
-
-                    duplicatePatternsMap[patternId].push(comparePatternId);
-                }
-            });
-        });
+        const duplicatePatternsMap = getDuplicatePatternsMap(soundData);
         const duplicatePatterns = Object.entries(duplicatePatternsMap);
 
         // stop if no unused patterns found
@@ -189,20 +245,21 @@ A total of {0} instruments will be deleted.",
         const ellipsis = duplicatePatterns.length > MAX_DUPLICATE_PATTERNS_TO_LIST ? '• […]' : '';
         let patternList = '';
         let numberOfPatternsToDelete = 0;
+        const duplicateLabel = nls.localize('vuengine/editors/sound/duplicates', 'duplicates');
         Object.values(duplicatePatterns).forEach(([patternId, duplicatePatternIds], index) => {
             numberOfPatternsToDelete += duplicatePatternIds.length;
             if (index < MAX_DUPLICATE_PATTERNS_TO_LIST) {
-                patternList += `• ${getPatternName(soundData, patternId)} → ${duplicatePatternIds.map(y => getPatternName(soundData, y)).join(', ')}\n`;
+                patternList += `• ${duplicatePatternIds.map(y => getPatternName(soundData, y)).join(', ')} (${duplicateLabel} ${getPatternName(soundData, patternId)})\n`;
             }
         });
         patternList += ellipsis;
 
         // prompt
         const dialog = new ConfirmDialog({
-            title: SoundEditorCommands.REMOVE_UNUSED_PATTERNS.label,
+            title: SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS.label,
             msg: `${nls.localize(
                 'vuengine/editors/sound/confirmCleanDuplicatePatterns',
-                'This will remove all duplicate patterns and replace references with ones to the duplicated pattern.\n\
+                'This will remove all pattern duplicate and replace references with ones to the duplicated pattern.\n\
         Are you sure you want to do this?\n\n\
         A total of {0} patterns will be deleted.',
                 numberOfPatternsToDelete
@@ -212,30 +269,8 @@ A total of {0} instruments will be deleted.",
 
         const confirmed = await dialog.open();
         if (confirmed) {
-            let updatedTracks = deepClone(soundData.tracks);
-            let updatedPatterns = Object.entries({ ...soundData.patterns });
-
-            Object.values(duplicatePatterns).forEach(([patternId, duplicatePatternIds]) => {
-                // filter out duplicate patterns
-                duplicatePatternIds.forEach(duplicatePatternId => {
-                    updatedPatterns = updatedPatterns.filter(([pId]) => pId !== duplicatePatternId);
-                });
-
-                updatedTracks = updatedTracks.map(track => ({
-                    ...track,
-                    sequence: Object.fromEntries(Object.entries(track.sequence).map(([step, pId]) => ([
-                        step,
-                        duplicatePatternIds.includes(pId) ? patternId : pId
-                    ])))
-                }));
-                // replace all references with original pattern ID
-            });
-
-            updateSoundData({
-                ...soundData,
-                patterns: Object.fromEntries(updatedPatterns),
-                tracks: updatedTracks,
-            });
+            const updatedSoundData = filterDuplicatePatterns(soundData, duplicatePatternsMap);
+            updateSoundData(updatedSoundData);
 
             services.messageService.info(nls.localize(
                 'vuengine/editors/sound/duplicatePatternsCleaned',

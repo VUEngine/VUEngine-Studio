@@ -90,13 +90,13 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
             title={nls.localize('vuengine/editors/font/actions/import', 'Import')}
             onClick={() => setImportDialogOpen(true)}
         >
-            <FileArrowUp size={20} />
+            <FileArrowDown size={20} />
         </PixelEditorTool>
         <PixelEditorTool
             title={nls.localize('vuengine/editors/font/actions/export', 'Export')}
             onClick={() => setExportDialogOpen(true)}
         >
-            <FileArrowDown size={20} />
+            <FileArrowUp size={20} />
         </PixelEditorTool>
         <PopUpDialog
             height='100%'

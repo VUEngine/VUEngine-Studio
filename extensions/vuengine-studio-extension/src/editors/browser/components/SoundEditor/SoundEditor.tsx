@@ -16,6 +16,7 @@ import { sortObjectByKeys } from '../Common/Utils';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { VsuChannelStereoLevelsData } from './Emulator/VsuTypes';
 import EventList from './EventList/EventList';
+import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
 import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
@@ -29,7 +30,14 @@ import Keybindings from './Other/Keybindings';
 import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
 import Transpose, { DEFAULT_TRANSPOSE_OPTIONS, TransposeOptions, TransposeOverflowBehavior, TransposeScope } from './Other/Transpose';
-import Utilities from './Other/Utilities';
+import Utilities, {
+    filterDuplicatePatterns,
+    filterUnusedInstruments,
+    filterUnusedPatterns,
+    getDuplicatePatternsMap,
+    getUnusedInstrumentIds,
+    getUnusedPatternsMaps
+} from './Other/Utilities';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -285,8 +293,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
-    const [showSidebar, setShowSidebar] = useState<boolean>(false);
-    const [sidebarTab, setSidebarTab] = useState<number>(0);
+    const [showSidebar, setShowSidebar] = useState<boolean>(true);
+    const [sidebarTab, setSidebarTab] = useState<number>(5);
+    const [importSettings, setImportSettings] = useState<ImportSettings>(DEFAULT_IMPORT_SETTINGS);
     const [transposeOptions, setTransposeOptions] = useState<TransposeOptions>(DEFAULT_TRANSPOSE_OPTIONS);
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length
         ? soundData.tracks[0].instrument ?? TRACK_DEFAULT_INSTRUMENT_ID
@@ -1006,12 +1015,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             canSelectFiles: true,
             canSelectMany: false,
             filters: {
-                [nls.localize('vuengine/editors/sound/supportedFiles', 'Supported Files')]: [
-                    // 'midi', 'mid',
-                    // 's3m',
-                    'uge',
-                    'vbm',
-                ],
+                [nls.localize('vuengine/editors/sound/supportedFiles', 'Supported Files')]:
+                    SUPPORTED_IMPORT_FILETYPES,
             }
         };
         const currentPath = await services.fileService.resolve(fileUri.parent);
@@ -1051,13 +1056,90 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         'The was an error importing the file {0}.',
                         uri.path.base,
                     ));
-                return;
+            } else {
+                setImportSettings(prev => ({
+                    ...prev,
+                    dialogOpen: true,
+                    soundData: importedSoundData!,
+                    trackSettings: importedSoundData!.tracks.map(t => ({
+                        enabled: true,
+                        type: t.type,
+                    })),
+                    fileUri: uri,
+                }));
             }
-
-            setTrackSettings([...importedSoundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
-            updateSoundData({ ...soundData, ...importedSoundData });
-            updateCurrentSequenceIndex(0, 0);
         }
+    };
+
+    const doImport = () => {
+        let importSoundData = { ...soundData, ...importSettings.soundData };
+
+        // apply user changes
+        importSoundData.tracks = importSoundData.tracks
+            .map((track, trackIndex) => ({
+                ...track,
+                type: importSettings.trackSettings[trackIndex]
+                    ? importSettings.trackSettings[trackIndex].type
+                    : track.type
+            }))
+            .filter((track, trackIndex) =>
+                importSettings.trackSettings[trackIndex]
+                    ? importSettings.trackSettings[trackIndex].enabled
+                    : true
+            );
+
+        // apply clean-up options
+        if (importSettings.removeUnusedPatterns) {
+            const unusedPatternsMap = getUnusedPatternsMaps(importSoundData);
+            importSoundData = filterUnusedPatterns(importSoundData, unusedPatternsMap);
+        }
+        if (importSettings.cleanDuplicatePatterns) {
+            const duplicatePatternsMap = getDuplicatePatternsMap(importSoundData);
+            importSoundData = filterDuplicatePatterns(importSoundData, duplicatePatternsMap);
+        }
+        if (importSettings.removeUnusedInstruments) {
+            const unusedInstrumentIds = getUnusedInstrumentIds(importSoundData);
+            importSoundData = filterUnusedInstruments(importSoundData, unusedInstrumentIds);
+        }
+
+        // mind import mode
+        if (importSettings.importMode === ImportMode.Add) {
+            importSoundData = {
+                ...soundData,
+                patterns: {
+                    ...soundData.patterns,
+                    ...importSoundData.patterns,
+                },
+                instruments: {
+                    ...soundData.instruments,
+                    ...importSoundData.instruments,
+                },
+                tracks: [
+                    ...soundData.tracks,
+                    ...importSoundData.tracks,
+                ],
+            };
+        }
+
+        // resort tracks
+        importSoundData.tracks = [
+            ...importSoundData.tracks.filter(t => t.type === SoundEditorTrackType.WAVE),
+            ...importSoundData.tracks.filter(t => t.type === SoundEditorTrackType.SWEEPMOD),
+            ...importSoundData.tracks.filter(t => t.type === SoundEditorTrackType.NOISE),
+        ];
+
+        // sort keys
+        importSoundData = window.electronVesCore.sortJson(importSoundData, {
+            depth: 8,
+            ignoreCase: true,
+            reverse: false,
+        });
+
+        // do import
+        updateSoundData(importSoundData);
+        setTrackSettings([...importSoundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
+        setImportSettings(DEFAULT_IMPORT_SETTINGS);
+        updateCurrentSequenceIndex(0, 0);
     };
 
     const commandListener = (commandId: string): void => {
@@ -1145,6 +1227,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 }
                 break;
             case SoundEditorCommands.IMPORT.id:
+                setImportSettings({
+                    ...DEFAULT_IMPORT_SETTINGS,
+                    dialogOpen: true,
+                    fileUri: undefined,
+                });
                 importFile();
                 break;
             case SoundEditorCommands.EXPORT.id:
@@ -1697,6 +1784,38 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             updateColor={color => setInstrumentColor(instrumentColorDialogOpen, color)}
                         />
                     }
+                </PopUpDialog>
+            }
+            {importSettings.dialogOpen &&
+                <PopUpDialog
+                    open={importSettings.dialogOpen}
+                    onClose={() => {
+                        setImportSettings(prev => ({ ...prev, dialogOpen: false }));
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    onOk={() => {
+                        doImport();
+                        setImportSettings(prev => ({ ...prev, dialogOpen: false }));
+                        enableCommands();
+                        focusEditor();
+                    }}
+                    title={nls.localize('vuengine/editors/sound/importSettings', 'Import Settings')}
+                    height="640px"
+                    width="640px"
+                    overflow="hidden"
+                    cancelButton={true}
+                    okButton={true}
+                    okLabel={nls.localize('vuengine/editors/sound/import', 'Import')}
+                    disableOkButton={!importSettings.fileUri}
+                    error={importSettings.error}
+                >
+                    <ImportSettingsDialog
+                        soundData={soundData}
+                        importSettings={importSettings}
+                        setImportSettings={setImportSettings}
+                        importFile={importFile}
+                    />
                 </PopUpDialog>
             }
         </HContainer>

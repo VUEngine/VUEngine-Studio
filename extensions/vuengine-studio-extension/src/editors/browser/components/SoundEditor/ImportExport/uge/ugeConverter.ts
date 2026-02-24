@@ -91,6 +91,20 @@ export const convertUgeSong = (song: Song): SoundData => {
     ];
     const patternsLookup = convertPatterns(song.patterns, instrumentsLookup);
 
+    // add patterns to song
+    Object.values(patternsLookup).forEach(convertedPatterns => {
+        convertedPatterns.forEach(p => {
+            result.patterns[p.id] = p.patternConfig;
+        });
+    });
+
+    // add instruments to song
+    Object.values(instrumentsLookup).forEach(convertedInstruments => {
+        convertedInstruments.forEach(i => {
+            result.instruments[i.id] = i.instrumentConfig;
+        });
+    });
+
     // for unknown reasons, only every fourth entry, starting with 0, is valid. the rest is 1s.
     const cleanedSequence: number[] = [];
     for (let i = 0; i < song.sequence.length - 1; i += 4) {
@@ -136,18 +150,6 @@ export const convertUgeSong = (song: Song): SoundData => {
             if (Object.keys(foundPattern.patternConfig.events).length > 0) {
                 // add pattern to sequence
                 tracks[trackIndex].sequence[sequenceIndex * CONVERTED_PATTERN_SIZE] = foundPattern.id;
-                // add pattern to song
-                result.patterns[foundPattern.id] = foundPattern.patternConfig;
-                // add pattern's instruments to song
-                Object.values(foundPattern.patternConfig.events).forEach(e => {
-                    const instrumentId = e[SoundEvent.Instrument];
-                    if (instrumentId !== undefined) {
-                        const foundInstrument = instrumentsLookup[trackIndex].filter(i => i.id === instrumentId)[0];
-                        if (foundInstrument !== undefined) {
-                            result.instruments[instrumentId] = foundInstrument.instrumentConfig;
-                        }
-                    }
-                });
             }
         });
     });
@@ -173,7 +175,6 @@ export const convertUgeSong = (song: Song): SoundData => {
 
             // set default instrument
             t.instrument = defaultInstrument.id;
-            result.instruments[defaultInstrument.id] = defaultInstrument.instrumentConfig;
         }
     });
 
@@ -194,8 +195,8 @@ export const convertUgeSong = (song: Song): SoundData => {
         });
     });
 
-    // resort tracks (for W-SM-N order) and add non-empty ones to song
-    [tracks[1], tracks[2], tracks[0], tracks[3]].forEach((t, trackIndex) => {
+    // add non-empty tracks to song
+    tracks.forEach(t => {
         if (Object.keys(t.sequence).length > 0) {
             // add track to song
             result.tracks.push(t);

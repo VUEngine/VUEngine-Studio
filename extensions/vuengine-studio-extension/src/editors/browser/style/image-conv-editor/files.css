@@ -76,13 +76,16 @@
 
 .jsonforms-container .fileAdd {
   align-items: center;
-  border: var(--theia-border-width) solid var(--theia-dropdown-border);
+  border: var(--theia-border-width) dashed var(--theia-dropdown-border);
   color: var(--theia-dropdown-border);
   border-radius: 2px;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
+  gap: 5px;
   height: var(--ves-file-height);
   justify-content: center;
+  user-select: none;
   width: var(--ves-file-width);
 }
 

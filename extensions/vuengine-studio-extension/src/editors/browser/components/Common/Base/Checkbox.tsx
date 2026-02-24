@@ -41,7 +41,7 @@ export default function Checkbox(props: CheckboxProps): React.JSX.Element {
                     tooltip={tooltip}
                 />
             }
-            <label>
+            <label style={{ cursor: disabled ? undefined : 'pointer' }}>
                 <input
                     type="checkbox"
                     checked={checked}

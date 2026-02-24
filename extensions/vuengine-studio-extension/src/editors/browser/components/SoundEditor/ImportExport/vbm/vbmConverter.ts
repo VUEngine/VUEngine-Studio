@@ -28,6 +28,7 @@ import {
     TRACK_PRIORITY_DEFAULT,
     TrackConfig
 } from '../../SoundEditorTypes';
+import { DEFAULT_WAVEFORM } from '../../Waveforms/WaveFormPresets';
 import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
 
 const DEFAULT_INSTRUMENT_ID = 'default';
@@ -63,9 +64,7 @@ const DEFAULT_INSTRUMENT = {
         left: VSU_VOLUME_DEFAULT,
         right: VSU_VOLUME_DEFAULT
     },
-    waveform: [
-        63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Pulse (50%)
-    ],
+    waveform: DEFAULT_WAVEFORM,
 };
 
 interface ConvertedInstrument {
@@ -105,6 +104,18 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
 
     const instrumentsLookup = convertInstruments(song);
     const patternsLookup = convertPatterns(song, instrumentsLookup, convertedPatternSize);
+
+    // add patterns to song
+    Object.values(patternsLookup).forEach(convertedPatterns => {
+        convertedPatterns.forEach(p => {
+            result.patterns[p.id] = p.patternConfig;
+        });
+    });
+
+    // add instruments to song
+    Object.values(instrumentsLookup).forEach(i => {
+        result.instruments[i.id] = i.instrumentConfig;
+    });
 
     const tracks: TrackConfig[] = [
         {
@@ -160,18 +171,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             if (foundPattern?.patternConfig && Object.keys(foundPattern.patternConfig.events).length > 0) {
                 // add pattern to sequence
                 tracks[trackIndex].sequence[sequenceIndex * convertedPatternSize] = foundPattern.id;
-                // add pattern to song
-                result.patterns[foundPattern.id] = foundPattern.patternConfig;
-                // add pattern's instruments to song
-                Object.values(foundPattern.patternConfig.events).forEach(e => {
-                    const instrumentId = e[SoundEvent.Instrument];
-                    if (instrumentId !== undefined) {
-                        const foundConvertedInstrument = instrumentsLookup.find(i => i.id === instrumentId);
-                        if (foundConvertedInstrument !== undefined) {
-                            result.instruments[instrumentId] = foundConvertedInstrument.instrumentConfig;
-                        }
-                    }
-                });
             }
         });
     });
@@ -322,9 +321,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                     left: VSU_VOLUME_DEFAULT,
                     right: VSU_VOLUME_DEFAULT
                 },
-                waveform: [
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-                ],
+                waveform: DEFAULT_WAVEFORM,
             },
         });
     });

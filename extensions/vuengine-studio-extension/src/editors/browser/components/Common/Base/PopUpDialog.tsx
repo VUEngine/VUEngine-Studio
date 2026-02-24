@@ -1,6 +1,13 @@
 import { nls } from '@theia/core';
 import React, { PropsWithChildren, useEffect } from 'react';
 import HContainer from './HContainer';
+import styled from 'styled-components';
+
+const StyledError = styled(HContainer)`
+    align-items: center;
+    color: var(--theia-editorError-foreground);
+    flex-grow: 2;
+`;
 
 interface PopUpDialogProps {
     open: boolean
@@ -13,12 +20,13 @@ interface PopUpDialogProps {
     width?: string
     maxWidth?: string
     okButton?: boolean
+    disableOkButton?: boolean
     cancelButton?: boolean
     overflow?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, onClose, onOk, okLabel, title, error, height, width, maxWidth, okButton, cancelButton, children, overflow } = props;
+    const { open, onClose, onOk, okLabel, title, error, height, width, maxWidth, okButton, disableOkButton, cancelButton, children, overflow } = props;
 
     const onKeyDown = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -65,9 +73,11 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 {children}
             </div>
             <HContainer className="dialogControl">
-                <div className="error" style={{ flex: 2 }}>
-                    {error}
-                </div>
+                <StyledError>
+                    {error && <>
+                        <i className='codicon codicon-warning' /> {error}
+                    </>}
+                </StyledError>
                 {cancelButton &&
                     <button
                         className="theia-button secondary"
@@ -80,6 +90,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                     <button
                         className="theia-button main"
                         onClick={onOk}
+                        disabled={!!error || disableOkButton}
                         style={{
                             minWidth: '65px',
                         }}
