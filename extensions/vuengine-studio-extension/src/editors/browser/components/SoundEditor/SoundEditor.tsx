@@ -293,8 +293,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
-    const [showSidebar, setShowSidebar] = useState<boolean>(true);
-    const [sidebarTab, setSidebarTab] = useState<number>(5);
+    const [showSidebar, setShowSidebar] = useState<boolean>(false);
+    const [sidebarTab, setSidebarTab] = useState<number>(0);
     const [importSettings, setImportSettings] = useState<ImportSettings>(DEFAULT_IMPORT_SETTINGS);
     const [transposeOptions, setTransposeOptions] = useState<TransposeOptions>(DEFAULT_TRANSPOSE_OPTIONS);
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length

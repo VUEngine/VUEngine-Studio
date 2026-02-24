@@ -80,7 +80,7 @@ export interface ImportSettings {
 }
 
 export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
-    dialogOpen: true,
+    dialogOpen: false,
     soundData: {
         author: '',
         comment: '',
