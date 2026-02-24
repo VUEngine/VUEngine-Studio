@@ -686,7 +686,7 @@ export class VesBuildService {
       let projectPath = this.convertToEnvPath(buildWithWsl, workspaceRootUri);
       if (buildWithWsl) {
         const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-        projectPath = `${WSL_PROJECTS_PATH}/${projectPathSha1}`;
+        projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}`;
       }
       const engineCorePath = buildWithWsl
         ? WSL_ENGINE_CORE_PATH
