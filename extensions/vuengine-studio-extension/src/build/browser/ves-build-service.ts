@@ -686,7 +686,7 @@ export class VesBuildService {
       let projectPath = this.convertToEnvPath(workspaceRootUri);
       if (buildWithWsl) {
         const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-        projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}/`;
+        projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}`;
       }
       const engineCorePath = buildWithWsl
         ? WSL_ENGINE_CORE_PATH
@@ -1282,7 +1282,7 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     const projectPath = this.convertToEnvPath(workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-    await this.rsyncToWsl(`/mnt${projectPath}`, `${WSL_PROJECTS_PATH}${projectPathSha1}/`);
+    await this.rsyncToWsl(`/mnt${projectPath}`, `${WSL_PROJECTS_PATH}${projectPathSha1}`);
 
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     if (await this.fileService.exists(userPluginsUri)) {
