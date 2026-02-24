@@ -106,15 +106,15 @@ export default class PlayerRomBuilder {
             args: [
                 '--login',
                 '-c', [
-                    await this.services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-gcc.exe')),
-                    '-o', await this.services.vesBuildService.convertToEnvPath(false, this.tempBaseDir.resolve('sound.elf')),
+                    this.services.vesBuildService.convertToEnvPath(compilerUri.resolve('bin/v810-gcc.exe')),
+                    '-o', this.services.vesBuildService.convertToEnvPath(this.tempBaseDir.resolve('sound.elf')),
                     '-nostartfiles',
                     '-Tvb_shipping.ld',
                     '-lm',
-                    '-I', await this.services.vesBuildService.convertToEnvPath(false, this.tempBaseDir),
-                    '-I', await this.services.vesBuildService.convertToEnvPath(false, soundBaseUri),
-                    await this.services.vesBuildService.convertToEnvPath(false, SpecFileUri),
-                    '-L', await this.services.vesBuildService.convertToEnvPath(false, soundBaseUri),
+                    '-I', this.services.vesBuildService.convertToEnvPath(this.tempBaseDir),
+                    '-I', this.services.vesBuildService.convertToEnvPath(soundBaseUri),
+                    this.services.vesBuildService.convertToEnvPath(SpecFileUri),
+                    '-L', this.services.vesBuildService.convertToEnvPath(soundBaseUri),
                     '-lcore', '-lsound', '-lcore',
                 ].join(' '),
             ],
@@ -173,11 +173,11 @@ export default class PlayerRomBuilder {
             args: [
                 '--login',
                 '-c', [
-                    await this.services.vesBuildService.convertToEnvPath(false, compilerUri.resolve('bin/v810-objcopy.exe')),
+                    this.services.vesBuildService.convertToEnvPath(compilerUri.resolve('bin/v810-objcopy.exe')),
                     '-O',
                     'binary',
-                    await this.services.vesBuildService.convertToEnvPath(false, this.tempBaseDir.resolve('sound.elf')),
-                    await this.services.vesBuildService.convertToEnvPath(false, this.tempBaseDir.resolve('sound.vb')),
+                    this.services.vesBuildService.convertToEnvPath(this.tempBaseDir.resolve('sound.elf')),
+                    this.services.vesBuildService.convertToEnvPath(this.tempBaseDir.resolve('sound.vb')),
                 ].join(' '),
             ],
         } : {

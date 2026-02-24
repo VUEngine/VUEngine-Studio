@@ -83,3 +83,8 @@ export enum PrePostBuildTaskType {
   Task = 'task',
   Command = 'command',
 }
+
+export const WSL_ENGINE_CORE_PATH = '~/vuengine/core/';
+export const WSL_ENGINE_PLUGINS_PATH = '~/vuengine/plugins/';
+export const WSL_USER_PLUGINS_PATH = '~/vuengine/user/';
+export const WSL_PROJECTS_PATH = '~/vuengine/projects/';
