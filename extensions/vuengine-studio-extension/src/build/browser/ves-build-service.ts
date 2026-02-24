@@ -1326,7 +1326,7 @@ Beware! This is usually not necessary and will result in the next build taking l
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
-    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}/${projectPathSha1}/build`, `${projectBuildPath}/`);
+    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${projectPathSha1}/build`, `${projectBuildPath}/`);
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
