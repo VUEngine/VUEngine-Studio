@@ -966,7 +966,7 @@ export class VesBuildService {
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
-        return `/${x.substring(0, 1).toLowerCase()}/`;
+        return `/${x.substring(0, 1).toLowerCase()}`;
       });
 
     if (isWslInstalled) {
@@ -1225,9 +1225,8 @@ Beware! This is usually not necessary and will result in the next build taking l
     const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
-        'rsync',
-        `--rsync-path="mkdir -p ${to} && rsync"`,
-        '-zrmu',
+        'mkdir', '-p', to, '&&',
+        'rsync', '-zrmu',
         '--delete',
         '--force',
         '--exclude="build"',
@@ -1281,17 +1280,17 @@ Beware! This is usually not necessary and will result in the next build taking l
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const enginePath = this.convertToEnvPath(true, engineCoreUri);
     const pluginsPath = this.convertToEnvPath(true, enginePluginsUri);
-    await this.rsyncToWsl(enginePath, WSL_ENGINE_CORE_PATH);
-    await this.rsyncToWsl(pluginsPath, WSL_ENGINE_PLUGINS_PATH);
+    await this.rsyncToWsl(enginePath, `${WSL_ENGINE_CORE_PATH}/`);
+    await this.rsyncToWsl(pluginsPath, `${WSL_ENGINE_PLUGINS_PATH}/`);
 
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-    await this.rsyncToWsl(projectPath, `${WSL_PROJECTS_PATH}/${projectPathSha1}`);
+    await this.rsyncToWsl(projectPath, `${WSL_PROJECTS_PATH}/${projectPathSha1}/`);
 
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     if (await this.fileService.exists(userPluginsUri)) {
       const userPluginsPath = this.convertToEnvPath(true, userPluginsUri);
-      await this.rsyncToWsl(userPluginsPath, WSL_USER_PLUGINS_PATH);
+      await this.rsyncToWsl(userPluginsPath, `${WSL_USER_PLUGINS_PATH}/`);
     }
 
     this.pushBuildLogLine({
@@ -1326,7 +1325,7 @@ Beware! This is usually not necessary and will result in the next build taking l
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const projectPathSha1 = window.electronVesCore.sha1(projectPath);
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
-    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}/${projectPathSha1}/build/`, projectBuildPath);
+    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}/${projectPathSha1}/build`, projectBuildPath);
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
