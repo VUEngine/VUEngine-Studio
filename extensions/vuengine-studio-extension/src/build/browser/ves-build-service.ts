@@ -964,11 +964,14 @@ export class VesBuildService {
   convertToEnvPath(isWslInstalled: boolean, uri: URI): string {
     const path = uri.path.fsPath();
     let envPath = path
+      // remove backslashes with slashes
       .replace(/\\/g, '/')
+      // replace drive names
       .replace(/^[a-zA-Z]:\//, function (x): string {
         return `/${x.substring(0, 1).toLowerCase()}/`;
       })
-      .replace(/\/(?!.*\/)/, '');
+      // remove trailing slashes
+      .replace(/\/+$/, '');
 
     if (isWslInstalled) {
       envPath = '/mnt' + envPath;
