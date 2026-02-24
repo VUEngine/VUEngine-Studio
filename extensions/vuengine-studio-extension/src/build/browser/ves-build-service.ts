@@ -961,10 +961,10 @@ export class VesBuildService {
     await this.resetBuildStatus(BuildResult.aborted);
   }
 
-  convertToEnvPath(isWslInstalled: boolean, uri: URI): string {
+  convertToEnvPath(useWsl: boolean, uri: URI): string {
     const path = uri.path.fsPath();
     let envPath = path
-      // remove backslashes with slashes
+      // replace backslashes with slashes
       .replace(/\\/g, '/')
       // replace drive names
       .replace(/^[a-zA-Z]:\//, function (x): string {
@@ -973,8 +973,8 @@ export class VesBuildService {
       // remove trailing slashes
       .replace(/\/+$/, '');
 
-    if (isWslInstalled) {
-      envPath = '/mnt' + envPath;
+    if (useWsl) {
+      envPath = `/mnt${envPath}`;
     }
 
     return envPath;
@@ -1226,10 +1226,24 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
+    console.log('rsyncToWsl(): ', 'wsl.exe ' + [
+      'mkdir', '-p', `"${to}"`, '&&',
+      'rsync', '-zrmu',
+      '--delete',
+      '--force',
+      '--exclude="build"',
+      '--exclude=".git"',
+      '--include="*/"',
+      '--include="*.c"',
+      '--include="*.h"',
+      '--exclude="*"',
+      `"${from}"`,
+      `"${to}"`,
+    ].join(' '));
     const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
-        'mkdir', '-p', to, '&&',
+        'mkdir', '-p', `"${to}"`, '&&',
         'rsync', '-zrmu',
         '--delete',
         '--force',
@@ -1239,8 +1253,8 @@ Beware! This is usually not necessary and will result in the next build taking l
         '--include="*.c"',
         '--include="*.h"',
         '--exclude="*"',
-        from,
-        to,
+        `"${from}"`,
+        `"${to}"`,
       ]
     });
 
