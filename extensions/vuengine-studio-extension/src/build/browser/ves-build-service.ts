@@ -685,8 +685,8 @@ export class VesBuildService {
       const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(buildWithWsl, p)));
       let projectPath = this.convertToEnvPath(buildWithWsl, workspaceRootUri);
       if (buildWithWsl) {
-        const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-        projectPath = `${WSL_PROJECTS_PATH}${projectPathSha1}`;
+        const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
+        projectPath = `${WSL_PROJECTS_PATH}${realtiveProjectPath}`;
       }
       const engineCorePath = buildWithWsl
         ? WSL_ENGINE_CORE_PATH
@@ -1304,8 +1304,8 @@ Beware! This is usually not necessary and will result in the next build taking l
     await this.rsyncToWsl(pluginsPath + '/', WSL_ENGINE_PLUGINS_PATH);
 
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
-    const projectPathSha1 = window.electronVesCore.sha1(projectPath);
-    await this.rsyncToWsl(projectPath + '/', `${WSL_PROJECTS_PATH}${projectPathSha1}/`);
+    const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
+    await this.rsyncToWsl(projectPath + '/', `${WSL_PROJECTS_PATH}${realtiveProjectPath}/`);
 
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     if (await this.fileService.exists(userPluginsUri)) {
@@ -1343,9 +1343,9 @@ Beware! This is usually not necessary and will result in the next build taking l
     });
 
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
-    const projectPathSha1 = window.electronVesCore.sha1(projectPath);
+    const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
-    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${projectPathSha1}/build`, `${projectBuildPath}/`);
+    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${realtiveProjectPath}/build/*.vb`, `${projectBuildPath}/`);
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
