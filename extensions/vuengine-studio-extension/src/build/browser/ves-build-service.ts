@@ -1226,33 +1226,18 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
-    console.log('rsyncToWsl(): ', 'wsl.exe ' + [
-      'mkdir', '-p', `"${to}"`, '&&',
-      'rsync', '-zrmu',
-      '--checksum',
-      '--delete',
-      '--force',
-      '--exclude="build"',
-      '--exclude=".git"',
-      '--exclude=".github"',
-      '--include="*/"',
-      '--include="*.c"',
-      '--include="*.h"',
-      '--exclude="*"',
-      `"${from}"`,
-      `"${to}"`,
-    ].join(' '));
-
-        const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+    const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
         'rsync',
         `--rsync-path="mkdir -p ${to} && rsync"`,
         '-zrmu',
+        '--checksum',
         '--delete',
         '--force',
         '--exclude="build"',
         '--exclude=".git"',
+        '--exclude=".github"',
         '--include="*/"',
         '--include="*.c"',
         '--include="*.h"',
