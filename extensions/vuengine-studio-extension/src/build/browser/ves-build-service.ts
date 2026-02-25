@@ -1234,7 +1234,6 @@ Beware! This is usually not necessary and will result in the next build taking l
         '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
         '--delete',
         '--force',
-        '--exclude="build"',
         '--exclude=".git"',
         '--exclude=".github"',
         '--include="*/"',
@@ -1331,7 +1330,7 @@ Beware! This is usually not necessary and will result in the next build taking l
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);
     const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
-    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${realtiveProjectPath}/build/*.vb`, `${projectBuildPath}/`);
+    await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${realtiveProjectPath}/build/`, `${projectBuildPath}/`);
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
