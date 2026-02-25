@@ -1230,7 +1230,7 @@ Beware! This is usually not necessary and will result in the next build taking l
       command: 'wsl.exe',
       args: [
         'rsync',
-        `--rsync-path="mkdir -p ${to} && rsync"`,
+        `--rsync-path="mkdir -p ${to}"`,
         '-zrmu',
         '--checksum',
         '--delete',
