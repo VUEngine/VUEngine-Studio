@@ -692,7 +692,7 @@ export class VesBuildService {
         ? WSL_ENGINE_CORE_PATH
         : this.convertToEnvPath(buildWithWsl, engineCoreUri);
       const enginePluginsPath = buildWithWsl
-        ? WSL_PROJECTS_PATH
+        ? WSL_ENGINE_PLUGINS_PATH
         : this.convertToEnvPath(buildWithWsl, enginePluginsUri);
       const userPluginsPath = buildWithWsl
         ? WSL_USER_PLUGINS_PATH
