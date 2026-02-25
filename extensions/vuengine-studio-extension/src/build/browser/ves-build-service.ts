@@ -1233,6 +1233,7 @@ Beware! This is usually not necessary and will result in the next build taking l
       '--force',
       '--exclude="build"',
       '--exclude=".git"',
+      '--exclude=".github"',
       '--include="*/"',
       '--include="*.c"',
       '--include="*.h"',
