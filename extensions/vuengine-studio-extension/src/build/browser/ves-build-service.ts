@@ -1229,6 +1229,7 @@ Beware! This is usually not necessary and will result in the next build taking l
     console.log('rsyncToWsl(): ', 'wsl.exe ' + [
       'mkdir', '-p', `"${to}"`, '&&',
       'rsync', '-zrmu',
+      '--checksum',
       '--delete',
       '--force',
       '--exclude="build"',
