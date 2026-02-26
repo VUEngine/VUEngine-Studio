@@ -1239,8 +1239,6 @@ Beware! This is usually not necessary and will result in the next build taking l
         '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
         '--delete',
         '--force',
-        '--exclude=.git',
-        '--exclude=.github',
         // Exclude version control
         '--exclude=.git/',
         '--exclude=.github/',
