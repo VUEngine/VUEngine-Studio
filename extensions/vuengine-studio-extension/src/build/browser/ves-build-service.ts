@@ -1226,11 +1226,16 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
+
+    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command: 'wsl.exe',
+      args: ['mkdir', '-p', to]
+    });
+    
     const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
         'rsync',
-        '--rsync-path="mkdir -p ${to}"',
         '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
         '--delete',
         '--force',
