@@ -1239,12 +1239,24 @@ Beware! This is usually not necessary and will result in the next build taking l
         '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
         '--delete',
         '--force',
-        '--exclude=".git"',
-        '--exclude=".github"',
-        '--include="*/"',
-        '--include="*.c"',
-        '--include="*.h"',
-        '--exclude="*"',
+        '--exclude=.git',
+        '--exclude=.github',
+        // Exclude version control
+        '--exclude=.git/',
+        '--exclude=.github/',
+        // Exclude images/media
+        '--exclude=*.jpg',
+        '--exclude=*.jpeg',
+        '--exclude=*.png',
+        '--exclude=*.gif',
+        '--exclude=*.svg',
+        '--exclude=*.mp3',
+        '--exclude=*.wav',
+        '--exclude=*.mp4',
+        // Exclude web/compiled assets
+        '--exclude=*.html',
+        '--exclude=*.css',
+        '--exclude=node_modules/',
         from,
         to,
       ]
