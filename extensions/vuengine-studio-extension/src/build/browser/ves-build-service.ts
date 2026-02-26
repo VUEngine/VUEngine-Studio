@@ -1240,8 +1240,7 @@ Beware! This is usually not necessary and will result in the next build taking l
         '--delete',
         '--force',
         // Exclude version control
-        '--exclude=.git/',
-        '--exclude=.github/',
+        '--exclude=.git*',
         // Exclude images/media
         '--exclude=*.jpg',
         '--exclude=*.jpeg',
