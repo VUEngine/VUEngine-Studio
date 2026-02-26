@@ -1254,7 +1254,6 @@ Beware! This is usually not necessary and will result in the next build taking l
         // Exclude web/compiled assets
         '--exclude=*.html',
         '--exclude=*.css',
-        '--exclude=node_modules/',
         from,
         to,
       ]
