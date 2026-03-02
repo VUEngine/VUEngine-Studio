@@ -49,6 +49,7 @@ import {
   PrePostBuildTask,
   PrePostBuildTaskType,
   WSL_ENGINE_CORE_PATH,
+  WSL_ENGINE_PLATFORMS_PATH,
   WSL_ENGINE_PLUGINS_PATH,
   WSL_PROJECTS_PATH,
   WSL_USER_PLUGINS_PATH
@@ -661,6 +662,7 @@ export class VesBuildService {
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const enginePlatformsUri = await this.vesBuildPathsService.getEnginePlatformsUri();
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri(buildWithWsl);
@@ -668,7 +670,7 @@ export class VesBuildService {
     const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
-    await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePluginsUri, userPluginsUri);
+    await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePlatformsUri, enginePluginsUri, userPluginsUri);
 
     const pathUris: URI[] = [
       compilerUri.resolve('bin'),
@@ -691,6 +693,9 @@ export class VesBuildService {
       const engineCorePath = buildWithWsl
         ? WSL_ENGINE_CORE_PATH
         : this.convertToEnvPath(buildWithWsl, engineCoreUri);
+      const enginePlatformsPath = buildWithWsl
+        ? WSL_ENGINE_PLATFORMS_PATH
+        : this.convertToEnvPath(buildWithWsl, enginePlatformsUri);
       const enginePluginsPath = buildWithWsl
         ? WSL_ENGINE_PLUGINS_PATH
         : this.convertToEnvPath(buildWithWsl, enginePluginsUri);
@@ -712,6 +717,7 @@ export class VesBuildService {
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
         `ENGINE_FOLDER=${engineCorePath}`,
+        `PLATFORMS_FOLDER=${enginePlatformsPath}`,
         `PLUGINS_FOLDER=${enginePluginsPath}`,
         `USER_PLUGINS_FOLDER=${userPluginsPath}`,
         '-f', this.convertToEnvPath(buildWithWsl, makefileUri),
@@ -785,6 +791,7 @@ export class VesBuildService {
           BUILD_ALL: buildAll ? 1 : 0,
           DUMP_ELF: dumpElf ? 1 : 0,
           ENGINE_FOLDER: this.convertToEnvPath(buildWithWsl, engineCoreUri),
+          PLATFORMS_FOLDER: this.convertToEnvPath(buildWithWsl, enginePlatformsUri),
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
@@ -797,7 +804,7 @@ export class VesBuildService {
     };
   }
 
-  protected async checkPathsForSpaces(workspaceRootUri: URI, engineCoreUri: URI, enginePluginsUri: URI, userPluginsUri: URI): Promise<void> {
+  protected async checkPathsForSpaces(workspaceRootUri: URI, engineCoreUri: URI, enginePlatformsUri: URI, enginePluginsUri: URI, userPluginsUri: URI): Promise<void> {
     if (/\s/.test(await this.fileService.fsPath(workspaceRootUri))) {
       throw new Error(
         `${nls.localize('vuengine/build/errorProjectPathMustNotContainSpaces', 'Error: Project path must not contain spaces. Your project path:')}\n` +
@@ -806,6 +813,10 @@ export class VesBuildService {
       throw new Error(
         `${nls.localize('vuengine/build/errorEnginePathMustNotContainSpaces', 'Error: Engine path must not contain spaces. Your engine path:')}\n` +
         this.labelProvider.getLongName(engineCoreUri));
+    } else if (/\s/.test(await this.fileService.fsPath(enginePlatformsUri))) {
+      throw new Error(
+        `${nls.localize('vuengine/build/errorPlatformsPathMustNotContainSpaces', 'Error: Platforms path must not contain spaces. Your platforms path:')}\n` +
+        this.labelProvider.getLongName(enginePlatformsUri));
     } else if (/\s/.test(await this.fileService.fsPath(enginePluginsUri))) {
       throw new Error(
         `${nls.localize('vuengine/build/errorPluginsPathMustNotContainSpaces', 'Error: Plugins path must not contain spaces. Your plugins path:')}\n` +
@@ -1231,7 +1242,7 @@ Beware! This is usually not necessary and will result in the next build taking l
       command: 'wsl.exe',
       args: ['mkdir', '-p', to]
     });
-    
+
     const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
@@ -1295,10 +1306,13 @@ Beware! This is usually not necessary and will result in the next build taking l
     });
 
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const enginePlatformsUri = await this.vesBuildPathsService.getEnginePlatformsUri();
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const enginePath = this.convertToEnvPath(true, engineCoreUri);
+    const platformsPath = this.convertToEnvPath(true, enginePlatformsUri);
     const pluginsPath = this.convertToEnvPath(true, enginePluginsUri);
     await this.rsyncToWsl(enginePath + '/', WSL_ENGINE_CORE_PATH);
+    await this.rsyncToWsl(platformsPath + '/', WSL_ENGINE_PLATFORMS_PATH);
     await this.rsyncToWsl(pluginsPath + '/', WSL_ENGINE_PLUGINS_PATH);
 
     const projectPath = this.convertToEnvPath(true, workspaceRootUri);

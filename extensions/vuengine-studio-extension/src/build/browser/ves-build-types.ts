@@ -85,6 +85,7 @@ export enum PrePostBuildTaskType {
 }
 
 export const WSL_ENGINE_CORE_PATH = '~/vuengine/core/';
+export const WSL_ENGINE_PLATFORMS_PATH = '~/vuengine/platforms/';
 export const WSL_ENGINE_PLUGINS_PATH = '~/vuengine/plugins/';
 export const WSL_USER_PLUGINS_PATH = '~/vuengine/user/';
 export const WSL_PROJECTS_PATH = '~/vuengine/projects/';

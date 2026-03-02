@@ -39,6 +39,31 @@ export class VesBuildPathsService {
     return coreUri;
   }
 
+  async getEnginePlatformsUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const builtInFolderUri = resourcesUri.resolve('vb');
+    const builtInFolderPath = builtInFolderUri.path.fsPath();
+
+    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('platforms');
+    let coreUri = fallbackUri;
+
+    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_PLATFORMS_PATH)}`
+      .replace('%BUILTIN%', builtInFolderPath);
+
+    if (preference !== '') {
+      const preferenceUri = new URI(isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+      ).withScheme('file');
+
+      if (!preferenceUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(preferenceUri)) {
+        coreUri = preferenceUri;
+      }
+    }
+
+    return coreUri;
+  }
+
   async getMakeUri(isWslInstalled: boolean = false): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     return resourcesUri
