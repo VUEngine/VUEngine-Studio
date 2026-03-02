@@ -29,6 +29,8 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
                 switch (preferenceName) {
                     case VesBuildPreferenceIds.ENGINE_CORE_PATH:
                     case VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE:
+                    case VesBuildPreferenceIds.ENGINE_PLATFORMS_PATH:
+                    case VesBuildPreferenceIds.ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE:
                     case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
                     case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
                     case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
@@ -73,6 +75,18 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
                 workspaceData.folders.push({
                     path: enginePathWithScheme,
                     name: 'VUEngine Core',
+                });
+            }
+        }
+
+        const enginePlatformsInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE);
+        if (enginePlatformsInclude) {
+            const enginePlatformsUri = await this.vesBuildPathsService.getEnginePlatformsUri();
+            const enginePathWithScheme = enginePlatformsUri.withScheme(enginePlatformsUri.scheme).toString();
+            if (!workspaceData.folders.filter(f => f.path === enginePathWithScheme).length) {
+                workspaceData.folders.push({
+                    path: enginePathWithScheme,
+                    name: 'VUEngine Platforms',
                 });
             }
         }
