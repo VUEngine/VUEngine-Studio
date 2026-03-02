@@ -560,7 +560,7 @@ export class VesBuildService {
 
   // get number of all libraries for which there are no lib*.a files in build folder
   protected async getNumberOfLibrariesToBuild(allPluginNames: string[]): Promise<number> {
-    const allLibs = ['core', ...allPluginNames.map(pluginName => pluginName.split('/').pop())];
+    const allLibs = ['core', 'VirtualBoy', ...allPluginNames.map(pluginName => pluginName.split('/').pop())];
     const buildPathUri = await this.getBuildPathUri();
     const buildModeLc = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode).toLowerCase();
     const existingLibFiles = window.electronVesCore.findFiles(buildPathUri.path.fsPath(), [
@@ -582,7 +582,7 @@ export class VesBuildService {
     const buildAll = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ALL) as boolean;
     const allPluginNames = this.vesPluginsService.getActualUsedPluginNames();
     const libsToBuild = buildAll
-      ? allPluginNames.length + 1 // plugins + core
+      ? allPluginNames.length + 2 // plugins + core + platform
       : await this.getNumberOfLibrariesToBuild(allPluginNames);
 
     this.buildStatus = {
