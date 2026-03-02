@@ -60,7 +60,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
         });
 
         await this.props.preferenceService?.ready;
-        const enginePluginsUri = await this.props.vesPluginsPathsService?.getEnginePluginsUri();
+        const enginePluginsUri = await this.props.vesBuildPathsService?.getEnginePluginsUri();
         const userPluginsUri = await this.props.vesPluginsPathsService?.getUserPluginsUri();
         let baseUri = new URI;
         if (plugin.id.startsWith(VUENGINE_PLUGINS_PREFIX)) {

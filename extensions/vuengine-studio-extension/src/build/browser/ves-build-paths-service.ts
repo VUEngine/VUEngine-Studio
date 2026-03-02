@@ -14,15 +14,15 @@ export class VesBuildPathsService {
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
 
-  async getEngineCoreUri(): Promise<URI> {
+  async getEngineUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const builtInFolderUri = resourcesUri.resolve('vb');
     const builtInFolderPath = builtInFolderUri.path.fsPath();
 
-    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('core');
+    const fallbackUri = builtInFolderUri.resolve('vuengine');
     let coreUri = fallbackUri;
 
-    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH)}`
+    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_PATH)}`
       .replace('%BUILTIN%', builtInFolderPath);
 
     if (preference !== '') {
@@ -39,29 +39,24 @@ export class VesBuildPathsService {
     return coreUri;
   }
 
-  async getEnginePlatformsUri(): Promise<URI> {
-    const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const builtInFolderUri = resourcesUri.resolve('vb');
-    const builtInFolderPath = builtInFolderUri.path.fsPath();
-
-    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('platforms');
-    let coreUri = fallbackUri;
-
-    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_PLATFORMS_PATH)}`
-      .replace('%BUILTIN%', builtInFolderPath);
-
-    if (preference !== '') {
-      const preferenceUri = new URI(isWindows && !preference.startsWith('/')
-        ? `/${preference}`
-        : preference
-      ).withScheme('file');
-
-      if (!preferenceUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(preferenceUri)) {
-        coreUri = preferenceUri;
-      }
+  async getEngineCoreUri(): Promise<URI> {
+    const engineUri = await this.getEngineUri();
+    const engineCoreUri = engineUri.resolve('core');
+    if (await this.fileService.exists(engineCoreUri)) {
+      return engineCoreUri;
     }
 
-    return coreUri;
+    return engineUri;
+  }
+
+  async getEnginePlatformsUri(): Promise<URI> {
+    const engineUri = await this.getEngineUri();
+    return engineUri.resolve('platforms');
+  }
+
+  async getEnginePluginsUri(): Promise<URI> {
+    const engineUri = await this.getEngineUri();
+    return engineUri.resolve('plugins');
   }
 
   async getMakeUri(isWslInstalled: boolean = false): Promise<URI> {

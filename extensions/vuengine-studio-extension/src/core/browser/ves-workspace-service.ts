@@ -27,12 +27,8 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
         this.preferenceService.onPreferenceChanged(async ({ preferenceName }) => {
             if (this.opened) {
                 switch (preferenceName) {
-                    case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-                    case VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE:
-                    case VesBuildPreferenceIds.ENGINE_PLATFORMS_PATH:
-                    case VesBuildPreferenceIds.ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE:
-                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
-                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
+                    case VesBuildPreferenceIds.ENGINE_PATH:
+                    case VesBuildPreferenceIds.ENGINE_INCLUDE_IN_WORKSPACE:
                     case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
                     case VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE:
                         if (!this._workspace?.isDirectory) {
@@ -67,51 +63,30 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
             workspaceData = { folders: [] };
         }
 
-        const engineCoreInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE);
-        if (engineCoreInclude) {
-            const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+        const engineInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_INCLUDE_IN_WORKSPACE);
+        if (engineInclude) {
+            const engineCoreUri = await this.vesBuildPathsService.getEngineUri();
             const enginePathWithScheme = engineCoreUri.withScheme(engineCoreUri.scheme).toString();
             if (!workspaceData.folders.filter(f => f.path === enginePathWithScheme).length) {
                 workspaceData.folders.push({
                     path: enginePathWithScheme,
-                    name: 'VUEngine Core',
-                });
-            }
-        }
-
-        const enginePlatformsInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE);
-        if (enginePlatformsInclude) {
-            const enginePlatformsUri = await this.vesBuildPathsService.getEnginePlatformsUri();
-            const enginePathWithScheme = enginePlatformsUri.withScheme(enginePlatformsUri.scheme).toString();
-            if (!workspaceData.folders.filter(f => f.path === enginePathWithScheme).length) {
-                workspaceData.folders.push({
-                    path: enginePathWithScheme,
-                    name: 'VUEngine Platforms',
-                });
-            }
-        }
-
-        const enginePluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE);
-        if (enginePluginsInclude) {
-            const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-            const enginePluginsPathWithScheme = enginePluginsUri.withScheme(enginePluginsUri.scheme).toString();
-            if (!workspaceData.folders.filter(f => f.path === enginePluginsPathWithScheme).length) {
-                workspaceData.folders.push({
-                    path: enginePluginsPathWithScheme,
-                    name: 'VUEngine Plugins',
+                    name: 'VUEngine',
                 });
             }
         }
 
         const userPluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE);
         if (userPluginsInclude) {
+            const engineCoreUri = await this.vesBuildPathsService.getEngineUri();
             const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
             const userPluginsPathWithScheme = userPluginsUri.withScheme(userPluginsUri.scheme).toString();
-            if (!workspaceData.folders.filter(f => f.path === userPluginsPathWithScheme).length) {
-                workspaceData.folders.push({
-                    path: userPluginsPathWithScheme,
-                    name: 'User Plugins',
-                });
+            if (!engineInclude || !engineCoreUri.isEqualOrParent(userPluginsUri)) {
+                if (!workspaceData.folders.filter(f => f.path === userPluginsPathWithScheme).length) {
+                    workspaceData.folders.push({
+                        path: userPluginsPathWithScheme,
+                        name: 'User Plugins',
+                    });
+                }
             }
         }
 
