@@ -637,7 +637,7 @@ export class VesProjectService {
 
     // installed plugins
     const actuallyUsedPlugins = this.vesPluginsService.getActualUsedPluginNames();
-    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const enginePluginsUri = await this.vesBuildPathsService?.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     await Promise.all(actuallyUsedPlugins.map(async installedPluginId => {
       let uri: URI | undefined;
@@ -877,7 +877,7 @@ export class VesProjectService {
 
   // note: tests with caching plugin data in a single file did not increase performance much
   protected async getAllPluginsData(): Promise<{ [id: string]: VesPluginsData }> {
-    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const enginePluginsUri = await this.vesBuildPathsService?.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
 
     const findPlugins = async (rootUri: URI, prefix: string) => {

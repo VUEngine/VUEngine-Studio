@@ -17,31 +17,6 @@ export class VesPluginsPathsService {
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
 
-  async getEnginePluginsUri(): Promise<URI> {
-    const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const builtInFolderUri = resourcesUri.resolve('vb');
-    const builtInFolderPath = builtInFolderUri.path.fsPath();
-
-    const fallbackUri = builtInFolderUri.resolve('vuengine').resolve('plugins');
-    let pluginsUri = fallbackUri;
-
-    const preference = `${this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}`
-      .replace('%BUILTIN%', builtInFolderPath);
-
-    if (preference !== '') {
-      const preferenceUri = new URI(isWindows && !preference.startsWith('/')
-        ? `/${preference}`
-        : preference
-      ).withScheme('file');
-
-      if (!preferenceUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(preferenceUri)) {
-        pluginsUri = preferenceUri;
-      }
-    }
-
-    return pluginsUri;
-  }
-
   async getUserPluginsUri(): Promise<URI> {
     const homedir = await this.envVariablesServer.getHomeDirUri();
     const homedirUri = new URI(homedir).withScheme('file');

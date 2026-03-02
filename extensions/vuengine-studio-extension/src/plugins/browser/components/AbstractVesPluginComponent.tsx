@@ -3,6 +3,7 @@ import { HoverService } from "@theia/core/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import React from "react";
+import { VesBuildPathsService } from "../../../build/browser/ves-build-paths-service";
 import { VesCommonService } from "../../../core/browser/ves-common-service";
 import { VesProjectService } from "../../../project/browser/ves-project-service";
 import { VesPlugin } from "../ves-plugin";
@@ -16,6 +17,7 @@ export interface AbstractVesPluginComponentProps {
     preferenceService?: PreferenceService
     workspaceService: WorkspaceService
     vesCommonService?: VesCommonService
+    vesBuildPathsService?: VesBuildPathsService
     vesPluginsPathsService?: VesPluginsPathsService
     vesProjectService?: VesProjectService
 }

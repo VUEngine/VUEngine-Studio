@@ -14,10 +14,8 @@ export namespace VesBuildPreferenceIds {
     export const BUILD_MODE = [CATEGORY, 'mode'].join('.');
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
-    export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
-    export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
-    export const ENGINE_PLATFORMS_PATH = [CATEGORY, 'engine', 'platforms', 'path'].join('.');
-    export const ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'platforms', 'includeInWorkspace'].join('.');
+    export const ENGINE_PATH = [CATEGORY, 'engine', 'path'].join('.');
+    export const ENGINE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'includeInWorkspace'].join('.');
     export const BUILD_ALL = [CATEGORY, 'buildAll'].join('.');
     export const PRE_BUILD_TASKS = [CATEGORY, 'tasks', 'pre'].join('.');
     export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
@@ -56,15 +54,13 @@ const properties: IndexedAccess<PreferenceDataProperty> = {
         scope: PreferenceScope.Folder,
         overridable: true,
     },
-    [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
+    [VesBuildPreferenceIds.ENGINE_PATH]: {
         type: 'string',
         description: nls.localize(
-            'vuengine/build/preferences/engineCorePathDescription',
-            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". \
-Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated \
-occurences of any of the terms "core", "platforms", "plugins", "user" or "vuengine".'
+            'vuengine/build/preferences/enginePathDescription',
+            'Full path to libraries. In case of VUEngine, it must be a folder named "vuengine" with subfolders called "core", "platforms" and "plugins".'
         ),
-        default: '%BUILTIN%/vuengine/core',
+        default: '%BUILTIN%/vuengine',
         additionalProperties: {
             // @ts-ignore
             isDirectory: true,
@@ -72,32 +68,9 @@ occurences of any of the terms "core", "platforms", "plugins", "user" or "vuengi
         scope: PreferenceScope.Folder,
         overridable: true,
     },
-    [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
+    [VesBuildPreferenceIds.ENGINE_INCLUDE_IN_WORKSPACE]: {
         type: 'boolean',
-        description: nls.localize('vuengine/build/preferences/includeEngineCoreInWorkspaceDescription', 'Automatically include VUEngine core library in workspaces.'),
-        default: true,
-        scope: PreferenceScope.Folder,
-        overridable: true,
-    },
-    [VesBuildPreferenceIds.ENGINE_PLATFORMS_PATH]: {
-        type: 'string',
-        description: nls.localize(
-            'vuengine/build/preferences/enginePlatformsPathDescription',
-            'Full path to platforms library. Must be a folder named "platforms" inside a parent folder named "vuengine". \
-Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated \
-occurences of any of the terms "core", "platforms", "plugins", "user" or "vuengine".'
-        ),
-        default: '%BUILTIN%/vuengine/platforms',
-        additionalProperties: {
-            // @ts-ignore
-            isDirectory: true,
-        },
-        scope: PreferenceScope.Folder,
-        overridable: true,
-    },
-    [VesBuildPreferenceIds.ENGINE_PLATFORMS_INCLUDE_IN_WORKSPACE]: {
-        type: 'boolean',
-        description: nls.localize('vuengine/build/preferences/includeEnginePlatformsInWorkspaceDescription', 'Automatically include VUEngine platforms libraries in workspaces.'),
+        description: nls.localize('vuengine/build/preferences/includeEngineInWorkspaceDescription', 'Automatically include libraries in workspaces.'),
         default: true,
         scope: PreferenceScope.Folder,
         overridable: true,

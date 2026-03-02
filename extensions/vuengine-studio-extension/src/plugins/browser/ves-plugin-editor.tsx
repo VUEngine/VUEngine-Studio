@@ -5,6 +5,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import VesPluginEditorComponent from './components/VesPluginEditorComponent';
@@ -30,6 +31,8 @@ export class VesPluginEditor extends ReactWidget {
     protected readonly workspaceService: WorkspaceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
+    @inject(VesBuildPathsService)
+    readonly vesBuildPathsService: VesBuildPathsService;
     @inject(VesPluginsPathsService)
     readonly vesPluginsPathsService: VesPluginsPathsService;
     @inject(VesProjectService)
@@ -104,6 +107,7 @@ export class VesPluginEditor extends ReactWidget {
             workspaceService={this.workspaceService}
             vesCommonService={this.vesCommonService}
             vesProjectService={this.vesProjectService}
+            vesBuildPathsService={this.vesBuildPathsService}
             vesPluginsPathsService={this.vesPluginsPathsService}
         />;
     }
