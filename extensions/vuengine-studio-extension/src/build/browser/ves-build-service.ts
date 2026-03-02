@@ -669,7 +669,7 @@ export class VesBuildService {
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri(buildWithWsl);
     const makeUri = await this.vesBuildPathsService.getMakeUri(buildWithWsl);
-    const makefileUri = await this.getMakefileUri(workspaceRootUri, engineUri);
+    const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
     await this.checkPathsForSpaces(workspaceRootUri, engineUri, userPluginsUri);
