@@ -10,6 +10,3 @@
 [submodule "applications/electron/vb/libgccvb"]
 	path = applications/electron/vb/libgccvb
 	url = git@github.com:VUEngine/libgccvb.git
-[submodule "applications/electron/vb/vuengine/platforms/VirtualBoy"]
-	path = applications/electron/vb/vuengine/platforms/VirtualBoy
-	url = git@github.com:VUEngine/VUEngine-VirtualBoy.git
