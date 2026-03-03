@@ -1,15 +1,15 @@
 [submodule "applications/electron/binaries/vuengine-studio-tools"]
 	path = applications/electron/binaries/vuengine-studio-tools
 	url = git@github.com:VUEngine/VUEngine-Studio-Tools.git
-[submodule "applications/electron/vb/vuengine/core"]
-	path = applications/electron/vb/vuengine/core
-	url = git@github.com:VUEngine/VUEngine-Core.git
-[submodule "applications/electron/vb/vuengine/plugins"]
-	path = applications/electron/vb/vuengine/plugins
-	url = git@github.com:VUEngine/VUEngine-Plugins.git
 [submodule "applications/electron/vb/libgccvb"]
 	path = applications/electron/vb/libgccvb
 	url = git@github.com:VUEngine/libgccvb.git
+[submodule "applications/electron/vb/vuengine/core"]
+	path = applications/electron/vb/vuengine/core
+	url = git@github.com:VUEngine/VUEngine-Core.git
 [submodule "applications/electron/vb/vuengine/platforms"]
 	path = applications/electron/vb/vuengine/platforms
 	url = git@github.com:VUEngine/VUEngine-Platforms.git
+[submodule "applications/electron/vb/vuengine/plugins"]
+	path = applications/electron/vb/vuengine/plugins
+	url = git@github.com:VUEngine/VUEngine-Plugins.git
