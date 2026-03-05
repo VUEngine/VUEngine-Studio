@@ -4,10 +4,11 @@
 	{%- set compiler = project.items.CompilerConfig.engine -%}
 {%- endif -%}
 {%- set plugins = project.items.GameConfig.project.plugins | default({}) -%}
+{%- set plugins = ['platforms//VirtualBoy'].concat(plugins | keys) | sort -%}
 {% include('templates/partials/fileHeader/fileHeader.make.njk') %}
 
 # VUEngine plugins which the project uses
-PLUGINS							= {{ plugins | keys | sort | join(' \\\n\t\t\t\t\t\t\t\t  ') | safe }}
+PLUGINS							= {{ plugins | join(' \\\n\t\t\t\t\t\t\t\t  ') | safe }}
 
 # Optimization level
 OPTIMIZATION					= {{ compiler.optimization }}
