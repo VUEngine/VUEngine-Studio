@@ -1233,7 +1233,7 @@ Beware! This is usually not necessary and will result in the next build taking l
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
     const mkdirProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
-      args: ['mkdir', '-p', `"${to}"`]
+      args: ['mkdir', '-p', to]
     });
 
     await new Promise<void>((resolve, reject) => {
@@ -1256,8 +1256,8 @@ Beware! This is usually not necessary and will result in the next build taking l
         '--include="*.c"', // include all c files
         '--include="*.h"', // include all h files
         '--exclude="*"', // exclude all other files
-        `"${from}"`,
-        `"${to}"`,
+        from,
+        to,
       ]
     });
 
@@ -1305,12 +1305,6 @@ Beware! This is usually not necessary and will result in the next build taking l
       const userPluginsPath = this.convertToEnvPath(true, userPluginsUri);
       await this.rsyncToWsl(userPluginsPath + '/', WSL_USER_PLUGINS_PATH);
     }
-
-    this.pushBuildLogLine({
-      type: BuildLogLineType.Normal,
-      text: '',
-      timestamp: Date.now(),
-    });
   }
 
   protected async postBuildSyncWsl(): Promise<void> {
@@ -1325,6 +1319,11 @@ Beware! This is usually not necessary and will result in the next build taking l
       throw new Error;
     }
 
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
     this.buildStatus = {
       ...this.buildStatus,
       step: nls.localize('vuengine/build/syncingWsl', 'Syncing WSL'),
@@ -1339,12 +1338,6 @@ Beware! This is usually not necessary and will result in the next build taking l
     const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
     await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${realtiveProjectPath}/build/`, `${projectBuildPath}/`);
-
-    this.pushBuildLogLine({
-      type: BuildLogLineType.Normal,
-      text: '',
-      timestamp: Date.now(),
-    });
   }
 
   protected async runPostBuildTasks(): Promise<void> {
