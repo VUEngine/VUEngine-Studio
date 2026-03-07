@@ -1251,19 +1251,25 @@ Beware! This is usually not necessary and will result in the next build taking l
         '-rcztm', // r: recursive, c: checksum, z: compress, t: preserve timestamps, m: prune empty directories
         '--delete',
         '--force',
-        '--include="*/"', // include all directories
-        '--include="build/**"', // include entire build folder
-        '--include="*.c"', // include all c files
-        '--include="*.h"', // include all h files
-        '--exclude="*"', // exclude all other files
-        from,
-        to,
+        "--include='*/'", // include all directories
+        "--include='build/**'", // include entire build folder
+        "--include='*.c'", // include all c files
+        "--include='*.h'", // include all h files
+        "--exclude='*'", // exclude all other files
+        `'${from}'`,
+        `'${to}'`,
       ]
     });
 
     await new Promise<void>((resolve, reject) => {
-      this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
+      this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
         if (syncProcess.processManagerId === pId) {
+          console.log('syncProcess data:', pId, data);
+        }
+      });
+      this.vesProcessWatcher.onDidExitProcess(({ pId, event }) => {
+        if (syncProcess.processManagerId === pId) {
+          console.log('syncProcess exit:', pId, event);
           resolve();
         }
       });
