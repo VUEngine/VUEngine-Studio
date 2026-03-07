@@ -1255,6 +1255,7 @@ Beware! This is usually not necessary and will result in the next build taking l
         '--include=build/**', // include entire build folder
         '--include=*.c', // include all c files
         '--include=*.h', // include all h files
+        '--include=makefile*', // include all makefiles
         '--exclude=*', // exclude all other files
         from,
         to,
