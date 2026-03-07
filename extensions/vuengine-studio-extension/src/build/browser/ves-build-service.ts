@@ -1231,46 +1231,39 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
-
-    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+    const mkdirProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
-      args: ['mkdir', '-p', to]
+      args: ['mkdir', '-p', `"${to}"`]
     });
 
-    const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+    await new Promise<void>((resolve, reject) => {
+      this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
+        if (mkdirProcess.processManagerId === pId) {
+          resolve();
+        }
+      });
+    });
+
+    const syncProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
         'rsync',
-        '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
+        '-rcztm', // r: recursive, c: checksum, z: compress, t: preserve timestamps, m: prune empty directories
         '--delete',
         '--force',
-        // Exclude version control
-        '--exclude=.git*',
-        // Exclude images/media
-        '--exclude=*.jpg',
-        '--exclude=*.jpeg',
-        '--exclude=*.png',
-        '--exclude=*.gif',
-        '--exclude=*.svg',
-        '--exclude=*.mp3',
-        '--exclude=*.wav',
-        '--exclude=*.mp4',
-        // Exclude web/compiled assets
-        '--exclude=*.html',
-        '--exclude=*.css',
-        from,
-        to,
+        '--include="*/"', // include all directories
+        '--include="build/**"', // include entire build folder
+        '--include="*.c"', // include all c files
+        '--include="*.h"', // include all h files
+        '--exclude="*"', // exclude all other files
+        `"${from}"`,
+        `"${to}"`,
       ]
     });
 
     await new Promise<void>((resolve, reject) => {
-      this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
-        if (checkProcess.processManagerId === pId) {
-          resolve();
-        }
-      });
       this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
-        if (checkProcess.processManagerId === pId) {
+        if (syncProcess.processManagerId === pId) {
           resolve();
         }
       });
