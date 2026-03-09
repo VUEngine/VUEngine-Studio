@@ -388,7 +388,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             return;
         }
 
-        const patternStepOffset = currentSequenceIndex;
+        const patternStepOffset = currentSequenceIndex * SUB_NOTE_RESOLUTION;
         const relativeNoteCursor = noteCursor - patternStepOffset;
         const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
         Object.keys(noteClipboard).forEach(step => {
