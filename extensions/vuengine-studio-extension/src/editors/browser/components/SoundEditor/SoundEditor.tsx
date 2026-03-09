@@ -1093,21 +1093,55 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const doImport = () => {
-        let importSoundData = { ...soundData, ...importSettings.soundData };
+        let importSoundData = {
+            ...soundData,
+            ...importSettings.soundData,
+        };
 
         // apply user changes
-        importSoundData.tracks = importSoundData.tracks
-            .map((track, trackIndex) => ({
-                ...track,
-                type: importSettings.trackSettings[trackIndex]
-                    ? importSettings.trackSettings[trackIndex].type
-                    : track.type
-            }))
+        const tracksToImport: TrackConfig[] = [];
+        importSoundData.tracks
+            // filter out unselected tracks
             .filter((track, trackIndex) =>
                 importSettings.trackSettings[trackIndex]
                     ? importSettings.trackSettings[trackIndex].enabled
                     : true
-            );
+            )
+            // for others, adjust type
+            .forEach((track, trackIndex) => {
+                const type = importSettings.trackSettings[trackIndex]
+                    ? importSettings.trackSettings[trackIndex].type
+                    : track.type;
+                // update track
+                tracksToImport.push({ ...track, type });
+                // update patterns
+                Object.values(track.sequence).forEach(patternId => {
+                    if (importSoundData.patterns[patternId]) {
+                        importSoundData.patterns[patternId].type = type;
+                    }
+                });
+                // update track default instrument
+                if (track.instrument && importSoundData.instruments[track.instrument]) {
+                    importSoundData.instruments[track.instrument].type = type;
+                }
+                // update pattern instruments
+                Object.values(track.sequence).forEach(patternId => {
+                    if (importSoundData.patterns[patternId]) {
+                        const eventsMap = Object.values(importSoundData.patterns[patternId].events);
+                        eventsMap.forEach(events =>
+                            Object.keys(events).forEach(eventType => {
+                                if (eventType = SoundEvent.Instrument) {
+                                    const instrumentId = events[eventType];
+                                    if (importSoundData.instruments[instrumentId]) {
+                                        importSoundData.instruments[instrumentId].type = type;
+                                    }
+                                }
+                            })
+                        );
+                    }
+                });
+            });
+        importSoundData.tracks = [...tracksToImport];
 
         // apply clean-up options
         if (importSettings.removeUnusedPatterns) {
