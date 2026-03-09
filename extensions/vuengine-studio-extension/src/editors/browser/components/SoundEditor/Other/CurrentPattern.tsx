@@ -10,7 +10,7 @@ import VContainer from '../../Common/Base/VContainer';
 import EmptyContainer from '../../Common/EmptyContainer';
 import { nanoid } from '../../Common/Utils';
 import { InputWithAction, InputWithActionButton } from '../Instruments/Instruments';
-import { getPatternName, getTrackTypeLabel } from '../SoundEditor';
+import { getPatternLabel, getPatternName, getTrackTypeLabel } from '../SoundEditor';
 import {
     PATTERN_SIZE_MAX,
     PATTERN_SIZE_MIN,
@@ -123,7 +123,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     <InputWithAction>
                         <AdvancedSelect
                             options={Object.keys(soundData.patterns).map((patternId, i) => ({
-                                label: getPatternName(soundData, patternId),
+                                label: getPatternLabel(soundData, patternId),
                                 value: patternId,
                             }))}
                             defaultValue={currentPatternId.toString()}

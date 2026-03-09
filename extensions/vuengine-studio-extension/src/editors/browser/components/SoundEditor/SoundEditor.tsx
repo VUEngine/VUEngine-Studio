@@ -144,6 +144,22 @@ export const getPatternName = (soundData: SoundData, patternId: string): string 
         ? soundData.patterns[patternId].name
         : `(${patternId.slice(0, 4)})`;
 
+export const getPatternLabel = (soundData: SoundData, patternId: string): ReactElement => {
+    const pattern = soundData.patterns[patternId];
+    const name = getPatternName(soundData, patternId);
+    let icon = <WaveSine size={16} />;
+    if (pattern.type === SoundEditorTrackType.SWEEPMOD) {
+        icon = <WaveSawtooth size={16} />;
+    } else if (pattern.type === SoundEditorTrackType.NOISE) {
+        icon = <Waveform size={16} />;
+    }
+
+    return <HContainer alignItems='center' grow={1}>
+        <div style={{ flexGrow: 0, lineHeight: '10px' }}>{icon}</div>
+        <div style={{ flexGrow: 1 }}>{name}</div>
+    </HContainer>;
+};
+
 export const getInstrumentName = (soundData: SoundData, instrumentId: string): string => {
     const instrument = soundData.instruments[instrumentId];
     const name = instrumentId === TRACK_DEFAULT_INSTRUMENT_ID
@@ -171,7 +187,7 @@ export const getInstrumentLabel = (soundData: SoundData, instrumentId: string): 
     </HContainer>;
 };
 
-export const getTrackTypeLabel = (type: SoundEditorTrackType): ReactElement => {
+export const getTrackTypeLabel = (type: SoundEditorTrackType, i?: number): ReactElement => {
     const name = TRACK_TYPE_LABELS[type];
     let icon = <WaveSine size={16} />;
     if (type === SoundEditorTrackType.SWEEPMOD) {
@@ -180,9 +196,14 @@ export const getTrackTypeLabel = (type: SoundEditorTrackType): ReactElement => {
         icon = <Waveform size={16} />;
     }
 
+    let count = '';
+    if (i !== undefined) {
+        count = ` ${i + 1}`;
+    }
+
     return <HContainer alignItems='center' grow={1}>
         <div style={{ flexGrow: 0, lineHeight: '10px' }}>{icon}</div>
-        <div style={{ flexGrow: 1 }}>{name}</div>
+        <div style={{ flexGrow: 1 }}>{name}{count}</div>
     </HContainer>;
 };
 

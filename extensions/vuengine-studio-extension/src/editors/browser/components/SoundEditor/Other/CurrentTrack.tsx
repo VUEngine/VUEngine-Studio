@@ -21,7 +21,6 @@ import {
     TRACK_PRIORITY_MAX,
     TRACK_PRIORITY_MIN,
     TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
-    TRACK_TYPE_LABELS,
     TrackConfig
 } from '../SoundEditorTypes';
 
@@ -94,17 +93,17 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                                     default:
                                     case SoundEditorTrackType.WAVE:
                                         return {
-                                            label: `${TRACK_TYPE_LABELS[SoundEditorTrackType.WAVE]} ${i + 1}`,
+                                            label: getTrackTypeLabel(SoundEditorTrackType.WAVE, i),
                                             value: i.toString(),
                                         };
                                     case SoundEditorTrackType.SWEEPMOD:
                                         return {
-                                            label: TRACK_TYPE_LABELS[SoundEditorTrackType.SWEEPMOD],
+                                            label: getTrackTypeLabel(SoundEditorTrackType.SWEEPMOD),
                                             value: i.toString(),
                                         };
                                     case SoundEditorTrackType.NOISE:
                                         return {
-                                            label: TRACK_TYPE_LABELS[SoundEditorTrackType.NOISE],
+                                            label: getTrackTypeLabel(SoundEditorTrackType.NOISE),
                                             value: i.toString(),
                                         };
                                 }
