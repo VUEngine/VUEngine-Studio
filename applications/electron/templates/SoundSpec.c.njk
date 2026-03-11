@@ -56,7 +56,7 @@
 {{ macros.sectionHeader('Includes') }}
 
 #include <Sound.h>
-#include <SoundTrack.h>
+#include <VBSoundTrack.h>
 
 {{ macros.sectionHeader('Declarations') }}
 
@@ -221,21 +221,27 @@ const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyfr
 	{0, kSoundTrackEventEnd}, 
 };
 
-SoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
+VBSoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 {%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-	// Priority for sound channel usage
-	{{ track.priority | default(0) }},
+	// SoundTrack
+	{
+		// Allocator
+		__TYPE(VBSoundTrack),
 
-	// Skip if no sound source available?
-	{{ track.skippable | default(true) }},
+		// Priority for sound channel usage
+		{{ track.priority | default(0) }},
 
-	// Loop back point (cursor)
-	{{ trackKeyframes.loopKeyframe | default(0) }},
+		// Skip if no sound source available?
+		{{ track.skippable | default(true) }},
 
-	// Keyframes that define the track
-	(SoundTrackKeyframe*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes,
+		// Loop back point (cursor)
+		{{ trackKeyframes.loopKeyframe | default(0) }},
+
+		// Keyframes that define the track
+		(SoundTrackKeyframe*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyframes
+	},
 
 	// SxINT values
 	(uint8*){{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}SxINT,
