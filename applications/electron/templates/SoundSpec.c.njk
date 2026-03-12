@@ -272,7 +272,7 @@ VBSoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 
 {{ macros.sectionHeader('Definitions') }}
 
-SoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
+VBSoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
 {%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
