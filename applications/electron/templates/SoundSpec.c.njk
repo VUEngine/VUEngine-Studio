@@ -56,7 +56,7 @@
 {{ macros.sectionHeader('Includes') }}
 
 #include <Sound.h>
-#include <VBSoundTrack.h>
+#include <VSUSoundTrack.h>
 
 {{ macros.sectionHeader('Declarations') }}
 
@@ -221,14 +221,14 @@ const SoundTrackKeyframe {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}Keyfr
 	{0, kSoundTrackEventEnd}, 
 };
 
-VBSoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
+VSUSoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 {%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	// SoundTrack
 	{
 		// Allocator
-		__TYPE(VBSoundTrack),
+		__TYPE(VSUSoundTrack),
 
 		// Priority for sound channel usage
 		{{ track.priority | default(0) }},
@@ -272,7 +272,7 @@ VBSoundTrackROMSpec {{ sanitizedSpecName }}SoundTrack{{ loop.index0 }}
 
 {{ macros.sectionHeader('Definitions') }}
 
-VBSoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
+VSUSoundTrackROMSpec* const {{ sanitizedSpecName }}SoundTracks[]
 {%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
