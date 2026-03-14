@@ -12,11 +12,11 @@ interface EngineConfigTilesProps {
 export default function EngineConfigTiles(props: EngineConfigTilesProps): React.JSX.Element {
     const { data, updateData } = props;
 
-    const setTotalChars = (totalTiles: number): void => {
+    const setTotalTiles = (totalTiles: number): void => {
         updateData({
             ...data,
-            chars: {
-                ...(data.chars ?? {}),
+            tiles: {
+                ...(data.tiles ?? {}),
                 totalTiles,
             }
         });
@@ -26,16 +26,16 @@ export default function EngineConfigTiles(props: EngineConfigTilesProps): React.
         <VContainer gap={15}>
             <Input
                 label={nls.localize(
-                    'vuengine/editors/engineConfig/animation/availableChars',
+                    'vuengine/editors/engineConfig/animation/availableTiles',
                     'Available Tiles'
                 )}
                 tooltip={nls.localize(
-                    'vuengine/editors/engineConfig/animation/availableCharsDescription',
-                    'The total number of available chars in char memory.',
+                    'vuengine/editors/engineConfig/animation/availableTilesDescription',
+                    'The total number of available tiles in tile memory.',
                 )}
                 type="number"
-                value={data.chars?.totalTiles ?? TOTAL_TILES_DEFAULT_VALUE}
-                setValue={setTotalChars}
+                value={data.tiles?.totalTiles ?? TOTAL_TILES_DEFAULT_VALUE}
+                setValue={setTotalTiles}
                 min={TOTAL_TILES_MIN_VALUE}
                 max={TOTAL_TILES_MAX_VALUE}
                 defaultValue={TOTAL_TILES_DEFAULT_VALUE}

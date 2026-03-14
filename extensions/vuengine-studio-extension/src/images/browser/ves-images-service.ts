@@ -515,7 +515,7 @@ export class VesImagesService {
   /**
    * For unknown (and unnecessary) reasons, grit prepends an empty tile to a tileSet if there is none already.
    * We check if the empty tile is used and, if not, remove it and update the map indices accordingly.
-   * Grit also appends an empty tile to maps with an odd number of chars, which we remove.
+   * Grit also appends an empty tile to maps with an odd number of tiles, which we remove.
    */
   protected removeUnusedEmptyTileAddedByGrit(imageConfig: ImageConfig, convertedFileData: ConvertedFileData[]): void {
     const hasTileSetFile = imageConfig.tileset.shared;

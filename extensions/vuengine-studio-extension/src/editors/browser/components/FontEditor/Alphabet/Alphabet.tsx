@@ -6,11 +6,11 @@ import { VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';
 
 interface AlphabetProps {
-    charsData: number[][][]
+    tilesData: number[][][]
     offset: number
-    charCount: number
-    charWidth: number
-    charHeight: number
+    tileCount: number
+    tileWidth: number
+    tileHeight: number
     currentCharacterIndex: number
     setCurrentCharacterIndex: (currentCharacter: number) => void
     setCurrentCharacterHoverIndex: React.Dispatch<React.SetStateAction<number>>
@@ -19,9 +19,9 @@ interface AlphabetProps {
 
 export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     const {
-        charsData,
-        charHeight, charWidth,
-        offset, charCount,
+        tilesData,
+        tileHeight, tileWidth,
+        offset, tileCount,
         currentCharacterIndex, setCurrentCharacterIndex, setCurrentCharacterHoverIndex,
         variableSize,
     } = props;
@@ -36,11 +36,11 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
             return <AlphabetChar
                 key={`character-${character}`}
                 index={character}
-                charData={charsData[character]}
+                tileData={tilesData[character]}
                 offset={offset}
-                charCount={charCount}
-                charHeight={charHeight}
-                charWidth={charWidth}
+                tileCount={tileCount}
+                tileHeight={tileHeight}
+                tileWidth={tileWidth}
                 currentCharacterIndex={currentCharacterIndex}
                 setCurrentCharacterIndex={setCurrentCharacterIndex}
                 setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
@@ -52,7 +52,7 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     const commandListener = (commandId: string): void => {
         switch (commandId) {
             case FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id:
-                setCurrentCharacterIndex(currentCharacterIndex + 16 < offset + charCount
+                setCurrentCharacterIndex(currentCharacterIndex + 16 < offset + tileCount
                     ? currentCharacterIndex + 16
                     : currentCharacterIndex);
                 break;
@@ -62,7 +62,7 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
                     : currentCharacterIndex);
                 break;
             case FontEditorCommands.ALPHABET_NAVIGATE_NEXT_TILE.id:
-                setCurrentCharacterIndex(currentCharacterIndex + 1 < offset + charCount
+                setCurrentCharacterIndex(currentCharacterIndex + 1 < offset + tileCount
                     ? currentCharacterIndex + 1
                     : currentCharacterIndex);
                 break;
@@ -79,9 +79,9 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         setAsciiCharacters(getCharacters(96, 32));
         setExtendedCharacters(getCharacters(128, 128));
     }, [
-        charsData,
-        charHeight, charWidth,
-        offset, charCount,
+        tilesData,
+        tileHeight, tileWidth,
+        offset, tileCount,
         currentCharacterIndex,
         variableSize,
     ]);
@@ -91,7 +91,7 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         return () => disp.dispose();
     }, [
         offset,
-        charCount,
+        tileCount,
         currentCharacterIndex,
         setCurrentCharacterIndex,
     ]);

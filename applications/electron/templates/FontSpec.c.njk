@@ -4,11 +4,11 @@
 {%- set block = '' -%}
 {%- set currentByte = '' -%}
 {%- for character in range(item.offset, item.offset + item.characterCount) -%}
-	{%- for charRow in range(0, item.size.y) -%}
-		{%- for char in range(0, item.size.x) -%}
+	{%- for tileRow in range(0, item.size.y) -%}
+		{%- for tile in range(0, item.size.x) -%}
 			{%- for yPixel in range(0, 8) -%}
 				{%- for xPixel in range(0, 8) -%}
-					{%- set pixel = item.characters[character][yPixel + (charRow*8)][xPixel + (char*8)] | default(0) -%}
+					{%- set pixel = item.characters[character][yPixel + (tileRow*8)][xPixel + (tile*8)] | default(0) -%}
 					{%- set currentByte = [pixel | intToBin(2), currentByte] | join -%}
 
 					{%- if currentByte | length === 4 -%}
@@ -89,7 +89,7 @@ const uint32 {{ sanitizedSpecName }} FontTilesFrameOffsets[] __attribute__((alig
 
 TileSetROMSpec {{ sanitizedSpecName }}FontTileSet =
 {
-	// Number of chars in function of the number of frames to load at the same time
+	// Number of tiles in function of the number of frames to load at the same time
 	{{ item.pageSize * item.size.x * item.size.y }},
 
 	// Whether it is shared or not
@@ -111,7 +111,7 @@ TileSetROMSpec {{ sanitizedSpecName }}FontTileSet =
 
 FontROMSpec {{ sanitizedSpecName }}FontSpec =
 {
-	// Pointer to the char spec that the font uses
+	// Pointer to the tile spec that the font uses
 	(TileSetSpec*)&{{ sanitizedSpecName }}FontTileSet,
 
 	// Offset at which character number the font starts
@@ -123,7 +123,7 @@ FontROMSpec {{ sanitizedSpecName }}FontSpec =
 	// Number of characters per line in tileSet
 	1,
 
-	// Size of a single character (in chars) ({width, height})
+	// Size of a single character (in tiles) ({width, height})
 	{{ "{" }}{{ item.size.x }}, {{ item.size.y }}{{ "}" }},
 
 	// Font's name

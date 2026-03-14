@@ -241,7 +241,7 @@ AnimationFunctionROMSpec* {{ sanitizedSpecName }}AnimationSpecs[] =
 {%- endif -%}
 
 {%- if imageData.tiles is defined and (eye !== 'R' or isStereoAnimation) %}
-TileSetROMSpec {{ tileSetSpecName }}CharsetSpec =
+TileSetROMSpec {{ tileSetSpecName }}TileSetSpec =
 {
 	// Number of TILEs in function of the number of frames to load at the same time
 	{%- if isAnimated and isOptimizedAnimation %}
@@ -279,10 +279,10 @@ TileSetROMSpec {{ tileSetSpecName }}CharsetSpec =
 
 TextureROMSpec {{ spriteName }}TextureSpec =
 {
-	// Pointer to the char spec that the texture uses
-	(TileSetSpec*)&{{ tileSetSpecName }}CharsetSpec,
+	// Pointer to the tile spec that the texture uses
+	(TileSetSpec*)&{{ tileSetSpecName }}TileSetSpec,
 
-	// Pointer to the map array that defines how to use the tiles from the char set
+	// Pointer to the map array that defines how to use the tiles from the tile set
 	{% if isStereo and not isStereoAnimation and eye === 'R' -%}
 	{{ sanitizedSpecName ~ 'Actor' ~ imageData.maps[1].name }}Map,
 	{%- else -%}

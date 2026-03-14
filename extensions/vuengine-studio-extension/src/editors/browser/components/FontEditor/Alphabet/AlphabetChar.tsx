@@ -6,11 +6,11 @@ import { VariableSize } from '../FontEditorTypes';
 
 interface AlphabetCharProps {
     index: number
-    charData: number[][]
+    tileData: number[][]
     offset: number
-    charCount: number
-    charHeight: number
-    charWidth: number
+    tileCount: number
+    tileHeight: number
+    tileWidth: number
     currentCharacterIndex: number
     setCurrentCharacterIndex: (currentCharacter: number) => void
     setCurrentCharacterHoverIndex: React.Dispatch<React.SetStateAction<number>>
@@ -19,16 +19,16 @@ interface AlphabetCharProps {
 
 export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Element {
     const {
-        charData,
-        charHeight, charWidth,
+        tileData,
+        tileHeight, tileWidth,
         index,
-        offset, charCount,
+        offset, tileCount,
         currentCharacterIndex, setCurrentCharacterIndex: setCurrentCharacter, setCurrentCharacterHoverIndex,
         variableSize,
     } = props;
 
     const classNames = ['character'];
-    if (index < offset || index >= offset + charCount) {
+    if (index < offset || index >= offset + tileCount) {
         classNames.push('inactive');
     }
     if (index === currentCharacterIndex) {
@@ -37,12 +37,12 @@ export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Elemen
 
     const pixeldata = useMemo(() => {
         const result: number[][] = [];
-        [...Array(charHeight)].map((h, y) => {
+        [...Array(tileHeight)].map((h, y) => {
             const resultRow: number[] = [];
             if (!variableSize.enabled || y < variableSize.y) {
-                [...Array(charWidth)].map((w, x) => {
-                    if (!variableSize.enabled || x < (variableSize.x[index] ?? charWidth)) {
-                        const color = charData && charData[y] && charData[y][x] ? charData[y][x] : 0;
+                [...Array(tileWidth)].map((w, x) => {
+                    if (!variableSize.enabled || x < (variableSize.x[index] ?? tileWidth)) {
+                        const color = tileData && tileData[y] && tileData[y][x] ? tileData[y][x] : 0;
                         resultRow.push(color);
                     }
                 });
@@ -51,8 +51,8 @@ export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Elemen
         });
         return result;
     }, [
-        charData,
-        charHeight, charWidth,
+        tileData,
+        tileHeight, tileWidth,
         index,
         variableSize,
     ]);
@@ -64,15 +64,15 @@ export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Elemen
         onMouseOut={() => setCurrentCharacterHoverIndex(-1)}
     >
         <CanvasImage
-            height={charHeight}
+            height={tileHeight}
             palette={'11100100'}
             pixelData={[pixeldata]}
             style={{
-                zoom: charWidth === 8 && charHeight <= 16 || charHeight === 8 && charWidth <= 16
+                zoom: tileWidth === 8 && tileHeight <= 16 || tileHeight === 8 && tileWidth <= 16
                     ? 2
                     : undefined
             }}
-            width={charWidth}
+            width={tileWidth}
             displayMode={DisplayMode.Mono}
             colorMode={ColorMode.Default}
         />

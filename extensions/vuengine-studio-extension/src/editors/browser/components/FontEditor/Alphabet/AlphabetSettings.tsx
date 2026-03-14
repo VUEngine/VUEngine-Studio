@@ -7,8 +7,8 @@ import { MAX_TILE_COUNT, MAX_PAGE_SIZE, MIN_TILE_COUNT, MIN_OFFSET, MIN_PAGE_SIZ
 import FontTileInfo from '../Tools/FontTileInfo';
 
 interface AlphabetSettingsProps {
-    charCount: number
-    setCharCount: (charCount: number) => void
+    tileCount: number
+    setCharCount: (tileCount: number) => void
     offset: number
     setOffset: (offset: number) => void
     pageSize: number
@@ -18,10 +18,10 @@ interface AlphabetSettingsProps {
 }
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
-    const { charCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
+    const { tileCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
 
     const effectiveMaxCharCount = MAX_TILE_COUNT - offset;
-    const effectiveMaxOffset = MAX_TILE_COUNT - charCount;
+    const effectiveMaxOffset = MAX_TILE_COUNT - tileCount;
     const effectiveMaxPageSize = MAX_PAGE_SIZE - effectiveMaxOffset;
 
     return <HContainer gap={10} justifyContent='space-between'>
@@ -29,7 +29,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
             <Input
                 label={nls.localize('vuengine/editors/font/count', 'Count')}
                 type="number"
-                value={charCount}
+                value={tileCount}
                 setValue={setCharCount}
                 min={MIN_TILE_COUNT}
                 max={effectiveMaxCharCount}
@@ -64,7 +64,7 @@ For all regular use cases, this should be the total amount of characters in the 
                 {nls.localize('vuengine/editors/font/tiles', 'Tiles')}
             </label>
             <FontTileInfo
-                charCount={pageSize}
+                tileCount={pageSize}
                 sizeX={sizeX}
                 sizeY={sizeY}
             />
