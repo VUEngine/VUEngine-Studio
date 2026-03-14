@@ -53,7 +53,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const rotate = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        const n = charPixelHeight;
+        const n = tilePixelHeight;
         const x = Math.floor(n / 2);
         const y = n - 1;
         let k;
@@ -77,11 +77,11 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorHorizontally = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(charPixelHeight)].map((j, y) => {
+        [...Array(tilePixelHeight)].map((j, y) => {
             if (!updatedCharacter[y]) {
                 updatedCharacter[y] = [];
             }
-            [...Array(charPixelWidth)].map((k, x) => {
+            [...Array(tilePixelWidth)].map((k, x) => {
                 if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
             });
             updatedCharacter[y] = updatedCharacter[y].reverse();
@@ -93,7 +93,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorVertically = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(charPixelHeight)].map((j, y) => {
+        [...Array(tilePixelHeight)].map((j, y) => {
             if (!updatedCharacter[y]) {
                 updatedCharacter[y] = [];
             }

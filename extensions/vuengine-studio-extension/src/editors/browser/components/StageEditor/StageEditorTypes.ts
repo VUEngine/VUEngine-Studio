@@ -19,7 +19,7 @@ export interface StageActorData {
 
 export interface StageData {
     assets: {
-        charSetSpecs: string[]
+        tileSetSpecs: string[]
         fontSpecs: string[]
         sounds: string[]
         textureSpecs: string[]

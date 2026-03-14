@@ -1671,8 +1671,8 @@
         "maxScaleDescription": "The maximum possible scale. Affects param table allocation space."
       },
       "animation": {
-        "availableChars": "Available Tiles",
-        "availableCharsDescription": "The total number of available chars in char memory.",
+        "availableTiles": "Available Tiles",
+        "availableTilesDescription": "The total number of available tiles in tile memory.",
         "maxAnimationFunctionNameLength": "Maximum Animation Function Name Length",
         "maxAnimationFunctionNameLengthDescription": "The maximum length of an animation function name.",
         "maxFramesPerAnimationFunction": "Maximum Number of Frames per Animation Function",

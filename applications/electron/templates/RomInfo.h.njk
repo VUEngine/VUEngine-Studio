@@ -5,11 +5,11 @@
 #ifndef ROM_INFO_H_
 #define ROM_INFO_H_
 
-// game title (20 chars) 	 ####################
+// game title (20 tiles) 	 ####################
 #define __GAME_TITLE		"{{ (romInfo.gameTitle ~ '                    ') | truncate(20, true, '') }}"
-// maker code (2 chars)		 ##
+// maker code (2 tiles)		 ##
 #define __MAKER_CODE		"{{ (romInfo.makerCode ~ '  ') | truncate(2, true, '') }}"
-// game code (4 chars)		 ####
+// game code (4 tiles)		 ####
 #define __GAME_CODE			"{{ (romInfo.gameCodeSystem ~ ' ') | truncate(1, true, '') }}{{ (romInfo.gameCodeId ~ '  ') | truncate(2, true, '') }}{{ (romInfo.gameCodeLanguage ~ ' ') | truncate(1, true, '') }}"
 // revision (1.x)			 #
 #define __ROM_VERSION		 {{ (romInfo.revision ~ '') | truncate(1, true, '') }}

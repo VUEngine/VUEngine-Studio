@@ -19,7 +19,7 @@ export interface EngineConfigDataBrightness {
     mediumRed: number
 }
 
-export interface EngineConfigDataChars {
+export interface EngineConfigDataTiles {
     totalTiles: number
 }
 
@@ -164,7 +164,7 @@ export interface EngineConfigData {
     affine: EngineConfigDataAffine
     animation: EngineConfigDataAnimation
     brightness: EngineConfigDataBrightness
-    chars: EngineConfigDataChars
+    tiles: EngineConfigDataTiles
     debug: EngineConfigDataDebug
     exceptions: EngineConfigDataExceptions
     frameRate: EngineConfigDataFrameRate
@@ -185,7 +185,7 @@ export interface EngineConfigData {
 export const DIAGNOSTICS_LABELS = {
     [Diagnostics.NONE]: nls.localize('vuengine/editors/engineConfig/diagnostics/NONE', 'None'),
     [Diagnostics.BGMAP_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/BGMAP_MEMORY', 'BGMap Memory'),
-    [Diagnostics.TILE_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/TILE_MEMORY', 'Char Memory'),
+    [Diagnostics.TILE_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/TILE_MEMORY', 'Tile Memory'),
     [Diagnostics.COLLISIONS]: nls.localize('vuengine/editors/engineConfig/diagnostics/COLLISIONS', 'Collisions'),
     [Diagnostics.FRAME_BUFFERS]: nls.localize('vuengine/editors/engineConfig/diagnostics/FRAME_BUFFERS', 'Frame Buffers'),
     [Diagnostics.MEMORY_POOL]: nls.localize('vuengine/editors/engineConfig/diagnostics/MEMORY_POOL', 'Memory Pools'),

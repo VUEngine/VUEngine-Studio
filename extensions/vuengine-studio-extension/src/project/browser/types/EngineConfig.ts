@@ -61,7 +61,7 @@ export const EngineConfigType: ProjectDataType = {
                 },
                 additionalProperties: false
             },
-            chars: {
+            tiles: {
                 type: 'object',
                 properties: {
                     totalTiles: {
