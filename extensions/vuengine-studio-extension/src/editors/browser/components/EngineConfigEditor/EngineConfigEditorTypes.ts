@@ -20,7 +20,7 @@ export interface EngineConfigDataBrightness {
 }
 
 export interface EngineConfigDataChars {
-    totalChars: number
+    totalTiles: number
 }
 
 export enum Diagnostics {

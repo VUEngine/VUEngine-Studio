@@ -64,7 +64,7 @@ export const EngineConfigType: ProjectDataType = {
             chars: {
                 type: 'object',
                 properties: {
-                    totalChars: {
+                    totalTiles: {
                         type: 'integer',
                         default: 2048
                     }
