@@ -21,15 +21,15 @@ export interface ParsedImageData {
 
 interface ImportExportToolsProps {
     characters: number[][][]
-    charPixelHeight: number,
-    charPixelWidth: number,
+    tilePixelHeight: number,
+    tilePixelWidth: number,
     offset: number
     characterCount: number
     updateFontData: (partialFontData: Partial<FontData>) => void
 }
 
 export default function ImportExportTools(props: ImportExportToolsProps): React.JSX.Element {
-    const { charPixelHeight, charPixelWidth, offset, characterCount, characters, updateFontData } = props;
+    const { tilePixelHeight, tilePixelWidth, offset, characterCount, characters, updateFontData } = props;
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
     const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
@@ -146,8 +146,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
         >
             <ExportSettings
                 characters={characters}
-                charPixelHeight={charPixelHeight}
-                charPixelWidth={charPixelWidth}
+                tilePixelHeight={tilePixelHeight}
+                tilePixelWidth={tilePixelWidth}
                 offset={offset}
                 characterCount={characterCount}
                 exportPngData={exportPngData}

@@ -57,8 +57,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
     const [invert, setInvert] = useState<boolean>(false);
 
-    const charPixelHeight = importedTileHeight;
-    const charPixelWidth = importedTileWidth;
+    const tilePixelHeight = importedTileHeight;
+    const tilePixelWidth = importedTileWidth;
 
     const parseIndexedPng = async (fileContent: Uint8Array): Promise<ParsedImageData | false> => {
         const PNG = require('@camoto/pngjs/browser').PNG;
@@ -99,7 +99,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     };
 
     const imageDataToCharacters = (imageData: ParsedImageData): number[][][] => {
-        const charactersPerLine = imageData.width / (charPixelWidth);
+        const charactersPerLine = imageData.width / (tilePixelWidth);
 
         const chars: number[][][] = [];
         [...Array(MAX_TILE_COUNT)].map((i, c) => {
@@ -110,12 +110,12 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             } else {
             */
             chars[c] = [];
-            [...Array(charPixelHeight)].map((j, y) => {
+            [...Array(tilePixelHeight)].map((j, y) => {
                 chars[c][y] = [];
-                [...Array(charPixelWidth)].map((k, x) => {
+                [...Array(tilePixelWidth)].map((k, x) => {
                     const offsetCurrentCharacter = c - importOffset;
-                    const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (charPixelHeight)) + y;
-                    const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (charPixelWidth) + x;
+                    const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (tilePixelHeight)) + y;
+                    const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (tilePixelWidth) + x;
                     const paletteIndex = imageData.pixelData[currentYIndex] && imageData.pixelData[currentYIndex][currentXIndex]
                         ? imageData.pixelData[currentYIndex][currentXIndex]
                         : 0;
@@ -246,11 +246,11 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                             }}
                         >
                             <Alphabet
-                                charsData={importedCharacters}
+                                tilesData={importedCharacters}
                                 offset={0}
-                                charCount={256}
-                                charHeight={importedTileHeight}
-                                charWidth={importedTileWidth}
+                                tileCount={256}
+                                tileHeight={importedTileHeight}
+                                tileWidth={importedTileWidth}
                                 currentCharacterIndex={-1}
                                 setCurrentCharacterIndex={() => { }}
                                 setCurrentCharacterHoverIndex={() => { }}
