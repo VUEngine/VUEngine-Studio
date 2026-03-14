@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React from 'react';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { EngineConfigData, TOTAL_CHARS_DEFAULT_VALUE, TOTAL_CHARS_MAX_VALUE, TOTAL_CHARS_MIN_VALUE } from '../EngineConfigEditorTypes';
+import { EngineConfigData, TOTAL_TILES_DEFAULT_VALUE, TOTAL_TILES_MAX_VALUE, TOTAL_TILES_MIN_VALUE } from '../EngineConfigEditorTypes';
 
 interface EngineConfigTilesProps {
     data: EngineConfigData
@@ -34,11 +34,11 @@ export default function EngineConfigTiles(props: EngineConfigTilesProps): React.
                     'The total number of available chars in char memory.',
                 )}
                 type="number"
-                value={data.chars?.totalChars ?? TOTAL_CHARS_DEFAULT_VALUE}
+                value={data.chars?.totalChars ?? TOTAL_TILES_DEFAULT_VALUE}
                 setValue={setTotalChars}
-                min={TOTAL_CHARS_MIN_VALUE}
-                max={TOTAL_CHARS_MAX_VALUE}
-                defaultValue={TOTAL_CHARS_DEFAULT_VALUE}
+                min={TOTAL_TILES_MIN_VALUE}
+                max={TOTAL_TILES_MAX_VALUE}
+                defaultValue={TOTAL_TILES_DEFAULT_VALUE}
                 width={64}
             />
         </VContainer>

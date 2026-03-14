@@ -8,7 +8,7 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import PopUpDialog from '../../../Common/Base/PopUpDialog';
 import { PixelEditorTool } from '../../../PixelEditor/Sidebar/PixelEditorTool';
-import { CHAR_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
+import { TILE_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
 import ExportSettings from './ExportSettings';
 import ImportSettings from './ImportSettings';
 
@@ -35,8 +35,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
     const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
     const [exportFileName, setExportFileName] = useState<string>(fileUri.path.name);
     const [exportPngData, setExportPngData] = useState<Buffer>();
-    const [importedCharHeight, setImportedCharHeight] = useState<number>(CHAR_PIXEL_SIZE);
-    const [importedCharWidth, setImportedCharWidth] = useState<number>(CHAR_PIXEL_SIZE);
+    const [importedTileHeight, setImportedTileHeight] = useState<number>(TILE_PIXEL_SIZE);
+    const [importedTileWidth, setImportedTileWidth] = useState<number>(TILE_PIXEL_SIZE);
     const [importedCharacters, setImportedCharacters] = useState<number[][][]>([]);
     const [importOffset, setImportOffset] = useState<number>(32);
     const [importCharacterCount, setImportCharacterCount] = useState<number>(224);
@@ -107,8 +107,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 if (importedCharacters) {
                     updateFontData({
                         size: {
-                            x: importedCharWidth / CHAR_PIXEL_SIZE,
-                            y: importedCharHeight / CHAR_PIXEL_SIZE,
+                            x: importedTileWidth / TILE_PIXEL_SIZE,
+                            y: importedTileHeight / TILE_PIXEL_SIZE,
                         },
                         offset: importOffset,
                         characterCount: importCharacterCount,
@@ -125,10 +125,10 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 open={importDialogOpen}
                 importedCharacters={importedCharacters}
                 setImportedCharacters={setImportedCharacters}
-                importedCharHeight={importedCharHeight}
-                setImportedCharHeight={setImportedCharHeight}
-                importedCharWidth={importedCharWidth}
-                setImportedCharWidth={setImportedCharWidth}
+                importedTileHeight={importedTileHeight}
+                setImportedTileHeight={setImportedTileHeight}
+                importedTileWidth={importedTileWidth}
+                setImportedTileWidth={setImportedTileWidth}
                 importOffset={importOffset}
                 setImportOffset={setImportOffset}
                 setImportCharacterCount={setImportCharacterCount}

@@ -56,12 +56,12 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
                     ? currentCharacterIndex + 16
                     : currentCharacterIndex);
                 break;
-            case FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_PREV_TILE.id:
                 setCurrentCharacterIndex(currentCharacterIndex > offset
                     ? currentCharacterIndex - 1
                     : currentCharacterIndex);
                 break;
-            case FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_NEXT_TILE.id:
                 setCurrentCharacterIndex(currentCharacterIndex + 1 < offset + charCount
                     ? currentCharacterIndex + 1
                     : currentCharacterIndex);

@@ -29,10 +29,10 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
-            case FontEditorCommands.COPY_CHARACTER.id:
+            case FontEditorCommands.COPY_TILE.id:
                 copy();
                 break;
-            case FontEditorCommands.PASTE_CHARACTER.id:
+            case FontEditorCommands.PASTE_TILE.id:
                 paste();
                 break;
         }

@@ -21,7 +21,7 @@ import AlphabetSettings from './Alphabet/AlphabetSettings';
 import TileSettings from './Alphabet/TileSettings';
 import { FontEditorCommands } from './FontEditorCommands';
 import {
-    CHAR_PIXEL_SIZE,
+    TILE_PIXEL_SIZE,
     FontData,
     Size,
     VariableSize
@@ -69,8 +69,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { setData, undo, redo } = useDotting(dottingRef);
     const { addDataChangeListener, removeDataChangeListener } = useHandlers(dottingRef);
 
-    const charPixelWidth = data.size.x * CHAR_PIXEL_SIZE;
-    const charPixelHeight = data.size.y * CHAR_PIXEL_SIZE;
+    const charPixelWidth = data.size.x * TILE_PIXEL_SIZE;
+    const charPixelHeight = data.size.y * TILE_PIXEL_SIZE;
 
     const characters = data.characters || [];
 

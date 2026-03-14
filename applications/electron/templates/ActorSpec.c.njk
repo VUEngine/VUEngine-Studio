@@ -243,7 +243,7 @@ AnimationFunctionROMSpec* {{ sanitizedSpecName }}AnimationSpecs[] =
 {%- if imageData.tiles is defined and (eye !== 'R' or isStereoAnimation) %}
 TileSetROMSpec {{ tileSetSpecName }}CharsetSpec =
 {
-	// Number of CHARs in function of the number of frames to load at the same time
+	// Number of TILEs in function of the number of frames to load at the same time
 	{%- if isAnimated and isOptimizedAnimation %}
 	{{ imageData.animation.largestFrame }},
 	{%- elseif isAnimated and isSpritesheetAnimation and not item.animations.multiframe %}

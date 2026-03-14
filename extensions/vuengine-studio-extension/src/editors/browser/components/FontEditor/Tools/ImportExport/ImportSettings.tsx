@@ -17,17 +17,17 @@ import VContainer from '../../../Common/Base/VContainer';
 import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
-import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
+import { TILE_PIXEL_SIZE, MAX_TILE_COUNT, MAX_TILE_SIZE, MAX_OFFSET, MIN_TILE_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
 interface ImportSettingsProps {
     open: boolean
     importedCharacters: number[][][]
     setImportedCharacters: React.Dispatch<React.SetStateAction<number[][][]>>
-    importedCharHeight: number
-    setImportedCharHeight: React.Dispatch<React.SetStateAction<number>>
-    importedCharWidth: number
-    setImportedCharWidth: React.Dispatch<React.SetStateAction<number>>
+    importedTileHeight: number
+    setImportedTileHeight: React.Dispatch<React.SetStateAction<number>>
+    importedTileWidth: number
+    setImportedTileWidth: React.Dispatch<React.SetStateAction<number>>
     importOffset: number
     setImportOffset: React.Dispatch<React.SetStateAction<number>>
     setImportCharacterCount: React.Dispatch<React.SetStateAction<number>>
@@ -43,10 +43,10 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         open,
         importedCharacters,
         setImportedCharacters,
-        importedCharHeight,
-        setImportedCharHeight,
-        importedCharWidth,
-        setImportedCharWidth,
+        importedTileHeight,
+        setImportedTileHeight,
+        importedTileWidth,
+        setImportedTileWidth,
         importOffset,
         setImportOffset,
         setImportCharacterCount,
@@ -57,8 +57,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
     const [invert, setInvert] = useState<boolean>(false);
 
-    const charPixelHeight = importedCharHeight;
-    const charPixelWidth = importedCharWidth;
+    const charPixelHeight = importedTileHeight;
+    const charPixelWidth = importedTileWidth;
 
     const parseIndexedPng = async (fileContent: Uint8Array): Promise<ParsedImageData | false> => {
         const PNG = require('@camoto/pngjs/browser').PNG;
@@ -102,7 +102,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         const charactersPerLine = imageData.width / (charPixelWidth);
 
         const chars: number[][][] = [];
-        [...Array(MAX_CHAR_COUNT)].map((i, c) => {
+        [...Array(MAX_TILE_COUNT)].map((i, c) => {
             /*
             if (c < offset || c >= offset + characterCount) {
                 // @ts-ignore
@@ -164,7 +164,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         if (imgData !== false) {
             setSourceImageHeight(imgData.height);
             setSourceImageWidth(imgData.width);
-            setImportCharacterCount(imgData.width / importedCharWidth * imgData.height / importedCharHeight);
+            setImportCharacterCount(imgData.width / importedTileWidth * imgData.height / importedTileHeight);
             setImportedCharacters(imageDataToCharacters(imgData));
         } else {
             services.messageService.error(
@@ -184,8 +184,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     useEffect(() => {
         sourceImageToCharacters();
     }, [
-        importedCharHeight,
-        importedCharWidth,
+        importedTileHeight,
+        importedTileWidth,
         importOffset,
         sourceImagePath,
         invert,
@@ -249,8 +249,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                                 charsData={importedCharacters}
                                 offset={0}
                                 charCount={256}
-                                charHeight={importedCharHeight}
-                                charWidth={importedCharWidth}
+                                charHeight={importedTileHeight}
+                                charWidth={importedTileWidth}
                                 currentCharacterIndex={-1}
                                 setCurrentCharacterIndex={() => { }}
                                 setCurrentCharacterHoverIndex={() => { }}
@@ -272,21 +272,21 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     <HContainer alignItems='center'>
                         <Input
                             type="number"
-                            value={importedCharWidth}
-                            setValue={v => setImportedCharWidth(roundToNextMultipleOf8(v as number))}
-                            step={CHAR_PIXEL_SIZE}
-                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                            value={importedTileWidth}
+                            setValue={v => setImportedTileWidth(roundToNextMultipleOf8(v as number))}
+                            step={TILE_PIXEL_SIZE}
+                            min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
+                            max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
                             width={48}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
                         <Input
                             type="number"
-                            value={importedCharHeight}
-                            setValue={v => setImportedCharHeight(roundToNextMultipleOf8(v as number))}
-                            step={CHAR_PIXEL_SIZE}
-                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                            value={importedTileHeight}
+                            setValue={v => setImportedTileHeight(roundToNextMultipleOf8(v as number))}
+                            step={TILE_PIXEL_SIZE}
+                            min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
+                            max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
                             width={48}
                         />
                     </HContainer>

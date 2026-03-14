@@ -4,7 +4,7 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
+import { MAX_TILE_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]
@@ -18,8 +18,8 @@ interface ExportSettingsProps {
     setExportFileName: (exportFileName: string) => void
 }
 
-const MIN_CHARS_PER_LINE = 1;
-const MAX_CHARS_PER_LINE = 256;
+const MIN_TILES_PER_LINE = 1;
+const MAX_TILES_PER_LINE = 256;
 
 export default function ExportSettings(props: ExportSettingsProps): React.JSX.Element {
     const {
@@ -46,7 +46,7 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         const pixelsPerCharacterLine = charactersPerLine * charPixelWidth;
         const pixelsPerAlphabetLine = pixelsPerCharacterLine * charPixelHeight;
         const alphabetPixels: number[] = [];
-        [...Array(MAX_CHAR_COUNT)].forEach((x, characterIndex) => {
+        [...Array(MAX_TILE_COUNT)].forEach((x, characterIndex) => {
             if (characterIndex < startCharacter || characterIndex > endCharacter) {
                 return;
             }
@@ -102,8 +102,8 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
                 type="number"
                 value={charactersPerLine}
                 setValue={v => setCharactersPerLine(v as number)}
-                min={MIN_CHARS_PER_LINE}
-                max={MAX_CHARS_PER_LINE}
+                min={MIN_TILES_PER_LINE}
+                max={MAX_TILES_PER_LINE}
                 width={48}
             />
         </VContainer>
