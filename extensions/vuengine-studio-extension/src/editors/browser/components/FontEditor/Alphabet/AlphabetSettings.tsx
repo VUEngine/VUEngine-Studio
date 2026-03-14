@@ -3,7 +3,7 @@ import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
+import { MAX_TILE_COUNT, MAX_PAGE_SIZE, MIN_TILE_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
 import FontTileInfo from '../Tools/FontTileInfo';
 
 interface AlphabetSettingsProps {
@@ -20,8 +20,8 @@ interface AlphabetSettingsProps {
 export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
     const { charCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
 
-    const effectiveMaxCharCount = MAX_CHAR_COUNT - offset;
-    const effectiveMaxOffset = MAX_CHAR_COUNT - charCount;
+    const effectiveMaxCharCount = MAX_TILE_COUNT - offset;
+    const effectiveMaxOffset = MAX_TILE_COUNT - charCount;
     const effectiveMaxPageSize = MAX_PAGE_SIZE - effectiveMaxOffset;
 
     return <HContainer gap={10} justifyContent='space-between'>
@@ -31,7 +31,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 type="number"
                 value={charCount}
                 setValue={setCharCount}
-                min={MIN_CHAR_COUNT}
+                min={MIN_TILE_COUNT}
                 max={effectiveMaxCharCount}
                 width={48}
             />

@@ -2,13 +2,13 @@ import { nls } from '@theia/core';
 import { EditorCommand } from '../../ves-editors-types';
 
 export namespace FontEditorCommands {
-    export const ALPHABET_NAVIGATE_PREV_CHAR: EditorCommand = {
+    export const ALPHABET_NAVIGATE_PREV_TILE: EditorCommand = {
         id: 'editors.fontEditor.alphabetNavigatePrevChar',
         label: nls.localize('vuengine/editors/font/commands/alphabetNavigatePrevChar', 'Alphabet: Navigate Previous Character'),
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'left',
     };
-    export const ALPHABET_NAVIGATE_NEXT_CHAR: EditorCommand = {
+    export const ALPHABET_NAVIGATE_NEXT_TILE: EditorCommand = {
         id: 'editors.fontEditor.alphabetNavigateNextChar',
         label: nls.localize('vuengine/editors/font/commands/alphabetNavigateNextChar', 'Alphabet: Navigate Next Character'),
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
@@ -26,13 +26,13 @@ export namespace FontEditorCommands {
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'down',
     };
-    export const COPY_CHARACTER: EditorCommand = {
-        id: 'editors.fontEditor.copyCharacter',
-        label: nls.localize('vuengine/editors/font/commands/copyCharacter', 'Copy Character'),
+    export const COPY_TILE: EditorCommand = {
+        id: 'editors.fontEditor.copyTile',
+        label: nls.localize('vuengine/editors/font/commands/copyTile', 'Copy Character'),
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),
         keybinding: 'ctrlcmd+c',
     };
-    export const PASTE_CHARACTER: EditorCommand = {
+    export const PASTE_TILE: EditorCommand = {
         id: 'editors.fontEditor.pasteCharacter',
         label: nls.localize('vuengine/editors/font/commands/pasteCharacter', 'Paste Character'),
         category: nls.localize('vuengine/editors/font/commands/category', 'Font Editor'),

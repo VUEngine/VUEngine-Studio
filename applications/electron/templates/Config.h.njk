@@ -56,7 +56,7 @@
 
 {% if config.debug.alertGraphicsDepletion -%}
 #ifndef __SHIPPING
-#define __ALERT_CHAR_MEMORY_DEPLETION
+#define __ALERT_TILE_MEMORY_DEPLETION
 #define __ALERT_BGMAP_MEMORY_DEPLETION
 #define __ALERT_OBJECT_MEMORY_DEPLETION
 #define __ALERT_WORLD_MEMORY_DEPLETION
@@ -177,7 +177,7 @@
 
 {{ macros.sectionHeader('Char management') }}
 
-#define __CHAR_MEMORY_TOTAL_CHARS		{{ config.chars.totalChars }}
+#define __TILE_MEMORY_TOTAL_TILES		{{ config.chars.totalChars }}
 
 {{ macros.sectionHeader('Sprite management') }}
 

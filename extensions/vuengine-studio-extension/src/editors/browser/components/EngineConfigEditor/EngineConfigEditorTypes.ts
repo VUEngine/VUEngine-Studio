@@ -26,7 +26,7 @@ export interface EngineConfigDataChars {
 export enum Diagnostics {
     NONE = 'NONE',
     BGMAP_MEMORY = 'BGMAP_MEMORY',
-    CHAR_MEMORY = 'CHAR_MEMORY',
+    TILE_MEMORY = 'TILE_MEMORY',
     COLLISIONS = 'COLLISIONS',
     FRAME_BUFFERS = 'FRAME_BUFFERS',
     MEMORY_POOL = 'MEMORY_POOL',
@@ -185,7 +185,7 @@ export interface EngineConfigData {
 export const DIAGNOSTICS_LABELS = {
     [Diagnostics.NONE]: nls.localize('vuengine/editors/engineConfig/diagnostics/NONE', 'None'),
     [Diagnostics.BGMAP_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/BGMAP_MEMORY', 'BGMap Memory'),
-    [Diagnostics.CHAR_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/CHAR_MEMORY', 'Char Memory'),
+    [Diagnostics.TILE_MEMORY]: nls.localize('vuengine/editors/engineConfig/diagnostics/TILE_MEMORY', 'Char Memory'),
     [Diagnostics.COLLISIONS]: nls.localize('vuengine/editors/engineConfig/diagnostics/COLLISIONS', 'Collisions'),
     [Diagnostics.FRAME_BUFFERS]: nls.localize('vuengine/editors/engineConfig/diagnostics/FRAME_BUFFERS', 'Frame Buffers'),
     [Diagnostics.MEMORY_POOL]: nls.localize('vuengine/editors/engineConfig/diagnostics/MEMORY_POOL', 'Memory Pools'),
@@ -258,9 +258,9 @@ export const STACK_HEADROOM_MIN_VALUE = 1;
 export const STACK_HEADROOM_MAX_VALUE = 65536;
 export const STACK_HEADROOM_DEFAULT_VALUE = 1000;
 
-export const TOTAL_CHARS_MIN_VALUE = 1;
-export const TOTAL_CHARS_MAX_VALUE = 32768;
-export const TOTAL_CHARS_DEFAULT_VALUE = 2048;
+export const TOTAL_TILES_MIN_VALUE = 1;
+export const TOTAL_TILES_MAX_VALUE = 32768;
+export const TOTAL_TILES_DEFAULT_VALUE = 2048;
 
 export const FIXED_POINT_PRECISION_MIN_VALUE = 6;
 export const FIXED_POINT_PRECISION_MAX_VALUE = 13; // TODO: make dropdown
