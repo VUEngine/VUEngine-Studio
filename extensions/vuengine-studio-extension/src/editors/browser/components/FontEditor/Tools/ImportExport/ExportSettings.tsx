@@ -8,8 +8,8 @@ import { MAX_TILE_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]
-    charPixelHeight: number,
-    charPixelWidth: number,
+    tilePixelHeight: number,
+    tilePixelWidth: number,
     offset: number
     characterCount: number
     exportPngData?: Buffer
@@ -23,8 +23,8 @@ const MAX_TILES_PER_LINE = 256;
 
 export default function ExportSettings(props: ExportSettingsProps): React.JSX.Element {
     const {
-        charPixelHeight,
-        charPixelWidth,
+        tilePixelHeight,
+        tilePixelWidth,
         offset,
         characterCount,
         characters,
@@ -43,8 +43,8 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         const startCharacter = startLine * charactersPerLine;
         const endLine = Math.floor((offset + characterCount - 1 + charactersPerLine) / charactersPerLine);
         const endCharacter = endLine * charactersPerLine;
-        const pixelsPerCharacterLine = charactersPerLine * charPixelWidth;
-        const pixelsPerAlphabetLine = pixelsPerCharacterLine * charPixelHeight;
+        const pixelsPerCharacterLine = charactersPerLine * tilePixelWidth;
+        const pixelsPerAlphabetLine = pixelsPerCharacterLine * tilePixelHeight;
         const alphabetPixels: number[] = [];
         [...Array(MAX_TILE_COUNT)].forEach((x, characterIndex) => {
             if (characterIndex < startCharacter || characterIndex > endCharacter) {
@@ -52,10 +52,10 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
             }
             const offsetCharacterIndex = characterIndex - startCharacter;
             const alphabetLineOffset = Math.floor(offsetCharacterIndex / charactersPerLine) * pixelsPerAlphabetLine;
-            const characterOffset = offsetCharacterIndex % charactersPerLine * charPixelWidth;
-            [...Array(charPixelHeight)].forEach((y, characterLineIndex) => {
+            const characterOffset = offsetCharacterIndex % charactersPerLine * tilePixelWidth;
+            [...Array(tilePixelHeight)].forEach((y, characterLineIndex) => {
                 const characterLineOffset = characterLineIndex * pixelsPerCharacterLine;
-                [...Array(charPixelWidth)].forEach((z, characterPixelIndex) => {
+                [...Array(tilePixelWidth)].forEach((z, characterPixelIndex) => {
                     const pixelOffset = alphabetLineOffset + characterOffset + characterLineOffset + characterPixelIndex;
                     const pixelColorIndex = characterIndex >= offset && characterIndex < (offset + characterCount)
                         && characters[characterIndex] && characters[characterIndex][characterLineIndex]
@@ -68,8 +68,8 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         });
 
         const totalTiles = endCharacter - startCharacter;
-        const height = charPixelHeight * totalTiles / charactersPerLine;
-        const width = charPixelWidth * charactersPerLine;
+        const height = tilePixelHeight * totalTiles / charactersPerLine;
+        const width = tilePixelWidth * charactersPerLine;
 
         setImageHeight(height);
         setImageWidth(width);
