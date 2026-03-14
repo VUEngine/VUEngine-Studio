@@ -1245,7 +1245,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
     for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.tileCodeAt(i);
+      ia[i] = byteString.charCodeAt(i);
     }
 
     await this.workspaceService.ready;
@@ -1262,7 +1262,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
     for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.tileCodeAt(i);
+      ia[i] = byteString.charCodeAt(i);
     }
 
     const romPath = await this.getRomPath();
