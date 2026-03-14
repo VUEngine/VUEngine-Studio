@@ -12,12 +12,12 @@ interface EngineConfigTilesProps {
 export default function EngineConfigTiles(props: EngineConfigTilesProps): React.JSX.Element {
     const { data, updateData } = props;
 
-    const setTotalChars = (totalChars: number): void => {
+    const setTotalChars = (totalTiles: number): void => {
         updateData({
             ...data,
             chars: {
                 ...(data.chars ?? {}),
-                totalChars,
+                totalTiles,
             }
         });
     };
@@ -34,7 +34,7 @@ export default function EngineConfigTiles(props: EngineConfigTilesProps): React.
                     'The total number of available chars in char memory.',
                 )}
                 type="number"
-                value={data.chars?.totalChars ?? TOTAL_TILES_DEFAULT_VALUE}
+                value={data.chars?.totalTiles ?? TOTAL_TILES_DEFAULT_VALUE}
                 setValue={setTotalChars}
                 min={TOTAL_TILES_MIN_VALUE}
                 max={TOTAL_TILES_MAX_VALUE}

@@ -67,8 +67,8 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
             });
         });
 
-        const totalChars = endCharacter - startCharacter;
-        const height = charPixelHeight * totalChars / charactersPerLine;
+        const totalTiles = endCharacter - startCharacter;
+        const height = charPixelHeight * totalTiles / charactersPerLine;
         const width = charPixelWidth * charactersPerLine;
 
         setImageHeight(height);
