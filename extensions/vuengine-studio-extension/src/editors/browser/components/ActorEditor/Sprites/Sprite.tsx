@@ -990,7 +990,7 @@ If 0, the value is inferred from the texture.'
                             label={nls.localize('vuengine/editors/actor/share', 'Share')}
                             tooltip={nls.localize(
                                 'vuengine/editors/actor/shareDescription',
-                                "When enabled, this Sprite's CharSet will be shared with other instances using the same CharSet."
+                                "When enabled, this Sprite's TileSet will be shared with other instances using the same TileSet."
                             )}
                         />
                     </HContainer>

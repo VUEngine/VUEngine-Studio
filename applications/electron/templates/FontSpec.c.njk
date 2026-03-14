@@ -87,7 +87,7 @@ const uint32 {{ sanitizedSpecName }} FontTilesFrameOffsets[] __attribute__((alig
 
 {{ macros.sectionHeader('Definitions') }}
 
-CharSetROMSpec {{ sanitizedSpecName }}FontCharSet =
+TileSetROMSpec {{ sanitizedSpecName }}FontTileSet =
 {
 	// Number of chars in function of the number of frames to load at the same time
 	{{ item.pageSize * item.size.x * item.size.y }},
@@ -112,7 +112,7 @@ CharSetROMSpec {{ sanitizedSpecName }}FontCharSet =
 FontROMSpec {{ sanitizedSpecName }}FontSpec =
 {
 	// Pointer to the char spec that the font uses
-	(CharSetSpec*)&{{ sanitizedSpecName }}FontCharSet,
+	(TileSetSpec*)&{{ sanitizedSpecName }}FontTileSet,
 
 	// Offset at which character number the font starts
 	{{ item.offset }},
@@ -120,7 +120,7 @@ FontROMSpec {{ sanitizedSpecName }}FontSpec =
 	// Number of characters in this font
 	{{ item.characterCount }},
 
-	// Number of characters per line in charset
+	// Number of characters per line in tileSet
 	1,
 
 	// Size of a single character (in chars) ({width, height})

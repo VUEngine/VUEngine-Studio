@@ -18,7 +18,7 @@ import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCu
 import PixelEditorTools from '../PixelEditor/Sidebar/PixelEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
-import CharSettings from './Alphabet/CharSettings';
+import TileSettings from './Alphabet/TileSettings';
 import { FontEditorCommands } from './FontEditorCommands';
 import {
     CHAR_PIXEL_SIZE,
@@ -360,7 +360,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             <EditorSidebar>
                 <VContainer gap={15} overflow='hidden'>
                     <HContainer justifyContent='space-between'>
-                        <CharSettings
+                        <TileSettings
                             currentCharacter={currentCharacterIndex}
                             charHeight={charPixelHeight}
                             charWidth={charPixelWidth}

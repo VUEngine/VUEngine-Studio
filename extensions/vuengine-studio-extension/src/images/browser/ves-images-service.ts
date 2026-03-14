@@ -513,7 +513,7 @@ export class VesImagesService {
   }
 
   /**
-   * For unknown (and unnecessary) reasons, grit prepends an empty tile to a charset if there is none already.
+   * For unknown (and unnecessary) reasons, grit prepends an empty tile to a tileSet if there is none already.
    * We check if the empty tile is used and, if not, remove it and update the map indices accordingly.
    * Grit also appends an empty tile to maps with an odd number of chars, which we remove.
    */
@@ -535,7 +535,7 @@ export class VesImagesService {
       return;
     }
 
-    // remove empty tile at beginning of charset (0x00000000,0x00000000,0x00000000,0x00000000,) and decrement all map indices
+    // remove empty tile at beginning of tileSet (0x00000000,0x00000000,0x00000000,0x00000000,) and decrement all map indices
     convertedFileData.map(fileData => {
       if (!hasTileSetFile && !forceCleanup && fileData.map.data.includes('0000')) {
         return convertedFileData;
