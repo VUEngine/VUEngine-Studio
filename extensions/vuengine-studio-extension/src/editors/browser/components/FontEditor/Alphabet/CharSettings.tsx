@@ -6,7 +6,7 @@ import VContainer from '../../Common/Base/VContainer';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
-interface CharSettingsProps {
+interface TileSettingsProps {
     currentCharacter: number
     charHeight: number,
     charWidth: number,
@@ -14,7 +14,7 @@ interface CharSettingsProps {
     setCharSize: (size?: Size, variableSize?: VariableSize) => void
 }
 
-export default function CharSettings(props: CharSettingsProps): React.JSX.Element {
+export default function TileSettings(props: TileSettingsProps): React.JSX.Element {
     const { currentCharacter, charHeight, charWidth, variableSize, setCharSize } = props;
 
     const setVariablePixelWidth = (size: number) => {

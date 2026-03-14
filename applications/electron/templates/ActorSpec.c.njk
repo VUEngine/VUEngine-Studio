@@ -224,10 +224,10 @@ AnimationFunctionROMSpec* {{ sanitizedSpecName }}AnimationSpecs[] =
 	{%- set spriteImageData = item.components.sprites[sprite._imageData - 1]._imageData -%}
 {%- endif -%}
 {%- set imageData = spriteImageData.images[0] -%}
-{%- set charsetSpecName = sanitizedSpecName ~ 'Sprite' ~ spriteNumber -%}
+{%- set tileSetSpecName = sanitizedSpecName ~ 'Sprite' ~ spriteNumber -%}
 {%- if isStereoAnimation -%}
 	{%- set imageData = spriteImageData.images[loop.index0] -%}
-	{%- set charsetSpecName = charsetSpecName ~ eye -%}
+	{%- set tileSetSpecName = tileSetSpecName ~ eye -%}
 {%- endif -%}
 {%- set tilesName = sanitizedSpecName ~ 'Actor' ~ imageData.tiles.name -%}
 {%- set spriteName = sanitizedSpecName ~ 'Sprite' ~ spriteNumber -%}
@@ -241,7 +241,7 @@ AnimationFunctionROMSpec* {{ sanitizedSpecName }}AnimationSpecs[] =
 {%- endif -%}
 
 {%- if imageData.tiles is defined and (eye !== 'R' or isStereoAnimation) %}
-CharSetROMSpec {{ charsetSpecName }}CharsetSpec =
+TileSetROMSpec {{ tileSetSpecName }}CharsetSpec =
 {
 	// Number of CHARs in function of the number of frames to load at the same time
 	{%- if isAnimated and isOptimizedAnimation %}
@@ -280,7 +280,7 @@ CharSetROMSpec {{ charsetSpecName }}CharsetSpec =
 TextureROMSpec {{ spriteName }}TextureSpec =
 {
 	// Pointer to the char spec that the texture uses
-	(CharSetSpec*)&{{ charsetSpecName }}CharsetSpec,
+	(TileSetSpec*)&{{ tileSetSpecName }}CharsetSpec,
 
 	// Pointer to the map array that defines how to use the tiles from the char set
 	{% if isStereo and not isStereoAnimation and eye === 'R' -%}
