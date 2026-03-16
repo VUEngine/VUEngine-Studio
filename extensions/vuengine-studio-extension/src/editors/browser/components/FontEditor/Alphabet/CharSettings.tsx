@@ -4,18 +4,18 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
-import { TILE_PIXEL_SIZE, MAX_TILE_SIZE, MIN_TILE_SIZE, MIN_VARIABLE_TILE_SIZE, Size, VariableSize } from '../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
-interface TileSettingsProps {
+interface CharSettingsProps {
     currentCharacter: number
-    tileHeight: number,
-    tileWidth: number,
+    charHeight: number,
+    charWidth: number,
     variableSize: VariableSize,
     setCharSize: (size?: Size, variableSize?: VariableSize) => void
 }
 
-export default function TileSettings(props: TileSettingsProps): React.JSX.Element {
-    const { currentCharacter, tileHeight, tileWidth, variableSize, setCharSize } = props;
+export default function CharSettings(props: CharSettingsProps): React.JSX.Element {
+    const { currentCharacter, charHeight, charWidth, variableSize, setCharSize } = props;
 
     const setVariablePixelWidth = (size: number) => {
         const updatedVariableSizeX = deepClone(variableSize.x);
@@ -34,14 +34,14 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
     const setPixelWidth = (value: number) => {
         const newSize = clamp(
             roundToNextMultipleOf8(value),
-            MIN_TILE_SIZE * TILE_PIXEL_SIZE,
-            MAX_TILE_SIZE * TILE_PIXEL_SIZE
+            MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
+            MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
         );
 
         let updatedVariableSize;
         if (variableSize.enabled) {
-            const currentVariableSize = variableSize.x[currentCharacter] ?? tileWidth;
-            const currentVariableSizeDifference = tileWidth - currentVariableSize;
+            const currentVariableSize = variableSize.x[currentCharacter] ?? charWidth;
+            const currentVariableSizeDifference = charWidth - currentVariableSize;
             const newVariableSize = newSize - currentVariableSizeDifference;
 
             const updatedVariableSizeX = deepClone(variableSize.x);
@@ -55,8 +55,8 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
 
         setCharSize(
             {
-                x: newSize / TILE_PIXEL_SIZE,
-                y: tileHeight / TILE_PIXEL_SIZE
+                x: newSize / CHAR_PIXEL_SIZE,
+                y: charHeight / CHAR_PIXEL_SIZE
             },
             updatedVariableSize
         );
@@ -65,14 +65,14 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
     const setPixelHeight = (value: number) => {
         const newSize = clamp(
             roundToNextMultipleOf8(value),
-            MIN_TILE_SIZE * TILE_PIXEL_SIZE,
-            MAX_TILE_SIZE * TILE_PIXEL_SIZE
+            MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
+            MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
         );
 
         let updatedVariableSize;
         if (variableSize.enabled) {
             const currentVariableSize = variableSize.y;
-            const currentVariableSizeDifference = tileHeight - currentVariableSize;
+            const currentVariableSizeDifference = charHeight - currentVariableSize;
             const newVariableSize = newSize - currentVariableSizeDifference;
             updatedVariableSize = {
                 ...variableSize,
@@ -82,8 +82,8 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
 
         setCharSize(
             {
-                x: tileWidth / TILE_PIXEL_SIZE,
-                y: newSize / TILE_PIXEL_SIZE
+                x: charWidth / CHAR_PIXEL_SIZE,
+                y: newSize / CHAR_PIXEL_SIZE
             },
             updatedVariableSize
         );
@@ -140,10 +140,10 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
                     <HContainer alignItems='center'>
                         <Input
                             type="number"
-                            value={variableSize.x[currentCharacter] ?? tileWidth}
+                            value={variableSize.x[currentCharacter] ?? charWidth}
                             setValue={setVariablePixelWidth}
-                            min={MIN_VARIABLE_TILE_SIZE}
-                            max={tileWidth}
+                            min={MIN_VARIABLE_CHAR_SIZE}
+                            max={charWidth}
                             width={64}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
@@ -151,8 +151,8 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
                             type="number"
                             value={variableSize.y}
                             setValue={setVariablePixelHeight}
-                            min={MIN_VARIABLE_TILE_SIZE}
-                            max={tileWidth}
+                            min={MIN_VARIABLE_CHAR_SIZE}
+                            max={charWidth}
                             width={64}
                         />
                     </HContainer>
@@ -172,20 +172,20 @@ export default function TileSettings(props: TileSettingsProps): React.JSX.Elemen
                 <HContainer alignItems='center'>
                     <Input
                         type="number"
-                        step={TILE_PIXEL_SIZE}
-                        min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
-                        max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
-                        value={tileWidth}
+                        step={CHAR_PIXEL_SIZE}
+                        min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                        max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                        value={charWidth}
                         setValue={setPixelWidth}
                         width={64}
                     />
                     <div style={{ paddingBottom: 3 }}>×</div>
                     <Input
                         type="number"
-                        step={TILE_PIXEL_SIZE}
-                        min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
-                        max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
-                        value={tileHeight}
+                        step={CHAR_PIXEL_SIZE}
+                        min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                        max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                        value={charHeight}
                         setValue={setPixelHeight}
                         width={64}
                     />

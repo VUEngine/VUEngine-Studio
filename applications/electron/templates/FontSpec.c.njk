@@ -4,11 +4,11 @@
 {%- set block = '' -%}
 {%- set currentByte = '' -%}
 {%- for character in range(item.offset, item.offset + item.characterCount) -%}
-	{%- for tileRow in range(0, item.size.y) -%}
-		{%- for tile in range(0, item.size.x) -%}
+	{%- for charRow in range(0, item.size.y) -%}
+		{%- for char in range(0, item.size.x) -%}
 			{%- for yPixel in range(0, 8) -%}
 				{%- for xPixel in range(0, 8) -%}
-					{%- set pixel = item.characters[character][yPixel + (tileRow*8)][xPixel + (tile*8)] | default(0) -%}
+					{%- set pixel = item.characters[character][yPixel + (charRow*8)][xPixel + (char*8)] | default(0) -%}
 					{%- set currentByte = [pixel | intToBin(2), currentByte] | join -%}
 
 					{%- if currentByte | length === 4 -%}

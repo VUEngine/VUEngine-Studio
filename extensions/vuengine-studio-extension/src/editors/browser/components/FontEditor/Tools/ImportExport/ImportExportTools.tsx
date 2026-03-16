@@ -8,7 +8,7 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import PopUpDialog from '../../../Common/Base/PopUpDialog';
 import { PixelEditorTool } from '../../../PixelEditor/Sidebar/PixelEditorTool';
-import { TILE_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, FontData } from '../../FontEditorTypes';
 import ExportSettings from './ExportSettings';
 import ImportSettings from './ImportSettings';
 
@@ -21,22 +21,22 @@ export interface ParsedImageData {
 
 interface ImportExportToolsProps {
     characters: number[][][]
-    tilePixelHeight: number,
-    tilePixelWidth: number,
+    charPixelHeight: number,
+    charPixelWidth: number,
     offset: number
     characterCount: number
     updateFontData: (partialFontData: Partial<FontData>) => void
 }
 
 export default function ImportExportTools(props: ImportExportToolsProps): React.JSX.Element {
-    const { tilePixelHeight, tilePixelWidth, offset, characterCount, characters, updateFontData } = props;
+    const { charPixelHeight, charPixelWidth, offset, characterCount, characters, updateFontData } = props;
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
     const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
     const [exportFileName, setExportFileName] = useState<string>(fileUri.path.name);
     const [exportPngData, setExportPngData] = useState<Buffer>();
-    const [importedTileHeight, setImportedTileHeight] = useState<number>(TILE_PIXEL_SIZE);
-    const [importedTileWidth, setImportedTileWidth] = useState<number>(TILE_PIXEL_SIZE);
+    const [importedCharHeight, setImportedCharHeight] = useState<number>(CHAR_PIXEL_SIZE);
+    const [importedCharWidth, setImportedCharWidth] = useState<number>(CHAR_PIXEL_SIZE);
     const [importedCharacters, setImportedCharacters] = useState<number[][][]>([]);
     const [importOffset, setImportOffset] = useState<number>(32);
     const [importCharacterCount, setImportCharacterCount] = useState<number>(224);
@@ -107,8 +107,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 if (importedCharacters) {
                     updateFontData({
                         size: {
-                            x: importedTileWidth / TILE_PIXEL_SIZE,
-                            y: importedTileHeight / TILE_PIXEL_SIZE,
+                            x: importedCharWidth / CHAR_PIXEL_SIZE,
+                            y: importedCharHeight / CHAR_PIXEL_SIZE,
                         },
                         offset: importOffset,
                         characterCount: importCharacterCount,
@@ -125,10 +125,10 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
                 open={importDialogOpen}
                 importedCharacters={importedCharacters}
                 setImportedCharacters={setImportedCharacters}
-                importedTileHeight={importedTileHeight}
-                setImportedTileHeight={setImportedTileHeight}
-                importedTileWidth={importedTileWidth}
-                setImportedTileWidth={setImportedTileWidth}
+                importedCharHeight={importedCharHeight}
+                setImportedCharHeight={setImportedCharHeight}
+                importedCharWidth={importedCharWidth}
+                setImportedCharWidth={setImportedCharWidth}
                 importOffset={importOffset}
                 setImportOffset={setImportOffset}
                 setImportCharacterCount={setImportCharacterCount}
@@ -146,8 +146,8 @@ export default function ImportExportTools(props: ImportExportToolsProps): React.
         >
             <ExportSettings
                 characters={characters}
-                tilePixelHeight={tilePixelHeight}
-                tilePixelWidth={tilePixelWidth}
+                charPixelHeight={charPixelHeight}
+                charPixelWidth={charPixelWidth}
                 offset={offset}
                 characterCount={characterCount}
                 exportPngData={exportPngData}

@@ -1,24 +1,24 @@
 import React from 'react';
 
 interface FontTileInfoProps {
-    tileCount: number
+    charCount: number
     sizeX: number
     sizeY: number
 }
 
 export default function FontTileInfo(props: FontTileInfoProps): React.JSX.Element {
-    const { tileCount, sizeY, sizeX } = props;
+    const { charCount, sizeY, sizeX } = props;
 
-    const tiles = tileCount * sizeX * sizeY;
+    const tileCount = charCount * sizeX * sizeY;
 
     return (
         <input
-            className={`theia-input heaviness ${tiles > 1024 ? 'heavinessHeavy' : tiles > 512 ? 'heavinessMedium' : ''}`}
+            className={`theia-input heaviness ${tileCount > 1024 ? 'heavinessHeavy' : tileCount > 512 ? 'heavinessMedium' : ''}`}
             style={{
                 width: 64,
             }}
             type='text'
-            value={`${tiles > 2048 ? '⚠ ' : ''}${tiles}`}
+            value={`${tileCount > 2048 ? '⚠ ' : ''}${tileCount}`}
             disabled
         />
     );

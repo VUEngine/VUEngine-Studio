@@ -3,12 +3,12 @@ import React from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { MAX_TILE_COUNT, MAX_PAGE_SIZE, MIN_TILE_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
+import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
 import FontTileInfo from '../Tools/FontTileInfo';
 
 interface AlphabetSettingsProps {
-    tileCount: number
-    setCharCount: (tileCount: number) => void
+    charCount: number
+    setCharCount: (charCount: number) => void
     offset: number
     setOffset: (offset: number) => void
     pageSize: number
@@ -18,10 +18,10 @@ interface AlphabetSettingsProps {
 }
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
-    const { tileCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
+    const { charCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
 
-    const effectiveMaxCharCount = MAX_TILE_COUNT - offset;
-    const effectiveMaxOffset = MAX_TILE_COUNT - tileCount;
+    const effectiveMaxCharCount = MAX_CHAR_COUNT - offset;
+    const effectiveMaxOffset = MAX_CHAR_COUNT - charCount;
     const effectiveMaxPageSize = MAX_PAGE_SIZE - effectiveMaxOffset;
 
     return <HContainer gap={10} justifyContent='space-between'>
@@ -29,9 +29,9 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
             <Input
                 label={nls.localize('vuengine/editors/font/count', 'Count')}
                 type="number"
-                value={tileCount}
+                value={charCount}
                 setValue={setCharCount}
-                min={MIN_TILE_COUNT}
+                min={MIN_CHAR_COUNT}
                 max={effectiveMaxCharCount}
                 width={48}
             />
@@ -64,7 +64,7 @@ For all regular use cases, this should be the total amount of characters in the 
                 {nls.localize('vuengine/editors/font/tiles', 'Tiles')}
             </label>
             <FontTileInfo
-                tileCount={pageSize}
+                charCount={pageSize}
                 sizeX={sizeX}
                 sizeY={sizeY}
             />

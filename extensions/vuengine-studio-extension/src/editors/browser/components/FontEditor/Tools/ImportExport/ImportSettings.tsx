@@ -17,17 +17,17 @@ import VContainer from '../../../Common/Base/VContainer';
 import { roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
-import { TILE_PIXEL_SIZE, MAX_TILE_COUNT, MAX_TILE_SIZE, MAX_OFFSET, MIN_TILE_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
 interface ImportSettingsProps {
     open: boolean
     importedCharacters: number[][][]
     setImportedCharacters: React.Dispatch<React.SetStateAction<number[][][]>>
-    importedTileHeight: number
-    setImportedTileHeight: React.Dispatch<React.SetStateAction<number>>
-    importedTileWidth: number
-    setImportedTileWidth: React.Dispatch<React.SetStateAction<number>>
+    importedCharHeight: number
+    setImportedCharHeight: React.Dispatch<React.SetStateAction<number>>
+    importedCharWidth: number
+    setImportedCharWidth: React.Dispatch<React.SetStateAction<number>>
     importOffset: number
     setImportOffset: React.Dispatch<React.SetStateAction<number>>
     setImportCharacterCount: React.Dispatch<React.SetStateAction<number>>
@@ -43,10 +43,10 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         open,
         importedCharacters,
         setImportedCharacters,
-        importedTileHeight,
-        setImportedTileHeight,
-        importedTileWidth,
-        setImportedTileWidth,
+        importedCharHeight,
+        setImportedCharHeight,
+        importedCharWidth,
+        setImportedCharWidth,
         importOffset,
         setImportOffset,
         setImportCharacterCount,
@@ -57,8 +57,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
     const [invert, setInvert] = useState<boolean>(false);
 
-    const tilePixelHeight = importedTileHeight;
-    const tilePixelWidth = importedTileWidth;
+    const charPixelHeight = importedCharHeight;
+    const charPixelWidth = importedCharWidth;
 
     const parseIndexedPng = async (fileContent: Uint8Array): Promise<ParsedImageData | false> => {
         const PNG = require('@camoto/pngjs/browser').PNG;
@@ -99,10 +99,10 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     };
 
     const imageDataToCharacters = (imageData: ParsedImageData): number[][][] => {
-        const charactersPerLine = imageData.width / (tilePixelWidth);
+        const charactersPerLine = imageData.width / (charPixelWidth);
 
         const chars: number[][][] = [];
-        [...Array(MAX_TILE_COUNT)].map((i, c) => {
+        [...Array(MAX_CHAR_COUNT)].map((i, c) => {
             /*
             if (c < offset || c >= offset + characterCount) {
                 // @ts-ignore
@@ -110,12 +110,12 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             } else {
             */
             chars[c] = [];
-            [...Array(tilePixelHeight)].map((j, y) => {
+            [...Array(charPixelHeight)].map((j, y) => {
                 chars[c][y] = [];
-                [...Array(tilePixelWidth)].map((k, x) => {
+                [...Array(charPixelWidth)].map((k, x) => {
                     const offsetCurrentCharacter = c - importOffset;
-                    const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (tilePixelHeight)) + y;
-                    const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (tilePixelWidth) + x;
+                    const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (charPixelHeight)) + y;
+                    const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (charPixelWidth) + x;
                     const paletteIndex = imageData.pixelData[currentYIndex] && imageData.pixelData[currentYIndex][currentXIndex]
                         ? imageData.pixelData[currentYIndex][currentXIndex]
                         : 0;
@@ -164,7 +164,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         if (imgData !== false) {
             setSourceImageHeight(imgData.height);
             setSourceImageWidth(imgData.width);
-            setImportCharacterCount(imgData.width / importedTileWidth * imgData.height / importedTileHeight);
+            setImportCharacterCount(imgData.width / importedCharWidth * imgData.height / importedCharHeight);
             setImportedCharacters(imageDataToCharacters(imgData));
         } else {
             services.messageService.error(
@@ -184,8 +184,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     useEffect(() => {
         sourceImageToCharacters();
     }, [
-        importedTileHeight,
-        importedTileWidth,
+        importedCharHeight,
+        importedCharWidth,
         importOffset,
         sourceImagePath,
         invert,
@@ -246,11 +246,11 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                             }}
                         >
                             <Alphabet
-                                tilesData={importedCharacters}
+                                charData={importedCharacters}
                                 offset={0}
-                                tileCount={256}
-                                tileHeight={importedTileHeight}
-                                tileWidth={importedTileWidth}
+                                charCount={256}
+                                charHeight={importedCharHeight}
+                                charWidth={importedCharWidth}
                                 currentCharacterIndex={-1}
                                 setCurrentCharacterIndex={() => { }}
                                 setCurrentCharacterHoverIndex={() => { }}
@@ -272,21 +272,21 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     <HContainer alignItems='center'>
                         <Input
                             type="number"
-                            value={importedTileWidth}
-                            setValue={v => setImportedTileWidth(roundToNextMultipleOf8(v as number))}
-                            step={TILE_PIXEL_SIZE}
-                            min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
-                            max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
+                            value={importedCharWidth}
+                            setValue={v => setImportedCharWidth(roundToNextMultipleOf8(v as number))}
+                            step={CHAR_PIXEL_SIZE}
+                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             width={48}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
                         <Input
                             type="number"
-                            value={importedTileHeight}
-                            setValue={v => setImportedTileHeight(roundToNextMultipleOf8(v as number))}
-                            step={TILE_PIXEL_SIZE}
-                            min={MIN_TILE_SIZE * TILE_PIXEL_SIZE}
-                            max={MAX_TILE_SIZE * TILE_PIXEL_SIZE}
+                            value={importedCharHeight}
+                            setValue={v => setImportedCharHeight(roundToNextMultipleOf8(v as number))}
+                            step={CHAR_PIXEL_SIZE}
+                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                             width={48}
                         />
                     </HContainer>

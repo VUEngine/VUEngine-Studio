@@ -29,10 +29,10 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
-            case FontEditorCommands.COPY_TILE.id:
+            case FontEditorCommands.COPY_CHARACTER.id:
                 copy();
                 break;
-            case FontEditorCommands.PASTE_TILE.id:
+            case FontEditorCommands.PASTE_CHARACTER.id:
                 paste();
                 break;
         }
@@ -53,7 +53,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const rotate = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        const n = tilePixelHeight;
+        const n = charPixelHeight;
         const x = Math.floor(n / 2);
         const y = n - 1;
         let k;
@@ -77,11 +77,11 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorHorizontally = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(tilePixelHeight)].map((j, y) => {
+        [...Array(charPixelHeight)].map((j, y) => {
             if (!updatedCharacter[y]) {
                 updatedCharacter[y] = [];
             }
-            [...Array(tilePixelWidth)].map((k, x) => {
+            [...Array(charPixelWidth)].map((k, x) => {
                 if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
             });
             updatedCharacter[y] = updatedCharacter[y].reverse();
@@ -93,7 +93,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorVertically = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(tilePixelHeight)].map((j, y) => {
+        [...Array(charPixelHeight)].map((j, y) => {
             if (!updatedCharacter[y]) {
                 updatedCharacter[y] = [];
             }
