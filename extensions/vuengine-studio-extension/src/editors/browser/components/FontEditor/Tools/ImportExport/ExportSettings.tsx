@@ -4,12 +4,12 @@ import { EditorsContext, EditorsContextType } from '../../../../ves-editors-type
 import HContainer from '../../../Common/Base/HContainer';
 import Input from '../../../Common/Base/Input';
 import VContainer from '../../../Common/Base/VContainer';
-import { MAX_TILE_COUNT } from '../../FontEditorTypes';
+import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
 
 interface ExportSettingsProps {
     characters: number[][][]
-    tilePixelHeight: number,
-    tilePixelWidth: number,
+    charPixelHeight: number,
+    charPixelWidth: number,
     offset: number
     characterCount: number
     exportPngData?: Buffer
@@ -18,13 +18,13 @@ interface ExportSettingsProps {
     setExportFileName: (exportFileName: string) => void
 }
 
-const MIN_TILES_PER_LINE = 1;
-const MAX_TILES_PER_LINE = 256;
+const MIN_CHARS_PER_LINE = 1;
+const MAX_CHARS_PER_LINE = 256;
 
 export default function ExportSettings(props: ExportSettingsProps): React.JSX.Element {
     const {
-        tilePixelHeight,
-        tilePixelWidth,
+        charPixelHeight,
+        charPixelWidth,
         offset,
         characterCount,
         characters,
@@ -43,19 +43,19 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
         const startCharacter = startLine * charactersPerLine;
         const endLine = Math.floor((offset + characterCount - 1 + charactersPerLine) / charactersPerLine);
         const endCharacter = endLine * charactersPerLine;
-        const pixelsPerCharacterLine = charactersPerLine * tilePixelWidth;
-        const pixelsPerAlphabetLine = pixelsPerCharacterLine * tilePixelHeight;
+        const pixelsPerCharacterLine = charactersPerLine * charPixelWidth;
+        const pixelsPerAlphabetLine = pixelsPerCharacterLine * charPixelHeight;
         const alphabetPixels: number[] = [];
-        [...Array(MAX_TILE_COUNT)].forEach((x, characterIndex) => {
+        [...Array(MAX_CHAR_COUNT)].forEach((x, characterIndex) => {
             if (characterIndex < startCharacter || characterIndex > endCharacter) {
                 return;
             }
             const offsetCharacterIndex = characterIndex - startCharacter;
             const alphabetLineOffset = Math.floor(offsetCharacterIndex / charactersPerLine) * pixelsPerAlphabetLine;
-            const characterOffset = offsetCharacterIndex % charactersPerLine * tilePixelWidth;
-            [...Array(tilePixelHeight)].forEach((y, characterLineIndex) => {
+            const characterOffset = offsetCharacterIndex % charactersPerLine * charPixelWidth;
+            [...Array(charPixelHeight)].forEach((y, characterLineIndex) => {
                 const characterLineOffset = characterLineIndex * pixelsPerCharacterLine;
-                [...Array(tilePixelWidth)].forEach((z, characterPixelIndex) => {
+                [...Array(charPixelWidth)].forEach((z, characterPixelIndex) => {
                     const pixelOffset = alphabetLineOffset + characterOffset + characterLineOffset + characterPixelIndex;
                     const pixelColorIndex = characterIndex >= offset && characterIndex < (offset + characterCount)
                         && characters[characterIndex] && characters[characterIndex][characterLineIndex]
@@ -67,9 +67,9 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
             });
         });
 
-        const totalTiles = endCharacter - startCharacter;
-        const height = tilePixelHeight * totalTiles / charactersPerLine;
-        const width = tilePixelWidth * charactersPerLine;
+        const totalChars = endCharacter - startCharacter;
+        const height = charPixelHeight * totalChars / charactersPerLine;
+        const width = charPixelWidth * charactersPerLine;
 
         setImageHeight(height);
         setImageWidth(width);
@@ -102,8 +102,8 @@ export default function ExportSettings(props: ExportSettingsProps): React.JSX.El
                 type="number"
                 value={charactersPerLine}
                 setValue={v => setCharactersPerLine(v as number)}
-                min={MIN_TILES_PER_LINE}
-                max={MAX_TILES_PER_LINE}
+                min={MIN_CHARS_PER_LINE}
+                max={MAX_CHARS_PER_LINE}
                 width={48}
             />
         </VContainer>

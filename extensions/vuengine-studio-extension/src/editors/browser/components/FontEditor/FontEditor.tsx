@@ -18,10 +18,10 @@ import PixelEditorCurrentToolSettings from '../PixelEditor/Sidebar/PixelEditorCu
 import PixelEditorTools from '../PixelEditor/Sidebar/PixelEditorTools';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
-import TileSettings from './Alphabet/TileSettings';
+import CharSettings from './Alphabet/CharSettings';
 import { FontEditorCommands } from './FontEditorCommands';
 import {
-    TILE_PIXEL_SIZE,
+    CHAR_PIXEL_SIZE,
     FontData,
     Size,
     VariableSize
@@ -69,8 +69,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { setData, undo, redo } = useDotting(dottingRef);
     const { addDataChangeListener, removeDataChangeListener } = useHandlers(dottingRef);
 
-    const tilePixelWidth = data.size.x * TILE_PIXEL_SIZE;
-    const tilePixelHeight = data.size.y * TILE_PIXEL_SIZE;
+    const charPixelWidth = data.size.x * CHAR_PIXEL_SIZE;
+    const charPixelHeight = data.size.y * CHAR_PIXEL_SIZE;
 
     const characters = data.characters || [];
 
@@ -167,33 +167,33 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         updateFontData({ characters: updatedCharacters });
     };
 
-    const fill = (tile: number[][], x: number, y: number, oldColor: number, newColor: number): number[][] => {
-        const tileColor = tile && tile[y] ? tile[y][x] ?? 0 : 0;
+    const fill = (char: number[][], x: number, y: number, oldColor: number, newColor: number): number[][] => {
+        const charColor = char && char[y] ? char[y][x] ?? 0 : 0;
         if (x >= 0 && y >= 0
-            && x < tilePixelWidth
-            && y < tilePixelHeight
-            && tileColor === oldColor) {
-            if (!tile[y]) {
-                tile[y] = [];
+            && x < charPixelWidth
+            && y < charPixelHeight
+            && charColor === oldColor) {
+            if (!char[y]) {
+                char[y] = [];
             }
-            tile[y][x] = newColor;
-            tile = fill(tile, x, y + 1, oldColor, newColor);
-            tile = fill(tile, x, y - 1, oldColor, newColor);
-            tile = fill(tile, x + 1, y, oldColor, newColor);
-            tile = fill(tile, x - 1, y, oldColor, newColor);
+            char[y][x] = newColor;
+            char = fill(char, x, y + 1, oldColor, newColor);
+            char = fill(char, x, y - 1, oldColor, newColor);
+            char = fill(char, x + 1, y, oldColor, newColor);
+            char = fill(char, x - 1, y, oldColor, newColor);
         }
 
-        return tile;
+        return char;
     };
 
     const getCurrentCharacterDottingData = (): PixelModifyItem[][] => {
         const currentCharacterData = characters[currentCharacterIndex] ?? [];
         const dottingData: PixelModifyItem[][] = [];
-        const effectiveHeight = data.variableSize.enabled ? data.variableSize.y : tilePixelHeight;
-        [...Array(tilePixelHeight)].forEach((j, y) => {
+        const effectiveHeight = data.variableSize.enabled ? data.variableSize.y : charPixelHeight;
+        [...Array(charPixelHeight)].forEach((j, y) => {
             const newRow: PixelModifyItem[] = [];
-            const effectiveWidth = data.variableSize.enabled ? data.variableSize.x[currentCharacterIndex] ?? tilePixelWidth : tilePixelWidth;
-            [...Array(tilePixelWidth)].forEach((i, x) => {
+            const effectiveWidth = data.variableSize.enabled ? data.variableSize.x[currentCharacterIndex] ?? charPixelWidth : charPixelWidth;
+            [...Array(charPixelWidth)].forEach((i, x) => {
                 const paletteColor = PALETTE_COLORS[ColorMode.Default][currentCharacterData[y] !== undefined &&
                     currentCharacterData[y] !== null &&
                     currentCharacterData[y][x] !== undefined &&
@@ -277,7 +277,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     return <div
         tabIndex={0}
-        className={`font-editor width-${tilePixelWidth} height-${tilePixelHeight}`}
+        className={`font-editor width-${charPixelWidth} height-${charPixelHeight}`}
     >
         <div
             ref={canvasContainerRef}
@@ -349,8 +349,8 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     />
                     <ImportExportTools
                         characters={data.characters}
-                        tilePixelHeight={tilePixelHeight}
-                        tilePixelWidth={tilePixelWidth}
+                        charPixelHeight={charPixelHeight}
+                        charPixelWidth={charPixelWidth}
                         offset={data.offset}
                         characterCount={data.characterCount}
                         updateFontData={updateFontData}
@@ -360,10 +360,10 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             <EditorSidebar>
                 <VContainer gap={15} overflow='hidden'>
                     <HContainer justifyContent='space-between'>
-                        <TileSettings
+                        <CharSettings
                             currentCharacter={currentCharacterIndex}
-                            tileHeight={tilePixelHeight}
-                            tileWidth={tilePixelWidth}
+                            charHeight={charPixelHeight}
+                            charWidth={charPixelWidth}
                             variableSize={data.variableSize}
                             setCharSize={setCharSize}
                         />
@@ -380,11 +380,11 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                             </span>
                         </label>
                         <Alphabet
-                            tilesData={data.characters || []}
+                            charData={data.characters || []}
                             offset={data.offset}
-                            tileCount={data.characterCount}
-                            tileHeight={tilePixelHeight}
-                            tileWidth={tilePixelWidth}
+                            charCount={data.characterCount}
+                            charHeight={charPixelHeight}
+                            charWidth={charPixelWidth}
                             variableSize={data.variableSize}
                             currentCharacterIndex={currentCharacterIndex}
                             setCurrentCharacterIndex={setCurrentCharacterIndex}
@@ -392,7 +392,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                         />
                     </VContainer>
                     <AlphabetSettings
-                        tileCount={data.characterCount}
+                        charCount={data.characterCount}
                         setCharCount={setCharacterCount}
                         offset={data.offset}
                         setOffset={setOffset}

@@ -48,24 +48,24 @@ export const win1252CharNames = [
     'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', '÷', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ ',
 ];
 
-export const TILE_PIXEL_SIZE = 8;
-export const MIN_TILE_SIZE = 1;
-export const MAX_TILE_SIZE = 64;
-export const DEFAULT_TILE_SIZE = MIN_TILE_SIZE;
+export const CHAR_PIXEL_SIZE = 8;
+export const MIN_CHAR_SIZE = 1;
+export const MAX_CHAR_SIZE = 64;
+export const DEFAULT_CHAR_SIZE = MIN_CHAR_SIZE;
 
-export const MIN_TILE_COUNT = 1;
-export const MAX_TILE_COUNT = 256;
-export const DEFAULT_TILE_COUNT = MAX_TILE_COUNT;
+export const MIN_CHAR_COUNT = 1;
+export const MAX_CHAR_COUNT = 256;
+export const DEFAULT_CHAR_COUNT = MAX_CHAR_COUNT;
 
 export const MIN_OFFSET = 0;
-export const MAX_OFFSET = MAX_TILE_COUNT - MIN_TILE_COUNT;
+export const MAX_OFFSET = MAX_CHAR_COUNT - MIN_CHAR_COUNT;
 export const DEFAULT_OFFSET = MIN_OFFSET;
 
-export const MIN_PAGE_SIZE = MIN_TILE_COUNT;
-export const MAX_PAGE_SIZE = MAX_TILE_COUNT;
+export const MIN_PAGE_SIZE = MIN_CHAR_COUNT;
+export const MAX_PAGE_SIZE = MAX_CHAR_COUNT;
 export const DEFAULT_PAGE_SIZE = MAX_PAGE_SIZE;
 
 export const DEFAULT_VARIABLE_SIZE_ENABLED = false;
-export const MIN_VARIABLE_TILE_SIZE = 1;
-export const MAX_VARIABLE_TILE_SIZE = MAX_TILE_SIZE * TILE_PIXEL_SIZE;
-export const DEFAULT_VARIABLE_TILE_SIZE = DEFAULT_TILE_SIZE * TILE_PIXEL_SIZE;
+export const MIN_VARIABLE_CHAR_SIZE = 1;
+export const MAX_VARIABLE_CHAR_SIZE = MAX_CHAR_SIZE * CHAR_PIXEL_SIZE;
+export const DEFAULT_VARIABLE_CHAR_SIZE = DEFAULT_CHAR_SIZE * CHAR_PIXEL_SIZE;
