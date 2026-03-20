@@ -115,7 +115,7 @@ export default class PlayerRomBuilder {
                     '-I', this.services.vesBuildService.convertToEnvPath(false, soundBaseUri),
                     this.services.vesBuildService.convertToEnvPath(false, SpecFileUri),
                     '-L', this.services.vesBuildService.convertToEnvPath(false, soundBaseUri),
-                    '-lcore', '-lsound', '-lcore',
+                    '-lcore', '-lsound', '-lVirtualBoy', '-lcore', '-lVirtualBoy',
                 ].join(' '),
             ],
         } : {
@@ -129,7 +129,7 @@ export default class PlayerRomBuilder {
                 '-I', soundBaseUri.path.fsPath(),
                 SpecFileUri.path.fsPath(),
                 '-L', soundBaseUri.path.fsPath(),
-                '-lcore', '-lsound', '-lcore',
+                '-lcore', '-lsound', '-lVirtualBoy', '-lcore', '-lVirtualBoy',
             ],
         };
 
