@@ -47,6 +47,7 @@
             "**/build/*.map": true
           },
           "git.autofetch": true,
+          "git.repositoryScanMaxDepth": 2,
           "security.workspace.trust.enabled": false,
           "terminal.grouping.mode": "tree",
           "toolbar.showToolbar": true,
