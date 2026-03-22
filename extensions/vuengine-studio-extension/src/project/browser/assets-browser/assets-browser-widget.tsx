@@ -5,13 +5,13 @@ import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
-import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import AssetsTree from './components/AssetsSidebar/AssetsTree';
-import { VesProjectService } from './ves-project-service';
+import NoWorkspaceOpened from '../../../core/browser/components/NoWorkspaceOpened';
+import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
+import AssetsTree from '../components/AssetsSidebar/AssetsTree';
+import { VesProjectService } from '../ves-project-service';
 
 @injectable()
-export class VesProjectAssetsSidebarWidget extends ReactWidget {
+export class AssetsBrowserWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
   @inject(FileService)
@@ -23,16 +23,33 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
   @inject(VesWorkspaceService)
   private readonly workspaceService: VesWorkspaceService;
 
-  static readonly ID = 'vesProjectAssetsSidebarWidget';
-  static readonly LABEL = nls.localize('vuengine/projects/assets', 'Assets');
+  static readonly ID: string = 'assets-browser';
+  static readonly LABEL: string = nls.localize('vuengine/projects/assetsBrowser', 'Assets Browser');
 
-  public allExpanded: boolean = false;
-  public forceRefresh: boolean = false;
+  public allExpanded: boolean = true;
+  public forceRefresh: boolean;
+  public forceAdd: boolean;
+
+  protected getId(): string {
+    return AssetsBrowserWidget.ID;
+  }
+
+  protected getLabel(): string {
+    return AssetsBrowserWidget.LABEL;
+  }
+
+  protected getIcon(): string {
+    return 'codicon codicon-library';
+  }
+
+  protected getTypes(): string[] {
+    return [];
+  }
 
   @postConstruct()
   protected init(): void {
-    this.id = VesProjectAssetsSidebarWidget.ID;
-    this.title.iconClass = 'codicon codicon-library';
+    this.id = this.getId();
+    this.title.iconClass = this.getIcon();
     this.title.closable = false;
     this.node.style.outline = 'none';
     this.bindEvents();
@@ -42,20 +59,27 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
   }
 
   protected bindEvents(): void {
-    this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
-      if (isCollaboration) {
-        this.update();
-      }
-    });
+    this.toDispose.pushAll([
+      this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
+        if (isCollaboration) {
+          this.update();
+        }
+      }),
+    ]);
   }
 
   protected setTitle(): void {
-    this.title.label = VesProjectAssetsSidebarWidget.LABEL;
+    this.title.label = this.getLabel();
     this.title.caption = this.title.label;
   }
 
+  public add(): void {
+    this.forceAdd = !!!this.forceAdd;
+    this.update();
+  }
+
   public refresh(): void {
-    this.forceRefresh = !this.forceRefresh;
+    this.forceRefresh = !!!this.forceRefresh;
     this.update();
   }
 
@@ -76,11 +100,13 @@ export class VesProjectAssetsSidebarWidget extends ReactWidget {
         commandService={this.commandService}
       />
       : <AssetsTree
+        types={this.getTypes()}
         allExpanded={this.allExpanded}
         fileService={this.fileService}
         openerService={this.openerService}
         vesProjectService={this.vesProjectService}
         forceRefresh={this.forceRefresh}
+        forceAdd={this.forceAdd}
       />;
   }
 }

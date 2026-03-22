@@ -1,6 +1,6 @@
 import { Command } from '@theia/core';
 
-export namespace VesTitlebarWindowControlCommands {
+export namespace TitlebarCommands {
   export const MINIMIZE: Command = Command.toLocalizedCommand(
     {
       id: 'titlebar.minimizeWindow',

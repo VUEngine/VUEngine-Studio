@@ -3,12 +3,16 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 
 @injectable()
 export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEditorsWidget> {
     @inject(VesProjectService)
     protected vesProjectService: VesProjectService;
+    @inject(ViewModeService)
+    protected viewModeService: ViewModeService;
 
     protected typeId: string;
 
@@ -25,7 +29,12 @@ export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEdito
         return 0;
     }
 
+    protected async changeViewMode(): Promise<void> {
+        await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[this.typeId]);
+    }
+
     protected createWidgetOptions(uri: URI): VesEditorsWidgetOptions {
+        this.changeViewMode();
         return {
             typeId: this.typeId,
             uri: uri.withoutFragment().toString(),

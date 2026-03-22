@@ -1,6 +1,6 @@
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, nls, PreferenceScope, PreferenceService } from '@theia/core/lib/common';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
@@ -18,12 +18,22 @@ export namespace VesBuildMenuSection {
 export class VesBuildContribution implements CommandContribution, KeybindingContribution, MenuContribution {
   @inject(ApplicationShell)
   protected readonly shell: ApplicationShell;
+  @inject(MenuModelRegistry)
+  private readonly menuModelRegistry: MenuModelRegistry;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
   @inject(VesWorkspaceService)
   private readonly workspaceService: VesWorkspaceService;
+
+  @postConstruct()
+  protected init(): void {
+    this.vesBuildService.onDidChangeBuildMode(buildMode => {
+      this.registerBuildModeMenu(this.menuModelRegistry);
+    });
+    this.registerBuildModeMenu(this.menuModelRegistry);
+  }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCommands.CLEAN, {
@@ -82,6 +92,19 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       keybinding: 'alt+shift+c'
     });
   }
+
+  async registerBuildModeMenu(menus: MenuModelRegistry): Promise<void> {
+    await this.preferenceService.ready;
+    const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE);
+
+    const menuAction = {
+      commandId: VesBuildCommands.SET_MODE.id,
+      label: `${VesBuildCommands.SET_MODE.label} (${buildMode})`,
+      order: '1'
+    };
+    menus.unregisterMenuAction(menuAction, VesBuildMenuSection.CONFIG);
+    menus.registerMenuAction(VesBuildMenuSection.CONFIG, menuAction);
+  };
 
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerSubmenu(buildMenuPath, nls.localize('vuengine/build/build', 'Build'), {

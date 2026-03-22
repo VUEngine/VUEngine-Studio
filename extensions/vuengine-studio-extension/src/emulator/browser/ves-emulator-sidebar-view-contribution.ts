@@ -36,7 +36,7 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             widgetId: VesEmulatorSidebarWidget.ID,
             widgetName: VesEmulatorSidebarWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'right',
+                area: 'left',
                 rank: 800,
             },
         });

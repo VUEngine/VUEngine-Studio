@@ -1,6 +1,5 @@
 import { CommandService, environment, nls, PreferenceService } from '@theia/core';
 import { ApplicationShell, CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
-import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -25,8 +24,6 @@ export class VesExportService {
   protected readonly fileDialogService: FileDialogService;
   @inject(FileService)
   protected readonly fileService: FileService;
-  @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)

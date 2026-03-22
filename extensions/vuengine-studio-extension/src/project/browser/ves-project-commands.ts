@@ -21,17 +21,6 @@ export namespace VesProjectCommands {
         'vuengine/projects/commands/category',
     );
 
-    export const DASHBOARD_SHOW: Command = Command.toLocalizedCommand(
-        {
-            id: 'project.showDashboardView',
-            label: 'Show Stages Dashboard',
-            iconClass: 'codicon codicon-compass',
-            category: 'Project',
-        },
-        'vuengine/projects/commands/showStagesDashboard',
-        'vuengine/projects/commands/dashboard/category',
-    );
-
     export const ZOOM_IN: Command = Command.toLocalizedCommand(
         {
             id: 'project.dashboard.zoomIn',

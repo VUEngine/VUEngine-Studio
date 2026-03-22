@@ -88,26 +88,26 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
             execute: widget => this.generateFiles(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.currentWidget as VesEditorsWidget
+                : this.shell.activeWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
             execute: widget => this.openSource(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.currentWidget as VesEditorsWidget
+                : this.shell.activeWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_GENERATED_FILES, {
             isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
+            isVisible: widget => widget instanceof VesEditorsWidget || this.shell.activeWidget instanceof VesEditorsWidget,
             execute: widget => this.openGeneratedFiles(widget instanceof VesEditorsWidget
                 ? widget
-                : this.shell.currentWidget as VesEditorsWidget
+                : this.shell.activeWidget as VesEditorsWidget
             ),
         });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {

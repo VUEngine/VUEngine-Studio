@@ -259,7 +259,7 @@ export class VesBuildWidget extends ReactWidget {
                   {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
                 </button>
                 <button
-                  className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-empty-window codicon-rotate-180'}`}
+                  className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-chip'}`}
                   onClick={this.flash}
                   title={this.vesFlashCartService.isQueued
                     ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`

@@ -1,19 +1,32 @@
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
-import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, nls, PreferenceService } from '@theia/core/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorService } from './ves-emulator-service';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
+import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 
 @injectable()
 export class VesEmulatorContribution implements CommandContribution, KeybindingContribution, MenuContribution {
   @inject(ApplicationShell)
   protected readonly shell: ApplicationShell;
+  @inject(MenuModelRegistry)
+  private readonly menuModelRegistry: MenuModelRegistry;
+  @inject(PreferenceService)
+  private readonly preferenceService: PreferenceService;
   @inject(VesEmulatorService)
   private readonly vesEmulatorService: VesEmulatorService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
+
+  @postConstruct()
+  protected init(): void {
+    this.vesEmulatorService.onDidChangeEmulator(emulatorConfigName => {
+      this.registerDefaultEmulatorMenu(this.menuModelRegistry);
+    });
+    this.registerDefaultEmulatorMenu(this.menuModelRegistry);
+  }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(EmulatorCommands.RUN, {
@@ -302,6 +315,20 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       when: 'emulatorFocus',
     });
   }
+
+  async registerDefaultEmulatorMenu(menus: MenuModelRegistry): Promise<void> {
+    await this.preferenceService.ready;
+    const defaultEmulator = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR);
+    const emulatorName = defaultEmulator ? defaultEmulator : nls.localize('vuengine/emulator/builtIn', 'Built-In');
+
+    const menuAction = {
+      commandId: EmulatorCommands.SELECT.id,
+      label: `${EmulatorCommands.SELECT.label} (${emulatorName})`,
+      order: '2',
+    };
+    menus.unregisterMenuAction(menuAction, VesBuildMenuSection.CONFIG);
+    menus.registerMenuAction(VesBuildMenuSection.CONFIG, menuAction);
+  };
 
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {

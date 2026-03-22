@@ -25,18 +25,21 @@ interface TreeNode {
 }
 
 interface AssetsTreeProps {
+    types: string[]
     allExpanded: boolean
     fileService: FileService
     openerService: OpenerService
     vesProjectService: VesProjectService
-    forceRefresh: boolean
+    forceRefresh?: boolean
+    forceAdd?: boolean
 }
 
 export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const {
+        types,
         allExpanded,
         fileService, openerService, vesProjectService,
-        forceRefresh
+        forceRefresh, forceAdd,
     } = props;
     const treeContainerRef = useRef<HTMLDivElement>(null);
     const [treeHeight, setTreeHeight] = useState<number>(300);
@@ -63,12 +66,16 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
         await vesProjectService.projectDataReady;
 
         const foundItems: TreeNode[] = [];
-        Object.keys(PROJECT_TYPES).forEach(typeId => {
-            const type = PROJECT_TYPES[typeId];
+        const availableTypes = Object.keys(PROJECT_TYPES)
+            .filter(typeId => {
+                const type = PROJECT_TYPES[typeId];
+                return (types.length === 0 || types.includes(typeId))
+                    && type.file.startsWith('.')
+                    && (type.enabled === undefined || type.enabled === true);
+            });
 
-            if (!type.file.startsWith('.') || (type.enabled !== undefined && type.enabled === false)) {
-                return;
-            }
+        availableTypes.forEach(typeId => {
+            const type = PROJECT_TYPES[typeId];
 
             const typeNode: TreeNode = {
                 id: `type-${typeId}`,
@@ -111,7 +118,14 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
             }
 
             typeNode.children!.sort((a, b) => a.name.localeCompare(b.name));
-            foundItems.push(typeNode);
+
+            if (availableTypes.length > 1) {
+                foundItems.push(typeNode);
+            } else {
+                typeNode.children!.forEach(c => {
+                    foundItems.push(c);
+                });
+            }
         });
 
         foundItems.sort((a, b) => a.name.localeCompare(b.name));
@@ -139,7 +153,18 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     };
 
     useEffect(() => {
-        refresh();
+        if (forceAdd !== undefined) {
+            // TODO: show type selection if types.length > 1
+            addItem(types[0]);
+        }
+    }, [
+        forceAdd
+    ]);
+
+    useEffect(() => {
+        if (refresh !== undefined) {
+            refresh();
+        }
     }, [
         forceRefresh
     ]);
@@ -182,6 +207,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
                     setValue={v => setSearchTerm(v as string)}
                     placeholder={nls.localize('vuengine/editors/project/enterSearchTerm', 'Enter Search Term...')}
                     grow={1}
+                    clearable
                 />
                 <RadioSelect
                     options={[{
