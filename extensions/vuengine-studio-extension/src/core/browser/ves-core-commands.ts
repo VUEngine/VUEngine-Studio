@@ -34,7 +34,7 @@ export namespace VesCoreCommands {
             label: 'Switch Header/Source',
             category: 'Editor',
         },
-        'vuengine/editors/commands/switchHeaderSource',
-        'vuengine/editors/commands/category'
+        'vuengine/general/commands/switchHeaderSource',
+        'vuengine/general/commands/category'
     );
 }

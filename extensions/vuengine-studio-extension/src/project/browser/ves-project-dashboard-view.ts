@@ -1,5 +1,5 @@
 import { CommandContribution, CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution } from '@theia/core/lib/browser';
+import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesProjectCommands } from './ves-project-commands';
@@ -23,23 +23,11 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
         });
     }
 
-    registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesProjectCommands.DASHBOARD_SHOW, {
-            isEnabled: () => this.workspaceService.opened,
-            isVisible: () => this.workspaceService.opened,
-            execute: async () => {
-                if (this.workspaceService.opened) {
-                    await this.openView({
-                        area: 'main',
-                        activate: true,
-                        reveal: true,
-                        // rank: -1000,
-                    });
-                    // this.commandService.executeCommand(CommonCommands.PIN_TAB.id);
-                }
-            }
-        });
+    async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: true, reveal: true });
+    }
 
+    registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesProjectCommands.ZOOM_IN, {
             isEnabled: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,
             isVisible: () => this.shell.currentWidget instanceof VesProjectDashboardWidget,

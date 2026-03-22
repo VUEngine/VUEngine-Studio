@@ -6,7 +6,6 @@ import { nls } from '@theia/core';
 
 @injectable()
 export class VesPluginsSearchBar extends ReactWidget {
-
     @inject(VesPluginsSearchModel)
     protected readonly model: VesPluginsSearchModel;
 

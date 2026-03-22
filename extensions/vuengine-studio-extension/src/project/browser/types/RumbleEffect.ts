@@ -53,7 +53,7 @@ export const RumbleEffectType: ProjectDataType = {
         type: 'RumbleEffectEditor',
         scope: '#'
     },
-    icon: 'codicon codicon-screen-normal',
+    icon: 'codicon codicon-target',
     templates: [
         RumbleEffectSpecTemplate,
         RumbleEffectsTemplate

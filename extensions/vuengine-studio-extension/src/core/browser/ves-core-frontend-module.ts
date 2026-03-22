@@ -10,10 +10,6 @@ import {
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { EncodingRegistry } from '@theia/core/lib/browser/encoding-registry';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
-import {
-    BrowserMainMenuFactory,
-    BrowserMenuBarContribution
-} from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
@@ -27,8 +23,6 @@ import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget'
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
-import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
-import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
@@ -36,7 +30,6 @@ import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/vi
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
-import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
 import { VesCollaborationFrontendContribution } from './ves-collaboration-frontend-contribution';
@@ -56,8 +49,6 @@ import { VesFilterContribution } from './ves-filter-contribution';
 import { VesKeybindingWidget } from './ves-keybindings-widget';
 import { VesKeymapsFrontendContribution } from './ves-keymaps-frontend-contribution';
 import { VesFileNavigatorContribution } from './ves-navigator-contribution';
-import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
-import { VesOutlineViewContribution } from './ves-outline-view-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
@@ -67,7 +58,6 @@ import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
-import { VesVSXExtensionsContribution } from './ves-vsx-extensions-contribution';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -86,11 +76,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // custom theme colors
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
-
-    // enable main menu
-    rebind(BrowserMainMenuFactory).toSelf().inSingletonScope();
-    bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
 
     // properly initiate compact main menu
     bind(VesCoreCompactMainMenuContribution).toSelf().inSingletonScope();
@@ -171,14 +156,14 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
 
     // initially hide "open editors" tab of navigator
-    bind(VesNavigatorWidgetFactory).toSelf();
-    rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
+    // bind(VesNavigatorWidgetFactory).toSelf();
+    // rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
 
     // initially hide extensions widget
-    rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
+    // rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
 
     // initially hide outline view
-    rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
+    // rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
 
     // initially open file explorer for workspaces
     rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();

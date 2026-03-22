@@ -1,11 +1,30 @@
 import { PreferenceContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
 import { WorkspaceFileService } from '@theia/workspace/lib/common';
 import '../../../src/project/browser/style/index.css';
 import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
+import { ActorAssetsBrowserViewContribution } from './assets-browser/actor-assets-browser-view-contribution';
+import { ActorAssetsBrowserWidget } from './assets-browser/actor-assets-browser-widget';
+import { AssetsBrowserViewContribution } from './assets-browser/assets-browser-view-contribution';
+import { AssetsBrowserWidget } from './assets-browser/assets-browser-widget';
+import { BrightnessRepeatAssetsBrowserViewContribution } from './assets-browser/brightness-repeat-assets-browser-view-contribution';
+import { BrightnessRepeatAssetsBrowserWidget } from './assets-browser/brightness-repeat-assets-browser-widget';
+import { ColumnTableAssetsBrowserViewContribution } from './assets-browser/column-table-assets-browser-view-contribution';
+import { ColumnTableAssetsBrowserWidget } from './assets-browser/column-table-assets-browser-widget';
+import { FontAssetsBrowserViewContribution } from './assets-browser/font-assets-browser-view-contribution';
+import { FontAssetsBrowserWidget } from './assets-browser/font-assets-browser-widget';
+import { ImageAssetsBrowserViewContribution } from './assets-browser/image-assets-browser-view-contribution';
+import { ImageAssetsBrowserWidget } from './assets-browser/image-assets-browser-widget';
+import { RumbleEffectAssetsBrowserViewContribution } from './assets-browser/rumble-effect-assets-browser-view-contribution';
+import { RumbleEffectAssetsBrowserWidget } from './assets-browser/rumble-effect-assets-browser-widget';
+import { SoundAssetsBrowserViewContribution } from './assets-browser/sound-assets-browser-view-contribution';
+import { SoundAssetsBrowserWidget } from './assets-browser/sound-assets-browser-widget';
+import { StageAssetsBrowserViewContribution } from './assets-browser/stage-assets-browser-view-contribution';
+import { StageAssetsBrowserWidget } from './assets-browser/stage-assets-browser-widget';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
@@ -19,9 +38,8 @@ import { VesProjectSidebarViewContribution } from './ves-project-sidebar-view-co
 import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
-import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { VesProjectAssetsSidebarViewContribution } from './ves-project-assets-sidebar-view-contribution';
-import { VesProjectAssetsSidebarWidget } from './ves-project-assets-sidebar-widget';
+import { LogicAssetsBrowserViewContribution } from './assets-browser/logic-assets-browser-view-contribution';
+import { LogicAssetsBrowserWidget } from './assets-browser/logic-assets-browser-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -70,13 +88,29 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         createWidget: () => ctx.container.get<VesProjectSidebarWidget>(VesProjectSidebarWidget)
     })).inSingletonScope();
 
-    // assets sidebar view
-    bindViewContribution(bind, VesProjectAssetsSidebarViewContribution);
-    bind(FrontendApplicationContribution).toService(VesProjectAssetsSidebarViewContribution);
-    bind(TabBarToolbarContribution).toService(VesProjectAssetsSidebarViewContribution);
-    bind(VesProjectAssetsSidebarWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: VesProjectAssetsSidebarWidget.ID,
-        createWidget: () => ctx.container.get<VesProjectAssetsSidebarWidget>(VesProjectAssetsSidebarWidget)
-    })).inSingletonScope();
+    // assets sidebar views
+    [
+        [AssetsBrowserViewContribution, AssetsBrowserWidget],
+        [ActorAssetsBrowserViewContribution, ActorAssetsBrowserWidget],
+        [BrightnessRepeatAssetsBrowserViewContribution, BrightnessRepeatAssetsBrowserWidget],
+        [ColumnTableAssetsBrowserViewContribution, ColumnTableAssetsBrowserWidget],
+        [FontAssetsBrowserViewContribution, FontAssetsBrowserWidget],
+        [ImageAssetsBrowserViewContribution, ImageAssetsBrowserWidget],
+        [LogicAssetsBrowserViewContribution, LogicAssetsBrowserWidget],
+        [RumbleEffectAssetsBrowserViewContribution, RumbleEffectAssetsBrowserWidget],
+        [SoundAssetsBrowserViewContribution, SoundAssetsBrowserWidget],
+        [StageAssetsBrowserViewContribution, StageAssetsBrowserWidget],
+    ].forEach(v => {
+        // @ts-ignore
+        bindViewContribution(bind, v[0]);
+        bind(FrontendApplicationContribution).toService(v[0]);
+        bind(TabBarToolbarContribution).toService(v[0]);
+        bind(v[1]).toSelf();
+        bind(WidgetFactory).toDynamicValue(ctx => ({
+            // @ts-ignore
+            id: v[1].ID,
+            // @ts-ignore
+            createWidget: () => ctx.container.get<v[1]>(v[1])
+        })).inSingletonScope();
+    });
 });

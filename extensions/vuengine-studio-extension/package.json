@@ -110,6 +110,9 @@
       "electronMain": "lib/core/electron-main/ves-electron-main-application-module"
     },
     {
+      "frontend": "lib/viewMode/browser/view-mode-frontend-module"
+    },
+    {
       "frontend": "lib/about/browser/ves-about-frontend-module"
     },
     {

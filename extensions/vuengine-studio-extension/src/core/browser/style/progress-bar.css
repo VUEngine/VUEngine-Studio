@@ -4,6 +4,7 @@
   line-height: 32px;
   position: relative;
   text-align: center;
+  user-select: none;
 }
 
 .vesProgressBar div {
