@@ -1,4 +1,4 @@
-import { NavigatableWidgetOpenHandler } from '@theia/core/lib/browser';
+import { NavigatableWidgetOpenHandler, WidgetOpenerOptions } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
@@ -29,12 +29,13 @@ export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEdito
         return 0;
     }
 
-    protected async changeViewMode(): Promise<void> {
+    async open(uri: URI, options?: WidgetOpenerOptions): Promise<VesEditorsWidget> {
         await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[this.typeId]);
+
+        return super.open(uri, options);
     }
 
     protected createWidgetOptions(uri: URI): VesEditorsWidgetOptions {
-        this.changeViewMode();
         return {
             typeId: this.typeId,
             uri: uri.withoutFragment().toString(),
