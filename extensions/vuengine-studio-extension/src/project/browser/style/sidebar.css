@@ -1,3 +1,7 @@
 .theia-side-panel .codicon.codicon-symbol-event:before {
     color: var(--theia-foreground);
 }
+
+.lm-Widget.theia-side-panel .lm-DockPanel-widget {
+    min-width: 250px;
+}
