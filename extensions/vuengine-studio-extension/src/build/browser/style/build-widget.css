@@ -12,6 +12,15 @@
   min-width: 250px;
 }
 
+.buildWidget .buildPanel {
+  display: flex;
+  gap: var(--theia-ui-padding);
+}
+
+.buildWidget .buildPanel .vesProgressBar {
+  flex-grow: 1;
+}
+
 .buildWidget .buildActions {
   display: flex;
   flex-direction: column;
@@ -31,7 +40,6 @@
 }
 
 .buildWidget .theia-button {
-  flex-grow: 1;
   margin: 0;
   min-height: 22px;
   min-width: unset;

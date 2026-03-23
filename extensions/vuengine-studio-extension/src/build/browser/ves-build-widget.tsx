@@ -4,25 +4,19 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorManager } from '@theia/editor/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import Input from '../../editors/browser/components/Common/Base/Input';
-import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
-import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
-import { VesExportCommands } from '../../export/browser/ves-export-commands';
-import { VesExportService } from '../../export/browser/ves-export-service';
-import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
-import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
+import BuildArchive from './components/BuildArchive';
 import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
-import BuildArchive from './components/BuildArchive';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -53,12 +47,6 @@ export class VesBuildWidget extends ReactWidget {
   private readonly vesBuildService: VesBuildService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
-  @inject(VesEmulatorService)
-  private readonly vesEmulatorService: VesEmulatorService;
-  @inject(VesExportService)
-  private readonly vesExportService: VesExportService;
-  @inject(VesFlashCartService)
-  private readonly vesFlashCartService: VesFlashCartService;
   @inject(VesWorkspaceService)
   private readonly workspaceService: VesWorkspaceService;
 
@@ -227,6 +215,12 @@ export class VesBuildWidget extends ReactWidget {
                         {this.vesBuildService.buildStatus.progress}%
                       </span>
                     </div>
+                    <button
+                      className='theia-button secondary codicon codicon-circle-slash'
+                      disabled={!this.vesBuildService.buildStatus.active}
+                      onClick={this.abort}
+                      title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
+                    />
                   </div>
                 )}
               {!this.vesBuildService.buildStatus.active && (
@@ -242,51 +236,6 @@ export class VesBuildWidget extends ReactWidget {
                   </div>
                 </>
               )}
-              <div className='buildButtons'>
-                <button
-                  className='theia-button secondary codicon codicon-circle-slash'
-                  disabled={!this.vesBuildService.buildStatus.active}
-                  onClick={this.abort}
-                  title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
-                />
-                <button
-                  className={`theia-button secondary ${this.vesEmulatorService.isQueued ? 'queued' : 'codicon codicon-run'}`}
-                  onClick={this.run}
-                  title={this.vesEmulatorService.isQueued
-                    ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                    : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`}
-                >
-                  {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
-                </button>
-                <button
-                  className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-chip'}`}
-                  onClick={this.flash}
-                  title={this.vesFlashCartService.isQueued
-                    ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
-                    : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)
-                    }`}
-                >
-                  {this.vesFlashCartService.isQueued && <i className='fa fa-hourglass-half'></i>}
-                </button>
-                <button
-                  className={`theia-button secondary ${this.vesExportService.isQueued ? 'queued' : 'codicon codicon-desktop-download'}`}
-                  onClick={this.export}
-                  title={this.vesExportService.isQueued
-                    ? `${nls.localize('vuengine/export/exportQueued', 'Export Queued')}...`
-                    : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
-                >
-                  {this.vesExportService.isQueued && <i className='fa fa-hourglass-half'></i>}
-                </button>
-                <button
-                  className={`theia-button secondary ${!this.vesBuildService.isCleaning && 'codicon codicon-trash'}`}
-                  onClick={this.clean}
-                  title={this.vesBuildService.isCleaning
-                    ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
-                    : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
-                >
-                  {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
-                </button>
-              </div>
               {isWindows && !doUseWsl && (
                 <div>
                   <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
@@ -524,22 +473,6 @@ export class VesBuildWidget extends ReactWidget {
   };
 
   protected abort = async () => this.vesBuildService.abortBuild();
-  protected run = () => {
-    this.commandService.executeCommand(EmulatorCommands.RUN.id);
-    this.update();
-  };
-  protected flash = () => {
-    this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
-    this.update();
-  };
-  protected export = () => {
-    this.commandService.executeCommand(VesExportCommands.EXPORT.id);
-    this.update();
-  };
-  protected clean = () => {
-    this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
-    this.update();
-  };
 
   protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times', false);
 }
