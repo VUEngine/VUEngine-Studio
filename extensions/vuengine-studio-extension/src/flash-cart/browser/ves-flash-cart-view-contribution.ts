@@ -19,14 +19,14 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             widgetId: VesFlashCartWidget.ID,
             widgetName: VesFlashCartWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'right',
+                area: 'main',
                 rank: 900,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: false, reveal: false });
+        await this.openView({ activate: true, reveal: true });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
