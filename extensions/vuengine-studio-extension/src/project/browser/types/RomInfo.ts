@@ -50,7 +50,7 @@ export const RomInfoType: ProjectDataType = {
         type: 'RomInfoEditor',
         scope: '#'
     },
-    icon: 'codicon codicon-chip',
+    icon: 'codicon codicon-layout-menubar',
     templates: [
         RomInfoTemplate
     ]
