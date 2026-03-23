@@ -14,11 +14,12 @@ export class ActorAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: ActorAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: -10000,
+                rank: 0,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: true, reveal: true });
     }
 }

@@ -14,11 +14,12 @@ export class BrightnessRepeatAssetsBrowserViewContribution extends AbstractViewC
             widgetName: BrightnessRepeatAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: -10000,
+                rank: 0,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: false, reveal: false });
     }
 }

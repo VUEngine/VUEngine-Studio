@@ -14,11 +14,12 @@ export class RumbleEffectAssetsBrowserViewContribution extends AbstractViewContr
             widgetName: RumbleEffectAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: -10000,
+                rank: 0,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: false, reveal: false });
     }
 }

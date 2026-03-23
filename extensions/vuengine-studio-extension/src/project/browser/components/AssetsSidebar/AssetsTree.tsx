@@ -198,7 +198,14 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     }, []);
 
     return (
-        <VContainer gap={0} grow={1} overflow='hidden' style={{ height: '100%' }}>
+        <VContainer
+            gap={0}
+            grow={1}
+            overflow='hidden'
+            style={{
+                height: '100%'
+            }}
+        >
             <VContainer style={{
                 padding: 'calc(2 * var(--theia-ui-padding))',
             }}>
