@@ -3,7 +3,12 @@ import { ApplicationShell, LocalStorageService, Widget, WidgetManager } from '@t
 import { ContextKey, ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, VIEW_MODE_WIDGET_MAP, ViewMode } from './view-mode-types';
+import { DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, ViewMode } from './view-mode-types';
+
+interface ViewModeChange {
+    newViewMode: ViewMode
+    oldViewMode: ViewMode
+}
 
 export const VIEW_MODE_CONTEXT_KEY = 'viewMode';
 
@@ -21,8 +26,9 @@ export class ViewModeService {
     protected readonly widgetManager: WidgetManager;
 
     protected viewModeContextKey: ContextKey<ViewMode>;
+    protected layoutChangeComplete: boolean = false;
 
-    protected readonly onDidChangeViewModeEmitter = new Emitter<ViewMode>();
+    protected readonly onDidChangeViewModeEmitter = new Emitter<ViewModeChange>();
     readonly onDidChangeViewMode = this.onDidChangeViewModeEmitter.event;
 
     @postConstruct()
@@ -49,71 +55,31 @@ export class ViewModeService {
         );
     }
 
-    async setViewMode(viewMode: ViewMode): Promise<void> {
-        if (viewMode !== this.getViewMode() && Object.keys(ViewMode).includes(viewMode)) {
-            this.viewModeContextKey.set(viewMode);
-            this.onDidChangeViewModeEmitter.fire(viewMode);
-            await this.localStorageService.setData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY, viewMode);
-            this.updateVisibleWidgets(viewMode);
+    setLayoutChangeComplete(layoutChangeComplete: boolean): void {
+        this.layoutChangeComplete = layoutChangeComplete;
+    }
+
+    async setViewMode(newViewMode: ViewMode): Promise<void> {
+        const oldViewMode = this.getViewMode();
+        if (newViewMode !== oldViewMode && Object.keys(ViewMode).includes(newViewMode)) {
+            this.viewModeContextKey.set(newViewMode);
+            await this.localStorageService.setData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY, newViewMode);
+            this.setLayoutChangeComplete(false);
+            this.onDidChangeViewModeEmitter.fire({ newViewMode, oldViewMode });
+
+            return new Promise<void>((resolve, reject) => {
+                const waitForLayoutChange = setInterval(() => {
+                    if (this.layoutChangeComplete) {
+                        clearInterval(waitForLayoutChange);
+                        resolve();
+                    }
+                }, 100);
+            });
         }
     }
 
     getViewMode(): ViewMode {
         return this.viewModeContextKey.get() ?? DEFAULT_VIEW_MODE;
-    }
-
-    protected updateVisibleWidgets(viewMode: ViewMode): void {
-        this.openForced(viewMode);
-        this.updateMain(viewMode);
-    }
-
-    protected async openForced(viewMode: ViewMode): Promise<void> {
-        // const leftWidgets = this.shell.getWidgets('left');
-        // const rightWidgets = this.shell.getWidgets('right');
-
-        // TODO: show unknown views/widgets (e.g. from extensions) on source code view mode
-
-        const allowedWidgets = VIEW_MODE_WIDGET_MAP[viewMode].force.map(f => f.widgetId);
-        await Promise.all(
-            this.shell.widgets.map(async w => {
-                if (!allowedWidgets.includes(w.id)) {
-                    await this.shell.closeWidget(w.id);
-                }
-            })
-        );
-
-        await Promise.all(
-            VIEW_MODE_WIDGET_MAP[viewMode].force.map(async f => {
-                const widget = await this.widgetManager.getOrCreateWidget(f.widgetId);
-                console.log('widget', widget);
-                await this.shell.addWidget(widget, f.widgetOptions);
-                if (f.reveal) {
-                    await this.shell.revealWidget(widget.id);
-                }
-            })
-        );
-    }
-
-    protected updateMain(viewMode: ViewMode): void {
-        /*
-        const mainWidgets = this.shell.getWidgets('main');
-
-        mainWidgets.forEach(w => {
-            VIEW_MODE_WIDGET_MAP[viewMode].forEach(allowedWidgetId => {
-                let show = false;
-                console.log('w.id', w.id);
-                if (w.id.startsWith(allowedWidgetId)) {
-                    show = true;
-                }
-
-                if (show) {
-                    this.showWidget(w);
-                } else {
-                    this.hideWidget(w);
-                }
-            });
-        });
-        */
     }
 
     protected hideWidget(widget: Widget): void {

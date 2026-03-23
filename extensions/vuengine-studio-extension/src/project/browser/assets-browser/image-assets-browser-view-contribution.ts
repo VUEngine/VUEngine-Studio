@@ -14,11 +14,12 @@ export class ImageAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: ImageAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: -10000,
+                rank: 1,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: false, reveal: false });
     }
 }
