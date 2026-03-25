@@ -1,4 +1,4 @@
-import { ApplicationShell, DockLayout, ShellLayoutTransformer, SidePanel } from '@theia/core/lib/browser';
+import { ApplicationShell, DockLayout, ShellLayoutTransformer, SidePanel, Widget } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { PROBLEMS_WIDGET_ID } from '@theia/markers/lib/browser/problem/problem-widget';
 import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
@@ -29,6 +29,8 @@ import { ViewMode } from './view-mode-types';
 
 @injectable()
 export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
+    @inject(ApplicationShell)
+    protected readonly shell: ApplicationShell;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
 
@@ -108,11 +110,19 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
             return;
         }
 
+        /**
+         * TODO: invert logic for view mode sourceCode, for it to act as fallback
+         * for unknown widgets, e.g. from extensions
+         */
         this.pruneConfig(layoutData.mainPanel?.main, allowedWidgets);
-        this.pruneSidePanel(layoutData.leftPanel, allowedWidgets);
-        this.pruneSidePanel(layoutData.rightPanel, allowedWidgets);
+        this.handleSidePanels(layoutData, allowedWidgets);
+    }
 
-        console.log('pruned layoutData', layoutData);
+    protected async handleSidePanels(layoutData: ApplicationShell.LayoutData, allowedWidgets: string[]): Promise<void> {
+        this.toggleSidePanelWidgets(layoutData.leftPanel, allowedWidgets);
+        this.toggleSidePanelWidgets(layoutData.rightPanel, allowedWidgets);
+        await this.shell.leftPanelHandler.collapse();
+        await this.shell.rightPanelHandler.collapse();
     }
 
     protected isWidgetAllowed(widgetId: string, allowedWidgets: string[]): boolean {
@@ -146,15 +156,29 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
         }
     }
 
-    protected pruneSidePanel(items: SidePanel.LayoutData | undefined, allowedWidgets: string[]): void {
-        if (items) {
-            items.items = items.items?.filter(widget => {
-                const allowed = this.isWidgetAllowed(widget.widget?.id ?? 'none', allowedWidgets);
-                if (!allowed) {
-                    // widget.widget?.close();
+    protected toggleSidePanelWidgets(items: SidePanel.LayoutData | undefined, allowedWidgets: string[]): void {
+        if (items?.items) {
+            items.items = items.items.filter(widget => {
+                let allowed = false;
+                if (widget.widget) {
+                    allowed = this.isWidgetAllowed(widget.widget.id, allowedWidgets);
+                    if (allowed) {
+                        this.showSidePanelWidget(widget.widget);
+                    } else {
+                        this.hideSidePanelWidget(widget.widget);
+                    }
                 }
+
                 return allowed;
             });
         }
+    }
+
+    protected hideSidePanelWidget(widget: Widget): void {
+        widget.title.className += ' otherViewMode';
+    }
+
+    protected showSidePanelWidget(widget: Widget): void {
+        widget.title.className = widget.title.className.replace(/ otherViewMode/g, '');
     }
 }
