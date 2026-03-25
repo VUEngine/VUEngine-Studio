@@ -1,5 +1,5 @@
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MenuPath, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core';
-import { KeybindingContribution, KeybindingRegistry, SidePanelHandler } from '@theia/core/lib/browser';
+import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { ViewModeCommands } from './view-mode-commands';
 import { ViewModeService } from './view-mode-service';
@@ -18,8 +18,6 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
     protected readonly commands: CommandRegistry;
     @inject(QuickPickService)
     protected readonly quickPickService: QuickPickService;
-    @inject(SidePanelHandler)
-    protected readonly sidePanelHandler: SidePanelHandler;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
 
