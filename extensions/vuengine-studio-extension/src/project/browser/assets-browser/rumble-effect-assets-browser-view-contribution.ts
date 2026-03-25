@@ -14,7 +14,7 @@ export class RumbleEffectAssetsBrowserViewContribution extends AbstractViewContr
             widgetName: RumbleEffectAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

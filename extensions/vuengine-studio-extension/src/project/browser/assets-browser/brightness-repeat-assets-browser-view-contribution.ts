@@ -14,7 +14,7 @@ export class BrightnessRepeatAssetsBrowserViewContribution extends AbstractViewC
             widgetName: BrightnessRepeatAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

@@ -14,7 +14,7 @@ export class ColumnTableAssetsBrowserViewContribution extends AbstractViewContri
             widgetName: ColumnTableAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

@@ -14,7 +14,7 @@ export class ImageAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: ImageAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 1,
+                rank: 200,
             },
         });
     }

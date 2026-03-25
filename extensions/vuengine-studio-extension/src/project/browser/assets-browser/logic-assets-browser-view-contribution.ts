@@ -14,7 +14,7 @@ export class LogicAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: LogicAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }
