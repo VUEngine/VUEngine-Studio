@@ -14,7 +14,7 @@ export class FontAssetsBrowserViewContribution extends AbstractViewContribution<
             widgetName: FontAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

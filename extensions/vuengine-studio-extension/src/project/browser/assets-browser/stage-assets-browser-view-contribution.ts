@@ -14,7 +14,7 @@ export class StageAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: StageAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

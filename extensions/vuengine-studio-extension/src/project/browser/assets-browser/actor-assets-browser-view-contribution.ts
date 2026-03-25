@@ -14,7 +14,7 @@ export class ActorAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: ActorAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }

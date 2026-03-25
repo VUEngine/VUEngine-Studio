@@ -14,7 +14,7 @@ export class SoundAssetsBrowserViewContribution extends AbstractViewContribution
             widgetName: SoundAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 0,
+                rank: 100,
             },
         });
     }
