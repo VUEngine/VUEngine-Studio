@@ -29,8 +29,6 @@ import { ViewMode } from './view-mode-types';
 
 @injectable()
 export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
 
@@ -114,15 +112,13 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
          * TODO: invert logic for view mode sourceCode, for it to act as fallback
          * for unknown widgets, e.g. from extensions
          */
-        this.pruneConfig(layoutData.mainPanel?.main, allowedWidgets);
-        this.handleSidePanels(layoutData, allowedWidgets);
+        this.filterConfig(layoutData.mainPanel?.main, allowedWidgets);
+        this.filterSidePanels(layoutData, allowedWidgets);
     }
 
-    protected async handleSidePanels(layoutData: ApplicationShell.LayoutData, allowedWidgets: string[]): Promise<void> {
-        this.toggleSidePanelWidgets(layoutData.leftPanel, allowedWidgets);
-        this.toggleSidePanelWidgets(layoutData.rightPanel, allowedWidgets);
-        await this.shell.leftPanelHandler.collapse();
-        await this.shell.rightPanelHandler.collapse();
+    protected async filterSidePanels(layoutData: ApplicationShell.LayoutData, allowedWidgets: string[]): Promise<void> {
+        this.filterSidePanelWidgets(layoutData.leftPanel, allowedWidgets);
+        this.filterSidePanelWidgets(layoutData.rightPanel, allowedWidgets);
     }
 
     protected isWidgetAllowed(widgetId: string, allowedWidgets: string[]): boolean {
@@ -136,27 +132,27 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
         return result;
     }
 
-    protected pruneConfig(area: DockLayout.AreaConfig | null | undefined, allowedWidgets: string[]): void {
+    protected filterConfig(area: DockLayout.AreaConfig | null | undefined, allowedWidgets: string[]): void {
         if (area?.type === 'tab-area') {
-            this.pruneTabConfig(area, allowedWidgets);
+            this.filterTabConfig(area, allowedWidgets);
         } else if (area?.type === 'split-area') {
-            this.pruneSplitConfig(area, allowedWidgets);
+            this.filterSplitConfig(area, allowedWidgets);
         }
     }
 
-    protected pruneTabConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
+    protected filterTabConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
         if (area.type === 'tab-area') {
             area.widgets = area.widgets.filter(widget => this.isWidgetAllowed(widget.id, allowedWidgets));
         }
     }
 
-    protected pruneSplitConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
+    protected filterSplitConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
         if (area.type === 'split-area') {
-            area.children.forEach(c => this.pruneConfig(c, allowedWidgets));
+            area.children.forEach(c => this.filterConfig(c, allowedWidgets));
         }
     }
 
-    protected toggleSidePanelWidgets(items: SidePanel.LayoutData | undefined, allowedWidgets: string[]): void {
+    protected filterSidePanelWidgets(items: SidePanel.LayoutData | undefined, allowedWidgets: string[]): void {
         if (items?.items) {
             items.items = items.items.filter(widget => {
                 let allowed = false;

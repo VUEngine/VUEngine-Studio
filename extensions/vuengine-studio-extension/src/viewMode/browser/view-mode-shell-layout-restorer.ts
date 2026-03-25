@@ -1,13 +1,16 @@
 import { ApplicationShell, ShellLayoutRestorer } from '@theia/core/lib/browser';
+import { FrontendApplicationState, StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ViewModeService } from './view-mode-service';
 import { ViewMode } from './view-mode-types';
-import { StopReason } from '@theia/core/lib/common/frontend-application-state';
+import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
+    @inject(FrontendApplicationStateService)
+    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
 
@@ -19,6 +22,13 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     }
 
     protected bindEvents(): void {
+        this.frontendApplicationStateService.onStateChanged(
+            async (state: FrontendApplicationState) => {
+                if (state === 'initialized_layout') {
+                    await this.restoreViewModeLayout(this.viewModeService.getViewMode());
+                }
+            }
+        );
         this.viewModeService.onDidChangeViewMode(async viewModeChange => {
             this.storeViewModeLayout(viewModeChange.oldViewMode);
             await this.restoreViewModeLayout(viewModeChange.newViewMode);
@@ -57,17 +67,27 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         }
     }
 
-    async restoreViewModeLayout(viewMode: ViewMode): Promise<boolean> {
-        const storageKey = this.getViewModeStorageKey(viewMode);
+    async restoreViewModeLayout(viewMode: ViewMode): Promise<void> {
+        let layoutData = this.shell.getLayoutData();
 
+        const storageKey = this.getViewModeStorageKey(viewMode);
         const serializedLayoutData = await this.storageService.getData<string>(storageKey);
-        if (serializedLayoutData === undefined) {
-            return false;
+        if (serializedLayoutData !== undefined) {
+            layoutData = await this.inflate(serializedLayoutData);
         }
-        const layoutData = await this.inflate(serializedLayoutData);
 
         this.transformations.getContributions().forEach(transformation => transformation.transformLayoutOnRestore(layoutData));
         await this.shell.setLayoutData(layoutData);
-        return true;
+
+        await this.collapseSidePanelsIfEmpty(layoutData);
+    }
+
+    async collapseSidePanelsIfEmpty(layoutData: ApplicationShell.LayoutData): Promise<void> {
+        if (!layoutData.leftPanel?.items?.filter(widget => widget.expanded).length) {
+            await this.shell.leftPanelHandler.collapse();
+        }
+        if (!layoutData.rightPanel?.items?.filter(widget => widget.expanded).length) {
+            await this.shell.rightPanelHandler.collapse();
+        }
     }
 }
