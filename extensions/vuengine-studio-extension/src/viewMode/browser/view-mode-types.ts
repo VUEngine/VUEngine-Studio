@@ -1,10 +1,34 @@
 import { nls } from '@theia/core';
+import { PROBLEMS_WIDGET_ID } from '@theia/markers/lib/browser/problem/problem-widget';
+import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
+import { OUTLINE_WIDGET_FACTORY_ID } from '@theia/outline-view/lib/browser/outline-view-contribution';
+import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views/preference-searchbar-widget';
+import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
+import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
+import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
+import { VesBuildWidget } from '../../build/browser/ves-build-widget';
+import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
+import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
+import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
+import { VesFlashCartWidget } from '../../flash-cart/browser/ves-flash-cart-widget';
+import { VesPluginsViewContainer } from '../../plugins/browser/ves-plugins-view-container';
+import { ActorAssetsBrowserWidget } from '../../project/browser/assets-browser/actor-assets-browser-widget';
+import { BrightnessRepeatAssetsBrowserWidget } from '../../project/browser/assets-browser/brightness-repeat-assets-browser-widget';
+import { ColumnTableAssetsBrowserWidget } from '../../project/browser/assets-browser/column-table-assets-browser-widget';
+import { FontAssetsBrowserWidget } from '../../project/browser/assets-browser/font-assets-browser-widget';
+import { ImageAssetsBrowserWidget } from '../../project/browser/assets-browser/image-assets-browser-widget';
+import { LogicAssetsBrowserWidget } from '../../project/browser/assets-browser/logic-assets-browser-widget';
+import { RumbleEffectAssetsBrowserWidget } from '../../project/browser/assets-browser/rumble-effect-assets-browser-widget';
+import { SoundAssetsBrowserWidget } from '../../project/browser/assets-browser/sound-assets-browser-widget';
+import { StageAssetsBrowserWidget } from '../../project/browser/assets-browser/stage-assets-browser-widget';
 import { ActorType } from '../../project/browser/types/Actor';
 import { FontType } from '../../project/browser/types/Font';
 import { LogicType } from '../../project/browser/types/Logic';
 import { SoundType } from '../../project/browser/types/Sound';
 import { StageType } from '../../project/browser/types/Stage';
 import { TranslationsType } from '../../project/browser/types/Translations';
+import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
+import { VesProjectSidebarWidget } from '../../project/browser/ves-project-sidebar-widget';
 
 export enum ViewMode {
     actors = 'actors',
@@ -79,3 +103,89 @@ export const TYPE_VIEW_MODE_RELATIONS: { [typeId: string]: ViewMode } = {
 
 export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
 export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
+
+export const VIEW_MODE_WIDGETS: Record<ViewMode, { allow?: string[], force?: string[] }> = {
+    [ViewMode.actors]: {
+        allow: [
+            ActorAssetsBrowserWidget.ID,
+            ImageAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.assets]: {
+        allow: [
+            BrightnessRepeatAssetsBrowserWidget.ID,
+            ColumnTableAssetsBrowserWidget.ID,
+            RumbleEffectAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.build]: {
+        force: [
+            VesBuildWidget.ID,
+        ]
+    },
+    [ViewMode.emulator]: {
+        allow: [
+            VesEmulatorSidebarWidget.ID,
+            VesEmulatorWidget.ID,
+        ]
+    },
+    [ViewMode.flashCarts]: {
+        force: [
+            VesFlashCartWidget.ID,
+        ]
+    },
+    [ViewMode.fonts]: {
+        allow: [
+            FontAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.localization]: {
+        allow: [
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.logic]: {
+        allow: [
+            LogicAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.sound]: {
+        allow: [
+            SoundAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.settings]: {
+        allow: [
+            PreferencesSearchbarWidget.ID,
+            VesProjectSidebarWidget.ID,
+            VesEditorsWidget.ID,
+        ]
+    },
+    [ViewMode.sourceCode]: {
+        allow: [
+            'code-editor-opener',
+            'ves-plugins-search-bar',
+            EXPLORER_VIEW_CONTAINER_ID,
+            OUTLINE_WIDGET_FACTORY_ID,
+            PROBLEMS_WIDGET_ID,
+            SCM_VIEW_CONTAINER_ID,
+            SEARCH_VIEW_CONTAINER_ID,
+            VesPluginsViewContainer.ID,
+            VSXExtensionsViewContainer.ID,
+        ]
+    },
+    [ViewMode.stages]: {
+        allow: [
+            StageAssetsBrowserWidget.ID,
+            VesEditorsWidget.ID,
+        ],
+        force: [
+            VesProjectDashboardWidget.ID,
+        ]
+    },
+};

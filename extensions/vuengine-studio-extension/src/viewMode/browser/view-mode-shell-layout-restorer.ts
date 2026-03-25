@@ -1,9 +1,9 @@
 import { ApplicationShell, ShellLayoutRestorer } from '@theia/core/lib/browser';
+import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { FrontendApplicationState, StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ViewModeService } from './view-mode-service';
-import { ViewMode } from './view-mode-types';
-import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { VIEW_MODE_WIDGETS, ViewMode } from './view-mode-types';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
@@ -79,15 +79,33 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         this.transformations.getContributions().forEach(transformation => transformation.transformLayoutOnRestore(layoutData));
         await this.shell.setLayoutData(layoutData);
 
-        await this.collapseSidePanelsIfEmpty(layoutData);
+        await this.collapseSidePanelsIfEmpty(viewMode, layoutData);
+        await this.forceMainWidgets(viewMode);
     }
 
-    async collapseSidePanelsIfEmpty(layoutData: ApplicationShell.LayoutData): Promise<void> {
-        if (!layoutData.leftPanel?.items?.filter(widget => widget.expanded).length) {
+    async collapseSidePanelsIfEmpty(viewMode: ViewMode, layoutData: ApplicationShell.LayoutData): Promise<void> {
+        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? [];
+
+        if (!layoutData.leftPanel?.items?.filter(widget =>
+            allowedWidgets.includes(widget.widget?.id ?? '') && widget.expanded
+        ).length) {
             await this.shell.leftPanelHandler.collapse();
         }
-        if (!layoutData.rightPanel?.items?.filter(widget => widget.expanded).length) {
+        if (!layoutData.rightPanel?.items?.filter(widget =>
+            allowedWidgets.includes(widget.widget?.id ?? '') && widget.expanded
+        ).length) {
             await this.shell.rightPanelHandler.collapse();
         }
+    }
+
+    async forceMainWidgets(viewMode: ViewMode): Promise<void> {
+        const forcedWidgets = VIEW_MODE_WIDGETS[viewMode].force ?? [];
+
+        await Promise.all(
+            forcedWidgets.map(async f => {
+                const widget = await this.widgetManager.getOrCreateWidget(f);
+                await this.shell.addWidget(widget, { area: 'main' });
+            })
+        );
     }
 }
