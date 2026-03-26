@@ -59,6 +59,10 @@ export class ViewModeService {
         this.layoutChangeComplete = layoutChangeComplete;
     }
 
+    async resetViewMode(): Promise<void> {
+        return this.localStorageService.setData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY, undefined);
+    }
+
     async setViewMode(newViewMode: ViewMode): Promise<void> {
         const oldViewMode = this.getViewMode();
         if (newViewMode !== oldViewMode && Object.keys(ViewMode).includes(newViewMode)) {

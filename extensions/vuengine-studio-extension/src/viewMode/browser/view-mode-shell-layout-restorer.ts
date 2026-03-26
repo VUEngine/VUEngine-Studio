@@ -1,4 +1,4 @@
-import { ApplicationShell, ShellLayoutRestorer } from '@theia/core/lib/browser';
+import { ApplicationShell, FrontendApplication, ShellLayoutRestorer } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { FrontendApplicationState, StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -40,6 +40,15 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         return `${this.storageKey}-${this.storageKeySuffix}-${viewMode}`;
     }
 
+    storeLayout(app: FrontendApplication): void {
+        if (this.shouldStoreLayout) {
+            const viewMode = this.viewModeService.getViewMode();
+            this.storeViewModeLayout(viewMode);
+        }
+
+        super.storeLayout(app);
+    }
+
     protected async resetLayout(): Promise<void> {
         if (await this.windowService.isSafeToShutDown(StopReason.Reload)) {
             await Promise.all(
@@ -47,6 +56,8 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
                     this.storageService.setData(this.getViewModeStorageKey(viewMode as ViewMode), undefined)
                 )
             );
+
+            await this.viewModeService.resetViewMode();
         }
 
         return super.resetLayout();
@@ -81,28 +92,43 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
 
         await this.collapseSidePanelsIfEmpty(viewMode, layoutData);
         await this.forceMainWidgets(viewMode);
+
+        if (serializedLayoutData === undefined) {
+            await this.setInitialRevealed(viewMode);
+        }
+    }
+
+    async setInitialRevealed(viewMode: ViewMode): Promise<void> {
+        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
+        Object.entries(allowedWidgets).forEach(async ([widgetId, revealInitially]) => {
+            if (revealInitially) {
+                await this.shell.revealWidget(widgetId);
+            }
+        });
     }
 
     async collapseSidePanelsIfEmpty(viewMode: ViewMode, layoutData: ApplicationShell.LayoutData): Promise<void> {
-        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? [];
+        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
+        const allowedWidgetsIds = Object.keys(allowedWidgets);
 
         if (!layoutData.leftPanel?.items?.filter(widget =>
-            allowedWidgets.includes(widget.widget?.id ?? '') && widget.expanded
+            allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
         ).length) {
             await this.shell.leftPanelHandler.collapse();
         }
         if (!layoutData.rightPanel?.items?.filter(widget =>
-            allowedWidgets.includes(widget.widget?.id ?? '') && widget.expanded
+            allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
         ).length) {
             await this.shell.rightPanelHandler.collapse();
         }
     }
 
     async forceMainWidgets(viewMode: ViewMode): Promise<void> {
-        const forcedWidgets = VIEW_MODE_WIDGETS[viewMode].force ?? [];
+        const forcedWidgets = VIEW_MODE_WIDGETS[viewMode].force ?? {};
+        const forcedWidgetsIds = Object.keys(forcedWidgets);
 
         await Promise.all(
-            forcedWidgets.map(async f => {
+            forcedWidgetsIds.map(async f => {
                 const widget = await this.widgetManager.getOrCreateWidget(f);
                 await this.shell.addWidget(widget, { area: 'main' });
             })
