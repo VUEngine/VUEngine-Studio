@@ -1,3 +1,4 @@
+import { HoverService } from '@theia/core/lib/browser';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import React from 'react';
 import styled from 'styled-components';
@@ -63,17 +64,26 @@ interface ApplicationTitleProps {
     openRecentWorkspace: () => void
     closeWorkspace: () => void
     vesCommonService: VesCommonService
+    hoverService: HoverService
 }
 
 export default function ApplicationTitle(props: ApplicationTitleProps): React.JSX.Element {
-    const { applicationTitle, isWorkspaceOpened, isCollaboration, openRecentWorkspace, closeWorkspace, vesCommonService } = props;
+    const { applicationTitle, isWorkspaceOpened, isCollaboration, openRecentWorkspace, closeWorkspace, vesCommonService, hoverService } = props;
 
     return (
         <StyledApplicationTitle
             onClick={openRecentWorkspace}
-            title={WorkspaceCommands.OPEN_RECENT_WORKSPACE.label +
-                vesCommonService.getKeybindingLabel(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id, true)
-            }
+            onMouseEnter={event => {
+                hoverService.requestHover({
+                    content: WorkspaceCommands.OPEN_RECENT_WORKSPACE.label +
+                        vesCommonService.getKeybindingLabel(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id, true),
+                    target: event.currentTarget,
+                    position: 'bottom',
+                });
+            }}
+            onMouseLeave={() => {
+                hoverService.cancelHover();
+            }}
         >
             {isCollaboration && <>
                 <i className="codicon codicon-broadcast"></i>
@@ -82,9 +92,17 @@ export default function ApplicationTitle(props: ApplicationTitleProps): React.JS
             {isWorkspaceOpened &&
                 <StyledApplicationTitleCloseButton
                     onClick={closeWorkspace}
-                    title={WorkspaceCommands.CLOSE.label +
-                        vesCommonService.getKeybindingLabel(WorkspaceCommands.CLOSE.id, true)
-                    }
+                    onMouseEnter={event => {
+                        hoverService.requestHover({
+                            content: WorkspaceCommands.CLOSE.label +
+                                vesCommonService.getKeybindingLabel(WorkspaceCommands.CLOSE.id, true),
+                            target: event.currentTarget,
+                            position: 'bottom',
+                        });
+                    }}
+                    onMouseLeave={() => {
+                        hoverService.cancelHover();
+                    }}
                 >
                     <i className="codicon codicon-close" />
                 </StyledApplicationTitleCloseButton>

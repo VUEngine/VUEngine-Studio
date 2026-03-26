@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { HoverService } from '@theia/core/lib/browser';
 import React from 'react';
 import styled from 'styled-components';
 import { VesBuildCommands } from '../../../build/browser/ves-build-commands';
@@ -8,7 +8,6 @@ import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { EmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../../flash-cart/browser/ves-flash-cart-commands';
-import { VesProjectCommands } from '../../../project/browser/ves-project-commands';
 
 const StyledActionButton = styled.button`
     align-items: center;
@@ -111,8 +110,6 @@ interface ActionButtonsProps {
     hasConnectedFlashCarts: boolean
     isCleaning: boolean
     romExists: boolean
-    createNewProject: () => void
-    openWorkspaceFile: () => void
     build: () => void
     run: () => void
     flash: () => void
@@ -120,6 +117,7 @@ interface ActionButtonsProps {
     clean: () => void
     openBuildMenu: () => void
     vesCommonService: VesCommonService
+    hoverService: HoverService
 }
 
 export default function ActionButtons(props: ActionButtonsProps): React.JSX.Element {
@@ -131,36 +129,18 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
         isFlashing, flashingProgress, hasConnectedFlashCarts,
         isCleaning,
         romExists,
-        createNewProject, openWorkspaceFile,
         build, run, flash, exportRom, clean,
         openBuildMenu,
         vesCommonService,
+        hoverService,
     } = props;
 
     const progressBarColor = hasWarnings
         ? 'var(--theia-editorWarning-foreground)'
         : 'var(--theia-progressBar-background)';
 
-    return !isWorkspaceOpened
+    return isWorkspaceOpened
         ? <>
-            <StyledActionButton
-                className='open-workspace'
-                title={nls.localize('vuengine/projects/commands/openProject', 'Open Project...') +
-                    vesCommonService.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}
-                onClick={openWorkspaceFile}
-            >
-                <i className='fa fa-file-code-o'></i>
-            </StyledActionButton>
-            <StyledActionButton
-                className='new-project'
-                title={nls.localize('vuengine/projects/commands/newProject', 'New Project') +
-                    vesCommonService.getKeybindingLabel(VesProjectCommands.NEW.id, true)}
-                onClick={createNewProject}
-            >
-                <i className='fa fa-plus'></i>
-            </StyledActionButton>
-        </>
-        : <>
             <StyledActionButtonWithSubMenu
                 className={'build' + (buildIsQueued
                     ? ' queued'
@@ -178,9 +158,18 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                             ${progressBarColor} ${buildStatus.progress}%,
                             rgba(255, 255, 255, .5) ${buildStatus.progress}%)`
                 } : {}}
-                title={buildStatus.active
-                    ? `${nls.localize('vuengine/build/building', 'Building')}... ${buildStatus.progress}%`
-                    : `${VesBuildCommands.BUILD.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
+                onMouseEnter={event => {
+                    hoverService.requestHover({
+                        content: buildStatus.active
+                            ? `${nls.localize('vuengine/build/building', 'Building')}... ${buildStatus.progress}%`
+                            : `${VesBuildCommands.BUILD.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`,
+                        target: event.currentTarget,
+                        position: 'bottom',
+                    });
+                }}
+                onMouseLeave={() => {
+                    hoverService.cancelHover();
+                }}
                 onClick={build}
             >
                 {buildIsQueued
@@ -194,9 +183,18 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
             </StyledActionButtonWithSubMenu>
             <StyledActionButton
                 className={'run' + (runIsQueued ? ' queued' : '')}
-                title={runIsQueued
-                    ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                    : `${EmulatorCommands.RUN.label}${vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`}
+                onMouseEnter={event => {
+                    hoverService.requestHover({
+                        content: runIsQueued
+                            ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
+                            : `${EmulatorCommands.RUN.label}${vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`,
+                        target: event.currentTarget,
+                        position: 'bottom',
+                    });
+                }}
+                onMouseLeave={() => {
+                    hoverService.cancelHover();
+                }}
                 onClick={run}
             >
                 {runIsQueued
@@ -209,11 +207,20 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                     backgroundImage: 'linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) '
                         + flashingProgress + '%, rgba(255, 255, 255, .5) ' + flashingProgress + '%)'
                 } : {}}
-                title={flashIsQueued
-                    ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
-                    : isFlashing
-                        ? `Flashing... ${flashingProgress}%`
-                        : `${VesFlashCartCommands.FLASH.label}${vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
+                onMouseEnter={event => {
+                    hoverService.requestHover({
+                        content: flashIsQueued
+                            ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
+                            : isFlashing
+                                ? `Flashing... ${flashingProgress}%`
+                                : `${VesFlashCartCommands.FLASH.label}${vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`,
+                        target: event.currentTarget,
+                        position: 'bottom',
+                    });
+                }}
+                onMouseLeave={() => {
+                    hoverService.cancelHover();
+                }}
                 disabled={!hasConnectedFlashCarts}
                 onClick={flash}
             >
@@ -225,7 +232,16 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
             </StyledActionButton>
             <StyledActionButton
                 className="export"
-                title={`${VesExportCommands.EXPORT.label}${vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
+                onMouseEnter={event => {
+                    hoverService.requestHover({
+                        content: `${VesExportCommands.EXPORT.label}${vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`,
+                        target: event.currentTarget,
+                        position: 'bottom',
+                    });
+                }}
+                onMouseLeave={() => {
+                    hoverService.cancelHover();
+                }}
                 disabled={!romExists || buildStatus.active}
                 onClick={exportRom}
             >
@@ -233,7 +249,16 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
             </StyledActionButton>
             <StyledActionButton
                 className={'clean' + (isCleaning ? ' active' : '')}
-                title={isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+                onMouseEnter={event => {
+                    hoverService.requestHover({
+                        content: isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`,
+                        target: event.currentTarget,
+                        position: 'bottom',
+                    });
+                }}
+                onMouseLeave={() => {
+                    hoverService.cancelHover();
+                }}
                 disabled={buildStatus.active}
                 onClick={clean}
             >
@@ -241,5 +266,6 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                     ? <i className='fa fa-cog fa-spin'></i>
                     : <i className='codicon codicon-trash'></i>}
             </StyledActionButton>
-        </>;
+        </>
+        : <></>;
 }

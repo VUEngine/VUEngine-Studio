@@ -2,7 +2,9 @@ import { Emitter } from '@theia/core';
 import { ApplicationShell, LocalStorageService, Widget, WidgetManager } from '@theia/core/lib/browser';
 import { ContextKey, ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, ViewMode } from './view-mode-types';
 
 interface ViewModeChange {
@@ -24,9 +26,16 @@ export class ViewModeService {
     protected readonly localStorageService: LocalStorageService;
     @inject(WidgetManager)
     protected readonly widgetManager: WidgetManager;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
     protected viewModeContextKey: ContextKey<ViewMode>;
     protected layoutChangeComplete: boolean = false;
+
+    protected _ready = new Deferred<void>();
+    get ready(): Promise<void> {
+        return this._ready.promise;
+    }
 
     protected readonly onDidChangeViewModeEmitter = new Emitter<ViewModeChange>();
     readonly onDidChangeViewMode = this.onDidChangeViewModeEmitter.event;
@@ -44,12 +53,16 @@ export class ViewModeService {
         this.frontendApplicationStateService.onStateChanged(
             async (state: FrontendApplicationState) => {
                 if (state === 'initialized_layout') {
-                    const lastViewModeLocalStorage = await this.localStorageService.getData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY) as ViewMode;
-                    let lastViewMode = DEFAULT_VIEW_MODE;
-                    if (Object.keys(ViewMode).includes(lastViewModeLocalStorage)) {
-                        lastViewMode = lastViewModeLocalStorage;
+                    let lastViewMode = ViewMode.welcome;
+                    if (this.workspaceService.opened) {
+                        const lastViewModeLocalStorage = await this.localStorageService.getData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY) as ViewMode;
+                        lastViewMode = DEFAULT_VIEW_MODE;
+                        if (Object.keys(ViewMode).includes(lastViewModeLocalStorage)) {
+                            lastViewMode = lastViewModeLocalStorage;
+                        }
                     }
-                    this.setViewMode(lastViewMode);
+                    this.setViewMode(lastViewMode, true);
+                    this._ready.resolve();
                 }
             }
         );
@@ -63,13 +76,15 @@ export class ViewModeService {
         return this.localStorageService.setData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY, undefined);
     }
 
-    async setViewMode(newViewMode: ViewMode): Promise<void> {
+    async setViewMode(newViewMode: ViewMode, omitEvent?: boolean): Promise<void> {
         const oldViewMode = this.getViewMode();
         if (newViewMode !== oldViewMode && Object.keys(ViewMode).includes(newViewMode)) {
             this.viewModeContextKey.set(newViewMode);
             await this.localStorageService.setData(LAST_VIEW_MODE_LOCAL_STORAGE_KEY, newViewMode);
             this.setLayoutChangeComplete(false);
-            this.onDidChangeViewModeEmitter.fire({ newViewMode, oldViewMode });
+            if (!omitEvent) {
+                this.onDidChangeViewModeEmitter.fire({ newViewMode, oldViewMode });
+            }
 
             return new Promise<void>((resolve, reject) => {
                 const waitForLayoutChange = setInterval(() => {
@@ -83,7 +98,9 @@ export class ViewModeService {
     }
 
     getViewMode(): ViewMode {
-        return this.viewModeContextKey.get() ?? DEFAULT_VIEW_MODE;
+        return this.workspaceService.opened
+            ? this.viewModeContextKey.get() ?? DEFAULT_VIEW_MODE
+            : ViewMode.welcome;
     }
 
     protected hideWidget(widget: Widget): void {

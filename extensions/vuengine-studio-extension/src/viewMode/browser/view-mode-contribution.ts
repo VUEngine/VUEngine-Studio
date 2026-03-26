@@ -199,6 +199,7 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
         };
 
         const viewModeOptions: QuickPickItem[] = Object.keys(ViewMode)
+            .filter(vm => vm !== ViewMode.welcome)
             .filter(vm => !DISABLED_VIEW_MODES.includes(vm as ViewMode))
             .map(vm => ({
                 id: vm,

@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { HoverService } from '@theia/core/lib/browser';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -28,15 +29,25 @@ const StyledMainMenuIcon = styled.button`
 interface MainMenuProps {
     hidden: boolean
     openMainMenu: () => void
+    hoverService: HoverService
 }
 
 export default function MainMenu(props: MainMenuProps): React.JSX.Element {
-    const { hidden, openMainMenu } = props;
+    const { hidden, openMainMenu, hoverService } = props;
 
     return hidden ? <></> : (
         <StyledMainMenuIcon
             onClick={openMainMenu}
-            title={nls.localizeByDefault('Application Menu')}
+            onMouseEnter={event => {
+                hoverService.requestHover({
+                    content: nls.localizeByDefault('Application Menu'),
+                    target: event.currentTarget,
+                    position: 'bottom',
+                });
+            }}
+            onMouseLeave={() => {
+                hoverService.cancelHover();
+            }}
         >
             <i className='codicon codicon-menu' />
         </StyledMainMenuIcon>

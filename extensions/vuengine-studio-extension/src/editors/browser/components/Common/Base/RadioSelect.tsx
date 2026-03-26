@@ -234,7 +234,6 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
                         hs.cancelHover();
                     }
                 }}
-
             >
                 {o.label ? o.label : o.value}
             </StyledRadioSelectOption>
