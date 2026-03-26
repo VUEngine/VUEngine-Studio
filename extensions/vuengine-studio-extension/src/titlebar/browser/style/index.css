@@ -4,7 +4,7 @@
 
 #theia-top-panel {
   /* background: linear-gradient(135deg, #AE33BE 0%, #9033BE 50%, #7233BE 100%); */
-  background: linear-gradient(135deg, #D34114 0%, #d31422 25%, #d31422 75%, #D31470 100%);;
+  background: linear-gradient(135deg, #EB2121 0%, #d31422 25%, #d31422 75%, #EB2121 100%);;
   box-sizing: content-box;
   z-index: 1;
 }

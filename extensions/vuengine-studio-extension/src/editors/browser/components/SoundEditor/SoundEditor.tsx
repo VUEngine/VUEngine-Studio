@@ -1353,7 +1353,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     return (
         <HContainer
-            className="musicEditor"
             gap={0}
             overflow="hidden"
             style={{ padding: 0 }}

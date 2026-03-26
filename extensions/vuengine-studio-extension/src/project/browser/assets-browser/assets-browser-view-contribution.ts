@@ -73,27 +73,27 @@ export class AssetsBrowserViewContribution extends AbstractViewContribution<Asse
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(AssetsBrowserCommands.WIDGET_TOGGLE, {
-            execute: () => this.toggleView()
+            execute: widget => this.toggleView()
         });
         commandRegistry.registerCommand(AssetsBrowserCommands.ADD, {
-            isEnabled: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            isVisible: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            execute: () => (this.shell.currentWidget as AssetsBrowserWidget).add(),
+            isEnabled: widget => widget instanceof AssetsBrowserWidget,
+            isVisible: widget => widget instanceof AssetsBrowserWidget,
+            execute: widget => (widget as AssetsBrowserWidget).add(),
         });
         commandRegistry.registerCommand(AssetsBrowserCommands.REFRESH, {
-            isEnabled: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            isVisible: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            execute: () => (this.shell.currentWidget as AssetsBrowserWidget).refresh(),
+            isEnabled: widget => widget instanceof AssetsBrowserWidget,
+            isVisible: widget => widget instanceof AssetsBrowserWidget,
+            execute: widget => (widget as AssetsBrowserWidget).refresh(),
         });
         commandRegistry.registerCommand(AssetsBrowserCommands.EXPAND_ALL, {
-            isEnabled: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            isVisible: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            execute: () => (this.shell.currentWidget as AssetsBrowserWidget).setAllExpanded(true),
+            isEnabled: widget => widget instanceof AssetsBrowserWidget,
+            isVisible: widget => widget instanceof AssetsBrowserWidget,
+            execute: widget => (widget as AssetsBrowserWidget).setAllExpanded(true),
         });
         commandRegistry.registerCommand(AssetsBrowserCommands.COLLAPSE_ALL, {
-            isEnabled: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            isVisible: () => this.shell.currentWidget instanceof AssetsBrowserWidget,
-            execute: () => (this.shell.currentWidget as AssetsBrowserWidget).setAllExpanded(false),
+            isEnabled: widget => widget instanceof AssetsBrowserWidget,
+            isVisible: widget => widget instanceof AssetsBrowserWidget,
+            execute: widget => (widget as AssetsBrowserWidget).setAllExpanded(false),
         });
     }
 

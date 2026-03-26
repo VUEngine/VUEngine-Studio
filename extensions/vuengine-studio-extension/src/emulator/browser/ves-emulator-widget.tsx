@@ -217,28 +217,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.title.caption = caption;
     this.title.iconClass = 'codicon codicon-play';
     this.title.closable = true;
-
-    this.keybindingRegistry.onKeybindingsChanged(() => {
-      this.keybindingToState();
-      this.update();
-    });
-    this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
-      if ([VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE].includes(preferenceName)) {
-        this.update();
-      } else if (
-        [
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO,
-        ].includes(preferenceName)
-      ) {
-        this.update();
-        this.reload();
-      }
-    });
   }
 
   protected async checkRomExists(): Promise<void> {
@@ -335,7 +313,28 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
             this.startEmulator();
           }
         });
-      })
+      }),
+      this.keybindingRegistry.onKeybindingsChanged(() => {
+        this.keybindingToState();
+        this.update();
+      }),
+      this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
+        if ([VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE].includes(preferenceName)) {
+          this.update();
+        } else if (
+          [
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO,
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO,
+          ].includes(preferenceName)
+        ) {
+          this.update();
+          this.reload();
+        }
+      }),
     ]);
   }
 
