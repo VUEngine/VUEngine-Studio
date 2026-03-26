@@ -187,7 +187,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         const path = (this.uri.scheme === UNTITLED_SCHEME)
             ? `untitled-${this.options.typeId}-${nanoid()}`
             : this.uri.path;
-        this.id = `vesEditorsWidget:${path}`;
+        this.id = `${VesEditorsWidget.ID}:${this.options.typeId}:${path}`;
 
         this.title.iconClass = 'fa fa-cog';
         this.title.closable = true;
