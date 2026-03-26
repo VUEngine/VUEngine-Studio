@@ -8,6 +8,13 @@ import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser
 import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
 import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
 import { VesBuildWidget } from '../../build/browser/ves-build-widget';
+import { SoundEditorCurrentNoteWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-note-widget';
+import { SoundEditorCurrentPatternWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-pattern-widget';
+import { SoundEditorCurrentTrackWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-track-widget';
+import { SoundEditorInstrumentsWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-instruments-widget';
+import { SoundEditorKeyBindingsWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-key-bindings-widget';
+import { SoundEditorPropertiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-properties-widget';
+import { SoundEditorUtilitiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-utilities-widget';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
 import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
@@ -162,17 +169,24 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [VesEditorsWidget.ID]: false,
         }
     },
-    [ViewMode.sound]: {
-        allow: {
-            [SoundAssetsBrowserWidget.ID]: true,
-            [VesEditorsWidget.ID]: false,
-        }
-    },
     [ViewMode.settings]: {
         allow: {
             [PreferencesSearchbarWidget.ID]: false,
             [VesProjectSidebarWidget.ID]: true,
             [VSXExtensionsViewContainer.ID]: false,
+            [VesEditorsWidget.ID]: false,
+        }
+    },
+    [ViewMode.sound]: {
+        allow: {
+            [SoundAssetsBrowserWidget.ID]: true,
+            [SoundEditorPropertiesWidget.ID]: false,
+            [SoundEditorInstrumentsWidget.ID]: false,
+            [SoundEditorCurrentTrackWidget.ID]: false,
+            [SoundEditorCurrentPatternWidget.ID]: false,
+            [SoundEditorCurrentNoteWidget.ID]: false,
+            [SoundEditorUtilitiesWidget.ID]: false,
+            [SoundEditorKeyBindingsWidget.ID]: false,
             [VesEditorsWidget.ID]: false,
         }
     },
