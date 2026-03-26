@@ -56,8 +56,8 @@ export enum ViewMode {
 }
 
 export const DISABLED_VIEW_MODES: ViewMode[] = [
-    // ViewMode.logic,
-    // ViewMode.stages,
+    ViewMode.logic,
+    ViewMode.stages,
 ];
 
 export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {
@@ -122,7 +122,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [ActorAssetsBrowserWidget.ID]: true,
             [ImageAssetsBrowserWidget.ID]: false,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Actor:`]: false,
         }
     },
     [ViewMode.assets]: {
@@ -130,7 +130,9 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [BrightnessRepeatAssetsBrowserWidget.ID]: true,
             [ColumnTableAssetsBrowserWidget.ID]: false,
             [RumbleEffectAssetsBrowserWidget.ID]: false,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:BrightnessRepeat:`]: false,
+            [`${VesEditorsWidget.ID}:ColumnTable:`]: false,
+            [`${VesEditorsWidget.ID}:RumbleEffect:`]: false,
         }
     },
     [ViewMode.build]: {
@@ -155,18 +157,18 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.fonts]: {
         allow: {
             [FontAssetsBrowserWidget.ID]: true,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Font:`]: false,
         }
     },
     [ViewMode.localization]: {
         allow: {
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Translations:`]: false,
         }
     },
     [ViewMode.logic]: {
         allow: {
             [LogicAssetsBrowserWidget.ID]: true,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Logic:`]: false,
         }
     },
     [ViewMode.settings]: {
@@ -174,7 +176,6 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [PreferencesSearchbarWidget.ID]: false,
             [VesProjectSidebarWidget.ID]: true,
             [VSXExtensionsViewContainer.ID]: false,
-            [VesEditorsWidget.ID]: false,
         }
     },
     [ViewMode.sound]: {
@@ -187,7 +188,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [SoundEditorCurrentNoteWidget.ID]: false,
             [SoundEditorUtilitiesWidget.ID]: false,
             [SoundEditorKeyBindingsWidget.ID]: false,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Sound:`]: false,
         }
     },
     [ViewMode.sourceCode]: {
@@ -204,7 +205,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.stages]: {
         allow: {
             [StageAssetsBrowserWidget.ID]: true,
-            [VesEditorsWidget.ID]: false,
+            [`${VesEditorsWidget.ID}:Stage:`]: false,
         },
         force: {
             [VesProjectDashboardWidget.ID]: false,
