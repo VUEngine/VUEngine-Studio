@@ -1,3 +1,4 @@
+import { HoverService } from '@theia/core/lib/browser';
 import React from 'react';
 import styled from 'styled-components';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
@@ -40,16 +41,26 @@ interface ViewModeSelectProps {
     viewMode: ViewMode
     openViewModeMenu: () => void
     vesCommonService: VesCommonService
+    hoverService: HoverService
 }
 
 export default function ViewModeSelect(props: ViewModeSelectProps): React.JSX.Element {
-    const { hidden, viewMode, openViewModeMenu, vesCommonService } = props;
+    const { hidden, viewMode, openViewModeMenu, vesCommonService, hoverService } = props;
 
     return hidden ? <></> : (
         <StyledViewModeSelect
             onClick={openViewModeMenu}
-            title={ViewModeCommands.CHANGE_VIEW_MODE.label +
-                vesCommonService.getKeybindingLabel(ViewModeCommands.CHANGE_VIEW_MODE.id, true)}
+            onMouseEnter={event => {
+                hoverService.requestHover({
+                    content: ViewModeCommands.CHANGE_VIEW_MODE.label +
+                        vesCommonService.getKeybindingLabel(ViewModeCommands.CHANGE_VIEW_MODE.id, true),
+                    target: event.currentTarget,
+                    position: 'bottom',
+                });
+            }}
+            onMouseLeave={() => {
+                hoverService.cancelHover();
+            }}
         >
             <i className={VIEW_MODE_ICONS[viewMode]} /> {VIEW_MODE_LABELS[viewMode]}
             <i className="codicon codicon-chevron-down" />

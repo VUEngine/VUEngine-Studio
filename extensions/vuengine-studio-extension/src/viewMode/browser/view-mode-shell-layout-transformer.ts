@@ -14,7 +14,7 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
      */
     transformLayoutOnRestore(layoutData: ApplicationShell.LayoutData): void {
         const viewMode = this.viewModeService.getViewMode();
-        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
+        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode] ? VIEW_MODE_WIDGETS[viewMode].allow ?? {} : {};
         const allowedWidgetsIds = Object.keys(allowedWidgets);
 
         /**

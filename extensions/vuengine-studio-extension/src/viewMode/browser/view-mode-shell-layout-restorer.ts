@@ -1,6 +1,5 @@
 import { ApplicationShell, FrontendApplication, ShellLayoutRestorer } from '@theia/core/lib/browser';
-import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { FrontendApplicationState, StopReason } from '@theia/core/lib/common/frontend-application-state';
+import { StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ViewModeService } from './view-mode-service';
 import { VIEW_MODE_WIDGETS, ViewMode } from './view-mode-types';
@@ -9,8 +8,6 @@ import { VIEW_MODE_WIDGETS, ViewMode } from './view-mode-types';
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
 
@@ -19,16 +16,16 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     @postConstruct()
     protected init(): void {
         this.bindEvents();
+        this.initializeViewModeLayout();
+    }
+
+    protected async initializeViewModeLayout(): Promise<void> {
+        await this.viewModeService.ready;
+        await this.restoreViewModeLayout(this.viewModeService.getViewMode());
+        this.viewModeService.setLayoutChangeComplete(true);
     }
 
     protected bindEvents(): void {
-        this.frontendApplicationStateService.onStateChanged(
-            async (state: FrontendApplicationState) => {
-                if (state === 'initialized_layout') {
-                    await this.restoreViewModeLayout(this.viewModeService.getViewMode());
-                }
-            }
-        );
         this.viewModeService.onDidChangeViewMode(async viewModeChange => {
             this.storeViewModeLayout(viewModeChange.oldViewMode);
             await this.restoreViewModeLayout(viewModeChange.newViewMode);
@@ -111,15 +108,35 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
         const allowedWidgetsIds = Object.keys(allowedWidgets);
 
-        if (!layoutData.leftPanel?.items?.filter(widget =>
-            allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
-        ).length) {
-            await this.shell.leftPanelHandler.collapse();
+        const numberAllowedLeft = layoutData.leftPanel?.items?.filter(
+            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '')
+        ).length;
+        const numberAllowedAndVisibleLeft = layoutData.leftPanel?.items?.filter(
+            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+        ).length;
+        const numberAllowedRight = layoutData.rightPanel?.items?.filter(
+            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '')
+        ).length;
+        const numberAllowedAndVisibleRight = layoutData.rightPanel?.items?.filter(
+            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+        ).length;
+
+        if (numberAllowedLeft === 0) {
+            this.shell.leftPanelHandler.container.hide();
+        } else {
+            this.shell.leftPanelHandler.container.show();
+            if (numberAllowedAndVisibleLeft === 0) {
+                await this.shell.leftPanelHandler.collapse();
+            }
         }
-        if (!layoutData.rightPanel?.items?.filter(widget =>
-            allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
-        ).length) {
-            await this.shell.rightPanelHandler.collapse();
+
+        if (numberAllowedRight === 0) {
+            this.shell.rightPanelHandler.container.hide();
+        } else {
+            this.shell.rightPanelHandler.container.show();
+            if (numberAllowedAndVisibleRight === 0) {
+                await this.shell.rightPanelHandler.collapse();
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 import { CommandService, isOSX, MAIN_MENU_BAR, MenuPath } from '@theia/core';
-import { ApplicationShell, CommonCommands, ContextMenuRenderer, KeybindingRegistry, MAXIMIZED_CLASS } from '@theia/core/lib/browser';
+import { ApplicationShell, CommonCommands, ContextMenuRenderer, HoverService, KeybindingRegistry, MAXIMIZED_CLASS } from '@theia/core/lib/browser';
 import { ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -18,7 +18,6 @@ import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service'
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VIEW_MODE_MENU } from '../../viewMode/browser/view-mode-contribution';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
 import ActionButtons from './components/ActionButtons';
@@ -73,6 +72,8 @@ export class TitlebarWidget extends ReactWidget {
     protected readonly contextMenuRenderer: ContextMenuRenderer;
     @inject(ContextKeyService)
     protected readonly contextKeyService: ContextKeyService;
+    @inject(HoverService)
+    protected readonly hoverService: HoverService;
     @inject(KeybindingRegistry)
     protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(VesCommonService)
@@ -150,10 +151,12 @@ export class TitlebarWidget extends ReactWidget {
                         viewMode={this.viewModeService.getViewMode()}
                         openViewModeMenu={this.openViewModeMenu.bind(this)}
                         vesCommonService={this.vesCommonService}
+                        hoverService={this.hoverService}
                     />
                     <MainMenu
                         hidden={false}
                         openMainMenu={this.openMainMenu.bind(this)}
+                        hoverService={this.hoverService}
                     />
                 </div>
                 <div>
@@ -164,6 +167,7 @@ export class TitlebarWidget extends ReactWidget {
                         openRecentWorkspace={this.openRecentWorkspace.bind(this)}
                         closeWorkspace={this.closeWorkspace.bind(this)}
                         vesCommonService={this.vesCommonService}
+                        hoverService={this.hoverService}
                     />
                 </div>
                 <div>
@@ -171,6 +175,7 @@ export class TitlebarWidget extends ReactWidget {
                         isMaximizedEditor={this.isMaximizedEditor}
                         collapse={this.collapse.bind(this)}
                         vesCommonService={this.vesCommonService}
+                        hoverService={this.hoverService}
                     />
                     <ActionButtons
                         isWorkspaceOpened={this.workspaceService.opened}
@@ -184,8 +189,6 @@ export class TitlebarWidget extends ReactWidget {
                         hasConnectedFlashCarts={this.vesFlashCartService.connectedFlashCarts.length > 0}
                         isCleaning={this.vesBuildService.isCleaning}
                         romExists={this.romExists}
-                        createNewProject={this.createNewProject.bind(this)}
-                        openWorkspaceFile={this.openWorkspaceFile.bind(this)}
                         build={this.build.bind(this)}
                         run={this.run.bind(this)}
                         flash={this.flash.bind(this)}
@@ -193,6 +196,7 @@ export class TitlebarWidget extends ReactWidget {
                         clean={this.clean.bind(this)}
                         openBuildMenu={this.openBuildMenu.bind(this)}
                         vesCommonService={this.vesCommonService}
+                        hoverService={this.hoverService}
                     />
                     <WindowControls
                         hidden={isOSX}
@@ -207,8 +211,6 @@ export class TitlebarWidget extends ReactWidget {
         );
     }
 
-    protected createNewProject = () => this.commandService.executeCommand(VesProjectCommands.NEW.id);
-    protected openWorkspaceFile = () => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
     protected build = () => this.commandService.executeCommand(VesBuildCommands.BUILD.id);
     protected run = () => this.commandService.executeCommand(EmulatorCommands.RUN.id);
     protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);

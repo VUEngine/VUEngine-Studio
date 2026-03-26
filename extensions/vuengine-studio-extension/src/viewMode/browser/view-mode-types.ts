@@ -12,6 +12,7 @@ import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
 import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
 import { VesFlashCartWidget } from '../../flash-cart/browser/ves-flash-cart-widget';
+import { VesGettingStartedWidget } from '../../getting-started/browser/ves-getting-started-widget';
 import { VesPluginsViewContainer } from '../../plugins/browser/ves-plugins-view-container';
 import { ActorAssetsBrowserWidget } from '../../project/browser/assets-browser/actor-assets-browser-widget';
 import { BrightnessRepeatAssetsBrowserWidget } from '../../project/browser/assets-browser/brightness-repeat-assets-browser-widget';
@@ -38,12 +39,13 @@ export enum ViewMode {
     emulator = 'emulator',
     flashCarts = 'flashCarts',
     fonts = 'fonts',
+    localization = 'localization',
     logic = 'logic',
     sound = 'sound',
     settings = 'settings',
     sourceCode = 'sourceCode',
     stages = 'stages',
-    localization = 'localization',
+    welcome = 'welcome',
 }
 
 export const DISABLED_VIEW_MODES: ViewMode[] = [
@@ -192,6 +194,11 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         },
         force: {
             [VesProjectDashboardWidget.ID]: false,
+        }
+    },
+    [ViewMode.welcome]: {
+        force: {
+            [VesGettingStartedWidget.ID]: false,
         }
     },
 };
