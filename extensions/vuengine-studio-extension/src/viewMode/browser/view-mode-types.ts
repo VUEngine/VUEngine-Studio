@@ -6,6 +6,7 @@ import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views
 import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
 import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
+import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
 import { VesBuildWidget } from '../../build/browser/ves-build-widget';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
@@ -124,6 +125,9 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         }
     },
     [ViewMode.build]: {
+        allow: {
+            [VesBuildArchiveWidget.ID]: false,
+        },
         force: {
             [VesBuildWidget.ID]: false,
         }

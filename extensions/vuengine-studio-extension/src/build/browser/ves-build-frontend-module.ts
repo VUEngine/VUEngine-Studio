@@ -12,6 +12,8 @@ import { VesBuildStatusBarContribution } from './ves-build-statusbar-contributio
 import { VesBuildViewContribution } from './ves-build-view-contribution';
 import { VesBuildWidget } from './ves-build-widget';
 import { VesFileNavigatorFilter } from './ves-navigator-filter';
+import { VesBuildArchiveViewContribution } from './ves-build-archive-view-contribution';
+import { VesBuildArchiveWidget } from './ves-build-archive-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -39,6 +41,16 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesBuildWidget.ID,
         createWidget: () => ctx.container.get<VesBuildWidget>(VesBuildWidget)
+    })).inSingletonScope();
+
+    // build archive view
+    bindViewContribution(bind, VesBuildArchiveViewContribution);
+    bind(FrontendApplicationContribution).toService(VesBuildArchiveViewContribution);
+    bind(TabBarToolbarContribution).toService(VesBuildArchiveViewContribution);
+    bind(VesBuildArchiveWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesBuildArchiveWidget.ID,
+        createWidget: () => ctx.container.get<VesBuildArchiveWidget>(VesBuildArchiveWidget)
     })).inSingletonScope();
 
     // allow hiding build folder from navigator

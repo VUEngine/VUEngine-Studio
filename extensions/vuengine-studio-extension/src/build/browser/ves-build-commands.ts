@@ -57,7 +57,7 @@ export namespace VesBuildCommands {
       label: 'Toggle Build View',
     },
     'vuengine/build/commands/toggleView',
-    'vuengine/build/commands/toggleViewy'
+    'vuengine/build/commands/category'
   );
 
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
@@ -77,6 +77,25 @@ export namespace VesBuildCommands {
       iconClass: 'codicon codicon-settings',
     },
     'vuengine/build/commands/showSettings',
+    'vuengine/build/commands/category'
+  );
+
+  export const ARCHIVE_WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
+    {
+      id: 'build.toggleArchiveView',
+      label: 'Toggle Build Archive View',
+    },
+    'vuengine/build/commands/toggleArchiveView',
+    'vuengine/build/commands/category'
+  );
+
+  export const ARCHIVE_CLEAR: Command = Command.toLocalizedCommand(
+    {
+      id: 'build.clearArchive',
+      label: 'Clear Build Archive',
+      iconClass: 'codicon codicon-trash',
+    },
+    'vuengine/build/commands/clearArchive',
     'vuengine/build/commands/category'
   );
 };

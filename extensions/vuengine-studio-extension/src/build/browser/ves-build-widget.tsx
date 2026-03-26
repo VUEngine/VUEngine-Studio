@@ -1,23 +1,21 @@
 import { CommandService, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
-import { HoverService, Message, OpenerService } from '@theia/core/lib/browser';
+import { Message } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorManager } from '@theia/editor/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import Input from '../../editors/browser/components/Common/Base/Input';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
-import BuildArchive from './components/BuildArchive';
 import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -36,12 +34,6 @@ export class VesBuildWidget extends ReactWidget {
   private readonly commandService: CommandService;
   @inject(EditorManager)
   private readonly editorManager: EditorManager;
-  @inject(FileService)
-  private readonly fileService: FileService;
-  @inject(HoverService)
-  private readonly hoverService: HoverService;
-  @inject(OpenerService)
-  private readonly openerService: OpenerService;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
@@ -103,7 +95,6 @@ export class VesBuildWidget extends ReactWidget {
   protected async bindEvents(): Promise<void> {
     await this.workspaceService.ready;
 
-    this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
       if (isCollaboration) {
         this.update();
@@ -392,13 +383,6 @@ export class VesBuildWidget extends ReactWidget {
                 <i className='fa fa-trash-o'></i>
               </button>
             </div>
-            <BuildArchive
-              fileService={this.fileService}
-              hoverService={this.hoverService}
-              openerService={this.openerService}
-              preferenceService={this.preferenceService}
-              vesBuildService={this.vesBuildService}
-            />
           </div>
         );
   }
