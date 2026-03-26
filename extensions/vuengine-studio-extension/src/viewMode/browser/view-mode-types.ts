@@ -104,88 +104,90 @@ export const TYPE_VIEW_MODE_RELATIONS: { [typeId: string]: ViewMode } = {
 export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
 export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
 
-export const VIEW_MODE_WIDGETS: Record<ViewMode, { allow?: string[], force?: string[] }> = {
+type ViewModeWidgets = Record<string, boolean>;
+type ViewModeWidgetsMap = Record<ViewMode, { allow?: ViewModeWidgets, force?: ViewModeWidgets }>;
+
+export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.actors]: {
-        allow: [
-            ActorAssetsBrowserWidget.ID,
-            ImageAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [ActorAssetsBrowserWidget.ID]: true,
+            [ImageAssetsBrowserWidget.ID]: false,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.assets]: {
-        allow: [
-            BrightnessRepeatAssetsBrowserWidget.ID,
-            ColumnTableAssetsBrowserWidget.ID,
-            RumbleEffectAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [BrightnessRepeatAssetsBrowserWidget.ID]: true,
+            [ColumnTableAssetsBrowserWidget.ID]: false,
+            [RumbleEffectAssetsBrowserWidget.ID]: false,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.build]: {
-        force: [
-            VesBuildWidget.ID,
-        ]
+        force: {
+            [VesBuildWidget.ID]: false,
+        }
     },
     [ViewMode.emulator]: {
-        allow: [
-            VesEmulatorSidebarWidget.ID,
-            VesEmulatorWidget.ID,
-        ]
+        allow: {
+            [VesEmulatorSidebarWidget.ID]: false,
+            [VesEmulatorWidget.ID]: false,
+        }
     },
     [ViewMode.flashCarts]: {
-        force: [
-            VesFlashCartWidget.ID,
-        ]
+        force: {
+            [VesFlashCartWidget.ID]: false,
+        }
     },
     [ViewMode.fonts]: {
-        allow: [
-            FontAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [FontAssetsBrowserWidget.ID]: true,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.localization]: {
-        allow: [
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.logic]: {
-        allow: [
-            LogicAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [LogicAssetsBrowserWidget.ID]: true,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.sound]: {
-        allow: [
-            SoundAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [SoundAssetsBrowserWidget.ID]: true,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.settings]: {
-        allow: [
-            PreferencesSearchbarWidget.ID,
-            VesProjectSidebarWidget.ID,
-            VesEditorsWidget.ID,
-        ]
+        allow: {
+            [PreferencesSearchbarWidget.ID]: false,
+            [VesProjectSidebarWidget.ID]: true,
+            [VSXExtensionsViewContainer.ID]: false,
+            [VesEditorsWidget.ID]: false,
+        }
     },
     [ViewMode.sourceCode]: {
-        allow: [
-            'code-editor-opener',
-            'ves-plugins-search-bar',
-            EXPLORER_VIEW_CONTAINER_ID,
-            OUTLINE_WIDGET_FACTORY_ID,
-            PROBLEMS_WIDGET_ID,
-            SCM_VIEW_CONTAINER_ID,
-            SEARCH_VIEW_CONTAINER_ID,
-            VesPluginsViewContainer.ID,
-            VSXExtensionsViewContainer.ID,
-        ]
+        allow: {
+            'code-editor-opener': false,
+            [EXPLORER_VIEW_CONTAINER_ID]: true,
+            [OUTLINE_WIDGET_FACTORY_ID]: false,
+            [PROBLEMS_WIDGET_ID]: false,
+            [SCM_VIEW_CONTAINER_ID]: false,
+            [SEARCH_VIEW_CONTAINER_ID]: false,
+            [VesPluginsViewContainer.ID]: false,
+        }
     },
     [ViewMode.stages]: {
-        allow: [
-            StageAssetsBrowserWidget.ID,
-            VesEditorsWidget.ID,
-        ],
-        force: [
-            VesProjectDashboardWidget.ID,
-        ]
+        allow: {
+            [StageAssetsBrowserWidget.ID]: true,
+            [VesEditorsWidget.ID]: false,
+        },
+        force: {
+            [VesProjectDashboardWidget.ID]: false,
+        }
     },
 };

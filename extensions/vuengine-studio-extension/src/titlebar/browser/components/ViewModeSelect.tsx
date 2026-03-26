@@ -14,11 +14,11 @@ const StyledViewModeSelect = styled.button`
     color: var(--theia-titlebar);
     cursor: pointer;
     display: flex;
-    gap: 5px;
+    gap: 3px;
     height: calc(var(--theia-private-menubar-height) - 7px);
     line-height: calc(var(--theia-private-menubar-height) - 7px);
     outline-width: 0 !important;
-    padding: 0 10px;
+    padding: 0 var(--theia-ui-padding);
     position: relative;
     width: 180px;
 

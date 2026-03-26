@@ -14,24 +14,25 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
      */
     transformLayoutOnRestore(layoutData: ApplicationShell.LayoutData): void {
         const viewMode = this.viewModeService.getViewMode();
-        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? [];
+        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
+        const allowedWidgetsIds = Object.keys(allowedWidgets);
 
         /**
          * TODO: invert logic for view mode sourceCode, for it to act as fallback
          * for unknown widgets, e.g. from extensions
          */
-        this.filterConfig(layoutData.mainPanel?.main, allowedWidgets);
-        this.filterSidePanels(layoutData, allowedWidgets);
+        this.filterConfig(layoutData.mainPanel?.main, allowedWidgetsIds);
+        this.filterSidePanels(layoutData, allowedWidgetsIds);
     }
 
-    protected async filterSidePanels(layoutData: ApplicationShell.LayoutData, allowedWidgets: string[]): Promise<void> {
-        this.filterSidePanelWidgets(layoutData.leftPanel, allowedWidgets);
-        this.filterSidePanelWidgets(layoutData.rightPanel, allowedWidgets);
+    protected async filterSidePanels(layoutData: ApplicationShell.LayoutData, allowedWidgetsIds: string[]): Promise<void> {
+        this.filterSidePanelWidgets(layoutData.leftPanel, allowedWidgetsIds);
+        this.filterSidePanelWidgets(layoutData.rightPanel, allowedWidgetsIds);
     }
 
-    protected isWidgetAllowed(widgetId: string, allowedWidgets: string[]): boolean {
+    protected isWidgetAllowed(widgetId: string, allowedWidgetsIds: string[]): boolean {
         let result = false;
-        allowedWidgets.forEach(aw => {
+        allowedWidgetsIds.forEach(aw => {
             if (widgetId.startsWith(aw)) {
                 result = true;
             }
@@ -40,31 +41,31 @@ export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {
         return result;
     }
 
-    protected filterConfig(area: DockLayout.AreaConfig | null | undefined, allowedWidgets: string[]): void {
+    protected filterConfig(area: DockLayout.AreaConfig | null | undefined, allowedWidgetsIds: string[]): void {
         if (area?.type === 'tab-area') {
-            this.filterTabConfig(area, allowedWidgets);
+            this.filterTabConfig(area, allowedWidgetsIds);
         } else if (area?.type === 'split-area') {
-            this.filterSplitConfig(area, allowedWidgets);
+            this.filterSplitConfig(area, allowedWidgetsIds);
         }
     }
 
-    protected filterTabConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
+    protected filterTabConfig(area: DockLayout.AreaConfig, allowedWidgetsIds: string[]): void {
         if (area.type === 'tab-area') {
-            area.widgets = area.widgets.filter(widget => this.isWidgetAllowed(widget.id, allowedWidgets));
+            area.widgets = area.widgets.filter(widget => this.isWidgetAllowed(widget.id, allowedWidgetsIds));
         }
     }
 
-    protected filterSplitConfig(area: DockLayout.AreaConfig, allowedWidgets: string[]): void {
+    protected filterSplitConfig(area: DockLayout.AreaConfig, allowedWidgetsIds: string[]): void {
         if (area.type === 'split-area') {
-            area.children.forEach(c => this.filterConfig(c, allowedWidgets));
+            area.children.forEach(c => this.filterConfig(c, allowedWidgetsIds));
         }
     }
 
-    protected filterSidePanelWidgets(items: SidePanel.LayoutData | undefined, allowedWidgets: string[]): void {
+    protected filterSidePanelWidgets(items: SidePanel.LayoutData | undefined, allowedWidgetsIds: string[]): void {
         items?.items?.forEach(widget => {
             let allowed = false;
             if (widget.widget) {
-                allowed = this.isWidgetAllowed(widget.widget.id, allowedWidgets);
+                allowed = this.isWidgetAllowed(widget.widget.id, allowedWidgetsIds);
                 if (allowed) {
                     this.showSidePanelWidget(widget.widget);
                 } else {
