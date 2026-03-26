@@ -2271,6 +2271,11 @@
   resolved "https://registry.yarnpkg.com/@phosphor-icons/react/-/react-2.0.15.tgz#4d8e28484d45649f53a6cd75db161cf8b8379e1d"
   integrity sha512-PQKNcRrfERlC8gJGNz0su0i9xVmeubXSNxucPcbCLDd9u0cwJVTEyYK87muul/svf0UXFdL2Vl6bbeOhT1Mwow==
 
+"@phosphor-icons/web@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@phosphor-icons/web/-/web-2.1.2.tgz#edb7170a5fc740bd2448efc09321231e24558d68"
+  integrity sha512-rPAR9o/bEcp4Cw4DEeZHXf+nlGCMNGkNDRizYHM47NLxz9vvEHp/Tt6FMK1NcWadzw/pFDPnRBGi/ofRya958A==
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"

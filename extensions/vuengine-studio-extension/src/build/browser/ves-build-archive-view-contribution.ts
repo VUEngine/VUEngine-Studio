@@ -1,14 +1,14 @@
 import { CommandRegistry } from '@theia/core';
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
 import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesBuildArchiveWidget } from './ves-build-archive-widget';
 import { VesBuildCommands } from './ves-build-commands';
-import { TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 
 @injectable()
-export class VesBuildArchiveViewContribution extends AbstractViewContribution<VesBuildArchiveWidget> {
+export class VesBuildArchiveViewContribution extends AbstractViewContribution<VesBuildArchiveWidget> implements TabBarToolbarContribution {
     @inject(ViewModeService)
     private readonly viewModeService: ViewModeService;
 
