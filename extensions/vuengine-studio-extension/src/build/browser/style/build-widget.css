@@ -14,6 +14,7 @@
 
 .buildWidget .buildPanel {
   display: flex;
+  flex-grow: 1;
   gap: var(--theia-ui-padding);
 }
 
@@ -23,20 +24,13 @@
 
 .buildWidget .buildActions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--theia-ui-padding);
   padding: calc(var(--theia-ui-padding) * 2) calc(var(--theia-ui-padding) * 2) 0;
 }
 
-.buildWidget .buildButtons {
-  display: flex;
-  flex-direction: row;
-  gap: var(--theia-ui-padding);
-}
-
-.buildWidget .buildButtons .theia-button {
-  font-size: var(--theia-ui-font-size1);
-  width: 20%;
+.buildWidget .theia-select-component {
+  width: 140px;
 }
 
 .buildWidget .theia-button {
@@ -51,6 +45,7 @@
 
 .buildWidget .theia-button.build {
   font-size: var(--theia-ui-font-size1);
+  flex-grow: 1;
   width: 100%;
 }
 

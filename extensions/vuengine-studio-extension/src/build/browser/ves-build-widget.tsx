@@ -16,7 +16,8 @@ import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
-import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
+import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -102,6 +103,7 @@ export class VesBuildWidget extends ReactWidget {
   protected async bindEvents(): Promise<void> {
     await this.workspaceService.ready;
 
+    this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
       if (isCollaboration) {
         this.update();
@@ -109,7 +111,6 @@ export class VesBuildWidget extends ReactWidget {
     });
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
-        case VesBuildPreferenceIds.BUILD_MODE:
         case VesBuildPreferenceIds.DUMP_ELF:
         case VesBuildPreferenceIds.ENGINE_PATH:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
@@ -225,27 +226,33 @@ export class VesBuildWidget extends ReactWidget {
                 )}
               {!this.vesBuildService.buildStatus.active && (
                 <>
-                  <div className='buildButtons'>
-                    <button
-                      className='theia-button large build'
-                      disabled={!this.workspaceService.opened}
-                      onClick={this.build}
-                    >
-                      {nls.localize('vuengine/build/build', 'Build')}
-                    </button>
-                  </div>
+                  <button
+                    className='theia-button large build'
+                    disabled={!this.workspaceService.opened}
+                    onClick={this.build}
+                  >
+                    {nls.localize('vuengine/build/build', 'Build')}
+                  </button>
                 </>
               )}
-              {isWindows && !doUseWsl && (
-                <div>
-                  <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
-                    'Please consider installing WSL to massively improve build times.')} (
-                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/general/documentation',
-                    'Documentation')}</a>
-                  )
-                </div>
-              )}
+              <SelectComponent
+                options={Object.keys(BuildMode).map(m => ({
+                  value: m,
+                  label: m,
+                }))}
+                defaultValue={this.vesBuildService.getBuildMode()}
+                onChange={option => this.vesBuildService.setBuildMode(option.value as BuildMode)}
+              />
             </div>
+            {isWindows && !doUseWsl && (
+              <div>
+                <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
+                  'Please consider installing WSL to massively improve build times.')} (
+                <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/general/documentation',
+                  'Documentation')}</a>
+                )
+              </div>
+            )}
             {this.vesBuildService.buildStatus.log.length > 0 && (
               <div className='buildMeta'>
                 <div className='buildStatus'>

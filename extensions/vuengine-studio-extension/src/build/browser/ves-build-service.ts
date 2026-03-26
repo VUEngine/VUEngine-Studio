@@ -1423,6 +1423,10 @@ Beware! This is usually not necessary and will result in the next build taking l
     this.setBuildMode(selection.label as BuildMode);
   }
 
+  getBuildMode(): BuildMode {
+    return this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
+  }
+
   async setBuildMode(buildMode: BuildMode): Promise<void> {
     await this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
   }
