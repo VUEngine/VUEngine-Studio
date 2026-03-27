@@ -20,6 +20,8 @@ import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
 import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
@@ -45,6 +47,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsContextKeyService)
     protected readonly contextKeyService: VesEditorsContextKeyService;
+    @inject(ViewModeService)
+    protected readonly viewModeService: ViewModeService;
     @inject(UserWorkingDirectoryProvider)
     protected readonly workingDirProvider: UserWorkingDirectoryProvider;
 
@@ -189,24 +193,33 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
             isEnabled: () => true,
             isVisible: widget => {
-                const p = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri.path;
-                if (p) {
-                    for (const t of Object.values(PROJECT_TYPES)) {
-                        if ([p.ext, p.base].includes(t.file)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
+                return u !== undefined && this.getTypeByWidgetUri(u) !== '';
             },
             execute: async widget => {
                 const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
+                    const typeId = this.getTypeByWidgetUri(u);
+                    await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[typeId]);
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
                 }
             },
         });
+    }
+
+    protected getTypeByWidgetUri(widgetUri: URI): string {
+        let result = '';
+
+        const p = widgetUri.path;
+        for (const typeId of Object.keys(PROJECT_TYPES)) {
+            const type = PROJECT_TYPES[typeId];
+            if ([p.ext, p.base].includes(type.file)) {
+                result = typeId;
+            }
+        }
+
+        return result;
     }
 
     registerKeybindings(registry: KeybindingRegistry): void {
