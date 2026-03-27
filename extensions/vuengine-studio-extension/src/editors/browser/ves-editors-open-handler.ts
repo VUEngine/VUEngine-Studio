@@ -25,6 +25,8 @@ export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEdito
                 if (viewMode !== ViewMode.sourceCode) {
                     this.typeId = typeId;
                     return 1000;
+                } else {
+                    return 1;
                 }
             }
         }
