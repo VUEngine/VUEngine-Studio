@@ -9,7 +9,7 @@ import { CollaborationFrontendContribution } from '@theia/collaboration/lib/brow
 import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
 import { CorePreferenceContribution, FilterContribution, PreferenceConfigurations } from '@theia/core';
 import {
-    ApplicationShell, FrontendApplicationContribution,
+    ApplicationShell,
     KeybindingContribution,
     LabelProviderContribution
 } from '@theia/core/lib/browser';
@@ -28,7 +28,6 @@ import { KeymapsFrontendContribution } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
-import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
@@ -42,7 +41,6 @@ import { VesCollaborationFrontendContribution } from './ves-collaboration-fronte
 import { VesCommonService } from './ves-common-service';
 import { VesApplicationShell } from './ves-core-application-shell';
 import { VesColorContribution } from './ves-core-color-contribution';
-import { VesCoreCompactMainMenuContribution } from './ves-core-compact-main-menu-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
 import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configuration';
@@ -54,7 +52,6 @@ import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-con
 import { VesFilterContribution } from './ves-filter-contribution';
 import { VesKeybindingWidget } from './ves-keybindings-widget';
 import { VesKeymapsFrontendContribution } from './ves-keymaps-frontend-contribution';
-import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
@@ -82,10 +79,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // custom theme colors
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
-
-    // properly initiate compact main menu
-    bind(VesCoreCompactMainMenuContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(VesCoreCompactMainMenuContribution);
 
     // preferences
     rebind(CorePreferenceContribution).toConstantValue({ schema: VesCorePreferenceSchema });
@@ -160,17 +153,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // add select path button to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
-
-    // initially hide "open editors" tab of navigator
-    // bind(VesNavigatorWidgetFactory).toSelf();
-    // rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
-
-    // initially hide extensions widget
-    // rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
-
-    // initially hide outline view
-    // rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
-
-    // initially open file explorer for workspaces
-    rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();
 });
