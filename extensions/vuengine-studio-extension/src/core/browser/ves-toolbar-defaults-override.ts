@@ -36,10 +36,7 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 }
             ]
         ],
-        [ToolbarAlignment.CENTER]: [
-            [
-            ]
-        ],
+        [ToolbarAlignment.CENTER]: [],
         [ToolbarAlignment.RIGHT]: [
             [
                 {
