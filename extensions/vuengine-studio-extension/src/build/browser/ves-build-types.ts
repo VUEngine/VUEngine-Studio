@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 
 export enum BuildMode {
@@ -7,6 +8,14 @@ export enum BuildMode {
   Tools = 'Tools',
   Debug = 'Debug',
 }
+
+export const BUILD_MODE_DESCRIPTIONS: Record<BuildMode, string> = {
+  [BuildMode.Shipping]: nls.localize('vuengine/build/modes/shippingDescription', 'Includes no asserts or debug flags, for shipping only.'),
+  [BuildMode.Release]: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for testing on hardware.'),
+  [BuildMode.Beta]: nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing on emulators.'),
+  [BuildMode.Tools]: nls.localize('vuengine/build/modes/toolsDescription', 'Includes selected asserts, includes debugging tools.'),
+  [BuildMode.Debug]: nls.localize('vuengine/build/modes/debugDescription', 'Includes all runtime assertions, includes debugging tools.'),
+};
 
 export enum BuildResult {
   aborted = 'aborted',

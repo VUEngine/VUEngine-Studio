@@ -1,8 +1,10 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { AbstractViewContribution, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { Command, CommandRegistry, CommandService } from '@theia/core';
+import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 
 export namespace VesEmulatorSidebarCommands {
@@ -30,6 +32,8 @@ export namespace VesEmulatorSidebarCommands {
 export class VesEmulatorSidebarViewContribution extends AbstractViewContribution<VesEmulatorSidebarWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(ViewModeService)
+    protected readonly viewModeService: ViewModeService;
 
     constructor() {
         super({
@@ -50,6 +54,8 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_TOGGLE, {
+            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
             execute: () => this.toggleView()
         });
 
@@ -66,24 +72,6 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             command: VesEmulatorSidebarCommands.WIDGET_HELP.id,
             tooltip: VesEmulatorSidebarCommands.WIDGET_HELP.label,
             priority: 2,
-        });
-    }
-
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        super.registerMenus(menus);
-
-        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-            commandId: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
-            label: this.viewLabel
-        });
-    }
-
-    async registerKeybindings(keybindings: KeybindingRegistry): Promise<void> {
-        super.registerKeybindings(keybindings);
-
-        keybindings.registerKeybinding({
-            command: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
-            keybinding: 'ctrlcmd+shift+e'
         });
     }
 }

@@ -40,7 +40,7 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
       commandId: VesFlashCartCommands.FLASH.id,
       label: VesFlashCartCommands.FLASH.label,
-      order: '4'
+      order: '3'
     });
   }
 }

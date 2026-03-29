@@ -1,5 +1,5 @@
-import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { CommandRegistry, CommandService } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -56,6 +56,8 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
+            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
             execute: force => this.toggleWidget(force)
         });
 
@@ -83,15 +85,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             command: VesBuildCommands.WIDGET_HELP.id,
             tooltip: VesBuildCommands.WIDGET_HELP.label,
             priority: 3,
-        });
-    }
-
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        super.registerMenus(menus);
-
-        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-            commandId: VesBuildCommands.WIDGET_TOGGLE.id,
-            label: this.viewLabel
         });
     }
 

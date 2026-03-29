@@ -38,6 +38,7 @@ import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import {
+  BUILD_MODE_DESCRIPTIONS,
   BuildArchiveFrequency,
   BuildLogLine,
   BuildLogLineFileLink,
@@ -1391,27 +1392,27 @@ Beware! This is usually not necessary and will result in the next build taking l
     const buildTypes: QuickPickItem[] = [
       {
         label: BuildMode.Shipping,
-        description: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for shipping only.'),
+        description: BUILD_MODE_DESCRIPTIONS[BuildMode.Shipping],
         iconClasses: ['codicon', (BuildMode.Shipping === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Release,
-        description: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for testing on hardware.'),
+        description: BUILD_MODE_DESCRIPTIONS[BuildMode.Release],
         iconClasses: ['codicon', (BuildMode.Release === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Beta,
-        description: nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing on emulators.'),
+        description: BUILD_MODE_DESCRIPTIONS[BuildMode.Beta],
         iconClasses: ['codicon', (BuildMode.Beta === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Tools,
-        description: nls.localize('vuengine/build/modes/toolsDescription', 'Includes selected asserts, includes debugging tools.'),
+        description: BUILD_MODE_DESCRIPTIONS[BuildMode.Tools],
         iconClasses: ['codicon', (BuildMode.Tools === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Debug,
-        description: nls.localize('vuengine/build/modes/debugDescription', 'Includes all runtime assertions, includes debugging tools.'),
+        description: BUILD_MODE_DESCRIPTIONS[BuildMode.Debug],
         iconClasses: ['codicon', (BuildMode.Debug === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       }
     ];

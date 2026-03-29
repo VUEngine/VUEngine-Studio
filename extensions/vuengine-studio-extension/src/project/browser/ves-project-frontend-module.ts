@@ -10,7 +10,6 @@ import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
 import { ActorAssetsBrowserViewContribution } from './assets-browser/actor-assets-browser-view-contribution';
 import { ActorAssetsBrowserWidget } from './assets-browser/actor-assets-browser-widget';
 import { AssetsBrowserViewContribution } from './assets-browser/assets-browser-view-contribution';
-import { AssetsBrowserWidget } from './assets-browser/assets-browser-widget';
 import { BrightnessRepeatAssetsBrowserViewContribution } from './assets-browser/brightness-repeat-assets-browser-view-contribution';
 import { BrightnessRepeatAssetsBrowserWidget } from './assets-browser/brightness-repeat-assets-browser-widget';
 import { ColumnTableAssetsBrowserViewContribution } from './assets-browser/column-table-assets-browser-view-contribution';
@@ -89,8 +88,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     })).inSingletonScope();
 
     // assets sidebar views
+    bind(AssetsBrowserViewContribution).toSelf().inSingletonScope();
+    bind(CommandContribution).toService(AssetsBrowserViewContribution);
+    bind(TabBarToolbarContribution).toService(AssetsBrowserViewContribution);
     [
-        [AssetsBrowserViewContribution, AssetsBrowserWidget],
         [ActorAssetsBrowserViewContribution, ActorAssetsBrowserWidget],
         [BrightnessRepeatAssetsBrowserViewContribution, BrightnessRepeatAssetsBrowserWidget],
         [ColumnTableAssetsBrowserViewContribution, ColumnTableAssetsBrowserWidget],

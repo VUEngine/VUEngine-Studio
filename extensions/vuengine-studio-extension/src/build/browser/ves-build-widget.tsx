@@ -15,7 +15,7 @@ import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
-import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
+import { BUILD_MODE_DESCRIPTIONS, BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -229,6 +229,7 @@ export class VesBuildWidget extends ReactWidget {
               <SelectComponent
                 options={Object.keys(BuildMode).map(m => ({
                   value: m,
+                  description: BUILD_MODE_DESCRIPTIONS[m as BuildMode],
                   label: m,
                 }))}
                 defaultValue={this.vesBuildService.getBuildMode()}

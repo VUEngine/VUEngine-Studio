@@ -1,18 +1,9 @@
 import { Command, CommandContribution, CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { AssetsBrowserWidget } from './assets-browser-widget';
 
 export namespace AssetsBrowserCommands {
-    export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
-        {
-            id: 'assetsBrowser.toggleView',
-            label: 'Toggle Asset Browser',
-        },
-        'vuengine/projects/assetsBrowser/commands/toggleView',
-        'vuengine/projects/assetsBrowser/commands/category'
-    );
     export const ADD: Command = Command.toLocalizedCommand(
         {
             id: 'assetsBrowser.add',
@@ -52,29 +43,11 @@ export namespace AssetsBrowserCommands {
 };
 
 @injectable()
-export class AssetsBrowserViewContribution extends AbstractViewContribution<AssetsBrowserWidget> implements CommandContribution, TabBarToolbarContribution {
+export class AssetsBrowserViewContribution implements CommandContribution, TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
-    constructor() {
-        super({
-            widgetId: AssetsBrowserWidget.ID,
-            widgetName: AssetsBrowserWidget.LABEL,
-            defaultWidgetOptions: {
-                area: 'left',
-                rank: -10000,
-            },
-        });
-    }
-
-    async initializeLayout(app: FrontendApplication): Promise<void> {
-    }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
-        super.registerCommands(commandRegistry);
-
-        commandRegistry.registerCommand(AssetsBrowserCommands.WIDGET_TOGGLE, {
-            execute: widget => this.toggleView()
-        });
         commandRegistry.registerCommand(AssetsBrowserCommands.ADD, {
             isEnabled: widget => widget instanceof AssetsBrowserWidget,
             isVisible: widget => widget instanceof AssetsBrowserWidget,

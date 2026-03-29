@@ -1,8 +1,10 @@
-import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { CommandRegistry, CommandService } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
@@ -11,6 +13,8 @@ import { VesFlashCartWidget } from './ves-flash-cart-widget';
 export class VesFlashCartViewContribution extends AbstractViewContribution<VesFlashCartWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     private readonly commandService: CommandService;
+    @inject(ViewModeService)
+    private readonly viewModeService: ViewModeService;
     @inject(VesFlashCartService)
     private readonly vesFlashCartService: VesFlashCartService;
 
@@ -33,6 +37,8 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
+            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
             execute: () => this.toggleView()
         });
 
@@ -73,24 +79,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             command: VesFlashCartCommands.WIDGET_REFRESH.id,
             tooltip: VesFlashCartCommands.WIDGET_REFRESH.label,
             priority: 4,
-        });
-    }
-
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        super.registerMenus(menus);
-
-        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-            commandId: VesFlashCartCommands.WIDGET_TOGGLE.id,
-            label: this.viewLabel
-        });
-    }
-
-    async registerKeybindings(keybindings: KeybindingRegistry): Promise<void> {
-        super.registerKeybindings(keybindings);
-
-        keybindings.registerKeybinding({
-            command: VesFlashCartCommands.WIDGET_TOGGLE.id,
-            keybinding: 'ctrlcmd+shift+k'
         });
     }
 }

@@ -1,11 +1,18 @@
+import { CALL_HIERARCHY_TOGGLE_COMMAND_ID } from '@theia/callhierarchy/lib/browser/callhierarchy';
 import { nls } from '@theia/core';
+import { CommonCommands } from '@theia/core/lib/browser';
+import { KeymapsCommands } from '@theia/keymaps/lib/browser';
+import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 import { PROBLEMS_WIDGET_ID } from '@theia/markers/lib/browser/problem/problem-widget';
+import { FILE_NAVIGATOR_TOGGLE_COMMAND_ID } from '@theia/navigator/lib/browser/navigator-contribution';
 import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OUTLINE_WIDGET_FACTORY_ID } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views/preference-searchbar-widget';
 import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
+import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
 import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
+import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
 import { VesBuildWidget } from '../../build/browser/ves-build-widget';
 import { SoundEditorCurrentNoteWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-note-widget';
@@ -38,13 +45,13 @@ import { StageType } from '../../project/browser/types/Stage';
 import { TranslationsType } from '../../project/browser/types/Translations';
 import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
 import { VesProjectSidebarWidget } from '../../project/browser/ves-project-sidebar-widget';
+import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
+import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 
 export enum ViewMode {
     actors = 'actors',
     assets = 'assets',
     build = 'build',
-    emulator = 'emulator',
-    flashCarts = 'flashCarts',
     fonts = 'fonts',
     localization = 'localization',
     logic = 'logic',
@@ -63,10 +70,8 @@ export const DISABLED_VIEW_MODES: ViewMode[] = [
 export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {
     [ViewMode.actors]: nls.localize('vuengine/general/viewModes/actors', 'Actors'),
     [ViewMode.assets]: nls.localize('vuengine/general/viewModes/assets', 'Other Assets'),
-    [ViewMode.build]: nls.localize('vuengine/general/viewModes/build', 'Build'),
-    [ViewMode.emulator]: nls.localize('vuengine/general/viewModes/emulator', 'Emulator'),
+    [ViewMode.build]: nls.localize('vuengine/general/viewModes/build', 'Build & Run'),
     [ViewMode.fonts]: nls.localize('vuengine/general/viewModes/fonts', 'Fonts'),
-    [ViewMode.flashCarts]: nls.localize('vuengine/general/viewModes/flashCarts', 'Flash Carts'),
     [ViewMode.localization]: nls.localize('vuengine/general/viewModes/localization', 'Localization'),
     [ViewMode.logic]: nls.localize('vuengine/general/viewModes/logic', 'Logic'),
     [ViewMode.sound]: nls.localize('vuengine/general/viewModes/sound', 'Sound'),
@@ -79,8 +84,6 @@ export const VIEW_MODE_ICONS: { [viewMode: string]: string } = {
     [ViewMode.actors]: ActorType.icon ?? '',
     [ViewMode.assets]: 'codicon codicon-library',
     [ViewMode.build]: 'codicon codicon-symbol-property',
-    [ViewMode.emulator]: 'codicon codicon-run',
-    [ViewMode.flashCarts]: 'codicon codicon-chip',
     [ViewMode.fonts]: FontType.icon ?? '',
     [ViewMode.localization]: TranslationsType.icon ?? '',
     [ViewMode.logic]: LogicType.icon ?? '',
@@ -138,19 +141,11 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.build]: {
         allow: {
             [VesBuildArchiveWidget.ID]: false,
+            [VesEmulatorSidebarWidget.ID]: false,
+            [VesEmulatorWidget.ID]: false,
         },
         force: {
             [VesBuildWidget.ID]: false,
-        }
-    },
-    [ViewMode.emulator]: {
-        allow: {
-            [VesEmulatorSidebarWidget.ID]: false,
-            [VesEmulatorWidget.ID]: false,
-        }
-    },
-    [ViewMode.flashCarts]: {
-        force: {
             [VesFlashCartWidget.ID]: false,
         }
     },
@@ -174,7 +169,9 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.settings]: {
         allow: {
             [PreferencesSearchbarWidget.ID]: false,
+            [KeybindingWidget.ID]: false,
             [VesProjectSidebarWidget.ID]: true,
+            [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
         }
     },
@@ -199,7 +196,6 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [PROBLEMS_WIDGET_ID]: false,
             [SCM_VIEW_CONTAINER_ID]: false,
             [SEARCH_VIEW_CONTAINER_ID]: false,
-            [VesPluginsViewContainer.ID]: false,
         }
     },
     [ViewMode.stages]: {
@@ -216,4 +212,33 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [VesGettingStartedWidget.ID]: false,
         }
     },
+};
+
+export const COMMAND_ID_TO_VIEW_MODE: Record<string, ViewMode> = {
+    [KeymapsCommands.OPEN_KEYMAPS.id]: ViewMode.settings,
+    [KeymapsCommands.OPEN_KEYMAPS_JSON.id]: ViewMode.settings,
+    [KeymapsCommands.OPEN_KEYMAPS_JSON_TOOLBAR.id]: ViewMode.settings,
+    [CommonCommands.OPEN_PREFERENCES.id]: ViewMode.settings,
+    [VSXExtensionsCommands.INSTALL_FROM_VSIX.id]: ViewMode.settings,
+    [VSXExtensionsCommands.INSTALL_VSIX_FILE.id]: ViewMode.settings,
+    [VSXExtensionsCommands.INSTALL_ANOTHER_VERSION.id]: ViewMode.settings,
+    [VSXExtensionsCommands.SHOW_BUILTINS.id]: ViewMode.settings,
+    [VSXExtensionsCommands.SHOW_INSTALLED.id]: ViewMode.settings,
+    [VSXExtensionsCommands.SHOW_RECOMMENDATIONS.id]: ViewMode.settings,
+
+    [CommonCommands.NEW_FILE.id]: ViewMode.sourceCode,
+    [CommonCommands.PICK_NEW_FILE.id]: ViewMode.sourceCode,
+    [WorkspaceCommands.FILE_COMPARE.id]: ViewMode.sourceCode,
+    [WorkspaceCommands.NEW_FILE.id]: ViewMode.sourceCode,
+    [WorkspaceCommands.NEW_FOLDER.id]: ViewMode.sourceCode,
+    [FILE_NAVIGATOR_TOGGLE_COMMAND_ID]: ViewMode.sourceCode,
+    [TypeHierarchyCommands.TOGGLE_VIEW.id]: ViewMode.sourceCode,
+    [CALL_HIERARCHY_TOGGLE_COMMAND_ID]: ViewMode.sourceCode,
+    ['scmView:toggle']: ViewMode.sourceCode,
+    ['debug:toggle']: ViewMode.sourceCode,
+    ['debug:console:toggle']: ViewMode.sourceCode,
+    ['outlineView:toggle']: ViewMode.sourceCode,
+    [SearchInWorkspaceCommands.OPEN_SIW_WIDGET.id]: ViewMode.sourceCode,
+    [SearchInWorkspaceCommands.REPLACE_IN_FILES.id]: ViewMode.sourceCode,
+    [SearchInWorkspaceCommands.FIND_IN_FOLDER.id]: ViewMode.sourceCode,
 };

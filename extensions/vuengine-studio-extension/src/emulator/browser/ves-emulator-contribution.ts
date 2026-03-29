@@ -1,11 +1,11 @@
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
-import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, nls, PreferenceService } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, MenuAction, MenuContribution, MenuModelRegistry, nls, PreferenceService } from '@theia/core/lib/common';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { EmulatorCommands } from './ves-emulator-commands';
-import { VesEmulatorService } from './ves-emulator-service';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
+import { EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
+import { VesEmulatorService } from './ves-emulator-service';
 
 @injectable()
 export class VesEmulatorContribution implements CommandContribution, KeybindingContribution, MenuContribution {
@@ -321,7 +321,7 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     const defaultEmulator = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR);
     const emulatorName = defaultEmulator ? defaultEmulator : nls.localize('vuengine/emulator/builtIn', 'Built-In');
 
-    const menuAction = {
+    const menuAction: MenuAction = {
       commandId: EmulatorCommands.SELECT.id,
       label: `${EmulatorCommands.SELECT.label} (${emulatorName})`,
       order: '2',
@@ -334,7 +334,7 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
       commandId: EmulatorCommands.RUN.id,
       label: EmulatorCommands.RUN.label,
-      order: '3',
+      order: '2',
     });
     menus.registerMenuAction(VesBuildMenuSection.CONFIG, {
       commandId: EmulatorCommands.SELECT.id,

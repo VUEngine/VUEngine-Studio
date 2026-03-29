@@ -24,7 +24,7 @@ export namespace ViewModeCommands {
   export const SWITCH_TO_ASSETS_VIEW_MODE: Command = Command.toLocalizedCommand(
     {
       id: 'viewMode.switchToAssetsViewMode',
-      label: 'Switch To Assets View Mode',
+      label: 'Switch To Other Assets View Mode',
       iconClass: VIEW_MODE_ICONS[ViewMode.assets],
       category: 'View Mode',
     },
@@ -39,26 +39,6 @@ export namespace ViewModeCommands {
       category: 'View Mode',
     },
     'vuengine/viewMode/commands/switchToBuildViewMode',
-    'vuengine/viewMode/commands/category',
-  );
-  export const SWITCH_TO_EMULATOR_VIEW_MODE: Command = Command.toLocalizedCommand(
-    {
-      id: 'viewMode.switchToEmulatorViewMode',
-      label: 'Switch To Emulator View Mode',
-      iconClass: VIEW_MODE_ICONS[ViewMode.emulator],
-      category: 'View Mode',
-    },
-    'vuengine/viewMode/commands/switchToEmulatorViewMode',
-    'vuengine/viewMode/commands/category',
-  );
-  export const SWITCH_TO_FLASH_CARTS_VIEW_MODE: Command = Command.toLocalizedCommand(
-    {
-      id: 'viewMode.switchToFlashCartsViewMode',
-      label: 'Switch To FlashCarts View Mode',
-      iconClass: VIEW_MODE_ICONS[ViewMode.flashCarts],
-      category: 'View Mode',
-    },
-    'vuengine/viewMode/commands/switchToFlashCartsViewMode',
     'vuengine/viewMode/commands/category',
   );
   export const SWITCH_TO_FONTS_VIEW_MODE: Command = Command.toLocalizedCommand(

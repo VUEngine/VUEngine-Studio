@@ -1,11 +1,12 @@
-import { MenuModelRegistry } from '@theia/core';
-import { CommonCommands, CommonMenus, FrontendApplicationContribution, KeybindingRegistry } from '@theia/core/lib/browser';
+import { CommonCommands, FrontendApplicationContribution, KeybindingRegistry } from '@theia/core/lib/browser';
 import { FrontendApplication } from '@theia/core/lib/browser/frontend-application';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
 import { CommandRegistry, CommandService } from '@theia/core/lib/common/command';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY, TAGS_QUERY } from './ves-plugins-search-model';
@@ -23,6 +24,8 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     protected readonly commandRegistry: CommandRegistry;
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(ViewModeService)
+    protected readonly viewModeService: ViewModeService;
 
     constructor() {
         super({
@@ -43,7 +46,12 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
-            execute: () => this.toggleView()
+            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.settings,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.settings,
+            execute: async () => {
+                await this.viewModeService.setViewMode(ViewMode.settings);
+                this.toggleView()
+            }
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_CLEAR_ALL, {
@@ -95,26 +103,31 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     }
 
     protected async showPluginTags(): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = TAGS_QUERY;
     }
 
     protected async showInstalledPlugins(): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = INSTALLED_QUERY;
     }
 
     protected async showRecommendedPlugins(): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = RECOMMENDED_QUERY;
     }
 
     protected async showSearchByTag(tag?: string): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = `${TAG_SEARCH_QUERY}${tag ?? ''}`;
     }
 
     protected async showSearchByAuthor(author?: string): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = `${AUTHOR_SEARCH_QUERY}${author ?? ''}`;
     }
@@ -137,15 +150,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
             command: VesPluginsCommands.WIDGET_SETTINGS.id,
             tooltip: VesPluginsCommands.WIDGET_SETTINGS.label,
             priority: 2,
-        });
-    }
-
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        super.registerMenus(menus);
-
-        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-            commandId: VesPluginsCommands.WIDGET_TOGGLE.id,
-            label: this.viewLabel
         });
     }
 
