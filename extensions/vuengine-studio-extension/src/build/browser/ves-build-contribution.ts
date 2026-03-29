@@ -1,5 +1,15 @@
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
-import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, nls, PreferenceScope, PreferenceService } from '@theia/core/lib/common';
+import {
+  CommandContribution,
+  CommandRegistry,
+  MAIN_MENU_BAR,
+  MenuAction,
+  MenuContribution,
+  MenuModelRegistry,
+  nls,
+  PreferenceScope,
+  PreferenceService
+} from '@theia/core/lib/common';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesBuildCommands } from './ves-build-commands';
@@ -97,7 +107,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
     await this.preferenceService.ready;
     const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE);
 
-    const menuAction = {
+    const menuAction: MenuAction = {
       commandId: VesBuildCommands.SET_MODE.id,
       label: `${VesBuildCommands.SET_MODE.label} (${buildMode})`,
       order: '1'
@@ -112,14 +122,14 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
     });
 
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
-      commandId: VesBuildCommands.CLEAN.id,
-      label: VesBuildCommands.CLEAN.label,
+      commandId: VesBuildCommands.BUILD.id,
+      label: VesBuildCommands.BUILD.label,
       order: '1'
     });
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
-      commandId: VesBuildCommands.BUILD.id,
-      label: VesBuildCommands.BUILD.label,
-      order: '2'
+      commandId: VesBuildCommands.CLEAN.id,
+      label: VesBuildCommands.CLEAN.label,
+      order: '4'
     });
 
     menus.registerMenuAction(VesBuildMenuSection.CONFIG, {

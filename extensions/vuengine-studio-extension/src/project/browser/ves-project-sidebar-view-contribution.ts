@@ -1,6 +1,8 @@
-import { Command, CommandContribution, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { AbstractViewContribution, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { Command, CommandContribution, CommandRegistry, CommandService } from '@theia/core';
+import { AbstractViewContribution, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import { ViewModeService } from '../../viewMode/browser/view-mode-service';
+import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 
 export namespace VesProjectSidebarCommands {
@@ -18,6 +20,8 @@ export namespace VesProjectSidebarCommands {
 export class VesProjectSidebarViewContribution extends AbstractViewContribution<VesProjectSidebarWidget> implements CommandContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(ViewModeService)
+    protected readonly viewModeService: ViewModeService;
 
     constructor() {
         super({
@@ -38,16 +42,9 @@ export class VesProjectSidebarViewContribution extends AbstractViewContribution<
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesProjectSidebarCommands.WIDGET_TOGGLE, {
+            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.settings,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.settings,
             execute: () => this.toggleView()
-        });
-    }
-
-    async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        super.registerMenus(menus);
-
-        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-            commandId: VesProjectSidebarCommands.WIDGET_TOGGLE.id,
-            label: this.viewLabel
         });
     }
 

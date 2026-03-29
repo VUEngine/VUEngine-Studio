@@ -1,11 +1,11 @@
-import { Emitter } from '@theia/core';
-import { ApplicationShell, LocalStorageService, Widget, WidgetManager } from '@theia/core/lib/browser';
+import { CommandService, Emitter } from '@theia/core';
+import { LocalStorageService, Widget, WidgetManager } from '@theia/core/lib/browser';
 import { ContextKey, ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, ViewMode } from './view-mode-types';
+import { COMMAND_ID_TO_VIEW_MODE, DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, ViewMode } from './view-mode-types';
 
 interface ViewModeChange {
     newViewMode: ViewMode
@@ -16,8 +16,8 @@ export const VIEW_MODE_CONTEXT_KEY = 'viewMode';
 
 @injectable()
 export class ViewModeService {
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell;
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
     @inject(ContextKeyService)
     protected readonly contextKeyService: ContextKeyService;
     @inject(FrontendApplicationStateService)
@@ -66,6 +66,16 @@ export class ViewModeService {
                 }
             }
         );
+        this.commandService.onWillExecuteCommand(async e => {
+            if (!this.workspaceService.opened) {
+                return;
+            }
+
+            const targetView = COMMAND_ID_TO_VIEW_MODE[e.commandId];
+            if (targetView) {
+                await this.setViewMode(targetView);
+            }
+        });
     }
 
     setLayoutChangeComplete(layoutChangeComplete: boolean): void {

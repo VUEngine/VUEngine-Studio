@@ -10,12 +10,14 @@ import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/
 import { CorePreferenceContribution, FilterContribution, PreferenceConfigurations } from '@theia/core';
 import {
     ApplicationShell,
+    CommonFrontendContribution,
     KeybindingContribution,
     LabelProviderContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { EncodingRegistry } from '@theia/core/lib/browser/encoding-registry';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
+import { BrowserMainMenuFactory } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
@@ -38,8 +40,10 @@ import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/type
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
 import { VesCollaborationFrontendContribution } from './ves-collaboration-frontend-contribution';
+import { VesCommonFrontendContribution } from './ves-common-frontend-contribution.ts';
 import { VesCommonService } from './ves-common-service';
 import { VesApplicationShell } from './ves-core-application-shell';
+import { VesBrowserMainMenuFactory } from './ves-core-browser-menu-plugin';
 import { VesColorContribution } from './ves-core-color-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
@@ -153,4 +157,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // add select path button to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
+
+    // remove main menu and settings menu
+    bind(VesBrowserMainMenuFactory).toSelf();
+    rebind(BrowserMainMenuFactory).to(VesBrowserMainMenuFactory);
+    bind(VesCommonFrontendContribution).toSelf();
+    rebind(CommonFrontendContribution).to(VesCommonFrontendContribution);
 });
