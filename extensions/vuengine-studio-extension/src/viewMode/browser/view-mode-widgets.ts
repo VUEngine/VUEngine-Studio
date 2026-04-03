@@ -28,7 +28,6 @@ import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
 import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
 import { VesFlashCartWidget } from '../../flash-cart/browser/ves-flash-cart-widget';
-import { VesGettingStartedWidget } from '../../getting-started/browser/ves-getting-started-widget';
 import { VesPluginsViewContainer } from '../../plugins/browser/ves-plugins-view-container';
 import { ActorAssetsBrowserWidget } from '../../project/browser/assets-browser/actor-assets-browser-widget';
 import { BrightnessRepeatAssetsBrowserWidget } from '../../project/browser/assets-browser/brightness-repeat-assets-browser-widget';
@@ -41,6 +40,7 @@ import { SoundAssetsBrowserWidget } from '../../project/browser/assets-browser/s
 import { StageAssetsBrowserWidget } from '../../project/browser/assets-browser/stage-assets-browser-widget';
 import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
 import { VesProjectSidebarWidget } from '../../project/browser/ves-project-sidebar-widget';
+import { WelcomeWidget } from '../../welcome/browser/welcome-widget';
 import { ViewMode } from './view-mode-types';
 
 export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
@@ -148,7 +148,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     },
     [ViewMode.welcome]: {
         force: {
-            [VesGettingStartedWidget.ID]: false,
+            [WelcomeWidget.ID]: false,
         }
     },
 };

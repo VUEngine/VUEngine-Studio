@@ -13,6 +13,6 @@ export const VesCorePreferenceSchema: PreferenceSchema = {
             ...corePreferenceSchema.properties['window.menuBarVisibility'],
             default: 'hidden',
             included: false
-        }
+        },
     }
 };
