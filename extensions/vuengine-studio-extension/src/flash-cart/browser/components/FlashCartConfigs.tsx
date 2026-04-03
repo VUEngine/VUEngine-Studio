@@ -16,7 +16,6 @@ interface FlashCartConfigsProps {
 }
 
 export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JSX.Element {
-    const [configsExpanded, setConfigsExpanded] = React.useState<boolean>(false);
     const [flashCartConfigs, setFlashCartConfigs] = React.useState<FlashCartConfig[]>(props.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS, []));
 
     React.useEffect(() => {
@@ -75,17 +74,8 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
         }
     };
 
-    return <div className='flashCartConfigsWrapper'>
-        <div className='flashCartConfigsOverview' onClick={() => setConfigsExpanded(!configsExpanded)}>
-            <i className={`fa fa-chevron-${configsExpanded ? 'down' : 'left'}`} />
-            <div>
-                {nls.localize('vuengine/flashCarts/configs/builtInConfigurations', 'Built-in Configurations')}: {BUILT_IN_FLASH_CART_CONFIGS.length}
-            </div>
-            <div>
-                {nls.localize('vuengine/flashCarts/configs/customConfigurations', 'Custom Configurations')}: {flashCartConfigs.length}
-            </div>
-        </div>
-        {configsExpanded && <div className='flashCartConfigs'>
+    return (
+        <div className='flashCartConfigs'>
             {BUILT_IN_FLASH_CART_CONFIGS.map((config, index) =>
                 <FlashCartConfigForm
                     key={`flashCartConfig-builtin-${index}`}
@@ -122,6 +112,6 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
                     <i className='codicon codicon-plus' />
                 </button>
             </div>
-        </div>}
-    </div>;
+        </div>
+    );
 }

@@ -16,6 +16,8 @@ import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-co
 import { VesFlashCartTabBarDecorator } from './ves-flash-cart-tab-bar-decorator';
 import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
+import { FlashCartConfigsViewContribution } from './ves-flash-cart-configs-view-contribution';
+import { FlashCartConfigsWidget } from './ves-flash-cart-configs-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -49,4 +51,13 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // tab bar decorator
     bind(VesFlashCartTabBarDecorator).toSelf().inSingletonScope();
     bind(TabBarDecorator).toService(VesFlashCartTabBarDecorator);
+
+    // emulator configs view
+    bindViewContribution(bind, FlashCartConfigsViewContribution);
+    bind(FrontendApplicationContribution).toService(FlashCartConfigsViewContribution);
+    bind(FlashCartConfigsWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: FlashCartConfigsWidget.ID,
+        createWidget: () => ctx.container.get<FlashCartConfigsWidget>(FlashCartConfigsWidget)
+    })).inSingletonScope();
 });

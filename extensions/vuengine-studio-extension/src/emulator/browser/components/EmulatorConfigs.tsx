@@ -18,7 +18,6 @@ interface EmulatorConfigsProps {
 }
 
 export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.Element {
-    const [configsExpanded, setConfigsExpanded] = React.useState<boolean>(false);
     const [defaultEmulator, setDefaultEmulator] = React.useState<string>(props.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, ''));
     const [emulatorConfigs, setEmulatorConfigs] = React.useState<EmulatorConfig[]>(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS, []));
     const [rv3dsIpAddress, setRv3dsIpAddress] = React.useState<string>(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, ''));
@@ -132,19 +131,8 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
         return () => preflistener.dispose();
     }, [props.preferenceService]);
 
-    return <div className='emulatorConfigsWrapper'>
-        <div className='emulatorConfigsOverview' onClick={() => setConfigsExpanded(!configsExpanded)}>
-            <i className={`fa fa-chevron-${configsExpanded ? 'down' : 'left'}`} />
-            <div>
-                {nls.localize('vuengine/emulator/defaultEmulator', 'Default Emulator')}: {!defaultEmulator
-                    ? nls.localize('vuengine/emulator/builtIn', 'Built-In')
-                    : defaultEmulator}
-            </div>
-            <div>
-                {nls.localize('vuengine/emulator/customConfigurations', 'Custom Configurations')}: {emulatorConfigs.length}
-            </div>
-        </div>
-        {configsExpanded && <div className='emulatorConfigs'>
+    return (
+        <div className='emulatorConfigs'>
             <div className='emulatorConfig'>
                 <div>
                     <label>
@@ -293,6 +281,6 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                     <i className='codicon codicon-plus' />
                 </button>
             </div>
-        </div>}
-    </div>;
+        </div>
+    );
 }

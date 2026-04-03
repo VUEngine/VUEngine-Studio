@@ -8,11 +8,11 @@ import { VesEmulatorContribution } from './ves-emulator-contribution';
 import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
 import { VesEmulatorPreferenceSchema } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
-import { VesEmulatorSidebarViewContribution } from './ves-emulator-sidebar-view-contribution';
-import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 import { VesEmulatorStatusBarContribution } from './ves-emulator-statusbar-contribution';
 import { VesEmulatorViewContribution } from './ves-emulator-view';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './ves-emulator-widget';
+import { EmulatorConfigsViewContribution } from './ves-emulator-configs-view-contribution';
+import { EmulatorConfigsWidget } from './ves-emulator-configs-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -50,13 +50,12 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         },
     }));
 
-    // emulator sidebar view
-    bindViewContribution(bind, VesEmulatorSidebarViewContribution);
-    bind(FrontendApplicationContribution).toService(VesEmulatorSidebarViewContribution);
-    bind(TabBarToolbarContribution).toService(VesEmulatorSidebarViewContribution);
-    bind(VesEmulatorSidebarWidget).toSelf();
+    // emulator configs view
+    bindViewContribution(bind, EmulatorConfigsViewContribution);
+    bind(FrontendApplicationContribution).toService(EmulatorConfigsViewContribution);
+    bind(EmulatorConfigsWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: VesEmulatorSidebarWidget.ID,
-        createWidget: () => ctx.container.get<VesEmulatorSidebarWidget>(VesEmulatorSidebarWidget)
+        id: EmulatorConfigsWidget.ID,
+        createWidget: () => ctx.container.get<EmulatorConfigsWidget>(EmulatorConfigsWidget)
     })).inSingletonScope();
 });

@@ -1,11 +1,12 @@
 import { ApplicationShell, FrontendApplication, ShellLayoutRestorer } from '@theia/core/lib/browser';
 import { StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { ViewModeService } from './view-mode-service';
 import { ViewMode } from './view-mode-types';
 import { VIEW_MODE_WIDGETS } from './view-mode-widgets';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
@@ -16,6 +17,7 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
+    protected storageKey = `layout-${VES_VERSION}`;
     protected readonly storageKeySuffix = 'view-mode';
 
     @postConstruct()
