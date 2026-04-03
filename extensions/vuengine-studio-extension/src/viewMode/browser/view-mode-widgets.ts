@@ -112,13 +112,6 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.sound]: {
         allow: {
             [SoundAssetsBrowserWidget.ID]: true,
-            'vesSoundEditorPropertiesWidget': false,
-            'vesSoundEditorInstrumentsWidget': false,
-            'vesSoundEditorCurrentTrackWidget': false,
-            'vesSoundEditorCurrentPatternWidget': false,
-            'vesSoundEditorCurrentNoteWidget': false,
-            'vesSoundEditorUtilitiesWidget': false,
-            'vesSoundEditorKeyBindingsWidget': false,
             [`${VesEditorsWidget.ID}:Sound:`]: false,
         }
     },

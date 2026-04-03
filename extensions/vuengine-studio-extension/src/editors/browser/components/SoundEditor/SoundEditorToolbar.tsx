@@ -6,8 +6,7 @@ import {
     PencilSimple,
     Selection,
     SelectionBackground,
-    SelectionForeground,
-    SidebarSimple
+    SelectionForeground
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
@@ -161,8 +160,6 @@ interface SoundEditorToolbarProps {
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
     setPlaying: Dispatch<SetStateAction<boolean>>
-    showSidebar: boolean
-    toggleSidebar: () => void
 }
 
 export default function SoundEditorToolbar(props: SoundEditorToolbarProps): React.JSX.Element {
@@ -189,7 +186,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setTrack,
         forcePlayerRomRebuild,
         setPlaying,
-        showSidebar, toggleSidebar,
     } = props;
     const isPlayingRegular = playing && !testNote;
 
@@ -462,18 +458,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                     </InputWithActionButton>
                 </InputWithAction>
             </StyledSoundEditorToolbarGroup>
-        </StyledSoundEditorToolbarSide>
-        <StyledSoundEditorToolbarSide>
-            <RadioSelect
-                defaultValue={showSidebar}
-                onChange={toggleSidebar}
-                options={[{
-                    label: <SidebarSimple mirrored size={17} />,
-                    tooltip: SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.label +
-                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id, true),
-                    value: true
-                }]}
-            />
         </StyledSoundEditorToolbarSide>
     </StyledSoundEditorToolbar>;
 }
