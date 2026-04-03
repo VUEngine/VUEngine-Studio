@@ -1,25 +1,24 @@
 import { nls } from '@theia/core';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { injectable, postConstruct } from '@theia/core/shared/inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { SoundEditorAbstractSidebarWidget } from './sound-editor-abstract-sidebar-widget';
+import { VesEditorsWidget } from '../../ves-editors-widget';
 
 @injectable()
-export class SoundEditorInstrumentsWidget extends ReactWidget {
+export class SoundEditorInstrumentsWidget extends SoundEditorAbstractSidebarWidget {
   static readonly ID = 'vesSoundEditorInstrumentsWidget';
   static readonly LABEL = nls.localize('vuengine/editors/sound/instrumentEditor', 'Instrument Editor');
 
-  @postConstruct()
   protected init(): void {
     this.id = SoundEditorInstrumentsWidget.ID;
     this.title.iconClass = 'codicon ph ph-guitar';
-    this.title.closable = false;
     this.title.label = SoundEditorInstrumentsWidget.LABEL;
     this.title.caption = SoundEditorInstrumentsWidget.LABEL;
 
-    this.update();
+    super.init();
   }
 
-  protected render(): React.ReactNode {
+  protected renderSidebar(widget: VesEditorsWidget): React.ReactNode {
     return (
       <></>
     );

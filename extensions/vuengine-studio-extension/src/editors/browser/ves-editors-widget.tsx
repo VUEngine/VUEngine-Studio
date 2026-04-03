@@ -15,7 +15,8 @@ import {
     Saveable,
     SaveableSource,
     StatusBar,
-    StatusBarEntry
+    StatusBarEntry,
+    Widget
 } from '@theia/core/lib/browser';
 import { ClipboardService } from '@theia/core/lib/browser/clipboard-service';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
@@ -25,7 +26,7 @@ import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { ThemeType } from '@theia/core/lib/common/theme';
 import { Message } from '@theia/core/shared/@lumino/messaging';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct, unmanaged } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { UndoRedoService } from '@theia/editor/lib/browser/undo-redo-service';
 import { EditorPreferences } from '@theia/editor/lib/common/editor-preferences';
@@ -48,7 +49,7 @@ import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { nanoid, stringify } from './components/Common/Utils';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import { EditorsContext } from './ves-editors-types';
+import { EditorsContext, EditorsContextType } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions extends NavigatableWidgetOptions {
@@ -129,15 +130,16 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
 
-    typeId: string;
-    uri: URI;
-    commands: string[] = [];
-    commandsEnabled: boolean = true;
+    public typeId: string;
+    public uri: URI;
+    public commands: string[] = [];
+    public commandsEnabled: boolean = true;
+
+    public data: ItemData | undefined;
+    public editorsContext: EditorsContextType;
 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
-
-    protected data: ItemData | undefined;
 
     protected currentThemeType: ThemeType;
 
@@ -175,6 +177,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     get saveable(): Saveable {
         return this;
+    }
+
+    constructor(@unmanaged() options?: Widget.IOptions) {
+        super(options);
+
+        this.initMembers();
     }
 
     @postConstruct()
@@ -253,6 +261,50 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.isLoading = true;
         this.isGenerating = false;
         this.generatingProgress = -1;
+
+        this.editorsContext = {
+            fileUri: this.uri,
+            isGenerating: this.isGenerating,
+            isReadonly: this.isReadOnly,
+            setSaveCallback: this.setSaveCallback.bind(this),
+            setIsGenerating: this.setIsGenerating.bind(this),
+            setGeneratingProgress: this.setGeneratingProgress.bind(this),
+            setCommands: this.setCommands.bind(this),
+            onCommandExecute: this.onCommandExecute.bind(this),
+            enableCommands: this.enableCommands.bind(this),
+            disableCommands: this.disableCommands.bind(this),
+            focusEditor: this.focusEditor.bind(this),
+            setStatusBarItem: this.setStatusBarItem.bind(this),
+            removeStatusBarItem: this.removeStatusBarItem.bind(this),
+            currentThemeType: this.currentThemeType,
+            services: {
+                clipboardService: this.clipboardService,
+                colorRegistry: this.colorRegistry,
+                commandService: this.commandService,
+                envVariablesServer: this.envVariablesServer,
+                fileService: this.fileService,
+                fileDialogService: this.fileDialogService,
+                hoverService: this.hoverService,
+                messageService: this.messageService,
+                localStorageService: this.localStorageService,
+                openerService: this.openerService,
+                quickPickService: this.quickPickService,
+                preferenceService: this.preferenceService,
+                themeService: this.themeService,
+                vesBuildPathsService: this.vesBuildPathsService,
+                vesBuildService: this.vesBuildService,
+                vesCodeGenService: this.vesCodeGenService,
+                vesCommonService: this.vesCommonService,
+                vesImagesService: this.vesImagesService,
+                vesPluginsService: this.vesPluginsService,
+                vesProcessService: this.vesProcessService,
+                vesProcessWatcher: this.vesProcessWatcher,
+                vesProjectService: this.vesProjectService,
+                vesRumblePackService: this.vesRumblePackService,
+                windowService: this.windowService,
+                workspaceService: this.workspaceService,
+            },
+        };
     }
 
     protected setSaveCallback(callback: () => void): void {
@@ -501,49 +553,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             </div>
             {!this.isLoading && this.data &&
                 <EditorsContext.Provider
-                    value={{
-                        fileUri: this.uri,
-                        isGenerating: this.isGenerating,
-                        isReadonly: this.isReadOnly,
-                        setSaveCallback: this.setSaveCallback.bind(this),
-                        setIsGenerating: this.setIsGenerating.bind(this),
-                        setGeneratingProgress: this.setGeneratingProgress.bind(this),
-                        setCommands: this.setCommands.bind(this),
-                        onCommandExecute: this.onCommandExecute.bind(this),
-                        enableCommands: this.enableCommands.bind(this),
-                        disableCommands: this.disableCommands.bind(this),
-                        focusEditor: this.focusEditor.bind(this),
-                        setStatusBarItem: this.setStatusBarItem.bind(this),
-                        removeStatusBarItem: this.removeStatusBarItem.bind(this),
-                        currentThemeType: this.currentThemeType,
-                        services: {
-                            clipboardService: this.clipboardService,
-                            colorRegistry: this.colorRegistry,
-                            commandService: this.commandService,
-                            envVariablesServer: this.envVariablesServer,
-                            fileService: this.fileService,
-                            fileDialogService: this.fileDialogService,
-                            hoverService: this.hoverService,
-                            messageService: this.messageService,
-                            localStorageService: this.localStorageService,
-                            openerService: this.openerService,
-                            quickPickService: this.quickPickService,
-                            preferenceService: this.preferenceService,
-                            themeService: this.themeService,
-                            vesBuildPathsService: this.vesBuildPathsService,
-                            vesBuildService: this.vesBuildService,
-                            vesCodeGenService: this.vesCodeGenService,
-                            vesCommonService: this.vesCommonService,
-                            vesImagesService: this.vesImagesService,
-                            vesPluginsService: this.vesPluginsService,
-                            vesProcessService: this.vesProcessService,
-                            vesProcessWatcher: this.vesProcessWatcher,
-                            vesProjectService: this.vesProjectService,
-                            vesRumblePackService: this.vesRumblePackService,
-                            windowService: this.windowService,
-                            workspaceService: this.workspaceService,
-                        },
-                    }}
+                    value={this.editorsContext}
                 >
                     <JsonFormsStyleContext.Provider value={this.getStyles()}>
                         <JsonForms

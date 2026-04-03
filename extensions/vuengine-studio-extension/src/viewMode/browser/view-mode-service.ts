@@ -114,11 +114,11 @@ export class ViewModeService {
             : ViewMode.welcome;
     }
 
-    protected hideWidget(widget: Widget): void {
+    hideWidget(widget: Widget): void {
         widget.title.className += ' otherViewMode';
     }
 
-    protected showWidget(widget: Widget): void {
+    showWidget(widget: Widget): void {
         widget.title.className = widget.title.className.replace(/ otherViewMode/g, '');
     }
 }

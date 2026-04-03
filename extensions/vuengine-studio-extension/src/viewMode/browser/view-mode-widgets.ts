@@ -17,13 +17,6 @@ import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
 import { VesBuildWidget } from '../../build/browser/ves-build-widget';
-import { SoundEditorCurrentNoteWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-note-widget';
-import { SoundEditorCurrentPatternWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-pattern-widget';
-import { SoundEditorCurrentTrackWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-current-track-widget';
-import { SoundEditorInstrumentsWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-instruments-widget';
-import { SoundEditorKeyBindingsWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-key-bindings-widget';
-import { SoundEditorPropertiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-properties-widget';
-import { SoundEditorUtilitiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-utilities-widget';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { EmulatorConfigsWidget } from '../../emulator/browser/ves-emulator-configs-widget';
 import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
@@ -119,13 +112,13 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.sound]: {
         allow: {
             [SoundAssetsBrowserWidget.ID]: true,
-            [SoundEditorPropertiesWidget.ID]: false,
-            [SoundEditorInstrumentsWidget.ID]: false,
-            [SoundEditorCurrentTrackWidget.ID]: false,
-            [SoundEditorCurrentPatternWidget.ID]: false,
-            [SoundEditorCurrentNoteWidget.ID]: false,
-            [SoundEditorUtilitiesWidget.ID]: false,
-            [SoundEditorKeyBindingsWidget.ID]: false,
+            'vesSoundEditorPropertiesWidget': false,
+            'vesSoundEditorInstrumentsWidget': false,
+            'vesSoundEditorCurrentTrackWidget': false,
+            'vesSoundEditorCurrentPatternWidget': false,
+            'vesSoundEditorCurrentNoteWidget': false,
+            'vesSoundEditorUtilitiesWidget': false,
+            'vesSoundEditorKeyBindingsWidget': false,
             [`${VesEditorsWidget.ID}:Sound:`]: false,
         }
     },

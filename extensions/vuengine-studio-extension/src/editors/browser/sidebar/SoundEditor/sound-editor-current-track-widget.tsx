@@ -1,25 +1,24 @@
 import { nls } from '@theia/core';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { injectable, postConstruct } from '@theia/core/shared/inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { VesEditorsWidget } from '../../ves-editors-widget';
+import { SoundEditorAbstractSidebarWidget } from './sound-editor-abstract-sidebar-widget';
 
 @injectable()
-export class SoundEditorCurrentTrackWidget extends ReactWidget {
+export class SoundEditorCurrentTrackWidget extends SoundEditorAbstractSidebarWidget {
   static readonly ID = 'vesSoundEditorCurrentTrackWidget';
   static readonly LABEL = nls.localize('vuengine/editors/sound/currentTrack', 'Current Track');
 
-  @postConstruct()
   protected init(): void {
     this.id = SoundEditorCurrentTrackWidget.ID;
     this.title.iconClass = 'codicon ph ph-road-horizon';
-    this.title.closable = false;
     this.title.label = SoundEditorCurrentTrackWidget.LABEL;
     this.title.caption = SoundEditorCurrentTrackWidget.LABEL;
 
-    this.update();
+    super.init();
   }
 
-  protected render(): React.ReactNode {
+  protected renderSidebar(widget: VesEditorsWidget): React.ReactNode {
     return (
       <></>
     );
