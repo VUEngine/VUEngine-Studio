@@ -8,9 +8,12 @@ import { FILE_NAVIGATOR_TOGGLE_COMMAND_ID } from '@theia/navigator/lib/browser/n
 import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OUTLINE_WIDGET_FACTORY_ID } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views/preference-searchbar-widget';
+import { PreferencesWidget } from '@theia/preferences/lib/browser/views/preference-widget';
 import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
-import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
 import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
+import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
+import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
+import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
 import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
@@ -45,8 +48,6 @@ import { StageType } from '../../project/browser/types/Stage';
 import { TranslationsType } from '../../project/browser/types/Translations';
 import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
 import { VesProjectSidebarWidget } from '../../project/browser/ves-project-sidebar-widget';
-import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
-import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 
 export enum ViewMode {
     actors = 'actors',
@@ -100,10 +101,11 @@ export const TYPE_VIEW_MODE_RELATIONS: { [typeId: string]: ViewMode } = {
     'ColumnTable': ViewMode.assets,
     'CompilerConfig': ViewMode.settings,
     'EngineConfig': ViewMode.settings,
-    'InGameTypes': ViewMode.settings,
+    'GameConfig': ViewMode.stages,
     'Events': ViewMode.settings,
     'Font': ViewMode.fonts,
     'Image': ViewMode.actors,
+    'InGameTypes': ViewMode.settings,
     'Logic': ViewMode.logic,
     'Messages': ViewMode.settings,
     'Pixel': ViewMode.actors,
@@ -170,9 +172,17 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [PreferencesSearchbarWidget.ID]: false,
             [KeybindingWidget.ID]: false,
+            [PreferencesWidget.ID]: false,
             [VesProjectSidebarWidget.ID]: true,
             [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
+            [`${VesEditorsWidget.ID}:ColliderLayers:`]: false,
+            [`${VesEditorsWidget.ID}:CompilerConfig:`]: false,
+            [`${VesEditorsWidget.ID}:EngineConfig:`]: false,
+            [`${VesEditorsWidget.ID}:Events:`]: false,
+            [`${VesEditorsWidget.ID}:InGameTypes:`]: false,
+            [`${VesEditorsWidget.ID}:Messages:`]: false,
+            [`${VesEditorsWidget.ID}:RomInfo:`]: false,
         }
     },
     [ViewMode.sound]: {
