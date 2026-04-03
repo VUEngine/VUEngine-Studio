@@ -11,6 +11,21 @@ import VContainer from '../Common/Base/VContainer';
 import { AllTranslationsData, Translations, TranslationsData, TranslationsWithContributors } from './TranslationsEditorTypes';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 
+const TRANSLATION_CONTAINER_WIDTH = 800;
+
+const StyledTranslationsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    overflow: hidden;
+
+    h3 {
+        margin-top: 0;
+        padding: 0 1px;
+    }
+`;
+
 const StyledLangCode = styled.input`
     font-family: monospace;
     max-width: 28px;
@@ -20,6 +35,9 @@ const StyledLangCode = styled.input`
 const StyledTranslationContainer = styled(HContainer)`
     border: 1px solid var(--theia-dropdown-border);
     border-radius: 2px;
+    box-sizing: border-box;
+    max-width: ${TRANSLATION_CONTAINER_WIDTH}px;
+    width: ${TRANSLATION_CONTAINER_WIDTH}px;
     padding: 10px;
 
     button {
@@ -196,133 +214,131 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
         getCombinedTranslations();
     }, []);
 
-    return <VContainer
-        gap={20}
-        style={{
-            maxWidth: 890,
-            width: '100%',
-        }}
-    >
-        <HContainer gap={10}>
-            <RadioSelect
-                options={[{
-                    value: ProjectContributor.Project,
-                    label: nls.localize('vuengine/editors/translations/project', 'Project'),
-                }, {
-                    value: ProjectContributor.Plugin,
-                    label: nls.localize('vuengine/editors/translations/plugins', 'Plugins'),
-                }]}
-                defaultValue={contributorsFilter}
-                onChange={options => setContributorsFilter(options.map(o => o.value) as ProjectContributor[])}
-                canSelectMany
-            />
-            <Input
-                value={searchTerm}
-                setValue={v => setSearchTerm(v as string)}
-                grow={1}
-                clearable={true}
-                placeholder={nls.localize('vuengine/editors/translations/enterSearchTerm', 'Enter Search Term...')}
-            />
-            <button
-                className='theia-button secondary'
-                onClick={() => addTranslation()}
-                title={nls.localizeByDefault('Add')}
-            >
-                <i className='codicon codicon-plus' />
-            </button>
-        </HContainer>
-        <VContainer gap={10}>
-            <HContainer style={{ padding: '0 10px' }}>
-                <label style={{ flexGrow: 1 }}>
-                    {nls.localizeByDefault('Key')}
-                </label>
-                <label style={{ width: 467 }}>
-                    {nls.localize('vuengine/editors/translations/translations', 'Translations')}
-                </label>
-            </HContainer>
-            {translations && Object.keys(translations).map(translationId =>
-                contributorsFilter.includes(translations[translationId]._contributor.split(':')[0] as ProjectContributor) &&
-                (!searchTerm || translationId.includes(searchTerm) || Object.values(translations[translationId].translation).filter(t => t.includes(searchTerm)).length > 0) &&
-                <StyledTranslationContainer
-                    gap={10}
-                    key={`string-key-${translationId}`}
-                >
-                    <VContainer grow={1} justifyContent='space-between'>
-                        <Input
-                            value={translationId}
-                            disabled={translations[translationId]._contributor !== ProjectContributor.Project}
-                            setValue={v => setTranslationId(translationId, v as string)}
-                            grow={1}
-                            clearable={false}
-                            inputRef={lastEditedTranslationId === translationId ? lastEditedTranslationIdInputRef : undefined}
-                        />
-                        <StyledSourceLabel>
-                            {translations[translationId]._contributor === ProjectContributor.Project
-                                ? nls.localize('vuengine/editors/translations/project', 'Project')
-                                : translations[translationId]._contributor.replace('plugin:', '')
-                            }
-                        </StyledSourceLabel>
-                    </VContainer>
-                    <VContainer>
-                        {translationsData.languages.map(lang =>
-                            <HContainer
-                                key={`string-translations-${translationId}-${lang.code}`}
-                            >
-                                <StyledLangCode
-                                    className="theia-input"
-                                    value={lang.code}
-                                    disabled={true}
-                                />
-                                <StyledReactTextareaAutosize
-                                    className="theia-input"
-                                    value={translations[translationId].translation[lang.code] ?? ''}
+    return (
+        <StyledTranslationsContainer>
+            <h3>
+                {nls.localize('vuengine/editors/translations/translations', 'Translations')}
+            </h3>
+            <VContainer gap={20} overflow='hidden' style={{ height: '100%', padding: 1 }}>
+                <HContainer gap={10} style={{ maxWidth: TRANSLATION_CONTAINER_WIDTH }}>
+                    <RadioSelect
+                        options={[{
+                            value: ProjectContributor.Project,
+                            label: nls.localize('vuengine/editors/translations/project', 'Project'),
+                        }, {
+                            value: ProjectContributor.Plugin,
+                            label: nls.localize('vuengine/editors/translations/plugins', 'Plugins'),
+                        }]}
+                        defaultValue={contributorsFilter}
+                        onChange={options => setContributorsFilter(options.map(o => o.value) as ProjectContributor[])}
+                        canSelectMany
+                    />
+                    <Input
+                        value={searchTerm}
+                        setValue={v => setSearchTerm(v as string)}
+                        grow={1}
+                        clearable={true}
+                        placeholder={nls.localize('vuengine/editors/translations/enterSearchTerm', 'Enter Search Term...')}
+                    />
+                    <button
+                        className='theia-button secondary'
+                        onClick={() => addTranslation()}
+                        title={nls.localizeByDefault('Add')}
+                    >
+                        <i className='codicon codicon-plus' />
+                    </button>
+                </HContainer>
+                <HContainer gap={10} overflow='auto' wrap='wrap'>
+                    {translations && Object.keys(translations).map(translationId =>
+                        contributorsFilter.includes(translations[translationId]._contributor.split(':')[0] as ProjectContributor) &&
+                        (!searchTerm
+                            || translationId.toLowerCase().includes(searchTerm.toLowerCase())
+                            ||
+                            Object.values(translations[translationId].translation).filter(t =>
+                                t.toLowerCase().includes(searchTerm.toLowerCase())
+                            ).length > 0) &&
+                        <StyledTranslationContainer
+                            gap={10}
+                            key={`string-key-${translationId}`}
+                        >
+                            <VContainer grow={1} justifyContent='space-between'>
+                                <Input
+                                    value={translationId}
                                     disabled={translations[translationId]._contributor !== ProjectContributor.Project}
-                                    maxRows={8}
-                                    onChange={e => setTranslation(translationId, lang.code, e.target.value)}
-                                    maxLength={48 * 28}
+                                    setValue={v => setTranslationId(translationId, v as string)}
+                                    grow={1}
+                                    clearable={false}
+                                    inputRef={lastEditedTranslationId === translationId ? lastEditedTranslationIdInputRef : undefined}
                                 />
-                            </HContainer>
-                        )}
-                    </VContainer>
-                    <VContainer>
-                        {translations[translationId]._contributor === ProjectContributor.Project && !translations[translationId]._isOverriden &&
-                            <button
-                                className='theia-button secondary'
-                                onClick={e => removeTranslation(translationId)}
-                                title={nls.localizeByDefault('Delete')}
-                            >
-                                <i className='codicon codicon-trash' />
-                            </button>
-                        }
-                        {translations[translationId]._contributor === ProjectContributor.Project && translations[translationId]._isOverriden &&
-                            <button
-                                className='theia-button secondary'
-                                onClick={e => removeTranslation(translationId)}
-                                title={nls.localizeByDefault('Reset')}
-                            >
-                                <i className='codicon codicon-discard' />
-                            </button>
-                        }
-                        {translations[translationId]._contributor !== ProjectContributor.Project &&
-                            <button
-                                className='theia-button secondary'
-                                onClick={e => addTranslation({ [translationId]: translations[translationId].translation })}
-                                title={nls.localize('vuengine/editors/translations/override', 'Override')}
-                            >
-                                <i className='codicon codicon-copy' />
-                            </button>
-                        }
-                    </VContainer>
-                </StyledTranslationContainer>
-            )}
-            <button
-                className='theia-button add-button full-width'
-                onClick={() => addTranslation()}
-                style={{ height: 48 }}
-                title={nls.localizeByDefault('Add')}
-            >
-                <i className='codicon codicon-plus' />
-            </button>
-        </VContainer>
-    </VContainer>;
+                                <StyledSourceLabel>
+                                    {translations[translationId]._contributor === ProjectContributor.Project
+                                        ? nls.localize('vuengine/editors/translations/project', 'Project')
+                                        : translations[translationId]._contributor.replace('plugin:', '')
+                                    }
+                                </StyledSourceLabel>
+                            </VContainer>
+                            <VContainer>
+                                {translationsData.languages.map(lang =>
+                                    <HContainer
+                                        key={`string-translations-${translationId}-${lang.code}`}
+                                    >
+                                        <StyledLangCode
+                                            className="theia-input"
+                                            value={lang.code}
+                                            disabled={true}
+                                        />
+                                        <StyledReactTextareaAutosize
+                                            className="theia-input"
+                                            value={translations[translationId].translation[lang.code] ?? ''}
+                                            disabled={translations[translationId]._contributor !== ProjectContributor.Project}
+                                            maxRows={8}
+                                            onChange={e => setTranslation(translationId, lang.code, e.target.value)}
+                                            maxLength={48 * 28}
+                                        />
+                                    </HContainer>
+                                )}
+                            </VContainer>
+                            <VContainer>
+                                {translations[translationId]._contributor === ProjectContributor.Project && !translations[translationId]._isOverriden &&
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={e => removeTranslation(translationId)}
+                                        title={nls.localizeByDefault('Delete')}
+                                    >
+                                        <i className='codicon codicon-trash' />
+                                    </button>
+                                }
+                                {translations[translationId]._contributor === ProjectContributor.Project && translations[translationId]._isOverriden &&
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={e => removeTranslation(translationId)}
+                                        title={nls.localizeByDefault('Reset')}
+                                    >
+                                        <i className='codicon codicon-discard' />
+                                    </button>
+                                }
+                                {translations[translationId]._contributor !== ProjectContributor.Project &&
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={e => addTranslation({ [translationId]: translations[translationId].translation })}
+                                        title={nls.localize('vuengine/editors/translations/override', 'Override')}
+                                    >
+                                        <i className='codicon codicon-copy' />
+                                    </button>
+                                }
+                            </VContainer>
+                        </StyledTranslationContainer>
+                    )}
+                    <button
+                        className='theia-button add-button full-width'
+                        onClick={() => addTranslation()}
+                        style={{ minHeight: 48, maxWidth: TRANSLATION_CONTAINER_WIDTH }}
+                        title={nls.localizeByDefault('Add')}
+                    >
+                        <i className='codicon codicon-plus' />
+                    </button>
+                </HContainer>
+            </VContainer>
+        </StyledTranslationsContainer>
+    );
 }

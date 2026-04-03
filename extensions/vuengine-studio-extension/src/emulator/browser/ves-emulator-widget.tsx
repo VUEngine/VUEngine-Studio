@@ -59,7 +59,7 @@ const EmulatorControls = styled.div`
     height: 26px;
     margin: 0 2px;
     min-width: 32px;
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
   & select.theia-select {

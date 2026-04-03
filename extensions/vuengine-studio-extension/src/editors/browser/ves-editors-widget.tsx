@@ -120,11 +120,11 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
-    private readonly vesRumblePackService: VesRumblePackService;
+    protected readonly vesRumblePackService: VesRumblePackService;
     @inject(WindowService)
-    private readonly windowService: WindowService;
+    protected readonly windowService: WindowService;
     @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService;
+    protected readonly workspaceService: WorkspaceService;
 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';

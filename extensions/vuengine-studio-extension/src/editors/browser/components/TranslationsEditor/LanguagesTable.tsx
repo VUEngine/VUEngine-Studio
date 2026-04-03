@@ -1,5 +1,5 @@
 import { DotsNine } from '@phosphor-icons/react';
-import { deepClone, nls, QuickPickItem, QuickPickItemOrSeparator, QuickPickOptions } from '@theia/core';
+import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
@@ -12,10 +12,24 @@ import HContainer from '../Common/Base/HContainer';
 import Input from '../Common/Base/Input';
 import VContainer from '../Common/Base/VContainer';
 import { arrayMove, showItemSelection } from '../Common/Utils';
-import { Language, LANGUAGE_PRESETS, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
+import { Language, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
 
 const LANGUAGE_CONTAINER_HEIGHT = 110;
-const LANGUAGE_CONTAINER_WIDTH = 290;
+const LANGUAGE_CONTAINER_WIDTH = 300;
+
+const StyledLanguagesContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    max-width: ${LANGUAGE_CONTAINER_WIDTH}px;
+    min-width: ${LANGUAGE_CONTAINER_WIDTH}px;
+
+    h3 {
+        margin-top: 0;
+        padding: 0 1px;
+    }
+`;
 
 const StyledLanguageContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);
@@ -61,9 +75,32 @@ const StyledLanguageContainer = styled.div`
 const StyledPreviewContainer = styled.div`
     border: 1px solid var(--theia-dropdown-border);
     border-radius: 2px;
-    height: 67px;
+    box-sizing: border-box;
+    height: 66px;
     position: relative;
-    width: 80px;
+    width: 82px;
+
+    &.empty {
+        position:relative;
+        overflow: hidden;
+
+        &:before,
+        &:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 200%;
+            border-left: 1px solid var(--theia-dropdown-border);
+            transform: translateY(-50%) rotate(-51deg);
+            z-index: 1;
+        }
+
+        &:before {
+            transform: translateY(-50%) rotate(51deg);
+        }
+    }
 `;
 
 const StyledPreviewContainerClickOverlay = styled.div`
@@ -85,10 +122,11 @@ const DropTarget = styled.div`
 interface LanguagesTableProps {
     translationsData: TranslationsData,
     updateTranslationsData: (translationsData: TranslationsData) => void,
+    addLanguage: () => Promise<void>
 }
 
 export default function LanguagesTable(props: LanguagesTableProps): React.JSX.Element {
-    const { translationsData, updateTranslationsData } = props;
+    const { translationsData, updateTranslationsData, addLanguage } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [flagPreviews, setFlagPreviews] = useState<ReactElement[]>([]);
 
@@ -163,62 +201,6 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
         });
     };
 
-    const showLanguageSelection = (): Promise<QuickPickItem | undefined> => {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/translations/addLanguage', 'Add Language'),
-            placeholder: nls.localize('vuengine/editors/translations/selectLanguageToAdd', 'Select a language to add...'),
-        };
-        const items: QuickPickItemOrSeparator[] = [{
-            id: 'custom',
-            label: nls.localize('vuengine/editors/translations/customLanguage', 'Custom Language'),
-        }, {
-            type: 'separator',
-            label: nls.localize('vuengine/editors/translations/presets', 'Presets'),
-        }];
-        const existingLanguageCodes = translationsData.languages.map(l => l.code);
-        Object.values(LANGUAGE_PRESETS)
-            .filter(l => !existingLanguageCodes.includes(l.code))
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map(a => {
-                items.push({
-                    id: a.code,
-                    label: a.code,
-                    description: a.name,
-                });
-            });
-
-        return services.quickPickService.show(
-            items,
-            quickPickOptions
-        );
-    };
-
-    const addLanguage = async (): Promise<void> => {
-        const languageToAdd = await showLanguageSelection();
-        if (languageToAdd) {
-            let preset = {
-                code: 'xx',
-                name: '',
-                flagActorId: 'UZHCHu3RBQgKczqm', // unknown flag
-            } as Language;
-            if (languageToAdd.id !== 'custom') {
-                preset = LANGUAGE_PRESETS[languageToAdd.id!];
-            }
-
-            // TODO: why does this not set dirty flag?
-            updateTranslationsData({
-                languages: [...translationsData.languages, preset],
-                translations: Object.fromEntries(
-                    Object.entries(translationsData.translations)
-                        .map(([tId, ts]) => ([
-                            tId,
-                            { ...ts, [preset.code]: '' }
-                        ]))
-                )
-            });
-        }
-    };
-
     const removeLanguage = async (language: Language): Promise<void> => {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/editors/translations/deleteLanguageQuestion', 'Delete Language?'),
@@ -264,8 +246,8 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
 
         translationsData.languages.forEach((language, index) => {
 
-            let actorPreview = <></>;
-            let actorName = '';
+            let actorPreview;
+            let actorName;
 
             const actor = services.vesProjectService.getProjectDataItemById(language.flagActorId, 'Actor') as ActorData & WithContributor & WithFileUri;
             if (actor) {
@@ -303,7 +285,7 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
 
             previews.push(
                 <StyledPreviewContainer
-                    className='preview-container-world'
+                    className={actorPreview ? 'preview-container-world' : 'empty'}
                     onClick={() => setFlagActorId(index)}
                 >
                     <StyledPreviewContainerClickOverlay
@@ -323,77 +305,84 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
     }, [translationsData]);
 
     return (
-        <SortableList
-            onSortEnd={moveLanguage}
-            draggedItemClassName='dragging'
-            dropTarget={<DropTarget />}
-            style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 10,
-            }}
-        >
-            {translationsData.languages.map((lang, i) =>
-                <SortableItem key={`string-key-${i}`}>
-                    <StyledLanguageContainer>
-                        <VContainer gap={15}>
-                            <HContainer gap={10} grow={1}>
-                                <VContainer grow={1}>
-                                    <label>
-                                        {nls.localizeByDefault('Name')}
-                                    </label>
-                                    <Input
-                                        value={lang.name}
-                                        setValue={v => setName(i, v as string)}
-                                        grow={1}
-                                    />
-                                </VContainer>
-                                <VContainer>
-                                    <label>
-                                        {nls.localizeByDefault('Code')}
-                                    </label>
-                                    <Input
-                                        value={lang.code}
-                                        setValue={v => setCode(i, lang.code, v as string)}
-                                        width={48}
-                                    />
-                                </VContainer>
-                            </HContainer>
-                            <HContainer>
-                                <SortableKnob>
-                                    <button
-                                        className='theia-button secondary dragKnob'
-                                        title={nls.localize('vuengine/editors/translations/reorderLanguage', 'Drag to reorder')}
-                                    >
-                                        <DotsNine size={16} />
-                                    </button>
-                                </SortableKnob>
-                                <button
-                                    className='theia-button secondary'
-                                    onClick={e => removeLanguage(lang)}
-                                    title={nls.localize('vuengine/editors/translations/deleteLanguage', 'Delete Language')}
-                                >
-                                    <i className='codicon codicon-trash' />
-                                </button>
-                            </HContainer>
-                        </VContainer>
-                        <VContainer>
-                            <label>
-                                {nls.localizeByDefault('Flag')}
-                            </label>
-                            {flagPreviews[i]}
-                        </VContainer>
-                    </StyledLanguageContainer>
-                </SortableItem>
-            )}
-            <button
-                className='theia-button add-button'
-                onClick={addLanguage}
-                style={{ width: LANGUAGE_CONTAINER_WIDTH }}
-                title={nls.localizeByDefault('Add')}
+        <StyledLanguagesContainer>
+            <h3>
+                {nls.localize('vuengine/editors/translations/languages', 'Languages')}
+            </h3>
+            <SortableList
+                onSortEnd={moveLanguage}
+                draggedItemClassName='dragging'
+                dropTarget={<DropTarget />}
+                style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 10,
+                    overflow: 'auto',
+                    padding: 1,
+                }}
             >
-                <i className='codicon codicon-plus' />
-            </button>
-        </SortableList>
+                {translationsData.languages.map((lang, i) =>
+                    <SortableItem key={`string-key-${i}`}>
+                        <StyledLanguageContainer>
+                            <VContainer gap={15}>
+                                <HContainer gap={10} grow={1}>
+                                    <VContainer grow={1}>
+                                        <label>
+                                            {nls.localizeByDefault('Name')}
+                                        </label>
+                                        <Input
+                                            value={lang.name}
+                                            setValue={v => setName(i, v as string)}
+                                            grow={1}
+                                        />
+                                    </VContainer>
+                                    <VContainer>
+                                        <label>
+                                            {nls.localizeByDefault('Code')}
+                                        </label>
+                                        <Input
+                                            value={lang.code}
+                                            setValue={v => setCode(i, lang.code, v as string)}
+                                            width={48}
+                                        />
+                                    </VContainer>
+                                </HContainer>
+                                <HContainer>
+                                    <SortableKnob>
+                                        <button
+                                            className='theia-button secondary dragKnob'
+                                            title={nls.localize('vuengine/editors/translations/reorderLanguage', 'Drag to reorder')}
+                                        >
+                                            <DotsNine size={16} />
+                                        </button>
+                                    </SortableKnob>
+                                    <button
+                                        className='theia-button secondary'
+                                        onClick={e => removeLanguage(lang)}
+                                        title={nls.localize('vuengine/editors/translations/deleteLanguage', 'Delete Language')}
+                                    >
+                                        <i className='codicon codicon-trash' />
+                                    </button>
+                                </HContainer>
+                            </VContainer>
+                            <VContainer>
+                                <label>
+                                    {nls.localizeByDefault('Flag')}
+                                </label>
+                                {flagPreviews[i]}
+                            </VContainer>
+                        </StyledLanguageContainer>
+                    </SortableItem>
+                )}
+                <button
+                    className='theia-button add-button'
+                    onClick={addLanguage}
+                    style={{ minHeight: 48, width: LANGUAGE_CONTAINER_WIDTH }}
+                    title={nls.localizeByDefault('Add')}
+                >
+                    <i className='codicon codicon-plus' />
+                </button>
+            </SortableList>
+        </StyledLanguagesContainer>
     );
 }
