@@ -1,9 +1,11 @@
 import { ApplicationShell, FrontendApplication, ShellLayoutRestorer } from '@theia/core/lib/browser';
 import { StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { ViewModeService } from './view-mode-service';
 import { ViewMode } from './view-mode-types';
 import { VIEW_MODE_WIDGETS } from './view-mode-widgets';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
@@ -11,6 +13,8 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
     protected readonly shell: ApplicationShell;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
     protected readonly storageKeySuffix = 'view-mode';
 
@@ -147,7 +151,22 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
 
         await Promise.all(
             forcedWidgetsIds.map(async f => {
-                const widget = await this.widgetManager.getOrCreateWidget(f);
+                let options = {};
+                if (f.startsWith(VesEditorsWidget.ID)) {
+                    await this.workspaceService.ready;
+                    const roots = this.workspaceService.tryGetRoots();
+                    const workspaceRootUri = roots[0].resource;
+                    const typeId = f.split(':')[1];
+                    const uri = workspaceRootUri.resolve('config').resolve(typeId);
+                    f = VesEditorsWidget.ID;
+                    options = {
+                        typeId,
+                        uri: uri.withoutFragment().toString(),
+                        kind: 'navigatable',
+                    };
+                }
+
+                const widget = await this.widgetManager.getOrCreateWidget(f, options);
                 await this.shell.addWidget(widget, { area: 'main' });
             })
         );

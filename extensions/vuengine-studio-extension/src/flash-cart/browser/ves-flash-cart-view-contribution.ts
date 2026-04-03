@@ -33,7 +33,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
-            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
             isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
             execute: () => this.toggleView()
         });

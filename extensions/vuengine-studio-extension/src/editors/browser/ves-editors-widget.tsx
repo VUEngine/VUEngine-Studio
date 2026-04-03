@@ -190,7 +190,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.id = `${VesEditorsWidget.ID}:${this.options.typeId}:${path}`;
 
         this.title.iconClass = 'fa fa-cog';
-        this.title.closable = true;
+        this.title.closable = false;
         this.node.tabIndex = 0;
 
         this.setTitle();
@@ -222,6 +222,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         if (type?.icon) {
             this.title.iconClass = type.icon;
         }
+        if (type?.file.startsWith('.')) {
+            this.title.closable = true;
+        }
 
         if (this.uri.scheme !== UNTITLED_SCHEME) {
             if (await this.fileService.exists(this.uri)) {
@@ -230,7 +233,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                 if (this.isReadOnly) {
                     lock(this.title);
                 }
-            } else {
+            } else if (type?.file.startsWith('.')) {
                 console.error('File does not exists', this.uri.path.fsPath());
                 this.isLoading = false;
                 this.update();
