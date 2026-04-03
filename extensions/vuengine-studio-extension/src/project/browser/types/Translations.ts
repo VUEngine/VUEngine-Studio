@@ -6,7 +6,7 @@ import { ProjectDataType } from '../ves-project-types';
 export const TranslationsType: ProjectDataType = {
     file: 'Translations',
     schema: {
-        title: nls.localize('vuengine/projects/typeLabels/translations', 'Translations'),
+        title: nls.localize('vuengine/projects/typeLabels/translations', 'Localization'),
         properties: {
             languages: {
                 type: 'array',

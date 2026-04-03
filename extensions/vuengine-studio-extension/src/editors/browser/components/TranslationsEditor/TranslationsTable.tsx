@@ -19,6 +19,7 @@ const StyledTranslationsContainer = styled.div`
     flex-grow: 1;
     height: 100%;
     overflow: hidden;
+    padding: calc(2 * var(--theia-ui-padding));
 
     h3 {
         margin-top: 0;

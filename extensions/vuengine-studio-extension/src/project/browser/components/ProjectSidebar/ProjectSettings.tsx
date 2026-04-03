@@ -85,7 +85,7 @@ export default function ProjectSettings(props: ProjectSettingsProps): React.JSX.
         const availableConfigs: ConfigType[] = [];
         Object.keys(PROJECT_TYPES).forEach(typeId => {
             const type = PROJECT_TYPES[typeId];
-            if (type.file.startsWith('.') || type.excludeFromDashboard || type.enabled === false) {
+            if (typeId === 'Translations' || type.file.startsWith('.') || type.excludeFromDashboard || type.enabled === false) {
                 return;
             }
             const item = vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId) as ProjectDataItem & WithFileUri;

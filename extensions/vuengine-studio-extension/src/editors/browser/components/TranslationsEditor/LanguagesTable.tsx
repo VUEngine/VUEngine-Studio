@@ -18,12 +18,12 @@ const LANGUAGE_CONTAINER_HEIGHT = 110;
 const LANGUAGE_CONTAINER_WIDTH = 300;
 
 const StyledLanguagesContainer = styled.div`
-    border-right: 1px solid var(--theia-dropdown-border);
+    border-right: 2px solid var(--theia-editorGroupHeader-tabsBackground);
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    padding-right: calc(2 * var(--theia-ui-padding));
+    padding: calc(2 * var(--theia-ui-padding));
     max-width: ${LANGUAGE_CONTAINER_WIDTH}px;
     min-width: ${LANGUAGE_CONTAINER_WIDTH}px;
 

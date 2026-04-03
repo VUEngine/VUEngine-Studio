@@ -8,7 +8,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
+import { DISABLED_VIEW_MODES, TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
 
 @injectable()
 export class VesEditorsContribution implements FrontendApplicationContribution {
@@ -43,7 +43,10 @@ export class VesEditorsContribution implements FrontendApplicationContribution {
             open: async uri => {
                 for (const typeId of Object.keys(PROJECT_TYPES)) {
                     if ([uri.path.ext, uri.path.base].includes(PROJECT_TYPES[typeId].file)) {
-                        await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[typeId]);
+                        const targetViewMode = TYPE_VIEW_MODE_RELATIONS[typeId];
+                        if (!DISABLED_VIEW_MODES.includes(targetViewMode)) {
+                            await this.viewModeService.setViewMode(targetViewMode);
+                        }
                     }
                 }
                 const opener = await this.openerService.getOpener(uri);

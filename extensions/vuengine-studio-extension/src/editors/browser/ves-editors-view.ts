@@ -21,7 +21,7 @@ import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
+import { DISABLED_VIEW_MODES, TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
 import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
@@ -200,7 +200,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
                     const typeId = this.getTypeByWidgetUri(u);
-                    await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[typeId]);
+
+                    const targetViewMode = TYPE_VIEW_MODE_RELATIONS[typeId];
+                    if (!DISABLED_VIEW_MODES.includes(targetViewMode)) {
+                        await this.viewModeService.setViewMode(targetViewMode);
+                    }
+
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
                 }

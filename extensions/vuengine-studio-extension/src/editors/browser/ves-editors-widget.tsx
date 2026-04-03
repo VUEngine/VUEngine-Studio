@@ -261,7 +261,13 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected setTitle(): void {
         // const name = this.labelProvider.getLongName(this.uri);
-        const name = this.uri.path.name;
+        let name = this.uri.path.name;
+
+        const type = PROJECT_TYPES[this.typeId];
+        if (type && !type.file.startsWith('.') && type.schema.title) {
+            name = type.schema.title;
+        }
+
         this.title.label = name;
         this.title.caption = this.uri.path.fsPath();
     }

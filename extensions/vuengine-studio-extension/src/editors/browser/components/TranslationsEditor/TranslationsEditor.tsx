@@ -12,12 +12,12 @@ const I18N_PLUGIN_ID = 'vuengine//other/I18n';
 
 const StyledWarningContainer = styled.div`
     align-items: center;
-    border-bottom: 1px solid var(--theia-activityBar-background);
+    border-bottom: 2px solid var(--theia-editorGroupHeader-tabsBackground);
     display: flex;
     flex-direction: row;
     gap: var(--theia-ui-padding);
     justify-content: center;
-    padding-bottom: var(--theia-ui-padding);
+    padding: calc(2 * var(--theia-ui-padding));
     position: relative;
     z-index: 10;
 `;
@@ -25,7 +25,6 @@ const StyledWarningContainer = styled.div`
 const StyledTranslationsEditor = styled.div`
     display: flex;
     flex-direction: row;
-    gap: calc(2 * var(--theia-ui-padding));
     height: 100%;
     overflow: hidden;
 `;
@@ -103,7 +102,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
     };
 
     return (
-        <VContainer gap={15} overflow='hidden'>
+        <VContainer gap={0} overflow='hidden' style={{ padding: 0 }}>
             {!hasI18nPlugin &&
                 <StyledWarningContainer>
                     <i className="codicon codicon-warning invalid" />

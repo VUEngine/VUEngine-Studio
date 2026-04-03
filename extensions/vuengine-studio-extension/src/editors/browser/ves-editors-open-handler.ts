@@ -4,7 +4,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { TYPE_VIEW_MODE_RELATIONS, ViewMode } from '../../viewMode/browser/view-mode-types';
+import { DISABLED_VIEW_MODES, TYPE_VIEW_MODE_RELATIONS, ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 
 @injectable()
@@ -35,7 +35,10 @@ export class VesEditorsOpenHandler extends NavigatableWidgetOpenHandler<VesEdito
     }
 
     async open(uri: URI, options?: WidgetOpenerOptions): Promise<VesEditorsWidget> {
-        await this.viewModeService.setViewMode(TYPE_VIEW_MODE_RELATIONS[this.typeId]);
+        const targetViewMode = TYPE_VIEW_MODE_RELATIONS[this.typeId];
+        if (!DISABLED_VIEW_MODES.includes(targetViewMode)) {
+            await this.viewModeService.setViewMode(targetViewMode);
+        }
 
         return super.open(uri, options);
     }
