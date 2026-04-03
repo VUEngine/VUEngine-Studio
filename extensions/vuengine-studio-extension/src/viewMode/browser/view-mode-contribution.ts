@@ -1,12 +1,14 @@
-import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MenuPath, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core';
-import { CommonMenus, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
+import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MenuPath } from '@theia/core';
+import { CommonMenus, ContextMenuRenderer, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
+import { ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { VSXCommands } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VIEW_MODE_SELECT_ID } from '../../titlebar/browser/components/ViewModeSelect';
 import { ViewModeCommands } from './view-mode-commands';
 import { ViewModeService } from './view-mode-service';
-import { DISABLED_VIEW_MODES, VIEW_MODE_ICONS, VIEW_MODE_LABELS, ViewMode } from './view-mode-types';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { DISABLED_VIEW_MODES, VIEW_MODE_LABELS, ViewMode } from './view-mode-types';
 
 export const VIEW_VIEW_MODE = [...CommonMenus.VIEW, '1_viewMode'];
 
@@ -20,8 +22,10 @@ export namespace ViewModeMenuSection {
 export class ViewModeContribution implements CommandContribution, KeybindingContribution, MenuContribution {
     @inject(CommandRegistry)
     protected readonly commands: CommandRegistry;
-    @inject(QuickPickService)
-    protected readonly quickPickService: QuickPickService;
+    @inject(ContextKeyService)
+    protected readonly contextKeyService: ContextKeyService;
+    @inject(ContextMenuRenderer)
+    protected readonly contextMenuRenderer: ContextMenuRenderer;
     @inject(ViewModeService)
     protected readonly viewModeService: ViewModeService;
     @inject(WorkspaceService)
@@ -30,7 +34,7 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(ViewModeCommands.CHANGE_VIEW_MODE, {
             isEnabled: () => this.workspaceService.opened,
-            execute: () => this.viewModeQuickPick()
+            execute: () => this.openViewModeMenu()
         });
         commandRegistry.registerCommand(ViewModeCommands.SWITCH_TO_ACTORS_VIEW_MODE, {
             isEnabled: () => this.workspaceService.opened && !DISABLED_VIEW_MODES.includes(ViewMode.actors),
@@ -196,25 +200,22 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
         });
     }
 
-    protected async viewModeQuickPick(): Promise<void> {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: ViewModeCommands.CHANGE_VIEW_MODE.label,
-        };
-
-        const viewModeOptions: QuickPickItem[] = Object.keys(ViewMode)
-            .filter(vm => vm !== ViewMode.welcome)
-            .filter(vm => !DISABLED_VIEW_MODES.includes(vm as ViewMode))
-            .map(vm => ({
-                id: vm,
-                label: VIEW_MODE_LABELS[vm],
-                iconClasses: VIEW_MODE_ICONS[vm].split(' '),
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        const selection = await this.quickPickService.show<QuickPickItem>(viewModeOptions, quickPickOptions);
-        if (!selection) {
+    protected openViewModeMenu(): void {
+        const button = document.getElementById(VIEW_MODE_SELECT_ID);
+        if (!button) {
             return;
         }
-        this.viewModeService.setViewMode(selection.id as ViewMode);
+
+        const buttonRect = button.getBoundingClientRect();
+        this.contextMenuRenderer.render({
+            menuPath: VIEW_MODE_MENU,
+            includeAnchorArg: false,
+            anchor: {
+                x: buttonRect.left,
+                y: buttonRect.top,
+            },
+            context: button,
+            contextKeyService: this.contextKeyService,
+        });
     }
 }
