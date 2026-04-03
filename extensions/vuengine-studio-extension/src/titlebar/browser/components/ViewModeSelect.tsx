@@ -44,11 +44,14 @@ interface ViewModeSelectProps {
     hoverService: HoverService
 }
 
+export const VIEW_MODE_SELECT_ID = 'viewModeSelect';
+
 export default function ViewModeSelect(props: ViewModeSelectProps): React.JSX.Element {
     const { hidden, viewMode, openViewModeMenu, vesCommonService, hoverService } = props;
 
     return hidden ? <></> : (
         <StyledViewModeSelect
+            id={VIEW_MODE_SELECT_ID}
             onClick={openViewModeMenu}
             onMouseEnter={event => {
                 hoverService.requestHover({

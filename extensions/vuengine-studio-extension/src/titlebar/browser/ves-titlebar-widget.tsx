@@ -232,20 +232,6 @@ export class TitlebarWidget extends ReactWidget {
     protected openRecentWorkspace = () => this.commandService.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
     protected closeWorkspace = () => this.commandService.executeCommand(WorkspaceCommands.CLOSE.id);
 
-    protected openViewModeMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
-        const button = e.currentTarget.getBoundingClientRect();
-        this.contextMenuRenderer.render({
-            menuPath: VIEW_MODE_MENU,
-            includeAnchorArg: false,
-            anchor: {
-                x: button.left,
-                y: button.top,
-            },
-            context: e.currentTarget,
-            contextKeyService: this.contextKeyService,
-        });
-    }
-
     protected openMenu(e: React.MouseEvent<HTMLElement, MouseEvent>, menuPath: MenuPath): void {
         e.stopPropagation();
         const button = e.currentTarget.getBoundingClientRect();
@@ -259,6 +245,10 @@ export class TitlebarWidget extends ReactWidget {
             context: e.currentTarget,
             contextKeyService: this.contextKeyService,
         });
+    }
+
+    protected openViewModeMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
+        this.openMenu(e, VIEW_MODE_MENU);
     }
 
     protected openMainMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
