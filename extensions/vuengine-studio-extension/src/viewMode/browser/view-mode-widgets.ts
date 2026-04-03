@@ -25,8 +25,9 @@ import { SoundEditorKeyBindingsWidget } from '../../editors/browser/sidebar/Soun
 import { SoundEditorPropertiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-properties-widget';
 import { SoundEditorUtilitiesWidget } from '../../editors/browser/sidebar/SoundEditor/sound-editor-utilities-widget';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
-import { VesEmulatorSidebarWidget } from '../../emulator/browser/ves-emulator-sidebar-widget';
+import { EmulatorConfigsWidget } from '../../emulator/browser/ves-emulator-configs-widget';
 import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
+import { FlashCartConfigsWidget } from '../../flash-cart/browser/ves-flash-cart-configs-widget';
 import { VesFlashCartWidget } from '../../flash-cart/browser/ves-flash-cart-widget';
 import { VesPluginsViewContainer } from '../../plugins/browser/ves-plugins-view-container';
 import { ActorAssetsBrowserWidget } from '../../project/browser/assets-browser/actor-assets-browser-widget';
@@ -70,7 +71,8 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.build]: {
         allow: {
             [VesBuildArchiveWidget.ID]: false,
-            [VesEmulatorSidebarWidget.ID]: false,
+            [EmulatorConfigsWidget.ID]: false,
+            [FlashCartConfigsWidget.ID]: false,
             [VesEmulatorWidget.ID]: false,
         },
         force: {

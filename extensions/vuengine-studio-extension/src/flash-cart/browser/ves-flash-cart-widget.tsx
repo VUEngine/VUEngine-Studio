@@ -4,8 +4,6 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { FileDialogService } from '@theia/filesystem/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -17,10 +15,6 @@ import { VesFlashCartService } from './ves-flash-cart-service';
 export class VesFlashCartWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
-  @inject(FileService)
-  private readonly fileService: FileService;
-  @inject(FileDialogService)
-  private readonly fileDialogService: FileDialogService;
   @inject(LocalStorageService)
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
@@ -112,8 +106,6 @@ export class VesFlashCartWidget extends ReactWidget {
       />
       : <FlashCarts
         commandService={this.commandService}
-        fileService={this.fileService}
-        fileDialogService={this.fileDialogService}
         preferenceService={this.preferenceService}
         vesBuildService={this.vesBuildService}
         vesCommonService={this.vesCommonService}
