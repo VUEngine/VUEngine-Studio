@@ -1232,17 +1232,24 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   protected async rsyncToWsl(from: string, to: string): Promise<void> {
-
-    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+    const mkdirProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: ['mkdir', '-p', to]
     });
 
-    const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+    await new Promise<void>((resolve, reject) => {
+      this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
+        if (mkdirProcess.processManagerId === pId) {
+          resolve();
+        }
+      });
+    });
+
+    const syncProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: 'wsl.exe',
       args: [
         'rsync',
-        '-rczt',              // r: recursive, c: checksum, z: compress, t: preserve times
+        '-rczt', // r: recursive, c: checksum, z: compress, t: preserve times
         '--delete',
         '--force',
         // Exclude version control
@@ -1259,6 +1266,15 @@ Beware! This is usually not necessary and will result in the next build taking l
         // Exclude web/compiled assets
         '--exclude=*.html',
         '--exclude=*.css',
+
+        // '-rcztm', // r: recursive, c: checksum, z: compress, t: preserve timestamps, m: prune empty directories
+        // '--include=*/', // include all directories
+        // '--include=build/**', // include entire build folder
+        // '--include=*.c', // include all c files
+        // '--include=*.h', // include all h files
+        // '--include=lib/compiler/**', // include makefiles and preprocessor
+        // '--exclude=*', // exclude all other files
+
         from,
         to,
       ]
@@ -1266,12 +1282,12 @@ Beware! This is usually not necessary and will result in the next build taking l
 
     await new Promise<void>((resolve, reject) => {
       this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
-        if (checkProcess.processManagerId === pId) {
+        if (syncProcess.processManagerId === pId) {
           resolve();
         }
       });
       this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
-        if (checkProcess.processManagerId === pId) {
+        if (syncProcess.processManagerId === pId) {
           resolve();
         }
       });
@@ -1313,12 +1329,6 @@ Beware! This is usually not necessary and will result in the next build taking l
       const userPluginsPath = this.convertToEnvPath(true, userPluginsUri);
       await this.rsyncToWsl(userPluginsPath + '/', WSL_USER_PLUGINS_PATH);
     }
-
-    this.pushBuildLogLine({
-      type: BuildLogLineType.Normal,
-      text: '',
-      timestamp: Date.now(),
-    });
   }
 
   protected async postBuildSyncWsl(): Promise<void> {
@@ -1332,6 +1342,12 @@ Beware! This is usually not necessary and will result in the next build taking l
     if (!workspaceRootUri) {
       throw new Error;
     }
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
 
     this.buildStatus = {
       ...this.buildStatus,
@@ -1347,12 +1363,6 @@ Beware! This is usually not necessary and will result in the next build taking l
     const realtiveProjectPath = projectPath.replace(/[/\\]+$/, '').split(/[/\\]/).pop();
     const projectBuildPath = this.convertToEnvPath(true, workspaceRootUri.resolve('build'));
     await this.rsyncToWsl(`${WSL_PROJECTS_PATH}${realtiveProjectPath}/build/`, `${projectBuildPath}/`);
-
-    this.pushBuildLogLine({
-      type: BuildLogLineType.Normal,
-      text: '',
-      timestamp: Date.now(),
-    });
   }
 
   protected async runPostBuildTasks(): Promise<void> {

@@ -241,7 +241,7 @@ if (isWindows) {
     properties[VesBuildPreferenceIds.USE_WSL] = {
         type: 'boolean',
         description: nls.localize('vuengine/build/preferences/useWslDescription', 'Automatically build through WSL if detected.'),
-        default: false,
+        default: true,
         scope: PreferenceScope.Folder,
         overridable: true,
     };
