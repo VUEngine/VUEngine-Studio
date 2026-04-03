@@ -4,26 +4,31 @@ import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
 import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 import { injectable } from '@theia/core/shared/inversify';
+import { NativeImage, SegmentedControlSegment } from 'electron';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
 import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
+import { ViewModeCommands } from '../../viewMode/browser/view-mode-commands';
+import { VIEW_MODE_LABELS, ViewMode } from '../../viewMode/browser/view-mode-types';
+import { VesTouchBarIcons } from '../common/images/touch-bar-icons';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
-import { VesTouchBarIcons } from './images/touch-bar-icons';
-// import IMAGE_BLANK from '../../../src/touchbar/electron-main/images/blank.png';
-// import IMAGE_VES from '../../../src/touchbar/electron-main/images/ves.png';
-// import IMAGE_CLEAN from '../../../src/touchbar/electron-main/images/clean.png';
-// import IMAGE_BUILD from '../../../src/touchbar/electron-main/images/build.png';
-// import IMAGE_RUN from '../../../src/touchbar/electron-main/images/run.png';
-// import IMAGE_FLASH from '../../../src/touchbar/electron-main/images/flash.png';
-// import IMAGE_EXPORT from '../../../src/touchbar/electron-main/images/export.png';
-// import IMAGE_MENU from '../../../src/touchbar/electron-main/images/menu.png';
-// import IMAGE_QUEUED from '../../../src/touchbar/electron-main/images/queued.png';
-// import IMAGE_PLUS from '../../../src/touchbar/electron-main/images/plus.png';
-// import IMAGE_OPEN_FOLDER from '../../../src/touchbar/electron-main/images/open-folder.png';
-// import IMAGE_FILE_CODE from '../../../src/touchbar/electron-main/images/file-code.png';
+
+export const VIEW_MODE_TOUCHBAR_ICONS: { [viewMode: string]: NativeImage } = {
+    [ViewMode.actors]: nativeImage.createFromDataURL(VesTouchBarIcons.SMILEY).resize({ height: 18 }),
+    [ViewMode.assets]: nativeImage.createFromDataURL(VesTouchBarIcons.LIBRARY).resize({ height: 18 }),
+    [ViewMode.build]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_PROPERTY).resize({ height: 18 }),
+    [ViewMode.fonts]: nativeImage.createFromDataURL(VesTouchBarIcons.CASE_SENSITIVE).resize({ height: 18 }),
+    [ViewMode.localization]: nativeImage.createFromDataURL(VesTouchBarIcons.COMMENT_DISCUSSION).resize({ height: 18 }),
+    [ViewMode.logic]: nativeImage.createFromDataURL(VesTouchBarIcons.PULSE).resize({ height: 18 }),
+    [ViewMode.sound]: nativeImage.createFromDataURL(VesTouchBarIcons.MUSIC).resize({ height: 18 }),
+    [ViewMode.settings]: nativeImage.createFromDataURL(VesTouchBarIcons.SETTINGS).resize({ height: 18 }),
+    [ViewMode.sourceCode]: nativeImage.createFromDataURL(VesTouchBarIcons.CODE).resize({ height: 18 }),
+    [ViewMode.stages]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_METHOD).resize({ height: 18 }),
+};
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -98,25 +103,13 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     }
 
     protected registerVesTouchBar(electronWindow: BrowserWindow, workspaceOpened: boolean): void {
-        const { TouchBarButton } = TouchBar;
-
-        const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
-
-        const vesButton = new TouchBarButton({
-            backgroundColor: '#a22929',
-            icon: vesIcon,
-            // click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'core.about'),
-            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
-        });
-
         const vesTouchBar = new TouchBar({
             items: workspaceOpened
                 ? [
-                    vesButton,
-                    ...this.getProjectToolbarButtons(electronWindow),
+                    ...this.getViewModeMenuButtons(electronWindow),
+                    ...this.getBuildMenuButtons(electronWindow),
                 ]
                 : [
-                    vesButton,
                     ...this.getNoProjectToolbarButtons(electronWindow),
                 ]
         });
@@ -124,14 +117,42 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.setTouchBar(vesTouchBar);
     }
 
-    protected getProjectToolbarButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
+    protected getViewModeMenuButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
+        const { TouchBarButton, TouchBarSpacer } = TouchBar;
+
+        const viewModeSpacer = new TouchBarSpacer({
+            size: 'small',
+        });
+
+        const viewModeButton = new TouchBarButton({
+            backgroundColor: '#d31422',
+            // backgroundColor: this.colorRegistry.getCurrentColor('focusBorder'),
+            label: VIEW_MODE_LABELS[ViewMode.sourceCode],
+            icon: VIEW_MODE_TOUCHBAR_ICONS[ViewMode.sourceCode],
+            iconPosition: 'left',
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, ViewModeCommands.CHANGE_VIEW_MODE.id),
+        });
+
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeViewMode, (viewMode: ViewMode) => {
+            viewModeButton.label = VIEW_MODE_LABELS[viewMode];
+            viewModeButton.icon = VIEW_MODE_TOUCHBAR_ICONS[viewMode];
+        });
+
+        return [
+            viewModeButton,
+            viewModeSpacer,
+        ];
+    }
+
+    protected getBuildMenuButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 
         const blankIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK).resize({ height: 18 });
-        const cleanIcon = nativeImage.createFromDataURL(VesTouchBarIcons.CLEAN).resize({ height: 16 });
-        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD).resize({ height: 18 });
-        const runIcon = nativeImage.createFromDataURL(VesTouchBarIcons.RUN).resize({ height: 16 });
-        const flashIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FLASH).resize({ height: 18 });
+        const cleanIcon = nativeImage.createFromDataURL(VesTouchBarIcons.TRASH).resize({ height: 16 });
+        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_PROPERTY).resize({ height: 18 });
+        const exportIcon = nativeImage.createFromDataURL(VesTouchBarIcons.DESKTOP_DOWNLOAD).resize({ height: 18 });
+        const runIcon = nativeImage.createFromDataURL(VesTouchBarIcons.PLAY).resize({ height: 16 });
+        const flashIcon = nativeImage.createFromDataURL(VesTouchBarIcons.CHIP).resize({ height: 18 });
         const queuedIcon = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED).resize({ height: 16 });
 
         const buildMenuBuildButton = new TouchBarButton({
@@ -146,22 +167,18 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             icon: flashIcon,
             click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesFlashCartCommands.FLASH.id),
         });
+        const buildMenuExportButton = new TouchBarButton({
+            icon: exportIcon,
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesExportCommands.EXPORT.id),
+        });
         const buildMenuCleanButton = new TouchBarButton({
             icon: cleanIcon,
             click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
         });
 
-        const buildModes = [{
-            label: BuildMode.Shipping,
-        }, {
-            label: BuildMode.Release,
-        }, {
-            label: BuildMode.Beta,
-        }, {
-            label: BuildMode.Tools,
-        }, {
-            label: BuildMode.Debug,
-        }];
+        const buildModes: SegmentedControlSegment[] = Object.keys(BuildMode).map(m => ({
+            label: m,
+        }));
 
         const buildModeButtonSegmentedControl = new TouchBarSegmentedControl({
             segmentStyle: 'automatic',
@@ -172,11 +189,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         const buildMenuSpacer = new TouchBarSpacer({
-            size: 'large',
+            size: 'small',
         });
 
         const buildModeButton = new TouchBarPopover({
-            label: nls.localize('vuengine/build/mode', 'Mode'),
+            label: nls.localize('vuengine/build/buildMode', 'Build Mode'),
             showCloseButton: true,
             items: new TouchBar({
                 items: [
@@ -230,6 +247,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildMenuBuildButton,
             buildMenuRunButton,
             buildMenuFlashButton,
+            buildMenuExportButton,
             buildMenuCleanButton,
             buildMenuSpacer,
             buildModeButton,
@@ -239,9 +257,10 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     protected getNoProjectToolbarButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton> {
         const { TouchBarButton } = TouchBar;
 
-        const newProjectIcon = nativeImage.createFromDataURL(VesTouchBarIcons.PLUS).resize({ height: 18 });
-        const openIcon = nativeImage.createFromDataURL(VesTouchBarIcons.OPEN_FOLDER).resize({ height: 18 });
-        const openWorkspaceIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FILE_CODE).resize({ height: 18 });
+        const newProjectIcon = nativeImage.createFromDataURL(VesTouchBarIcons.ADD).resize({ height: 18 });
+        const openIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FOLDER_OPENED).resize({ height: 18 });
+        const openWorkspaceIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FOLDER_LIBRARY).resize({ height: 18 });
+        const repoCloneIcon = nativeImage.createFromDataURL(VesTouchBarIcons.REPO_CLONE).resize({ height: 18 });
 
         const newProjectButton = new TouchBarButton({
             icon: newProjectIcon,
@@ -257,11 +276,16 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             icon: openWorkspaceIcon,
             click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'workspace:openWorkspace'),
         });
+        const repoCloneButton = new TouchBarButton({
+            icon: repoCloneIcon,
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'git.clone'),
+        });
 
         return [
-            newProjectButton,
-            openButton,
             openWorkspaceButton,
+            openButton,
+            repoCloneButton,
+            newProjectButton,
         ];
     }
 }

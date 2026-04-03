@@ -2,7 +2,8 @@ import { ApplicationShell, FrontendApplication, ShellLayoutRestorer } from '@the
 import { StopReason } from '@theia/core/lib/common/frontend-application-state';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ViewModeService } from './view-mode-service';
-import { VIEW_MODE_WIDGETS, ViewMode } from './view-mode-types';
+import { ViewMode } from './view-mode-types';
+import { VIEW_MODE_WIDGETS } from './view-mode-widgets';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
