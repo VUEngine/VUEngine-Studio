@@ -1,9 +1,17 @@
+import { codicon } from '@theia/core/lib/browser';
 import { injectable } from '@theia/core/shared/inversify';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 
 // override to allow querying through OPEN_KEYMAPS command parameter
 @injectable()
 export class VesKeybindingWidget extends KeybindingWidget {
+    protected init(): void {
+        super.init();
+
+        this.title.iconClass = codicon('record-keys');
+        this.title.closable = false;
+    }
+
     search(query: string): void {
         const searchField = this.findSearchField();
         if (searchField) {

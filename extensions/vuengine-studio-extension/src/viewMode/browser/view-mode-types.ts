@@ -171,8 +171,6 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.settings]: {
         allow: {
             [PreferencesSearchbarWidget.ID]: false,
-            [KeybindingWidget.ID]: false,
-            [PreferencesWidget.ID]: false,
             [VesProjectSidebarWidget.ID]: true,
             [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
@@ -183,6 +181,10 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [`${VesEditorsWidget.ID}:InGameTypes:`]: false,
             [`${VesEditorsWidget.ID}:Messages:`]: false,
             [`${VesEditorsWidget.ID}:RomInfo:`]: false,
+        },
+        force: {
+            [KeybindingWidget.ID]: false,
+            [PreferencesWidget.ID]: false,
         }
     },
     [ViewMode.sound]: {
