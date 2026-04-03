@@ -137,7 +137,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
 
-    data: ItemData | undefined;
+    protected data: ItemData | undefined;
 
     protected currentThemeType: ThemeType;
 
@@ -314,10 +314,20 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     getResourceUri(): URI | undefined {
+        const type = PROJECT_TYPES[this.typeId];
+        if (!type || !type.file.startsWith('.')) {
+            return undefined;
+        }
+
         return this.uri;
     }
 
     createMoveToUri(resourceUri: URI): URI | undefined {
+        const type = PROJECT_TYPES[this.typeId];
+        if (!type || !type.file.startsWith('.')) {
+            return undefined;
+        }
+
         return this.uri;
     }
 
