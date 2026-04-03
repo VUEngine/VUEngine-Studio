@@ -15,6 +15,13 @@ export class ViewModePreferencesWidget extends PreferencesWidget {
 
         this.title.label = ViewModePreferencesWidget.LABEL;
         this.title.caption = ViewModePreferencesWidget.LABEL;
+        this.title.closable = false;
+
+        this.doInit();
+    }
+
+    protected async doInit(): Promise<void> {
+        await this.workspaceService.ready;
         this.title.closable = !this.workspaceService.opened;
     }
 }

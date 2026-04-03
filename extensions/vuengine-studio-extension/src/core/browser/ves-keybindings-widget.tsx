@@ -13,6 +13,13 @@ export class VesKeybindingWidget extends KeybindingWidget {
         super.init();
 
         this.title.iconClass = codicon('record-keys');
+        this.title.closable = false;
+
+        this.doInit();
+    }
+
+    protected async doInit(): Promise<void> {
+        await this.workspaceService.ready;
         this.title.closable = !this.workspaceService.opened;
     }
 
