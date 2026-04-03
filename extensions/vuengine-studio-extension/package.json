@@ -21,7 +21,6 @@
     "@theia/editor": "1.69.0",
     "@theia/electron": "1.69.0",
     "@theia/filesystem": "1.69.0",
-    "@theia/getting-started": "1.69.0",
     "@theia/keymaps": "1.69.0",
     "@theia/markers": "1.69.0",
     "@theia/monaco": "1.69.0",
@@ -145,7 +144,7 @@
       "frontend": "lib/flash-cart/browser/ves-flash-cart-frontend-module"
     },
     {
-      "frontend": "lib/getting-started/browser/ves-getting-started-frontend-module"
+      "frontend": "lib/welcome/browser/welcome-frontend-module"
     },
     {
       "frontend": "lib/images/browser/ves-images-frontend-module"

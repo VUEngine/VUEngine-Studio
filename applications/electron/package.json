@@ -29,7 +29,6 @@
         "reloadOnReconnect": true,
         "preferences": {
           "files.autoSave": "onFocusChange",
-          "workbench.startupEditor": "welcomePageInEmptyWorkbench",
           "workbench.tree.renderIndentGuides": "none",
           "editor.detectIndentation": false,
           "editor.inlayHints.fontSize": 10,

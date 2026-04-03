@@ -1,9 +1,13 @@
 import { nls } from '@theia/core';
-import { injectable } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { PreferencesWidget } from '@theia/preferences/lib/browser/views/preference-widget';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class ViewModePreferencesWidget extends PreferencesWidget {
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
+
     static readonly LABEL = nls.localize('vuengine/general/ideSettings', 'IDE Settings');
 
     protected init(): void {
@@ -11,6 +15,6 @@ export class ViewModePreferencesWidget extends PreferencesWidget {
 
         this.title.label = ViewModePreferencesWidget.LABEL;
         this.title.caption = ViewModePreferencesWidget.LABEL;
-        this.title.closable = false;
+        this.title.closable = !this.workspaceService.opened;
     }
 }
