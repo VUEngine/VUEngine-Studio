@@ -1,4 +1,3 @@
-import { ContainerModule } from '@theia/core/shared/inversify';
 import { CommandContribution, MenuContribution, PreferenceContribution } from '@theia/core';
 import {
     bindViewContribution,
@@ -6,16 +5,17 @@ import {
     KeybindingContribution,
     WidgetFactory
 } from '@theia/core/lib/browser';
+import { TabBarDecorator } from '@theia/core/lib/browser/shell/tab-bar-decorator';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { ContainerModule } from '@theia/core/shared/inversify';
+import '../../../src/flash-cart/browser/style/index.css';
 import { VesFlashCartContribution } from './ves-flash-cart-contribution';
+import { VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 import { VesFlashCartService } from './ves-flash-cart-service';
+import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
+import { VesFlashCartTabBarDecorator } from './ves-flash-cart-tab-bar-decorator';
 import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
-import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
-import { VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
-import { TabBarDecorator } from '@theia/core/lib/browser/shell/tab-bar-decorator';
-import { VesFlashCartTabBarDecorator } from './ves-flash-cart-tab-bar-decorator';
-import '../../../src/flash-cart/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -36,7 +36,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // flash cart view
     bindViewContribution(bind, VesFlashCartViewContribution);
-    bind(FrontendApplicationContribution).toService(VesFlashCartViewContribution);
     bind(TabBarToolbarContribution).toService(VesFlashCartViewContribution);
     bind(VesFlashCartWidget).toSelf();
     bind(WidgetFactory)

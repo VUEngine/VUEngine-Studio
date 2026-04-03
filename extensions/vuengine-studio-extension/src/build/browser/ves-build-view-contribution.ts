@@ -1,5 +1,5 @@
 import { CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, KeybindingRegistry } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -24,10 +24,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 rank: 700,
             },
         });
-    }
-
-    async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
     }
 
     protected async toggleWidget(force?: boolean): Promise<void> {

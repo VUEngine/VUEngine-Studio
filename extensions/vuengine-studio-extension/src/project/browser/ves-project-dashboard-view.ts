@@ -1,5 +1,5 @@
 import { CommandContribution, CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
+import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesProjectCommands } from './ves-project-commands';
@@ -21,10 +21,6 @@ export class VesProjectDashboardViewContribution extends AbstractViewContributio
                 // rank: -1000,
             },
         });
-    }
-
-    async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {

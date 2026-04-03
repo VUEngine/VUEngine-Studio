@@ -69,7 +69,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // build view
     bindViewContribution(bind, VesProjectDashboardViewContribution);
-    bind(FrontendApplicationContribution).toService(VesProjectDashboardViewContribution);
     bind(CommandContribution).toService(VesProjectDashboardViewContribution);
     bind(OpenHandler).to(VesProjectDashboardOpenHandler).inSingletonScope();
     bind(VesProjectDashboardWidget).toSelf();

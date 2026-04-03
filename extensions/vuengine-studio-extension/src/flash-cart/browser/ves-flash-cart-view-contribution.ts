@@ -1,5 +1,5 @@
 import { CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, FrontendApplication } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -27,10 +27,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                 rank: 900,
             },
         });
-    }
-
-    async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
