@@ -52,7 +52,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
-            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
             isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
             execute: force => this.toggleWidget(force)
         });

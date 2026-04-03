@@ -46,7 +46,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
-            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.settings,
             isVisible: () => this.viewModeService.getViewMode() === ViewMode.settings,
             execute: async () => {
                 await this.viewModeService.setViewMode(ViewMode.settings);

@@ -15,7 +15,7 @@ const StyledWarningContainer = styled.div`
     border-bottom: 1px solid var(--theia-activityBar-background);
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: var(--theia-ui-padding);
     justify-content: center;
     padding-bottom: var(--theia-ui-padding);
     position: relative;
@@ -25,7 +25,8 @@ const StyledWarningContainer = styled.div`
 const StyledTranslationsEditor = styled.div`
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: calc(2 * var(--theia-ui-padding));
+    height: 100%;
     overflow: hidden;
 `;
 

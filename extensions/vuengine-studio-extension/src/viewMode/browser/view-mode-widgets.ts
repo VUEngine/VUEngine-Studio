@@ -85,7 +85,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         }
     },
     [ViewMode.localization]: {
-        allow: {
+        force: {
             [`${VesEditorsWidget.ID}:Translations:`]: false,
         }
     },
