@@ -1,7 +1,7 @@
 import { ApplicationShell, DockLayout, ShellLayoutTransformer, SidePanel, Widget } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { ViewModeService } from './view-mode-service';
-import { VIEW_MODE_WIDGETS } from './view-mode-types';
+import { VIEW_MODE_WIDGETS } from './view-mode-widgets';
 
 @injectable()
 export class ViewModeShellLayoutTransformer implements ShellLayoutTransformer {

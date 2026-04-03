@@ -5,7 +5,8 @@ import { FrontendApplicationState, FrontendApplicationStateService } from '@thei
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { COMMAND_ID_TO_VIEW_MODE, DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, ViewMode } from './view-mode-types';
+import { ViewMode } from './view-mode-types';
+import { COMMAND_ID_TO_VIEW_MODE, DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY } from './view-mode-widgets';
 
 interface ViewModeChange {
     newViewMode: ViewMode
