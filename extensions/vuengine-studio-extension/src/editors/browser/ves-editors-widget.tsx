@@ -9,8 +9,6 @@ import {
     LabelProvider,
     LocalStorageService,
     lock,
-    NavigatableWidget,
-    NavigatableWidgetOptions,
     OpenerService,
     Saveable,
     SaveableSource,
@@ -51,7 +49,7 @@ import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EditorsContext } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
-export interface VesEditorsWidgetOptions extends NavigatableWidgetOptions {
+export interface VesEditorsWidgetOptions {
     typeId: string
 }
 
@@ -60,7 +58,7 @@ export interface ItemData {
 };
 
 @injectable()
-export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource {
+export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
     @inject(ClipboardService)
     private readonly clipboardService: ClipboardService;
     @inject(ColorRegistry)
@@ -317,24 +315,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                 this.update();
             }),
         ]);
-    }
-
-    getResourceUri(): URI | undefined {
-        const type = PROJECT_TYPES[this.typeId];
-        if (!type || !type.file.startsWith('.')) {
-            return undefined;
-        }
-
-        return this.uri;
-    }
-
-    createMoveToUri(resourceUri: URI): URI | undefined {
-        const type = PROJECT_TYPES[this.typeId];
-        if (!type || !type.file.startsWith('.')) {
-            return undefined;
-        }
-
-        return this.uri;
     }
 
     close(): void {

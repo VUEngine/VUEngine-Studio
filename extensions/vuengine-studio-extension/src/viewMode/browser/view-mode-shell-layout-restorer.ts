@@ -163,7 +163,6 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
                 options = {
                     typeId,
                     uri: uri.withoutFragment().toString(),
-                    kind: 'navigatable',
                 };
             }
 
