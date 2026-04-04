@@ -34,7 +34,7 @@ const ControlsOverlay = styled.div`
   }
 
   &>div>div {
-    border-bottom: 1px dashed var(--theia-activityBar-background);
+    border-bottom: 1px dashed var(--theia-editorGroup-border);
     margin-bottom: calc(var(--theia-ui-padding) * 4);
     padding-bottom: calc(var(--theia-ui-padding) * 4);
   }

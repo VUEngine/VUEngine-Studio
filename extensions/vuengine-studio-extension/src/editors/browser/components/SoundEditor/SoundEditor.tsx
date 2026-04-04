@@ -121,7 +121,7 @@ const StyledLowerContainer = styled.div`
 `;
 
 const StyledSidebarTabs = styled.div` 
-    border-left: 2px solid var(--theia-activityBar-background);
+    border-left: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
 `;
@@ -129,7 +129,7 @@ const StyledSidebarTabs = styled.div`
 const StyledSidebarTab = styled.div` 
     align-items: center;
     border-bottom: none;
-    border-left: 2px solid transparent;
+    border-left: 1px solid transparent;
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
@@ -137,7 +137,7 @@ const StyledSidebarTab = styled.div`
     height: var(--theia-private-sidebar-tab-width);
     justify-content: center;
     line-height: 30px;
-    margin-left: -2px;
+    margin-left: -1px;
     max-width: var(--theia-private-sidebar-tab-width);
     min-width: var(--theia-private-sidebar-tab-width);
     opacity: .3;
@@ -151,7 +151,7 @@ const StyledSidebarTab = styled.div`
     &:focus,
     &:hover,
     &.selected {
-        background-color: var(--theia-activityBar-background);
+        background-color: var(--theia-editorGroup-border);
 
         svg {
             opacity: 1;
@@ -164,7 +164,7 @@ const StyledSidebarTab = styled.div`
 `;
 
 const StyledSidebar = styled.div` 
-    border-left: 2px solid var(--theia-activityBar-background);
+    border-left: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
     max-width: 40%;
@@ -172,8 +172,9 @@ const StyledSidebar = styled.div`
 `;
 
 const StyledSidebarTitle = styled.div` 
-    
+  
 `;
+
 const StyledSidebarContent = styled.div` 
     display: flex;
     flex-direction: column;
@@ -371,6 +372,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
     const [sidebarTab, setSidebarTab] = useState<SidebarTab>(SidebarTab.none);
+    const [previousSidebarTab, setPreviousSidebarTab] = useState<SidebarTab>(SidebarTab.properties);
     const [importSettings, setImportSettings] = useState<ImportSettings>(DEFAULT_IMPORT_SETTINGS);
     const [transposeOptions, setTransposeOptions] = useState<TransposeOptions>(DEFAULT_TRANSPOSE_OPTIONS);
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length
@@ -899,8 +901,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentEditedInstrumentId(actualInstrumentId);
     };
 
+    const updateSidebarTab = (tab: SidebarTab): void => {
+        setPreviousSidebarTab(sidebarTab);
+        setSidebarTab(tab);
+    };
+
     const showOrToggleSidebarTab = (tab: SidebarTab): void => {
-        setSidebarTab(prev => tab === prev ? SidebarTab.none : tab);
+        updateSidebarTab(tab === sidebarTab ? SidebarTab.none : tab);
     };
 
     const editInstrument = (instrumentId: string): void => {
@@ -909,15 +916,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const editCurrentTrack = (): void => {
-        setSidebarTab(SidebarTab.currentTrack);
+        updateSidebarTab(SidebarTab.currentTrack);
     };
 
     const editCurrentPattern = (): void => {
-        setSidebarTab(SidebarTab.currentPattern);
+        updateSidebarTab(SidebarTab.currentPattern);
     };
 
     const editCurrentNote = (): void => {
-        setSidebarTab(SidebarTab.currentNote);
+        updateSidebarTab(SidebarTab.currentNote);
     };
 
     const addPattern = (trackId: number, step: number, size?: number): void => {
@@ -1317,7 +1324,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 }
                 break;
             case SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY.id:
-                // TODO
+                updateSidebarTab(sidebarTab === SidebarTab.none ? previousSidebarTab : SidebarTab.none);
                 break;
             case SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id:
                 if (soundData.tracks.length > 0) {
@@ -1501,7 +1508,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setRangeDragEndStep={setRangeDragEndStep}
                                         setForcePlayerRomRebuild={setForcePlayerRomRebuild}
                                         noteCursor={noteCursor}
-                                        setNoteCursor={setNoteCursor}
+                                        setNoteCursor={updateNoteCursor}
                                         stepsPerNote={stepsPerNote}
                                         stepsPerBar={stepsPerBar}
                                     />
@@ -1613,7 +1620,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 {sidebarTab === SidebarTab.currentTrack &&
                                     <CurrentTrack
                                         soundData={soundData}
-                                        setSoundData={updateSoundData}
+                                        updateSoundData={updateSoundData}
                                         currentTrackId={currentTrackId}
                                         setCurrentTrackId={updateCurrentTrackId}
                                         setTrack={setTrack}

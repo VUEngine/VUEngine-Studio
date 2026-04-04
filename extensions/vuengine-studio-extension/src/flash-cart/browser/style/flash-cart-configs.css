@@ -8,7 +8,7 @@
 }
 
 .flashCartConfig {
-    border: 1px solid var(--theia-activityBar-background);
+    border: 1px solid var(--theia-editorGroup-border);
     border-radius: 2px;
     display: flex;
     flex-direction: column;

@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const PixelEditorTool = styled.div`
-    background-color: var(--theia-activityBar-background);
-    border: 1px solid var(--theia-activityBar-background);
+    background-color: var(--theia-editorGroup-border);
+    border: 1px solid var(--theia-editorGroup-border);
     box-sizing: border-box;
     justify-content: center;
     align-items: center;
@@ -15,7 +15,7 @@ export const PixelEditorTool = styled.div`
 
     &:hover,
     &.active {
-        border-color: var(--theia-activityBar-background);
+        border-color: var(--theia-editorGroup-border);
         outline: 1px solid var(--theia-button-background);
         outline-offset: -1px;
     }

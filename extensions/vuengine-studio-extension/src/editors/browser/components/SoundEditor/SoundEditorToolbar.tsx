@@ -155,7 +155,7 @@ interface SoundEditorToolbarProps {
     trackSettings: TrackSettings[]
     playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: (instrumentId: string) => void
     setNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number

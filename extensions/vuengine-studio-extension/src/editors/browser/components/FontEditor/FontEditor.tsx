@@ -38,7 +38,7 @@ interface FontEditorProps {
 const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
   border-radius: 2px;
-  border: 1px solid var(--theia-activityBar-background);
+  border: 1px solid var(--theia-editorGroup-border);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

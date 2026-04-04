@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import Input from '../../Common/Base/Input';
 import {
     EventsMap,
@@ -14,7 +14,7 @@ interface StepInputProps {
     events: EventsMap
     noteSnapping: boolean
     setNotes: (notes: EventsMap) => void
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
 }
 
 export default function StepInput(props: StepInputProps): React.JSX.Element {

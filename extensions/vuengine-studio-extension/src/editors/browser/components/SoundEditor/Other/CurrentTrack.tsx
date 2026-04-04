@@ -1,6 +1,6 @@
 import { Trash } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
@@ -26,7 +26,7 @@ import {
 
 interface CurrentTrackProps {
     soundData: SoundData
-    setSoundData: Dispatch<SetStateAction<SoundData>>
+    updateSoundData: (soundData: SoundData) => void
     currentTrackId: number
     setCurrentTrackId: (id: number) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
@@ -38,7 +38,7 @@ interface CurrentTrackProps {
 export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
-        soundData, setSoundData,
+        soundData, updateSoundData,
         currentTrackId, setCurrentTrackId,
         setTrack, removeTrack,
         editInstrument,
@@ -64,7 +64,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
         });
 
     const setTrackType = (type: SoundEditorTrackType): void =>
-        setSoundData({
+        updateSoundData({
             ...soundData,
             tracks: soundData.tracks
                 .map((t, i) => ({

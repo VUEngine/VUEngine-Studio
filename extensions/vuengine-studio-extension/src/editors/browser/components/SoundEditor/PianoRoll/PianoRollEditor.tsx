@@ -1,4 +1,4 @@
-import React, { Dispatch, RefObject, SetStateAction, useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import styled from 'styled-components';
 import {
     EventsMap,
@@ -55,7 +55,7 @@ interface PianoRollEditorProps {
     currentPatternId: string
     currentSequenceIndex: number
     currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: (instrumentId: string) => void
     noteCursor: number
     setNoteCursor: (note: number) => void
     setNotes: (notes: EventsMap) => void

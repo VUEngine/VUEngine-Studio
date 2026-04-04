@@ -12,7 +12,7 @@ const I18N_PLUGIN_ID = 'vuengine//other/I18n';
 
 const StyledWarningContainer = styled.div`
     align-items: center;
-    border-bottom: 2px solid var(--theia-editorGroupHeader-tabsBackground);
+    border-bottom: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: row;
     gap: var(--theia-ui-padding);

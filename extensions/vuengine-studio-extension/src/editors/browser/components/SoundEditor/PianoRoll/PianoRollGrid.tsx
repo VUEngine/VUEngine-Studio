@@ -33,9 +33,9 @@ interface PianoRollGridProps {
     currentPatternId: string
     currentSequenceIndex: number
     currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: (instrumentId: string) => void
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     setNotes: (notes: EventsMap) => void
     newNoteDuration: number
     pianoRollNoteHeight: number

@@ -153,7 +153,7 @@ const StyledToggleButton = styled.button`
 interface PianoRollProps {
     soundData: SoundData
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     tool: SoundEditorTool
     marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
@@ -161,7 +161,7 @@ interface PianoRollProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     currentInstrumentId: string
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: (instrumentId: string) => void
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
@@ -343,7 +343,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             if (currentPattern?.events[sn] && currentPattern?.events[sn][SoundEvent.Note]) {
                 const currentNoteId = currentPattern.events[sn][SoundEvent.Note];
                 const newNoteId = NOTES_LABELS.indexOf(currentNoteId) + amount;
-                if (newNoteId >= 0 && newNoteId < NOTES_SPECTRUM) {
+                if (newNoteId > -1 && newNoteId < NOTES_SPECTRUM) {
                     notes[sn] = {
                         ...currentPattern.events[sn],
                         [SoundEvent.Note]: NOTES_LABELS[newNoteId],
@@ -521,12 +521,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         switch (commandId) {
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id:
                 if (noteCursor < songLength - SUB_NOTE_RESOLUTION) {
-                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + SUB_NOTE_RESOLUTION);
+                    setNoteCursor(Math.floor(noteCursor / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION + SUB_NOTE_RESOLUTION);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id:
                 if (noteCursor >= SUB_NOTE_RESOLUTION) {
-                    setNoteCursor(prev => Math.floor(prev / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
+                    setNoteCursor(Math.floor(noteCursor / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - SUB_NOTE_RESOLUTION);
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id:

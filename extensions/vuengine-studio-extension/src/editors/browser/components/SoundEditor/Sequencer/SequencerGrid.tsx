@@ -70,7 +70,7 @@ interface SequencerGridProps {
     removePatternsFromSequence: (patterns: string[]) => void
     noteSnapping: boolean
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     stepsPerNote: number
     stepsPerBar: number
 }

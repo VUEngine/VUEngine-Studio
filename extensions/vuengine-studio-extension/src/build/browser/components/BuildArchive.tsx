@@ -27,7 +27,7 @@ const BuildArchiveEmpty = styled.div`
 `;
 
 const BuildArchiveOptions = styled.div`
-    border-bottom: 1px solid var(--theia-activityBar-background);
+    border-bottom: 1px solid var(--theia-editorGroup-border);
     padding: calc(var(--theia-ui-padding) * 2);
 `;
 
@@ -41,7 +41,7 @@ const BuildArchiveFile = styled.div`
     display: flex;
     gap: var(--theia-ui-padding);
     padding: var(--theia-ui-padding) calc(var(--theia-ui-padding) * 2);
-    border-bottom: 1px solid var(--theia-activityBar-background);
+    border-bottom: 1px solid var(--theia-editorGroup-border);
 
     &:last-child {
         border: none;

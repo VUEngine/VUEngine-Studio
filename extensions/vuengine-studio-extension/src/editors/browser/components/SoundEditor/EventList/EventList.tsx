@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
@@ -140,7 +140,7 @@ interface EventListProps {
     pattern: PatternConfig
     noteCursor: number
     setNotes: (notes: EventsMap) => void
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
 }
 
 export default function EventList(props: EventListProps): React.JSX.Element {

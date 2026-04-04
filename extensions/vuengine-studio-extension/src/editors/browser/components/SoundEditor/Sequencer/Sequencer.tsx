@@ -137,7 +137,7 @@ interface SequencerProps {
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     stepsPerNote: number
     stepsPerBar: number
 }

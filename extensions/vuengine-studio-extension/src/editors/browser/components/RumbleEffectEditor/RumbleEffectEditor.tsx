@@ -43,7 +43,7 @@ const ConnectionStatus = styled.div`
 `;
 
 const RumblePakLog = styled.div`
-    border: 1px solid var(--theia-activityBar-background);
+    border: 1px solid var(--theia-editorGroup-border);
     box-sizing: border-box;
     flex-grow: 1;
     font-family: monospace;

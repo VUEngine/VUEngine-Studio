@@ -385,7 +385,7 @@ const applyNoteSlide = (
         const note = stepEvents[SoundEvent.Note];
         const noteId = Object.values(NOTES).indexOf(note);
         const duration = stepEvents[SoundEvent.Duration];
-        if (note === undefined || noteId === undefined || duration === undefined) {
+        if (note === undefined || noteId === -1 || duration === undefined) {
             return;
         }
 
@@ -513,7 +513,8 @@ const reduceKeyframes = (
 ): TrackKeyframes => {
     const result = deepClone(trackKeyframes);
 
-    const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step))
+    const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap)
+        .map(step => parseInt(step))
         .sort((a, b) => a - b)
         .reverse();
 
@@ -567,7 +568,10 @@ const applyLoopPoint = (
         result.keyframeMap[loopPointStep] = {};
     }
 
-    const loopKeyframe = Object.keys(result.keyframeMap).indexOf(`${loopPointStep}`);
+    const loopKeyframe = Object.keys(result.keyframeMap)
+        .map(step => parseInt(step))
+        .sort((a, b) => a - b)
+        .indexOf(loopPointStep);
 
     return {
         ...result,
@@ -667,33 +671,33 @@ export const getTrackKeyframes = (
 ): TrackKeyframesPrepared => {
     const initialInstrument = soundData.instruments[track.instrument];
 
-    // console.log('-----------------------------------------------------');
+    console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
-    // console.log('mergePatterns', deepClone(trackEventsMap));
+    console.log('mergePatterns', deepClone(trackEventsMap));
     trackEventsMap = filterEmptyEvents(trackEventsMap);
-    // console.log('filterEmptyEvents', deepClone(trackEventsMap));
+    console.log('filterEmptyEvents', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    // console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
+    console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
-    // console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
+    console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
     trackEventsMap = notesToFrequencies(trackEventsMap);
-    // console.log('notesToFrequencies', deepClone(trackEventsMap));
+    console.log('notesToFrequencies', deepClone(trackEventsMap));
     trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
-    // console.log('applyNoteDuration', deepClone(trackEventsMap));
+    console.log('applyNoteDuration', deepClone(trackEventsMap));
     trackEventsMap = applyNoteSlide(trackEventsMap);
-    // console.log('applyNoteSlide', deepClone(trackEventsMap));
+    console.log('applyNoteSlide', deepClone(trackEventsMap));
 
     let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
-    // console.log('transformToKeyframes', deepClone(trackKeyframes));
+    console.log('transformToKeyframes', deepClone(trackKeyframes));
     trackKeyframes = reduceKeyframes(trackKeyframes);
-    // console.log('reduceKeyframes', deepClone(trackKeyframes));
+    console.log('reduceKeyframes', deepClone(trackKeyframes));
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
-    // console.log('applyLoopPoint', deepClone(trackKeyframes));
+    console.log('applyLoopPoint', deepClone(trackKeyframes));
 
     let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
-    // console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
+    console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
-    // console.log('setStartEvent', deepClone(trackKeyframesPrepared));
+    console.log('setStartEvent', deepClone(trackKeyframesPrepared));
 
     return trackKeyframesPrepared;
 };

@@ -100,7 +100,7 @@ interface PianoRollPlacedNoteProps {
     noteSnapping: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
-    setCurrentInstrumentId: Dispatch<SetStateAction<string>>
+    setCurrentInstrumentId: (instrumentId: string) => void
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
     cancelNoteDrag: boolean

@@ -366,13 +366,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
-        let json = {};
         try {
-            json = JSON.parse(this.reference?.object.getText() || '{}');
+            this.data = JSON.parse(this.reference?.object.getText() || '{}');
         } catch (error) {
-            console.error('Malformed JSON, could not update editor.');
+            console.error(`Could not parse malformed JSON in ${this.uri.path.fsPath()}.`);
         }
-        this.data = json as ItemData;
+
         this.data = await this.vesProjectService.getSchemaDefaults(type, this.data);
     }
 
@@ -480,7 +479,11 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.update();
     }
 
-    protected updateModel(): void {
+    protected async updateModel(): Promise<void> {
+        if (this.reference?.object.textEditorModel.getValue() === '') {
+            const type = PROJECT_TYPES[this.typeId];
+            this.data = await this.vesProjectService.getSchemaDefaults(type, this.data);
+        }
         this.justUpdatedModel = true;
         this.reference?.object.textEditorModel.pushStackElement();
         this.reference?.object.textEditorModel.setValue(stringify(this.data));

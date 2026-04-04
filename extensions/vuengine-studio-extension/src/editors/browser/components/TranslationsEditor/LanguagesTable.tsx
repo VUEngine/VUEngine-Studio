@@ -18,7 +18,7 @@ const LANGUAGE_CONTAINER_HEIGHT = 110;
 const LANGUAGE_CONTAINER_WIDTH = 300;
 
 const StyledLanguagesContainer = styled.div`
-    border-right: 2px solid var(--theia-editorGroupHeader-tabsBackground);
+    border-right: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -27,7 +27,7 @@ const StyledLanguagesContainer = styled.div`
     max-width: ${LANGUAGE_CONTAINER_WIDTH}px;
     min-width: ${LANGUAGE_CONTAINER_WIDTH}px;
 
-    h3 {
+    h2 {
         margin-top: 0;
         padding: 0 1px;
     }
@@ -308,9 +308,9 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
 
     return (
         <StyledLanguagesContainer>
-            <h3>
+            <h2>
                 {nls.localize('vuengine/editors/translations/languages', 'Languages')}
-            </h3>
+            </h2>
             <SortableList
                 onSortEnd={moveLanguage}
                 draggedItemClassName='dragging'

@@ -27,7 +27,7 @@ const StyledGameConfigEditor = styled.div`
 `;
 
 const StyledSideBar = styled.div`
-    border-right: 2px solid var(--theia-editorGroupHeader-tabsBackground);
+    border-right: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -36,21 +36,25 @@ const StyledSideBar = styled.div`
 `;
 
 const StyledSideBarTab = styled.div`
-    border-bottom: 1px solid var(--theia-editorGroupHeader-tabsBackground);
-    border-right: 2px solid transparent;
+    border-bottom: 1px solid var(--theia-editorGroup-border);
+    border-right: 1px solid transparent;
     cursor: pointer;
     display: flex;
     gap: var(--theia-ui-padding);
-    margin-right: -2px;
+    margin-right: -1px;
     padding: calc(3 * var(--theia-ui-padding));
 
     &:hover,
     &.selected {
-        background-color: var(--theia-editorGroupHeader-tabsBackground);
+        background-color: var(--theia-editorGroup-border);
     }
 
     &.selected {
         border-right-color: var(--theia-foreground);
+    }
+
+    .codicon-symbol-event {
+        color: var(--theia-foreground) !important;
     }
 `;
 

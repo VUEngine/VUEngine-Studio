@@ -69,7 +69,7 @@ const EffectsPanelTabs = [
 interface EffectsPanelProps {
     soundData: SoundData
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number

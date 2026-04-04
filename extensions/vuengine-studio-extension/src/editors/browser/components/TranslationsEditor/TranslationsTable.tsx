@@ -21,7 +21,7 @@ const StyledTranslationsContainer = styled.div`
     overflow: hidden;
     padding: calc(2 * var(--theia-ui-padding));
 
-    h3 {
+    h2 {
         margin-top: 0;
         padding: 0 1px;
     }
@@ -217,9 +217,9 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
 
     return (
         <StyledTranslationsContainer>
-            <h3>
+            <h2>
                 {nls.localize('vuengine/editors/translations/translations', 'Translations')}
-            </h3>
+            </h2>
             <VContainer gap={20} overflow='hidden' style={{ height: '100%', padding: 1 }}>
                 <HContainer gap={10} style={{ maxWidth: TRANSLATION_CONTAINER_WIDTH }}>
                     <RadioSelect

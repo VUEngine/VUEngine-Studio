@@ -40,7 +40,7 @@ interface NotePropertiesProps {
     noteSnapping: boolean
     setNoteSnapping: Dispatch<SetStateAction<boolean>>
     noteCursor: number
-    setNoteCursor: Dispatch<SetStateAction<number>>
+    setNoteCursor: (step: number) => void
     currentSequenceIndex: number
     pattern: PatternConfig
     emulatorInitialized: boolean
