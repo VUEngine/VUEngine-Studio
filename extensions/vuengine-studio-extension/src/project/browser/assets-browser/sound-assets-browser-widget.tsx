@@ -5,7 +5,7 @@ import { AssetsBrowserWidget } from './assets-browser-widget';
 
 @injectable()
 export class SoundAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:sound`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:Sound`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${SoundType.schema.title}`;
 
   protected getId(): string {

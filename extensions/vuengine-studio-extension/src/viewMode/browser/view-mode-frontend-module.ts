@@ -1,4 +1,4 @@
-import { KeybindingContribution, ShellLayoutRestorer, ShellLayoutTransformer } from '@theia/core/lib/browser';
+import { bindViewContribution, KeybindingContribution, ShellLayoutRestorer, ShellLayoutTransformer, WidgetFactory } from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -10,6 +10,8 @@ import { ViewModePreferencesWidget } from './view-mode-preferences-widget';
 import { ViewModeService } from './view-mode-service';
 import { ViewModeShellLayoutRestorer } from './view-mode-shell-layout-restorer';
 import { ViewModeShellLayoutTransformer } from './view-mode-shell-layout-transformer';
+import { UnimplementedViewModeViewContribution } from './ves-unimplemented-view-mode-view';
+import { UnimplementedViewModeWidget } from './ves-unimplemented-view-mode-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(ViewModeService).toSelf().inSingletonScope();
@@ -26,4 +28,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(PreferencesWidget)
         .toDynamicValue(({ container }) => createPreferencesWidgetContainer(container).get(ViewModePreferencesWidget))
         .inSingletonScope();
+
+    bindViewContribution(bind, UnimplementedViewModeViewContribution);
+    bind(UnimplementedViewModeWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: UnimplementedViewModeWidget.ID,
+        createWidget: () => ctx.container.get<UnimplementedViewModeWidget>(UnimplementedViewModeWidget)
+    })).inSingletonScope();
 });

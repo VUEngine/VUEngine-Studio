@@ -20,6 +20,8 @@ import { ImageAssetsBrowserViewContribution } from './assets-browser/image-asset
 import { ImageAssetsBrowserWidget } from './assets-browser/image-assets-browser-widget';
 import { LogicAssetsBrowserViewContribution } from './assets-browser/logic-assets-browser-view-contribution';
 import { LogicAssetsBrowserWidget } from './assets-browser/logic-assets-browser-widget';
+import { PixelAssetsBrowserViewContribution } from './assets-browser/pixel-assets-browser-view-contribution';
+import { PixelAssetsBrowserWidget } from './assets-browser/pixel-assets-browser-widget';
 import { RumbleEffectAssetsBrowserViewContribution } from './assets-browser/rumble-effect-assets-browser-view-contribution';
 import { RumbleEffectAssetsBrowserWidget } from './assets-browser/rumble-effect-assets-browser-widget';
 import { SoundAssetsBrowserViewContribution } from './assets-browser/sound-assets-browser-view-contribution';
@@ -84,6 +86,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         [FontAssetsBrowserViewContribution, FontAssetsBrowserWidget],
         [ImageAssetsBrowserViewContribution, ImageAssetsBrowserWidget],
         [LogicAssetsBrowserViewContribution, LogicAssetsBrowserWidget],
+        [PixelAssetsBrowserViewContribution, PixelAssetsBrowserWidget],
         [RumbleEffectAssetsBrowserViewContribution, RumbleEffectAssetsBrowserWidget],
         [SoundAssetsBrowserViewContribution, SoundAssetsBrowserWidget],
         [StageAssetsBrowserViewContribution, StageAssetsBrowserWidget],

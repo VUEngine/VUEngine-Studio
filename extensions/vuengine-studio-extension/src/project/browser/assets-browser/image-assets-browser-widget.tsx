@@ -5,7 +5,7 @@ import { nls } from '@theia/core';
 
 @injectable()
 export class ImageAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:image`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:Image`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${ImageType.schema.title}`;
 
   protected getId(): string {

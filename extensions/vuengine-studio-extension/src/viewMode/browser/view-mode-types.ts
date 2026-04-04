@@ -20,9 +20,12 @@ export enum ViewMode {
     welcome = 'welcome',
 }
 
+export const DEFAULT_VIEW_MODE = ViewMode.stages;
+export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
+
 export const DISABLED_VIEW_MODES: ViewMode[] = [
-    ViewMode.logic,
-    ViewMode.stages,
+    // ViewMode.logic,
+    // ViewMode.stages,
 ];
 
 export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {

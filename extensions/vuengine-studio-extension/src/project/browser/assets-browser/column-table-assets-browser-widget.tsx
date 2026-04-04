@@ -5,7 +5,7 @@ import { AssetsBrowserWidget } from './assets-browser-widget';
 
 @injectable()
 export class ColumnTableAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:columnTable`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:ColumnTable`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${ColumnTableType.schema.title}`;
 
   protected getId(): string {

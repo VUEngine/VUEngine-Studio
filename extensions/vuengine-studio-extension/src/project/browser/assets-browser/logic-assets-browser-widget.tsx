@@ -5,7 +5,7 @@ import { nls } from '@theia/core';
 
 @injectable()
 export class LogicAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:logic`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:Logic`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${LogicType.schema.title}`;
 
   protected getId(): string {

@@ -24,15 +24,14 @@ import { ColumnTableAssetsBrowserWidget } from '../../project/browser/assets-bro
 import { FontAssetsBrowserWidget } from '../../project/browser/assets-browser/font-assets-browser-widget';
 import { ImageAssetsBrowserWidget } from '../../project/browser/assets-browser/image-assets-browser-widget';
 import { LogicAssetsBrowserWidget } from '../../project/browser/assets-browser/logic-assets-browser-widget';
+import { PixelAssetsBrowserWidget } from '../../project/browser/assets-browser/pixel-assets-browser-widget';
 import { RumbleEffectAssetsBrowserWidget } from '../../project/browser/assets-browser/rumble-effect-assets-browser-widget';
 import { SoundAssetsBrowserWidget } from '../../project/browser/assets-browser/sound-assets-browser-widget';
 import { StageAssetsBrowserWidget } from '../../project/browser/assets-browser/stage-assets-browser-widget';
 import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
 import { WelcomeWidget } from '../../welcome/browser/welcome-widget';
+import { UnimplementedViewModeWidget } from './ves-unimplemented-view-mode-widget';
 import { ViewMode } from './view-mode-types';
-
-export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
-export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
 
 export type ViewModeWidgets = Record<string, boolean>;
 export type ViewModeWidgetsMap = Record<ViewMode, { allow?: ViewModeWidgets, force?: ViewModeWidgets }>;
@@ -42,6 +41,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [ActorAssetsBrowserWidget.ID]: true,
             [ImageAssetsBrowserWidget.ID]: false,
+            [PixelAssetsBrowserWidget.ID]: false,
             [`${VesEditorsWidget.ID}:Actor:`]: false,
             'code-editor-opener': false,
         }
@@ -87,6 +87,9 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [LogicAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Logic:`]: false,
             'code-editor-opener': false,
+        },
+        force: {
+            [UnimplementedViewModeWidget.ID]: false,
         }
     },
     [ViewMode.settings]: {

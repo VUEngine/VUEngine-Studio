@@ -1,13 +1,9 @@
-import { CommandService } from '@theia/core';
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { RumbleEffectAssetsBrowserWidget } from './rumble-effect-assets-browser-widget';
 
 @injectable()
 export class RumbleEffectAssetsBrowserViewContribution extends AbstractViewContribution<RumbleEffectAssetsBrowserWidget> {
-    @inject(CommandService)
-    protected readonly commandService: CommandService;
-
     constructor() {
         super({
             widgetId: RumbleEffectAssetsBrowserWidget.ID,

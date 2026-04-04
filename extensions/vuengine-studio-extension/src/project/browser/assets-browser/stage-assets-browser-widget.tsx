@@ -5,7 +5,7 @@ import { AssetsBrowserWidget } from './assets-browser-widget';
 
 @injectable()
 export class StageAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:stage`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:Stage`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${StageType.schema.title}`;
 
   protected getId(): string {

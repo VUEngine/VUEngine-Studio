@@ -5,7 +5,7 @@ import { AssetsBrowserWidget } from './assets-browser-widget';
 
 @injectable()
 export class FontAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:font`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:Font`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${FontType.schema.title}`;
 
   protected getId(): string {

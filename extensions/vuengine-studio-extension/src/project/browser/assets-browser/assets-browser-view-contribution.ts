@@ -2,6 +2,7 @@ import { Command, CommandContribution, CommandRegistry, CommandService } from '@
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { AssetsBrowserWidget } from './assets-browser-widget';
+import { PROJECT_TYPES } from '../ves-project-data';
 
 export namespace AssetsBrowserCommands {
     export const ADD: Command = Command.toLocalizedCommand(
@@ -49,7 +50,7 @@ export class AssetsBrowserViewContribution implements CommandContribution, TabBa
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         commandRegistry.registerCommand(AssetsBrowserCommands.ADD, {
-            isEnabled: widget => widget instanceof AssetsBrowserWidget,
+            isEnabled: widget => widget instanceof AssetsBrowserWidget && PROJECT_TYPES[widget.id.split(':')[1]].enabled !== false,
             isVisible: widget => widget instanceof AssetsBrowserWidget,
             execute: widget => (widget as AssetsBrowserWidget).add(),
         });

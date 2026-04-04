@@ -304,7 +304,7 @@ export default function ProjectDashboard(props: ProjectDashboardProps): React.JS
             title: 'Activate Preview',
             msg: 'Sorry, a stage editor has not yet been implemented. \n\
 You will need to manually create stages for now, consult the documentation for help. \n\
-Do you want to enable a preview of the dashboard with mocked data?'
+Do you want to enable a preview with mocked data?'
         });
         const confirmed = await dialog.open();
         if (confirmed) {

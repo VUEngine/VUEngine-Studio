@@ -1,13 +1,9 @@
-import { CommandService } from '@theia/core';
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { ColumnTableAssetsBrowserWidget } from './column-table-assets-browser-widget';
 
 @injectable()
 export class ColumnTableAssetsBrowserViewContribution extends AbstractViewContribution<ColumnTableAssetsBrowserWidget> {
-    @inject(CommandService)
-    protected readonly commandService: CommandService;
-
     constructor() {
         super({
             widgetId: ColumnTableAssetsBrowserWidget.ID,

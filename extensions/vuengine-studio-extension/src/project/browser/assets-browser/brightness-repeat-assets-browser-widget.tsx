@@ -5,7 +5,7 @@ import { AssetsBrowserWidget } from './assets-browser-widget';
 
 @injectable()
 export class BrightnessRepeatAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:brightnessRepeat`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:BrightnessRepeat`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${BrightnessRepeatType.schema.title}`;
 
   protected getId(): string {

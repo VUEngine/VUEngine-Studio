@@ -5,7 +5,7 @@ import { nls } from '@theia/core';
 
 @injectable()
 export class RumbleEffectAssetsBrowserWidget extends AssetsBrowserWidget {
-  static readonly ID: string = `${AssetsBrowserWidget.ID}:rumbleEffect`;
+  static readonly ID: string = `${AssetsBrowserWidget.ID}:RumbleEffect`;
   static readonly LABEL: string = `${AssetsBrowserWidget.LABEL}: ${RumbleEffectType.schema.title}`;
 
   protected getId(): string {

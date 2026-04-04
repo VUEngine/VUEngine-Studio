@@ -1,16 +1,16 @@
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { injectable } from '@theia/core/shared/inversify';
-import { ImageAssetsBrowserWidget } from './image-assets-browser-widget';
+import { PixelAssetsBrowserWidget } from './pixel-assets-browser-widget';
 
 @injectable()
-export class ImageAssetsBrowserViewContribution extends AbstractViewContribution<ImageAssetsBrowserWidget> {
+export class PixelAssetsBrowserViewContribution extends AbstractViewContribution<PixelAssetsBrowserWidget> {
     constructor() {
         super({
-            widgetId: ImageAssetsBrowserWidget.ID,
-            widgetName: ImageAssetsBrowserWidget.LABEL,
+            widgetId: PixelAssetsBrowserWidget.ID,
+            widgetName: PixelAssetsBrowserWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'left',
-                rank: 200,
+                rank: 300,
             },
         });
     }
