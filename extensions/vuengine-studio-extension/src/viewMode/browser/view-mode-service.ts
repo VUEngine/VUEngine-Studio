@@ -6,7 +6,7 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ViewMode } from './view-mode-types';
-import { COMMAND_ID_TO_VIEW_MODE, DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY } from './view-mode-widgets';
+import { COMMAND_ID_TO_VIEW_MODE, DEFAULT_VIEW_MODE, LAST_VIEW_MODE_LOCAL_STORAGE_KEY, VIEW_MODE_WIDGETS, ViewModeWidgets } from './view-mode-widgets';
 
 interface ViewModeChange {
     newViewMode: ViewMode
@@ -120,5 +120,33 @@ export class ViewModeService {
 
     showWidget(widget: Widget): void {
         widget.title.className = widget.title.className.replace(/ otherViewMode/g, '');
+    }
+
+    /*
+     * Get list of allowed widgets and whether it's an allow or a disallow list.
+     * The source code view mode functions as a fallback that follows an inverted logic than other view modes.
+     * Instead of filtering through an allow list, this mode _disallows_ the widgets of all others view modes
+     * and thus holds all "other" widgets, including unknown ones, e.g. from extensions.
+     */
+    getWidgets(viewMode: ViewMode): { allowList: boolean, widgets: ViewModeWidgets } {
+        let allowList = true;
+        let widgets: ViewModeWidgets = {};
+
+        if (viewMode === ViewMode.sourceCode) {
+            allowList = false;
+            Object.values(ViewMode)
+                .filter(v => v !== ViewMode.sourceCode)
+                .forEach(v => {
+                    widgets = {
+                        ...widgets,
+                        ...(VIEW_MODE_WIDGETS[v].allow ?? {}),
+                        ...(VIEW_MODE_WIDGETS[v].force ?? {}),
+                    };
+                });
+        } else {
+            widgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
+        }
+
+        return { allowList, widgets };
     }
 }

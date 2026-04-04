@@ -99,7 +99,7 @@ export class VesProjectDashboardWidget extends ReactWidget {
     private readonly workspaceService: WorkspaceService;
 
     static readonly ID = 'vesProjectDashboardWidget';
-    static readonly LABEL = nls.localize('vuengine/project/stages/overview', 'Overview');
+    static readonly LABEL = nls.localize('vuengine/project/stages/navigator', 'Navigator');
 
     protected state: VesProjectDashboardWidgetState = {
         scale: ZOOM_DEFAULT,
@@ -115,7 +115,7 @@ export class VesProjectDashboardWidget extends ReactWidget {
 
         this.id = VesProjectDashboardWidget.ID;
         this.title.label = VesProjectDashboardWidget.LABEL;
-        this.title.caption = nls.localize('vuengine/project/stagesDashboard', 'Stages');
+        this.title.caption = VesProjectDashboardWidget.LABEL;
         this.title.iconClass = 'codicon codicon-compass';
         this.title.closable = false;
         this.node.style.outline = 'none';

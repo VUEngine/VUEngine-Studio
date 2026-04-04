@@ -35,7 +35,7 @@ export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {
     [ViewMode.sound]: nls.localize('vuengine/general/viewModes/sound', 'Sound'),
     [ViewMode.settings]: nls.localize('vuengine/general/viewModes/settings', 'Settings'),
     [ViewMode.sourceCode]: nls.localize('vuengine/general/viewModes/sourceCode', 'Source Code'),
-    [ViewMode.stages]: nls.localize('vuengine/general/viewModes/stages', 'Stages'),
+    [ViewMode.stages]: nls.localize('vuengine/general/viewModes/stages', 'Game World'),
 };
 
 export const VIEW_MODE_ICONS: { [viewMode: string]: string } = {

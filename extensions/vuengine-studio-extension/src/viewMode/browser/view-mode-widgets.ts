@@ -2,14 +2,9 @@ import { CALL_HIERARCHY_TOGGLE_COMMAND_ID } from '@theia/callhierarchy/lib/brows
 import { CommonCommands } from '@theia/core/lib/browser';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
-import { PROBLEMS_WIDGET_ID } from '@theia/markers/lib/browser/problem/problem-widget';
 import { FILE_NAVIGATOR_TOGGLE_COMMAND_ID } from '@theia/navigator/lib/browser/navigator-contribution';
-import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
-import { OUTLINE_WIDGET_FACTORY_ID } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views/preference-searchbar-widget';
 import { PreferencesWidget } from '@theia/preferences/lib/browser/views/preference-widget';
-import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
-import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
@@ -39,8 +34,8 @@ import { ViewMode } from './view-mode-types';
 export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
 export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
 
-type ViewModeWidgets = Record<string, boolean>;
-type ViewModeWidgetsMap = Record<ViewMode, { allow?: ViewModeWidgets, force?: ViewModeWidgets }>;
+export type ViewModeWidgets = Record<string, boolean>;
+export type ViewModeWidgetsMap = Record<ViewMode, { allow?: ViewModeWidgets, force?: ViewModeWidgets }>;
 
 export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.actors]: {
@@ -48,6 +43,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [ActorAssetsBrowserWidget.ID]: true,
             [ImageAssetsBrowserWidget.ID]: false,
             [`${VesEditorsWidget.ID}:Actor:`]: false,
+            'code-editor-opener': false,
         }
     },
     [ViewMode.assets]: {
@@ -58,6 +54,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [`${VesEditorsWidget.ID}:BrightnessRepeat:`]: false,
             [`${VesEditorsWidget.ID}:ColumnTable:`]: false,
             [`${VesEditorsWidget.ID}:RumbleEffect:`]: false,
+            'code-editor-opener': false,
         }
     },
     [ViewMode.build]: {
@@ -66,6 +63,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [EmulatorConfigsWidget.ID]: false,
             [FlashCartConfigsWidget.ID]: false,
             [VesEmulatorWidget.ID]: false,
+            'code-editor-opener': false,
         },
         force: {
             [VesBuildWidget.ID]: false,
@@ -76,6 +74,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [FontAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Font:`]: false,
+            'code-editor-opener': false,
         }
     },
     [ViewMode.localization]: {
@@ -87,6 +86,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [LogicAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Logic:`]: false,
+            'code-editor-opener': false,
         }
     },
     [ViewMode.settings]: {
@@ -94,6 +94,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [PreferencesSearchbarWidget.ID]: false,
             [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
+            'code-editor-opener': false,
         },
         force: {
             [`${VesEditorsWidget.ID}:GameConfig:`]: false,
@@ -105,22 +106,17 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         allow: {
             [SoundAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Sound:`]: false,
+            'code-editor-opener': false,
         }
     },
     [ViewMode.sourceCode]: {
-        allow: {
-            'code-editor-opener': false,
-            [EXPLORER_VIEW_CONTAINER_ID]: true,
-            [OUTLINE_WIDGET_FACTORY_ID]: false,
-            [PROBLEMS_WIDGET_ID]: false,
-            [SCM_VIEW_CONTAINER_ID]: false,
-            [SEARCH_VIEW_CONTAINER_ID]: false,
-        }
+        // fallback view mode
     },
     [ViewMode.stages]: {
         allow: {
             [StageAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Stage:`]: false,
+            'code-editor-opener': false,
         },
         force: {
             [VesProjectDashboardWidget.ID]: false,

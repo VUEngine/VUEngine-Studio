@@ -6,7 +6,7 @@ import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
 import { ViewModeService } from './view-mode-service';
 import { ViewMode } from './view-mode-types';
-import { VIEW_MODE_WIDGETS } from './view-mode-widgets';
+import { VIEW_MODE_WIDGETS, ViewModeWidgets } from './view-mode-widgets';
 
 @injectable()
 export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
@@ -94,11 +94,16 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         this.transformations.getContributions().forEach(transformation => transformation.transformLayoutOnRestore(layoutData));
         await this.shell.setLayoutData(layoutData);
 
-        await this.collapseSidePanelsIfEmpty(viewMode, layoutData);
-        await this.forceMainWidgets(viewMode);
+        const { allowList, widgets } = this.viewModeService.getWidgets(viewMode);
 
-        if (serializedLayoutData === undefined) {
-            await this.setInitialRevealed(viewMode);
+        await this.collapseSidePanelsIfEmpty(viewMode, layoutData, widgets, allowList);
+
+        if (allowList) {
+            await this.forceMainWidgets(viewMode);
+
+            if (serializedLayoutData === undefined) {
+                await this.setInitialRevealed(viewMode);
+            }
         }
     }
 
@@ -111,21 +116,28 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         });
     }
 
-    async collapseSidePanelsIfEmpty(viewMode: ViewMode, layoutData: ApplicationShell.LayoutData): Promise<void> {
-        const allowedWidgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};
-        const allowedWidgetsIds = Object.keys(allowedWidgets);
+    async collapseSidePanelsIfEmpty(viewMode: ViewMode, layoutData: ApplicationShell.LayoutData, widgets: ViewModeWidgets, allowList: boolean): Promise<void> {
+        const widgetsIds = Object.keys(widgets);
 
         const numberAllowedLeft = layoutData.leftPanel?.items?.filter(
-            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '')
+            widget => allowList
+                ? widgetsIds.includes(widget.widget?.id ?? '')
+                : !widgetsIds.includes(widget.widget?.id ?? '')
         ).length;
         const numberAllowedAndVisibleLeft = layoutData.leftPanel?.items?.filter(
-            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+            widget => allowList
+                ? widgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+                : !widgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
         ).length;
         const numberAllowedRight = layoutData.rightPanel?.items?.filter(
-            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '')
+            widget => allowList
+                ? widgetsIds.includes(widget.widget?.id ?? '')
+                : !widgetsIds.includes(widget.widget?.id ?? '')
         ).length;
         const numberAllowedAndVisibleRight = layoutData.rightPanel?.items?.filter(
-            widget => allowedWidgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+            widget => allowList
+                ? widgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
+                : !widgetsIds.includes(widget.widget?.id ?? '') && widget.expanded
         ).length;
 
         if (numberAllowedLeft === 0) {
