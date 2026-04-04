@@ -543,7 +543,7 @@ ColliderROMSpec {{ colliderName }}ColliderSpec =
 	{%- if collider.layers | length > 0 %}
 	kLayer
 		{%- for layerId in collider.layers %}
-			{{- project.items.ColliderLayers.project.layers[layerId] | sanitizeSpecName -}}
+			{{- project.items.GameConfig.project.colliderLayers[layerId] | sanitizeSpecName -}}
 			{%- if not loop.last -%}
 				{{- " | kLayer" -}}
 			{%- endif -%}
@@ -556,7 +556,7 @@ ColliderROMSpec {{ colliderName }}ColliderSpec =
 	{%- if collider.layersToCheck | length > 0 %}
 	kLayerAll & ~(kLayer
 		{%- for layerId in collider.layersToCheck %}
-			{{- project.items.ColliderLayers.project.layers[layerId] | sanitizeSpecName -}}
+			{{- project.items.GameConfig.project.colliderLayers[layerId] | sanitizeSpecName -}}
 			{%- if not loop.last -%}
 				{{- " | kLayer" -}}
 			{%- endif -%}
@@ -734,7 +734,7 @@ ComponentSpec* const {{ sanitizedSpecName }}ComponentSpecs[] =
 	{%- if item.inGameType == 'None' %}
 	kTypeNone,
 	{%- else %}
-	kType{{ project.items.InGameTypes.project.types[item.inGameType] | sanitizeSpecName }},
+	kType{{ project.items.GameConfig.project.inGameTypes[item.inGameType] | sanitizeSpecName }},
 	{%- endif %}
 
 	// Animation to play automatically

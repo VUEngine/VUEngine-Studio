@@ -44,9 +44,9 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     const getEngineSettings = async (): Promise<void> => {
         await services.vesProjectService.projectDataReady;
-        const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
+        const gameConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'GameConfig');
         // @ts-ignore
-        setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
+        setMaxAnimationFrames(gameConfig.engine?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
     };
 
     const setDefault = (): void => {
@@ -231,7 +231,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                             <i className='codicon codicon-plus' />
                         </button>
                         : <div>
-                            {nls.localize('vuengine/editors/actor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
+                            {nls.localize('vuengine/editors/actor/frameLimitReaced', 'Frame limit reached. Edit in Engine Config if necessary.')}
                         </div>
                     }
                 </HContainer>

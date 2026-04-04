@@ -7,6 +7,7 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
+import { GameConfigData } from '../../GameConfigEditor/GameConfigEditorTypes';
 
 interface AnimationsSettingsProps {
     isMultiFileAnimation: boolean
@@ -20,9 +21,8 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
 
     const getEngineSettings = async (): Promise<void> => {
         await services.vesProjectService.projectDataReady;
-        const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
-        // @ts-ignore
-        setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
+        const gameConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfigData;
+        setMaxAnimationFrames(gameConfig?.engine?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
     };
 
     const setAnimationFrames = async (frames: number): Promise<void> => {

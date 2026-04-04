@@ -1,4 +1,4 @@
-{%- set layers = project.items.ColliderLayers.project -%}
+{%- set layers = project.items.GameConfig.project.colliderLayers -%}
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
@@ -11,11 +11,11 @@
 
 {{ macros.sectionHeader('Definitions') }}
 
-{% if layers.layers | length > 0 -%}
+{% if layers | length > 0 -%}
 enum ColliderLayers
 {
 	{%- set current = 0 -%}
-	{%- for layer in layers.layers | values | removeEmpty | sort -%}
+	{%- for layer in layers | values | removeEmpty | sort -%}
 	{%- set current = current + 1 %}
 	kLayer{{ layer | sanitizeSpecName }} = 1 << (kLayerNone + {{ current }}),
 	{%- endfor %}

@@ -23,7 +23,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Systeminformation } from 'systeminformation';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { clamp } from '../../editors/browser/components/Common/Utils';
-import { EngineConfigData } from '../../editors/browser/components/EngineConfigEditor/EngineConfigEditorTypes';
+import { GameConfigData } from '../../editors/browser/components/GameConfigEditor/GameConfigEditorTypes';
 import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -1491,12 +1491,12 @@ Beware! This is usually not necessary and will result in the next build taking l
   }
 
   getTotalMemoryPoolsSize(): number {
-    const engineConfig = this.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig') as EngineConfigData;
-    if (engineConfig === undefined) {
+    const gameConfig = this.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfigData;
+    if (gameConfig === undefined) {
       return 0;
     }
 
-    return (engineConfig.memoryPools?.pools ?? []).reduce(
+    return (gameConfig.engine.memoryPools?.pools ?? []).reduce(
       (accumulator, pool) => accumulator + pool.size * pool.objects,
       0,
     );

@@ -56,7 +56,10 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         super({
             widgetId: VesEditorsWidget.ID,
             widgetName: VesEditorsWidget.LABEL,
-            defaultWidgetOptions: { area: 'main' },
+            defaultWidgetOptions: {
+                area: 'main',
+                rank: -100,
+            },
         });
     }
 

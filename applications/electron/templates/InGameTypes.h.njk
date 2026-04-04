@@ -1,4 +1,4 @@
-{%- set types = project.items.InGameTypes.project -%}
+{%- set types = project.items.GameConfig.project.inGameTypes -%}
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
@@ -11,10 +11,10 @@
 
 {{ macros.sectionHeader('Definitions') }}
 
-{% if types.types | length > 0 -%}
+{% if types | length > 0 -%}
 enum InGameTypes
 {
-	{%- for type in types.types | values | removeEmpty | sort %}
+	{%- for type in types | values | removeEmpty | sort %}
 	kType{{ type | sanitizeSpecName }}{% if loop.first %} = kTypeNone + 1{% endif %},
 	{%- endfor %}
 };

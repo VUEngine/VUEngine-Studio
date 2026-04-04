@@ -156,12 +156,12 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         <Input
             label={nls.localize('vuengine/editors/sound/name', 'Name')}
             value={soundData.name}
-            setValue={setName}
+            setValue={v => setName(v as string)}
         />
         <Input
             label={nls.localize('vuengine/editors/sound/author', 'Author')}
             value={soundData.author}
-            setValue={setAuthor}
+            setValue={v => setAuthor(v as string)}
         />
 
         <VContainer>
@@ -248,7 +248,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                 <Input
                     type='number'
                     value={beats}
-                    setValue={setBeats}
+                    setValue={v => setBeats(v as number)}
                     min={1}
                     max={NOTE_RESOLUTION}
                     width={64}
@@ -308,7 +308,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                         </StyledSizeButton>
                         <Input
                             value={soundData.loopPoint}
-                            setValue={setLoopPoint}
+                            setValue={v => setLoopPoint(v as number)}
                             type='number'
                             min={0}
                             max={soundData.size - 1}
@@ -339,7 +339,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                 label={nls.localize('vuengine/editors/sound/group', 'Group')}
                 tooltip={nls.localize(
                     'vuengine/editors/sound/groupDescription',
-                    'Sounds can be grouped by type. The maximum volume for each group can be set in the EngineConfig \
+                    'Sounds can be grouped by type. The maximum volume for each group can be set in the Engine Config \
 to allow for fine-tuning the relative volumes of e.g. background music and sound effects.'
                 )}
             />

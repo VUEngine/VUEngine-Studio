@@ -33,7 +33,6 @@ import { RumbleEffectAssetsBrowserWidget } from '../../project/browser/assets-br
 import { SoundAssetsBrowserWidget } from '../../project/browser/assets-browser/sound-assets-browser-widget';
 import { StageAssetsBrowserWidget } from '../../project/browser/assets-browser/stage-assets-browser-widget';
 import { VesProjectDashboardWidget } from '../../project/browser/ves-project-dashboard-widget';
-import { VesProjectSidebarWidget } from '../../project/browser/ves-project-sidebar-widget';
 import { WelcomeWidget } from '../../welcome/browser/welcome-widget';
 import { ViewMode } from './view-mode-types';
 
@@ -93,18 +92,11 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.settings]: {
         allow: {
             [PreferencesSearchbarWidget.ID]: false,
-            [VesProjectSidebarWidget.ID]: true,
             [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
-            [`${VesEditorsWidget.ID}:ColliderLayers:`]: false,
-            [`${VesEditorsWidget.ID}:CompilerConfig:`]: false,
-            [`${VesEditorsWidget.ID}:EngineConfig:`]: false,
-            [`${VesEditorsWidget.ID}:Events:`]: false,
-            [`${VesEditorsWidget.ID}:InGameTypes:`]: false,
-            [`${VesEditorsWidget.ID}:Messages:`]: false,
-            [`${VesEditorsWidget.ID}:RomInfo:`]: false,
         },
         force: {
+            [`${VesEditorsWidget.ID}:GameConfig:`]: false,
             [KeybindingWidget.ID]: false,
             [PreferencesWidget.ID]: false,
         }

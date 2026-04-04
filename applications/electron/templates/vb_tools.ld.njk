@@ -1,8 +1,4 @@
-{%- if project.items.CompilerConfig.project is defined -%}
-	{%- set compiler = project.items.CompilerConfig.project -%}
-{%- else -%}
-	{%- set compiler = project.items.CompilerConfig.engine -%}
-{%- endif -%}
+{%- set compiler = project.items.GameConfig.project.compiler -%}
 {% include('templates/partials/fileHeader/fileHeader.ld.njk') %}
 
 OUTPUT_FORMAT("elf32-v810", "elf32-v810", "elf32-v810")

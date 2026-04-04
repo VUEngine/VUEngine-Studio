@@ -1,13 +1,5 @@
-{%- if project.items.EngineConfig.project is defined -%}
-	{%- set config = project.items.EngineConfig.project -%}
-{%- else -%}
-	{%- set config = project.items.EngineConfig.engine -%}
-{%- endif -%}
-{%- if project.items.CompilerConfig.project is defined -%}
-	{%- set compiler = project.items.CompilerConfig.project -%}
-{%- else -%}
-	{%- set compiler = project.items.CompilerConfig.engine -%}
-{%- endif -%}
+{%- set config = project.items.GameConfig.project.engine -%}
+{%- set compiler = project.items.GameConfig.project.compiler -%}
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 

@@ -1,8 +1,4 @@
-{%- if project.items.CompilerConfig.project is defined -%}
-	{%- set compiler = project.items.CompilerConfig.project -%}
-{%- else -%}
-	{%- set compiler = project.items.CompilerConfig.engine -%}
-{%- endif -%}
+{%- set compiler = project.items.GameConfig.project.compiler -%}
 {%- set plugins = project.items.GameConfig.project.plugins | default({}) -%}
 {%- set plugins = ['platforms//VirtualBoy'].concat(plugins | keys) | sort -%}
 {% include('templates/partials/fileHeader/fileHeader.make.njk') %}

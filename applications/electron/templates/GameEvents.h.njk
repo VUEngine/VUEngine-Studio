@@ -1,4 +1,4 @@
-{%- set events = project.items.Events.project -%}
+{%- set events = project.items.GameConfig.project.events -%}
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
@@ -11,10 +11,10 @@
 
 {{ macros.sectionHeader('Definitions') }}
 
-{% if events.events | length > 0 -%}
+{% if events | length > 0 -%}
 enum GameEvents
 {
-	{%- for event in events.events | values | removeEmpty | sort %}
+	{%- for event in events | values | removeEmpty | sort %}
 	kEvent{{ event | sanitizeSpecName }}{% if loop.first %} = kEventGameFirst + 1{% endif %},
 	{%- endfor %}
 };

@@ -1,5 +1,5 @@
 import { PreferenceContribution } from '@theia/core';
-import { bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
+import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -18,6 +18,8 @@ import { FontAssetsBrowserViewContribution } from './assets-browser/font-assets-
 import { FontAssetsBrowserWidget } from './assets-browser/font-assets-browser-widget';
 import { ImageAssetsBrowserViewContribution } from './assets-browser/image-assets-browser-view-contribution';
 import { ImageAssetsBrowserWidget } from './assets-browser/image-assets-browser-widget';
+import { LogicAssetsBrowserViewContribution } from './assets-browser/logic-assets-browser-view-contribution';
+import { LogicAssetsBrowserWidget } from './assets-browser/logic-assets-browser-widget';
 import { RumbleEffectAssetsBrowserViewContribution } from './assets-browser/rumble-effect-assets-browser-view-contribution';
 import { RumbleEffectAssetsBrowserWidget } from './assets-browser/rumble-effect-assets-browser-widget';
 import { SoundAssetsBrowserViewContribution } from './assets-browser/sound-assets-browser-view-contribution';
@@ -27,18 +29,13 @@ import { StageAssetsBrowserWidget } from './assets-browser/stage-assets-browser-
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
-import { VesProjectDashboardOpenHandler } from './ves-project-dashboard-open-handler';
 import { VesProjectDashboardViewContribution } from './ves-project-dashboard-view';
 import { VesProjectDashboardWidget } from './ves-project-dashboard-widget';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
-import { VesProjectSidebarViewContribution } from './ves-project-sidebar-view-contribution';
-import { VesProjectSidebarWidget } from './ves-project-sidebar-widget';
 import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
-import { LogicAssetsBrowserViewContribution } from './assets-browser/logic-assets-browser-view-contribution';
-import { LogicAssetsBrowserWidget } from './assets-browser/logic-assets-browser-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -70,20 +67,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // build view
     bindViewContribution(bind, VesProjectDashboardViewContribution);
     bind(CommandContribution).toService(VesProjectDashboardViewContribution);
-    bind(OpenHandler).to(VesProjectDashboardOpenHandler).inSingletonScope();
     bind(VesProjectDashboardWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesProjectDashboardWidget.ID,
         createWidget: () => ctx.container.get<VesProjectDashboardWidget>(VesProjectDashboardWidget)
-    })).inSingletonScope();
-
-    // project sidebar view
-    bindViewContribution(bind, VesProjectSidebarViewContribution);
-    bind(FrontendApplicationContribution).toService(VesProjectSidebarViewContribution);
-    bind(VesProjectSidebarWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: VesProjectSidebarWidget.ID,
-        createWidget: () => ctx.container.get<VesProjectSidebarWidget>(VesProjectSidebarWidget)
     })).inSingletonScope();
 
     // assets sidebar views

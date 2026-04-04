@@ -23,6 +23,7 @@ import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
+import { GameConfigData } from '../../GameConfigEditor/GameConfigEditorTypes';
 
 interface PreviewProps {
   hasAnyComponent: boolean
@@ -57,9 +58,10 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     classNames.push('dragging');
   }
 
-  const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
-  // @ts-ignore
-  const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
+  const gameConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as GameConfigData;
+  const frameMultiplicator = gameConfig && gameConfig.engine.frameRate?.frameCycle
+    ? gameConfig.engine.frameRate.frameCycle + 1
+    : 1;
   const animate = currentComponent?.startsWith('animations-');
   const currentAnimation = currentComponent?.startsWith('animations-')
     ? parseInt(currentComponent.split('animations-')[1])
