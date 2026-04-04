@@ -151,23 +151,25 @@ export class ViewModeShellLayoutRestorer extends ShellLayoutRestorer {
         const forcedWidgets = VIEW_MODE_WIDGETS[viewMode].force ?? {};
         const forcedWidgetsIds = Object.keys(forcedWidgets);
 
-        forcedWidgetsIds.forEach(async f => {
+        for (const f of forcedWidgetsIds) {
+            let widgetId = f;
             let options = {};
+
             if (f.startsWith(VesEditorsWidget.ID)) {
                 await this.workspaceService.ready;
                 const roots = this.workspaceService.tryGetRoots();
                 const workspaceRootUri = roots[0].resource;
                 const typeId = f.split(':')[1];
                 const uri = workspaceRootUri.resolve('config').resolve(typeId);
-                f = VesEditorsWidget.ID;
+                widgetId = VesEditorsWidget.ID;
                 options = {
                     typeId,
                     uri: uri.withoutFragment().toString(),
                 };
             }
 
-            const widget = await this.widgetManager.getOrCreateWidget(f, options);
+            const widget = await this.widgetManager.getOrCreateWidget(widgetId, options);
             await this.shell.addWidget(widget, { area: 'main' });
-        });
+        }
     }
 }
