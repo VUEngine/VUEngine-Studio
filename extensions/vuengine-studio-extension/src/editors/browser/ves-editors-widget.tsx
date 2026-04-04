@@ -12,6 +12,7 @@ import {
     OpenerService,
     Saveable,
     SaveableSource,
+    setDirty,
     StatusBar,
     StatusBarEntry
 } from '@theia/core/lib/browser';
@@ -51,6 +52,7 @@ import { EditorsContext } from './ves-editors-types';
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
     typeId: string
+    uri: string
 }
 
 export interface ItemData {
@@ -187,7 +189,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             : this.uri.path;
         this.id = `${VesEditorsWidget.ID}:${this.options.typeId}:${path}`;
 
-        this.title.iconClass = 'fa fa-cog';
+        this.title.iconClass = 'codicon codicon-settings-gear';
         this.title.closable = false;
         this.node.tabIndex = 0;
 
@@ -213,7 +215,10 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         }
         this.toDispose.push(this.reference = reference);
         this.reference?.object.onContentChanged(() => this.handleModelChange(type));
-        this.reference?.object.onDirtyChanged(() => this.onDirtyChangedEmitter.fire());
+        this.reference?.object.onDirtyChanged(() => {
+            setDirty(this, this.dirty);
+            this.onDirtyChangedEmitter.fire();
+        });
 
         this.schema = type?.schema;
         this.uiSchema = type?.uiSchema;
@@ -373,6 +378,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     async revert(options?: Saveable.RevertOptions): Promise<void> {
         this.reference?.object.revert();
+        setDirty(this, false);
     }
 
     createSnapshot(): Saveable.Snapshot {
@@ -419,6 +425,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             }
         }
 
+        setDirty(this, false);
+
         if (this.saveCallback) {
             this.saveCallback();
         }
@@ -443,6 +451,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.pushUndoRedo({ ...oldData }, { ...newData });
 
         this.updateModel();
+
+        setDirty(this, this.dirty);
+        this.onDirtyChangedEmitter.fire();
     }
 
     protected pushUndoRedo(oldData: ItemData, newData: ItemData): void {
@@ -464,9 +475,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             return;
         }
 
+        setDirty(this, this.dirty);
         await this.loadData(type);
         this.update();
-
     }
 
     protected updateModel(): void {

@@ -115,17 +115,23 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
-            isEnabled: widget => widget instanceof VesEditorsWidget,
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => {
-                widget?.undo();
-                widget?.dispatchCommandEvent(CommonCommands.UNDO.id);
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.undo();
+                w?.dispatchCommandEvent(CommonCommands.UNDO.id);
             }
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
-            isEnabled: widget => widget instanceof VesEditorsWidget,
+            isEnabled: widget => widget instanceof VesEditorsWidget || this.shell.currentWidget instanceof VesEditorsWidget,
             execute: widget => {
-                widget?.redo();
-                widget?.dispatchCommandEvent(CommonCommands.REDO.id);
+                const w = widget instanceof VesEditorsWidget
+                    ? widget
+                    : this.shell.currentWidget as VesEditorsWidget;
+                w?.redo();
+                w?.dispatchCommandEvent(CommonCommands.REDO.id);
             }
         });
 

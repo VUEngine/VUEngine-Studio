@@ -1,4 +1,48 @@
+/*
 #theia-main-content-panel,
 #theia-main-content-panel .lm-Widget.lm-DockPanel-widget {
     background: transparent;
+}
+*/
+
+
+/* Show dirty marker on unclosable views */
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty>.lm-TabBar-tabCloseIcon {
+  padding: 2px;
+  margin-left: 4px;
+  height: var(--theia-icon-size);
+  width: var(--theia-icon-size);
+  font: normal normal normal 16px/1 codicon;
+  display: inline-block;
+  text-decoration: none;
+  text-rendering: auto;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty.closeIcon-start > .lm-TabBar-tabCloseIcon {
+  margin-left: inherit;
+  margin-right: 4px;
+}
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty>.lm-TabBar-tabCloseIcon:hover {
+  border-radius: 5px;
+  background-color: rgba(50%, 50%, 50%, 0.2);
+}
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty:not(.closeIcon-start) {
+  padding-right: 4px;
+}
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty.closeIcon-start {
+  padding-left: 4px;
+}
+
+.lm-TabBar.theia-app-centers .lm-TabBar-tab.theia-mod-dirty>.lm-TabBar-tabCloseIcon:before {
+  content: "\ea71";
 }
