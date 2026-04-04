@@ -1,3 +1,4 @@
+import { Cube, Spinner } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog, StatusBarAlignment } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -496,6 +497,7 @@ Do you want to enable a preview with mocked data?'
                             'vuengine/project/clickBelowToAddFirstStage',
                             'Click below to add the first stage',
                         )}
+                        icon={<Cube size={40} />}
                         onClick={addStage}
                     />
                 </>
@@ -545,6 +547,7 @@ Do you want to enable a preview with mocked data?'
                 'vuengine/project/loadingGameConfig',
                 'Loading game config...',
             )}
+            icon={<Spinner size={32} />}
         />
     );
 }

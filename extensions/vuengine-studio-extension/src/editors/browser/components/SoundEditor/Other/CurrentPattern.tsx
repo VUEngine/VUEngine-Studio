@@ -1,4 +1,4 @@
-import { Copy, Trash } from '@phosphor-icons/react';
+import { Copy, Rectangle, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
@@ -111,6 +111,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     'vuengine/editors/sound/clickBelowToAddFirstPattern',
                     'Click below to add the first pattern',
                 )}
+                icon={<Rectangle size={32} />}
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_PATTERN.id)}
             />
         )

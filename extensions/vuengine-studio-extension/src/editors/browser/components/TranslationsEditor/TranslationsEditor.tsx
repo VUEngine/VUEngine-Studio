@@ -7,6 +7,7 @@ import EmptyContainer from '../Common/EmptyContainer';
 import LanguagesTable from './LanguagesTable';
 import { Language, LANGUAGE_PRESETS, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
+import { Translate } from '@phosphor-icons/react';
 
 const I18N_PLUGIN_ID = 'vuengine//other/I18n';
 
@@ -124,6 +125,7 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
                             'vuengine/editors/translations/clickBelowToAddFirstLanguage',
                             'Click below to add the first language',
                         )}
+                        icon={<Translate size={32} />}
                         onClick={() => addLanguage()}
                     />
                 ) : (

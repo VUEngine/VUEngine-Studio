@@ -181,6 +181,7 @@ const StyledSidebarContent = styled.div`
     flex-grow: 1;
     max-width: 100%;
     overflow-y: auto;
+    position: relative;
     width: 440px;
 `;
 

@@ -189,7 +189,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             : this.uri.path;
         this.id = `${VesEditorsWidget.ID}:${this.options.typeId}:${path}`;
 
-        this.title.iconClass = 'codicon codicon-settings-gear';
         this.title.closable = false;
         this.node.tabIndex = 0;
 

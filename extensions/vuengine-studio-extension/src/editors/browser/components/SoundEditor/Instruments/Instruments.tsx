@@ -1,4 +1,4 @@
-import { Waveform, WaveSawtooth, WaveSine } from '@phosphor-icons/react';
+import { Guitar, Waveform, WaveSawtooth, WaveSine } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -236,6 +236,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     'vuengine/editors/sound/clickBelowToAddFirstInstrument',
                     'Click below to add the first instrument',
                 )}
+                icon={<Guitar size={32} />}
                 onClick={addInstrument}
             />
         );
