@@ -13,7 +13,7 @@ export class BrightnessRepeatAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/brightnessRepeatBrowser', 'Brightness Repeat Browser');
+    return nls.localize('vuengine/projects/brightnessRepeatBrowser', 'Brightness Repeat Configs');
   }
 
   protected getIcon(): string {

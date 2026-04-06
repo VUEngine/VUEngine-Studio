@@ -51,7 +51,7 @@ export const VIEW_MODE_ICONS: { [viewMode: string]: string } = {
     [ViewMode.sound]: SoundType.icon ?? '',
     [ViewMode.settings]: 'codicon codicon-settings',
     [ViewMode.sourceCode]: 'codicon codicon-code',
-    [ViewMode.stages]: StageType.icon ?? '',
+    [ViewMode.stages]: 'codicon codicon-globe',
 };
 
 export const TYPE_VIEW_MODE_RELATIONS: { [typeId: string]: ViewMode } = {

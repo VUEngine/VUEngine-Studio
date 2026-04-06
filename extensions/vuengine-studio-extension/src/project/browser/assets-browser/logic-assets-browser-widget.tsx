@@ -13,7 +13,7 @@ export class LogicAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/logicBrowser', 'Logic Browser');
+    return nls.localize('vuengine/projects/logicBrowser', 'Logic');
   }
 
   protected getIcon(): string {

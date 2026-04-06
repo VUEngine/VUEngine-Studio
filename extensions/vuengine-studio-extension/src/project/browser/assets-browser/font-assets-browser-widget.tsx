@@ -13,7 +13,7 @@ export class FontAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/fontBrowser', 'Font Browser');
+    return nls.localize('vuengine/projects/fontBrowser', 'Fonts');
   }
 
   protected getIcon(): string {

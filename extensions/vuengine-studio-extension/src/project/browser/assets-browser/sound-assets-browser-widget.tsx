@@ -13,7 +13,7 @@ export class SoundAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/soundBrowser', 'Sound Browser');
+    return nls.localize('vuengine/projects/soundBrowser', 'Sounds');
   }
 
   protected getIcon(): string {

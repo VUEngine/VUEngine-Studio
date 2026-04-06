@@ -13,7 +13,7 @@ export class RumbleEffectAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/rumbleEffectBrowser', 'Rumble Effect Browser');
+    return nls.localize('vuengine/projects/rumbleEffectBrowser', 'Rumble Effects');
   }
 
   protected getIcon(): string {

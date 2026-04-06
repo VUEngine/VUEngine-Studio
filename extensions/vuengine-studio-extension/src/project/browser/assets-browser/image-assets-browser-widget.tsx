@@ -13,7 +13,7 @@ export class ImageAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/imageBrowser', 'Image Browser');
+    return nls.localize('vuengine/projects/imageBrowser', 'Images');
   }
 
   protected getIcon(): string {

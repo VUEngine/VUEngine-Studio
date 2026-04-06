@@ -24,7 +24,7 @@ export class AssetsBrowserWidget extends ReactWidget {
   private readonly workspaceService: VesWorkspaceService;
 
   static readonly ID: string = 'assets-browser';
-  static readonly LABEL: string = nls.localize('vuengine/projects/assetsBrowser', 'Assets Browser');
+  static readonly LABEL: string = nls.localize('vuengine/projects/assetsBrowser', 'Assets');
 
   public allExpanded: boolean = true;
   public forceRefresh: boolean;

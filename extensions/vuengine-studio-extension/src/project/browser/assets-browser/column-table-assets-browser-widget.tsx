@@ -13,7 +13,7 @@ export class ColumnTableAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/columnTableBrowser', 'Column Table Browser');
+    return nls.localize('vuengine/projects/columnTableBrowser', 'Column Table Configs');
   }
 
   protected getIcon(): string {

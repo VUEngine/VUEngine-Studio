@@ -13,7 +13,7 @@ export class StageAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/stageBrowser', 'Stage Browser');
+    return nls.localize('vuengine/projects/stageBrowser', 'Stages');
   }
 
   protected getIcon(): string {

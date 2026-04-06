@@ -13,7 +13,7 @@ export class PixelAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/pixelBrowser', 'Pixel Browser');
+    return nls.localize('vuengine/projects/pixelBrowser', 'Pixel Arts');
   }
 
   protected getIcon(): string {

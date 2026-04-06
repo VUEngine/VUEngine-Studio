@@ -13,7 +13,7 @@ export class ActorAssetsBrowserWidget extends AssetsBrowserWidget {
   }
 
   protected getLabel(): string {
-    return nls.localize('vuengine/projects/actorBrowser', 'Actor Browser');
+    return nls.localize('vuengine/projects/actorBrowser', 'Actors');
   }
 
   protected getIcon(): string {
