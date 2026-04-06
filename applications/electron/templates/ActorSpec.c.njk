@@ -592,19 +592,19 @@ BodyROMSpec {{ bodyName }}BodySpec =
 	true,
 
 	// Mass
-	__F_TO_FIX10_6({{ (body.mass | float).toFixed(3) }}f),
+	__F_TO_FIXED({{ (body.mass | float).toFixed(3) }}f),
 
 	// Friction
-	__F_TO_FIX10_6({{ (body.friction | float).toFixed(3) }}f),
+	__F_TO_FIXED({{ (body.friction | float).toFixed(3) }}f),
 
 	// Bounciness
-	__F_TO_FIX10_6({{ (body.bounciness | float).toFixed(3) }}f),
+	__F_TO_FIXED({{ (body.bounciness | float).toFixed(3) }}f),
 
 	// Maximum velocity
 	{ __I_TO_FIXED({{ body.maximumVelocity.x }}), __I_TO_FIXED({{ body.maximumVelocity.y }}), __I_TO_FIXED({{ body.maximumVelocity.z }}) },
 
 	// Maximum speed
-	__I_TO_FIX10_6({{ body.maximumSpeed }}),
+	__F_TO_FIXED({{ (body.maximumSpeed | float).toFixed(3) }}f),
 
 	// Axises on which the body is subject to gravity
 	{% if body.gravityAxes.length -%}
