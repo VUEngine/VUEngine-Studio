@@ -24,7 +24,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             widgetName: VesFlashCartWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'main',
-                rank: 900,
+                rank: 200,
             },
         });
     }

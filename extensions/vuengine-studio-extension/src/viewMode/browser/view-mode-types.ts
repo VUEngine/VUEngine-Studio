@@ -3,7 +3,6 @@ import { ActorType } from '../../project/browser/types/Actor';
 import { FontType } from '../../project/browser/types/Font';
 import { LogicType } from '../../project/browser/types/Logic';
 import { SoundType } from '../../project/browser/types/Sound';
-import { StageType } from '../../project/browser/types/Stage';
 import { TranslationsType } from '../../project/browser/types/Translations';
 
 export enum ViewMode {

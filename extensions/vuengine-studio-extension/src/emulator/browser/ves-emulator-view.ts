@@ -19,7 +19,10 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
     super({
       widgetId: VesEmulatorWidget.ID,
       widgetName: VesEmulatorWidget.LABEL,
-      defaultWidgetOptions: { area: 'main' },
+      defaultWidgetOptions: {
+        area: 'main',
+        rank: 300,
+      },
     });
   }
 

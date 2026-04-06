@@ -21,7 +21,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             widgetName: VesBuildWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'main',
-                rank: 700,
+                rank: 100,
             },
         });
     }
