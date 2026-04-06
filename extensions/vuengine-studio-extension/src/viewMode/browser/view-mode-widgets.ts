@@ -49,6 +49,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [PixelAssetsBrowserWidget.ID]: false,
             [`${VesEditorsWidget.ID}:Actor:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         }
     },
     [ViewMode.assets]: {
@@ -60,6 +61,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [`${VesEditorsWidget.ID}:ColumnTable:`]: false,
             [`${VesEditorsWidget.ID}:RumbleEffect:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         }
     },
     [ViewMode.build]: {
@@ -69,6 +71,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [FlashCartConfigsWidget.ID]: false,
             [VesEmulatorWidget.ID]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         },
         force: {
             [VesBuildWidget.ID]: false,
@@ -80,6 +83,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [FontAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Font:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         }
     },
     [ViewMode.localization]: {
@@ -92,6 +96,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [LogicAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Logic:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         },
         force: {
             [UnimplementedViewModeWidget.ID]: false,
@@ -103,6 +108,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [VesPluginsViewContainer.ID]: false,
             [VSXExtensionsViewContainer.ID]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         },
         force: {
             [`${VesEditorsWidget.ID}:GameConfig:`]: false,
@@ -115,12 +121,14 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [SoundAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Sound:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         }
     },
     [ViewMode.sourceCode]: {
         // since this is a fallback mode, the below are disallow exceptions, rather
         allow: {
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
             [EXPLORER_VIEW_CONTAINER_ID]: true,
             [OUTLINE_WIDGET_FACTORY_ID]: false,
             [PROBLEMS_WIDGET_ID]: false,
@@ -133,6 +141,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [StageAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Stage:`]: false,
             'code-editor-opener': false,
+            'shell-tab-code-editor-opener': false,
         },
         force: {
             [VesProjectDashboardWidget.ID]: false,
