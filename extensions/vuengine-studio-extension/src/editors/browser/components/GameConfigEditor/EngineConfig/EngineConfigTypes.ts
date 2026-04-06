@@ -262,8 +262,6 @@ export const TOTAL_TILES_MIN_VALUE = 1;
 export const TOTAL_TILES_MAX_VALUE = 32768;
 export const TOTAL_TILES_DEFAULT_VALUE = 2048;
 
-export const FIXED_POINT_PRECISION_MIN_VALUE = 6;
-export const FIXED_POINT_PRECISION_MAX_VALUE = 13; // TODO: make dropdown
 export const FIXED_POINT_PRECISION_DEFAULT_VALUE = 6;
 export const SEED_CYCLES_MIN_VALUE = 1;
 export const SEED_CYCLES_MAX_VALUE = 64;
