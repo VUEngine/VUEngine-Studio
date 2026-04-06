@@ -125,15 +125,6 @@ export class VesBuildWidget extends ReactWidget {
 
     this.vesBuildService.onDidChangeRomSize(() => this.update());
 
-    this.vesBuildService.onDidChangeBuildStatus(status => {
-      this.handleProgressDecorator();
-      this.update();
-    });
-
-    this.onDidChangeVisibility(() => {
-      this.handleProgressDecorator();
-    });
-
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
 
     this.vesBuildService.onDidStartBuild(() => {
@@ -172,16 +163,6 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
     this.node.tabIndex = 0;
     this.node.focus();
-  }
-
-  protected handleProgressDecorator(): void {
-    if (this.vesBuildService.buildStatus.active) {
-      this.title.className = this.isVisible
-        ? 'ves-decorator-progress'
-        : this.vesBuildService.getNumberOfWarnings()
-          ? `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress} ves-decorator-progress-with-warnings`
-          : `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress}`;
-    }
   }
 
   protected render(): React.ReactNode {
@@ -370,7 +351,7 @@ export class VesBuildWidget extends ReactWidget {
               <Input
                 placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
                 value={this.state.searchTerm}
-                setValue={this.setSearchTerm}
+                setValue={v => this.setSearchTerm(v as string)}
                 grow={1}
               />
               <button

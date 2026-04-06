@@ -26,10 +26,7 @@ export class VesFlashCartTabBarDecorator implements TabBarDecorator {
     }
 
     decorate(title: Title<Widget>): WidgetDecoration.Data[] {
-        return (title.owner.id === VesFlashCartWidget.ID &&
-            !this.flashCartService.isQueued &&
-            !this.flashCartService.isFlashing &&
-            this.flashCartService.connectedFlashCarts.length)
+        return title.owner.id === VesFlashCartWidget.ID
             ? [{ badge: this.flashCartService.connectedFlashCarts.length }]
             : [];
     }

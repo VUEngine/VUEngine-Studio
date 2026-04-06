@@ -41,7 +41,9 @@ export class VesFlashCartWidget extends ReactWidget {
     this.id = VesFlashCartWidget.ID;
     this.title.iconClass = 'codicon codicon-chip';
     this.title.closable = false;
-    this.setTitle();
+    this.title.label = VesFlashCartWidget.LABEL;
+    this.title.caption = VesFlashCartWidget.LABEL;
+
     this.bindEvents();
     this.update();
   }
@@ -58,45 +60,23 @@ export class VesFlashCartWidget extends ReactWidget {
       }
     });
     this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => {
-      this.setTitle();
       this.update();
     });
     this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
     this.vesFlashCartService.onDidChangeIsQueued(isQueued => {
-      this.title.className = isQueued ? 'ves-decorator-queued' : '';
       this.update();
     });
     this.vesFlashCartService.onDidChangeFlashingProgress(() => {
-      this.handleProgressDecorator();
       this.update();
     });
-    this.onDidChangeVisibility(() => {
-      this.handleProgressDecorator();
-    });
     this.vesFlashCartService.onDidChangeAtLeastOneCanHoldRom(() => this.update());
-    this.vesFlashCartService.onDidSucceedFlashing(() => this.title.className = 'ves-decorator-success');
-    this.vesFlashCartService.onDidFailFlashing(() => this.title.className = 'ves-decorator-error');
     this.vesBuildService.onDidChangeLastBuildMode(() => this.update());
-  }
-
-  protected setTitle(): void {
-    const count = this.vesFlashCartService.connectedFlashCarts.length;
-    this.title.label = `${nls.localize('vuengine/flashCarts/connectedFlashCarts', 'Connected Flash Carts')}: ${count}`;
-    this.title.caption = this.title.label;
   }
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.node.tabIndex = 0;
     this.node.focus();
-  }
-
-  protected handleProgressDecorator(): void {
-    if (this.vesFlashCartService.isFlashing) {
-      this.title.className = this.isVisible
-        ? 'ves-decorator-progress'
-        : `ves-decorator-progress ves-decorator-progress-${this.vesFlashCartService.flashingProgress}`;
-    }
   }
 
   protected render(): React.ReactNode {

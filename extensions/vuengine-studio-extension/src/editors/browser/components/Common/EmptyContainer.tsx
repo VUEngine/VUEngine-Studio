@@ -19,11 +19,13 @@ interface EmptyContainerProps {
     title: string;
     description?: string;
     icon?: ReactElement;
+    buttonIconCls?: string;
+    buttonLabel?: string;
     onClick?: () => void
 }
 
 export default function EmptyContainer(props: EmptyContainerProps): React.JSX.Element {
-    const { title, description, icon, onClick } = props;
+    const { title, description, icon, buttonIconCls, buttonLabel, onClick } = props;
 
     return <StyledContainer>
         {icon ? icon : <PuzzlePiece size={32} />}
@@ -35,7 +37,12 @@ export default function EmptyContainer(props: EmptyContainerProps): React.JSX.El
             {title}
         </div>
         {description &&
-            <div>
+            <div
+                style={{
+                    maxWidth: 460,
+                    textAlign: 'center',
+                }}
+            >
                 {description}
             </div>
         }
@@ -47,7 +54,7 @@ export default function EmptyContainer(props: EmptyContainerProps): React.JSX.El
                     marginTop: 20
                 }}
             >
-                <i className='codicon codicon-add' /> {nls.localizeByDefault('Add')}
+                <i className={buttonIconCls ?? 'codicon codicon-add'} /> {buttonLabel ?? nls.localizeByDefault('Add')}
             </button>
         }
     </StyledContainer>;
