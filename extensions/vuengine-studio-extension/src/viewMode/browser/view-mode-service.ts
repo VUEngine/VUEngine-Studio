@@ -134,14 +134,20 @@ export class ViewModeService {
 
         if (viewMode === ViewMode.sourceCode) {
             allowList = false;
+            const allowedWidgetIds = Object.keys(VIEW_MODE_WIDGETS[ViewMode.sourceCode].allow ?? {});
             Object.values(ViewMode)
                 .filter(v => v !== ViewMode.sourceCode)
                 .forEach(v => {
-                    widgets = {
-                        ...widgets,
+                    const viewModeWidgets = {
                         ...(VIEW_MODE_WIDGETS[v].allow ?? {}),
                         ...(VIEW_MODE_WIDGETS[v].force ?? {}),
                     };
+
+                    Object.keys(viewModeWidgets)
+                        .filter(widgetId => !allowedWidgetIds.includes(widgetId))
+                        .forEach(widgetId => {
+                            widgets[widgetId] = viewModeWidgets[widgetId];
+                        }, {});
                 });
         } else {
             widgets = VIEW_MODE_WIDGETS[viewMode].allow ?? {};

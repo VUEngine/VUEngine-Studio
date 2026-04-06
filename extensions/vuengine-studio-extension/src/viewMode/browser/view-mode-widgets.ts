@@ -2,9 +2,14 @@ import { CALL_HIERARCHY_TOGGLE_COMMAND_ID } from '@theia/callhierarchy/lib/brows
 import { CommonCommands } from '@theia/core/lib/browser';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
+import { PROBLEMS_WIDGET_ID } from '@theia/markers/lib/browser/problem/problem-widget';
 import { FILE_NAVIGATOR_TOGGLE_COMMAND_ID } from '@theia/navigator/lib/browser/navigator-contribution';
+import { EXPLORER_VIEW_CONTAINER_ID } from '@theia/navigator/lib/browser/navigator-widget-factory';
+import { OUTLINE_WIDGET_FACTORY_ID } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PreferencesSearchbarWidget } from '@theia/preferences/lib/browser/views/preference-searchbar-widget';
 import { PreferencesWidget } from '@theia/preferences/lib/browser/views/preference-widget';
+import { SCM_VIEW_CONTAINER_ID } from '@theia/scm/lib/browser/scm-contribution';
+import { SEARCH_VIEW_CONTAINER_ID } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { SearchInWorkspaceCommands } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
@@ -113,7 +118,15 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
         }
     },
     [ViewMode.sourceCode]: {
-        // fallback view mode
+        // since this is a fallback mode, the below are disallow exceptions, rather
+        allow: {
+            'code-editor-opener': false,
+            [EXPLORER_VIEW_CONTAINER_ID]: true,
+            [OUTLINE_WIDGET_FACTORY_ID]: false,
+            [PROBLEMS_WIDGET_ID]: false,
+            [SCM_VIEW_CONTAINER_ID]: false,
+            [SEARCH_VIEW_CONTAINER_ID]: false,
+        }
     },
     [ViewMode.stages]: {
         allow: {
