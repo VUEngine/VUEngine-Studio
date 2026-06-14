@@ -41,50 +41,50 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
 
     return <>
         <div className='flashingActions'>
-            {vesFlashCartService.isQueued && (
-                <>
-                    <div className='flashingPanel'>
-                        <i className='fa fa-fw fa-hourglass-half'></i>{' '}
-                        <em>
-                            {nls.localize('vuengine/flashCarts/flashingIsQueued', 'Flashing is queued and will start once the build is ready')}
-                        </em>
-                    </div>
-                    <button
-                        className='theia-button large secondary cancel'
-                        onClick={flash}
-                    >
-                        {nls.localize('vuengine/flashCarts/cancel', 'Cancel')}
-                    </button>
-                </>
-            )}
-            {!vesFlashCartService.isQueued &&
-                vesFlashCartService.flashingProgress > -1 && vesFlashCartService.flashingProgress < 100 && (
-                    <div className='flashingPanel'>
+            <div className='flashingPanel'>
+                {vesFlashCartService.isQueued && (
+                    <>
+                        <div>
+                            <i className='fa fa-fw fa-hourglass-half'></i>{' '}
+                            <em>
+                                {nls.localize('vuengine/flashCarts/flashingIsQueued', 'Flashing is queued and will start once the build is ready')}
+                            </em>
+                        </div>
+                        <button
+                            className='theia-button large secondary cancel'
+                            onClick={flash}
+                        >
+                            {nls.localize('vuengine/flashCarts/cancel', 'Cancel')}
+                        </button>
+                    </>
+                )}
+                {!vesFlashCartService.isQueued &&
+                    vesFlashCartService.flashingProgress > -1 && vesFlashCartService.flashingProgress < 100 && (
                         <div className='vesProgressBar'>
                             <div style={{ width: vesFlashCartService.flashingProgress + '%' }}></div>
                             <span>
                                 {vesFlashCartService.flashingProgress}%
                             </span>
                         </div>
-                    </div>
+                    )}
+                {!vesFlashCartService.isQueued && !vesFlashCartService.isFlashing && (
+                    <button
+                        className='theia-button large flash'
+                        onClick={flash}
+                        disabled={!workspaceService.opened || !vesFlashCartService.atLeastOneCanHoldRom}
+                    >
+                        {nls.localize('vuengine/flashCarts/flash', 'Flash')}
+                    </button>
                 )}
-            {!vesFlashCartService.isQueued && !vesFlashCartService.isFlashing && (
-                <button
-                    className='theia-button large flash'
-                    onClick={flash}
-                    disabled={!workspaceService.opened || !vesFlashCartService.atLeastOneCanHoldRom}
-                >
-                    {nls.localize('vuengine/flashCarts/flash', 'Flash')}
-                </button>
-            )}
-            {vesFlashCartService.isFlashing && (
-                <button
-                    className='theia-button secondary abort'
-                    onClick={abort}
-                >
-                    {nls.localize('vuengine/flashCarts/abort', 'Abort')}
-                </button>
-            )}
+                {vesFlashCartService.isFlashing && (
+                    <button
+                        className='theia-button secondary codicon codicon-circle-slash'
+                        disabled={!vesFlashCartService.isFlashing}
+                        onClick={abort}
+                        title={nls.localize('vuengine/flashCarts/abort', 'Abort')}
+                    />
+                )}
+            </div>
             <FlashAutoQueuePreference
                 preferenceService={preferenceService}
             />

@@ -23,6 +23,16 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+#vesFlashCartWidget .flashingPanel {
+  display: flex;
+  flex-direction: row;
+  gap: var(--theia-ui-padding);
+}
+
+#vesFlashCartWidget .flashingPanel div:first-child {
+  flex-grow: 1;
+}
+
 #vesFlashCartWidget .flashCarts {
   overflow: auto;
   display: flex;
