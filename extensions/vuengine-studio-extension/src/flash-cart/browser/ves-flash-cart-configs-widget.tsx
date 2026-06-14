@@ -34,7 +34,7 @@ export class FlashCartConfigsWidget extends ReactWidget {
   protected init(): void {
     this.id = FlashCartConfigsWidget.ID;
     this.title.iconClass = 'codicon codicon-multiple-windows codicon-rotate-180';
-    this.title.closable = false;
+    this.title.closable = true;
     this.title.label = FlashCartConfigsWidget.LABEL;
     this.title.caption = FlashCartConfigsWidget.LABEL;
     this.title.className = '';

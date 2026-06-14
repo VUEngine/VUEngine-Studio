@@ -343,6 +343,16 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
+  export const CONFIG_WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.toggleConfigsView',
+      label: 'Toggle Emulator Configs View',
+      iconClass: 'codicon codicon-run-all',
+    },
+    'vuengine/emulator/commands/toggleConfigsView',
+    'vuengine/emulator/commands/category'
+  );
+
   export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
     {
       id: 'emulator.showSettings',

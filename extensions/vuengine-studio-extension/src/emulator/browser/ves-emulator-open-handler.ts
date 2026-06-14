@@ -31,7 +31,7 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
     }
 
     async open(uri: URI, options?: WidgetOpenerOptions): Promise<VesEmulatorWidget> {
-        await this.viewModeService.setViewMode(ViewMode.build);
+        await this.viewModeService.setViewMode(ViewMode.sourceCode);
 
         // When the emulator is already active, it should be opened and reset.
         const widget = await this.getOrCreateWidget(uri, options);

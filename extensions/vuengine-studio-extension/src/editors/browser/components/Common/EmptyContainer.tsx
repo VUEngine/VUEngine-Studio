@@ -12,6 +12,7 @@ const StyledContainer = styled.div`
     gap: 5px;
     inset: 0;
     justify-content: center;
+    padding: calc(var(--theia-ui-padding) * 2);
     position: absolute;
 `;
 

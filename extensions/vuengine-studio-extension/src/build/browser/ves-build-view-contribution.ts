@@ -1,5 +1,5 @@
-import { CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, KeybindingRegistry } from '@theia/core/lib/browser';
+import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -20,17 +20,20 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             widgetId: VesBuildWidget.ID,
             widgetName: VesBuildWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'main',
-                rank: 100,
+                area: 'right',
+                rank: 700,
             },
         });
     }
 
-    protected async toggleWidget(force?: boolean): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.build);
+    async initializeLayout(app: FrontendApplication): Promise<void> {
         await this.openView({ activate: true, reveal: true });
+    }
 
-        /*
+    protected async toggleWidget(force?: boolean): Promise<void> {
+        await this.viewModeService.setViewMode(ViewMode.sourceCode);
+        // await this.openView({ activate: true, reveal: true });
+
         if (force === true) {
             this.openView({ activate: true, reveal: true });
         } else if (force === false) {
@@ -38,7 +41,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         } else {
             this.toggleView();
         }
-        */
     }
 
     protected async hideView(): Promise<void> {
@@ -52,7 +54,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
             execute: force => this.toggleWidget(force)
         });
 
@@ -76,10 +78,25 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             priority: 2,
         });
         toolbar.registerItem({
+            id: VesBuildCommands.ARCHIVE_WIDGET_TOGGLE.id,
+            command: VesBuildCommands.ARCHIVE_WIDGET_TOGGLE.id,
+            tooltip: VesBuildCommands.ARCHIVE_WIDGET_TOGGLE.label,
+            priority: 3,
+        });
+        toolbar.registerItem({
             id: VesBuildCommands.WIDGET_HELP.id,
             command: VesBuildCommands.WIDGET_HELP.id,
             tooltip: VesBuildCommands.WIDGET_HELP.label,
-            priority: 3,
+            priority: 4,
+        });
+    }
+
+    async registerMenus(menus: MenuModelRegistry): Promise<void> {
+        super.registerMenus(menus);
+
+        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
+            commandId: VesBuildCommands.WIDGET_TOGGLE.id,
+            label: this.viewLabel
         });
     }
 

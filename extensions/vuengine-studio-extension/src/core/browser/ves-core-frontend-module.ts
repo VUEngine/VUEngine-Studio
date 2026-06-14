@@ -30,6 +30,7 @@ import { KeymapsFrontendContribution } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
+import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
@@ -56,6 +57,7 @@ import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-con
 import { VesFilterContribution } from './ves-filter-contribution';
 import { VesKeybindingWidget } from './ves-keybindings-widget';
 import { VesKeymapsFrontendContribution } from './ves-keymaps-frontend-contribution';
+import { VesOutlineViewContribution } from './ves-outline-view-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
@@ -153,6 +155,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
+
+    // initially hide outline view
+    rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
 
     // add select path button to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();

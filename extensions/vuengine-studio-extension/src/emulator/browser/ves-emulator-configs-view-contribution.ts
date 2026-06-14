@@ -3,7 +3,9 @@ import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/b
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { ViewModeService } from '../../viewMode/browser/view-mode-service';
 import { ViewMode } from '../../viewMode/browser/view-mode-types';
+import { EmulatorCommands } from './ves-emulator-commands';
 import { EmulatorConfigsWidget } from './ves-emulator-configs-widget';
+import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 
 @injectable()
 export class EmulatorConfigsViewContribution extends AbstractViewContribution<EmulatorConfigsWidget> {
@@ -15,30 +17,30 @@ export class EmulatorConfigsViewContribution extends AbstractViewContribution<Em
             widgetId: EmulatorConfigsWidget.ID,
             widgetName: EmulatorConfigsWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'left',
+                area: 'main',
                 rank: 100,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: false, reveal: false });
+        // await this.openView({ activate: false, reveal: false });
     }
 
     protected async toggleWidget(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.build);
+        await this.viewModeService.setViewMode(ViewMode.sourceCode);
         await this.openView({ activate: true, reveal: true });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
-        /*
-        commandRegistry.registerCommand(VesBuildCommands.ARCHIVE_WIDGET_TOGGLE, {
-            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
+        commandRegistry.registerCommand(EmulatorCommands.CONFIG_WIDGET_TOGGLE, {
+            // isEnabled: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
+            isEnabled: () => true,
+            // isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
+            isVisible: widget => widget?.id === VesEmulatorSidebarWidget.ID,
             execute: () => this.toggleWidget()
         });
-        */
     }
 }

@@ -31,7 +31,7 @@ export class EmulatorConfigsWidget extends ReactWidget {
   protected init(): void {
     this.id = EmulatorConfigsWidget.ID;
     this.title.iconClass = 'codicon codicon-run-all';
-    this.title.closable = false;
+    this.title.closable = true;
     this.title.label = EmulatorConfigsWidget.LABEL;
     this.title.caption = EmulatorConfigsWidget.LABEL;
     this.title.className = '';

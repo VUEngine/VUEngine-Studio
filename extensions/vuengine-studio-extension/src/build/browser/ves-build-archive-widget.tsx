@@ -38,7 +38,7 @@ export class VesBuildArchiveWidget extends ReactWidget {
     this.bindEvents();
     this.id = VesBuildArchiveWidget.ID;
     this.title.iconClass = 'codicon codicon-archive';
-    this.title.closable = false;
+    this.title.closable = true;
     this.title.label = VesBuildArchiveWidget.LABEL;
     this.title.caption = VesBuildArchiveWidget.LABEL;
     this.title.className = '';

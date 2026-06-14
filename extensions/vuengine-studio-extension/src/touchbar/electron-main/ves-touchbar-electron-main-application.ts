@@ -20,7 +20,7 @@ import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 export const VIEW_MODE_TOUCHBAR_ICONS: { [viewMode: string]: NativeImage } = {
     [ViewMode.actors]: nativeImage.createFromDataURL(VesTouchBarIcons.SMILEY).resize({ height: 18 }),
     [ViewMode.assets]: nativeImage.createFromDataURL(VesTouchBarIcons.LIBRARY).resize({ height: 18 }),
-    [ViewMode.build]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_PROPERTY).resize({ height: 18 }),
+    // [ViewMode.build]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_PROPERTY).resize({ height: 18 }),
     [ViewMode.fonts]: nativeImage.createFromDataURL(VesTouchBarIcons.CASE_SENSITIVE).resize({ height: 18 }),
     [ViewMode.localization]: nativeImage.createFromDataURL(VesTouchBarIcons.COMMENT_DISCUSSION).resize({ height: 18 }),
     [ViewMode.logic]: nativeImage.createFromDataURL(VesTouchBarIcons.PULSE).resize({ height: 18 }),

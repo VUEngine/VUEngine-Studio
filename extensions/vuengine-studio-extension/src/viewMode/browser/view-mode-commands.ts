@@ -31,6 +31,7 @@ export namespace ViewModeCommands {
     'vuengine/viewMode/commands/switchToAssetsViewMode',
     'vuengine/viewMode/commands/category',
   );
+  /*
   export const SWITCH_TO_BUILD_VIEW_MODE: Command = Command.toLocalizedCommand(
     {
       id: 'viewMode.switchToBuildViewMode',
@@ -41,6 +42,7 @@ export namespace ViewModeCommands {
     'vuengine/viewMode/commands/switchToBuildViewMode',
     'vuengine/viewMode/commands/category',
   );
+  */
   export const SWITCH_TO_FONTS_VIEW_MODE: Command = Command.toLocalizedCommand(
     {
       id: 'viewMode.switchToFontsViewMode',

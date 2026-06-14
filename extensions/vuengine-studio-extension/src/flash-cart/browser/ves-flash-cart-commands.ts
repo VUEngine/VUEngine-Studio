@@ -60,4 +60,14 @@ export namespace VesFlashCartCommands {
     'vuengine/flashCarts/commands/detectConnected',
     'vuengine/flashCarts/commands/category'
   );
+
+  export const CONFIG_WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
+    {
+      id: 'flashCarts.toggleConfigsView',
+      label: 'Toggle Flash Cart Configs View',
+      iconClass: 'codicon codicon-multiple-windows codicon-rotate-180',
+    },
+    'vuengine/flashCarts/commands/toggleConfigsView',
+    'vuengine/flashCarts/commands/category'
+  );
 };

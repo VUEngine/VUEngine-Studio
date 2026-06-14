@@ -15,13 +15,7 @@ import { TypeHierarchyCommands } from '@theia/typehierarchy/lib/browser/typehier
 import { VSXExtensionsCommands } from '@theia/vsx-registry/lib/browser/vsx-extension-commands';
 import { VSXExtensionsViewContainer } from '@theia/vsx-registry/lib/browser/vsx-extensions-view-container';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
-import { VesBuildArchiveWidget } from '../../build/browser/ves-build-archive-widget';
-import { VesBuildWidget } from '../../build/browser/ves-build-widget';
 import { VesEditorsWidget } from '../../editors/browser/ves-editors-widget';
-import { EmulatorConfigsWidget } from '../../emulator/browser/ves-emulator-configs-widget';
-import { VesEmulatorWidget } from '../../emulator/browser/ves-emulator-widget';
-import { FlashCartConfigsWidget } from '../../flash-cart/browser/ves-flash-cart-configs-widget';
-import { VesFlashCartWidget } from '../../flash-cart/browser/ves-flash-cart-widget';
 import { VesPluginsViewContainer } from '../../plugins/browser/ves-plugins-view-container';
 import { ActorAssetsBrowserWidget } from '../../project/browser/assets-browser/actor-assets-browser-widget';
 import { BrightnessRepeatAssetsBrowserWidget } from '../../project/browser/assets-browser/brightness-repeat-assets-browser-widget';
@@ -64,6 +58,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             'shell-tab-code-editor-opener': false,
         }
     },
+    /*
     [ViewMode.build]: {
         allow: {
             [VesBuildArchiveWidget.ID]: false,
@@ -78,6 +73,7 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
             [VesFlashCartWidget.ID]: false,
         }
     },
+    */
     [ViewMode.fonts]: {
         allow: {
             [FontAssetsBrowserWidget.ID]: true,

@@ -3,16 +3,18 @@ import { FrontendApplicationContribution, KeybindingContribution, OpenHandler, W
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import '../../../src/emulator/browser/style/index.css';
+import { EmulatorConfigsViewContribution } from './ves-emulator-configs-view-contribution';
+import { EmulatorConfigsWidget } from './ves-emulator-configs-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorContribution } from './ves-emulator-contribution';
 import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
 import { VesEmulatorPreferenceSchema } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
+import { VesEmulatorSidebarViewContribution } from './ves-emulator-sidebar-view-contribution';
+import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 import { VesEmulatorStatusBarContribution } from './ves-emulator-statusbar-contribution';
 import { VesEmulatorViewContribution } from './ves-emulator-view';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './ves-emulator-widget';
-import { EmulatorConfigsViewContribution } from './ves-emulator-configs-view-contribution';
-import { EmulatorConfigsWidget } from './ves-emulator-configs-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -57,5 +59,15 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: EmulatorConfigsWidget.ID,
         createWidget: () => ctx.container.get<EmulatorConfigsWidget>(EmulatorConfigsWidget)
+    })).inSingletonScope();
+
+    // emulator sidebar view
+    bindViewContribution(bind, VesEmulatorSidebarViewContribution);
+    bind(FrontendApplicationContribution).toService(VesEmulatorSidebarViewContribution);
+    bind(TabBarToolbarContribution).toService(VesEmulatorSidebarViewContribution);
+    bind(VesEmulatorSidebarWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesEmulatorSidebarWidget.ID,
+        createWidget: () => ctx.container.get<VesEmulatorSidebarWidget>(VesEmulatorSidebarWidget)
     })).inSingletonScope();
 });

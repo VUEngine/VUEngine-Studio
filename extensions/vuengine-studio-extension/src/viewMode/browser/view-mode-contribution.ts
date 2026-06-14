@@ -44,10 +44,12 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
             isEnabled: () => this.workspaceService.opened && !DISABLED_VIEW_MODES.includes(ViewMode.assets),
             execute: () => this.viewModeService.setViewMode(ViewMode.assets)
         });
+        /*
         commandRegistry.registerCommand(ViewModeCommands.SWITCH_TO_BUILD_VIEW_MODE, {
             isEnabled: () => this.workspaceService.opened && !DISABLED_VIEW_MODES.includes(ViewMode.build),
             execute: () => this.viewModeService.setViewMode(ViewMode.build)
         });
+        */
         commandRegistry.registerCommand(ViewModeCommands.SWITCH_TO_FONTS_VIEW_MODE, {
             isEnabled: () => this.workspaceService.opened && !DISABLED_VIEW_MODES.includes(ViewMode.fonts),
             execute: () => this.viewModeService.setViewMode(ViewMode.fonts)
@@ -115,10 +117,12 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
             command: ViewModeCommands.SWITCH_TO_SOURCE_CODE_VIEW_MODE.id,
             keybinding: 'ctrlcmd+8'
         });
+        /*
         registry.registerKeybindings({
             command: ViewModeCommands.SWITCH_TO_BUILD_VIEW_MODE.id,
             keybinding: 'ctrlcmd+9'
         });
+        */
         registry.registerKeybindings({
             command: ViewModeCommands.SWITCH_TO_SETTINGS_VIEW_MODE.id,
             keybinding: 'ctrlcmd+0'
@@ -187,11 +191,13 @@ export class ViewModeContribution implements CommandContribution, KeybindingCont
             ViewModeMenuSection.OTHER,
             VIEW_VIEW_MODE,
         ].forEach(menuSection => {
+            /*
             menus.registerMenuAction(menuSection, {
                 commandId: ViewModeCommands.SWITCH_TO_BUILD_VIEW_MODE.id,
                 label: VIEW_MODE_LABELS[ViewMode.build],
                 order: 'b1'
             });
+            */
             menus.registerMenuAction(menuSection, {
                 commandId: ViewModeCommands.SWITCH_TO_SETTINGS_VIEW_MODE.id,
                 label: VIEW_MODE_LABELS[ViewMode.settings],

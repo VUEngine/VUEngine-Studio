@@ -8,7 +8,7 @@ import { TranslationsType } from '../../project/browser/types/Translations';
 export enum ViewMode {
     actors = 'actors',
     assets = 'assets',
-    build = 'build',
+    // build = 'build',
     fonts = 'fonts',
     localization = 'localization',
     logic = 'logic',
@@ -19,7 +19,7 @@ export enum ViewMode {
     welcome = 'welcome',
 }
 
-export const DEFAULT_VIEW_MODE = ViewMode.stages;
+export const DEFAULT_VIEW_MODE = ViewMode.sourceCode;
 export const LAST_VIEW_MODE_LOCAL_STORAGE_KEY = 'vuengine-last-view-mode';
 
 export const DISABLED_VIEW_MODES: ViewMode[] = [
@@ -30,7 +30,7 @@ export const DISABLED_VIEW_MODES: ViewMode[] = [
 export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {
     [ViewMode.actors]: nls.localize('vuengine/general/viewModes/actors', 'Actors'),
     [ViewMode.assets]: nls.localize('vuengine/general/viewModes/assets', 'Other Assets'),
-    [ViewMode.build]: nls.localize('vuengine/general/viewModes/build', 'Build & Run'),
+    // [ViewMode.build]: nls.localize('vuengine/general/viewModes/build', 'Build & Run'),
     [ViewMode.fonts]: nls.localize('vuengine/general/viewModes/fonts', 'Fonts'),
     [ViewMode.localization]: nls.localize('vuengine/general/viewModes/localization', 'Localization'),
     [ViewMode.logic]: nls.localize('vuengine/general/viewModes/logic', 'Logic'),
@@ -43,7 +43,7 @@ export const VIEW_MODE_LABELS: { [viewMode: string]: string } = {
 export const VIEW_MODE_ICONS: { [viewMode: string]: string } = {
     [ViewMode.actors]: ActorType.icon ?? '',
     [ViewMode.assets]: 'codicon codicon-library',
-    [ViewMode.build]: 'codicon codicon-symbol-property',
+    // [ViewMode.build]: 'codicon codicon-symbol-property',
     [ViewMode.fonts]: FontType.icon ?? '',
     [ViewMode.localization]: TranslationsType.icon ?? '',
     [ViewMode.logic]: LogicType.icon ?? '',

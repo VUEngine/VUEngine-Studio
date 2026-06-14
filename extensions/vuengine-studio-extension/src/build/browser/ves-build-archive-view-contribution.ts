@@ -6,6 +6,7 @@ import { ViewModeService } from '../../viewMode/browser/view-mode-service';
 import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesBuildArchiveWidget } from './ves-build-archive-widget';
 import { VesBuildCommands } from './ves-build-commands';
+import { VesBuildWidget } from './ves-build-widget';
 
 @injectable()
 export class VesBuildArchiveViewContribution extends AbstractViewContribution<VesBuildArchiveWidget> implements TabBarToolbarContribution {
@@ -17,18 +18,18 @@ export class VesBuildArchiveViewContribution extends AbstractViewContribution<Ve
             widgetId: VesBuildArchiveWidget.ID,
             widgetName: VesBuildArchiveWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'right',
+                area: 'main',
                 rank: 100,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: false, reveal: false });
+        // await this.openView({ activate: false, reveal: false });
     }
 
     protected async toggleWidget(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.build);
+        await this.viewModeService.setViewMode(ViewMode.sourceCode);
         await this.openView({ activate: true, reveal: true });
     }
 
@@ -43,8 +44,10 @@ export class VesBuildArchiveViewContribution extends AbstractViewContribution<Ve
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.ARCHIVE_WIDGET_TOGGLE, {
-            isEnabled: () => this.viewModeService.getViewMode() === ViewMode.build,
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
+            // isEnabled: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
+            isEnabled: () => true,
+            // isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
+            isVisible: widget => widget?.id === VesBuildWidget.ID,
             execute: () => this.toggleWidget()
         });
 

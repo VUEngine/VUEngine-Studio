@@ -38,6 +38,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // flash cart view
     bindViewContribution(bind, VesFlashCartViewContribution);
+    bind(FrontendApplicationContribution).toService(VesFlashCartViewContribution);
     bind(TabBarToolbarContribution).toService(VesFlashCartViewContribution);
     bind(VesFlashCartWidget).toSelf();
     bind(WidgetFactory)

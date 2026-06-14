@@ -35,6 +35,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // build view
     bindViewContribution(bind, VesBuildViewContribution);
+    bind(FrontendApplicationContribution).toService(VesBuildViewContribution);
     bind(TabBarToolbarContribution).toService(VesBuildViewContribution);
     bind(VesBuildWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({

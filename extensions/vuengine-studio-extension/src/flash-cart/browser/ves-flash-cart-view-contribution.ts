@@ -1,5 +1,5 @@
-import { CommandRegistry, CommandService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
+import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
@@ -23,17 +23,21 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             widgetId: VesFlashCartWidget.ID,
             widgetName: VesFlashCartWidget.LABEL,
             defaultWidgetOptions: {
-                area: 'main',
-                rank: 200,
+                area: 'right',
+                rank: 900,
             },
         });
+    }
+
+    async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: false, reveal: false });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.build,
+            isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
             execute: () => this.toggleView()
         });
 
@@ -61,6 +65,12 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             id: VesFlashCartCommands.WIDGET_SETTINGS.id,
             command: VesFlashCartCommands.WIDGET_SETTINGS.id,
             tooltip: VesFlashCartCommands.WIDGET_SETTINGS.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
+            id: VesFlashCartCommands.CONFIG_WIDGET_TOGGLE.id,
+            command: VesFlashCartCommands.CONFIG_WIDGET_TOGGLE.id,
+            tooltip: VesFlashCartCommands.CONFIG_WIDGET_TOGGLE.label,
             priority: 2,
         });
         toolbar.registerItem({
@@ -74,6 +84,15 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             command: VesFlashCartCommands.WIDGET_REFRESH.id,
             tooltip: VesFlashCartCommands.WIDGET_REFRESH.label,
             priority: 4,
+        });
+    }
+
+    async registerMenus(menus: MenuModelRegistry): Promise<void> {
+        super.registerMenus(menus);
+
+        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
+            commandId: VesFlashCartCommands.WIDGET_TOGGLE.id,
+            label: this.viewLabel
         });
     }
 }

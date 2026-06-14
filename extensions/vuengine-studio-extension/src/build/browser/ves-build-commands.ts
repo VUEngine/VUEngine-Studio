@@ -84,6 +84,7 @@ export namespace VesBuildCommands {
     {
       id: 'build.toggleArchiveView',
       label: 'Toggle Build Archive View',
+      iconClass: 'codicon codicon-archive',
     },
     'vuengine/build/commands/toggleArchiveView',
     'vuengine/build/commands/category'
