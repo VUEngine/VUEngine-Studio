@@ -432,7 +432,7 @@
       "rumblePackConnectionStatus": "ランブルパック接続状態",
       "rumblePackTool": "ランブルパックツール",
       "runEffect": "ラン効果",
-      "stopCurrentEffect": "電流の効果を停止する",
+      "stopCurrentEffect": "現在の効果を停止する",
       "sustainNeg": "サスティーン(Neg.)",
       "sustainPos": "サスティーン(pos.)",
       "vbCommandLineState": "VB コマンドライン状態",
