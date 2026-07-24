@@ -12,6 +12,7 @@ import * as nunjucks from 'nunjucks';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
+import { convertPcm } from '../../editors/browser/components/PCMEditor/converter';
 import { getTrackKeyframes } from '../../editors/browser/components/SoundEditor/Other/templating';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
@@ -33,29 +34,29 @@ import { CODEGEN_CHANNEL_NAME, GenerationMode, IsGeneratingFilesStatus, SHOW_DON
 @injectable()
 export class VesCodeGenService {
   @inject(FileService)
-  protected fileService: FileService;
+  protected readonly fileService: FileService;
   @inject(MessageService)
   protected readonly messageService: MessageService;
   @inject(OutputChannelManager)
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(QuickInputService)
-  protected quickInputService: QuickInputService;
+  protected readonly quickInputService: QuickInputService;
   @inject(QuickPickService)
-  protected quickPickService: QuickPickService;
+  protected readonly quickPickService: QuickPickService;
   @inject(PreferenceService)
-  protected preferenceService: PreferenceService;
+  protected readonly preferenceService: PreferenceService;
   @inject(VesCommonService)
-  protected vesCommonService: VesCommonService;
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesImagesService)
-  protected vesImageService: VesImagesService;
+  protected readonly vesImageService: VesImagesService;
   @inject(VesPluginsService)
-  protected vesPluginsService: VesPluginsService;
+  protected readonly vesPluginsService: VesPluginsService;
   @inject(VesProcessService)
-  protected vesProcessService: VesProcessService;
+  protected readonly vesProcessService: VesProcessService;
   @inject(VesProjectService)
-  protected vesProjectService: VesProjectService;
+  protected readonly vesProjectService: VesProjectService;
   @inject(VesWorkspaceService)
-  protected workspaceService: VesWorkspaceService;
+  protected readonly workspaceService: VesWorkspaceService;
 
   protected timeout: number = 0;
 
@@ -663,6 +664,11 @@ export class VesCodeGenService {
     });
 
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
+
+    env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, range: number, callback): Promise<void> => {
+      const result = await convertPcm(configFileUri, filePath, range, this.fileService);
+      callback(null, result);
+    }, true);
 
     env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath: string, callback): Promise<void> => {
       const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);

@@ -23,6 +23,7 @@ import { ColumnTableAssetsBrowserWidget } from '../../project/browser/assets-bro
 import { FontAssetsBrowserWidget } from '../../project/browser/assets-browser/font-assets-browser-widget';
 import { ImageAssetsBrowserWidget } from '../../project/browser/assets-browser/image-assets-browser-widget';
 import { LogicAssetsBrowserWidget } from '../../project/browser/assets-browser/logic-assets-browser-widget';
+import { PcmAssetsBrowserWidget } from '../../project/browser/assets-browser/pcm-assets-browser-widget';
 import { PixelAssetsBrowserWidget } from '../../project/browser/assets-browser/pixel-assets-browser-widget';
 import { RumbleEffectAssetsBrowserWidget } from '../../project/browser/assets-browser/rumble-effect-assets-browser-widget';
 import { SoundAssetsBrowserWidget } from '../../project/browser/assets-browser/sound-assets-browser-widget';
@@ -115,7 +116,9 @@ export const VIEW_MODE_WIDGETS: ViewModeWidgetsMap = {
     [ViewMode.sound]: {
         allow: {
             [SoundAssetsBrowserWidget.ID]: true,
+            [PcmAssetsBrowserWidget.ID]: true,
             [`${VesEditorsWidget.ID}:Sound:`]: false,
+            [`${VesEditorsWidget.ID}:PCM:`]: false,
             'code-editor-opener': false,
             'shell-tab-code-editor-opener': false,
         }

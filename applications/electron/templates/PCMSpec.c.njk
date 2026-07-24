@@ -1,0 +1,55 @@
+{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+{%- set soundData = itemUri | convertPcm(item.sourceFile, item.range) -%}
+
+{%- import 'templates/partials/macros.njk' as macros -%}
+{% include('templates/partials/fileHeader/fileHeader.c.njk') %}
+
+{{ macros.sectionHeader('Includes') }}
+
+#include <PCMSoundPlayer.h>
+
+{{ macros.sectionHeader('Declarations') }}
+
+#define {{ sanitizedSpecName }}SoundTrackLength {{ soundData | length }}
+
+{{ macros.sectionHeader('Definitions') }}
+
+const uint8 {{ sanitizedSpecName }}SoundTrack1SxLRV[] 
+{%- if item.section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+#ifndef REDUCE_PCM_DATA
+	{% for soundDataValue in soundData -%}
+	{{  soundDataValue | intToHex(2) }},
+	{%- if loop.index % 16 == 0 and not loop.last %}{{ "\n	" }}{% endif -%}
+	{%- endfor %}
+#endif
+};
+
+PCMSoundROMSpec {{ sanitizedSpecName }}oSoundSpec =
+{
+	// Timer configuration
+	{
+		__TIMER_{{ item.timer.resolution }},
+		{{ item.timer.targetTimePerInterrupt}},
+		k{{ item.timer.targetTimePerInterrupttUnits}}
+	},
+	
+	// Name
+	"{{ sanitizedSpecName }}",
+
+	// Author name
+	"{{ item.author }}",
+
+	// Play in loop
+	{{ item.loop }},
+
+	// Total number of samples
+	{{ sanitizedSpecName }}SoundTrackLength,
+
+	// Target PCM cycles per game cycle
+	__MICROSECONDS_PER_SECOND / __DEFAULT_PCM_HZ,
+
+	// SxLRV values
+	(uint8*){{ sanitizedSpecName }}SoundTrack1SxLRV
+};

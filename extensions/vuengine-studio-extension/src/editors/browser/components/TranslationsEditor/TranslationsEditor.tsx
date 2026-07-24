@@ -8,20 +8,7 @@ import LanguagesTable from './LanguagesTable';
 import { Language, LANGUAGE_PRESETS, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
 import { Translate } from '@phosphor-icons/react';
-
-const I18N_PLUGIN_ID = 'vuengine//other/I18n';
-
-const StyledWarningContainer = styled.div`
-    align-items: center;
-    border-bottom: 1px solid var(--theia-editorGroup-border);
-    display: flex;
-    flex-direction: row;
-    gap: var(--theia-ui-padding);
-    justify-content: center;
-    padding: calc(2 * var(--theia-ui-padding));
-    position: relative;
-    z-index: 10;
-`;
+import MissingPlugin from '../Common/MissingPlugin';
 
 const StyledTranslationsEditor = styled.div`
     display: flex;
@@ -38,13 +25,6 @@ interface TranslationsEditorProps {
 export default function TranslationsEditor(props: TranslationsEditorProps): React.JSX.Element {
     const { translationsData, updateTranslationsData } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-
-    const installedPlugins = services.vesPluginsService.getInstalledPlugins();
-    const hasI18nPlugin = installedPlugins.includes(I18N_PLUGIN_ID);
-
-    const installPlugin = async () => {
-        await services.vesPluginsService.installPlugin(I18N_PLUGIN_ID);
-    };
 
     const showLanguageSelection = (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
@@ -104,19 +84,9 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
 
     return (
         <VContainer gap={0} overflow='hidden' style={{ padding: 0 }}>
-            {!hasI18nPlugin &&
-                <StyledWarningContainer>
-                    <i className="codicon codicon-warning invalid" />
-                    {nls.localize('vuengine/editors/translations/pluginMissing', 'The I18n plugin is required in order to use these translations.')}
-                    <button
-                        className="theia-button secondary"
-                        onClick={installPlugin}
-                    >
-                        {nls.localizeByDefault('Install')}
-                    </button>
-                </StyledWarningContainer>
-            }
-
+            <MissingPlugin
+                plugin='vuengine//other/I18n'
+            />
             {translationsData.languages.length === 0
                 ? (
                     <EmptyContainer
@@ -142,7 +112,6 @@ export default function TranslationsEditor(props: TranslationsEditorProps): Reac
                     </StyledTranslationsEditor>
                 )
             }
-
         </VContainer>
     );
 }

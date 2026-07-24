@@ -14,6 +14,7 @@ import { InGameTypesTemplate } from './template/InGameTypes';
 import { LanguagesCTemplate } from './template/LanguagesC';
 import { LanguagesHTemplate } from './template/LanguagesH';
 import { MessagesTemplate } from './template/Messages';
+import { PcmSpecTemplate } from './template/PCM';
 import { PluginConfigTemplate } from './template/PluginConfig';
 import { PluginConfigMakeTemplate } from './template/PluginConfigMake';
 import { PluginsConfigTemplate } from './template/PluginsConfig';
@@ -30,6 +31,7 @@ import { FontType } from './types/Font';
 import { GameConfigType } from './types/GameConfig';
 import { ImageType } from './types/Image';
 import { LogicType } from './types/Logic';
+import { PcmType } from './types/PCM';
 import { PixelType } from './types/Pixel';
 import { PluginFileType } from './types/PluginFile';
 import { RumbleEffectType } from './types/RumbleEffect';
@@ -55,6 +57,7 @@ export const PROJECT_TEMPLATES: ProjectDataTemplates = {
   LanguagesC: LanguagesCTemplate,
   LanguagesH: LanguagesHTemplate,
   Messages: MessagesTemplate,
+  PcmSpec: PcmSpecTemplate,
   PluginConfig: PluginConfigTemplate,
   PluginConfigMake: PluginConfigMakeTemplate,
   PluginsConfig: PluginsConfigTemplate,
@@ -74,6 +77,7 @@ export const PROJECT_TYPES: ProjectDataTypes = {
   GameConfig: GameConfigType,
   Image: ImageType,
   Logic: LogicType,
+  PCM: PcmType,
   Pixel: PixelType,
   PluginFile: PluginFileType,
   RumbleEffect: RumbleEffectType,
