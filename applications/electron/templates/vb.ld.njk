@@ -101,6 +101,7 @@ SECTIONS
 		*(.bss*)
 		*(COMMON)
 		PROVIDE (__bssEnd = .);
+		PROVIDE (_end = __bssEnd);
 	} >wram = 0xFF
 
 	.dram_bss (NOLOAD): AT(__dramDataEnd) SUBALIGN(4)
