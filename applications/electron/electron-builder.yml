@@ -127,14 +127,14 @@ win:
       to: app/binaries/vuengine-studio-tools/linux/make
 
 mac:
-  artifactName: VUEngine-Studio-${versionDashes}.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-${arch}.${ext}
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
   target:
     - pkg
   extraResources:
-    - from: binaries/vuengine-studio-tools/osx
+    - from: binaries/vuengine-studio-tools/osx-${arch}
       to: app/binaries/vuengine-studio-tools/osx
 
 linux:
