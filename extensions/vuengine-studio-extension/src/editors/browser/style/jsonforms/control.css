@@ -17,7 +17,7 @@
   min-height: unset;
 }
 
-.jsonforms-container .control> {
+.jsonforms-container .control > * {
   margin: 0;
 }
 

@@ -16,8 +16,8 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@theia/cli": "1.71.2",
-    "@types/yargs": "17.0.7",
+    "@theia/cli": "1.72.3",
+    "@types/yargs": "^17",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
@@ -31,7 +31,7 @@
     "rimraf": "^2.7.1",
     "ts-node": "^10.9.2",
     "type-fest": "^0.20.2",
-    "yargs": "17.2.1"
+    "yargs": "^17.7.2"
   },
   "scripts": {
     "clean": "lerna run clean && rimraf node_modules",
@@ -147,6 +147,7 @@
     "**/nan": "2.22.2",
     "**/cpu-features": "0.0.9",
     "**/perfect-scrollbar": "1.5.5",
-    "**/node-abi": "4.14.0"
+    "**/node-abi": "4.14.0",
+    "**/yauzl": "^3.3.1"
   }
 }
