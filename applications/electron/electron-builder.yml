@@ -2,7 +2,7 @@ appId: dev.vuengine.studio
 productName: VUEngine
 copyright: Copyright © 2006-2026 VUEngine
 electronDist: ../../node_modules/electron/dist
-electronVersion: 38.4.0
+electronVersion: 42.3.0
 # Although it is generally not recommended to disable asar, it is required for Theia.
 # Enabling this leads to: process ERROR Error: spawn ENOTDIR
 # because binaries can not be executed from the asar archive.
