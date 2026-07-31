@@ -9,13 +9,13 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 @injectable()
 export class VesCommonService {
   @inject(EnvVariablesServer)
-  protected envVariablesServer: EnvVariablesServer;
+  protected envVariablesServer!: EnvVariablesServer;
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(VesProcessService)
-  protected readonly vesProcessService: VesProcessService;
+  protected readonly vesProcessService!: VesProcessService;
   @inject(VesProcessWatcher)
-  protected readonly vesProcessWatcher: VesProcessWatcher;
+  protected readonly vesProcessWatcher!: VesProcessWatcher;
 
   @postConstruct()
   protected init(): void {

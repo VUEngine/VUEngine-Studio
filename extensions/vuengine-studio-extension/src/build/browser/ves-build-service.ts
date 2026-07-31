@@ -60,45 +60,45 @@ import {
 @injectable()
 export class VesBuildService {
   @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
+  protected readonly shell!: ApplicationShell;
   @inject(CommandRegistry)
-  protected readonly commandRegistry: CommandRegistry;
+  protected readonly commandRegistry!: CommandRegistry;
   @inject(CommandService)
-  protected readonly commandService: CommandService;
+  protected readonly commandService!: CommandService;
   @inject(EnvVariablesServer)
-  protected envVariablesServer: EnvVariablesServer;
+  protected envVariablesServer!: EnvVariablesServer;
   @inject(FileService)
-  protected fileService: FileService;
+  protected fileService!: FileService;
   @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  protected readonly frontendApplicationStateService!: FrontendApplicationStateService;
   @inject(LabelProvider)
-  protected readonly labelProvider: LabelProvider;
+  protected readonly labelProvider!: LabelProvider;
   @inject(LocalStorageService)
-  protected readonly localStorageService: LocalStorageService;
+  protected readonly localStorageService!: LocalStorageService;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  protected readonly preferenceService!: PreferenceService;
   @inject(QuickPickService)
-  protected readonly quickPickService: QuickPickService;
+  protected readonly quickPickService!: QuickPickService;
   @inject(TaskService)
-  protected readonly taskService: TaskService;
+  protected readonly taskService!: TaskService;
   @inject(VesBuildPathsService)
-  protected readonly vesBuildPathsService: VesBuildPathsService;
+  protected readonly vesBuildPathsService!: VesBuildPathsService;
   @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
+  protected readonly vesCommonService!: VesCommonService;
   @inject(VesPluginsPathsService)
-  protected readonly vesPluginsPathsService: VesPluginsPathsService;
+  protected readonly vesPluginsPathsService!: VesPluginsPathsService;
   @inject(VesPluginsService)
-  protected readonly vesPluginsService: VesPluginsService;
+  protected readonly vesPluginsService!: VesPluginsService;
   @inject(VesProjectService)
-  protected readonly vesProjectService: VesProjectService;
+  protected readonly vesProjectService!: VesProjectService;
   @inject(VesProcessService)
-  protected readonly vesProcessService: VesProcessService;
+  protected readonly vesProcessService!: VesProcessService;
   @inject(VesProcessWatcher)
-  protected readonly vesProcessWatcher: VesProcessWatcher;
+  protected readonly vesProcessWatcher!: VesProcessWatcher;
   @inject(WorkspaceService)
-  protected readonly workspaceService: WorkspaceService;
+  protected readonly workspaceService!: WorkspaceService;
 
-  protected cpuInfo: Systeminformation.CpuData;
+  protected cpuInfo: Systeminformation.CpuData = {} as Systeminformation.CpuData;
 
   protected _ready = new Deferred<void>();
   get ready(): Promise<void> {
@@ -670,6 +670,7 @@ export class VesBuildService {
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri(buildWithWsl);
     const makeUri = await this.vesBuildPathsService.getMakeUri(buildWithWsl);
+    const quickJsUri = await this.vesBuildPathsService.getQuickJsUri(buildWithWsl);
     const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
@@ -679,6 +680,7 @@ export class VesBuildService {
       compilerUri.resolve('bin'),
       compilerUri.resolve('libexec').resolve('gcc').resolve('v810').resolve('4.7.4'),
       makeUri,
+      quickJsUri,
     ];
 
     if (isOSX) {

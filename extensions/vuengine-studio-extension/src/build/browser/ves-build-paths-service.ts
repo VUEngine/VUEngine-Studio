@@ -8,11 +8,11 @@ import { VesBuildPreferenceIds } from './ves-build-preferences';
 @injectable()
 export class VesBuildPathsService {
   @inject(FileService)
-  protected fileService: FileService;
+  protected fileService!: FileService;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  protected readonly preferenceService!: PreferenceService;
   @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
+  protected readonly vesCommonService!: VesCommonService;
 
   async getEngineUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
@@ -66,6 +66,15 @@ export class VesBuildPathsService {
       .resolve('vuengine-studio-tools')
       .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
       .resolve('make');
+  }
+
+  async getQuickJsUri(isWslInstalled: boolean = false): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
+      .resolve('quickjs');
   }
 
   async getSedUri(isWslInstalled: boolean = false): Promise<URI> {
