@@ -1,4 +1,4 @@
-import { nls, URI } from '@theia/core';
+import { nls, QuickPickItem, QuickPickService, URI } from '@theia/core';
 import { ConfirmDialog, open, OpenerService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React, { useEffect, useRef, useState } from 'react';
@@ -29,6 +29,7 @@ interface AssetsTreeProps {
     allExpanded: boolean
     fileService: FileService
     openerService: OpenerService
+    quickPickService: QuickPickService
     vesProjectService: VesProjectService
     forceRefresh?: boolean
     forceAdd?: boolean
@@ -38,7 +39,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     const {
         types,
         allExpanded,
-        fileService, openerService, vesProjectService,
+        fileService, openerService, quickPickService, vesProjectService,
         forceRefresh, forceAdd,
     } = props;
     const treeContainerRef = useRef<HTMLDivElement>(null);
@@ -62,17 +63,20 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
         setTimeout(() => setLoading(false), 100);
     };
 
-    const getItems = async () => {
-        await vesProjectService.projectDataReady;
-
-        const foundItems: TreeNode[] = [];
-        const availableTypes = Object.keys(PROJECT_TYPES)
+    const getAvailableTypes = (): string[] =>
+        Object.keys(PROJECT_TYPES)
             .filter(typeId => {
                 const type = PROJECT_TYPES[typeId];
                 return (types.length === 0 || types.includes(typeId))
                     && type.file.startsWith('.')
                     && (type.enabled === undefined || type.enabled === true);
             });
+
+    const getItems = async () => {
+        await vesProjectService.projectDataReady;
+
+        const foundItems: TreeNode[] = [];
+        const availableTypes = getAvailableTypes();
 
         availableTypes.forEach(typeId => {
             const type = PROJECT_TYPES[typeId];
@@ -152,11 +156,44 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
         }
     };
 
+    const selectTypeToAdd = async (): Promise<string | undefined> => {
+        const availableTypes = getAvailableTypes();
+        if (!availableTypes.length) {
+            return undefined;
+        }
+        if (availableTypes.length === 1) {
+            return availableTypes[0];
+        }
+
+        const items: QuickPickItem[] = availableTypes
+            .map(typeId => {
+                const type = PROJECT_TYPES[typeId];
+                return {
+                    id: typeId,
+                    label: type.schema?.title ?? typeId,
+                    iconClasses: type.icon?.split(' ') ?? ['codicon', 'codicon-file'],
+                };
+            })
+            .sort((a, b) => a.label.localeCompare(b.label));
+
+        const selectedType = await quickPickService.show(items, {
+            title: nls.localize('vuengine/projects/addAsset', 'Add Asset'),
+            placeholder: nls.localize('vuengine/projects/selectTypeOfAssetToAdd', 'Select the type of asset to add'),
+        });
+
+        return selectedType?.id;
+    };
+
+    const addNewItem = async () => {
+        const typeId = await selectTypeToAdd();
+        if (typeId !== undefined) {
+            await addItem(typeId);
+        }
+    };
+
     useEffect(() => {
         if (forceAdd !== undefined) {
-            // TODO: show type selection if types.length > 1
-            alert('ADD');
-            addItem(types[0]);
+            addNewItem();
         }
     }, [
         forceAdd

@@ -1,4 +1,4 @@
-import { CommandService, nls } from '@theia/core';
+import { CommandService, nls, QuickPickService } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@lumino/messaging';
@@ -18,6 +18,8 @@ export class AssetsBrowserWidget extends ReactWidget {
   private readonly fileService!: FileService;
   @inject(OpenerService)
   private readonly openerService!: OpenerService;
+  @inject(QuickPickService)
+  private readonly quickPickService!: QuickPickService;
   @inject(VesProjectService)
   private readonly vesProjectService!: VesProjectService;
   @inject(VesWorkspaceService)
@@ -104,6 +106,7 @@ export class AssetsBrowserWidget extends ReactWidget {
         allExpanded={this.allExpanded}
         fileService={this.fileService}
         openerService={this.openerService}
+        quickPickService={this.quickPickService}
         vesProjectService={this.vesProjectService}
         forceRefresh={this.forceRefresh}
         forceAdd={this.forceAdd}
