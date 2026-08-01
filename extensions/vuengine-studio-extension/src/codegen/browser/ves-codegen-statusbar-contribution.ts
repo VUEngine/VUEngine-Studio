@@ -37,6 +37,11 @@ export class VesCodeGenStatusBarContribution implements FrontendApplicationContr
             }
         }
 
+        if (status === IsGeneratingFilesStatus.error) {
+            icon = 'codicon-error';
+            label = nls.localize('vuengine/codegen/generationFailed', 'Generation Failed');
+        }
+
         if (status === IsGeneratingFilesStatus.hide) {
             this.statusBar.removeElement(ENTRY_KEY);
         } else {

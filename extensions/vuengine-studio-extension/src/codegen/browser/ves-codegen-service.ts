@@ -29,7 +29,15 @@ import {
   ProjectDataTemplateTargetForEachOfType,
   WithFileUri
 } from '../../project/browser/ves-project-types';
-import { CODEGEN_CHANNEL_NAME, GenerationMode, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
+import {
+  CODEGEN_CHANNEL_NAME,
+  FILE_UPDATE_DEBOUNCE,
+  GenerationMode,
+  GenerationResult,
+  IsGeneratingFilesStatus,
+  RENDER_TIMEOUT,
+  SHOW_DONE_DURATION
+} from './ves-codegen-types';
 
 @injectable()
 export class VesCodeGenService {
@@ -62,6 +70,10 @@ export class VesCodeGenService {
 
   protected numberOfGeneratedFiles = 0;
 
+  protected env: Promise<nunjucks.Environment> | undefined;
+
+  protected readonly pendingFileUpdates = new Map<string, number>();
+
   protected _isGeneratingFiles: IsGeneratingFilesStatus = IsGeneratingFilesStatus.hide;
   protected readonly onDidChangeIsGeneratingFilesEmitter = new Emitter<IsGeneratingFilesStatus>();
   readonly onDidChangeIsGeneratingFiles = this.onDidChangeIsGeneratingFilesEmitter.event;
@@ -70,7 +82,7 @@ export class VesCodeGenService {
     this.onDidChangeIsGeneratingFilesEmitter.fire(this._isGeneratingFiles);
 
     window.clearTimeout(this.timeout);
-    if (status === IsGeneratingFilesStatus.done) {
+    if (status === IsGeneratingFilesStatus.done || status === IsGeneratingFilesStatus.error) {
       this.timeout = window.setTimeout(() => {
         this.isGeneratingFiles = IsGeneratingFilesStatus.hide;
       }, SHOW_DONE_DURATION);
@@ -98,7 +110,26 @@ export class VesCodeGenService {
   protected async doInit(): Promise<void> {
     await this.preferenceService.ready;
     await this.vesPluginsService.ready;
-    await this.configureTemplateEngine();
+    // only pre-warm here, rendering does not wait on this having completed
+    this.getTemplateEngine().catch(() => { });
+  }
+
+  /**
+   * Configures the template engine on first use and caches it. Deliberately lazy:
+   * configuring during init would run before the backend connection is up, and a
+   * failure there used to leave every render waiting forever.
+   */
+  protected getTemplateEngine(): Promise<nunjucks.Environment> {
+    if (!this.env) {
+      this.env = this.configureTemplateEngine().catch(error => {
+        // drop the cached failure so the next run can retry instead of hanging
+        this.env = undefined;
+        this.logLine(`Could not configure the template engine. ${error}`, OutputChannelSeverity.Error);
+        throw error;
+      });
+    }
+
+    return this.env;
   }
 
   protected bindEvents(): void {
@@ -133,7 +164,22 @@ export class VesCodeGenService {
     }));
   }
 
-  protected async handleFileUpdate(fileUri: URI): Promise<void> {
+  /**
+   * Several independent events can describe a single logical change to one file, e.g. an
+   * add followed by an update, or duplicate watcher events for one write. Generating is
+   * expensive, so a burst is collapsed into a single run on the trailing edge, which also
+   * guarantees the run sees the final state of the file.
+   */
+  protected handleFileUpdate(fileUri: URI): void {
+    const key = fileUri.toString();
+    window.clearTimeout(this.pendingFileUpdates.get(key));
+    this.pendingFileUpdates.set(key, window.setTimeout(() => {
+      this.pendingFileUpdates.delete(key);
+      this.doHandleFileUpdate(fileUri);
+    }, FILE_UPDATE_DEBOUNCE));
+  }
+
+  protected async doHandleFileUpdate(fileUri: URI): Promise<void> {
     await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
       const type = PROJECT_TYPES[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file) && type.templates?.length) {
@@ -245,11 +291,19 @@ export class VesCodeGenService {
     pick.show();
 
     return new Promise((resolve, reject) => {
+      let accepted = false;
       pick.onDidAccept(() => {
+        accepted = true;
         pick.hide();
         const t: string[] = [];
         pick.selectedItems.map(s => s.id !== undefined ? t.push(s.id) : undefined);
         resolve(t);
+      });
+      // dismissing the picker must settle the promise too, otherwise it leaks forever
+      pick.onDidHide(() => {
+        if (!accepted) {
+          resolve(undefined);
+        }
       });
     });
   }
@@ -278,6 +332,9 @@ export class VesCodeGenService {
   async generate(types: string[], generationMode: GenerationMode, fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
+    let numberOfFailedFiles = 0;
+
+    this.logLine(`Generating ${generationMode} for ${types.length} type(s): ${types.join(', ') || '<none>'}.`);
 
     try {
       await Promise.all(types.map(async typeId => {
@@ -289,17 +346,23 @@ export class VesCodeGenService {
           }
 
           await Promise.all(type.templates.map(async template => {
-            const count = await this.renderTemplate(template, generationMode, typeId, fileUri ?? inferredFileUri);
-            numberOfGeneratedFiles += count;
+            const result = await this.renderTemplate(template, generationMode, typeId, fileUri ?? inferredFileUri);
+            numberOfGeneratedFiles += result.generated;
+            numberOfFailedFiles += result.failed;
           }));
         };
       }));
     } catch (error) {
-      this.isGeneratingFiles = IsGeneratingFilesStatus.hide;
+      this.logLine(`Code generation failed. ${error}`, OutputChannelSeverity.Error);
+      numberOfFailedFiles++;
     }
 
+    this.logLine(`Finished. Generated ${numberOfGeneratedFiles} file(s), ${numberOfFailedFiles} failure(s).`);
+
     this.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
-    this.isGeneratingFiles = IsGeneratingFilesStatus.done;
+    this.isGeneratingFiles = numberOfFailedFiles > 0
+      ? IsGeneratingFilesStatus.error
+      : IsGeneratingFilesStatus.done;
   }
 
   protected fileHasChanged(itemFileStat: FileStatWithMetadata, targetFileStat?: FileStatWithMetadata): boolean {
@@ -321,9 +384,41 @@ export class VesCodeGenService {
     silent?: boolean
   ): Promise<void> {
     await this.workspaceService.ready;
+    const env = await this.getTemplateEngine();
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     return new Promise((resolve, reject) => {
-      nunjucks.renderString(templateString, data, (err, res) => {
+      // `stage` names how far this got, so a timeout can report where it stalled.
+      // `settled` means the promise actually settled, not that a step began.
+      let stage = 'render';
+      let settled = false;
+      const done = (action: () => void): void => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        try {
+          action();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      // deliberately never cleared, so that it still reports a step that starts but
+      // never finishes, which is otherwise indistinguishable from a hang
+      window.setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        const message = `Timed out after ${RENDER_TIMEOUT / 1000}s at "${stage}" generating `
+          + `${targetUri.path.fsPath()} from ${template.template}.`;
+        if (!silent === true) {
+          this.logLine(message, OutputChannelSeverity.Error);
+        }
+        done(() => reject(new Error(message)));
+      }, RENDER_TIMEOUT);
+
+      env.renderString(templateString, data, (err, res) => {
+        stage = 'render-callback';
+
         if (err) {
           if (!silent === true) {
             this.logLine(
@@ -331,37 +426,64 @@ export class VesCodeGenService {
               OutputChannelSeverity.Error
             );
           }
-          reject();
-        } else if (res) {
-          const writeFile = () => {
-            this.fileService.writeFile(
-              targetUri,
-              BinaryBuffer.wrap(iconv.encode(res, encoding))
-            ).then(() => {
-              const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
-              if (!silent === true) {
-                this.logLine(`Rendered template ${template.template} to ${p}.`);
-              }
-              resolve();
-            });
-          };
-          if (this.workspaceService.isCollaboration()) {
-            // delete first when in collab session, otherwise it won't let us overwrite
-            this.fileService.exists(targetUri).then(exists => {
-              if (exists) {
-                this.fileService.delete(targetUri).then(() => {
-                  writeFile();
-                });
-              } else {
-                writeFile();
-              }
-            });
-          } else {
-            writeFile();
-          }
+          return done(() => reject(err));
         }
+
+        if (!res) {
+          // nothing to write, but the promise must still settle
+          if (!silent === true) {
+            this.logLine(
+              `Template ${template.template} rendered empty, skipped writing ${targetUri.path.fsPath()}.`,
+              OutputChannelSeverity.Warning
+            );
+          }
+          return done(resolve);
+        }
+
+        const writeFile = async () => {
+          if (this.workspaceService.isCollaboration()) {
+            stage = 'collab-delete';
+            // delete first when in collab session, otherwise it won't let us overwrite
+            if (await this.fileService.exists(targetUri)) {
+              await this.fileService.delete(targetUri);
+            }
+          }
+
+          stage = 'encode';
+          // iconv-lite returns a polyfilled Buffer in the frontend bundle, which the file
+          // service RPC cannot forward. Copying it into a plain Uint8Array is what makes
+          // the write actually reach disk - without this, writeFile never settles.
+          const encoded = BinaryBuffer.wrap(Uint8Array.from(iconv.encode(res, encoding)));
+
+          stage = 'write';
+          await this.fileService.writeFile(targetUri, encoded);
+
+          stage = 'written';
+          const p = workspaceRootUri?.relative(targetUri) ?? targetUri.path.fsPath();
+          if (!silent === true) {
+            this.logLine(`Rendered template ${template.template} to ${p}.`);
+          }
+        };
+
+        writeFile().then(() => done(resolve), writeError => {
+          if (!silent === true) {
+            this.logLine(
+              `Failed to write ${targetUri.path.fsPath()} for template ${template.template}. ${writeError}`,
+              OutputChannelSeverity.Error
+            );
+          }
+          done(() => reject(writeError));
+        });
       });
     });
+  }
+
+  protected toFilterError(filterName: string, error: unknown): Error {
+    const message = error instanceof Error
+      ? error.message
+      : String(error);
+    this.logLine(`Filter ${filterName} failed. ${message}`, OutputChannelSeverity.Error);
+    return error instanceof Error ? error : new Error(message);
   }
 
   protected logLine(message: string, severity: OutputChannelSeverity = OutputChannelSeverity.Info): void {
@@ -399,7 +521,7 @@ export class VesCodeGenService {
     }
 
     const result: URI[] = [];
-    template.targets.map(async t => {
+    await Promise.all(template.targets.map(async t => {
       if (t.conditions && jsonLogic.apply(t.conditions, item) !== true) {
         return;
       }
@@ -456,27 +578,32 @@ export class VesCodeGenService {
       } else {
         return findTarget();
       }
-    });
+    }));
 
     return result;
   }
 
-  protected async renderTemplate(template: ProjectDataTemplate, generationMode: GenerationMode, typeId?: string, fileUri?: URI): Promise<number> {
+  protected async renderTemplate(template: ProjectDataTemplate, generationMode: GenerationMode, typeId?: string, fileUri?: URI): Promise<GenerationResult> {
     await this.vesProjectService.projectDataReady;
 
+    const nothingToDo: GenerationResult = { generated: 0, failed: 0 };
+
     if (template.enabled === false) {
-      return 0;
+      this.logLine(`Skipped template ${template.template}, it is disabled.`);
+      return nothingToDo;
     }
 
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
-      return 0;
+      this.logLine(`Skipped template ${template.template}, no workspace root.`, OutputChannelSeverity.Warning);
+      return nothingToDo;
     }
 
     const templateString = await this.getTemplateString(template);
     if (!templateString) {
-      return 0;
+      this.logLine(`Skipped template ${template.template}, template file is missing or empty.`, OutputChannelSeverity.Warning);
+      return nothingToDo;
     }
 
     const encoding = template.encoding
@@ -485,6 +612,7 @@ export class VesCodeGenService {
     const projectData = this.vesProjectService.getProjectData();
 
     let numberOfGeneratedFiles = 0;
+    let numberOfFailedFiles = 0;
 
     const toRender = [];
     if (template.itemSpecific) {
@@ -495,22 +623,31 @@ export class VesCodeGenService {
             return;
           }
 
-          const fileContents = await this.fileService.readFile(i._fileUri);
-          const fileContentsJson = JSON.parse(fileContents.value.toString());
-          let data = fileContentsJson;
-          if (typeId) {
-            data = await this.vesProjectService.getSchemaDefaults(PROJECT_TYPES[typeId], data);
-          }
+          try {
+            const fileContents = await this.fileService.readFile(i._fileUri);
+            const fileContentsJson = JSON.parse(fileContents.value.toString());
+            let data = fileContentsJson;
+            if (typeId) {
+              data = await this.vesProjectService.getSchemaDefaults(PROJECT_TYPES[typeId], data);
+            }
 
-          toRender.push({
-            item: {
-              ...data,
-              _filename: i._fileUri.path.name,
-              _folder: i._fileUri.parent.path.name,
-            },
-            project: projectData,
-            itemUri: i._fileUri,
-          });
+            toRender.push({
+              item: {
+                ...data,
+                _filename: i._fileUri.path.name,
+                _folder: i._fileUri.parent.path.name,
+              },
+              project: projectData,
+              itemUri: i._fileUri,
+            });
+          } catch (error) {
+            // one unreadable item must not take down the whole generation run
+            numberOfFailedFiles++;
+            this.logLine(
+              `Could not read item ${i._fileUri.path.fsPath()} for template ${template.template}. ${error}`,
+              OutputChannelSeverity.Error
+            );
+          }
         })
       );
     } else {
@@ -544,19 +681,28 @@ export class VesCodeGenService {
             }
           }
 
-          numberOfGeneratedFiles++;
-          await this.renderTemplateToFile(
-            template,
-            targetUri,
-            templateString,
-            data,
-            encoding
-          );
+          try {
+            await this.renderTemplateToFile(
+              template,
+              targetUri,
+              templateString,
+              data,
+              encoding
+            );
+            // only count files that actually made it to disk
+            numberOfGeneratedFiles++;
+          } catch (error) {
+            // renderTemplateToFile already logged the cause
+            numberOfFailedFiles++;
+          }
         }));
       })
     );
 
-    return numberOfGeneratedFiles;
+    return {
+      generated: numberOfGeneratedFiles,
+      failed: numberOfFailedFiles,
+    };
   }
 
   protected async handlePluginChange(): Promise<void> {
@@ -586,10 +732,34 @@ export class VesCodeGenService {
     }));
   }
 
-  protected async configureTemplateEngine(): Promise<void> {
+  protected async configureTemplateEngine(): Promise<nunjucks.Environment> {
     // configure base path for includes of template partials
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const env = nunjucks.configure(await this.fileService.fsPath(resourcesUri));
+
+    const fileService = this.fileService;
+    const log = (message: string, severity?: OutputChannelSeverity): void => this.logLine(message, severity);
+    const VesFileServiceLoader = nunjucks.Loader.extend({
+      async: true,
+      getSource(name: string, callback: (err: Error | null, result: nunjucks.LoaderSource | null) => void): void {
+        let uri = resourcesUri;
+        name.split('/').forEach(namePart => {
+          uri = uri.resolve(namePart);
+        });
+        fileService.readFile(uri).then(
+          content => callback(null, {
+            src: content.value.toString(),
+            path: name,
+            noCache: true,
+          }),
+          error => {
+            log(`Could not load template partial ${name} from ${uri.path.fsPath()}. ${error}`, OutputChannelSeverity.Error);
+            callback(new Error(`Could not load template partial ${name}. ${error}`), null);
+          }
+        );
+      },
+    } as unknown as nunjucks.ILoaderAsync);
+
+    const env = new nunjucks.Environment(new VesFileServiceLoader() as unknown as nunjucks.ILoaderAsync);
 
     // add filters
     env.addFilter('basename', (value: URI | string, ending: boolean = true) => {
@@ -666,22 +836,36 @@ export class VesCodeGenService {
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
 
     env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, range: number, callback): Promise<void> => {
-      const result = await convertPcm(configFileUri, filePath, range, this.fileService);
-      callback(null, result);
+      try {
+        const result = await convertPcm(configFileUri, filePath, range, this.fileService);
+        callback(null, result);
+      } catch (error) {
+        callback(this.toFilterError('convertPcm', error), null);
+      }
     }, true);
 
     env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath: string, callback): Promise<void> => {
-      const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
-      callback(null, result);
+      try {
+        const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
+        callback(null, result);
+      } catch (error) {
+        callback(this.toFilterError('convertImage', error), null);
+      }
     }, true);
 
     env.addFilter('uncompressJson', async (str: unknown, callback): Promise<void> => {
-      const result = await this.vesCommonService.unzipJson(str);
-      callback(null, result);
+      try {
+        const result = await this.vesCommonService.unzipJson(str);
+        callback(null, result);
+      } catch (error) {
+        callback(this.toFilterError('uncompressJson', error), null);
+      }
     }, true);
 
     // add functions
     env.addGlobal('compressTiles', compressTiles);
     env.addGlobal('getTrackKeyframes', getTrackKeyframes);
+
+    return env;
   }
 }

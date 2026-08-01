@@ -22,7 +22,7 @@ export class VesBuildPathsService {
     const fallbackUri = builtInFolderUri.resolve('vuengine');
     let coreUri = fallbackUri;
 
-    const preference = `${this.preferenceService.get(VesBuildPreferenceIds.ENGINE_PATH)}`
+    const preference = (this.preferenceService.get<string>(VesBuildPreferenceIds.ENGINE_PATH) ?? '')
       .replace('%BUILTIN%', builtInFolderPath);
 
     if (preference !== '') {

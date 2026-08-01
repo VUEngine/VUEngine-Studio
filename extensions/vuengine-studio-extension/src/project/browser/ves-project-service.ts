@@ -57,38 +57,41 @@ import {
   WithVersion
 } from './ves-project-types';
 
+// How long after writing a file its own watcher events are ignored.
+const SELF_WRITE_GRACE_PERIOD = 1000;
+
 @injectable()
 export class VesProjectService {
   @inject(CommandService)
-  protected commandService: CommandService;
+  protected commandService!: CommandService;
   @inject(FileService)
-  protected fileService: FileService;
+  protected fileService!: FileService;
   @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  protected readonly frontendApplicationStateService!: FrontendApplicationStateService;
   @inject(MessageService)
-  protected messageService: MessageService;
+  protected messageService!: MessageService;
   @inject(OpenerService)
-  protected openerService: OpenerService;
+  protected openerService!: OpenerService;
   @inject(QuickInputService)
-  protected readonly quickInputService: QuickInputService;
+  protected readonly quickInputService!: QuickInputService;
   @inject(OutputChannelManager)
-  protected readonly outputChannelManager: OutputChannelManager;
+  protected readonly outputChannelManager!: OutputChannelManager;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  protected readonly preferenceService!: PreferenceService;
   @inject(QuickPickService)
-  protected readonly quickPickService: QuickPickService;
+  protected readonly quickPickService!: QuickPickService;
   @inject(VesBuildPathsService)
-  private readonly vesBuildPathsService: VesBuildPathsService;
+  private readonly vesBuildPathsService!: VesBuildPathsService;
   @inject(VesCommonService)
-  private readonly vesCommonService: VesCommonService;
+  private readonly vesCommonService!: VesCommonService;
   @inject(VesPluginsService)
-  private readonly vesPluginsService: VesPluginsService;
+  private readonly vesPluginsService!: VesPluginsService;
   @inject(VesPluginsPathsService)
-  private readonly vesPluginsPathsService: VesPluginsPathsService;
+  private readonly vesPluginsPathsService!: VesPluginsPathsService;
   @inject(WindowTitleService)
-  private readonly windowTitleService: WindowTitleService;
+  private readonly windowTitleService!: WindowTitleService;
   @inject(VesWorkspaceService)
-  private readonly workspaceService: VesWorkspaceService;
+  private readonly workspaceService!: VesWorkspaceService;
 
   protected readonly _projectDataReady = new Deferred<void>();
   get projectDataReady(): Promise<void> {
@@ -122,7 +125,9 @@ export class VesProjectService {
 
   protected workspaceProjectFolderUri: URI | undefined;
   protected gameConfigFileUri: URI | undefined;
-  protected justWroteGameConfigFile: boolean = false;
+  // Timestamp until which watcher events for the game config file are treated as echoes
+  // of our own write. Necessary, because a single write can produce more than one watcher event.
+  protected ignoreGameConfigChangesUntil: number = 0;
 
   protected knownContributors: { [contributor: string]: URI } = {};
 
@@ -463,7 +468,7 @@ export class VesProjectService {
         // delete first when in collab session, otherwise it won't let us overwrite
         await this.fileService.delete(this.gameConfigFileUri!);
       }
-      this.justWroteGameConfigFile = true;
+      this.ignoreGameConfigChangesUntil = Date.now() + SELF_WRITE_GRACE_PERIOD;
       await this.fileService.writeFile(
         this.gameConfigFileUri!,
         BinaryBuffer.fromString(stringify({
@@ -471,6 +476,8 @@ export class VesProjectService {
           plugins: sortedPlugins
         })),
       );
+      // the write itself takes time, so start the grace period from when it completed
+      this.ignoreGameConfigChangesUntil = Date.now() + SELF_WRITE_GRACE_PERIOD;
 
       // fire event
       this.onDidUpdateGameConfigEmitter.fire();
@@ -568,8 +575,8 @@ export class VesProjectService {
 
   protected async handleFileUpdate(fileUri: URI): Promise<void> {
     if (this.gameConfigFileUri && fileUri.isEqual(this.gameConfigFileUri)) {
-      if (this.justWroteGameConfigFile) {
-        this.justWroteGameConfigFile = false;
+      if (Date.now() < this.ignoreGameConfigChangesUntil) {
+        // echo of our own write, re-reading and regenerating would be redundant
         return;
       }
       this.enableFileChangeEventLock();
@@ -727,14 +734,29 @@ export class VesProjectService {
     }
   }
 
+  protected resolveProjectDataReady(): void {
+    if (this._projectDataReady.state === 'unresolved') {
+      this._projectDataReady.resolve();
+    }
+  }
+
   protected async readProjectData(): Promise<void> {
+    try {
+      await this.doReadProjectData();
+    } catch (error) {
+      console.error('Could not fully read VUEngine project data.', error);
+    } finally {
+      this.resolveProjectDataReady();
+    }
+  }
+
+  protected async doReadProjectData(): Promise<void> {
     await this.workspaceService.ready;
+    await this.preferenceService.ready;
 
     // do nothing when no project is opened
     if (!this.workspaceService.opened) {
-      if (this._projectDataReady.state === 'unresolved') {
-        this._projectDataReady.resolve();
-      }
+      this.resolveProjectDataReady();
 
       return;
     }
@@ -742,6 +764,10 @@ export class VesProjectService {
     const startTime = performance.now();
 
     await this.setKnownContributors();
+
+    // collect into a fresh map and swap it in below, so that re-reads neither
+    // accumulate items of contributors that are gone nor expose a half-filled map
+    const items: ProjectDataItemsByTypeWithContributor = {};
 
     // add items to project data
     const filePatterns = Object.values(PROJECT_TYPES).map((t: ProjectDataType) => t.file?.startsWith('.')
@@ -764,12 +790,12 @@ export class VesProjectService {
         await Promise.all(Object.keys(PROJECT_TYPES).map(async typeId => {
           const type = PROJECT_TYPES[typeId] as ProjectDataType;
           if ([uri.path.ext, uri.path.base].includes(type.file)) {
-            if (!this._projectData.items[typeId]) {
-              this._projectData.items[typeId] = {};
+            if (!items[typeId]) {
+              items[typeId] = {};
             }
 
-            const fileContent = await this.fileService.readFile(uri);
             try {
+              const fileContent = await this.fileService.readFile(uri);
               const fileContentJson = JSON.parse(fileContent.value.toString());
               const itemWithContributor = {
                 _contributor: knownContributorKey,
@@ -779,20 +805,20 @@ export class VesProjectService {
               };
               if (type.file?.startsWith('.')) {
                 if (fileContentJson._id) {
-                  const existingItem = this._projectData.items[typeId][fileContentJson._id];
+                  const existingItem = items[typeId][fileContentJson._id];
                   const previousUri = existingItem?._fileUri;
-                  if (this._projectData.items[typeId][fileContentJson._id] && !uri.isEqual(previousUri)) {
+                  if (existingItem && !uri.isEqual(previousUri)) {
                     this.warnDuplicateItemId(uri, previousUri);
                   }
-                  this._projectData.items[typeId][fileContentJson._id] = itemWithContributor;
+                  items[typeId][fileContentJson._id] = itemWithContributor;
                 } else {
                   this.warnMissingItemId(uri);
                 }
               } else {
-                this._projectData.items[typeId][knownContributorKey] = itemWithContributor;
+                items[typeId][knownContributorKey] = itemWithContributor;
               }
             } catch (error) {
-              console.error('Malformed item file could not be parsed.', uri?.path.fsPath());
+              console.error('Item file could not be read or parsed.', uri?.path.fsPath(), error);
               return;
             }
           }
@@ -800,12 +826,13 @@ export class VesProjectService {
       }));
     }));
 
+    this._projectData.items = items;
+
     const duration = performance.now() - startTime;
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
 
-    if (this._projectDataReady.state === 'unresolved') {
-      this._projectDataReady.resolve();
-    }
+    // resolve before the outdated check below, which may wait on user input
+    this.resolveProjectDataReady();
 
     // check for outdated items
     const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
