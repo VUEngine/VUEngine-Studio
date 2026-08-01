@@ -10,8 +10,6 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 
 @injectable()
@@ -19,19 +17,17 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     @inject(CommandService)
     protected readonly commandService!: CommandService;
     @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService;
+    protected readonly preferenceService!: PreferenceService;
     @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService;
+    protected readonly vesBuildService!: VesBuildService;
     @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
+    protected readonly vesCommonService!: VesCommonService;
     @inject(VesEmulatorService)
-    protected readonly vesEmulatorService: VesEmulatorService;
+    protected readonly vesEmulatorService!: VesEmulatorService;
     @inject(VesFlashCartService)
-    protected readonly vesFlashCartService: VesFlashCartService;
-    @inject(ViewModeService)
-    protected readonly viewModeService: ViewModeService;
+    protected readonly vesFlashCartService!: VesFlashCartService;
     @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService;
+    protected readonly workspaceService!: WorkspaceService;
 
     onStart(app: FrontendApplication): void {
         super.onStart(app);
@@ -52,8 +48,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         // TODO: add more touchbar modes for emulator etc
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.init, this.workspaceService.opened);
 
-        window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.setViewMode, (viewMode: ViewMode) => this.viewModeService.setViewMode(viewMode));
-
         window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.executeCommand, (command: string) => this.commandService.executeCommand(command));
         window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.setBuildMode, (buildMode: BuildMode) => this.preferenceService.set(
             VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User
@@ -63,14 +57,11 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         ));
 
         // init touchbar values
-        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeViewMode, this.viewModeService.getViewMode());
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildMode, this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE));
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, this.vesFlashCartService.connectedFlashCarts);
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulatorConfigs, this.vesEmulatorService.getEmulatorConfigs());
 
-        this.viewModeService.onDidChangeViewMode(viewModeChange =>
-            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeViewMode, viewModeChange.newViewMode));
         this.vesBuildService.onDidChangeIsQueued(buildStatus =>
             window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildIsQueued, buildStatus));
         this.vesBuildService.onDidChangeBuildStatus(buildStatus =>

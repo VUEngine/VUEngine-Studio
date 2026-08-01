@@ -1,6 +1,6 @@
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry, MenuAction, MenuContribution, MenuModelRegistry, nls, PreferenceService } from '@theia/core/lib/common';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 import { EmulatorCommands } from './ves-emulator-commands';
@@ -10,23 +10,13 @@ import { VesEmulatorService } from './ves-emulator-service';
 @injectable()
 export class VesEmulatorContribution implements CommandContribution, KeybindingContribution, MenuContribution {
   @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
-  @inject(MenuModelRegistry)
-  private readonly menuModelRegistry: MenuModelRegistry;
+  protected readonly shell!: ApplicationShell;
   @inject(PreferenceService)
-  private readonly preferenceService: PreferenceService;
+  private readonly preferenceService!: PreferenceService;
   @inject(VesEmulatorService)
-  private readonly vesEmulatorService: VesEmulatorService;
+  private readonly vesEmulatorService!: VesEmulatorService;
   @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
-
-  @postConstruct()
-  protected init(): void {
-    this.vesEmulatorService.onDidChangeEmulator(emulatorConfigName => {
-      this.registerDefaultEmulatorMenu(this.menuModelRegistry);
-    });
-    this.registerDefaultEmulatorMenu(this.menuModelRegistry);
-  }
+  private readonly workspaceService!: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(EmulatorCommands.RUN, {

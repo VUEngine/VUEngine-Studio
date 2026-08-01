@@ -1,5 +1,5 @@
 import { CommandService, isOSX, MAIN_MENU_BAR, MenuPath } from '@theia/core';
-import { ApplicationShell, CommonCommands, ContextMenuRenderer, HoverService, KeybindingRegistry, MAXIMIZED_CLASS } from '@theia/core/lib/browser';
+import { ApplicationShell, CommonCommands, ContextMenuRenderer, HoverService, KeybindingRegistry, MAXIMIZED_CLASS, OpenerService } from '@theia/core/lib/browser';
 import { ContextKeyService } from '@theia/core/lib/browser/context-key-service';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -18,14 +18,11 @@ import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service'
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VIEW_MODE_MENU } from '../../viewMode/browser/view-mode-contribution';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
 import ActionButtons from './components/ActionButtons';
 import ApplicationIcon from './components/ApplicationIcon';
 import ApplicationTitle from './components/ApplicationTitle';
 import MainMenu from './components/MainMenu';
 import MaximizeToggle from './components/MaximizeToggle';
-import ViewModeSelect from './components/ViewModeSelect';
 import WindowControls from './components/WindowControls';
 import { TitlebarCommands } from './ves-titlebar-commands';
 
@@ -65,31 +62,31 @@ export class TitlebarWidget extends ReactWidget {
     static readonly LABEL = 'Titlebar';
 
     @inject(ApplicationShell)
-    protected applicationShell: ApplicationShell;
+    protected applicationShell!: ApplicationShell;
     @inject(CommandService)
     protected readonly commandService!: CommandService;
     @inject(ContextMenuRenderer)
-    protected readonly contextMenuRenderer: ContextMenuRenderer;
+    protected readonly contextMenuRenderer!: ContextMenuRenderer;
     @inject(ContextKeyService)
-    protected readonly contextKeyService: ContextKeyService;
+    protected readonly contextKeyService!: ContextKeyService;
+    @inject(OpenerService)
+    protected readonly openerService!: OpenerService;
     @inject(HoverService)
-    protected readonly hoverService: HoverService;
+    protected readonly hoverService!: HoverService;
     @inject(KeybindingRegistry)
     protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
-    @inject(ViewModeService)
-    protected readonly viewModeService: ViewModeService;
+    protected readonly vesCommonService!: VesCommonService;
     @inject(WindowTitleService)
-    private readonly windowTitleService: WindowTitleService;
+    private readonly windowTitleService!: WindowTitleService;
     @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService;
+    protected readonly vesBuildService!: VesBuildService;
     @inject(VesEmulatorService)
-    protected readonly vesEmulatorService: VesEmulatorService;
+    protected readonly vesEmulatorService!: VesEmulatorService;
     @inject(VesFlashCartService)
-    protected readonly vesFlashCartService: VesFlashCartService;
+    protected readonly vesFlashCartService!: VesFlashCartService;
     @inject(VesWorkspaceService)
-    private readonly workspaceService: VesWorkspaceService;
+    private readonly workspaceService!: VesWorkspaceService;
 
     protected applicationTitle = '';
     protected isMaximizedEditor: boolean = false;
@@ -120,7 +117,6 @@ export class TitlebarWidget extends ReactWidget {
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => this.update());
         this.vesEmulatorService.onDidChangeIsQueued(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
-        this.viewModeService.onDidChangeViewMode(() => this.update());
 
         this.update();
     }
@@ -146,17 +142,11 @@ export class TitlebarWidget extends ReactWidget {
             <StyledTitleBar onDoubleClick={this.maximizeWindow}>
                 <div>
                     <ApplicationIcon />
-                    <ViewModeSelect
-                        hidden={!this.workspaceService.opened}
-                        viewMode={this.viewModeService.getViewMode()}
-                        openViewModeMenu={this.openViewModeMenu.bind(this)}
-                        vesCommonService={this.vesCommonService}
-                        hoverService={this.hoverService}
-                    />
                     <MainMenu
-                        hidden={false}
                         openMainMenu={this.openMainMenu.bind(this)}
                         hoverService={this.hoverService}
+                        workspaceService={this.workspaceService}
+                        openerService={this.openerService}
                     />
                 </div>
                 <div>
@@ -245,10 +235,6 @@ export class TitlebarWidget extends ReactWidget {
             context: e.currentTarget,
             contextKeyService: this.contextKeyService,
         });
-    }
-
-    protected openViewModeMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
-        this.openMenu(e, VIEW_MODE_MENU);
     }
 
     protected openMainMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {

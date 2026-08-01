@@ -115,7 +115,7 @@ interface ActionButtonsProps {
     flash: () => void
     exportRom: () => void
     clean: () => void
-    openBuildMenu: () => void
+    openBuildMenu: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
     vesCommonService: VesCommonService
     hoverService: HoverService
 }

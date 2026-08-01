@@ -68,6 +68,8 @@ import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesWorkspaceService } from './ves-workspace-service';
+import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
+import { VesVSXExtensionsContribution } from './ves-vsx-extensions-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     const removeContribution = (serviceIdentifier: interfaces.ServiceIdentifier) => {
@@ -156,6 +158,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
 
+    // initially hide extensions widget
+    rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
+
     // initially hide outline view
     rebind(OutlineViewContribution).to(VesOutlineViewContribution).inSingletonScope();
 
@@ -163,7 +168,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesPreferenceStringInputRenderer).toSelf();
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
 
-    // remove main menu and settings menu
+    // remove main menu
     bind(VesBrowserMainMenuFactory).toSelf();
     rebind(BrowserMainMenuFactory).to(VesBrowserMainMenuFactory);
     bind(VesCommonFrontendContribution).toSelf();

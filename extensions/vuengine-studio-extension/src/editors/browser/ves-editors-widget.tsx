@@ -189,7 +189,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             : this.uri.path;
         this.id = `${VesEditorsWidget.ID}:${this.options.typeId}:${path}`;
 
-        this.title.closable = false;
+        this.title.closable = true;
         this.node.tabIndex = 0;
 
         this.setTitle();
@@ -223,9 +223,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.uiSchema = type?.uiSchema;
         if (type?.icon) {
             this.title.iconClass = type.icon;
-        }
-        if (type?.file.startsWith('.')) {
-            this.title.closable = true;
         }
 
         if (this.uri.scheme !== UNTITLED_SCHEME) {

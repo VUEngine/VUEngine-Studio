@@ -3,8 +3,6 @@ import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplicat
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
@@ -12,11 +10,9 @@ import { VesFlashCartWidget } from './ves-flash-cart-widget';
 @injectable()
 export class VesFlashCartViewContribution extends AbstractViewContribution<VesFlashCartWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
-    private readonly commandService: CommandService;
-    @inject(ViewModeService)
-    private readonly viewModeService: ViewModeService;
+    private readonly commandService!: CommandService;
     @inject(VesFlashCartService)
-    private readonly vesFlashCartService: VesFlashCartService;
+    private readonly vesFlashCartService!: VesFlashCartService;
 
     constructor() {
         super({
@@ -24,7 +20,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             widgetName: VesFlashCartWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'right',
-                rank: 900,
+                rank: -100,
             },
         });
     }
@@ -37,7 +33,6 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
             execute: () => this.toggleView()
         });
 

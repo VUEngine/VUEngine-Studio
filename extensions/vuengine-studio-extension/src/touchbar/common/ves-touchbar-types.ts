@@ -1,7 +1,5 @@
 export enum VesTouchBarCommands {
     init = 'touchbar-init',
-    changeViewMode = 'touchbar-change-view-mode',
-    setViewMode = 'touchbar-set-view-mode',
     changeBuildIsQueued = 'touchbar-change-build-is-queued',
     changeBuildMode = 'touchbar-change-build-mode',
     changeBuildStatus = 'touchbar-change-build-status',

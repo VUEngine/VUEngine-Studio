@@ -155,6 +155,7 @@ export default function AssetsTree(props: AssetsTreeProps): React.JSX.Element {
     useEffect(() => {
         if (forceAdd !== undefined) {
             // TODO: show type selection if types.length > 1
+            alert('ADD');
             addItem(types[0]);
         }
     }, [

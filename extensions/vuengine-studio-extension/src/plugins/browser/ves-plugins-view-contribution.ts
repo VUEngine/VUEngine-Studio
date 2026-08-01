@@ -5,8 +5,6 @@ import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-con
 import { CommandRegistry, CommandService } from '@theia/core/lib/common/command';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY, TAGS_QUERY } from './ves-plugins-search-model';
@@ -19,13 +17,11 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     implements FrontendApplicationContribution, TabBarToolbarContribution {
 
     @inject(VesPluginsModel)
-    protected readonly model: VesPluginsModel;
+    protected readonly model!: VesPluginsModel;
     @inject(CommandRegistry)
-    protected readonly commandRegistry: CommandRegistry;
+    protected readonly commandRegistry!: CommandRegistry;
     @inject(CommandService)
-    protected readonly commandService: CommandService;
-    @inject(ViewModeService)
-    protected readonly viewModeService: ViewModeService;
+    protected readonly commandService!: CommandService;
 
     constructor() {
         super({
@@ -46,9 +42,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.settings,
             execute: async () => {
-                await this.viewModeService.setViewMode(ViewMode.settings);
                 this.toggleView()
             }
         });
@@ -102,31 +96,26 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     }
 
     protected async showPluginTags(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = TAGS_QUERY;
     }
 
     protected async showInstalledPlugins(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = INSTALLED_QUERY;
     }
 
     protected async showRecommendedPlugins(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = RECOMMENDED_QUERY;
     }
 
     protected async showSearchByTag(tag?: string): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = `${TAG_SEARCH_QUERY}${tag ?? ''}`;
     }
 
     protected async showSearchByAuthor(author?: string): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.settings);
         await this.openView({ activate: true });
         this.model.search.query = `${AUTHOR_SEARCH_QUERY}${author ?? ''}`;
     }

@@ -44,7 +44,7 @@ export const TranslationsType: ProjectDataType = {
         type: 'TranslationsEditor',
         scope: '#'
     },
-    icon: 'codicon codicon-comment-discussion',
+    icon: 'codicon ph ph-translate',
     templates: [
         LanguagesCTemplate,
         LanguagesHTemplate

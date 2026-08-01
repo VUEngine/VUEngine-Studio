@@ -4,7 +4,7 @@ import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
 import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 import { injectable } from '@theia/core/shared/inversify';
-import { NativeImage, SegmentedControlSegment } from 'electron';
+import { SegmentedControlSegment } from 'electron';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
@@ -12,23 +12,8 @@ import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
-import { ViewModeCommands } from '../../viewMode/browser/view-mode-commands';
-import { VIEW_MODE_LABELS, ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesTouchBarIcons } from '../common/images/touch-bar-icons';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
-
-export const VIEW_MODE_TOUCHBAR_ICONS: { [viewMode: string]: NativeImage } = {
-    [ViewMode.actors]: nativeImage.createFromDataURL(VesTouchBarIcons.SMILEY).resize({ height: 18 }),
-    [ViewMode.assets]: nativeImage.createFromDataURL(VesTouchBarIcons.LIBRARY).resize({ height: 18 }),
-    // [ViewMode.build]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_PROPERTY).resize({ height: 18 }),
-    [ViewMode.fonts]: nativeImage.createFromDataURL(VesTouchBarIcons.CASE_SENSITIVE).resize({ height: 18 }),
-    [ViewMode.localization]: nativeImage.createFromDataURL(VesTouchBarIcons.COMMENT_DISCUSSION).resize({ height: 18 }),
-    [ViewMode.logic]: nativeImage.createFromDataURL(VesTouchBarIcons.PULSE).resize({ height: 18 }),
-    [ViewMode.sound]: nativeImage.createFromDataURL(VesTouchBarIcons.MUSIC).resize({ height: 18 }),
-    [ViewMode.settings]: nativeImage.createFromDataURL(VesTouchBarIcons.SETTINGS).resize({ height: 18 }),
-    [ViewMode.sourceCode]: nativeImage.createFromDataURL(VesTouchBarIcons.CODE).resize({ height: 18 }),
-    [ViewMode.stages]: nativeImage.createFromDataURL(VesTouchBarIcons.SYMBOL_METHOD).resize({ height: 18 }),
-};
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -106,7 +91,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const vesTouchBar = new TouchBar({
             items: workspaceOpened
                 ? [
-                    ...this.getViewModeMenuButtons(electronWindow),
                     ...this.getBuildMenuButtons(electronWindow),
                 ]
                 : [
@@ -115,33 +99,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         electronWindow.setTouchBar(vesTouchBar);
-    }
-
-    protected getViewModeMenuButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
-        const { TouchBarButton, TouchBarSpacer } = TouchBar;
-
-        const viewModeSpacer = new TouchBarSpacer({
-            size: 'small',
-        });
-
-        const viewModeButton = new TouchBarButton({
-            backgroundColor: '#d31422',
-            // backgroundColor: this.colorRegistry.getCurrentColor('focusBorder'),
-            label: VIEW_MODE_LABELS[ViewMode.sourceCode],
-            icon: VIEW_MODE_TOUCHBAR_ICONS[ViewMode.sourceCode],
-            iconPosition: 'left',
-            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, ViewModeCommands.CHANGE_VIEW_MODE.id),
-        });
-
-        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeViewMode, (viewMode: ViewMode) => {
-            viewModeButton.label = VIEW_MODE_LABELS[viewMode];
-            viewModeButton.icon = VIEW_MODE_TOUCHBAR_ICONS[viewMode];
-        });
-
-        return [
-            viewModeButton,
-            viewModeSpacer,
-        ];
     }
 
     protected getBuildMenuButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {

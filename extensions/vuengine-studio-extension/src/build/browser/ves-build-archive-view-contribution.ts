@@ -1,18 +1,13 @@
 import { CommandRegistry } from '@theia/core';
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { inject, injectable } from '@theia/core/shared/inversify';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { ViewMode } from '../../viewMode/browser/view-mode-types';
+import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildArchiveWidget } from './ves-build-archive-widget';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildWidget } from './ves-build-widget';
 
 @injectable()
 export class VesBuildArchiveViewContribution extends AbstractViewContribution<VesBuildArchiveWidget> implements TabBarToolbarContribution {
-    @inject(ViewModeService)
-    private readonly viewModeService: ViewModeService;
-
     constructor() {
         super({
             widgetId: VesBuildArchiveWidget.ID,
@@ -29,7 +24,6 @@ export class VesBuildArchiveViewContribution extends AbstractViewContribution<Ve
     }
 
     protected async toggleWidget(): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.sourceCode);
         await this.openView({ activate: true, reveal: true });
     }
 
@@ -44,9 +38,7 @@ export class VesBuildArchiveViewContribution extends AbstractViewContribution<Ve
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.ARCHIVE_WIDGET_TOGGLE, {
-            // isEnabled: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
             isEnabled: () => true,
-            // isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
             isVisible: widget => widget?.id === VesBuildWidget.ID,
             execute: () => this.toggleWidget()
         });

@@ -17,3 +17,7 @@
     display: inline-block;
     transform: rotate(180deg);
 }
+
+.ph:before {
+    font-size: 130%;
+}

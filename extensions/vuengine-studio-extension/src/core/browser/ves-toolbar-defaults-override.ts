@@ -45,11 +45,6 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     icon: 'codicon codicon-terminal',
                 },
                 {
-                    id: CommonCommands.SELECT_COLOR_THEME.id,
-                    command: CommonCommands.SELECT_COLOR_THEME.id,
-                    icon: 'codicon codicon-color-mode'
-                },
-                {
                     id: VesCodeGenCommands.GENERATE_FILES.id,
                     command: VesCodeGenCommands.GENERATE_FILES.id,
                     icon: 'codicon codicon-server-process'

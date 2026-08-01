@@ -13,22 +13,22 @@ import { VesProjectService } from '../ves-project-service';
 @injectable()
 export class AssetsBrowserWidget extends ReactWidget {
   @inject(CommandService)
-  private readonly commandService: CommandService;
+  private readonly commandService!: CommandService;
   @inject(FileService)
-  private readonly fileService: FileService;
+  private readonly fileService!: FileService;
   @inject(OpenerService)
-  private readonly openerService: OpenerService;
+  private readonly openerService!: OpenerService;
   @inject(VesProjectService)
-  private readonly vesProjectService: VesProjectService;
+  private readonly vesProjectService!: VesProjectService;
   @inject(VesWorkspaceService)
-  private readonly workspaceService: VesWorkspaceService;
+  private readonly workspaceService!: VesWorkspaceService;
 
   static readonly ID: string = 'assets-browser';
   static readonly LABEL: string = nls.localize('vuengine/projects/assetsBrowser', 'Assets');
 
-  public allExpanded: boolean = true;
-  public forceRefresh: boolean;
-  public forceAdd: boolean;
+  public allExpanded: boolean = false;
+  public forceRefresh: boolean | undefined;
+  public forceAdd: boolean | undefined;
 
   protected getId(): string {
     return AssetsBrowserWidget.ID;

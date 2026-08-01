@@ -44,59 +44,59 @@ interface VesProjectDashboardWidgetState {
 @injectable()
 export class VesProjectDashboardWidget extends ReactWidget {
     @inject(FrontendApplication)
-    protected readonly app: FrontendApplication;
+    protected readonly app!: FrontendApplication;
     @inject(ClipboardService)
-    private readonly clipboardService: ClipboardService;
+    private readonly clipboardService!: ClipboardService;
     @inject(ColorRegistry)
-    private readonly colorRegistry: ColorRegistry;
+    private readonly colorRegistry!: ColorRegistry;
     @inject(CommandService)
-    protected readonly commandService: CommandService;
+    protected readonly commandService!: CommandService;
     @inject(EnvVariablesServer)
-    protected readonly envVariablesServer: EnvVariablesServer;
+    protected readonly envVariablesServer!: EnvVariablesServer;
     @inject(FileService)
-    protected readonly fileService: FileService;
+    protected readonly fileService!: FileService;
     @inject(FileDialogService)
-    protected readonly fileDialogService: FileDialogService;
+    protected readonly fileDialogService!: FileDialogService;
     @inject(HoverService)
-    protected readonly hoverService: HoverService;
+    protected readonly hoverService!: HoverService;
     @inject(MessageService)
-    protected readonly messageService: MessageService;
+    protected readonly messageService!: MessageService;
     @inject(LocalStorageService)
-    protected readonly localStorageService: LocalStorageService;
+    protected readonly localStorageService!: LocalStorageService;
     @inject(OpenerService)
-    protected readonly openerService: OpenerService;
+    protected readonly openerService!: OpenerService;
     @inject(QuickPickService)
-    protected readonly quickPickService: QuickPickService;
+    protected readonly quickPickService!: QuickPickService;
     @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService;
+    protected readonly preferenceService!: PreferenceService;
     @inject(StatusBar)
-    protected readonly statusBar: StatusBar;
+    protected readonly statusBar!: StatusBar;
     @inject(ThemeService)
-    protected readonly themeService: ThemeService;
+    protected readonly themeService!: ThemeService;
     @inject(VesBuildPathsService)
-    protected readonly vesBuildPathsService: VesBuildPathsService;
+    protected readonly vesBuildPathsService!: VesBuildPathsService;
     @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService;
+    protected readonly vesBuildService!: VesBuildService;
     @inject(VesCodeGenService)
-    protected readonly vesCodeGenService: VesCodeGenService;
+    protected readonly vesCodeGenService!: VesCodeGenService;
     @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
+    protected readonly vesCommonService!: VesCommonService;
     @inject(VesImagesService)
-    protected readonly vesImagesService: VesImagesService;
+    protected readonly vesImagesService!: VesImagesService;
     @inject(VesPluginsService)
-    protected readonly vesPluginsService: VesPluginsService;
+    protected readonly vesPluginsService!: VesPluginsService;
     @inject(VesProcessService)
-    protected readonly vesProcessService: VesProcessService;
+    protected readonly vesProcessService!: VesProcessService;
     @inject(VesProcessWatcher)
-    protected readonly vesProcessWatcher: VesProcessWatcher;
+    protected readonly vesProcessWatcher!: VesProcessWatcher;
     @inject(VesProjectService)
-    protected readonly vesProjectService: VesProjectService;
+    protected readonly vesProjectService!: VesProjectService;
     @inject(VesRumblePackService)
-    private readonly vesRumblePackService: VesRumblePackService;
+    private readonly vesRumblePackService!: VesRumblePackService;
     @inject(WindowService)
-    private readonly windowService: WindowService;
+    private readonly windowService!: WindowService;
     @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService;
+    private readonly workspaceService!: WorkspaceService;
 
     static readonly ID = 'vesProjectDashboardWidget';
     static readonly LABEL = nls.localize('vuengine/project/stages/navigator', 'Navigator');
@@ -117,7 +117,7 @@ export class VesProjectDashboardWidget extends ReactWidget {
         this.title.label = VesProjectDashboardWidget.LABEL;
         this.title.caption = VesProjectDashboardWidget.LABEL;
         this.title.iconClass = 'codicon codicon-compass';
-        this.title.closable = false;
+        this.title.closable = true;
         this.node.style.outline = 'none';
 
         this.update();

@@ -30,7 +30,7 @@ export namespace VesEmulatorSidebarCommands {
 @injectable()
 export class VesEmulatorSidebarViewContribution extends AbstractViewContribution<VesEmulatorSidebarWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
-    protected readonly commandService: CommandService;
+    protected readonly commandService!: CommandService;
 
     constructor() {
         super({
@@ -38,7 +38,7 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             widgetName: VesEmulatorSidebarWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'right',
-                rank: 800,
+                rank: -200,
             },
         });
     }

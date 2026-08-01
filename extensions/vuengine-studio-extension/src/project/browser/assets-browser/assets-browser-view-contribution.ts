@@ -1,8 +1,8 @@
 import { Command, CommandContribution, CommandRegistry, CommandService } from '@theia/core';
+import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { AssetsBrowserWidget } from './assets-browser-widget';
-import { PROJECT_TYPES } from '../ves-project-data';
 
 export namespace AssetsBrowserCommands {
     export const ADD: Command = Command.toLocalizedCommand(
@@ -44,13 +44,28 @@ export namespace AssetsBrowserCommands {
 };
 
 @injectable()
-export class AssetsBrowserViewContribution implements CommandContribution, TabBarToolbarContribution {
+export class AssetsBrowserViewContribution extends AbstractViewContribution<AssetsBrowserWidget> implements CommandContribution, TabBarToolbarContribution {
     @inject(CommandService)
-    protected readonly commandService: CommandService;
+    protected readonly commandService!: CommandService;
+
+    constructor() {
+        super({
+            widgetId: AssetsBrowserWidget.ID,
+            widgetName: AssetsBrowserWidget.LABEL,
+            defaultWidgetOptions: {
+                area: 'left',
+                rank: -100,
+            },
+        });
+    }
+
+    async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView({ activate: true, reveal: true });
+    }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         commandRegistry.registerCommand(AssetsBrowserCommands.ADD, {
-            isEnabled: widget => widget instanceof AssetsBrowserWidget && PROJECT_TYPES[widget.id.split(':')[1]].enabled !== false,
+            isEnabled: widget => widget instanceof AssetsBrowserWidget,
             isVisible: widget => widget instanceof AssetsBrowserWidget,
             execute: widget => (widget as AssetsBrowserWidget).add(),
         });

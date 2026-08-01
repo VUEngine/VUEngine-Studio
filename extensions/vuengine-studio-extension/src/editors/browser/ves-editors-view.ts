@@ -20,8 +20,6 @@ import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { DISABLED_VIEW_MODES, TYPE_VIEW_MODE_RELATIONS } from '../../viewMode/browser/view-mode-types';
 import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
@@ -30,27 +28,25 @@ import { VesEditorsWidget } from './ves-editors-widget';
 @injectable()
 export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
-    protected readonly commandService: CommandService;
+    protected readonly commandService!: CommandService;
     @inject(EditorManager)
-    protected readonly editorManager: EditorManager;
+    protected readonly editorManager!: EditorManager;
     @inject(FileService)
-    protected readonly fileService: FileService;
+    protected readonly fileService!: FileService;
     @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+    protected readonly frontendApplicationStateService!: FrontendApplicationStateService;
     @inject(OpenerService)
-    protected readonly openerService: OpenerService;
+    protected readonly openerService!: OpenerService;
     @inject(UntitledResourceResolver)
-    protected readonly untitledResourceResolver: UntitledResourceResolver;
+    protected readonly untitledResourceResolver!: UntitledResourceResolver;
     @inject(VesCodeGenService)
-    protected readonly vesCodeGenService: VesCodeGenService;
+    protected readonly vesCodeGenService!: VesCodeGenService;
     @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
+    protected readonly vesCommonService!: VesCommonService;
     @inject(VesEditorsContextKeyService)
-    protected readonly contextKeyService: VesEditorsContextKeyService;
-    @inject(ViewModeService)
-    protected readonly viewModeService: ViewModeService;
+    protected readonly contextKeyService!: VesEditorsContextKeyService;
     @inject(UserWorkingDirectoryProvider)
-    protected readonly workingDirProvider: UserWorkingDirectoryProvider;
+    protected readonly workingDirProvider!: UserWorkingDirectoryProvider;
 
     constructor() {
         super({
@@ -208,13 +204,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             execute: async widget => {
                 const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
-                    const typeId = this.getTypeByWidgetUri(u);
-
-                    const targetViewMode = TYPE_VIEW_MODE_RELATIONS[typeId];
-                    if (!DISABLED_VIEW_MODES.includes(targetViewMode)) {
-                        await this.viewModeService.setViewMode(targetViewMode);
-                    }
-
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
                 }

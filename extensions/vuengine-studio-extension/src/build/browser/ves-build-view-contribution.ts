@@ -3,17 +3,13 @@ import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplicat
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { ViewModeService } from '../../viewMode/browser/view-mode-service';
-import { ViewMode } from '../../viewMode/browser/view-mode-types';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildWidget } from './ves-build-widget';
 
 @injectable()
 export class VesBuildViewContribution extends AbstractViewContribution<VesBuildWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
-    private readonly commandService: CommandService;
-    @inject(ViewModeService)
-    private readonly viewModeService: ViewModeService;
+    private readonly commandService!: CommandService;
 
     constructor() {
         super({
@@ -21,26 +17,13 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             widgetName: VesBuildWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'right',
-                rank: 700,
+                rank: -300,
             },
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
-    }
-
-    protected async toggleWidget(force?: boolean): Promise<void> {
-        await this.viewModeService.setViewMode(ViewMode.sourceCode);
-        // await this.openView({ activate: true, reveal: true });
-
-        if (force === true) {
-            this.openView({ activate: true, reveal: true });
-        } else if (force === false) {
-            this.hideView();
-        } else {
-            this.toggleView();
-        }
+        await this.openView({ activate: false, reveal: false });
     }
 
     protected async hideView(): Promise<void> {
@@ -54,8 +37,11 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         super.registerCommands(commandRegistry);
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
-            isVisible: () => this.viewModeService.getViewMode() === ViewMode.sourceCode,
-            execute: force => this.toggleWidget(force)
+            execute: force => force === true
+                ? this.openView({ activate: true, reveal: true })
+                : force === false
+                    ? this.hideView()
+                    : this.toggleView()
         });
 
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_HELP, {
