@@ -167,7 +167,7 @@ nsis:
   artifactName: VUEngine-Studio-${versionDashes}-Setup.${ext}
   uninstallDisplayName: VUEngine Studio
 pkg:
-  artifactName: VUEngine-Studio-${versionDashes}-Setup.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-${arch}-Setup.${ext}
   installLocation: /Applications
   allowAnywhere: false
   allowCurrentUserHome: false
