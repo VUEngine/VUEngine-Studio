@@ -26,6 +26,18 @@ export default function Quantisation(): React.JSX.Element {
         });
     };
 
+    const setMaxTiles = (maxTiles: number): void => {
+        updateImageData({
+            tileset: {
+                ...imageData.tileset,
+                optimization: {
+                    ...imageData.tileset.optimization,
+                    maxTiles,
+                },
+            },
+        });
+    };
+
     return <>
         <VContainer gap={5}>
             <label>
@@ -55,6 +67,8 @@ export default function Quantisation(): React.JSX.Element {
                 updateColorMode={setColorMode}
                 compression={imageData.tileset.compression}
                 allowFrameBlendMode={allowFrameBlendMode}
+                maxTiles={imageData.tileset.optimization?.maxTiles ?? 0}
+                updateMaxTiles={setMaxTiles}
             />
         </PopUpDialog>
     </>;

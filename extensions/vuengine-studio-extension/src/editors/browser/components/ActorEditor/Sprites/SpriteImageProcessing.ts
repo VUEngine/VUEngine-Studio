@@ -142,6 +142,12 @@ export function buildImageProcessingSettingsFormProps(
         }),
         allowFrameBlendMode,
         compression: sprite.compression,
+        maxTiles: sprite.maxTiles ?? 0,
+        updateMaxTiles: maxTiles => updateSprite({
+            maxTiles,
+        }, {
+            appendImageData: true,
+        }),
         convertImage: () => updateSprite({}, {
             appendImageData: true,
         }),

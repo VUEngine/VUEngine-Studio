@@ -199,6 +199,7 @@ export interface SpriteData {
     displacement: PixelVector
     manipulationFunction: string
     optimizeTiles: boolean
+    maxTiles: number
     shareTiles: boolean
     texture: {
         files: string[]

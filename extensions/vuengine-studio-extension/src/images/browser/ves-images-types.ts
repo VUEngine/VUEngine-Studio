@@ -34,6 +34,9 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
   tileset: {
     shared: false,
     compression: ImageCompressionType.NONE,
+    optimization: {
+      maxTiles: 0,
+    },
   },
   map: {
     generate: true,

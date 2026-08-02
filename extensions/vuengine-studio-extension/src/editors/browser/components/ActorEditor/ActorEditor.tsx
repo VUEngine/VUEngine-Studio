@@ -269,6 +269,9 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                         tileset: {
                             compression: sprite.compression,
                             shared: isStereoSprite,
+                            optimization: {
+                                maxTiles: sprite.maxTiles ?? 0,
+                            },
                         },
                         files: f,
                         imageProcessingSettings: sprite.imageProcessingSettings,

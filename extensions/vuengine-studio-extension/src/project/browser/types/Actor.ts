@@ -429,6 +429,11 @@ export const ActorType: ProjectDataType = {
                                     type: 'boolean',
                                     default: true
                                 },
+                                maxTiles: {
+                                    type: 'integer',
+                                    default: 0,
+                                    minimum: 0
+                                },
                                 shareTiles: {
                                     type: 'boolean',
                                     default: true

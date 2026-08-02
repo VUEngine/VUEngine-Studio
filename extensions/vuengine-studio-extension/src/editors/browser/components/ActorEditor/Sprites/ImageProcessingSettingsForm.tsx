@@ -12,6 +12,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import CanvasImage from '../../Common/CanvasImage';
@@ -28,6 +29,7 @@ import {
   ImageCompressionType,
   ImageProcessingSettings,
   ImageQuantizationAlgorithm,
+  MAX_CHARS,
   MAX_IMAGE_WIDTH,
 } from 'vb-image-converter';
 
@@ -35,6 +37,17 @@ const ReconvertButton = styled.button`
     background-color: transparent;
     height: 100%;
 `;
+
+const OptionGroup = styled(HContainer)`
+    border: 1px solid var(--theia-dropdown-border);
+    border-radius: 2px;
+    flex-wrap: wrap !important;
+    gap: 20px !important;
+    min-height: 56px;
+    padding: 10px;
+`;
+
+const DEFAULT_MAX_TILES = 128;
 
 export interface ImageProcessingSettingsFormProps {
     image: string
@@ -46,6 +59,8 @@ export interface ImageProcessingSettingsFormProps {
     updateColorMode: (colorMode: ColorMode) => void
     allowFrameBlendMode: boolean
     compression: ImageCompressionType
+    maxTiles: number
+    updateMaxTiles: (maxTiles: number) => void
     convertImage?: () => void
 }
 
@@ -61,6 +76,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         updateColorMode,
         allowFrameBlendMode,
         compression,
+        maxTiles,
+        updateMaxTiles,
         convertImage,
     } = props;
     const [pixelData, setPixelData] = useState<number[][]>([]);
@@ -127,6 +144,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const finalWidth = useMemo(() => clamp(roundToNextMultipleOf8(width), 0, MAX_IMAGE_WIDTH), [width]);
     const isPadded = finalHeight > height || finalWidth > width;
     const isCropped = width > MAX_IMAGE_WIDTH;
+
+    const tilesAfter = imageData?.tiles?.count ?? 0;
+    const tilesBefore = imageData?.optimization?.tilesBefore ?? tilesAfter;
+    const tolerance = imageData?.optimization
+        ? Math.round(imageData.optimization.tolerance * 100) / 100
+        : undefined;
+    const isOptimizing = maxTiles > 0;
+    const toggleOptimize = () => updateMaxTiles(isOptimizing
+        ? 0
+        : tilesBefore || DEFAULT_MAX_TILES
+    );
 
     useEffect(() => {
         getImageDimensions();
@@ -290,16 +318,16 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         </VContainer>
                     </HContainer>
                 </VContainer>
-                <HContainer gap={20}>
-                    <VContainer>
+                <HContainer gap={10} wrap='wrap'>
+                    <OptionGroup>
                         <ColorModeSelect
                             value={colorMode ?? ColorMode.Default}
                             setValue={newColorMode => updateColorMode(newColorMode)}
                             hoverService={services.hoverService}
                             disabled={!image || !allowFrameBlendMode}
                         />
-                    </VContainer>
-                    <HContainer gap={10} style={{ minHeight: 64 }}>
+                    </OptionGroup>
+                    <OptionGroup>
                         <VContainer>
                             <Checkbox
                                 sideLabel={nls.localize('vuengine/editors/general/dither', 'Dither')}
@@ -372,7 +400,55 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                 }
                             </>
                         }
-                    </HContainer>
+                    </OptionGroup>
+                    <OptionGroup>
+                        <VContainer>
+                            <Checkbox
+                                sideLabel={nls.localize('vuengine/editors/general/optimize', 'Optimize')}
+                                checked={isOptimizing}
+                                setChecked={toggleOptimize}
+                                disabled={!image}
+                            />
+                        </VContainer>
+                        {isOptimizing &&
+                            <>
+                                <Input
+                                    label={nls.localize('vuengine/editors/general/targetTileCount', 'Target')}
+                                    tooltip={nls.localize(
+                                        'vuengine/editors/general/targetTileCountDescription',
+                                        'Merges near-identical tiles until the tileset fits into the given number of tiles. \
+This is lossy, the image gets redrawn from the reduced tileset. \
+Has no effect while tile reduction is turned off.',
+                                    )}
+                                    type="number"
+                                    value={maxTiles}
+                                    setValue={v => updateMaxTiles(v as number)}
+                                    min={1}
+                                    max={MAX_CHARS}
+                                    step={1}
+                                    width={64}
+                                    disabled={!image}
+                                />
+                                {tilesBefore > 0 &&
+                                    <VContainer gap="0">
+                                        <label>
+                                            {nls.localize('vuengine/editors/general/tileCount', 'Tile Count')}
+                                        </label>
+                                        <VContainer gap={2} style={{ opacity: .6, paddingTop: 4 }}>
+                                            <div>
+                                                {tilesBefore} → {tilesAfter}
+                                            </div>
+                                            {tolerance !== undefined &&
+                                                <div>
+                                                    {nls.localize('vuengine/editors/general/tolerance', 'Tolerance')}: {tolerance}
+                                                </div>
+                                            }
+                                        </VContainer>
+                                    </VContainer>
+                                }
+                            </>
+                        }
+                    </OptionGroup>
                 </HContainer>
             </VContainer >
         </div >

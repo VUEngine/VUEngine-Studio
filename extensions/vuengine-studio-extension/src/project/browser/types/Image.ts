@@ -47,6 +47,17 @@ export const ImageType: ProjectDataType = {
                             }
                         ],
                         default: 'none'
+                    },
+                    optimization: {
+                        type: 'object',
+                        properties: {
+                            maxTiles: {
+                                type: 'integer',
+                                default: 0,
+                                minimum: 0
+                            }
+                        },
+                        additionalProperties: false,
                     }
                 },
                 additionalProperties: false,
