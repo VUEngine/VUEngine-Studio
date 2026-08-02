@@ -23,20 +23,20 @@ import Collider from '../Collider/Collider';
 import CollidersSettings from '../Collider/CollidersSettings';
 import Mutator from '../Mutator/Mutator';
 import SoundComponent from '../Sound/SoundComponent';
-import { ImageProcessingSettingsFormProps } from '../Sprites/ImageProcessingSettingsForm';
 import Sprite from '../Sprites/Sprite';
+import { SpriteImageMetaDataPair } from '../Sprites/SpriteImageProcessing';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
 
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
     updateComponent: (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: ActorEditorSaveDataOptions) => void,
-    spriteProcessingDialog: boolean | ImageProcessingSettingsFormProps
-    setSpriteProcessingDialog: Dispatch<SetStateAction<boolean | ImageProcessingSettingsFormProps>>
+    spriteImageMetaData: SpriteImageMetaDataPair
+    setSpriteProcessingDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function CurrentComponent(props: CurrentComponentProps): React.JSX.Element {
-    const { isMultiFileAnimation, updateComponent, spriteProcessingDialog, setSpriteProcessingDialog } = props;
+    const { isMultiFileAnimation, updateComponent, spriteImageMetaData, setSpriteProcessingDialogOpen } = props;
     const { data, currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
 
     const getComponentEditor = (): React.JSX.Element => {
@@ -82,8 +82,8 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         sprite={data.components.sprites[index]}
                         updateSprite={(partialData: Partial<SpriteData>, options?: ActorEditorSaveDataOptions) => updateComponent('sprites', index, partialData, options)}
                         isMultiFileAnimation={isMultiFileAnimation}
-                        spriteProcessingDialog={spriteProcessingDialog}
-                        setSpriteProcessingDialog={setSpriteProcessingDialog}
+                        imageMetaData={spriteImageMetaData}
+                        setSpriteProcessingDialogOpen={setSpriteProcessingDialogOpen}
                     />;
                 case 'wireframes':
                     return <Wireframe

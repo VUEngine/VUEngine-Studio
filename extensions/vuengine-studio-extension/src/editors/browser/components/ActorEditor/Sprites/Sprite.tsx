@@ -1,9 +1,6 @@
 import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
-import { isNumber, nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { nls } from '@theia/core';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
@@ -12,7 +9,7 @@ import { DataSection } from '../../Common/CommonTypes';
 import InfoLabel from '../../Common/InfoLabel';
 import SectionSelect from '../../Common/SectionSelect';
 import TransparencySelect from '../../Common/TransparencySelect';
-import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
+import { clamp } from '../../Common/Utils';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { ActorEditorSaveDataOptions } from '../ActorEditor';
@@ -30,84 +27,44 @@ import {
     SpriteData,
     SpriteImageData
 } from '../ActorEditorTypes';
-import { ImageProcessingSettingsFormProps } from './ImageProcessingSettingsForm';
+import {
+    buildImageProcessingSettingsFormProps,
+    isSpriteAnimated,
+    SpriteImageMetaDataPair,
+} from './SpriteImageProcessing';
 import SpritesSettings from './SpritesSettings';
 import Checkbox from '../../Common/Base/Checkbox';
+import { ImageCompressionType } from 'vb-image-converter';
 
 interface SpriteProps {
     sprite: SpriteData
     updateSprite: (partialData: Partial<SpriteData>, options?: ActorEditorSaveDataOptions) => void
     isMultiFileAnimation: boolean
-    spriteProcessingDialog: boolean | ImageProcessingSettingsFormProps
-    setSpriteProcessingDialog: Dispatch<SetStateAction<boolean | ImageProcessingSettingsFormProps>>
+    imageMetaData: SpriteImageMetaDataPair
+    setSpriteProcessingDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(ActorEditorContext) as ActorEditorContextType;
-    const { sprite, updateSprite, isMultiFileAnimation, spriteProcessingDialog, setSpriteProcessingDialog } = props;
-    const [leftWidth, setLeftWidth] = useState<number>(0);
-    const [leftWidthPadded, setLeftWidthPadded] = useState<number>(0);
-    const [leftHeight, setLeftHeight] = useState<number>(0);
-    const [leftHeightPadded, setLeftHeightPadded] = useState<number>(0);
-    const [rightWidth, setRightWidth] = useState<number>(0);
-    const [rightWidthPadded, setRightWidthPadded] = useState<number>(0);
-    const [rightHeight, setRightHeight] = useState<number>(0);
-    const [rightHeightPadded, setRightHeightPadded] = useState<number>(0);
-    const [filenameLeft, setFilenameLeft] = useState<string>('');
-    const [filenameRight, setFilenameRight] = useState<string>('');
+    const { sprite, updateSprite, isMultiFileAnimation, imageMetaData, setSpriteProcessingDialogOpen } = props;
+    const {
+        filename: filenameLeft,
+        width: leftWidth,
+        height: leftHeight,
+        widthPadded: leftWidthPadded,
+        heightPadded: leftHeightPadded,
+    } = imageMetaData.left;
+    const {
+        filename: filenameRight,
+        width: rightWidth,
+        height: rightHeight,
+        widthPadded: rightWidthPadded,
+        heightPadded: rightHeightPadded,
+    } = imageMetaData.right;
 
-    const isAnimated = sprite.isAnimated && (data.components?.animations?.length > 0);
+    const isAnimated = isSpriteAnimated(data, sprite);
 
-    const allowFrameBlendMode = data.sprites.type === SpriteType.Bgmap &&
-        // No HiColor support for animated sprites
-        !isAnimated &&
-        // No HiColor support for repeated sprites
-        !sprite.texture?.repeat?.x &&
-        !sprite.texture?.repeat?.y &&
-        // FrameBlend sprites are stored in a single map, aligned top/down. Therefore, they can't be higher than 256 px.
-        leftHeightPadded <= 256;
-
-    const getMetaData = async (): Promise<void> => {
-        const dim: number[][] = [[], []];
-        const fn: string[] = [];
-        await Promise.all([
-            sprite.texture?.files,
-            sprite.texture?.files2
-        ].map(async (f, i) => {
-            fn[i] = '';
-            dim[i] = [];
-            if (f?.length) {
-                const resolvedUri = fileUri.parent.resolve(f[0]);
-                fn[i] = resolvedUri.path.base;
-                if (f.length > 1) {
-                    fn[i] += ' +' + (f.length - 1);
-                }
-                const exists = await services.fileService.exists(resolvedUri);
-                let d;
-                if (exists) {
-                    d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                }
-
-                const imageHeight = d?.height ?? 0;
-                const imageWidth = d?.width ?? 0;
-                const finalHeight = clamp(roundToNextMultipleOf8(imageHeight), 0, imageHeight);
-                const finalWidth = clamp(roundToNextMultipleOf8(imageWidth), 0, MAX_IMAGE_WIDTH);
-                dim[i] = [imageWidth, imageHeight, finalWidth, finalHeight];
-            }
-        }));
-
-        setFilenameLeft(fn[0]);
-        setFilenameRight(fn[1]);
-        setLeftWidth(dim[0][0]);
-        setLeftHeight(dim[0][1]);
-        setLeftWidthPadded(dim[0][2]);
-        setLeftHeightPadded(dim[0][3]);
-        setRightWidth(dim[1][0]);
-        setRightHeight(dim[1][1]);
-        setRightWidthPadded(dim[1][2]);
-        setRightHeightPadded(dim[1][3]);
-    };
+    const imageProcessingProps = buildImageProcessingSettingsFormProps(data, sprite, updateSprite, leftHeightPadded);
 
     const getTilesCount = (imageData: SpriteImageData | number | undefined): number => {
         if (imageData !== undefined) {
@@ -138,12 +95,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         return 0;
     };
 
-    const reconvertImage = (): void => {
-        updateSprite({}, {
-            appendImageData: true,
-        });
-    };
-
     const setManipulationFunction = (manipulationFunction: string): void => {
         updateSprite({
             manipulationFunction,
@@ -159,14 +110,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const setBgmapMode = (bgmapMode: BgmapMode): void => {
         updateSprite({
             bgmapMode,
-        });
-    };
-
-    const setColorMode = (colorMode: ColorMode): void => {
-        updateSprite({
-            colorMode,
-        }, {
-            appendImageData: true,
         });
     };
 
@@ -324,18 +267,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const setFiles = async (files: string[]): Promise<void> => {
-        updateSprite({
-            name: files.length ? files[0].split('/').pop()?.split('.')[0] : undefined,
-            texture: {
-                ...sprite.texture,
-                files
-            }
-        }, {
-            appendImageData: true,
-        });
-    };
-
     const setFiles2 = async (files: string[]): Promise<void> => {
         updateSprite({
             texture: {
@@ -353,17 +284,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const updateImageProcessingSettings = (partialImageProcessingSettings: Partial<ImageProcessingSettings>) => {
-        updateSprite({
-            imageProcessingSettings: {
-                ...sprite.imageProcessingSettings,
-                ...partialImageProcessingSettings
-            },
-        }, {
-            appendImageData: true,
-        });
-    };
-
     const setTilesCompression = async (compression: ImageCompressionType): Promise<void> => {
         updateSprite({
             compression,
@@ -371,39 +291,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             appendImageData: true,
         });
     };
-
-    const setProcessingDialogData = () => {
-        setSpriteProcessingDialog({
-            image: sprite.texture?.files[0],
-            setFiles: setFiles,
-            imageData: !isNumber(sprite._imageData) ? sprite._imageData?.images[0] : undefined,
-            processingSettings: sprite.imageProcessingSettings,
-            updateProcessingSettings: updateImageProcessingSettings,
-            colorMode: allowFrameBlendMode ? sprite.colorMode : ColorMode.Default,
-            updateColorMode: setColorMode,
-            allowFrameBlendMode: allowFrameBlendMode,
-            compression: sprite.compression,
-            convertImage: reconvertImage,
-        });
-    };
-
-    useEffect(() => {
-        if (spriteProcessingDialog !== false) {
-            setProcessingDialogData();
-        }
-    }, [
-        sprite,
-    ]);
-
-    useEffect(() => {
-        getMetaData();
-    }, [
-        isAnimated,
-        data.animations?.totalFrames,
-        isMultiFileAnimation,
-        sprite.texture?.files,
-        sprite.texture?.files2,
-    ]);
 
     const tilesCount = getTilesCount(sprite._imageData);
     // if not an integer, the number of frames must be wrong
@@ -490,14 +377,14 @@ or multiple files, where each represents one animation frame.'
                                 <div style={{ paddingRight: 10 }}>
                                     <Images
                                         data={sprite.texture?.files || []}
-                                        updateData={setFiles}
+                                        updateData={imageProcessingProps.setFiles}
                                         allInFolderAsFallback={false}
                                         canSelectMany={isAnimated}
                                         stack={true}
                                         showMetaData={false}
                                         containerHeight='80px'
                                         containerWidth='100px'
-                                        fileAddExtraAction={() => setProcessingDialogData()}
+                                        fileAddExtraAction={() => setSpriteProcessingDialogOpen(true)}
                                     />
                                 </div>
                                 <VContainer grow={1} justifyContent="center" overflow="hidden">
@@ -571,14 +458,14 @@ or multiple files, where each represents one animation frame.'
                                                     <button
                                                         className="theia-button secondary"
                                                         title={nls.localize('vuengine/editors/actor/imageProcessingSettings', 'Image Processing Settings')}
-                                                        onClick={() => setProcessingDialogData()}
+                                                        onClick={() => setSpriteProcessingDialogOpen(true)}
                                                     >
                                                         <i className="codicon codicon-settings" />
                                                     </button>
                                                     <button
                                                         className="theia-button secondary"
                                                         title={nls.localize('vuengine/editors/actor/reconvertImage', 'Reconvert Image')}
-                                                        onClick={reconvertImage}
+                                                        onClick={imageProcessingProps.convertImage}
                                                     >
                                                         <i className="codicon codicon-sync" />
                                                     </button>

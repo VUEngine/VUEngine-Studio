@@ -21,7 +21,7 @@ export default function TransparencySelect(props: TransparencySelectProps): Reac
                     'vuengine/editors/general/transparencyDescription',
                     'With transparency enabled, this component will only be shown on every even or odd frame, \
 resulting in it appearing transparent (and slightly dimmer). \
-This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+This also halves CPU load since 50% less pixels have to be rendered per frame in average for this component.'
                 )}
             />
             <RadioSelect

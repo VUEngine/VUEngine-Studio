@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { decompressTiles } from '../../../../../images/browser/ves-images-compressor';
-import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
+import { decompressTiles, ImageCompressionType } from 'vb-image-converter';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
 import CanvasImage from '../../Common/CanvasImage';

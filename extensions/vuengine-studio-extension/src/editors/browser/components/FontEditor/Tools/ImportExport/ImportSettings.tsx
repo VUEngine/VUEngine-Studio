@@ -2,13 +2,6 @@ import { nls, URI } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ColorMode } from '../../../../../../core/browser/ves-common-types';
-import {
-    DEFAULT_COLOR_DISTANCE_CALCULATOR,
-    DEFAULT_DITHER_SERPENTINE,
-    DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-    DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER
-} from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import Checkbox from '../../../Common/Base/Checkbox';
 import HContainer from '../../../Common/Base/HContainer';
@@ -19,6 +12,13 @@ import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
 import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
+import {
+    ColorMode,
+    DEFAULT_COLOR_DISTANCE_CALCULATOR,
+    DEFAULT_DITHER_SERPENTINE,
+    DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+} from 'vb-image-converter';
+import { NO_DITHER_ALGORITHM } from '../../../../../../images/browser/ves-images-types';
 
 interface ImportSettingsProps {
     open: boolean
@@ -153,7 +153,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
             new URI(sourceImagePath),
             {
                 distanceCalculator: DEFAULT_COLOR_DISTANCE_CALCULATOR,
-                imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+                imageQuantizationAlgorithm: NO_DITHER_ALGORITHM,
                 minimumColorDistanceToDither: DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
                 serpentine: DEFAULT_DITHER_SERPENTINE,
                 invert,

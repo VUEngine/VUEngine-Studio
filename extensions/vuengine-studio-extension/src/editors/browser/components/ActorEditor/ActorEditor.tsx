@@ -2,9 +2,6 @@ import { deepClone, isBoolean, isNumber, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {
-    ConversionResult
-} from '../../../../images/browser/ves-images-types';
 import { ActorType } from '../../../../project/browser/types/Actor';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
@@ -31,7 +28,9 @@ import AddComponent from './Components/AddComponent';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import Preview from './Preview/Preview';
-import ImageProcessingSettingsForm, { ImageProcessingSettingsFormProps } from './Sprites/ImageProcessingSettingsForm';
+import ImageProcessingSettingsForm from './Sprites/ImageProcessingSettingsForm';
+import { buildImageProcessingSettingsFormProps, useSpriteImageMetaData } from './Sprites/SpriteImageProcessing';
+import { ConversionResult } from 'vb-image-converter';
 
 export const ShowTreeButton = styled.button`
   left: var(--padding);
@@ -92,11 +91,16 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     const [previewShowSprites, setPreviewShowSprites] = useState<boolean>(true);
     const [previewShowWireframes, setPreviewShowWireframes] = useState<boolean>(true);
     const [previewZoom, setPreviewZoom] = useState<number>(2);
-    const [spriteProcessingDialog, setSpriteProcessingDialog] = useState<boolean | ImageProcessingSettingsFormProps>(false);
+    const [spriteProcessingDialogOpen, setSpriteProcessingDialogOpen] = useState<boolean>(false);
     const [addComponentDialogOpen, setAddComponentDialogOpen] = useState<boolean>(false);
 
     const mostFilesOnASprite = getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
+
+    const [currentComponentType, currentComponentIndex] = currentComponent.split('-');
+    const currentSpriteIndex = currentComponentType === 'sprites' ? parseInt(currentComponentIndex || '-1') : -1;
+    const currentSprite = currentSpriteIndex > -1 ? data.components?.sprites?.[currentSpriteIndex] : undefined;
+    const currentSpriteImageMetaData = useSpriteImageMetaData(currentSprite);
     const hasAnyComponent = Object.values(data.components).filter(c => c.length > 0).length > 0;
 
     const getStateLocalStorageId = (): string =>
@@ -661,20 +665,20 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                     <CurrentComponent
                                         isMultiFileAnimation={isMultiFileAnimation}
                                         updateComponent={updateComponent}
-                                        spriteProcessingDialog={spriteProcessingDialog}
-                                        setSpriteProcessingDialog={setSpriteProcessingDialog}
+                                        spriteImageMetaData={currentSpriteImageMetaData}
+                                        setSpriteProcessingDialogOpen={setSpriteProcessingDialogOpen}
                                     />
                                 </Sidebar>
-                                {spriteProcessingDialog !== false && (
+                                {spriteProcessingDialogOpen && currentSprite !== undefined && (
                                     <PopUpDialog
                                         open={true}
                                         onClose={() => {
-                                            setSpriteProcessingDialog(false);
+                                            setSpriteProcessingDialogOpen(false);
                                             enableCommands();
                                             focusEditor();
                                         }}
                                         onOk={() => {
-                                            setSpriteProcessingDialog(false);
+                                            setSpriteProcessingDialogOpen(false);
                                             enableCommands();
                                             focusEditor();
                                         }}
@@ -683,16 +687,12 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
                                         width='100%'
                                     >
                                         <ImageProcessingSettingsForm
-                                            image={(spriteProcessingDialog as ImageProcessingSettingsFormProps).image}
-                                            setFiles={(spriteProcessingDialog as ImageProcessingSettingsFormProps).setFiles}
-                                            imageData={(spriteProcessingDialog as ImageProcessingSettingsFormProps).imageData}
-                                            processingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).processingSettings}
-                                            updateProcessingSettings={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateProcessingSettings}
-                                            colorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).colorMode}
-                                            updateColorMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).updateColorMode}
-                                            allowFrameBlendMode={(spriteProcessingDialog as ImageProcessingSettingsFormProps).allowFrameBlendMode}
-                                            compression={(spriteProcessingDialog as ImageProcessingSettingsFormProps).compression}
-                                            convertImage={(spriteProcessingDialog as ImageProcessingSettingsFormProps).convertImage}
+                                            {...buildImageProcessingSettingsFormProps(
+                                                data,
+                                                currentSprite,
+                                                (partialData, options) => updateComponent('sprites', currentSpriteIndex, partialData, options),
+                                                currentSpriteImageMetaData.left.heightPadded,
+                                            )}
                                         />
                                     </PopUpDialog>
                                 )}

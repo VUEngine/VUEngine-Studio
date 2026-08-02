@@ -44,7 +44,6 @@
     "@theia/workspace": "1.74.0",
     "chroma-js": "^3.1.2",
     "crc": "^4.3.2",
-    "crop-image-data": "^1.0.4",
     "datauri": "^3.0.0",
     "decompress": "^4.2.1",
     "deepmerge-ts": "^4.0.3",
@@ -57,7 +56,6 @@
     "fs-extra": "^10.0.0",
     "glob": "^10.3.10",
     "iconv-lite": "^0.6.3",
-    "image-q": "^4.0.0",
     "image-size": "^1.0.2",
     "inversify": "^6.2.2",
     "json-logic-js": "^2.0.2",
@@ -85,6 +83,7 @@
     "sort-json": "^2.0.1",
     "styled-components": "^6.1.13",
     "systeminformation": "^5.22.11",
+    "vb-image-converter": "git+https://github.com/VUEngine/VB-Image-Converter.git#v1.0.0",
     "vscode-uri": "^2.1.1"
   },
   "devDependencies": {
@@ -146,7 +145,8 @@
       "frontend": "lib/welcome/browser/welcome-frontend-module"
     },
     {
-      "frontend": "lib/images/browser/ves-images-frontend-module"
+      "frontend": "lib/images/browser/ves-images-frontend-module",
+      "backend": "lib/images/node/ves-images-backend-module"
     },
     {
       "backend": "lib/i18n/node/ves-i18n-backend-module"

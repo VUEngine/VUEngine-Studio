@@ -11,14 +11,6 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 
-/**
- * @jsdevtools/ono (pulled in via @apidevtools/json-schema-ref-parser) imports its
- * isomorphic implementation as the extensionless specifier "./isomorphic.node". Theia's
- * nativeDependenciesPlugin treats any import ending in ".node" as a native addon and
- * routes it through its runtime-require shim, which then fails to re-resolve the actual
- * "isomorphic.node.js" file. Resolve this specific import ourselves, ahead of Theia's
- * plugin, so it's bundled as the plain JS module it actually is.
- */
 function onoIsomorphicFixPlugin() {
     return {
         name: 'ono-isomorphic-fix',
@@ -34,17 +26,6 @@ function onoIsomorphicFixPlugin() {
 }
 nodeOptions.plugins.unshift(onoIsomorphicFixPlugin());
 
-/**
- * @jsdevtools/ono's package.json puts "esm/index.js" in its "module" field, which our
- * `mainFields: ['node', 'module', 'main']` prefers. That file ends with a "CommonJS default
- * export hack" (`module.exports = Object.assign(module.exports.default, module.exports)`)
- * meant to run inside a real per-file CJS wrapper. esbuild bundles ESM sources via its
- * `__esm` helper instead, which does not provide a local `module`/`exports` closure, so the
- * hack falls through to the *entry bundle's own* `module` object and overwrites
- * electron-main.js's exports with `Object.assign(undefined, ...)`, crashing on startup.
- * The CJS build (`cjs/index.js`) has the same hack but esbuild wraps CJS sources with a
- * real isolated `module`/`exports`, where it's safe. Force resolution to that build.
- */
 function onoCjsFixPlugin() {
     const cjsEntry = require.resolve('@jsdevtools/ono/cjs/index.js');
     return {
@@ -59,6 +40,8 @@ nodeOptions.plugins.unshift(onoCjsFixPlugin());
 const shroomsPath = path.resolve(__dirname, 'binaries/vuengine-studio-tools/web/shrooms-vb-core');
 browserOptions.entryPoints['shrooms.audio'] = shroomsPath + '/Audio.js';
 browserOptions.entryPoints['shrooms.core'] = shroomsPath + '/Core.js';
+
+nodeOptions.entryPoints['image-converter-worker'] = require.resolve('vb-image-converter/lib/worker.js');
 
 const browserContext = await esbuild.context(browserOptions);
 const nodeContext = await esbuild.context(nodeOptions);

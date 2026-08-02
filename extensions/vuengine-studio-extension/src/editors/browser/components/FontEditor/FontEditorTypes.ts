@@ -1,4 +1,4 @@
-import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { ImageCompressionType } from 'vb-image-converter';
 import { DataSection } from '../Common/CommonTypes';
 
 export interface FontData {

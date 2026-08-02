@@ -14,7 +14,7 @@ import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
 import { convertPcm } from '../../editors/browser/components/PCMEditor/converter';
 import { getTrackKeyframes } from '../../editors/browser/components/SoundEditor/Other/templating';
-import { compressTiles } from '../../images/browser/ves-images-compressor';
+import { compressTiles } from 'vb-image-converter';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { ImageConfigWithName } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
@@ -42,29 +42,29 @@ import {
 @injectable()
 export class VesCodeGenService {
   @inject(FileService)
-  protected readonly fileService: FileService;
+  protected readonly fileService!: FileService;
   @inject(MessageService)
-  protected readonly messageService: MessageService;
+  protected readonly messageService!: MessageService;
   @inject(OutputChannelManager)
-  protected readonly outputChannelManager: OutputChannelManager;
+  protected readonly outputChannelManager!: OutputChannelManager;
   @inject(QuickInputService)
-  protected readonly quickInputService: QuickInputService;
+  protected readonly quickInputService!: QuickInputService;
   @inject(QuickPickService)
-  protected readonly quickPickService: QuickPickService;
+  protected readonly quickPickService!: QuickPickService;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  protected readonly preferenceService!: PreferenceService;
   @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
+  protected readonly vesCommonService!: VesCommonService;
   @inject(VesImagesService)
-  protected readonly vesImageService: VesImagesService;
+  protected readonly vesImageService!: VesImagesService;
   @inject(VesPluginsService)
-  protected readonly vesPluginsService: VesPluginsService;
+  protected readonly vesPluginsService!: VesPluginsService;
   @inject(VesProcessService)
-  protected readonly vesProcessService: VesProcessService;
+  protected readonly vesProcessService!: VesProcessService;
   @inject(VesProjectService)
-  protected readonly vesProjectService: VesProjectService;
+  protected readonly vesProjectService!: VesProjectService;
   @inject(VesWorkspaceService)
-  protected readonly workspaceService: VesWorkspaceService;
+  protected readonly workspaceService!: VesWorkspaceService;
 
   protected timeout: number = 0;
 

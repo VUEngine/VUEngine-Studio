@@ -359,7 +359,7 @@ export const ActorType: ProjectDataType = {
                                 imageProcessingSettings: {
                                     type: 'object',
                                     properties: {
-                                        colorDistanceFormula: {
+                                        distanceCalculator: {
                                             type: 'string',
                                             default: 'euclidean'
                                         },

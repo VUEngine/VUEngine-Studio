@@ -1,10 +1,10 @@
 import { nls } from '@theia/core';
+import { ImageProcessingSettings } from 'vb-image-converter';
 import React, { useContext, useState } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
+import ImageProcessingSettingsForm from '../ActorEditor/Sprites/ImageProcessingSettingsForm';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
-import ImageProcessingSettingsForm from '../ActorEditor/Sprites/ImageProcessingSettingsForm';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function Quantisation(): React.JSX.Element {

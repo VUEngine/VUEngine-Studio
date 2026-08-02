@@ -135,7 +135,7 @@
     "@theia/workspace": "1.74.0",
     "fs-extra": "^9.1.0",
     "terser-webpack-plugin": "^5.3.10",
-    "vuengine-studio-extension": "0.7.0"
+    "vuengine-studio-extension": "*"
   },
   "devDependencies": {
     "@theia/cli": "1.74.0",

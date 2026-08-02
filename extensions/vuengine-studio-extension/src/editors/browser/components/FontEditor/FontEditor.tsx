@@ -1,10 +1,10 @@
 import { deepClone, nls } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
+import { ImageCompressionType } from 'vb-image-converter';
 import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
-import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import RadioSelect from '../Common/Base/RadioSelect';

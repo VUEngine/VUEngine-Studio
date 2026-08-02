@@ -1,6 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { ConversionResult, ImageCompressionType, ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 import {
     Axis,
@@ -23,6 +22,7 @@ import {
     WireframeType
 } from '../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from './ActorEditor';
+import { ConversionResult, ImageCompressionType, ImageProcessingSettings } from 'vb-image-converter';
 
 // @ts-ignore
 export const ActorEditorContext = createContext<ActorEditorContextType>({});

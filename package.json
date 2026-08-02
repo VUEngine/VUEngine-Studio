@@ -138,7 +138,8 @@
   ],
   "workspaces": [
     "applications/*",
-    "extensions/*"
+    "extensions/*",
+    "packages/*"
   ],
   "resolutions": {
     "@types/node": "^22.20.1",

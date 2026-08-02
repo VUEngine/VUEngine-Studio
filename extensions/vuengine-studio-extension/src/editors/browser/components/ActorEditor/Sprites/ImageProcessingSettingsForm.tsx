@@ -1,19 +1,12 @@
 import { nls } from '@theia/core';
-import * as iq from 'image-q';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
-    ConversionResult,
-    DEFAULT_COLOR_DISTANCE_CALCULATOR,
-    DEFAULT_DITHER_SERPENTINE,
-    DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-    DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+    DEFAULT_DITHER_ALGORITHM,
     DISTANCE_CALCULATOR_OPTIONS,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
-    ImageCompressionType,
-    ImageProcessingSettings,
-    MAX_IMAGE_WIDTH,
+    NO_DITHER_ALGORITHM,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -26,6 +19,17 @@ import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Com
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
+import {
+    ColorDistanceFormula,
+    ConversionResult,
+  DEFAULT_COLOR_DISTANCE_CALCULATOR,
+  DEFAULT_DITHER_SERPENTINE,
+  DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+  ImageCompressionType,
+  ImageProcessingSettings,
+  ImageQuantizationAlgorithm,
+  MAX_IMAGE_WIDTH,
+} from 'vb-image-converter';
 
 const ReconvertButton = styled.button`
     background-color: transparent;
@@ -119,7 +123,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         ));
     };
 
-    const finalHeight = useMemo(() => clamp(roundToNextMultipleOf8(height), 0, height), [height]);
+    const finalHeight = useMemo(() => roundToNextMultipleOf8(height), [height]);
     const finalWidth = useMemo(() => clamp(roundToNextMultipleOf8(width), 0, MAX_IMAGE_WIDTH), [width]);
     const isPadded = finalHeight > height || finalWidth > width;
     const isCropped = width > MAX_IMAGE_WIDTH;
@@ -299,14 +303,16 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         <VContainer>
                             <Checkbox
                                 sideLabel={nls.localize('vuengine/editors/general/dither', 'Dither')}
-                                checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
+                                checked={processingSettings?.imageQuantizationAlgorithm !== NO_DITHER_ALGORITHM}
                                 setChecked={() => {
                                     updateProcessingSettings({
-                                        imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
+                                        imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === NO_DITHER_ALGORITHM
+                                            ? DEFAULT_DITHER_ALGORITHM
+                                            : NO_DITHER_ALGORITHM,
                                     });
                                 }}
                             />
-                            {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                            {processingSettings?.imageQuantizationAlgorithm !== NO_DITHER_ALGORITHM &&
                                 <Checkbox
                                     sideLabel={nls.localize('vuengine/editors/general/serpentine', 'Serpentine')}
                                     checked={processingSettings?.serpentine ?? DEFAULT_DITHER_SERPENTINE}
@@ -318,7 +324,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                 />
                             }
                         </VContainer>
-                        {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                        {processingSettings?.imageQuantizationAlgorithm !== NO_DITHER_ALGORITHM &&
                             <>
                                 <VContainer style={{ minWidth: 200 }}>
                                     <label>
@@ -326,9 +332,9 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     </label>
                                     <AdvancedSelect
                                         options={IMAGE_QUANTIZATION_ALGORITHM_OPTIONS}
-                                        defaultValue={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                                        defaultValue={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_DITHER_ALGORITHM}
                                         onChange={options => updateProcessingSettings({
-                                            imageQuantizationAlgorithm: options[0] as iq.ImageQuantization,
+                                            imageQuantizationAlgorithm: options[0] as ImageQuantizationAlgorithm,
                                         })}
                                         disabled={!image}
                                         menuPlacement="top"
@@ -357,7 +363,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                             options={DISTANCE_CALCULATOR_OPTIONS}
                                             defaultValue={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
                                             onChange={options => updateProcessingSettings({
-                                                distanceCalculator: options[0] as iq.ColorDistanceFormula,
+                                                distanceCalculator: options[0] as ColorDistanceFormula,
                                             })}
                                             disabled={!image}
                                             menuPlacement="top"
