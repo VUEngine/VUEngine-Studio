@@ -39,6 +39,12 @@ import {
   SHOW_DONE_DURATION
 } from './ves-codegen-types';
 
+interface RenderTarget {
+  uri: URI
+  // The forEachOf bindings this target was expanded from, empty for plain targets.
+  bindings: object
+}
+
 @injectable()
 export class VesCodeGenService {
   @inject(FileService)
@@ -514,13 +520,17 @@ export class VesCodeGenService {
   }
 
   protected async getTargetUris(template: ProjectDataTemplate, item: any, itemUri?: URI): Promise<URI[]> {
+    return (await this.getTargets(template, item, itemUri)).map(target => target.uri);
+  }
+
+  protected async getTargets(template: ProjectDataTemplate, item: any, itemUri?: URI): Promise<RenderTarget[]> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
       return [];
     }
 
-    const result: URI[] = [];
+    const result: RenderTarget[] = [];
     await Promise.all(template.targets.map(async t => {
       if (t.conditions && jsonLogic.apply(t.conditions, item) !== true) {
         return;
@@ -547,7 +557,7 @@ export class VesCodeGenService {
         });
 
         if (targetUri !== undefined) {
-          result.push(targetUri);
+          result.push({ uri: targetUri, bindings: additionalData ?? {} });
         }
       };
 
@@ -660,12 +670,12 @@ export class VesCodeGenService {
 
     await Promise.all(
       toRender.map(async data => {
-        const targetUris = await this.getTargetUris(template, data.item, data.itemUri);
-        if (!targetUris) {
+        const targets = await this.getTargets(template, data.item, data.itemUri);
+        if (!targets) {
           return;
         }
 
-        await Promise.all(targetUris.map(async targetUri => {
+        await Promise.all(targets.map(async ({ uri: targetUri, bindings }) => {
           if (generationMode === GenerationMode.ChangedOnly) {
             if (!data.itemUri) {
               return;
@@ -686,7 +696,7 @@ export class VesCodeGenService {
               template,
               targetUri,
               templateString,
-              data,
+              { ...data, item: { ...data.item, ...bindings } },
               encoding
             );
             // only count files that actually made it to disk

@@ -11,7 +11,7 @@ interface ImagesProps {
     data: string[]
     updateData?: (data: string[]) => void
     canSelectMany: boolean
-    allInFolderAsFallback: boolean
+    alwaysShowAddButton?: boolean
     stack: boolean
     showMetaData: boolean
     absolutePaths?: boolean
@@ -26,7 +26,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         data,
         updateData,
         canSelectMany,
-        allInFolderAsFallback,
+        alwaysShowAddButton,
         stack,
         showMetaData,
         absolutePaths,
@@ -48,19 +48,8 @@ export default function Images(props: ImagesProps): React.JSX.Element {
     };
 
     const determineFilesToShow = async () => {
-        const files = data.length > 0
-            ? data
-            : allInFolderAsFallback
-                ? await Promise.all(window.electronVesCore.findFiles(await services.fileService.fsPath(fileUri.parent), '*.png')
-                    .map(async p => {
-                        const fullUri = fileUri.parent.resolve(p);
-                        const relativePath = fileUri.parent.relative(fullUri)?.toString()!;
-                        return relativePath;
-                    }))
-                : [];
-
         const result: { [path: string]: string } = {};
-        await Promise.all(files
+        await Promise.all(data
             .sort((a, b) => a.localeCompare(b))
             .map(async (p, i) => {
                 if (stack && i > 0) {
@@ -235,7 +224,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 }
             </div>;
         })}
-        {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
+        {(alwaysShowAddButton || !Object.keys(filesToShow).length) &&
             <div className={updateData ? 'fileAdd' : 'fileAdd disabled'} onClick={fileAddOnClick}>
                 {canSelectMany
                     ? <ImagesIcon size={20} />

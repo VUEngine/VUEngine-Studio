@@ -210,7 +210,6 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         <Images
                             data={sourceImagePath ? [sourceImagePath] : []}
                             updateData={(imagePaths: string[]) => setSourceImagePath(imagePaths[0])}
-                            allInFolderAsFallback={false}
                             canSelectMany={false}
                             stack={true}
                             showMetaData={false}

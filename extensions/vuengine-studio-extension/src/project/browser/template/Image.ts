@@ -18,22 +18,6 @@ export const ImageTemplate: ProjectDataTemplate = {
             ]
         }
     }, {
-        path: 'Converted/${_forEachOfBasename}.c',
-        root: ProjectDataTemplateTargetRoot.file,
-        forEachOf: { 'fileInFolder': ['*.png'] },
-        conditions: {
-            'and': [
-                { '==': [{ 'var': 'files.length' }, 0] },
-                {
-                    'or': [
-                        { '==': [{ 'var': 'animation.isAnimation' }, false] },
-                        { '==': [{ 'var': 'animation.individualFiles' }, false] }
-                    ]
-                },
-                { '==': [{ 'var': 'tileset.shared' }, false] }
-            ]
-        }
-    }, {
         path: 'Converted/${_filename}.c',
         root: ProjectDataTemplateTargetRoot.file,
         conditions: {

@@ -378,7 +378,6 @@ or multiple files, where each represents one animation frame.'
                                     <Images
                                         data={sprite.texture?.files || []}
                                         updateData={imageProcessingProps.setFiles}
-                                        allInFolderAsFallback={false}
                                         canSelectMany={isAnimated}
                                         stack={true}
                                         showMetaData={false}
@@ -482,7 +481,6 @@ or multiple files, where each represents one animation frame.'
                                         <Images
                                             data={sprite.texture?.files2 || []}
                                             updateData={setFiles2}
-                                            allInFolderAsFallback={false}
                                             canSelectMany={isAnimated}
                                             stack={true}
                                             showMetaData={false}

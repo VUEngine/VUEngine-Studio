@@ -1,11 +1,12 @@
 import { nls } from '@theia/core';
-import React from 'react';
-import { ImageConfig } from '../../../../images/browser/ves-images-types';
+import React, { useContext } from 'react';
+import { ImageConfig, ImageDataMap } from '../../../../images/browser/ves-images-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
 import Animation from './Animation';
 import DataOptions from './DataOptions';
-import { ImageEditorContext } from './ImageEditorTypes';
+import { conversionKey, ImageEditorContext, isSingleConvertedFile } from './ImageEditorTypes';
 import Images from './Images';
 import Map from './Map';
 import Quantisation from './Quantisation';
@@ -18,9 +19,48 @@ interface ImageEditorProps {
 
 export default function ImageEditor(props: ImageEditorProps): React.JSX.Element {
     const { data, updateData } = props;
+    const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, services } = useContext(EditorsContext) as EditorsContextType;
+
+    const convertImages = async (config: ImageConfig): Promise<ImageDataMap> => {
+        const name = fileUri.path.name;
+
+        if (isSingleConvertedFile(config)) {
+            const result = await services.vesImagesService.convertImage(fileUri, { ...config, name });
+            return { [name]: await services.vesImagesService.compressImageData(result) };
+        }
+
+        let converted = 0;
+        const imageData: ImageDataMap = {};
+        await Promise.all(config.files.map(async file => {
+            const result = await services.vesImagesService.convertImage(fileUri, { ...config, name }, file);
+            imageData[fileUri.parent.resolve(file).path.name] = await services.vesImagesService.compressImageData(result);
+            setGeneratingProgress(++converted, config.files.length);
+        }));
+
+        return imageData;
+    };
+
+    const convertAndUpdate = async (config: ImageConfig): Promise<void> => {
+        setIsGenerating(true);
+        try {
+            updateData({ ...config, _imageData: await convertImages(config) });
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const updateImageData = (updatedData: Partial<ImageConfig>): void => {
-        updateData({ ...data, ...updatedData });
+        if (isGenerating) {
+            return;
+        }
+
+        const newData = { ...data, ...updatedData };
+        if (conversionKey(newData) === conversionKey(data)) {
+            updateData(newData);
+            return;
+        }
+
+        convertAndUpdate(newData);
     };
 
     const updateFiles = (files: string[]): void => {
@@ -33,6 +73,7 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                 value={{
                     imageData: data,
                     updateImageData: updateImageData,
+                    reconvertImages: () => convertAndUpdate(data),
                 }}
             >
                 <VContainer gap={20} overflow='hidden'>
@@ -48,19 +89,10 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                             {nls.localize('vuengine/editors/image/files', 'Image Files')}
                             {' '}<span className='count'>{data.files.length}</span>
                         </label>
-                        {data.files.length === 0 &&
-                            <div style={{ fontStyle: 'italic' }}>
-                                <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
-                                {nls.localize(
-                                    'vuengine/editors/image/noFilesSelected',
-                                    'No images selected. All images in this folder will be converted.'
-                                )}
-                            </div>
-                        }
                         <Images
                             data={data.files}
                             updateData={updateFiles}
-                            allInFolderAsFallback={true}
+                            alwaysShowAddButton={true}
                             canSelectMany={true}
                             stack={false}
                             showMetaData={true}

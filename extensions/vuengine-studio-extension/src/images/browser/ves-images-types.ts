@@ -1,6 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 import {
   ColorMode,
+  ConversionResult,
   DEFAULT_COLOR_DISTANCE_CALCULATOR,
   DEFAULT_DITHER_SERPENTINE,
   DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
@@ -11,9 +12,14 @@ import {
 import { AdvancedSelectOption } from '../../editors/browser/components/Common/Base/AdvancedSelect';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
+export interface ImageDataMap {
+  [name: string]: Partial<ConversionResult>;
+}
+
 export type ImageConfig = ImageConverterConfig & {
   files: string[];
   section: DataSection;
+  _imageData?: ImageDataMap;
 };
 
 export type ImageConfigWithName = ImageConfig & {

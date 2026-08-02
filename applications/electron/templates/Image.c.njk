@@ -1,13 +1,25 @@
 {%- if item._forEachOfBasename is defined -%}
-	{%- set sanitizedSpecName = item._forEachOfBasename | sanitizeSpecName -%}
+	{%- set imageDataName = item._forEachOfBasename -%}
 {%- else -%}
-	{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
+	{%- set imageDataName = itemUri | basename(false) -%}
 {%- endif -%}
-{%- set imageData = itemUri | convertImage(item, item._forEachOf) -%}
+{%- set sanitizedSpecName = imageDataName | sanitizeSpecName -%}
 
+{%- set imageData = false -%}
+{%- if item._imageData is defined and item._imageData[imageDataName] is defined -%}
+	{%- set imageData = item._imageData[imageDataName] -%}
+{%- endif -%}
+{%- if not imageData -%}
+	{#- on-the-fly conversion fallback -#}
+	{%- set imageData = itemUri | convertImage(item, item._forEachOf) -%}
+{%- endif -%}
+
+{%- set tilesData = imageData.tiles.data | uncompressJson -%}
+{%- set tilesDataLength = tilesData | length -%}
 {%- set mapsDataTotalLength = 0 -%}
 {%- for map in imageData.maps -%}
-	{%- set mapsDataTotalLength = mapsDataTotalLength + map.data | length -%}
+	{%- set mapData = map.data | uncompressJson -%}
+	{%- set mapsDataTotalLength = mapsDataTotalLength + mapData | length -%}
 {%- endfor -%}
 
 {%- set reducedTilesLabel = 'unreduced' -%}
@@ -35,7 +47,7 @@
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //
 //	{{ sanitizedSpecName }}
-{% if imageData.tiles.data | length -%}
+{% if tilesDataLength -%}
 	//	* {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {% endif %}
 
@@ -47,14 +59,15 @@
 	//	* {{ imageData.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if item.animation.individualFiles and imageData.animation.largestFrame is defined %}, largest frame: {{imageData.animation.largestFrame}} tiles{% endif %}
 {% endif -%}
 
-{%- if imageData.tiles.data | length and imageData.maps | length -%}
-	//	Size: {{ (imageData.tiles.data | length + 1) * 4 }}
+{%- if tilesDataLength and imageData.maps | length -%}
+	//	Size: {{ (tilesDataLength + 1) * 4 }}
 	{%- for map in imageData.maps -%}
-		{{ ' + ' }}{{ map.data | length * 2 }}{{ ' ' }}
+		{%- set mapData = map.data | uncompressJson -%}
+		{{ ' + ' }}{{ mapData | length * 2 }}{{ ' ' }}
 	{%- endfor -%}
-	= {{ ((imageData.tiles.data | length + 1) * 4) + (mapsDataTotalLength * 2) }} byte
-{% elseif imageData.tiles.data | length -%}
-	//	Size: {{ (imageData.tiles.data | length + 1) * 4 }} byte
+	= {{ ((tilesDataLength + 1) * 4) + (mapsDataTotalLength * 2) }} byte
+{% elseif tilesDataLength -%}
+	//	Size: {{ (tilesDataLength + 1) * 4 }} byte
 {% elseif imageData.maps | length -%}
 	//	Size: {{ mapsDataTotalLength * 2 }} byte
 {% endif -%}

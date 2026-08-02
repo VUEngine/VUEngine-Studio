@@ -284,14 +284,16 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
         this.isGenerating = isGenerating;
         this.generatingProgress = isGenerating && progress > -1 ? progress : -1;
-        this.update();
+        // circumvent handleEditorChange
+        super.update();
     }
 
     protected setGeneratingProgress(current: number, total: number): void {
         const decimalPrecision = 10;
         const progress = Math.round(current * 100 / total * decimalPrecision) / decimalPrecision;
         this.generatingProgress = progress;
-        this.update();
+        // circumvent handleEditorChange
+        super.update();
     }
 
     dispatchCommandEvent(commandId: string): void {

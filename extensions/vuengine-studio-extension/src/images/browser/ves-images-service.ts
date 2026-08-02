@@ -10,20 +10,26 @@ import {
   PALETTE_R_VALUES,
   renderToPixels,
 } from 'vb-image-converter';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesConverter } from '../common/ves-images-service-protocol';
-import { ImageConfig, ImageConfigWithName } from './ves-images-types';
+import { ImageConfigWithName } from './ves-images-types';
 
 @injectable()
 export class VesImagesService {
   @inject(FileService)
   protected fileService!: FileService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService!: VesCommonService;
   @inject(VesImagesConverter)
   protected readonly converter!: VesImagesConverter;
 
   async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath?: string): Promise<ConversionResult> {
     const folderUri = imageConfigFileUri.parent;
-    const files = this.resolveSourceFiles(imageConfigFileUri, imageConfig, filePath);
+    const files = filePath ? [filePath] : imageConfig.files;
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
+    // Results of the previous run are of no interest to the converter, and shipping
+    // them along would send the whole compressed tile data over the wire every time.
+    const { _imageData, ...config } = imageConfig;
 
     return this.converter.convert({
       name,
@@ -31,8 +37,31 @@ export class VesImagesService {
         const fileUri = folderUri.resolve(file);
         return { name: fileUri.path.name, path: fileUri.path.fsPath() };
       }),
-      config: imageConfig,
+      config,
     });
+  }
+
+  async compressImageData(imageData: Partial<ConversionResult>): Promise<Partial<ConversionResult>> {
+    const result = { ...imageData };
+
+    if (result.tiles) {
+      result.tiles = {
+        ...result.tiles,
+        data: await this.vesCommonService.compressJson(result.tiles.data),
+      };
+      if (imageData.tiles?.frameOffsets) {
+        result.tiles.frameOffsets = await this.vesCommonService.compressJson(imageData.tiles.frameOffsets) as unknown as number[];
+      }
+    }
+
+    if (result.maps) {
+      result.maps = await Promise.all(result.maps.map(async map => ({
+        ...map,
+        data: await this.vesCommonService.compressJson(map.data),
+      })));
+    }
+
+    return result;
   }
 
   // Runs only the pre-processing stage and hands back an indexed PNG, for
@@ -77,17 +106,4 @@ export class VesImagesService {
     });
   }
 
-  protected resolveSourceFiles(imageConfigFileUri: URI, imageConfig: ImageConfig, filePath?: string): string[] {
-    if (filePath) {
-      return [filePath];
-    }
-    if (imageConfig.files.length) {
-      return imageConfig.files;
-    }
-
-    const folderUri = imageConfigFileUri.parent;
-    return window.electronVesCore.findFiles(folderUri.path.fsPath(), '*.png')
-      .sort((a, b) => a.localeCompare(b))
-      .map(path => folderUri.relative(folderUri.resolve(path))?.fsPath()!);
-  }
 }

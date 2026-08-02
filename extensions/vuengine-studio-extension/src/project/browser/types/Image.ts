@@ -7,6 +7,10 @@ export const ImageType: ProjectDataType = {
     schema: {
         title: nls.localize('vuengine/projects/typeLabels/image', 'Image'),
         properties: {
+            _imageData: {
+                type: 'object',
+                default: {}
+            },
             files: {
                 type: 'array',
                 items: {

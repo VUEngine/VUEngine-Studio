@@ -5,13 +5,22 @@ import { ColorMode } from '../../../../core/browser/ves-common-types';
 import ImageProcessingSettingsForm from '../ActorEditor/Sprites/ImageProcessingSettingsForm';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
-import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { ImageEditorContext, ImageEditorContextType, isSingleConvertedFile } from './ImageEditorTypes';
 
 export default function Quantisation(): React.JSX.Element {
-    const { imageData, updateImageData } = useContext(ImageEditorContext) as ImageEditorContextType;
+    const { imageData, updateImageData, reconvertImages } = useContext(ImageEditorContext) as ImageEditorContextType;
+    const { fileUri } = useContext(EditorsContext) as EditorsContextType;
     const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
 
     const allowFrameBlendMode = !imageData.animation.isAnimation;
+
+    const previewName = isSingleConvertedFile(imageData)
+        ? fileUri.path.name
+        : imageData.files.length
+            ? fileUri.parent.resolve(imageData.files[0]).path.name
+            : '';
+    const previewImageData = imageData._imageData?.[previewName];
 
     const setColorMode = (colorMode: ColorMode): void => {
         updateImageData({ colorMode });
@@ -61,6 +70,8 @@ export default function Quantisation(): React.JSX.Element {
         >
             <ImageProcessingSettingsForm
                 image={imageData.files[0]}
+                imageData={previewImageData}
+                convertImage={reconvertImages}
                 processingSettings={imageData.imageProcessingSettings}
                 updateProcessingSettings={updateImageProcessingSettings}
                 colorMode={allowFrameBlendMode ? imageData.colorMode : ColorMode.Default}

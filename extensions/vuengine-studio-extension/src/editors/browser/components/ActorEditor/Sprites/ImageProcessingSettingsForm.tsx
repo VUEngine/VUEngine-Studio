@@ -215,7 +215,6 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             <Images
                                 data={image ? [image] : []}
                                 updateData={setFiles}
-                                allInFolderAsFallback={false}
                                 canSelectMany={false}
                                 stack={true}
                                 showMetaData={false}
