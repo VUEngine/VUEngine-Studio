@@ -5,6 +5,7 @@ import { ColorMode } from '../../../../core/browser/ves-common-types';
 import ImageProcessingSettingsForm from '../ActorEditor/Sprites/ImageProcessingSettingsForm';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
+import { getTilesetOptimizationScope } from '../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { ImageEditorContext, ImageEditorContextType, isSingleConvertedFile } from './ImageEditorTypes';
 
@@ -80,6 +81,11 @@ export default function Quantisation(): React.JSX.Element {
                 allowFrameBlendMode={allowFrameBlendMode}
                 maxTiles={imageData.tileset.optimization?.maxTiles ?? 0}
                 updateMaxTiles={setMaxTiles}
+                optimizationScope={getTilesetOptimizationScope(
+                    imageData.animation.isAnimation,
+                    imageData.animation.individualFiles,
+                    imageData.tileset.shared,
+                )}
             />
         </PopUpDialog>
     </>;

@@ -34,6 +34,26 @@ export interface ImageConfigFileToBeConverted {
 export const NO_DITHER_ALGORITHM: ImageQuantizationAlgorithm = 'nearest';
 export const DEFAULT_DITHER_ALGORITHM: ImageQuantizationAlgorithm = 'floyd-steinberg';
 
+export enum TilesetOptimizationScope {
+  FRAME = 'frame',
+  TILESET = 'tileset',
+  NONE = 'none',
+}
+
+export const getTilesetOptimizationScope = (
+  isAnimation: boolean,
+  individualFiles: boolean,
+  sharedTileset: boolean,
+): TilesetOptimizationScope => {
+  if (isAnimation && !individualFiles) {
+    return TilesetOptimizationScope.NONE;
+  }
+
+  return isAnimation && !sharedTileset
+    ? TilesetOptimizationScope.FRAME
+    : TilesetOptimizationScope.TILESET;
+};
+
 export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
   files: [],
   section: DataSection.ROM,

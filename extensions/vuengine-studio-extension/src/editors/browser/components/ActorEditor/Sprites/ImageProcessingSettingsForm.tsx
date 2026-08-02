@@ -7,6 +7,7 @@ import {
     DISTANCE_CALCULATOR_OPTIONS,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
     NO_DITHER_ALGORITHM,
+    TilesetOptimizationScope,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import AdvancedSelect from '../../Common/Base/AdvancedSelect';
@@ -61,6 +62,7 @@ export interface ImageProcessingSettingsFormProps {
     compression: ImageCompressionType
     maxTiles: number
     updateMaxTiles: (maxTiles: number) => void
+    optimizationScope: TilesetOptimizationScope
     convertImage?: () => void
 }
 
@@ -78,6 +80,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         compression,
         maxTiles,
         updateMaxTiles,
+        optimizationScope,
         convertImage,
     } = props;
     const [pixelData, setPixelData] = useState<number[][]>([]);
@@ -145,7 +148,13 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const isPadded = finalHeight > height || finalWidth > width;
     const isCropped = width > MAX_IMAGE_WIDTH;
 
-    const tilesAfter = imageData?.tiles?.count ?? 0;
+    // An animation is budgeted per frame, so the counts that matter are those of its
+    // largest frame, the one character memory has to hold. Everything else is
+    // budgeted as a whole tileset.
+    const isPerFrame = optimizationScope === TilesetOptimizationScope.FRAME;
+    const tilesAfter = isPerFrame
+        ? imageData?.optimization?.tilesAfter ?? imageData?.animation?.largestFrame ?? 0
+        : imageData?.tiles?.count ?? 0;
     const tilesBefore = imageData?.optimization?.tilesBefore ?? tilesAfter;
     const tolerance = imageData?.optimization
         ? Math.round(imageData.optimization.tolerance * 100) / 100
@@ -400,54 +409,69 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             </>
                         }
                     </OptionGroup>
-                    <OptionGroup>
-                        <VContainer>
-                            <Checkbox
-                                sideLabel={nls.localize('vuengine/editors/general/optimize', 'Optimize')}
-                                checked={isOptimizing}
-                                setChecked={toggleOptimize}
-                                disabled={!image}
-                            />
-                        </VContainer>
-                        {isOptimizing &&
-                            <>
-                                <Input
-                                    label={nls.localize('vuengine/editors/general/targetTileCount', 'Target')}
-                                    tooltip={nls.localize(
-                                        'vuengine/editors/general/targetTileCountDescription',
-                                        'Merges near-identical tiles until the tileset fits into the given number of tiles. \
-This is lossy, the image gets redrawn from the reduced tileset. \
-Has no effect while tile reduction is turned off.',
-                                    )}
-                                    type="number"
-                                    value={maxTiles}
-                                    setValue={v => updateMaxTiles(v as number)}
-                                    min={1}
-                                    max={MAX_CHARS}
-                                    step={1}
-                                    width={64}
+                    {optimizationScope !== TilesetOptimizationScope.NONE &&
+                        <OptionGroup>
+                            <VContainer>
+                                <Checkbox
+                                    sideLabel={nls.localize('vuengine/editors/general/optimize', 'Optimize')}
+                                    checked={isOptimizing}
+                                    setChecked={toggleOptimize}
                                     disabled={!image}
                                 />
-                                {tilesBefore > 0 &&
-                                    <VContainer gap="0">
-                                        <label>
-                                            {nls.localize('vuengine/editors/general/tileCount', 'Tile Count')}
-                                        </label>
-                                        <VContainer gap={2} style={{ opacity: .6, paddingTop: 4 }}>
-                                            <div>
-                                                {tilesBefore} → {tilesAfter}
-                                            </div>
-                                            {tolerance !== undefined &&
+                            </VContainer>
+                            {isOptimizing &&
+                                <>
+                                    <Input
+                                        label={nls.localize('vuengine/editors/general/targetTileCount', 'Target')
+                                        }
+                                        tooltip={isPerFrame
+                                            ? nls.localize(
+                                                'vuengine/editors/general/targetTileCountPerFrameDescription',
+                                                'Merges near-identical tiles until every animation frame fits into the given number of tiles. \
+Frames are optimized one by one, since only one of them has to be in character memory at a time, \
+and the resulting tileset still holds all of them. \
+This is lossy, the images get redrawn from the reduced tileset.',
+                                            )
+                                            : nls.localize(
+                                                'vuengine/editors/general/targetTileCountDescription',
+                                                'Merges near-identical tiles until the tileset fits into the given number of tiles. \
+This is lossy, the image gets redrawn from the reduced tileset. \
+Has no effect while tile reduction is turned off.',
+                                            )
+                                        }
+                                        type="number"
+                                        value={maxTiles}
+                                        setValue={v => updateMaxTiles(v as number)}
+                                        min={1}
+                                        max={MAX_CHARS}
+                                        step={1}
+                                        width={64}
+                                        disabled={!image}
+                                    />
+                                    {tilesBefore > 0 &&
+                                        <VContainer gap="0">
+                                            <label>
+                                                {isPerFrame
+                                                    ? nls.localize('vuengine/editors/general/largestFrame', 'Largest Frame')
+                                                    : nls.localize('vuengine/editors/general/tileCount', 'Tile Count')
+                                                }
+                                            </label>
+                                            <VContainer gap={2} style={{ opacity: .6, paddingTop: 4 }}>
                                                 <div>
-                                                    {nls.localize('vuengine/editors/general/tolerance', 'Tolerance')}: {tolerance}
+                                                    {tilesBefore} → {tilesAfter}
                                                 </div>
-                                            }
+                                                {tolerance !== undefined &&
+                                                    <div>
+                                                        {nls.localize('vuengine/editors/general/tolerance', 'Tolerance')}: {tolerance}
+                                                    </div>
+                                                }
+                                            </VContainer>
                                         </VContainer>
-                                    </VContainer>
-                                }
-                            </>
-                        }
-                    </OptionGroup>
+                                    }
+                                </>
+                            }
+                        </OptionGroup>
+                    }
                 </HContainer>
             </VContainer >
         </div >

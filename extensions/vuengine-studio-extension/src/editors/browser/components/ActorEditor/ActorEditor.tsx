@@ -59,7 +59,7 @@ export interface ActorEditorSaveDataOptions {
     appendImageData?: boolean
 }
 
-const getMostFilesOnASprite = (actorData: ActorData): number =>
+export const getMostFilesOnASprite = (actorData: ActorData): number =>
     Math.max(...actorData.components?.sprites.map(s => s.texture.files.length));
 
 export default function ActorEditor(props: ActorEditorProps): React.JSX.Element {

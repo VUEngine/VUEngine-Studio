@@ -2,10 +2,11 @@ import { isNumber } from '@theia/core';
 import { useContext, useEffect, useState } from 'react';
 import { MAX_IMAGE_WIDTH } from 'vb-image-converter';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { getTilesetOptimizationScope } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import { SpriteType } from '../../Common/VUEngineTypes';
-import { ActorEditorSaveDataOptions } from '../ActorEditor';
+import { ActorEditorSaveDataOptions, getMostFilesOnASprite } from '../ActorEditor';
 import { ActorData, SpriteData } from '../ActorEditorTypes';
 import { ImageProcessingSettingsFormProps } from './ImageProcessingSettingsForm';
 
@@ -112,6 +113,8 @@ export function buildImageProcessingSettingsFormProps(
     imageHeightPadded: number,
 ): ImageProcessingSettingsFormProps {
     const allowFrameBlendMode = isFrameBlendModeAllowed(data, sprite, imageHeightPadded);
+    const isAnimation = data.components?.animations?.length > 0;
+    const isStereoSprite = sprite.texture?.files?.length === 1 && sprite.texture?.files2?.length === 1;
 
     return {
         image: sprite.texture?.files[0],
@@ -148,6 +151,11 @@ export function buildImageProcessingSettingsFormProps(
         }, {
             appendImageData: true,
         }),
+        optimizationScope: getTilesetOptimizationScope(
+            isAnimation,
+            isAnimation && getMostFilesOnASprite(data) > 1,
+            isStereoSprite,
+        ),
         convertImage: () => updateSprite({}, {
             appendImageData: true,
         }),
