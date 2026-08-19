@@ -845,9 +845,9 @@ export class VesCodeGenService {
 
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
 
-    env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, range: number, callback): Promise<void> => {
+    env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, callback): Promise<void> => {
       try {
-        const result = await convertPcm(configFileUri, filePath, range, this.fileService);
+        const result = await convertPcm(configFileUri, filePath, this.fileService);
         callback(null, result);
       } catch (error) {
         callback(this.toFilterError('convertPcm', error), null);

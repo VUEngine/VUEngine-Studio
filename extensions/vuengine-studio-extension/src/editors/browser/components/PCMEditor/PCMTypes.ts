@@ -13,13 +13,7 @@ export enum TimerResolution {
   '20US' = '20US',
 }
 
-export enum TimerTargetTimePerInterruptUnits {
-  'MS' = 'MS',
-  'US' = 'US',
-}
-
 export interface TimerConfig {
     resolution: TimerResolution
     targetTimePerInterrupt: number
-    targetTimePerInterruptUnits: TimerTargetTimePerInterruptUnits
 }

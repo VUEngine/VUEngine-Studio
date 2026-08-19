@@ -34,10 +34,6 @@ export const PcmType: ProjectDataType = {
                         type: 'integer',
                         minimum: 1,
                         default: 120
-                    },
-                    targetTimePerInterruptUnits: {
-                        type: 'string',
-                        default: 'US'
                     }
                 },
                 additionalProperties: false

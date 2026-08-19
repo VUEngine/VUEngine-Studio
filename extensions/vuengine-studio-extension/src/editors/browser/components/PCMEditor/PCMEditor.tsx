@@ -9,7 +9,7 @@ import { DataSection } from '../Common/CommonTypes';
 import InfoLabel from '../Common/InfoLabel';
 import MissingPlugin from '../Common/MissingPlugin';
 import SectionSelect from '../Common/SectionSelect';
-import { PCMData, TimerResolution, TimerTargetTimePerInterruptUnits } from './PCMTypes';
+import { PCMData, TimerResolution } from './PCMTypes';
 import Checkbox from '../Common/Base/Checkbox';
 import RadioSelect from '../Common/Base/RadioSelect';
 
@@ -38,13 +38,6 @@ export default function PCMEditor(props: PCMProps): React.JSX.Element {
         timer: {
             ...data.timer,
             resolution
-        }
-    });
-    const setTargetTimePerInterruptUnits = (targetTimePerInterruptUnits: TimerTargetTimePerInterruptUnits) => updateData({
-        ...data,
-        timer: {
-            ...data.timer,
-            targetTimePerInterruptUnits
         }
     });
     const setTargetTimePerInterrupt = (targetTimePerInterrupt: number) => updateData({
@@ -138,17 +131,13 @@ export default function PCMEditor(props: PCMProps): React.JSX.Element {
                 <label>
                     {nls.localize('vuengine/editors/pcm/targetTimePerInterrupt', 'Target Time Per Interrupt')}
                 </label>
-                <HContainer>
+                <HContainer alignItems='center'>
                     <Input
                         value={data.timer.targetTimePerInterrupt}
                         setValue={v => setTargetTimePerInterrupt(v as number)}
-                        width={80}
+                        width={64}
                     />
-                    <RadioSelect
-                        options={[{ value: TimerTargetTimePerInterruptUnits.MS }, { value: TimerTargetTimePerInterruptUnits.US }]}
-                        defaultValue={data.timer.targetTimePerInterruptUnits}
-                        onChange={options => setTargetTimePerInterruptUnits(options[0].value as TimerTargetTimePerInterruptUnits)}
-                    />
+                    US
                 </HContainer>
             </VContainer>
         </HContainer>

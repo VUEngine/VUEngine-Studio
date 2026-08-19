@@ -1,5 +1,5 @@
 {%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
-{%- set soundData = itemUri | convertPcm(item.sourceFile, item.range) -%}
+{%- set soundData = itemUri | convertPcm(item.sourceFile) -%}
 
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.c.njk') %}
@@ -26,13 +26,13 @@ const uint8 {{ sanitizedSpecName }}SoundTrack1SxLRV[]
 #endif
 };
 
-PCMSoundROMSpec {{ sanitizedSpecName }}oSoundSpec =
+PCMSoundROMSpec {{ sanitizedSpecName }}SoundSpec =
 {
 	// Timer configuration
 	{
 		__TIMER_{{ item.timer.resolution }},
 		{{ item.timer.targetTimePerInterrupt}},
-		k{{ item.timer.targetTimePerInterrupttUnits}}
+		kUS
 	},
 	
 	// Name
