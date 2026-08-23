@@ -180,9 +180,6 @@ export class VesEmulatorActorsPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.ACTORS, source, instanceId);
         this.title.label = EMULATOR_PANEL_LABELS[EmulatorPanelType.ACTORS];
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/actorsCaption', 'Actors currently allocated in the memory pools'
-        );
         // The same split the Worlds panel uses: a table that takes the slack,
         // and a detail view under it sized by its content.
         this.addClass('ves-emulator-vip-split');
@@ -666,59 +663,67 @@ another build they would be wrong together. Rebuild, or reload the ROM.'
 
     protected renderList(selected: ActorEntry): React.ReactNode {
         return <div className='ves-emulator-vip-split-table'>
-            <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table ves-emulator-actors-table'>
-                <thead>
-                    <tr>
-                        <th
-                            className='ves-emulator-actors-name'
-                            title={nls.localize(
-                                'vuengine/emulator/panels/actorsSpecColumnHint',
-                                'The spec this actor was built from, named as the project declares it.'
-                            )}
-                        >
-                            {nls.localize('vuengine/emulator/panels/actorsSpec', 'Spec')}
-                        </th>
-                        <th className='ves-emulator-actors-name'>
-                            {nls.localize('vuengine/emulator/panels/actorsClass', 'Class')}
-                        </th>
-                        <th title={nls.localize(
-                            'vuengine/emulator/panels/actorsIdHint', "The engine's own id for this instance"
-                        )}>
-                            {nls.localize('vuengine/emulator/panels/actorsId', 'Id')}
-                        </th>
-                        <th>X</th>
-                        <th>Y</th>
-                        <th>Z</th>
-                        <th title={nls.localize(
-                            'vuengine/emulator/panels/actorsBlockHint', 'The pool block it occupies, in bytes'
-                        )}>
-                            {nls.localize('vuengine/emulator/panels/poolsBlock', 'Block')}
-                        </th>
-                        <th>{nls.localize('vuengine/emulator/panels/actorsAddress', 'Address')}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.actors.map(actor => (
-                        <tr
-                            key={actor.objectAddress}
-                            // Hidden actors are still live and still cost a
-                            // block; dimming them says which are on screen.
-                            className={`${actor.hidden ? 'inactive' : ''}${
-                                actor.objectAddress === selected.objectAddress ? ' selected' : ''}`}
-                            onClick={() => this.select(actor.objectAddress)}
-                        >
-                            <td className='ves-emulator-actors-name'>{this.specLabelOf(actor)}</td>
-                            <td className='ves-emulator-actors-name'>{actor.className}</td>
-                            <td>{actor.internalId ?? '—'}</td>
-                            {actor.position.map((value, axis) =>
-                                <td key={axis}>{value ?? '—'}</td>
-                            )}
-                            <td>{actor.blockSize}</td>
-                            <td><code>{hex(actor.objectAddress, 8)}</code></td>
+            <fieldset className='ves-emulator-vip-inspector-group'>
+                <legend>
+                {nls.localize(
+                    'vuengine/emulator/panels/actorsCaption',
+                    'Actors currently allocated in the memory pools'
+                )}
+                </legend>
+                <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table ves-emulator-actors-table'>
+                    <thead>
+                        <tr>
+                            <th
+                                className='ves-emulator-actors-name'
+                                title={nls.localize(
+                                    'vuengine/emulator/panels/actorsSpecColumnHint',
+                                    'The spec this actor was built from, named as the project declares it.'
+                                )}
+                            >
+                                {nls.localize('vuengine/emulator/panels/actorsSpec', 'Spec')}
+                            </th>
+                            <th className='ves-emulator-actors-name'>
+                                {nls.localize('vuengine/emulator/panels/actorsClass', 'Class')}
+                            </th>
+                            <th title={nls.localize(
+                                'vuengine/emulator/panels/actorsIdHint', "The engine's own id for this instance"
+                            )}>
+                                {nls.localize('vuengine/emulator/panels/actorsId', 'Id')}
+                            </th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                            <th title={nls.localize(
+                                'vuengine/emulator/panels/actorsBlockHint', 'The pool block it occupies, in bytes'
+                            )}>
+                                {nls.localize('vuengine/emulator/panels/poolsBlock', 'Block')}
+                            </th>
+                            <th>{nls.localize('vuengine/emulator/panels/actorsAddress', 'Address')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {this.actors.map(actor => (
+                            <tr
+                                key={actor.objectAddress}
+                                // Hidden actors are still live and still cost a
+                                // block; dimming them says which are on screen.
+                                className={`${actor.hidden ? 'inactive' : ''}${
+                                    actor.objectAddress === selected.objectAddress ? ' selected' : ''}`}
+                                onClick={() => this.select(actor.objectAddress)}
+                            >
+                                <td className='ves-emulator-actors-name'>{this.specLabelOf(actor)}</td>
+                                <td className='ves-emulator-actors-name'>{actor.className}</td>
+                                <td>{actor.internalId ?? '—'}</td>
+                                {actor.position.map((value, axis) =>
+                                    <td key={axis}>{value ?? '—'}</td>
+                                )}
+                                <td>{actor.blockSize}</td>
+                                <td><code>{hex(actor.objectAddress, 8)}</code></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </fieldset>
         </div>;
     }
 

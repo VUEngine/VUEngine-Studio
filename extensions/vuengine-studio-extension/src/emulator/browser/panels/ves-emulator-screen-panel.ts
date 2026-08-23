@@ -21,8 +21,26 @@ export interface VesScreenRect {
     parallax: number;
 }
 
-/** Where the highlight is painted, over the picture rather than into it. */
+/**
+ * How a highlight is drawn, matching the outline the Worlds panel puts round a
+ * world's extents (`.ves-emulator-vip-canvas-extents`) — the two are the same
+ * mark and have to agree, but one is CSS and this one is drawn, so the colour
+ * is repeated by hand rather than shared.
+ *
+ * Green because the Virtual Boy's display is red: nothing underneath can be
+ * this colour, so the outline never disappears into the picture. Dashed for
+ * the same reason — a broken line reads as an annotation rather than as
+ * something the game drew. Three on, three off is what a CSS `dashed` border
+ * comes out as at this width, which is what the Worlds panel outlines a world
+ * with, so the two marks read alike.
+ *
+ * The widths are in the machine's own pixels, so they scale up with the
+ * picture and stay visible however large it is shown.
+ */
+const HIGHLIGHT_COLOR = 'rgb(0, 255, 0)';
+const HIGHLIGHT_FILL = 'rgba(0, 255, 0, 0.15)';
 const HIGHLIGHT_LINE_WIDTH = 1;
+const HIGHLIGHT_DASH = [3, 3];
 
 /**
  * The emulator's picture, in a panel of its own so it can be docked, resized
@@ -46,6 +64,10 @@ export class VesEmulatorScreenPanel extends BaseWidget {
      */
     protected overlayCanvas?: HTMLCanvasElement;
     protected highlights: VesScreenRect[] = [];
+    /** CSS pixels per machine pixel, i.e. how far the picture is scaled up. */
+    protected overlayScale = 1;
+    /** Device pixels per CSS pixel, so the outline is crisp on a HiDPI screen. */
+    protected overlayRatio = 1;
 
     protected displayMode: VbDisplayMode = VB_DEFAULT_DISPLAY_MODE;
     protected scale = 'auto';
@@ -54,7 +76,6 @@ export class VesEmulatorScreenPanel extends BaseWidget {
         super();
         this.id = `ves-emulator-panel:${instanceId}:${EmulatorPanelType.SCREEN}`;
         this.title.label = nls.localize('vuengine/emulator/panels/screen', 'Screen');
-        this.title.caption = this.title.label;
         this.title.closable = false;
         this.addClass('ves-emulator-screen-panel');
 
@@ -159,17 +180,29 @@ export class VesEmulatorScreenPanel extends BaseWidget {
         canvas.style.width = `${Math.floor(width * scale)}px`;
         canvas.style.height = `${Math.floor(height * scale)}px`;
 
-        // The overlay matches the picture exactly, in both the backing store
-        // it draws into and the size it is stretched to, so a rectangle in
-        // one lands on the same pixels in the other.
+        // The overlay covers the picture but is not drawn at its resolution:
+        // its backing store is the size it is actually displayed at, in device
+        // pixels. Drawn at the machine's own 384x224 it would be stretched by
+        // the same `image-rendering: pixelated` the picture wants, turning a
+        // one-pixel outline into a scaled-up staircase. At display resolution
+        // the outline is a real hairline, and the machine's pixels are scaled
+        // into place when drawing instead — see `overlayScale`.
         const overlay = this.overlayCanvas;
         if (overlay) {
-            if (overlay.width !== width || overlay.height !== height) {
-                overlay.width = width;
-                overlay.height = height;
+            const displayed = { width: Math.floor(width * scale), height: Math.floor(height * scale) };
+            const ratio = window.devicePixelRatio || 1;
+            const backing = {
+                width: Math.round(displayed.width * ratio),
+                height: Math.round(displayed.height * ratio),
+            };
+            if (overlay.width !== backing.width || overlay.height !== backing.height) {
+                overlay.width = backing.width;
+                overlay.height = backing.height;
             }
             overlay.style.width = canvas.style.width;
             overlay.style.height = canvas.style.height;
+            this.overlayScale = displayed.width / width;
+            this.overlayRatio = ratio;
             this.drawHighlights();
         }
     }
@@ -189,7 +222,11 @@ export class VesEmulatorScreenPanel extends BaseWidget {
         if (!overlay || !context) {
             return;
         }
-        context.clearRect(0, 0, overlay.width, overlay.height);
+        // Everything below is in CSS pixels: the transform absorbs the device
+        // ratio, so a one-unit line is one screen pixel however dense the
+        // display is, and the dash pattern is in those same units.
+        context.setTransform(this.overlayRatio, 0, 0, this.overlayRatio, 0, 0);
+        context.clearRect(0, 0, overlay.width / this.overlayRatio, overlay.height / this.overlayRatio);
         if (this.highlights.length === 0) {
             return;
         }
@@ -200,9 +237,10 @@ export class VesEmulatorScreenPanel extends BaseWidget {
         const showLeft = layout !== VbStereoLayout.OVERLAY || eyes !== VbEyes.RIGHT;
         const showRight = layout !== VbStereoLayout.OVERLAY || eyes !== VbEyes.LEFT;
 
-        context.strokeStyle = 'rgba(255, 64, 64, 0.9)';
-        context.fillStyle = 'rgba(255, 64, 64, 0.18)';
+        context.strokeStyle = HIGHLIGHT_COLOR;
+        context.fillStyle = HIGHLIGHT_FILL;
         context.lineWidth = HIGHLIGHT_LINE_WIDTH;
+        context.setLineDash(HIGHLIGHT_DASH);
 
         for (const rect of this.highlights) {
             if (showLeft) {
@@ -245,9 +283,20 @@ export class VesEmulatorScreenPanel extends BaseWidget {
                 break;
         }
 
-        // Half-pixel inset so a one-pixel stroke lands on the pixel rather
-        // than straddling the boundary between two.
-        context.fillRect(x, y, width, height);
-        context.strokeRect(x + 0.5, y + 0.5, Math.max(width - 1, 0), Math.max(height - 1, 0));
+        // From the machine's pixels into the ones actually on screen, which is
+        // what this canvas is sized in.
+        const left = x * this.overlayScale;
+        const top = y * this.overlayScale;
+        const across = width * this.overlayScale;
+        const down = height * this.overlayScale;
+
+        // The fill is not dashed — setLineDash only touches the stroke — so the
+        // wash is continuous under a broken outline.
+        context.fillRect(left, top, across, down);
+        // Half-pixel inset so a one-pixel stroke lands on a pixel rather than
+        // straddling the boundary between two, which is what would blur it.
+        context.strokeRect(
+            left + 0.5, top + 0.5, Math.max(across - 1, 0), Math.max(down - 1, 0)
+        );
     }
 }

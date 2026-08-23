@@ -186,8 +186,12 @@
 }
 
 /* Sits exactly over the picture rather than beside it in the flex row, and
-   never takes a click — the canvas below it is what the emulator listens on. */
+   never takes a click — the canvas below it is what the emulator listens on.
+   Unlike the picture it is drawn at the size it is shown at, so it wants the
+   normal smoothing rather than the nearest-neighbour scaling above, which
+   would turn its hairlines into staircases. */
 .ves-emulator-screen-overlay {
+  image-rendering: auto;
   pointer-events: none;
   position: absolute;
 }
@@ -377,15 +381,14 @@
 }
 
 .ves-emulator-memory-pools-usage {
+  min-width: 80px;
   width: 100%;
 }
 
-.ves-emulator-memory-pools-usage {
-  min-width: 140px;
-}
-
 td.ves-emulator-memory-pools-name,
-th.ves-emulator-memory-pools-name {
+th.ves-emulator-memory-pools-name,
+td.ves-emulator-memory-pools-usage,
+th.ves-emulator-memory-pools-usage {
   text-align: left;
 }
 
@@ -584,8 +587,14 @@ th.ves-emulator-memory-pools-name {
   position: absolute;
 }
 
+/* The same green the Actors panel marks the screen with — see HIGHLIGHT_COLOR
+   in ves-emulator-screen-panel.ts, which has to match this by hand since it is
+   drawn into a canvas rather than bordered by CSS. A colour the Virtual Boy
+   cannot itself display, so it never blends into the picture. The rhythm is
+   the browser's here and a set three-on-three-off there, chosen to come out
+   the same at this width. */
 .ves-emulator-vip-canvas-extents {
-  border: 1px dashed var(--theia-editorInfo-foreground);
+  border: 1px dashed rgb(0, 255, 0);
   box-sizing: border-box;
   position: absolute;
 }
@@ -594,6 +603,7 @@ th.ves-emulator-memory-pools-name {
   border-collapse: collapse;
   font-family: var(--theia-code-font-family);
   white-space: nowrap;
+  width: 100%;
 }
 
 .ves-emulator-vip-table th {
@@ -604,7 +614,12 @@ th.ves-emulator-memory-pools-name {
 
 .ves-emulator-vip-table th,
 .ves-emulator-vip-table td {
-  padding: 1px calc(var(--theia-ui-padding) * 1.5) 1px 0;
+  border-bottom: var(--theia-border-width) solid var(--theia-editorGroup-border);
+  padding: 1px var(--theia-ui-padding) 1px;
+}
+
+.ves-emulator-vip-table tr:last-child td {
+  border-bottom: none;
 }
 
 .ves-emulator-vip-table td {
@@ -1018,6 +1033,11 @@ th.ves-emulator-memory-pools-name {
   stroke-width: 1;
 }
 
+.ves-emulator-vsu-table th,
+.ves-emulator-vsu-table td {
+  text-align: left;
+}
+
 /* --- Rumble Pack ---------------------------------------------------------- */
 
 .ves-emulator-rumble-pack-status {
@@ -1054,15 +1074,6 @@ th.ves-emulator-memory-pools-name {
 
 .ves-emulator-rumble-pack-info td {
   font-family: var(--theia-code-font-family);
-}
-
-.ves-emulator-rumble-pack-heading {
-  align-items: center;
-  display: flex;
-  gap: var(--theia-ui-padding);
-  opacity: 0.7;
-  padding: calc(var(--theia-ui-padding) * 2) 0 var(--theia-ui-padding);
-  text-transform: uppercase;
 }
 
 .ves-emulator-rumble-pack-playing {

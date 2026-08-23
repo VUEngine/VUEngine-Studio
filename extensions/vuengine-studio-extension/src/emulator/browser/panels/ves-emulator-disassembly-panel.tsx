@@ -25,7 +25,6 @@ export class VesEmulatorDisassemblyPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.DISASSEMBLY, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/disassembly', 'Disassembly');
-        this.title.caption = this.title.label;
     }
 
     protected async refresh(): Promise<void> {

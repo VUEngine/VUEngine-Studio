@@ -86,7 +86,6 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_OBJECTS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/objects', 'Objects');
-        this.title.caption = nls.localize('vuengine/emulator/panels/objectsCaption', 'Object attribute memory');
         // Stacks the table above the detail view, each scrolling on its own,
         // which is why render returns them as siblings rather than wrapping
         // them: the widget's own node is the column they sit in.
@@ -289,55 +288,60 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                             this.update();
                         }}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/onlyVisible', 'Only visible')}
+                    {nls.localize('vuengine/emulator/panels/objects/onlyVisible', 'Only visible')}
                 </label>
             </div>
             <div className='ves-emulator-vip-split-table'>
-                <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Eyes</th>
-                            <th>JX</th>
-                            <th>JP</th>
-                            <th>JY</th>
-                            <th title={nls.localize('vuengine/emulator/panels/vip/character', 'Character')}>Char</th>
-                            <th>Pal</th>
-                            <th>Flip</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {shown.map(object => (
-                            <tr
-                                key={object.index}
-                                className={object.index === this.selected ? 'selected' : ''}
-                                title={hex(vipObjectAddress(object.index), 8)}
-                                onClick={() => this.selectObject(object.index)}
-                            >
-                                <td>{object.index}</td>
-                                <td>{`${object.lon ? 'L' : '-'}${object.ron ? 'R' : '-'}`}</td>
-                                <td>{object.jx}</td>
-                                <td>{object.jp}</td>
-                                <td>{object.jy}</td>
-                                <td>{object.char}</td>
-                                <td>JPLT{object.palette}</td>
-                                <td>{`${object.hFlip ? 'H' : '-'}${object.vFlip ? 'V' : '-'}`}</td>
+                <fieldset className='ves-emulator-vip-inspector-group'>
+                    <legend>
+                        Objects
+                    </legend>
+                    <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Eyes</th>
+                                <th>JX</th>
+                                <th>JP</th>
+                                <th>JY</th>
+                                <th title={nls.localize('vuengine/emulator/panels/objects/character', 'Character')}>Char</th>
+                                <th>Pal</th>
+                                <th>Flip</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {shown.map(object => (
+                                <tr
+                                    key={object.index}
+                                    className={object.index === this.selected ? 'selected' : ''}
+                                    title={hex(vipObjectAddress(object.index), 8)}
+                                    onClick={() => this.selectObject(object.index)}
+                                >
+                                    <td>{object.index}</td>
+                                    <td>{`${object.lon ? 'L' : '-'}${object.ron ? 'R' : '-'}`}</td>
+                                    <td>{object.jx}</td>
+                                    <td>{object.jp}</td>
+                                    <td>{object.jy}</td>
+                                    <td>{object.char}</td>
+                                    <td>JPLT{object.palette}</td>
+                                    <td>{`${object.hFlip ? 'H' : '-'}${object.vFlip ? 'V' : '-'}`}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </fieldset>
             </div>
             <div className='ves-emulator-vip-footer'>
                 {matching.length === 0
-                    ? nls.localize('vuengine/emulator/panels/vip/noObjects', 'No objects are being drawn.')
+                    ? nls.localize('vuengine/emulator/panels/objects/noObjects', 'No objects are being drawn.')
                     : shown.length < matching.length
                         ? nls.localize(
-                            'vuengine/emulator/panels/vip/objectsTruncated',
+                            'vuengine/emulator/panels/objects/objectsTruncated',
                             'Showing {0} of {1} objects.',
                             shown.length,
                             matching.length
                         )
-                        : nls.localize('vuengine/emulator/panels/vip/objectCount', '{0} objects.', matching.length)}
+                        : nls.localize('vuengine/emulator/panels/objects/objectCount', '{0} objects.', matching.length)}
             </div>
             {this.renderDetail(all[this.selected], registers)}
         </>;
@@ -360,14 +364,14 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
 
     protected renderObjectGroup(object: VipObject, registers: DataView): React.ReactNode {
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/object', 'Object')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/objects/object', 'Object')}</legend>
             <div className='ves-emulator-vip-detail-fields'>
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/index', 'Index'),
+                    nls.localize('vuengine/emulator/panels/objects/index', 'Index'),
                     numberInput(object.index, 0, VIP_OBJECT_COUNT - 1, value => this.selectObject(value))
                 )}
                 {field(
-                    nls.localize('vuengine/emulator/panels/vip/address', 'Address'),
+                    nls.localize('vuengine/emulator/panels/objects/address', 'Address'),
                     hex(vipObjectAddress(object.index), 8)
                 )}
             </div>
@@ -377,14 +381,14 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
 
     protected renderPropertiesGroup(object: VipObject): React.ReactNode {
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/properties', 'Properties')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/objects/properties', 'Properties')}</legend>
             <div className='ves-emulator-vip-detail-fields'>
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/character', 'Character'),
+                    nls.localize('vuengine/emulator/panels/objects/character', 'Character'),
                     numberInput(object.char, 0, VIP_CHAR_COUNT - 1, value => this.writeObject({ char: value }))
                 )}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/palette', 'Palette'),
+                    nls.localize('vuengine/emulator/panels/objects/palette', 'Palette'),
                     <select
                         className='theia-select'
                         value={object.palette}
@@ -406,7 +410,7 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                         checked={object.hFlip}
                         onChange={e => this.writeObject({ hFlip: e.target.checked })}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/hFlip', 'H-flip')}
+                    {nls.localize('vuengine/emulator/panels/objects/hFlip', 'H-flip')}
                 </label>
                 <label>
                     <input
@@ -414,7 +418,7 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                         checked={object.vFlip}
                         onChange={e => this.writeObject({ vFlip: e.target.checked })}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/vFlip', 'V-flip')}
+                    {nls.localize('vuengine/emulator/panels/objects/vFlip', 'V-flip')}
                 </label>
                 <label>
                     <input
@@ -422,7 +426,7 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                         checked={object.lon}
                         onChange={e => this.writeObject({ lon: e.target.checked })}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/left', 'Left')}
+                    {nls.localize('vuengine/emulator/panels/objects/left', 'Left')}
                 </label>
                 <label>
                     <input
@@ -430,7 +434,7 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                         checked={object.ron}
                         onChange={e => this.writeObject({ ron: e.target.checked })}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/right', 'Right')}
+                    {nls.localize('vuengine/emulator/panels/objects/right', 'Right')}
                 </label>
             </div>
         </fieldset>;
@@ -438,9 +442,9 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
 
     protected renderDisplayGroup(): React.ReactNode {
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/display', 'Display')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/objects/display', 'Display')}</legend>
             <label>
-                {nls.localize('vuengine/emulator/panels/vip/scale', 'Scale')}
+                {nls.localize('vuengine/emulator/panels/objects/scale', 'Scale')}
                 <input
                     type='range'
                     min={1}
@@ -451,10 +455,10 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                 <span className='hint'>{this.zoom}</span>
             </label>
             <label>
-                {nls.localize('vuengine/emulator/panels/vip/eye', 'Eye')}
+                {nls.localize('vuengine/emulator/panels/objects/eye', 'Eye')}
                 <select className='theia-select' value={this.eye} onChange={e => this.setEye(e.target.value as VipEye)}>
-                    <option value='left'>{nls.localize('vuengine/emulator/panels/vip/left', 'Left')}</option>
-                    <option value='right'>{nls.localize('vuengine/emulator/panels/vip/right', 'Right')}</option>
+                    <option value='left'>{nls.localize('vuengine/emulator/panels/objects/left', 'Left')}</option>
+                    <option value='right'>{nls.localize('vuengine/emulator/panels/objects/right', 'Right')}</option>
                 </select>
             </label>
             <label>
@@ -463,7 +467,7 @@ export class VesEmulatorVipObjectsPanel extends VesEmulatorPanel {
                     checked={this.showGenericPalette}
                     onChange={e => this.setShowGenericPalette(e.target.checked)}
                 />
-                {nls.localize('vuengine/emulator/panels/vip/genericPalette', 'Generic palette')}
+                {nls.localize('vuengine/emulator/panels/objects/genericPalette', 'Generic palette')}
             </label>
         </fieldset>;
     }

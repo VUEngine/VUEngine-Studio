@@ -101,7 +101,6 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_WORLDS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/worlds', 'Worlds');
-        this.title.caption = nls.localize('vuengine/emulator/panels/worldsCaption', 'World attribute memory');
         // Stacks the table above the detail view, each scrolling on its own,
         // which is why render returns the two as siblings rather than
         // wrapping them: the widget's own node is the column they sit in.
@@ -362,58 +361,63 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
 
         return <>
             <div className='ves-emulator-vip-split-table'>
-                <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th title={nls.localize('vuengine/emulator/panels/vip/headHint', 'Header register')}>Head</th>
-                            <th>Eyes</th>
-                            <th>Mode</th>
-                            <th title={nls.localize('vuengine/emulator/panels/vip/bgMapHint', 'Base BGMap segment')}>Map</th>
-                            <th title={nls.localize('vuengine/emulator/panels/vip/scHint', 'Segments across and down')}>Sc</th>
-                            <th>GX</th>
-                            <th>GP</th>
-                            <th>GY</th>
-                            <th>MX</th>
-                            <th>MP</th>
-                            <th>MY</th>
-                            <th title={nls.localize(
-                                'vuengine/emulator/panels/vip/sizeHint', 'Register value, which is size minus one'
-                            )}>W</th>
-                            <th title={nls.localize(
-                                'vuengine/emulator/panels/vip/sizeHint', 'Register value, which is size minus one'
-                            )}>H</th>
-                            <th>Flags</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {worlds.map(world => (
-                            <tr
-                                key={world.index}
-                                className={`${world.lon || world.ron ? '' : 'inactive'}${
-                                    world.index === this.selected ? ' selected' : ''}`}
-                                title={hex(vipWorldAddress(world.index), 8)}
-                                onClick={() => this.selectWorld(world.index)}
-                            >
-                                <td>{world.index}</td>
-                                <td><code>{hex(world.head, 4)}</code></td>
-                                <td>{`${world.lon ? 'L' : '-'}${world.ron ? 'R' : '-'}`}</td>
-                                <td>{VIP_WORLD_MODE_NAMES[world.mode]}</td>
-                                <td>{world.bgMap}</td>
-                                <td>{world.scx}&times;{world.scy}</td>
-                                <td>{world.gx}</td>
-                                <td>{world.gp}</td>
-                                <td>{world.gy}</td>
-                                <td>{world.mx}</td>
-                                <td>{world.mp}</td>
-                                <td>{world.my}</td>
-                                <td>{world.w}</td>
-                                <td>{world.h}</td>
-                                <td>{`${world.overplane ? 'OVR ' : ''}${world.end ? 'END' : ''}`}</td>
+                <fieldset className='ves-emulator-vip-inspector-group'>
+                    <legend>
+                        Worlds
+                    </legend>
+                    <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th title={nls.localize('vuengine/emulator/panels/worlds/headHint', 'Header register')}>Head</th>
+                                <th>Eyes</th>
+                                <th>Mode</th>
+                                <th title={nls.localize('vuengine/emulator/panels/worlds/bgMapHint', 'Base BGMap segment')}>Map</th>
+                                <th title={nls.localize('vuengine/emulator/panels/worlds/scHint', 'Segments across and down')}>Sc</th>
+                                <th>GX</th>
+                                <th>GP</th>
+                                <th>GY</th>
+                                <th>MX</th>
+                                <th>MP</th>
+                                <th>MY</th>
+                                <th title={nls.localize(
+                                    'vuengine/emulator/panels/worlds/sizeHint', 'Register value, which is size minus one'
+                                )}>W</th>
+                                <th title={nls.localize(
+                                    'vuengine/emulator/panels/worlds/sizeHint', 'Register value, which is size minus one'
+                                )}>H</th>
+                                <th>Flags</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {worlds.map(world => (
+                                <tr
+                                    key={world.index}
+                                    className={`${world.lon || world.ron ? '' : 'inactive'}${
+                                        world.index === this.selected ? ' selected' : ''}`}
+                                    title={hex(vipWorldAddress(world.index), 8)}
+                                    onClick={() => this.selectWorld(world.index)}
+                                >
+                                    <td>{world.index}</td>
+                                    <td><code>{hex(world.head, 4)}</code></td>
+                                    <td>{`${world.lon ? 'L' : '-'}${world.ron ? 'R' : '-'}`}</td>
+                                    <td>{VIP_WORLD_MODE_NAMES[world.mode]}</td>
+                                    <td>{world.bgMap}</td>
+                                    <td>{world.scx}&times;{world.scy}</td>
+                                    <td>{world.gx}</td>
+                                    <td>{world.gp}</td>
+                                    <td>{world.gy}</td>
+                                    <td>{world.mx}</td>
+                                    <td>{world.mp}</td>
+                                    <td>{world.my}</td>
+                                    <td>{world.w}</td>
+                                    <td>{world.h}</td>
+                                    <td>{`${world.overplane ? 'OVR ' : ''}${world.end ? 'END' : ''}`}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </fieldset>
             </div>
             {this.renderDetail(worlds[VIP_WORLD_COUNT - 1 - this.selected])}
         </>;
@@ -438,30 +442,30 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
 
     protected renderWorldGroup(world: VipWorld): React.ReactNode {
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/world', 'World')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/worlds/world', 'World')}</legend>
             <div className='ves-emulator-vip-detail-fields'>
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/index', 'Index'),
+                    nls.localize('vuengine/emulator/panels/worlds/index', 'Index'),
                     numberInput(world.index, 0, VIP_WORLD_COUNT - 1, value => this.selectWorld(value))
                 )}
                 {field(
-                    nls.localize('vuengine/emulator/panels/vip/address', 'Address'),
+                    nls.localize('vuengine/emulator/panels/worlds/address', 'Address'),
                     hex(vipWorldAddress(world.index), 8)
                 )}
                 {field(
                     'Head',
                     hex(world.head, 4),
-                    nls.localize('vuengine/emulator/panels/vip/headHint', 'Header register')
+                    nls.localize('vuengine/emulator/panels/worlds/headHint', 'Header register')
                 )}
             </div>
         </fieldset>;
     }
 
     protected renderPropertiesGroup(world: VipWorld): React.ReactNode {
-        const sizeHint = nls.localize('vuengine/emulator/panels/vip/sizeHint', 'Register value, which is size minus one');
-        const scHint = nls.localize('vuengine/emulator/panels/vip/scHint', 'Segments across and down');
+        const sizeHint = nls.localize('vuengine/emulator/panels/worlds/sizeHint', 'Register value, which is size minus one');
+        const scHint = nls.localize('vuengine/emulator/panels/worlds/scHint', 'Segments across and down');
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/properties', 'Properties')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/worlds/properties', 'Properties')}</legend>
             <div className='ves-emulator-vip-detail-fields'>
                 {control('Mode', <select
                     className='theia-select'
@@ -473,9 +477,9 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                     ))}
                 </select>)}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/map', 'Map'),
+                    nls.localize('vuengine/emulator/panels/worlds/map', 'Map'),
                     numberInput(world.bgMap, 0, 0x0f, value => this.writeHead({ bgMap: value })),
-                    nls.localize('vuengine/emulator/panels/vip/bgMapHint', 'Base BGMap segment')
+                    nls.localize('vuengine/emulator/panels/worlds/bgMapHint', 'Base BGMap segment')
                 )}
                 {control('Sc X', this.segmentCountInput(world.scx, value => this.writeHead({ scx: value })), scHint)}
                 {control('Sc Y', this.segmentCountInput(world.scy, value => this.writeHead({ scy: value })), scHint)}
@@ -488,36 +492,36 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                 {control('W', numberInput(world.w, 0, UNSIGNED_MAX, v => this.writeField(VipWorldField.W, v)), sizeHint)}
                 {control('H', numberInput(world.h, 0, UNSIGNED_MAX, v => this.writeField(VipWorldField.H, v)), sizeHint)}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/param', 'Param'),
+                    nls.localize('vuengine/emulator/panels/worlds/param', 'Param'),
                     numberInput(world.param, 0, UNSIGNED_MAX, v => this.writeField(VipWorldField.PARAM, v), PARAM_STEP),
-                    nls.localize('vuengine/emulator/panels/vip/paramHint', 'Register value, which is a halfword offset into BGMap memory')
+                    nls.localize('vuengine/emulator/panels/worlds/paramHint', 'Register value, which is a halfword offset into BGMap memory')
                 )}
                 {field(
-                    nls.localize('vuengine/emulator/panels/vip/paramAddress', 'Param address'),
+                    nls.localize('vuengine/emulator/panels/worlds/paramAddress', 'Param address'),
                     hex(vipParamTableAddress(world.param), 8),
-                    nls.localize('vuengine/emulator/panels/vip/paramAddressHint', 'Where the H-bias or Affine table the param register points at starts')
+                    nls.localize('vuengine/emulator/panels/worlds/paramAddressHint', 'Where the H-bias or Affine table the param register points at starts')
                 )}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/overplane', 'Overplane'),
+                    nls.localize('vuengine/emulator/panels/worlds/overplane', 'Overplane'),
                     numberInput(world.overplaneCell, 0, UNSIGNED_MAX, v => this.writeField(VipWorldField.OVERPLANE_CELL, v)),
-                    nls.localize('vuengine/emulator/panels/vip/overplaneHint', 'The cell drawn outside the map')
+                    nls.localize('vuengine/emulator/panels/worlds/overplaneHint', 'The cell drawn outside the map')
                 )}
             </div>
             <div className='ves-emulator-vip-detail-flags'>
                 <label>
                     <input type='checkbox' checked={world.lon} onChange={e => this.writeHead({ lon: e.target.checked })} />
-                    {nls.localize('vuengine/emulator/panels/vip/left', 'Left')}
+                    {nls.localize('vuengine/emulator/panels/worlds/left', 'Left')}
                 </label>
                 <label>
                     <input type='checkbox' checked={world.ron} onChange={e => this.writeHead({ ron: e.target.checked })} />
-                    {nls.localize('vuengine/emulator/panels/vip/right', 'Right')}
+                    {nls.localize('vuengine/emulator/panels/worlds/right', 'Right')}
                 </label>
-                <label title={nls.localize('vuengine/emulator/panels/vip/endHint', 'Drawing stops at this world')}>
+                <label title={nls.localize('vuengine/emulator/panels/worlds/endHint', 'Drawing stops at this world')}>
                     <input type='checkbox' checked={world.end} onChange={e => this.writeHead({ end: e.target.checked })} />
-                    {nls.localize('vuengine/emulator/panels/vip/end', 'End')}
+                    {nls.localize('vuengine/emulator/panels/worlds/end', 'End')}
                 </label>
                 <label title={nls.localize(
-                    'vuengine/emulator/panels/vip/overplaneFlagHint',
+                    'vuengine/emulator/panels/worlds/overplaneFlagHint',
                     'Draw the overplane outside the map instead of repeating it'
                 )}>
                     <input
@@ -525,7 +529,7 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                         checked={world.overplane}
                         onChange={e => this.writeHead({ overplane: e.target.checked })}
                     />
-                    {nls.localize('vuengine/emulator/panels/vip/overplane', 'Overplane')}
+                    {nls.localize('vuengine/emulator/panels/worlds/overplane', 'Overplane')}
                 </label>
             </div>
         </fieldset>;
@@ -544,20 +548,20 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
         const entry = vipHBiasRow(this.params(), row);
         const address = vipParamTableAddress(world.param) + row * VIP_HBIAS_ENTRY_BYTES;
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/hbias', 'H-bias')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/worlds/hbias', 'H-bias')}</legend>
             <div className='ves-emulator-vip-detail-fields'>
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/index', 'Index'),
+                    nls.localize('vuengine/emulator/panels/worlds/index', 'Index'),
                     numberInput(row, 0, Math.max(0, rows - 1), value => { this.hbiasRow = value; this.update(); }),
-                    nls.localize('vuengine/emulator/panels/vip/hbiasRowHint', 'Which row of the table to show; there is one per row of the world')
+                    nls.localize('vuengine/emulator/panels/worlds/hbiasRowHint', 'Which row of the table to show; there is one per row of the world')
                 )}
-                {field(nls.localize('vuengine/emulator/panels/vip/address', 'Address'), hex(address, 8))}
+                {field(nls.localize('vuengine/emulator/panels/worlds/address', 'Address'), hex(address, 8))}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/left', 'Left'),
+                    nls.localize('vuengine/emulator/panels/worlds/left', 'Left'),
                     numberInput(entry?.left ?? 0, SIGNED_MIN, SIGNED_MAX, value => this.writeHBias(world, row, 'left', value))
                 )}
                 {control(
-                    nls.localize('vuengine/emulator/panels/vip/right', 'Right'),
+                    nls.localize('vuengine/emulator/panels/worlds/right', 'Right'),
                     numberInput(entry?.right ?? 0, SIGNED_MIN, SIGNED_MAX, value => this.writeHBias(world, row, 'right', value))
                 )}
             </div>
@@ -566,9 +570,9 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
 
     protected renderDisplayGroup(): React.ReactNode {
         return <fieldset className='ves-emulator-vip-inspector-group'>
-            <legend>{nls.localize('vuengine/emulator/panels/vip/display', 'Display')}</legend>
+            <legend>{nls.localize('vuengine/emulator/panels/worlds/display', 'Display')}</legend>
             <label>
-                {nls.localize('vuengine/emulator/panels/vip/scale', 'Scale')}
+                {nls.localize('vuengine/emulator/panels/worlds/scale', 'Scale')}
                 <input
                     type='range'
                     min={1}
@@ -578,14 +582,14 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                 />
             </label>
             <label>
-                {nls.localize('vuengine/emulator/panels/vip/eye', 'Eye')}
+                {nls.localize('vuengine/emulator/panels/worlds/eye', 'Eye')}
                 <RadioSelect
                     options={[{
                         value: 'left',
-                        label: nls.localize('vuengine/emulator/panels/vip/left', 'Left'),
+                        label: nls.localize('vuengine/emulator/panels/worlds/left', 'Left'),
                     }, {
                         value: 'right',
-                        label: nls.localize('vuengine/emulator/panels/vip/right', 'Right'),
+                        label: nls.localize('vuengine/emulator/panels/worlds/right', 'Right'),
                     }]}
                     defaultValue={this.eye}
                     onChange={options => this.setEye(options[0].value as VipEye)}
@@ -597,7 +601,7 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                     checked={this.showGenericPalette}
                     onChange={e => this.setShowGenericPalette(e.target.checked)}
                 />
-                {nls.localize('vuengine/emulator/panels/vip/genericPalette', 'Generic palette')}
+                {nls.localize('vuengine/emulator/panels/worlds/genericPalette', 'Generic palette')}
             </label>
             <label>
                 <input
@@ -605,7 +609,7 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
                     checked={this.showExtents}
                     onChange={e => { this.showExtents = e.target.checked; this.update(); }}
                 />
-                {nls.localize('vuengine/emulator/panels/vip/showExtents', 'Show extents')}
+                {nls.localize('vuengine/emulator/panels/worlds/showExtents', 'Show extents')}
             </label>
         </fieldset>;
     }
@@ -623,7 +627,7 @@ export class VesEmulatorVipWorldsPanel extends VesEmulatorPanel {
             {world.mode === VipWorldMode.OBJECT &&
                 <div className='ves-emulator-vip-footer'>
                     {nls.localize(
-                        'vuengine/emulator/panels/vip/objectWorld',
+                        'vuengine/emulator/panels/worlds/objectWorld',
                         'An Object world draws objects from OAM, which the Objects panel lists.'
                     )}
                 </div>

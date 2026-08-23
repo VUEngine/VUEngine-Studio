@@ -70,7 +70,6 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_BGMAPS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/bgMaps', 'BGMaps');
-        this.title.caption = nls.localize('vuengine/emulator/panels/bgMapsCaption', 'Background map memory');
         // Stacks the segment table above the inspector, which is why this
         // panel's render returns the two as siblings rather than wrapping
         // them: the widget's own node is the column they sit in.
@@ -240,35 +239,40 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
         const uses = vipBgMapSegmentUses(worlds);
 
         return <div className='ves-emulator-vip-split-table'>
-            <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>{nls.localize('vuengine/emulator/panels/vip/address', 'Address')}</th>
-                        <th title={nls.localize(
-                            'vuengine/emulator/panels/vip/segmentWorldsHint', 'Worlds whose map this segment is part of'
-                        )}>{nls.localize('vuengine/emulator/panels/worlds', 'Worlds')}</th>
-                        <th title={nls.localize(
-                            'vuengine/emulator/panels/vip/segmentParamsHint', 'Worlds whose param table this segment holds'
-                        )}>{nls.localize('vuengine/emulator/panels/vip/params', 'Params')}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {uses.map((use, segment) => (
-                        <tr
-                            key={segment}
-                            className={`${use.worlds.length || use.params.length ? '' : 'inactive'}${
-                                segment === this.segment ? ' selected' : ''}`}
-                            onClick={() => this.setSegment(segment)}
-                        >
-                            <td>{segment}</td>
-                            <td><code>{hex(vipBgMapAddress(segment), 8)}</code></td>
-                            <td>{use.worlds.join(', ') || '—'}</td>
-                            <td>{use.params.join(', ') || '—'}</td>
+            <fieldset className='ves-emulator-vip-inspector-group'>
+                <legend>
+                    {nls.localize('vuengine/emulator/panels/bgMapsCaption', 'Background Maps')}
+                </legend>
+                <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table'>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{nls.localize('vuengine/emulator/panels/bgmaps/address', 'Address')}</th>
+                            <th title={nls.localize(
+                                'vuengine/emulator/panels/bgmaps/segmentWorldsHint', 'Worlds whose map this segment is part of'
+                            )}>{nls.localize('vuengine/emulator/panels/worlds', 'Worlds')}</th>
+                            <th title={nls.localize(
+                                'vuengine/emulator/panels/bgmaps/segmentParamsHint', 'Worlds whose param table this segment holds'
+                            )}>{nls.localize('vuengine/emulator/panels/bgmaps/params', 'Params')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {uses.map((use, segment) => (
+                            <tr
+                                key={segment}
+                                className={`${use.worlds.length || use.params.length ? '' : 'inactive'}${
+                                    segment === this.segment ? ' selected' : ''}`}
+                                onClick={() => this.setSegment(segment)}
+                            >
+                                <td>{segment}</td>
+                                <td><code>{hex(vipBgMapAddress(segment), 8)}</code></td>
+                                <td>{use.worlds.join(', ') || '—'}</td>
+                                <td>{use.params.join(', ') || '—'}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </fieldset>
         </div>;
     }
 
@@ -299,7 +303,7 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
         }
         if (!this.image || !this.cells) {
             return <div className='ves-emulator-panel-empty'>
-                {nls.localize('vuengine/emulator/panels/vip/reading', 'Reading VIP memory…')}
+                {nls.localize('vuengine/emulator/panels/bgmaps/reading', 'Reading VIP memory…')}
             </div>;
         }
 
@@ -318,39 +322,45 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
             {this.renderSegmentTable()}
             <div className='ves-emulator-vip-inspector'>
                 <div className='ves-emulator-vip-inspector-sidebar'>
-                    <div className='ves-emulator-vip-inspector-field'>
-                        <label>{nls.localize('vuengine/emulator/panels/vip/map', 'Map')}</label>
-                        <input
-                            type='number'
-                            className='theia-input'
-                            min={0}
-                            max={VIP_BGMAP_COUNT - 1}
-                            value={this.segment}
-                            onChange={e => this.setSegment(parseInt(e.target.value, 10))}
-                        />
-                    </div>
-                    <div className='ves-emulator-vip-inspector-field'>
-                        <label>{nls.localize('vuengine/emulator/panels/vip/cell', 'Cell')}</label>
-                        <input
-                            type='number'
-                            className='theia-input'
-                            min={0}
-                            max={VIP_BGMAP_CELLS * VIP_BGMAP_CELLS - 1}
-                            value={selected}
-                            onChange={e => this.selectCell(parseInt(e.target.value, 10))}
-                        />
-                    </div>
-                    <div className='ves-emulator-vip-inspector-field'>
-                        <label>{nls.localize('vuengine/emulator/panels/vip/address', 'Address')}</label>
-                        <input className='theia-input' readOnly value={hex(address, 8)} />
-                    </div>
-
-                    <VipCanvas image={preview} zoom={PREVIEW_ZOOM} />
+                    <fieldset className='ves-emulator-vip-inspector-group'>
+                        <legend>{nls.localize('vuengine/emulator/panels/bgmaps/selected', 'Selected')}</legend>
+                        <div className='ves-emulator-vip-inspector-field'>
+                            <label>{nls.localize('vuengine/emulator/panels/bgmaps/map', 'Map')}</label>
+                            <input
+                                type='number'
+                                className='theia-input'
+                                min={0}
+                                max={VIP_BGMAP_COUNT - 1}
+                                value={this.segment}
+                                onChange={e => this.setSegment(parseInt(e.target.value, 10))}
+                            />
+                        </div>
+                        <div className='ves-emulator-vip-inspector-field'>
+                            <label>{nls.localize('vuengine/emulator/panels/bgmaps/cell', 'Cell')}</label>
+                            <input
+                                type='number'
+                                className='theia-input'
+                                min={0}
+                                max={VIP_BGMAP_CELLS * VIP_BGMAP_CELLS - 1}
+                                value={selected}
+                                onChange={e => this.selectCell(parseInt(e.target.value, 10))}
+                            />
+                        </div>
+                        <div className='ves-emulator-vip-inspector-field'>
+                            <label>{nls.localize('vuengine/emulator/panels/bgmaps/address', 'Address')}</label>
+                            <input className='theia-input' readOnly value={hex(address, 8)} />
+                        </div>
+                    </fieldset>
 
                     <fieldset className='ves-emulator-vip-inspector-group'>
-                        <legend>{nls.localize('vuengine/emulator/panels/vip/cell', 'Cell')}</legend>
+                        <legend>{nls.localize('vuengine/emulator/panels/bgmaps/character', 'Character')}</legend>
+                        <VipCanvas image={preview} zoom={PREVIEW_ZOOM} />
+                    </fieldset>
+
+                    <fieldset className='ves-emulator-vip-inspector-group'>
+                        <legend>{nls.localize('vuengine/emulator/panels/bgmaps/cell', 'Cell')}</legend>
                         <label>
-                            {nls.localize('vuengine/emulator/panels/vip/character', 'Character')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/character', 'Character')}
                             <input
                                 type='number'
                                 className='theia-input'
@@ -366,7 +376,7 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
                             />
                         </label>
                         <label>
-                            {nls.localize('vuengine/emulator/panels/vip/palette', 'Palette')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/palette', 'Palette')}
                             <select
                                 className='theia-select'
                                 value={cell.palette}
@@ -383,7 +393,7 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
                                 checked={cell.hFlip}
                                 onChange={e => this.writeCell({ hFlip: e.target.checked })}
                             />
-                            {nls.localize('vuengine/emulator/panels/vip/horizontalFlip', 'Horizontal Flip')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/horizontalFlip', 'Horizontal Flip')}
                         </label>
                         <label>
                             <input
@@ -391,14 +401,14 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
                                 checked={cell.vFlip}
                                 onChange={e => this.writeCell({ vFlip: e.target.checked })}
                             />
-                            {nls.localize('vuengine/emulator/panels/vip/verticalFlip', 'Vertical Flip')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/verticalFlip', 'Vertical Flip')}
                         </label>
                     </fieldset>
 
                     <fieldset className='ves-emulator-vip-inspector-group'>
-                        <legend>{nls.localize('vuengine/emulator/panels/vip/display', 'Display')}</legend>
+                        <legend>{nls.localize('vuengine/emulator/panels/bgmaps/display', 'Display')}</legend>
                         <label>
-                            {nls.localize('vuengine/emulator/panels/vip/scale', 'Scale')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/scale', 'Scale')}
                             <input
                                 type='range'
                                 min={1}
@@ -414,7 +424,7 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
                                 checked={this.showGrid}
                                 onChange={e => { this.showGrid = e.target.checked; this.update(); }}
                             />
-                            {nls.localize('vuengine/emulator/panels/vip/showGrid', 'Show grid')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/showGrid', 'Show grid')}
                         </label>
                         <label>
                             <input
@@ -422,7 +432,7 @@ export class VesEmulatorVipBgMapsPanel extends VesEmulatorPanel {
                                 checked={this.showGenericPalette}
                                 onChange={e => this.setShowGenericPalette(e.target.checked)}
                             />
-                            {nls.localize('vuengine/emulator/panels/vip/genericPalette', 'Generic palette')}
+                            {nls.localize('vuengine/emulator/panels/bgmaps/genericPalette', 'Generic palette')}
                         </label>
                     </fieldset>
                 </div>

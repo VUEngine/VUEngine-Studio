@@ -49,7 +49,6 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_FRAME_BUFFERS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/frameBuffers', 'Frame Buffers');
-        this.title.caption = nls.localize('vuengine/emulator/panels/frameBuffersCaption', 'Left/right frame buffer memory');
     }
 
     protected pollHz(): number {
@@ -149,14 +148,14 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
         }
         if (!this.image) {
             return <div className='ves-emulator-panel-empty'>
-                {nls.localize('vuengine/emulator/panels/vip/reading', 'Reading VIP memory…')}
+                {nls.localize('vuengine/emulator/panels/framebuffers/reading', 'Reading VIP memory…')}
             </div>;
         }
 
         return <div className='ves-emulator-vip-inspector'>
             <div className='ves-emulator-vip-inspector-sidebar'>
                 <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/index', 'Index')}</label>
+                    <label>{nls.localize('vuengine/emulator/panels/framebuffers/index', 'Index')}</label>
                     <RadioSelect
                         options={[{
                             value: 0,
@@ -171,7 +170,7 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                     />
                 </div>
                 <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/left', 'Left')}</label>
+                    <label>{nls.localize('vuengine/emulator/panels/framebuffers/left', 'Left')}</label>
                     <input
                         className='theia-input'
                         readOnly
@@ -179,7 +178,7 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                     />
                 </div>
                 <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/right', 'Right')}</label>
+                    <label>{nls.localize('vuengine/emulator/panels/framebuffers/right', 'Right')}</label>
                     <input
                         className='theia-input'
                         readOnly
@@ -188,9 +187,9 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                 </div>
 
                 <fieldset className='ves-emulator-vip-inspector-group'>
-                    <legend>{nls.localize('vuengine/emulator/panels/vip/display', 'Display')}</legend>
+                    <legend>{nls.localize('vuengine/emulator/panels/framebuffers/display', 'Display')}</legend>
                     <label>
-                        {nls.localize('vuengine/emulator/panels/vip/scale', 'Scale')}
+                        {nls.localize('vuengine/emulator/panels/framebuffers/scale', 'Scale')}
                         <input
                             type='range'
                             min={1}
@@ -206,7 +205,7 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                             checked={this.showLeft}
                             onChange={e => { this.showLeft = e.target.checked; this.dirty = true; this.refresh(); }}
                         />
-                        {nls.localize('vuengine/emulator/panels/vip/left', 'Left')}
+                        {nls.localize('vuengine/emulator/panels/framebuffers/left', 'Left')}
                     </label>
                     <label>
                         <input
@@ -214,7 +213,7 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                             checked={this.showRight}
                             onChange={e => { this.showRight = e.target.checked; this.dirty = true; this.refresh(); }}
                         />
-                        {nls.localize('vuengine/emulator/panels/vip/right', 'Right')}
+                        {nls.localize('vuengine/emulator/panels/framebuffers/right', 'Right')}
                     </label>
                     <label>
                         <input
@@ -222,7 +221,7 @@ export class VesEmulatorVipFrameBuffersPanel extends VesEmulatorPanel {
                             checked={this.showGenericColors}
                             onChange={e => { this.showGenericColors = e.target.checked; this.dirty = true; this.refresh(); }}
                         />
-                        {nls.localize('vuengine/emulator/panels/vip/genericColors', 'Generic colors')}
+                        {nls.localize('vuengine/emulator/panels/framebuffers/genericColors', 'Generic colors')}
                     </label>
                 </fieldset>
             </div>

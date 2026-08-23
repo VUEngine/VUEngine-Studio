@@ -37,7 +37,6 @@ export class VesEmulatorRumblePackPanel extends VesEmulatorPanel {
     ) {
         super(EmulatorPanelType.RUMBLE_PACK, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/rumblePack', 'Rumble Pack');
-        this.title.caption = nls.localize('vuengine/emulator/panels/rumblePackCaption', 'Rumble Pack connection');
     }
 
     protected onAfterAttach(msg: Message): void {
@@ -97,59 +96,64 @@ export class VesEmulatorRumblePackPanel extends VesEmulatorPanel {
                 {port
                     ? <>
                         <i className='codicon codicon-pass-filled' />
-                        {nls.localize('vuengine/emulator/panels/rumblePackConnected', 'Rumble Pack connected')}
+                        {nls.localize('vuengine/emulator/panels/rumblePack/connected', 'Rumble Pack connected')}
                     </>
                     : <>
                         <i className='codicon codicon-circle-slash' />
-                        {nls.localize('vuengine/emulator/panels/rumblePackNotConnected', 'No Rumble Pack connected')}
+                        {nls.localize('vuengine/emulator/panels/rumblePack/notConnected', 'No Rumble Pack connected')}
                         <button
                             className='theia-button secondary'
                             onClick={() => this.detect()}
                             disabled={this.detecting}
                         >
                             {this.detecting
-                                ? nls.localize('vuengine/emulator/panels/rumblePackDetecting', 'Searching...')
-                                : nls.localize('vuengine/emulator/panels/rumblePackDetect', 'Detect')}
+                                ? nls.localize('vuengine/emulator/panels/rumblePack/detecting', 'Searching...')
+                                : nls.localize('vuengine/emulator/panels/rumblePack/detect', 'Detect')}
                         </button>
                     </>}
             </div>
             {this.error && <div className='ves-emulator-rumble-pack-error'>{this.error}</div>}
-            <table className='ves-emulator-rumble-pack-info'>
-                <tbody>
-                    {info && <>
+            <fieldset className='ves-emulator-vip-inspector-group'>
+                <legend>
+                    {nls.localize('vuengine/emulator/panels/rumblePack/status', 'Status')}
+                </legend>
+                <table className='ves-emulator-rumble-pack-info'>
+                    <tbody>
+                        {info && <>
+                            <tr>
+                                <th>{nls.localize('vuengine/emulator/panels/rumblePack/board', 'Board')}</th>
+                                <td>{name ?? nls.localize('vuengine/emulator/panels/rumblePack/unknownBoard', 'Unknown')}</td>
+                            </tr>
+                            <tr>
+                                <th>{nls.localize('vuengine/emulator/panels/rumblePack/vendorId', 'Vendor ID')}</th>
+                                <td><code>{usbId(info.usbVendorId)}</code></td>
+                            </tr>
+                            <tr>
+                                <th>{nls.localize('vuengine/emulator/panels/rumblePack/productId', 'Product ID')}</th>
+                                <td><code>{usbId(info.usbProductId)}</code></td>
+                            </tr>
+                        </>}
                         <tr>
-                            <th>{nls.localize('vuengine/emulator/panels/rumblePackBoard', 'Board')}</th>
-                            <td>{name ?? nls.localize('vuengine/emulator/panels/rumblePackUnknownBoard', 'Unknown')}</td>
+                            <th>{nls.localize('vuengine/emulator/panels/rumblePack/forwarding', 'Link port')}</th>
+                            <td>{this.rumblePackService.emulatorForwarding
+                                ? nls.localize('vuengine/emulator/panels/rumblePack/forwardingOn', 'Forwarding from the emulator')
+                                : nls.localize('vuengine/emulator/panels/rumblePack/forwardingOff', 'Not forwarding')}</td>
                         </tr>
                         <tr>
-                            <th>{nls.localize('vuengine/emulator/panels/rumblePackVendorId', 'Vendor ID')}</th>
-                            <td><code>{usbId(info.usbVendorId)}</code></td>
+                            {/* Nothing is sent anywhere with no pack attached, but the
+                                bytes are still read off the link port and decoded. */}
+                            <th>{port
+                                ? nls.localize('vuengine/emulator/panels/rumblePack/bytes', 'Bytes sent')
+                                : nls.localize('vuengine/emulator/panels/rumblePack/bytesCaptured', 'Bytes captured')}</th>
+                            <td><code>{this.rumblePackService.emulatedByteCount}</code></td>
                         </tr>
-                        <tr>
-                            <th>{nls.localize('vuengine/emulator/panels/rumblePackProductId', 'Product ID')}</th>
-                            <td><code>{usbId(info.usbProductId)}</code></td>
-                        </tr>
-                    </>}
-                    <tr>
-                        <th>{nls.localize('vuengine/emulator/panels/rumblePackForwarding', 'Link port')}</th>
-                        <td>{this.rumblePackService.emulatorForwarding
-                            ? nls.localize('vuengine/emulator/panels/rumblePackForwardingOn', 'Forwarding from the emulator')
-                            : nls.localize('vuengine/emulator/panels/rumblePackForwardingOff', 'Not forwarding')}</td>
-                    </tr>
-                    <tr>
-                        {/* Nothing is sent anywhere with no pack attached, but the
-                            bytes are still read off the link port and decoded. */}
-                        <th>{port
-                            ? nls.localize('vuengine/emulator/panels/rumblePackBytes', 'Bytes sent')
-                            : nls.localize('vuengine/emulator/panels/rumblePackBytesCaptured', 'Bytes captured')}</th>
-                        <td><code>{this.rumblePackService.emulatedByteCount}</code></td>
-                    </tr>
-                    {port && <tr>
-                        <th>{nls.localize('vuengine/emulator/panels/rumblePackLastReply', 'Last reply')}</th>
-                        <td><code>{lastReply ?? '—'}</code></td>
-                    </tr>}
-                </tbody>
-            </table>
+                        {port && <tr>
+                            <th>{nls.localize('vuengine/emulator/panels/rumblePack/lastReply', 'Last reply')}</th>
+                            <td><code>{lastReply ?? '—'}</code></td>
+                        </tr>}
+                    </tbody>
+                </table>
+            </fieldset>
 
             {this.renderEffect(rumbleState)}
             {this.renderCommands(commands)}
@@ -169,12 +173,12 @@ export class VesEmulatorRumblePackPanel extends VesEmulatorPanel {
         const spec = this.rumblePackService.emulatedSpec;
         const rows: [string, string][] = [
             [
-                nls.localize('vuengine/emulator/panels/rumblePackSpec', 'Spec'),
+                nls.localize('vuengine/emulator/panels/rumblePack/spec', 'Spec'),
                 // No spec at all is the engine's own "nothing is playing"; one
                 // without a name is an effect whose spec could not be named.
                 spec
                     ? spec.name ?? nls.localize(
-                        'vuengine/emulator/panels/rumblePackUnnamedSpec',
+                        'vuengine/emulator/panels/rumblePack/unnamedSpec',
                         'Unnamed, at {0}',
                         `0x${spec.address.toString(16).toUpperCase().padStart(8, '0')}`
                     )
@@ -206,50 +210,54 @@ export class VesEmulatorRumblePackPanel extends VesEmulatorPanel {
             ],
         ];
 
-        return <>
-            <div className='ves-emulator-rumble-pack-heading'>
-                {nls.localize('vuengine/emulator/panels/rumblePackEffect', 'Last Effect')}
-                {state.playing !== undefined && <span className='ves-emulator-rumble-pack-playing'>
-                    {state.playing
-                        ? nls.localize('vuengine/emulator/panels/rumblePackEffectPlaying', 'Playing')
-                        : nls.localize('vuengine/emulator/panels/rumblePackEffectStopped', 'Stopped')}
-                </span>}
-            </div>
-            <table className='ves-emulator-rumble-pack-info'>
-                <tbody>
-                    {rows.map(([label, value]) => <tr key={label}>
-                        <th>{label}</th>
-                        <td>{value}</td>
-                    </tr>)}
-                </tbody>
-            </table>
-        </>;
+        return (
+            <fieldset className='ves-emulator-vip-inspector-group'>
+                <legend>
+                    {nls.localize('vuengine/emulator/panels/rumblePack/effect', 'Last Effect')}
+                    {state.playing !== undefined && <span className='ves-emulator-rumble-pack-playing'>
+                        {state.playing
+                            ? nls.localize('vuengine/emulator/panels/rumblePack/effectPlaying', 'Playing')
+                            : nls.localize('vuengine/emulator/panels/rumblePack/effectStopped', 'Stopped')}
+                    </span>}
+                </legend>
+                <table className='ves-emulator-rumble-pack-info'>
+                    <tbody>
+                        {rows.map(([label, value]) => <tr key={label}>
+                            <th>{label}</th>
+                            <td>{value}</td>
+                        </tr>)}
+                    </tbody>
+                </table>
+            </fieldset>
+        );
     }
 
     /** The forwarded bytes mapped back to what each of them asked for. */
     protected renderCommands(commands: RumbleCommand[]): React.ReactNode {
-        return <>
-            <div className='ves-emulator-rumble-pack-heading'>
-                {nls.localize('vuengine/emulator/panels/rumblePackCommands', 'Last commands')}
-            </div>
-            {commands.length === 0 && <div className='ves-emulator-panel-empty'>
-                {this.source.sim
-                    ? nls.localize(
-                        'vuengine/emulator/panels/rumblePackNoCommands',
-                        'Nothing broadcast yet.'
-                    )
-                    : nls.localize('vuengine/emulator/panels/notRunning', 'The emulator is not running.')}
-            </div>}
-            <div className='ves-emulator-rumble-pack-commands'>
-                {commands.map((command, index) => <div
-                    key={index}
-                    className={command.unknown ? 'unknown' : undefined}
-                >
-                    <code>{command.bytes.map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' ')}</code>
-                    <span>{command.label}</span>
-                </div>)}
-            </div>
-        </>;
+        return (
+            <fieldset className='ves-emulator-vip-inspector-group'>
+                <legend>
+                    {nls.localize('vuengine/emulator/panels/rumblePack/commands', 'Last commands')}
+                </legend>
+                {commands.length === 0 && <div className='ves-emulator-panel-empty'>
+                    {this.source.sim
+                        ? nls.localize(
+                            'vuengine/emulator/panels/rumblePack/noCommands',
+                            'Nothing broadcast yet.'
+                        )
+                        : nls.localize('vuengine/emulator/panels/notRunning', 'The emulator is not running.')}
+                </div>}
+                <div className='ves-emulator-rumble-pack-commands'>
+                    {commands.map((command, index) => <div
+                        key={index}
+                        className={command.unknown ? 'unknown' : undefined}
+                    >
+                        <code>{command.bytes.map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' ')}</code>
+                        <span>{command.label}</span>
+                    </div>)}
+                </div>
+            </fieldset>
+        );
     }
 }
 

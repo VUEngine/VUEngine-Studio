@@ -63,7 +63,6 @@ export class VesEmulatorVsuPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VSU, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/vsu', 'VSU');
-        this.title.caption = nls.localize('vuengine/emulator/panels/vsuCaption', 'Virtual Sound Unit channels');
     }
 
     protected onAfterHide(msg: Message): void {
@@ -142,7 +141,7 @@ export class VesEmulatorVsuPanel extends VesEmulatorPanel {
         }
 
         return <div className='ves-emulator-vip'>
-            <table className='ves-emulator-vip-table'>
+            <table className='ves-emulator-vip-table ves-emulator-vsu-table'>
                 <thead>
                     <tr>
                         <th>#</th>

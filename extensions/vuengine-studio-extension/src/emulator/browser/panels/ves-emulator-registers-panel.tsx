@@ -115,6 +115,8 @@ const SYSTEM_REGISTER_LABELS: Record<string, string> = {
 };
 
 const PROGRAM_REGISTERS_PER_COLUMN = 16;
+/** Ten of them, so this splits the list evenly in two. */
+const SYSTEM_REGISTERS_PER_COLUMN = 5;
 
 /**
  * The VIP's control registers, and the V810's below them.
@@ -137,9 +139,6 @@ export class VesEmulatorRegistersPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.REGISTERS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/registers', 'Registers');
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/registersCaption', 'CPU and VIP control registers'
-        );
     }
 
     protected async refresh(): Promise<void> {
@@ -211,12 +210,14 @@ export class VesEmulatorRegistersPanel extends VesEmulatorPanel {
     }
 
     protected renderCpu(registers: VesVbRegisters): React.ReactNode {
-        const columns = [];
-        for (let first = 0; first < registers.program.length; first += PROGRAM_REGISTERS_PER_COLUMN) {
-            columns.push(registers.program.slice(first, first + PROGRAM_REGISTERS_PER_COLUMN).map(
-                (value, offset) => ({ index: first + offset, value })
-            ));
-        }
+        const programColumns = inColumns(
+            registers.program.map((value, index) => ({ index, value })),
+            PROGRAM_REGISTERS_PER_COLUMN
+        );
+        const systemColumns = inColumns(
+            Object.entries(registers.system),
+            SYSTEM_REGISTERS_PER_COLUMN
+        );
 
         return <fieldset className='ves-emulator-vip-inspector-group'>
             <legend>CPU</legend>
@@ -228,7 +229,7 @@ export class VesEmulatorRegistersPanel extends VesEmulatorPanel {
                 <div className='ves-emulator-vip-group'>
                     <h4>{nls.localize('vuengine/emulator/panels/programRegisters', 'Program')}</h4>
                     <div className='ves-emulator-vip-groups'>
-                        {columns.map(column => (
+                        {programColumns.map(column => (
                             <table key={column[0].index}>
                                 <tbody>
                                     {column.map(({ index, value }) => (
@@ -245,19 +246,36 @@ export class VesEmulatorRegistersPanel extends VesEmulatorPanel {
                 </div>
                 <div className='ves-emulator-vip-group'>
                     <h4>{nls.localize('vuengine/emulator/panels/systemRegisters', 'System')}</h4>
-                    <table>
-                        <tbody>
-                            {Object.entries(registers.system).map(([name, value]) => (
-                                <tr key={name}>
-                                    <th title={SYSTEM_REGISTER_LABELS[name]}>{name}</th>
-                                    <td><code>{hex(value, 8)}</code></td>
-                                    <td className='hint'>{SYSTEM_REGISTER_LABELS[name] ?? ''}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div className='ves-emulator-vip-groups'>
+                        {systemColumns.map(column => (
+                            <table key={column[0][0]}>
+                                <tbody>
+                                    {column.map(([name, value]) => (
+                                        <tr key={name}>
+                                            <th title={SYSTEM_REGISTER_LABELS[name]}>{name}</th>
+                                            <td><code>{hex(value, 8)}</code></td>
+                                            <td className='hint'>{SYSTEM_REGISTER_LABELS[name] ?? ''}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ))}
+                    </div>
                 </div>
             </div>
         </fieldset>;
     }
+}
+
+/**
+ * Deal a list into columns of at most `perColumn`, in reading order down each
+ * column in turn — which is how both register lists are laid out, so the two
+ * only differ in how long a column runs.
+ */
+function inColumns<T>(items: T[], perColumn: number): T[][] {
+    const columns: T[][] = [];
+    for (let first = 0; first < items.length; first += perColumn) {
+        columns.push(items.slice(first, first + perColumn));
+    }
+    return columns;
 }

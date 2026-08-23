@@ -28,9 +28,6 @@ export class VesEmulatorVipPalettesPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_PALETTES, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/palettes', 'Palettes');
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/palettesCaption', 'Brightness and palette registers'
-        );
     }
 
     protected async refresh(): Promise<void> {
@@ -81,7 +78,7 @@ export class VesEmulatorVipPalettesPanel extends VesEmulatorPanel {
                             <span
                                 key={index}
                                 className='ves-emulator-vip-swatch'
-                                style={{ background: `rgb(${intensity}, 0, 0)` }}
+                                style={{ background: `rgb(${intensity * 2}, 0, 0)` }}
                                 title={`${index}: ${intensity}`}
                             />
                         ))}
@@ -93,19 +90,19 @@ export class VesEmulatorVipPalettesPanel extends VesEmulatorPanel {
         return <div className='ves-emulator-vip'>
             <div className='ves-emulator-vip-groups'>
                 <div className='ves-emulator-vip-group'>
-                    <h4>{nls.localize('vuengine/emulator/panels/vip/bgMapPalettes', 'BGMap palettes')}</h4>
+                    <h4>{nls.localize('vuengine/emulator/panels/palettes/bgMapPalettes', 'BGMap palettes')}</h4>
                     <table><tbody>
                         {VIP_BGMAP_PALETTES.map((register, index) => renderPalette(`GPLT${index}`, register))}
                     </tbody></table>
                 </div>
                 <div className='ves-emulator-vip-group'>
-                    <h4>{nls.localize('vuengine/emulator/panels/vip/objectPalettes', 'Object palettes')}</h4>
+                    <h4>{nls.localize('vuengine/emulator/panels/palettes/objectPalettes', 'Object palettes')}</h4>
                     <table><tbody>
                         {VIP_OBJECT_PALETTES.map((register, index) => renderPalette(`JPLT${index}`, register))}
                     </tbody></table>
                 </div>
                 <div className='ves-emulator-vip-group'>
-                    <h4>{nls.localize('vuengine/emulator/panels/vip/brightness', 'Brightness')}</h4>
+                    <h4>{nls.localize('vuengine/emulator/panels/palettes/brightness', 'Brightness')}</h4>
                     <table><tbody>
                         {[
                             ['BRTA', VipRegister.BRTA],
@@ -119,10 +116,10 @@ export class VesEmulatorVipPalettesPanel extends VesEmulatorPanel {
                         ))}
                         <tr>
                             <th title={nls.localize(
-                                'vuengine/emulator/panels/vip/level3Hint',
+                                'vuengine/emulator/panels/palettes/level3Hint',
                                 'The brightest level is the sum of all three registers'
                             )}>
-                                {nls.localize('vuengine/emulator/panels/vip/levels', 'Levels')}
+                                {nls.localize('vuengine/emulator/panels/palettes/levels', 'Levels')}
                             </th>
                             <td colSpan={2}>
                                 <div className='ves-emulator-vip-swatches'>
@@ -130,7 +127,7 @@ export class VesEmulatorVipPalettesPanel extends VesEmulatorPanel {
                                         <span
                                             key={index}
                                             className='ves-emulator-vip-swatch'
-                                            style={{ background: `rgb(${intensity}, 0, 0)` }}
+                                            style={{ background: `rgb(${intensity * 2}, 0, 0)` }}
                                             title={`${index}: ${intensity}`}
                                         />
                                     ))}

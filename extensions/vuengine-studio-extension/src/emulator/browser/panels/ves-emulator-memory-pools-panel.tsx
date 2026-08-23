@@ -87,9 +87,6 @@ export class VesEmulatorMemoryPoolsPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.MEMORY_POOLS, source, instanceId);
         this.title.label = EMULATOR_PANEL_LABELS[EmulatorPanelType.MEMORY_POOLS];
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/memoryPoolsCaption', "VUEngine's dynamic object allocation"
-        );
     }
 
     protected pollHz(): number {

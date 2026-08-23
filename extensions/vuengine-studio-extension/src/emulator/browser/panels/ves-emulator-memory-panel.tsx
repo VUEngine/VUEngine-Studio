@@ -67,7 +67,6 @@ export class VesEmulatorMemoryPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.MEMORY, source, instanceId);
         this.title.label = EMULATOR_PANEL_LABELS[EmulatorPanelType.MEMORY];
-        this.title.caption = this.title.label;
     }
 
     protected async refresh(): Promise<void> {

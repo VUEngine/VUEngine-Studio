@@ -21,9 +21,6 @@ export class VesEmulatorEsSoundPanel extends VesEmulatorPanel {
     ) {
         super(EmulatorPanelType.ES_SOUND, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/esSound', 'ESSound');
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/esSoundCaption', 'MP3 and WAV playback through an ESSound cartridge'
-        );
         this.addClass('ves-emulator-vip-split');
         this.toDispose.push(this.player.onDidChange(() => this.update()));
     }

@@ -34,7 +34,6 @@ export class VesEmulatorTerminalPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.TERMINAL, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/terminal', 'Terminal');
-        this.title.caption = this.title.label;
 
         this.toDisposeOnDetach.push(this.source.onDidChange(() => this.startCapture()));
     }

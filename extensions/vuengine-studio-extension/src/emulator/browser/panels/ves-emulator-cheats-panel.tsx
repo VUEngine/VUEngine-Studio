@@ -40,9 +40,6 @@ export class VesEmulatorCheatsPanel extends VesEmulatorPanel {
     ) {
         super(EmulatorPanelType.CHEATS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/cheats', 'Cheats');
-        this.title.caption = nls.localize(
-            'vuengine/emulator/panels/cheatsCaption', 'Values written to memory every frame'
-        );
         this.addClass('ves-emulator-vip-split');
         this.toDispose.push(this.cheats.onDidChange(() => this.update()));
     }
@@ -149,36 +146,41 @@ export class VesEmulatorCheatsPanel extends VesEmulatorPanel {
                 <span className='ves-emulator-vip-footer'>{this.cheats.fileUri?.path.base ?? ''}</span>
             </div>
             <div className='ves-emulator-vip-split-table'>
-                <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table ves-emulator-cheats-table'>
-                    <thead>
-                        <tr>
-                            <th>{nls.localize('vuengine/emulator/cheats/on', 'On')}</th>
-                            <th>{nls.localizeByDefault('Name')}</th>
-                            <th title={nls.localize('vuengine/emulator/cheats/codesHint', 'Address and value of each write')}>
-                                {nls.localize('vuengine/emulator/cheats/codes', 'Codes')}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {cheats.map((entry, index) => (
-                            <tr
-                                key={index}
-                                className={`${entry.enabled ? '' : 'inactive'}${index === selected ? ' selected' : ''}`}
-                                onClick={() => this.select(index)}
-                            >
-                                <td>
-                                    <input
-                                        type='checkbox'
-                                        checked={entry.enabled}
-                                        onChange={e => this.cheats.update(index, { enabled: e.target.checked })}
-                                    />
-                                </td>
-                                <td className='name'>{entry.description}</td>
-                                <td className='name'>{entry.codes.map(formatVesCheatCode).join(' ')}</td>
+                <fieldset className='ves-emulator-vip-inspector-group'>
+                    <legend>
+                        {nls.localize('vuengine/emulator/cheats/cheats', 'Cheats')}
+                    </legend>
+                    <table className='ves-emulator-vip-table ves-emulator-vip-selectable-table ves-emulator-cheats-table'>
+                        <thead>
+                            <tr>
+                                <th>{nls.localize('vuengine/emulator/cheats/on', 'On')}</th>
+                                <th>{nls.localizeByDefault('Name')}</th>
+                                <th title={nls.localize('vuengine/emulator/cheats/codesHint', 'Address and value of each write')}>
+                                    {nls.localize('vuengine/emulator/cheats/codes', 'Codes')}
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {cheats.map((entry, index) => (
+                                <tr
+                                    key={index}
+                                    className={`${entry.enabled ? '' : 'inactive'}${index === selected ? ' selected' : ''}`}
+                                    onClick={() => this.select(index)}
+                                >
+                                    <td>
+                                        <input
+                                            type='checkbox'
+                                            checked={entry.enabled}
+                                            onChange={e => this.cheats.update(index, { enabled: e.target.checked })}
+                                        />
+                                    </td>
+                                    <td className='name'>{entry.description}</td>
+                                    <td className='name'>{entry.codes.map(formatVesCheatCode).join(' ')}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </fieldset>
             </div>
             {cheat
                 ? this.renderDetail(cheat)

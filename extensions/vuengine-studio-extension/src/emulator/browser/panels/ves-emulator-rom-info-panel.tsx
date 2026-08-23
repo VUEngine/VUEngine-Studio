@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import * as React from '@theia/core/shared/react';
 import EmptyContainer from '../../../editors/browser/components/Common/EmptyContainer';
-import { BUILD_MODE_DESCRIPTIONS, BuildMode } from '../../../build/browser/ves-build-types';
+import { BuildMode } from '../../../build/browser/ves-build-types';
 import { ROM_HEADER_MAKERS } from '../ves-emulator-types';
 import { VesEmulatorDebugSource, VesEmulatorPanel, EmulatorPanelType } from './ves-emulator-panel';
 import { Plug } from '@phosphor-icons/react';
@@ -21,7 +21,6 @@ export class VesEmulatorRomInfoPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.ROM_INFO, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/romInfo', 'ROM Info');
-        this.title.caption = nls.localize('vuengine/emulator/panels/romInfoCaption', 'Cartridge header');
     }
 
     protected pollHz(): number {

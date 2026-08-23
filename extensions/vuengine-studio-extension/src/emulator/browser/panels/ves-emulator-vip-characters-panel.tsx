@@ -65,7 +65,6 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
     constructor(source: VesEmulatorDebugSource, instanceId: string) {
         super(EmulatorPanelType.VIP_CHARACTERS, source, instanceId);
         this.title.label = nls.localize('vuengine/emulator/panels/characters', 'Characters');
-        this.title.caption = nls.localize('vuengine/emulator/panels/charactersCaption', 'Character (tile) memory');
     }
 
     protected pollHz(): number {
@@ -188,7 +187,7 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
         }
         if (!this.image) {
             return <div className='ves-emulator-panel-empty'>
-                {nls.localize('vuengine/emulator/panels/vip/reading', 'Reading VIP memory…')}
+                {nls.localize('vuengine/emulator/panels/characters/reading', 'Reading VIP memory…')}
             </div>;
         }
 
@@ -205,32 +204,38 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
 
         return <div className='ves-emulator-vip-inspector'>
             <div className='ves-emulator-vip-inspector-sidebar'>
-                <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/index', 'Index')}</label>
-                    <input
-                        type='number'
-                        className='theia-input'
-                        min={0}
-                        max={VIP_CHAR_COUNT - 1}
-                        value={selected}
-                        onChange={e => this.selectCharacter(parseInt(e.target.value, 10))}
-                    />
-                </div>
-                <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/address', 'Address')}</label>
-                    <input className='theia-input' readOnly value={hex(address, 8)} />
-                </div>
-                <div className='ves-emulator-vip-inspector-field'>
-                    <label>{nls.localize('vuengine/emulator/panels/vip/mirror', 'Mirror')}</label>
-                    <input className='theia-input' readOnly value={hex(mirror, 8)} />
-                </div>
-
-                <VipCanvas image={preview} zoom={PREVIEW_ZOOM} />
+                <fieldset className='ves-emulator-vip-inspector-group'>
+                    <legend>{nls.localize('vuengine/emulator/panels/characters/selected', 'Selected')}</legend>
+                    <div className='ves-emulator-vip-inspector-field'>
+                        <label>{nls.localize('vuengine/emulator/panels/characters/index', 'Index')}</label>
+                        <input
+                            type='number'
+                            className='theia-input'
+                            min={0}
+                            max={VIP_CHAR_COUNT - 1}
+                            value={selected}
+                            onChange={e => this.selectCharacter(parseInt(e.target.value, 10))}
+                        />
+                    </div>
+                    <div className='ves-emulator-vip-inspector-field'>
+                        <label>{nls.localize('vuengine/emulator/panels/characters/address', 'Address')}</label>
+                        <input className='theia-input' readOnly value={hex(address, 8)} />
+                    </div>
+                    <div className='ves-emulator-vip-inspector-field'>
+                        <label>{nls.localize('vuengine/emulator/panels/characters/mirror', 'Mirror')}</label>
+                        <input className='theia-input' readOnly value={hex(mirror, 8)} />
+                    </div>
+                </fieldset>
 
                 <fieldset className='ves-emulator-vip-inspector-group'>
-                    <legend>{nls.localize('vuengine/emulator/panels/vip/colors', 'Colors')}</legend>
+                    <legend>{nls.localize('vuengine/emulator/panels/characters/character', 'Character')}</legend>
+                    <VipCanvas image={preview} zoom={PREVIEW_ZOOM} />
+                </fieldset>
+
+                <fieldset className='ves-emulator-vip-inspector-group'>
+                    <legend>{nls.localize('vuengine/emulator/panels/characters/colors', 'Colors')}</legend>
                     <label>
-                        {nls.localize('vuengine/emulator/panels/vip/palette', 'Palette')}
+                        {nls.localize('vuengine/emulator/panels/characters/palette', 'Palette')}
                         <select
                             className='theia-select'
                             value={this.palette}
@@ -239,14 +244,14 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
                             )}
                         >
                             <option value={GENERIC_PALETTE}>
-                                {nls.localize('vuengine/emulator/panels/vip/genericPalette', 'Generic')}
+                                {nls.localize('vuengine/emulator/panels/characters/genericPalette', 'Generic')}
                             </option>
-                            <optgroup label={nls.localize('vuengine/emulator/panels/vip/bgMapPalettes', 'BGMap palettes')}>
+                            <optgroup label={nls.localize('vuengine/emulator/panels/characters/bgMapPalettes', 'BGMap palettes')}>
                                 {VIP_BGMAP_PALETTES.map((register, index) => (
                                     <option key={register} value={register}>GPLT{index}</option>
                                 ))}
                             </optgroup>
-                            <optgroup label={nls.localize('vuengine/emulator/panels/vip/objectPalettes', 'Object palettes')}>
+                            <optgroup label={nls.localize('vuengine/emulator/panels/characters/objectPalettes', 'Object palettes')}>
                                 {VIP_OBJECT_PALETTES.map((register, index) => (
                                     <option key={register} value={register}>JPLT{index}</option>
                                 ))}
@@ -266,9 +271,9 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
                 </fieldset>
 
                 <fieldset className='ves-emulator-vip-inspector-group'>
-                    <legend>{nls.localize('vuengine/emulator/panels/vip/display', 'Display')}</legend>
+                    <legend>{nls.localize('vuengine/emulator/panels/characters/display', 'Display')}</legend>
                     <label>
-                        {nls.localize('vuengine/emulator/panels/vip/columns', 'Columns')}
+                        {nls.localize('vuengine/emulator/panels/characters/columns', 'Columns')}
                         <input
                             type='range'
                             min={0}
@@ -279,7 +284,7 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
                         <span className='hint'>{this.charsPerRow}</span>
                     </label>
                     <label>
-                        {nls.localize('vuengine/emulator/panels/vip/scale', 'Scale')}
+                        {nls.localize('vuengine/emulator/panels/characters/scale', 'Scale')}
                         <input
                             type='range'
                             min={1}
@@ -295,7 +300,7 @@ export class VesEmulatorVipCharactersPanel extends VesEmulatorPanel {
                             checked={this.showGrid}
                             onChange={e => { this.showGrid = e.target.checked; this.update(); }}
                         />
-                        {nls.localize('vuengine/emulator/panels/vip/showGrid', 'Show grid')}
+                        {nls.localize('vuengine/emulator/panels/characters/showGrid', 'Show grid')}
                     </label>
                 </fieldset>
             </div>
