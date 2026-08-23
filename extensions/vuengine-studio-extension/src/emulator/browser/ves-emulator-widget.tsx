@@ -55,6 +55,8 @@ import { VesEmulatorDock, VesEmulatorDockLayout } from './panels/ves-emulator-do
 import { EmulatorPanelType } from './panels/ves-emulator-panel';
 import { VesEmulatorCheatStore } from './ves-emulator-cheat-store';
 import {
+  EMULATOR_ACTION_COMMANDS,
+  EMULATOR_ACTIONS,
   EMULATOR_GAMEPAD_BUTTONS,
   EMULATOR_GAMEPAD_INPUTS,
   EmulatorCommands,
@@ -64,7 +66,6 @@ import { VesEmulatorCoreService, VesEmulatorSession } from './ves-emulator-core-
 import { VesEmulatorEsSoundPlayer } from './ves-emulator-essound-player';
 import { readGamepadKeys } from './ves-emulator-gamepad';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
-import { VesEmulatorService } from './ves-emulator-service';
 import {
   CUSTOM_PALETTE_PREFIX,
   CustomAnaglyphPalette,
@@ -73,7 +74,7 @@ import {
   EMULATION_PALETTES,
   EMULATION_RENDERING_MODES,
   EMULATOR_SCALE_OPTIONS,
-  EmulatorFunctionKeyCode,
+  EmulatorAction,
   EmulatorGamePadKeyCode,
   EmulatorMode,
   EmulatorScale,
@@ -83,6 +84,18 @@ import {
   RomHeader,
   VES_EMULATOR_WIDGET_ID,
 } from './ves-emulator-types';
+
+/**
+ * One mapping: the keys currently bound to it, and what pressing them does.
+ *
+ * A game pad button is held, so it carries the pad code the core wants; an
+ * action is run once, so it carries the action. Which of the two it is decides
+ * how the key handler treats press and release.
+ */
+interface EmulatorInputBinding {
+  keys: ScopedKeybinding[];
+  command: EmulatorAction | EmulatorGamePadKeyCode;
+}
 
 enum EmulatorRomStatus {
   CHECKING = 'checking',
@@ -203,7 +216,7 @@ export interface vesEmulatorWidgetState {
   saveStateExists: boolean;
   romHeader: RomHeader;
   romSize: number;
-  input: any /* eslint-disable-line */;
+  input: Record<string, EmulatorInputBinding>;
   mode: EmulatorMode;
 }
 
@@ -229,8 +242,6 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   protected readonly vesCommonService!: VesCommonService;
   @inject(VesEmulatorCoreService)
   protected readonly vesEmulatorCoreService!: VesEmulatorCoreService;
-  @inject(VesEmulatorService)
-  protected readonly vesEmulatorService!: VesEmulatorService;
   @inject(VesEmulatorWidgetOptions)
   protected readonly options!: VesEmulatorWidgetOptions;
   @inject(VesRumblePackService)
@@ -271,6 +282,19 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
 
   /** How much history a single rewind tick may make up for after a stall. */
   static readonly REWIND_MAX_CATCHUP_MS = 100;
+
+  /**
+   * The actions that still work while the emulator is paused: the one that
+   * unpauses it, and the ones that do not depend on it running.
+   */
+  static readonly ACTIONS_WHILE_PAUSED: EmulatorAction[] = [
+    EmulatorAction.PauseToggle,
+    EmulatorAction.Fullscreen,
+    EmulatorAction.AudioMute,
+    EmulatorAction.Reset,
+    EmulatorAction.Screenshot,
+    EmulatorAction.ToggleControlsOverlay,
+  ];
 
   /** The emulation session backing this widget, created on first boot. */
   protected session?: VesEmulatorSession;
@@ -1060,112 +1084,36 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     );
   }
 
+  /**
+   * Re-read every mapping out of the keybinding registry.
+   *
+   * Built from the two tables that already say what exists — the game pad's
+   * buttons and the emulator's actions — rather than listed again here, so a
+   * new action needs adding in one place and gets its mapping for free.
+   */
   protected keybindingToState(): void {
     const player = this.usesPlayer2Controls() ? 2 : 1;
-    const gamePad: Record<string, { keys: ScopedKeybinding[], command: EmulatorGamePadKeyCode }> = {};
-    EMULATOR_GAMEPAD_BUTTONS.forEach(button => {
-      const gamePadInput = EMULATOR_GAMEPAD_INPUTS[button];
-      gamePad[button] = {
+    const input: Record<string, EmulatorInputBinding> = {};
+
+    for (const button of EMULATOR_GAMEPAD_BUTTONS) {
+      input[button] = {
         keys: this.keybindingRegistry.getKeybindingsForCommand(
           emulatorGamePadCommand(button, player).id
         ),
-        command: gamePadInput.key,
+        command: EMULATOR_GAMEPAD_INPUTS[button].key,
       };
-    });
+    }
 
-    this.state.input = {
-      ...gamePad,
-      pauseToggle: {
+    for (const action of EMULATOR_ACTIONS) {
+      input[action] = {
         keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_PAUSE_TOGGLE.id
+          EMULATOR_ACTION_COMMANDS[action].id
         ),
-        command: EmulatorFunctionKeyCode.PauseToggle,
-      },
-      reset: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_RESET.id
-        ),
-        command: EmulatorFunctionKeyCode.Reset,
-      },
-      audioMute: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_AUDIO_MUTE.id
-        ),
-        command: EmulatorFunctionKeyCode.AudioMute,
-      },
-      saveState: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_SAVE_STATE.id
-        ),
-        command: EmulatorFunctionKeyCode.SaveState,
-      },
-      loadState: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_LOAD_STATE.id
-        ),
-        command: EmulatorFunctionKeyCode.LoadState,
-      },
-      stateSlotDecrease: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id
-        ),
-        command: EmulatorFunctionKeyCode.StateSlotDecrease,
-      },
-      stateSlotIncrease: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id
-        ),
-        command: EmulatorFunctionKeyCode.StateSlotIncrease,
-      },
-      frameAdvance: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_FRAME_ADVANCE.id
-        ),
-        command: EmulatorFunctionKeyCode.FrameAdvance,
-      },
-      rewind: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_REWIND.id
-        ),
-        command: EmulatorFunctionKeyCode.Rewind,
-      },
-      toggleFastForward: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleFastForward,
-      },
-      toggleSlowmotion: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleSlowmotion,
-      },
-      toggleLowPower: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleLowPower,
-      },
-      fullscreen: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_FULLSCREEN.id
-        ),
-        command: EmulatorFunctionKeyCode.Fullscreen,
-      },
-      toggleControlsOverlay: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleControlsOverlay,
-      },
-      screenshot: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_SCREENSHOT.id
-        ),
-        command: EmulatorFunctionKeyCode.Screenshot,
-      },
-    };
+        command: action,
+      };
+    }
+
+    this.state.input = input;
   }
 
   protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
@@ -1221,7 +1169,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     if (
       e.type === 'keyup' &&
       this.rewinding &&
-      this.matchKey(this.state.input.rewind?.keys ?? [], e.code)
+      this.matchKey(this.state.input[EmulatorAction.Rewind]?.keys ?? [], e.code)
     ) {
       this.stopRewinding();
     }
@@ -1237,33 +1185,21 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     }
 
     for (const key in this.state.input) {
-      if (this.state.input.hasOwnProperty(key)) {
-        if (
-          (!this.state.paused && !this.state.showControls) ||
-          this.state.input[key].command ===
-          EmulatorFunctionKeyCode.ToggleControlsOverlay ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.PauseToggle) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.Fullscreen) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.AudioMute) ||
-          (!this.state.showControls &&
-            this.state.input[key].command === EmulatorFunctionKeyCode.Reset) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.Screenshot) ||
-          (this.state.frameAdvance &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.FrameAdvance)
-        ) {
-          if (this.matchKey(this.state.input[key].keys, e.code)) {
-            this.sendCommand(e.type, this.state.input[key].command);
-          }
-        }
+      if (!this.state.input.hasOwnProperty(key)) {
+        continue;
+      }
+      const input = this.state.input[key];
+      if (!this.matchKey(input.keys, e.code)) {
+        continue;
+      }
+      // A game pad button is held, so it needs the press and the release;
+      // rewind is held too, and its release is what ends it. Everything else
+      // is an action, and acts once, through its command.
+      if (GAMEPAD_KEY_TO_VB_KEY[input.command as EmulatorGamePadKeyCode] !== undefined
+        || input.command === EmulatorAction.Rewind) {
+        this.sendCommand(e.type, input.command);
+      } else if (e.type === 'keydown' && this.canRunAction(input.command as EmulatorAction)) {
+        this.runAction(input.command as EmulatorAction);
       }
     }
   }
@@ -1492,18 +1428,47 @@ granularity records less often and costs proportionally less.',
     this.node.focus();
   };
 
-  public sendKeypress = (
-    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode
-  ): void => {
-    if (
-      this.state.loaded &&
-      (!this.state.showControls ||
-        keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay)
-    ) {
-      this.sendCommand('keyPress', keyCode);
-    }
+  /**
+   * Run one of the emulator's actions.
+   *
+   * Through its command rather than by calling the implementation, so that the
+   * toolbar, the command palette and a key press all take the same route and
+   * are gated by the same `isEnabled`. The work itself is in `performAction`,
+   * which the command's handler calls back into.
+   */
+  public runAction = (action: EmulatorAction): void => {
+    this.commandService.executeCommand(EMULATOR_ACTION_COMMANDS[action].id);
+    // Hand the keyboard back, so the shortcuts keep working after a click.
     this.node.focus();
   };
+
+  /**
+   * Whether an action can run right now.
+   *
+   * The rules the key handler and the toolbar used to state separately, in one
+   * place: the controls overlay takes the widget over and only the action that
+   * closes it works; a paused emulator still takes the handful of actions that
+   * mean something while it is stopped; frame advance repeats only once frame
+   * advance has been entered.
+   */
+  public canRunAction(action: EmulatorAction): boolean {
+    if (!this.state.loaded) {
+      return false;
+    }
+    if (this.state.showControls) {
+      return action === EmulatorAction.ToggleControlsOverlay;
+    }
+    if (this.state.paused) {
+      return VesEmulatorWidget.ACTIONS_WHILE_PAUSED.includes(action)
+        || (this.state.frameAdvance && action === EmulatorAction.FrameAdvance);
+    }
+    return true;
+  }
+
+  /** Carry out an action. Called by its command, never directly. */
+  public async performAction(action: EmulatorAction): Promise<void> {
+    await this.sendCommand('keyPress', action);
+  }
 
   /** Content of the fixed toolbar above the dock area. */
   renderToolbar(): React.ReactNode {
@@ -1530,7 +1495,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle)
+                  this.runAction(EmulatorAction.PauseToggle)
                 }
                 disabled={!this.state.loaded || this.state.showControls}
               >
@@ -1544,7 +1509,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Reset)
+                  this.runAction(EmulatorAction.Reset)
                 }
                 disabled={!this.state.loaded || this.state.showControls}
               >
@@ -1560,7 +1525,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.AudioMute)
+                  this.runAction(EmulatorAction.AudioMute)
                 }
                 disabled={!this.state.loaded || this.state.showControls}
               >
@@ -1582,7 +1547,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower)
+                  this.runAction(EmulatorAction.ToggleLowPower)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1628,7 +1593,7 @@ granularity records less often and costs proportionally less.',
                     // have already stepped by the time the click arrives. A
                     // click with no pointer behind it is the button being
                     // activated from the keyboard: step back once.
-                    this.sendKeypress(EmulatorFunctionKeyCode.Rewind);
+                    this.runAction(EmulatorAction.Rewind);
                   }
                 }}
                 disabled={
@@ -1651,7 +1616,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion)
+                  this.runAction(EmulatorAction.ToggleSlowmotion)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1673,7 +1638,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance)
+                  this.runAction(EmulatorAction.FrameAdvance)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1696,7 +1661,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward)
+                  this.runAction(EmulatorAction.ToggleFastForward)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1716,7 +1681,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.SaveState)
+                  this.runAction(EmulatorAction.SaveState)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1734,7 +1699,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.LoadState)
+                  this.runAction(EmulatorAction.LoadState)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1775,7 +1740,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.SaveState)
+                  this.runAction(EmulatorAction.SaveState)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1794,7 +1759,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.LoadState)
+                  this.runAction(EmulatorAction.LoadState)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1828,7 +1793,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease)
+                  this.runAction(EmulatorAction.StateSlotDecrease)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1847,7 +1812,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease)
+                  this.runAction(EmulatorAction.StateSlotIncrease)
                 }
                 disabled={
                   !this.state.loaded ||
@@ -1859,16 +1824,6 @@ granularity records less often and costs proportionally less.',
               </button>
             </div>
             */}
-            <div>
-              <button
-                className="theia-button secondary"
-                title="Delete SRAM and restart"
-                onClick={this.deleteSramAndRestart}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-trash-o"></i>
-              </button>
-            </div>
             <div>
               <button
                 className={
@@ -1884,12 +1839,17 @@ granularity records less often and costs proportionally less.',
                         'Link Second Player',
                       )
                 }
+                // Through the commands, so the button and the palette are the
+                // same three operations; which one this is depends on how the
+                // pair currently stands, exactly as the label above does.
                 onClick={e =>
-                  this.isLinked()
-                    ? this.vesEmulatorService.unlinkPlayers(this)
-                    : this.linkedPeer
-                      ? this.vesEmulatorService.relinkPlayers(this)
-                      : this.vesEmulatorService.linkSecondPlayer(this)
+                  this.commandService.executeCommand(
+                    this.isLinked()
+                      ? EmulatorCommands.UNLINK_PLAYERS.id
+                      : this.linkedPeer
+                        ? EmulatorCommands.RELINK_PLAYERS.id
+                        : EmulatorCommands.LINK_SECOND_PLAYER.id
+                  )
                 }
                 disabled={!this.state.loaded}
               >
@@ -1967,7 +1927,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen)
+                  this.runAction(EmulatorAction.Fullscreen)
                 }
                 disabled={!this.state.loaded || this.state.showControls}
               >
@@ -1981,7 +1941,7 @@ granularity records less often and costs proportionally less.',
                     true,
                   )}`}
                 onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Screenshot)
+                  this.runAction(EmulatorAction.Screenshot)
                 }
                 disabled={!this.state.loaded || this.state.showControls}
               >
@@ -2001,9 +1961,7 @@ granularity records less often and costs proportionally less.',
                   true,
                 )}`}
                 onClick={e =>
-                  this.sendKeypress(
-                    EmulatorFunctionKeyCode.ToggleControlsOverlay,
-                  )
+                  this.runAction(EmulatorAction.ToggleControlsOverlay)
                 }
                 disabled={!this.state.loaded}
               >
@@ -2093,7 +2051,7 @@ granularity records less often and costs proportionally less.',
 
     // Rewind is held rather than toggled, so it needs the press and the
     // release, unlike the function keys below which act on release.
-    if (data === EmulatorFunctionKeyCode.Rewind) {
+    if (data === EmulatorAction.Rewind) {
       if (command === 'keydown') {
         this.startRewinding();
       } else if (command === 'keyup') {
@@ -2114,7 +2072,7 @@ granularity records less often and costs proportionally less.',
 
     if (command === 'keyPress' || command === 'keyup') {
       switch (data) {
-        case EmulatorFunctionKeyCode.AudioMute:
+        case EmulatorAction.AudioMute:
           this.state.muted = !this.state.muted;
           await this.sim?.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
           // ESSound plays alongside the emulator's own audio, so it follows
@@ -2126,7 +2084,7 @@ granularity records less often and costs proportionally less.',
           );
           this.update();
           break;
-        case EmulatorFunctionKeyCode.PauseToggle:
+        case EmulatorAction.PauseToggle:
           this.state.paused = !this.state.paused;
           this.state.frameAdvance = false;
           if (this.state.paused) {
@@ -2138,24 +2096,24 @@ granularity records less often and costs proportionally less.',
           this.esSound.setPaused(this.state.paused);
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleLowPower:
+        case EmulatorAction.ToggleLowPower:
           this.state.lowPower = !this.state.lowPower;
           await this.applyKeys();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleSlowmotion:
+        case EmulatorAction.ToggleSlowmotion:
           this.state.slowmotion = !this.state.slowmotion;
           this.state.fastForward = false;
           await this.applySpeed();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleFastForward:
+        case EmulatorAction.ToggleFastForward:
           this.state.fastForward = !this.state.fastForward;
           this.state.slowmotion = false;
           await this.applySpeed();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.FrameAdvance:
+        case EmulatorAction.FrameAdvance:
           if (!this.state.paused) {
             this.state.paused = true;
             await this.core?.suspend();
@@ -2165,22 +2123,22 @@ granularity records less often and costs proportionally less.',
           await this.core?.stepFrame();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.Fullscreen:
+        case EmulatorAction.Fullscreen:
           this.enterFullscreen();
           break;
-        case EmulatorFunctionKeyCode.ToggleControlsOverlay:
+        case EmulatorAction.ToggleControlsOverlay:
           this.toggleControlsOverlay();
           break;
-        case EmulatorFunctionKeyCode.Reset:
+        case EmulatorAction.Reset:
           await this.resetSim();
           break;
-        case EmulatorFunctionKeyCode.SaveState:
+        case EmulatorAction.SaveState:
           await this.saveState();
           break;
-        case EmulatorFunctionKeyCode.LoadState:
+        case EmulatorAction.LoadState:
           await this.loadState();
           break;
-        case EmulatorFunctionKeyCode.StateSlotDecrease:
+        case EmulatorAction.StateSlotDecrease:
           if (this.state.saveSlot > 1) {
             this.state.saveSlot--;
             this.update();
@@ -2191,7 +2149,7 @@ granularity records less often and costs proportionally less.',
             await this.refreshSaveStateExists();
           }
           break;
-        case EmulatorFunctionKeyCode.StateSlotIncrease:
+        case EmulatorAction.StateSlotIncrease:
           this.state.saveSlot++;
           this.update();
           await this.localStorageService.setData(
@@ -2200,7 +2158,7 @@ granularity records less often and costs proportionally less.',
           );
           await this.refreshSaveStateExists();
           break;
-        case EmulatorFunctionKeyCode.Screenshot:
+        case EmulatorAction.Screenshot:
           await this.takeScreenshot();
           break;
       }
@@ -2781,14 +2739,14 @@ granularity records less often and costs proportionally less.',
 
   protected toggleControlsOverlay(): void {
     if (!this.state.paused) {
-      this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle);
+      this.runAction(EmulatorAction.PauseToggle);
     }
     this.state.showControls = !this.state.showControls;
     this.update();
   }
 
   protected toButton(
-    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode
+    keyCode: EmulatorGamePadKeyCode | EmulatorAction
   ): string {
     let button: string = keyCode;
     if (keyCode.startsWith('Key')) {
@@ -2799,7 +2757,12 @@ granularity records less often and costs proportionally less.',
     return button.toLowerCase();
   }
 
-  protected deleteSramAndRestart = async () => {
+  /**
+   * Throw away the cartridge's save memory and boot again.
+   *
+   * Reached only through its command — see `EmulatorCommands.DELETE_SRAM`.
+   */
+  public deleteSramAndRestart = async () => {
     const dialog = new ConfirmDialog({
       title: nls.localize('vuengine/emulator/deleteSram', 'Delete SRAM'),
       msg: nls.localize(

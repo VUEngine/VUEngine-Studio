@@ -70,17 +70,13 @@ export class VesEmulatorRomInfoPanel extends VesEmulatorPanel {
                     <td><code>{romSize}</code> MBit</td>
                 </tr>
                 <tr>
-                    <th title={nls.localize(
-                        'vuengine/emulator/panels/romInfo/buildModeHint',
-                        'Read from the .map beside the ROM, which names the image the build produced. \
-A ROM built elsewhere has none.'
-                    )}>
-                        {nls.localize('vuengine/emulator/panels/romInfo/buildMode', 'Build Mode')}
-                    </th>
-                    <td title={mode ? BUILD_MODE_DESCRIPTIONS[mode] : undefined}>
-                        {mode ?? (buildMode
-                            ? <code>{buildMode}</code>
-                            : nls.localize('vuengine/emulator/panels/romInfo/buildModeUnknown', 'Unknown'))}
+                    <th>{nls.localize('vuengine/emulator/panels/romInfo/buildMode', 'Build Mode')}</th>
+                    <td>
+                        {mode
+                            ? <code>{mode}</code>
+                            : (buildMode
+                                ? <code>{buildMode}</code>
+                                : nls.localize('vuengine/emulator/panels/romInfo/buildModeUnknown', 'Unknown'))}
                     </td>
                 </tr>
             </tbody>

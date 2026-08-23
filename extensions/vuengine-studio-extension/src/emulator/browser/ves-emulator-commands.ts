@@ -1,5 +1,5 @@
 import { Command, nls } from '@theia/core';
-import { EmulatorGamePadKeyCode } from './ves-emulator-types';
+import { EmulatorAction, EmulatorGamePadKeyCode } from './ves-emulator-types';
 
 export namespace EmulatorCommands {
   export const RUN: Command = Command.toLocalizedCommand(
@@ -366,6 +366,52 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
+  export const LINK_SECOND_PLAYER: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.link.second',
+      label: 'Link Second Player',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/linkSecondPlayer',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const UNLINK_PLAYERS: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.link.unlink',
+      label: 'Unlink Players',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/unlinkPlayers',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const RELINK_PLAYERS: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.link.relink',
+      label: 'Re-link Players',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/relinkPlayers',
+    'vuengine/emulator/commands/category'
+  );
+
+  /**
+   * Not one of the action commands: it has no key mapping and no toolbar
+   * button, because it throws away saved progress and wants to be reached
+   * deliberately rather than by a stray click. The palette is the whole of its
+   * surface; the confirmation dialog is the rest of its safety.
+   */
+  export const DELETE_SRAM: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.deleteSram',
+      label: 'Delete SRAM and Restart',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/deleteSram',
+    'vuengine/emulator/commands/category'
+  );
+
   export const CANCEL_RED_VIPER_TRANSFER: Command = Command.toLocalizedCommand(
     {
       id: 'emulator.cancelRedViperTransfer',
@@ -445,3 +491,37 @@ export function emulatorGamePadCommand(button: EmulatorGamePadButton, player: nu
     const gamePadInput = EMULATOR_GAMEPAD_INPUTS[button];
     return player === 2 ? gamePadInput.player2 : gamePadInput.command;
 }
+
+/**
+ * The emulator's actions, and the commands they are invoked through.
+ *
+ * Everything that acts on a running emulator goes through one of these,
+ * whether it came from the toolbar, the command palette, or a key. The key
+ * mappings still reach the widget directly rather than through Theia's
+ * dispatcher — see `EMULATOR_FOCUS_CONTEXT`, which is deliberately never true
+ * so that the widget can see key releases as well as presses — but they now
+ * end up in the same place everything else does.
+ *
+ * Keyed by the action, which is the emulator's own name for what it does; the
+ * keys it answers to are whatever the keybinding registry says, and the
+ * defaults for those live in `registerKeybindings`.
+ */
+export const EMULATOR_ACTION_COMMANDS: Record<EmulatorAction, Command> = {
+    [EmulatorAction.PauseToggle]: EmulatorCommands.INPUT_PAUSE_TOGGLE,
+    [EmulatorAction.Reset]: EmulatorCommands.INPUT_RESET,
+    [EmulatorAction.AudioMute]: EmulatorCommands.INPUT_AUDIO_MUTE,
+    [EmulatorAction.ToggleLowPower]: EmulatorCommands.INPUT_TOGGLE_LOW_POWER,
+    [EmulatorAction.ToggleFastForward]: EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD,
+    [EmulatorAction.ToggleSlowmotion]: EmulatorCommands.INPUT_TOGGLE_SLOWMOTION,
+    [EmulatorAction.FrameAdvance]: EmulatorCommands.INPUT_FRAME_ADVANCE,
+    [EmulatorAction.Rewind]: EmulatorCommands.INPUT_REWIND,
+    [EmulatorAction.SaveState]: EmulatorCommands.INPUT_SAVE_STATE,
+    [EmulatorAction.LoadState]: EmulatorCommands.INPUT_LOAD_STATE,
+    [EmulatorAction.StateSlotDecrease]: EmulatorCommands.INPUT_STATE_SLOT_DECREASE,
+    [EmulatorAction.StateSlotIncrease]: EmulatorCommands.INPUT_STATE_SLOT_INCREASE,
+    [EmulatorAction.Fullscreen]: EmulatorCommands.INPUT_FULLSCREEN,
+    [EmulatorAction.ToggleControlsOverlay]: EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY,
+    [EmulatorAction.Screenshot]: EmulatorCommands.INPUT_SCREENSHOT,
+};
+
+export const EMULATOR_ACTIONS = Object.keys(EMULATOR_ACTION_COMMANDS) as EmulatorAction[];

@@ -5,8 +5,9 @@ import { TabBar, Widget } from '@theia/core/shared/@lumino/widgets';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { EMULATOR_PANEL_LABELS, EmulatorPanelType } from './panels/ves-emulator-panel';
-import { EmulatorCommands } from './ves-emulator-commands';
+import { EMULATOR_ACTION_COMMANDS, EMULATOR_ACTIONS, EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
+import { VesEmulatorService } from './ves-emulator-service';
 import { VesEmulatorWidget } from './ves-emulator-widget';
 
 @injectable()
@@ -17,6 +18,8 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   protected readonly quickPickService!: QuickPickService;
   @inject(VesEmulatorContextKeyService)
   protected readonly contextKeyService!: VesEmulatorContextKeyService;
+  @inject(VesEmulatorService)
+  protected readonly vesEmulatorService!: VesEmulatorService;
 
   constructor() {
     super({
@@ -44,37 +47,130 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(EmulatorCommands.ADD_PANEL, {
-      isEnabled: widget => widget instanceof VesEmulatorWidget,
-      isVisible: widget => widget instanceof VesEmulatorWidget,
-      // The tab group whose "+" was pressed, when that is where the command
-      // came from. Without one the panel opens beside the screen, as before.
-      execute: (widget, target?: TabBar<Widget>) => {
-        if (widget instanceof VesEmulatorWidget) {
-          this.pickPanel(widget, target);
+    // Every action the emulator can perform, registered once and reached the
+    // same way from the toolbar, a key mapping and the command palette. The
+    // widget they act on is the current one rather than an argument, which is
+    // what makes them work from the palette — a palette invocation passes
+    // nothing, so a handler that waited for a widget argument would be
+    // permanently disabled and never listed.
+    EMULATOR_ACTIONS.forEach(action => {
+      commandRegistry.registerCommand(EMULATOR_ACTION_COMMANDS[action], {
+        isEnabled: () => this.currentEmulator()?.canRunAction(action) ?? false,
+        isVisible: () => this.currentEmulator() !== undefined,
+        execute: () => this.currentEmulator()?.performAction(action),
+      });
+    });
+
+    // The link cable. At most one of these applies at a time — a pair is
+    // linked, or paired but running apart, or neither — so each is offered
+    // only in the state it belongs to rather than listed and greyed out.
+    commandRegistry.registerCommand(EmulatorCommands.LINK_SECOND_PLAYER, {
+      isEnabled: () => this.canLink(),
+      isVisible: () => this.canLink(),
+      execute: () => {
+        const emulator = this.currentEmulator();
+        if (emulator) {
+          this.vesEmulatorService.linkSecondPlayer(emulator);
         }
       },
     });
-    commandRegistry.registerCommand(EmulatorCommands.RESET_LAYOUT, {
-      isEnabled: widget => widget instanceof VesEmulatorWidget,
-      isVisible: widget => widget instanceof VesEmulatorWidget,
-      execute: widget => {
-        if (widget instanceof VesEmulatorWidget) {
-          widget.resetLayout();
+    commandRegistry.registerCommand(EmulatorCommands.UNLINK_PLAYERS, {
+      isEnabled: () => this.currentEmulator()?.isLinked() ?? false,
+      isVisible: () => this.currentEmulator()?.isLinked() ?? false,
+      execute: () => {
+        const emulator = this.currentEmulator();
+        if (emulator) {
+          this.vesEmulatorService.unlinkPlayers(emulator);
+        }
+      },
+    });
+    commandRegistry.registerCommand(EmulatorCommands.RELINK_PLAYERS, {
+      isEnabled: () => this.canRelink(),
+      isVisible: () => this.canRelink(),
+      execute: () => {
+        const emulator = this.currentEmulator();
+        if (emulator) {
+          this.vesEmulatorService.relinkPlayers(emulator);
         }
       },
     });
 
+    // Enabled whenever a ROM is loaded rather than through canRunAction: this
+    // is not one of the actions, and it asks for confirmation before doing
+    // anything, so the states that gate those do not apply to it.
+    commandRegistry.registerCommand(EmulatorCommands.DELETE_SRAM, {
+      isEnabled: () => this.currentEmulator() !== undefined,
+      isVisible: () => this.currentEmulator() !== undefined,
+      execute: () => this.currentEmulator()?.deleteSramAndRestart(),
+    });
+
+    commandRegistry.registerCommand(EmulatorCommands.ADD_PANEL, {
+      isEnabled: widget => this.emulatorFor(widget) !== undefined,
+      isVisible: widget => this.emulatorFor(widget) !== undefined,
+      // The tab group whose "+" was pressed, when that is where the command
+      // came from. Without one the panel opens beside the screen, as before.
+      execute: (widget, target?: TabBar<Widget>) => {
+        const emulator = this.emulatorFor(widget);
+        if (emulator) {
+          this.pickPanel(emulator, target);
+        }
+      },
+    });
+    commandRegistry.registerCommand(EmulatorCommands.RESET_LAYOUT, {
+      isEnabled: widget => this.emulatorFor(widget) !== undefined,
+      isVisible: widget => this.emulatorFor(widget) !== undefined,
+      execute: widget => this.emulatorFor(widget)?.resetLayout(),
+    });
+
     commandRegistry.registerCommand(EmulatorCommands.WIDGET_HELP, {
       isEnabled: () => true,
-      isVisible: widget => widget instanceof VesEmulatorWidget,
+      isVisible: widget => this.emulatorFor(widget) !== undefined,
       execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
     });
     commandRegistry.registerCommand(EmulatorCommands.WIDGET_SETTINGS, {
       isEnabled: () => true,
-      isVisible: widget => widget instanceof VesEmulatorWidget,
+      isVisible: widget => this.emulatorFor(widget) !== undefined,
       execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Emulator'),
     });
+  }
+
+  /** A second player can be opened: nothing is paired with this one yet. */
+  protected canLink(): boolean {
+    const emulator = this.currentEmulator();
+    return emulator !== undefined && emulator.isLoaded()
+      && !emulator.isLinked() && emulator.getLinkedPeer() === undefined;
+  }
+
+  /** A pair exists but is running apart, so it can be joined up again. */
+  protected canRelink(): boolean {
+    const emulator = this.currentEmulator();
+    return emulator !== undefined && emulator.isLoaded()
+      && !emulator.isLinked() && emulator.getLinkedPeer() !== undefined;
+  }
+
+  /**
+   * The emulator a command is about: the one it was handed, or the current one.
+   *
+   * A command invoked from a tab bar or a context menu arrives with its widget;
+   * one invoked from the palette arrives with nothing, and has to find it.
+   */
+  protected emulatorFor(widget: unknown): VesEmulatorWidget | undefined {
+    return widget instanceof VesEmulatorWidget ? widget : this.currentEmulator();
+  }
+
+  /**
+   * The emulator the user is working in, if any.
+   *
+   * `activeWidget` is empty while the palette itself has focus, so the widget
+   * that had it before is what these commands act on.
+   */
+  protected currentEmulator(): VesEmulatorWidget | undefined {
+    for (const candidate of [this.shell.activeWidget, this.shell.currentWidget]) {
+      if (candidate instanceof VesEmulatorWidget) {
+        return candidate;
+      }
+    }
+    return undefined;
   }
 
   protected async pickPanel(widget: VesEmulatorWidget, target?: TabBar<Widget>): Promise<void> {

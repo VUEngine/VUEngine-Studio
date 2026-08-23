@@ -245,20 +245,30 @@ export enum EmulatorGamePadKeyCode {
   RT = 'KeyH',
 }
 
-export enum EmulatorFunctionKeyCode {
-  Fullscreen = 'KeyO',
-  ToggleControlsOverlay = 'KeyP',
-  SaveState = 'F4',
-  LoadState = 'F5',
-  StateSlotDecrease = 'F6',
-  StateSlotIncrease = 'F7',
-  ToggleFastForward = 'ArrowRight',
-  PauseToggle = 'Space',
-  ToggleSlowmotion = 'ArrowDown',
-  ToggleLowPower = 'KeyS',
-  Rewind = 'ArrowLeft',
-  FrameAdvance = 'ArrowUp',
-  Reset = 'F10',
-  AudioMute = 'KeyQ',
-  Screenshot = 'F9',
+/**
+ * Something the emulator can be told to do, as opposed to a button held on its
+ * game pad.
+ *
+ * These identify an action and nothing else. They used to be key codes, which
+ * they no longer are anywhere: a key reaches an action through the keybinding
+ * registry, so what an action is bound to is whatever the user has mapped, and
+ * an enum claiming otherwise could only ever be out of date. The default
+ * mappings live where they belong, in `registerKeybindings`.
+ */
+export enum EmulatorAction {
+  Fullscreen = 'fullscreen',
+  ToggleControlsOverlay = 'toggleControlsOverlay',
+  SaveState = 'saveState',
+  LoadState = 'loadState',
+  StateSlotDecrease = 'stateSlotDecrease',
+  StateSlotIncrease = 'stateSlotIncrease',
+  ToggleFastForward = 'toggleFastForward',
+  PauseToggle = 'pauseToggle',
+  ToggleSlowmotion = 'toggleSlowmotion',
+  ToggleLowPower = 'toggleLowPower',
+  Rewind = 'rewind',
+  FrameAdvance = 'frameAdvance',
+  Reset = 'reset',
+  AudioMute = 'audioMute',
+  Screenshot = 'screenshot',
 }

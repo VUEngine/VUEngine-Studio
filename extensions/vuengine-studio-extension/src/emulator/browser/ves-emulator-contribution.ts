@@ -35,6 +35,12 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       execute: () => this.vesEmulatorService.cancelRedViperTransfer(),
     });
 
+    // The game pad's buttons. These do nothing when executed: they exist to
+    // hang key mappings off, which the emulator reads out of the keybinding
+    // registry itself rather than letting Theia dispatch them — a button is
+    // held, and a dispatched command would only ever say it went down. The
+    // emulator's own actions are registered in the view contribution, where
+    // the widget they act on is known, and do run when executed.
     commandRegistry.registerCommand(EmulatorCommands.INPUT_L_UP, {
       execute: () => { },
       isVisible: () => false,
@@ -101,66 +107,6 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
         execute: () => { },
         isVisible: () => false,
       });
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_SAVE_STATE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_LOAD_STATE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_STATE_SLOT_DECREASE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_STATE_SLOT_INCREASE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_PAUSE_TOGGLE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_SLOWMOTION, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_LOW_POWER, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_REWIND, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_FRAME_ADVANCE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_RESET, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_AUDIO_MUTE, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_FULLSCREEN, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY, {
-      execute: () => { },
-      isVisible: () => false,
-    });
-    commandRegistry.registerCommand(EmulatorCommands.INPUT_SCREENSHOT, {
-      execute: () => { },
-      isVisible: () => false,
     });
   }
 
@@ -243,22 +189,22 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_SAVE_STATE.id,
-      keybinding: '1',
+      keybinding: 'alt+1',
       when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_LOAD_STATE.id,
-      keybinding: '2',
+      keybinding: 'alt+2',
       when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
-      keybinding: '3',
+      keybinding: 'alt+3',
       when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
-      keybinding: '4',
+      keybinding: 'alt+4',
       when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
