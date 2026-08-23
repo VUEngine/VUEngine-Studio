@@ -20,6 +20,7 @@ import { VesBuildPathsService } from '../../build/browser/ves-build-paths-servic
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesEmulatorCoreService } from '../../emulator/browser/ves-emulator-core-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -45,6 +46,7 @@ export interface EditorsServices {
     vesBuildService: VesBuildService
     vesCodeGenService: VesCodeGenService
     vesCommonService: VesCommonService
+    vesEmulatorCoreService: VesEmulatorCoreService
     vesImagesService: VesImagesService
     vesPluginsService: VesPluginsService,
     vesProcessService: VesProcessService,
@@ -55,8 +57,7 @@ export interface EditorsServices {
     workspaceService: WorkspaceService
 };
 
-// @ts-ignore
-export const EditorsContext = createContext<EditorsContextType>({});
+export const EditorsContext = createContext<EditorsContextType>({} as EditorsContextType);
 
 export interface EditorsContextType {
     fileUri: URI

@@ -79,8 +79,13 @@
 		{%- set startTick = currentPlayerPosition * subNoteResolution -%}
 	{%- endif -%}
 
+	{#- The player prefers a baked in start tick over the one in SRAM, so a ROM
+	    that is meant to be seekable must not carry one: the editor writes the
+	    tick it wants into SRAM instead, which costs no rebuild. -#}
+	{%- set startFromTickValue = 0 if startFromSramTick else startTick -%}
+
 	{{- '\n\nconst bool startFromSramTick = ' ~ startFromSramTick ~ ';\n' -}}
-	{{- 'const uint32 startFromTick = ' ~ startTick ~ ';\n' -}}
+	{{- 'const uint32 startFromTick = ' ~ startFromTickValue ~ ';\n' -}}
 	{{- 'const bool miniVisualizer = ' ~ miniVisualizer ~ ';' -}}
 {%- endif -%}
 

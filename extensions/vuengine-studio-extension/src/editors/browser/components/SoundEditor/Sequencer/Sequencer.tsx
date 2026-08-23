@@ -135,7 +135,7 @@ interface SequencerProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     noteCursor: number
     setNoteCursor: (step: number) => void
     stepsPerNote: number
@@ -169,7 +169,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         playRangeEnd, setPlayRangeEnd,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         noteCursor, setNoteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
@@ -622,7 +622,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 rangeDragEndStep={rangeDragEndStep}
                 setRangeDragEndStep={setRangeDragEndStep}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
-                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                setPlayerSeekRequest={setPlayerSeekRequest}
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
                 editCurrentPattern={editCurrentPattern}

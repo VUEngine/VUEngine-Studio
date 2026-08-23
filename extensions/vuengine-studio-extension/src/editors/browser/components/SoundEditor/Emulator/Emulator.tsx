@@ -1,7 +1,8 @@
 import { URI } from '@theia/core';
-import { Endpoint } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { VesEmulatorSession } from '../../../../../emulator/browser/ves-emulator-core-service.js';
+import { VB_CART_RAM_BASE } from '../../../../../emulator/common/ves-vb-constants.js';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
 import { SoundData, SUB_NOTE_RESOLUTION, TrackSettings } from '../SoundEditorTypes.js';
 import PlayerRomBuilder from './PlayerRomBuilder.js';
@@ -12,9 +13,18 @@ const EmulatorContainer = styled.div`
     width: 48px;
 
     canvas {
-        top: -17px !important;
+        height: 224px;
+        image-rendering: pixelated;
+        position: relative;
+        top: -17px;
+        width: 384px;
     }
 `;
+
+const PLAYER_POSITION_ADDRESS = VB_CART_RAM_BASE;
+const PLAYER_POSITION_BYTES = 4;
+const PLAYER_SAVE_RAM_SIZE = 8192;
+const POSITION_POLL_MS = 50;
 
 interface EmulatorProps {
     soundData: SoundData
@@ -30,6 +40,7 @@ interface EmulatorProps {
     trackSettings: TrackSettings[]
     playerRomBuilder: PlayerRomBuilder
     forcePlayerRomRebuild: number
+    playerSeekRequest: number
     setPlaying: Dispatch<SetStateAction<boolean>>
 }
 
@@ -46,82 +57,84 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         trackSettings,
         playerRomBuilder,
         forcePlayerRomRebuild,
+        playerSeekRequest,
         setPlaying,
     } = props;
-    const [core, setCore] = useState<any>();
-    const [sim, setSim] = useState<any>();
-    const emulatorContainerRef = useRef<HTMLDivElement>(null);
+    const [session, setSession] = useState<VesEmulatorSession>();
     const [soundDataChecksum, setSoundDataChecksum] = useState<string>('');
-    const [shadowCanvasElement, setShadowCanvasElement] = useState<HTMLCanvasElement>();
-    const [shadowCanvasElementContext, setShadowCanvasElementContext] = useState<CanvasRenderingContext2D>();
-    const [progressTimeout, setProgressTimeout] = useState<NodeJS.Timeout>();
+    const progressTimeout = useRef<NodeJS.Timeout>();
+    const reading = useRef(false);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const canvasAttached = useRef(false);
 
-    const init = async (): Promise<void> => {
-        await initEmulator();
+    const initEmulator = async (): Promise<void> => {
+        const newSession = await services.vesEmulatorCoreService.createSession();
+        await newSession.sim.setVolume(2);
+        setSession(newSession);
         setEmulatorInitialized(true);
     };
 
-    const initEmulator = async (): Promise<void> => {
-        let VB;
-        try {
-            // bundled
-            VB = require('../../binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
-        } catch (e) {
-            // dev
-            VB = require('../../../../../../../../applications/electron/binaries/vuengine-studio-tools/web/shrooms-vb-core/VB.js')?.default;
-        }
-
-        const newCore = await VB.create({
-            audioUrl: './shrooms.audio.js',
-            coreUrl: './shrooms.core.js',
-            wasmUrl: new Endpoint({ path: '/shrooms/core.wasm' }).getRestUrl().toString(),
-        });
-        const newSim = await newCore.create();
-        newSim.setAnaglyph(0xFF0000, 0);
-        await newSim.setVolume(2);
-
-        setCore(newCore);
-        setSim(newSim);
+    const startTickFor = (position: number): number => {
+        const step = playRangeStart > -1 ? playRangeStart : Math.max(0, position);
+        return step * SUB_NOTE_RESOLUTION;
     };
 
     const loadRom = async (romFileUri: URI): Promise<void> => {
+        if (!session) {
+            return;
+        }
         const romFileContent = await services.fileService.readFile(romFileUri);
-        await sim.setCartROM(romFileContent.value.buffer);
-        await sim.reset();
-        core.emulate(sim, true);
+        await session.sim.setCartRom(romFileContent.value.buffer.slice().buffer);
+        const saveRam = new ArrayBuffer(PLAYER_SAVE_RAM_SIZE);
+        new DataView(saveRam).setUint32(0, startTickFor(currentPlayerPosition), true);
+        await session.sim.setCartRam(saveRam);
+        await session.sim.reset();
+        await session.core.run();
     };
 
-    const cleanUp = async (): Promise<void> => {
-        await core.suspend(sim);
-        await sim.delete();
-        await playerRomBuilder.cleanUp();
+    // seek to a position in the player ROM by stopping the sim,
+    // writing the start position to SRAM, and then restarting
+    const seekPlayer = async (position: number): Promise<void> => {
+        if (!session || !emulatorRomReady) {
+            return;
+        }
+        const tick = new ArrayBuffer(PLAYER_POSITION_BYTES);
+        new DataView(tick).setUint32(0, startTickFor(position), true);
+
+        await session.core.suspend();
+        await session.sim.writeMemory(PLAYER_POSITION_ADDRESS, tick);
+        await session.sim.reset();
+        if (playing) {
+            await session.core.run();
+        }
     };
 
     const buildAndPlay = async (): Promise<void> => {
-        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(soundData, currentPlayerPosition, playRangeStart, playRangeEnd, trackSettings, true);
+        const romFileUri = await playerRomBuilder.buildSoundPlayerRom(
+            soundData, currentPlayerPosition, playRangeStart, playRangeEnd, trackSettings, true
+        );
         if (await services.fileService.exists(romFileUri)) {
             await loadRom(romFileUri);
             setEmulatorRomReady(true);
         }
     };
 
-    // visually reads total elapsed ticks from canvas bit by bit
-    // TODO: remove once it is possible to directly read memory from emulator
-    const readCurrentPlayerPosition = () => {
-        const canvas = emulatorContainerRef.current?.firstElementChild?.firstElementChild as HTMLCanvasElement;
-        if (!canvas) {
+    // Read the elapsed tick count the player has stored in SRAM
+    const readCurrentPlayerPosition = async (): Promise<void> => {
+        if (!session || reading.current) {
             return;
         }
-        shadowCanvasElementContext?.drawImage(canvas, 0, 0);
-        const topLineImageData = shadowCanvasElementContext?.getImageData(0, 1, 256, 1).data;
+        reading.current = true;
 
-        let currentElapsedTicks = 0;
-        if (topLineImageData) {
-            for (let i = 0; i < 1024; i += 32) {
-                if (topLineImageData[i] > 200) {
-                    currentElapsedTicks += (1 << (i >> 5));
-                }
-            }
+        let currentElapsedTicks: number;
+        try {
+            const stored = await session.sim.readMemory(PLAYER_POSITION_ADDRESS, PLAYER_POSITION_BYTES);
+            currentElapsedTicks = new DataView(stored).getUint32(0, true);
+        } catch {
+            // The session can go away between a poll being scheduled and run
+            return;
+        } finally {
+            reading.current = false;
         }
 
         let elapsedSteps = Math.round(currentElapsedTicks / SUB_NOTE_RESOLUTION);
@@ -138,7 +151,8 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     };
 
     const unsetProgressInterval = (): void => {
-        clearTimeout(progressTimeout);
+        clearInterval(progressTimeout.current);
+        progressTimeout.current = undefined;
     };
 
     const setProgressInterval = (): void => {
@@ -146,81 +160,70 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
 
         if (playing && !testNote) {
             readCurrentPlayerPosition();
-            setProgressTimeout(setInterval(() => {
+            progressTimeout.current = setInterval(() => {
                 readCurrentPlayerPosition();
-            }, 50));
+            }, POSITION_POLL_MS);
         }
     };
 
     useEffect(() => {
-        init();
-
-        const shadowCanvas = document.createElement('canvas');
-        setShadowCanvasElement(shadowCanvas);
-        const shadowCanvasContext = shadowCanvas.getContext('2d', { willReadFrequently: true });
-        if (shadowCanvasContext) {
-            setShadowCanvasElementContext(shadowCanvasContext);
-        }
-        return () => {
-            if (shadowCanvasElement) {
-                document.removeChild(shadowCanvasElement);
-            }
-        };
+        initEmulator();
     }, []);
 
     useEffect(() => {
         setProgressInterval();
-        return unsetProgressInterval();
+        return () => unsetProgressInterval();
     }, [
+        session,
         playing,
+        testNote,
         playRangeStart,
-        playRangeEnd
+        playRangeEnd,
     ]);
 
     useEffect(() => {
-        if (sim) {
-            emulatorContainerRef?.current?.append(sim);
-            return () => {
-                cleanUp();
-            };
+        if (!session) {
+            return;
         }
+
+        if (canvasRef.current && !canvasAttached.current) {
+            canvasAttached.current = true;
+            session.sim.attachCanvas(canvasRef.current);
+        }
+
+        return () => {
+            session.dispose();
+            playerRomBuilder.cleanUp();
+        };
     }, [
-        sim,
+        session,
     ]);
 
     useEffect(() => {
-        if (!core || !sim) {
+        if (!session) {
             return;
         }
 
         if (playing) {
-            // console.log('compare checksums');
             const currentSoundDataChecksum = window.electronVesCore.sha1(JSON.stringify({
                 soundData: soundData,
                 trackSettings,
-                currentPlayerPosition,
                 playRangeStart,
                 playRangeEnd,
                 forcePlayerRomRebuild,
             }));
-            // console.log('current:', currentSoundDataChecksum);
-            // console.log('previous:', soundDataChecksum);
             if (soundDataChecksum !== currentSoundDataChecksum) {
-                // console.log('checksums differ, compile song');
                 setSoundDataChecksum(currentSoundDataChecksum);
                 buildAndPlay();
             } else {
-                // console.log('checksums are the same, play song');
-                core.emulate(sim, true);
-                // console.log('========================');
+                session.core.run();
             }
         } else {
-            core.suspend(sim);
+            session.core.suspend();
         }
     }, [
-        core,
         playing,
-        sim,
+        session,
         soundData,
         trackSettings,
         playRangeStart,
@@ -229,22 +232,30 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
-        if (!core || !sim) {
-            return;
-        }
-
-        if (!playing && currentPlayerPosition === -1) {
-            sim.reset();
+        if (playerSeekRequest > 0) {
+            seekPlayer(currentPlayerPosition);
         }
     }, [
-        core,
+        playerSeekRequest,
+    ]);
+
+    useEffect(() => {
+        if (session && !playing && currentPlayerPosition === -1) {
+            seekPlayer(-1);
+        }
+    }, [
         playing,
-        sim,
+        session,
         currentPlayerPosition,
     ]);
 
     return <EmulatorContainer
-        ref={emulatorContainerRef}
-        style={{ display: currentPlayerPosition === -1 || !emulatorRomReady ? 'none' : 'block' }}
-    />;
+        style={{
+            display: currentPlayerPosition === -1 || !emulatorRomReady
+                ? 'none'
+                : 'block'
+        }}
+    >
+        <canvas ref={canvasRef} />
+    </EmulatorContainer>;
 }

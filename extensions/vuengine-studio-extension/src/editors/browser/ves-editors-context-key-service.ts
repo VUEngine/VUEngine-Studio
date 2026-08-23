@@ -1,6 +1,9 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { ContextKeyService, ContextKey } from '@theia/core/lib/browser/context-key-service';
 
+/** The `when` clause the graphical editors' shortcuts are scoped to. */
+export const GRAPHICAL_EDITOR_FOCUS_CONTEXT = 'graphicalEditorFocus';
+
 @injectable()
 export class VesEditorsContextKeyService {
     @inject(ContextKeyService)
@@ -19,7 +22,7 @@ export class VesEditorsContextKeyService {
     @postConstruct()
     protected init(): void {
         this._graphicalEditorFocus = this.contextKeyService.createKey<boolean>(
-            'graphicalEditorFocus',
+            GRAPHICAL_EDITOR_FOCUS_CONTEXT,
             false
         );
         this._explorerResourceExt = this.contextKeyService.createKey<string>(

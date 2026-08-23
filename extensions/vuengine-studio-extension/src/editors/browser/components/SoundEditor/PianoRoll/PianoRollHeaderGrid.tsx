@@ -27,7 +27,7 @@ interface PianoRollHeaderGridProps {
     currentPatternId: string
     currentSequenceIndex: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     pianoRollNoteWidth: number
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -51,7 +51,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         tool,
         currentTrackId, currentPatternId, currentSequenceIndex,
         setCurrentPlayerPosition,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         pianoRollNoteWidth,
@@ -257,7 +257,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                     const x = e.clientX - rect.left + pianoRollScrollWindow.x;
                     const step = Math.floor(x / pianoRollNoteWidth);
                     setCurrentPlayerPosition(step);
-                    setForcePlayerRomRebuild(prev => prev + 1);
+                    setPlayerSeekRequest(prev => prev + 1);
                 }
             }
         }

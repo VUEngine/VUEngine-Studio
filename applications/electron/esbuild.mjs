@@ -37,9 +37,10 @@ function onoCjsFixPlugin() {
 }
 nodeOptions.plugins.unshift(onoCjsFixPlugin());
 
-const shroomsPath = path.resolve(__dirname, 'binaries/vuengine-studio-tools/web/shrooms-vb-core');
-browserOptions.entryPoints['shrooms.audio'] = shroomsPath + '/Audio.js';
-browserOptions.entryPoints['shrooms.core'] = shroomsPath + '/Core.js';
+browserOptions.entryPoints['ves-vb-worker'] =
+    require.resolve('vuengine-studio-extension/lib/emulator/worker/ves-vb-worker.js');
+browserOptions.entryPoints['ves-vb-audio-worklet'] =
+    require.resolve('vuengine-studio-extension/lib/emulator/worker/ves-vb-audio-worklet.js');
 
 nodeOptions.entryPoints['image-converter-worker'] = require.resolve('vb-image-converter/lib/worker.js');
 

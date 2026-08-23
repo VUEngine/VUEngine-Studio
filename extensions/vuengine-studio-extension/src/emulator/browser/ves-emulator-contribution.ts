@@ -3,7 +3,8 @@ import { CommandContribution, CommandRegistry, MenuAction, MenuContribution, Men
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
-import { EmulatorCommands } from './ves-emulator-commands';
+import { EMULATOR_GAMEPAD_BUTTONS, EMULATOR_GAMEPAD_INPUTS, EmulatorCommands } from './ves-emulator-commands';
+import { EMULATOR_FOCUS_CONTEXT } from './ves-emulator-context-key-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 
@@ -90,6 +91,17 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       execute: () => { },
       isVisible: () => false,
     });
+    // The second player's set. Like the first player's these do nothing when
+    // executed: they exist to hang key mappings off, which the emulator reads
+    // out of the keybinding registry itself. They have no defaults — player 2
+    // shares player 1's keys until someone says otherwise, and then says which
+    // keys to use.
+    EMULATOR_GAMEPAD_BUTTONS.forEach(button => {
+      commandRegistry.registerCommand(EMULATOR_GAMEPAD_INPUTS[button].player2, {
+        execute: () => { },
+        isVisible: () => false,
+      });
+    });
     commandRegistry.registerCommand(EmulatorCommands.INPUT_SAVE_STATE, {
       execute: () => { },
       isVisible: () => false,
@@ -161,148 +173,148 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_L_UP.id,
       keybinding: 'e',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_L_RIGHT.id,
       keybinding: 'f',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_L_DOWN.id,
       keybinding: 'd',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_L_LEFT.id,
       keybinding: 's',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_START.id,
       keybinding: 'b',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_SELECT.id,
       keybinding: 'v',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_L_TRIGGER.id,
       keybinding: 'g',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_R_UP.id,
       keybinding: 'i',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_R_RIGHT.id,
       keybinding: 'l',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_R_DOWN.id,
       keybinding: 'k',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_R_LEFT.id,
       keybinding: 'j',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_B.id,
       keybinding: 'n',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_A.id,
       keybinding: 'm',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_R_TRIGGER.id,
       keybinding: 'h',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
 
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_SAVE_STATE.id,
       keybinding: '1',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_LOAD_STATE.id,
       keybinding: '2',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
       keybinding: '3',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
       keybinding: '4',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
       keybinding: 'right',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_PAUSE_TOGGLE.id,
       keybinding: 'space',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
       keybinding: 'down',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
       keybinding: 'w',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_REWIND.id,
       keybinding: 'left',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_FRAME_ADVANCE.id,
       keybinding: 'up',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_RESET.id,
       keybinding: 'f10',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_AUDIO_MUTE.id,
       keybinding: 'q',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_FULLSCREEN.id,
       keybinding: 'o',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
       keybinding: 'p',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
     registry.registerKeybinding({
       command: EmulatorCommands.INPUT_SCREENSHOT.id,
       keybinding: 'f9',
-      when: 'emulatorFocus',
+      when: EMULATOR_FOCUS_CONTEXT,
     });
   }
 

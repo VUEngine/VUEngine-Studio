@@ -1,4 +1,5 @@
-import { Command } from '@theia/core';
+import { Command, nls } from '@theia/core';
+import { EmulatorGamePadKeyCode } from './ves-emulator-types';
 
 export namespace EmulatorCommands {
   export const RUN: Command = Command.toLocalizedCommand(
@@ -311,13 +312,25 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
-  export const INPUT_DUMP_SRAM: Command = Command.toLocalizedCommand(
+  export const ADD_PANEL: Command = Command.toLocalizedCommand(
     {
-      id: 'emulator.input.dumpSram',
-      label: 'Dump SRAM',
+      id: 'emulator.panels.add',
+      label: 'Add Emulator Panel...',
       category: 'Emulator',
+      iconClass: 'codicon codicon-add',
     },
-    'vuengine/emulator/input/dumpSramCommand',
+    'vuengine/emulator/commands/addPanel',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const RESET_LAYOUT: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.panels.resetLayout',
+      label: 'Reset Emulator Layout',
+      category: 'Emulator',
+      iconClass: 'codicon codicon-clear-all',
+    },
+    'vuengine/emulator/commands/resetLayout',
     'vuengine/emulator/commands/category'
   );
 
@@ -329,17 +342,6 @@ export namespace EmulatorCommands {
       iconClass: 'codicon codicon-book',
     },
     'vuengine/emulator/showDocumentation',
-    'vuengine/emulator/commands/category'
-  );
-
-  export const WIDGET_KEYBINDINGS: Command = Command.toLocalizedCommand(
-    {
-      id: 'emulator.showKeybindings',
-      label: 'Show Emulator Keybindings',
-      category: 'Emulator',
-      iconClass: 'fa fa-keyboard-o',
-    },
-    'vuengine/emulator/commands/showKeybindings',
     'vuengine/emulator/commands/category'
   );
 
@@ -375,3 +377,71 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 };
+
+/**
+ * The controller's own buttons, as the emulator's state and its on-screen
+ * reference both name them.
+ */
+export type EmulatorGamePadButton =
+    'lUp' | 'lRight' | 'lDown' | 'lLeft' | 'rUp' | 'rRight' | 'rDown' | 'rLeft'
+    | 'a' | 'b' | 'start' | 'select' | 'lTrigger' | 'rTrigger';
+
+export interface EmulatorGamePadInput {
+    /** What the emulator presses when one of the mapped keys is. */
+    key: EmulatorGamePadKeyCode;
+    /** The command the mapping hangs off, per player. */
+    command: Command;
+    player2: Command;
+}
+
+/**
+ * The second player's copy of a game pad command.
+ *
+ * A separate command rather than a modifier on the first player's, because a
+ * mapping *is* a keybinding and a keybinding belongs to exactly one command —
+ * so two sets of keys means two sets of commands. They carry the first
+ * player's labels, which already say which button they are, under a category
+ * that says which player.
+ */
+function player2Command(command: Command): Command {
+    return {
+        id: `${command.id}.player2`,
+        label: command.label,
+        category: nls.localize('vuengine/emulator/controller/categoryPlayer2', 'Emulator Game Pad (Player 2)'),
+    };
+}
+
+/**
+ * Every game pad button, with the commands that carry its key mappings.
+ *
+ * The order is the one the on-screen reference reads in, top to bottom of the
+ * left half and then the right.
+ */
+export const EMULATOR_GAMEPAD_INPUTS: Record<EmulatorGamePadButton, EmulatorGamePadInput> = {
+    lTrigger: input(EmulatorGamePadKeyCode.LT, EmulatorCommands.INPUT_L_TRIGGER),
+    lUp: input(EmulatorGamePadKeyCode.LUp, EmulatorCommands.INPUT_L_UP),
+    lRight: input(EmulatorGamePadKeyCode.LRight, EmulatorCommands.INPUT_L_RIGHT),
+    lDown: input(EmulatorGamePadKeyCode.LDown, EmulatorCommands.INPUT_L_DOWN),
+    lLeft: input(EmulatorGamePadKeyCode.LLeft, EmulatorCommands.INPUT_L_LEFT),
+    select: input(EmulatorGamePadKeyCode.Select, EmulatorCommands.INPUT_SELECT),
+    start: input(EmulatorGamePadKeyCode.Start, EmulatorCommands.INPUT_START),
+    rTrigger: input(EmulatorGamePadKeyCode.RT, EmulatorCommands.INPUT_R_TRIGGER),
+    rUp: input(EmulatorGamePadKeyCode.RUp, EmulatorCommands.INPUT_R_UP),
+    rRight: input(EmulatorGamePadKeyCode.RRight, EmulatorCommands.INPUT_R_RIGHT),
+    rDown: input(EmulatorGamePadKeyCode.RDown, EmulatorCommands.INPUT_R_DOWN),
+    rLeft: input(EmulatorGamePadKeyCode.RLeft, EmulatorCommands.INPUT_R_LEFT),
+    b: input(EmulatorGamePadKeyCode.B, EmulatorCommands.INPUT_B),
+    a: input(EmulatorGamePadKeyCode.A, EmulatorCommands.INPUT_A),
+};
+
+function input(key: EmulatorGamePadKeyCode, command: Command): EmulatorGamePadInput {
+    return { key, command, player2: player2Command(command) };
+}
+
+export const EMULATOR_GAMEPAD_BUTTONS = Object.keys(EMULATOR_GAMEPAD_INPUTS) as EmulatorGamePadButton[];
+
+/** The command a button's mapping hangs off, for one player. */
+export function emulatorGamePadCommand(button: EmulatorGamePadButton, player: number): Command {
+    const gamePadInput = EMULATOR_GAMEPAD_INPUTS[button];
+    return player === 2 ? gamePadInput.player2 : gamePadInput.command;
+}

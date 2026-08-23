@@ -1,5 +1,5 @@
-import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, MessageService, PreferenceScope, PreferenceService, isOSX, isWindows, nls } from '@theia/core/lib/common';
+import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions, WidgetManager } from '@theia/core/lib/browser';
+import { CommandService, isOSX, isWindows, MessageService, nls, PreferenceScope, PreferenceService } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -21,36 +21,41 @@ import {
   RED_VIPER_VBLINK_PORT,
   VbLinkStatus,
   VbLinkStatusData,
+  VES_EMULATOR_WIDGET_ID,
 } from './ves-emulator-types';
+// type only to not cause an injection loop
+import type { VesEmulatorWidget } from './ves-emulator-widget';
 
 export const ROM_PLACEHOLDER = '%ROM%';
 
 @injectable()
 export class VesEmulatorService {
   @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
+  protected readonly shell!: ApplicationShell;
   @inject(CommandService)
-  protected readonly commandService: CommandService;
+  protected readonly commandService!: CommandService;
   @inject(FileService)
-  private readonly fileService: FileService;
+  private readonly fileService!: FileService;
   @inject(MessageService)
-  private readonly messageService: MessageService;
+  private readonly messageService!: MessageService;
   @inject(OpenerService)
-  private readonly openerService: OpenerService;
+  private readonly openerService!: OpenerService;
   @inject(PreferenceService)
-  private readonly preferenceService: PreferenceService;
+  private readonly preferenceService!: PreferenceService;
   @inject(QuickPickService)
-  private readonly quickPickService: QuickPickService;
+  private readonly quickPickService!: QuickPickService;
   @inject(VesBuildService)
-  private readonly vesBuildService: VesBuildService;
+  private readonly vesBuildService!: VesBuildService;
   @inject(VesProcessService)
-  private readonly vesProcessService: VesProcessService;
+  private readonly vesProcessService!: VesProcessService;
   @inject(VesProjectService)
-  protected readonly vesProjectsService: VesProjectService;
+  protected readonly vesProjectsService!: VesProjectService;
   @inject(VesSocketService)
-  protected readonly vesSocketService: VesSocketService;
+  protected readonly vesSocketService!: VesSocketService;
   @inject(VesSocketWatcher)
-  protected readonly vesSocketWatcher: VesSocketWatcher;
+  protected readonly vesSocketWatcher!: VesSocketWatcher;
+  @inject(WidgetManager)
+  protected readonly widgetManager!: WidgetManager;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -309,6 +314,96 @@ export class VesEmulatorService {
   async runInBuiltInEmulator(romUri: URI): Promise<void> {
     const opener = await this.openerService.getOpener(romUri);
     await opener.open(romUri);
+  }
+
+  /**
+   * Link a second player to an already-running emulator, splitting a new tab
+   * to its right rather than opening two fresh ones.
+   *
+   * Both emulators share one worker, because the core emulates the link port
+   * by walking from a simulation to its peer inside a single WebAssembly
+   * instance. They therefore also share a clock: pausing one pauses both,
+   * which is what keeps a linked pair in step. `primary` is already running
+   * in its own, private worker, so joining it to the group means moving its
+   * session into the shared one — see VesEmulatorWidget.joinLinkGroup, which
+   * carries the running game across that move rather than resetting it.
+   */
+  async linkSecondPlayer(primary: VesEmulatorWidget): Promise<void> {
+    if (primary.isLinked()) {
+      return;
+    }
+    // Already paired, just not currently linked (see unlinkPlayers) — this
+    // is what the toolbar button routes to on its own, but guard it here too
+    // for anything else that might call in, so it reconnects the existing
+    // pair rather than adding a third tab.
+    if (primary.getLinkedPeer()) {
+      return this.relinkPlayers(primary);
+    }
+
+    const romUri = primary.getResourceUri();
+    if (!romUri) {
+      return;
+    }
+
+    const uri = romUri.withoutFragment().toString();
+    const linkGroupId = `link-${Date.now()}`;
+
+    await primary.joinLinkGroup(linkGroupId, 1);
+
+    const widget = await this.widgetManager.getOrCreateWidget<VesEmulatorWidget>(
+      VES_EMULATOR_WIDGET_ID,
+      // player 2 for good: it owns `<rom>.p2.sram` from here on, whether or
+      // not this pair stays linked (see VesEmulatorWidgetOptions.player).
+      { uri, instanceId: `${linkGroupId}-2`, linkGroupId, player: 2 }
+    );
+    widget.setPlayerLabel(2);
+    primary.setLinkedPeer(widget);
+    widget.setLinkedPeer(primary);
+    if (!widget.isAttached) {
+      this.shell.addWidget(widget, {
+        area: 'main',
+        // Beside the original, so both players can see their own screen.
+        mode: 'split-right',
+        ref: primary,
+      });
+    }
+    await this.shell.activateWidget(widget.id);
+  }
+
+  /**
+   * Sever a linked pair. Both tabs stay open and keep running, each back on
+   * its own private core, but still remembering each other (see
+   * VesEmulatorWidget.getLinkedPeer) so relinkPlayers can reconnect them.
+   */
+  async unlinkPlayers(widget: VesEmulatorWidget): Promise<void> {
+    const peer = widget.getLinkedPeer();
+    if (!peer || !widget.isLinked()) {
+      return;
+    }
+    // linkGroupId is undefined for both, so each independently takes
+    // createSession's plain-solo-core branch — no group bookkeeping for the
+    // two to race over, unlike relinkPlayers below.
+    await Promise.all([widget.leaveLinkGroup(), peer.leaveLinkGroup()]);
+  }
+
+  /**
+   * Reconnect an already-paired pair that is currently running unlinked.
+   *
+   * The two joins are sequenced deliberately, not run with Promise.all:
+   * VesEmulatorCoreService.createSession creates the shared core for a new
+   * link group id on the *first* caller to use it and only registers it
+   * afterwards, so a second, concurrent caller for the same id could miss it
+   * and stand up a second core instead of joining the first one. Awaiting
+   * `widget` first guarantees the group exists before `peer` ever looks.
+   */
+  async relinkPlayers(widget: VesEmulatorWidget): Promise<void> {
+    const peer = widget.getLinkedPeer();
+    if (!peer || widget.isLinked()) {
+      return;
+    }
+    const linkGroupId = `link-${Date.now()}`;
+    await widget.joinLinkGroup(linkGroupId, 1);
+    await peer.joinLinkGroup(linkGroupId, 2);
   }
 
   async runInRedViper(): Promise<void> {

@@ -9,9 +9,9 @@ import { ApplicationPackage } from '@theia/core/shared/@theia/application-packag
 export class EmulatorBackendContribution implements BackendApplicationContribution {
 
   @inject(ApplicationPackage)
-  protected readonly applicationPackage: ApplicationPackage;
+  protected readonly applicationPackage!: ApplicationPackage;
   @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
+  protected readonly envVariablesServer!: EnvVariablesServer;
 
   async configure(app: express.Application): Promise<void> {
     app.use(
@@ -22,7 +22,7 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
           'binaries',
           'vuengine-studio-tools',
           'web',
-          'retroarch'
+          'shrooms-vb-core'
         ),
         {
           dotfiles: 'allow'

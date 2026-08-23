@@ -7,6 +7,7 @@ import { EmulatorConfigsViewContribution } from './ves-emulator-configs-view-con
 import { EmulatorConfigsWidget } from './ves-emulator-configs-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorContribution } from './ves-emulator-contribution';
+import { VesEmulatorCoreService } from './ves-emulator-core-service';
 import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
 import { VesEmulatorPreferenceSchema } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -32,6 +33,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // emulator service
     bind(VesEmulatorService).toSelf().inSingletonScope();
+
+    // emulator core sessions
+    bind(VesEmulatorCoreService).toSelf().inSingletonScope();
 
     // context key service
     bind(VesEmulatorContextKeyService).toSelf().inSingletonScope();

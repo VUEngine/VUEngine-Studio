@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import { GRAPHICAL_EDITOR_FOCUS_CONTEXT } from '../../../ves-editors-context-key-service';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
 import ButtonAssignment from '../../Common/ButtonAssignment/ButtonAssignment';
@@ -20,44 +21,44 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
             <VContainer>
                 <ButtonAssignment
                     command={SoundEditorCommands.PLAY_PAUSE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.STOP}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOGGLE_SIDEBAR_VISIBILITY}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.OPEN_INSTRUMENT_EDITOR}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
             </VContainer>
@@ -68,38 +69,38 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
                 <VContainer>
                     <ButtonAssignment
                         command={SoundEditorCommands.IMPORT}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.EXPORT}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.TRANSPOSE}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.REMOVE_UNUSED_PATTERNS}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.REMOVE_UNUSED_INSTRUMENTS}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                     <ButtonAssignment
                         command={SoundEditorCommands.CLEAN_DUPLICATE_PATTERNS}
-                        commandService={services.commandService}
                         vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                         width={KEYBINDING_WIDTH}
                     />
                 </VContainer>
@@ -110,80 +111,80 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
             <VContainer>
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_EDIT}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_ERASER}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_DRAG}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_MARQUEE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_MARQUEE_MODE_REPLACE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_MARQUEE_MODE_ADD}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOOL_MARQUEE_MODE_SUBTRACT}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.TOGGLE_NOTE_SNAPPING}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SET_NOTE_LENGTH_1}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SET_NOTE_LENGTH_2}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SET_NOTE_LENGTH_4}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SET_NOTE_LENGTH_8}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SET_NOTE_LENGTH_16}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
             </VContainer>
@@ -193,116 +194,116 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
             <VContainer>
                 <ButtonAssignment
                     command={SoundEditorCommands.ADD_TRACK}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.ADD_PATTERN}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_1}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_2}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_3}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_4}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_5}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_TRACK_6}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_NEXT_TRACK}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_PREVIOUS_TRACK}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_NEXT_PATTERN}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_PREVIOUS_PATTERN}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
             </VContainer>
@@ -312,128 +313,128 @@ export default function Keybindings(props: KeybindingsProps): React.JSX.Element 
             <VContainer>
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_AT_CURSOR_POSITION}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.ADD_AT_CURSOR_POSITION}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.SELECT_ALL_NOTES}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.COPY_SELECTION}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.CUT_SELECTION}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PASTE_SELECTION}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.NOTES_UP}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.NOTES_DOWN}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.NOTES_UP_AN_OCTAVE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.NOTES_DOWN_AN_OCTAVE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
                 <ButtonAssignment
                     command={SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET}
-                    commandService={services.commandService}
                     vesCommonService={services.vesCommonService}
+                    when={GRAPHICAL_EDITOR_FOCUS_CONTEXT}
                     width={KEYBINDING_WIDTH}
                 />
             </VContainer>

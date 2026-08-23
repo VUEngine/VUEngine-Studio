@@ -159,6 +159,7 @@ interface SoundEditorToolbarProps {
     setNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
+    playerSeekRequest: number
     setPlaying: Dispatch<SetStateAction<boolean>>
 }
 
@@ -185,6 +186,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         setNotes,
         setTrack,
         forcePlayerRomRebuild,
+        playerSeekRequest,
         setPlaying,
     } = props;
     const isPlayingRegular = playing && !testNote;
@@ -289,6 +291,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         playRangeEnd={playRangeEnd}
                         trackSettings={trackSettings}
                         forcePlayerRomRebuild={forcePlayerRomRebuild}
+                        playerSeekRequest={playerSeekRequest}
                         setPlaying={setPlaying}
                     />
                 </StyledSoundEditorToolbarVisualization>

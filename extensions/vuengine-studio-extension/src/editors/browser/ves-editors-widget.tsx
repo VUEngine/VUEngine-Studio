@@ -37,6 +37,7 @@ import { VesBuildPathsService } from '../../build/browser/ves-build-paths-servic
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesEmulatorCoreService } from '../../emulator/browser/ves-emulator-core-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -62,69 +63,71 @@ export interface ItemData {
 @injectable()
 export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
     @inject(ClipboardService)
-    private readonly clipboardService: ClipboardService;
+    private readonly clipboardService!: ClipboardService;
     @inject(ColorRegistry)
-    private readonly colorRegistry: ColorRegistry;
+    private readonly colorRegistry!: ColorRegistry;
     @inject(CommandService)
-    protected readonly commandService: CommandService;
+    protected readonly commandService!: CommandService;
     @inject(EditorPreferences)
-    protected readonly editorPreferences: EditorPreferences;
+    protected readonly editorPreferences!: EditorPreferences;
     @inject(EnvVariablesServer)
-    protected readonly envVariablesServer: EnvVariablesServer;
+    protected readonly envVariablesServer!: EnvVariablesServer;
     @inject(FileDialogService)
-    protected readonly fileDialogService: FileDialogService;
+    protected readonly fileDialogService!: FileDialogService;
     @inject(FileService)
-    protected readonly fileService: FileService;
+    protected readonly fileService!: FileService;
     @inject(FrontendApplication)
-    protected readonly app: FrontendApplication;
+    protected readonly app!: FrontendApplication;
     @inject(HoverService)
-    protected readonly hoverService: HoverService;
+    protected readonly hoverService!: HoverService;
     @inject(LabelProvider)
-    protected readonly labelProvider: LabelProvider;
+    protected readonly labelProvider!: LabelProvider;
     @inject(MessageService)
-    protected readonly messageService: MessageService;
+    protected readonly messageService!: MessageService;
     @inject(LocalStorageService)
-    protected readonly localStorageService: LocalStorageService;
+    protected readonly localStorageService!: LocalStorageService;
     @inject(MonacoTextModelService)
-    protected readonly modelService: MonacoTextModelService;
+    protected readonly modelService!: MonacoTextModelService;
     @inject(OpenerService)
-    protected readonly openerService: OpenerService;
+    protected readonly openerService!: OpenerService;
     @inject(QuickPickService)
-    protected readonly quickPickService: QuickPickService;
+    protected readonly quickPickService!: QuickPickService;
     @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService;
+    protected readonly preferenceService!: PreferenceService;
     @inject(StatusBar)
-    protected readonly statusBar: StatusBar;
+    protected readonly statusBar!: StatusBar;
     @inject(ThemeService)
-    protected readonly themeService: ThemeService;
+    protected readonly themeService!: ThemeService;
     @inject(UndoRedoService)
-    protected readonly undoRedoService: UndoRedoService;
+    protected readonly undoRedoService!: UndoRedoService;
     @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService;
+    protected readonly vesBuildService!: VesBuildService;
     @inject(VesBuildPathsService)
-    protected readonly vesBuildPathsService: VesBuildPathsService;
+    protected readonly vesBuildPathsService!: VesBuildPathsService;
     @inject(VesCodeGenService)
-    protected readonly vesCodeGenService: VesCodeGenService;
+    protected readonly vesCodeGenService!: VesCodeGenService;
     @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
+    protected readonly vesCommonService!: VesCommonService;
     @inject(VesEditorsWidgetOptions)
-    protected readonly options: VesEditorsWidgetOptions;
+    protected readonly options!: VesEditorsWidgetOptions;
+    @inject(VesEmulatorCoreService)
+    protected readonly vesEmulatorCoreService!: VesEmulatorCoreService;
     @inject(VesImagesService)
-    protected readonly vesImagesService: VesImagesService;
+    protected readonly vesImagesService!: VesImagesService;
     @inject(VesPluginsService)
-    protected readonly vesPluginsService: VesPluginsService;
+    protected readonly vesPluginsService!: VesPluginsService;
     @inject(VesProcessService)
-    protected readonly vesProcessService: VesProcessService;
+    protected readonly vesProcessService!: VesProcessService;
     @inject(VesProcessWatcher)
-    protected readonly vesProcessWatcher: VesProcessWatcher;
+    protected readonly vesProcessWatcher!: VesProcessWatcher;
     @inject(VesProjectService)
-    protected readonly vesProjectService: VesProjectService;
+    protected readonly vesProjectService!: VesProjectService;
     @inject(VesRumblePackService)
-    protected readonly vesRumblePackService: VesRumblePackService;
+    protected readonly vesRumblePackService!: VesRumblePackService;
     @inject(WindowService)
-    protected readonly windowService: WindowService;
+    protected readonly windowService!: WindowService;
     @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService;
+    protected readonly workspaceService!: WorkspaceService;
 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
@@ -542,6 +545,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                             vesBuildService: this.vesBuildService,
                             vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
+                            vesEmulatorCoreService: this.vesEmulatorCoreService,
                             vesImagesService: this.vesImagesService,
                             vesPluginsService: this.vesPluginsService,
                             vesProcessService: this.vesProcessService,

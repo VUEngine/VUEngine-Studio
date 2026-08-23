@@ -22,7 +22,7 @@ The following third party binaries that are shipped with VUEngine Studio come wi
 - HyperFlasherCli by thunderstruck
 - MSYS by the MinGW Project
 - prog-vb by William D. Jones
-- Retroarch Web with Beetle VB Core by the RetroArch and Mednafen teams
+- shrooms-vb-core by GuyPerfect
 
 ## Usage
 
@@ -39,10 +39,6 @@ Make sure you're using at least node 22.
     nvm install 22
     nvm use 22
 
-Install yarn.
-
-    npm i -g yarn
-
 On Linux systems, you'll need the following packages:
 
     sudo apt-get install -y g++ gcc make python3 pkg-config libx11-dev libxkbfile-dev libsecret-1-dev
@@ -55,40 +51,40 @@ Install Python.
 
 After cloning, load git submodules with
 
-    yarn modules:init
+    npm run modules:init
 
 They can be updated at a later point with
 
-    yarn modules:update
+    npm run modules:update
 
 ### Build
 
 To build the application in production mode:
 
-    yarn && yarn build && yarn download:plugins
+    npm i && npm run build && npm run download:plugins
 
 For a fast, less resource intensive build use the following. This will not minify the frontend app.
 
-    yarn && yarn build:dev && yarn download:plugins
+    npm i && npm run build:dev && npm run download:plugins
 
 ### Development
 
 Open two terminals and execute one of the following commands in each.
 
-    yarn watch
-    yarn electron start
+    npm run watch
+    npm run electron start
 
 The first will do an incremental build on every code change you do. The latter will start the Electron frontend. Reload (CMD/Ctrl+R) to load your changes.
 
 ### Package the application
 
-    yarn electron package
+    npm run electron package
 
 The packaged application is located in `applications/electron/dist`.
 
 ### Create a preview application (without packaging it)
 
-    yarn electron package:preview
+    npm run electron package:preview
 
 The packaged application is located in `applications/electron/dist`.
 
@@ -97,8 +93,8 @@ The packaged application is located in `applications/electron/dist`.
 The E2E tests basic UI tests of the actual application.
 This is done based on the preview of the packaged application.
 
-    yarn electron package:preview
-    yarn electron test
+    npm run electron package:preview
+    npm run electron test
 
 ### Reporting feature requests and bugs
 

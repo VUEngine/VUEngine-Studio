@@ -1,9 +1,14 @@
 import { nls, PreferenceScope } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
-  EMULATION_MODES,
-  EMULATION_SCALES,
-  EMULATION_STEREO_MODES,
+  VB_DEFAULT_ANAGLYPH_PALETTE_ID,
+  VB_DEFAULT_PALETTE_ID,
+  VB_DEFAULT_RENDERING_MODE,
+  VB_LEVELS,
+} from '../common/ves-vb-constants';
+import {
+  EMULATION_RENDERING_MODES,
+  EmulatorScale
 } from './ves-emulator-types';
 
 export namespace VesEmulatorPreferenceIds {
@@ -12,14 +17,19 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATORS = [CATEGORY, 'custom', 'configs'].join('.');
   export const DEFAULT_EMULATOR = [CATEGORY, 'custom', 'default'].join('.');
   export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
-  export const EMULATOR_BUILTIN_STEREO_MODE = [CATEGORY, 'builtIn', 'stereoMode'].join('.');
-  export const EMULATOR_BUILTIN_EMULATION_MODE = [CATEGORY, 'builtIn', 'emulationMode'].join('.');
+  export const EMULATOR_BUILTIN_RENDERING_MODE = [CATEGORY, 'builtIn', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_PALETTE = [CATEGORY, 'builtIn', 'palette'].join('.');
+  export const EMULATOR_BUILTIN_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'anaglyphPalette'].join('.');
+  export const EMULATOR_BUILTIN_CUSTOM_PALETTES = [CATEGORY, 'builtIn', 'customPalettes'].join('.');
+  export const EMULATOR_BUILTIN_CUSTOM_ANAGLYPH_PALETTES = [CATEGORY, 'builtIn', 'customAnaglyphPalettes'].join('.');
   export const EMULATOR_BUILTIN_SCALE = [CATEGORY, 'builtIn', 'scale'].join('.');
   export const EMULATOR_BUILTIN_REWIND_ENABLE = [CATEGORY, 'builtIn', 'rewind', 'enable'].join('.');
   export const EMULATOR_BUILTIN_REWIND_GRANULARITY = [CATEGORY, 'builtIn', 'rewind', 'granularity'].join('.');
+  export const EMULATOR_BUILTIN_REWIND_BUFFER_SIZE = [CATEGORY, 'builtIn', 'rewind', 'bufferSize'].join('.');
   export const EMULATOR_BUILTIN_SLOW_MOTION_RATIO = [CATEGORY, 'builtIn', 'slowMotion', 'ratio'].join('.');
   export const EMULATOR_BUILTIN_FAST_FORWARD_RATIO = [CATEGORY, 'builtIn', 'fastForward', 'ratio'].join('.');
   export const EMULATOR_RED_VIPER_3DS_IP_ADDRESS = [CATEGORY, 'redViper', '3dsIpAddress'].join('.');
+  export const EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS = [CATEGORY, 'builtIn', 'player2', 'sameControls'].join('.');
 }
 
 export const VesEmulatorPreferenceSchema: PreferenceSchema = {
@@ -74,35 +84,119 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE]: {
       type: 'string',
       title: nls.localize(
-        'vuengine/emulator/preferences/builtInStereoModeTitle',
-        'Stereo Mode',
+        'vuengine/emulator/preferences/builtInRenderingModeTitle',
+        'Rendering Mode',
       ),
       description: nls.localize(
-        'vuengine/emulator/preferences/builtInStereoModeDescription',
-        'Stereoscopy display mode of built-in emulator.'
+        'vuengine/emulator/preferences/builtInRenderingModeDescription',
+        'How the built-in emulator presents the two eyes. The colors each mode is shown in are configured separately.'
       ),
-      enum: Object.keys(EMULATION_STEREO_MODES),
-      enumItemLabels: Object.values(EMULATION_STEREO_MODES),
-      default: Object.keys(EMULATION_STEREO_MODES)[0],
+      enum: Object.keys(EMULATION_RENDERING_MODES),
+      enumItemLabels: Object.values(EMULATION_RENDERING_MODES),
+      default: VB_DEFAULT_RENDERING_MODE,
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE]: {
       type: 'string',
       title: nls.localize(
-        'vuengine/emulator/preferences/builtInEmulationModeTitle',
-        'Emulation Mode'
+        'vuengine/emulator/preferences/builtInPaletteTitle',
+        'Color Palette',
       ),
       description: nls.localize(
-        'vuengine/emulator/preferences/builtInEmulationModeDescription',
-        'Emulation mode of built-in emulator.'
+        'vuengine/emulator/preferences/builtInPaletteDescription',
+        'Colors the built-in emulator shows the four display brightness levels in, in every rendering mode but Anaglyph. '
+        + 'Can be one of the built-in palettes or, as "custom:<name>", one defined in Custom Color Palettes.'
       ),
-      enum: Object.keys(EMULATION_MODES),
-      enumItemLabels: Object.values(EMULATION_MODES),
-      default: Object.keys(EMULATION_MODES)[0],
+      default: VB_DEFAULT_PALETTE_ID,
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE]: {
+      type: 'string',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInAnaglyphPaletteTitle',
+        'Anaglyph Colors',
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/builtInAnaglyphPaletteDescription',
+        'Tints the built-in emulator assigns to the eyes in the Anaglyph rendering mode. Pick the pair your glasses filter. '
+        + 'Can be one of the built-in pairs or, as "custom:<name>", one defined in Custom Anaglyph Colors.'
+      ),
+      default: VB_DEFAULT_ANAGLYPH_PALETTE_ID,
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES]: {
+      type: 'array',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInCustomPalettesTitle',
+        'Custom Color Palettes'
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/builtInCustomPalettesDescription',
+        'User-defined palettes, offered alongside the built-in ones.'
+      ),
+      items: {
+        type: 'object',
+        title: 'Custom color palette',
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Name of the palette.',
+            title: 'Name',
+          },
+          colors: {
+            type: 'array',
+            description: "The display's four brightness levels, from unlit to fully lit, as #rrggbb.",
+            title: 'Colors',
+            items: {
+              type: 'string',
+            },
+            minItems: VB_LEVELS,
+            maxItems: VB_LEVELS,
+          },
+        },
+      },
+      default: [],
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_ANAGLYPH_PALETTES]: {
+      type: 'array',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInCustomAnaglyphPalettesTitle',
+        'Custom Anaglyph Colors'
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/builtInCustomAnaglyphPalettesDescription',
+        'User-defined anaglyph tint pairs, offered alongside the built-in ones.'
+      ),
+      items: {
+        type: 'object',
+        title: 'Custom anaglyph colors',
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Name of the color pair.',
+            title: 'Name',
+          },
+          left: {
+            type: 'string',
+            description: 'Tint of the left eye, as #rrggbb.',
+            title: 'Left',
+          },
+          right: {
+            type: 'string',
+            description: 'Tint of the right eye, as #rrggbb.',
+            title: 'Right',
+          },
+        },
+      },
+      default: [],
       scope: PreferenceScope.Folder,
       overridable: true,
     },
@@ -116,9 +210,25 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
         'vuengine/emulator/preferences/builtInScalingModeDescription',
         'Scaling mode of built-in emulator.'
       ),
-      enum: Object.keys(EMULATION_SCALES),
-      enumItemLabels: Object.values(EMULATION_SCALES),
-      default: Object.keys(EMULATION_SCALES)[0],
+      enum: Object.keys(EmulatorScale),
+      enumItemLabels: Object.values(EmulatorScale),
+      default: EmulatorScale.AUTO,
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS]: {
+      type: 'boolean',
+      title: nls.localize(
+        'vuengine/emulator/preferences/player2SameControlsTitle',
+        'Player 2 Uses Player 1 Controls'
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/player2SameControlsDescription',
+        'Whether the second emulator of a link session answers to the same keys as the first. '
+        + 'Turn this off to map a separate set of keys for player 2, '
+        + "in the emulator's Configure Input window."
+      ),
+      default: true,
       scope: PreferenceScope.Folder,
       overridable: true,
     },
@@ -158,11 +268,30 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInRewindGranularityDescription',
-        'Defines how many frames per step the rewind function should go back at a time.'
+        'Defines how many frames per step the rewind function should go back at a time. '
+        + 'Higher values cover more time with the same amount of memory, at a coarser resolution.'
       ),
       default: 1,
-      minimum: 0,
+      minimum: 1,
       maximum: 32,
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_BUFFER_SIZE]: {
+      type: 'number',
+      title: nls.localize(
+        'vuengine/emulator/preferences/builtInRewindBufferSizeTitle',
+        'Rewind Buffer Size'
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/builtInRewindBufferSizeDescription',
+        'Maximum memory in MB the rewind history may use. Only what changes between steps is '
+        + 'stored, which measures at around 16 KB per step, so the default holds roughly 80 '
+        + 'seconds at a granularity of 1 and proportionally longer above that.'
+      ),
+      default: 64,
+      minimum: 8,
+      maximum: 1024,
       scope: PreferenceScope.Folder,
       overridable: true,
     },
@@ -191,10 +320,10 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       ),
       description: nls.localize(
         'vuengine/emulator/preferences/builtInFastForwardRatioDescription',
-        'The maximum rate at which content will be run when using fast forward. (E.g. 5.0 means 50 Hz * 5.0 = 250 fps cap). 0 means no FPS cap.'
+        'The rate at which content will be run when using fast forward. (E.g. 5.0 means 50 Hz * 5.0 = 250 fps).'
       ),
-      default: 0.0,
-      minimum: 0,
+      default: 4.0,
+      minimum: 1,
       maximum: 32,
       // TODO: allow 0.1 steps
       scope: PreferenceScope.Folder,

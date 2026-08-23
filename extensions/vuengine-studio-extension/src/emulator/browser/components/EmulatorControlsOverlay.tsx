@@ -1,27 +1,22 @@
-import { Command, CommandService } from '@theia/core';
+import { Command, nls, PreferenceScope, PreferenceService } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
 import * as React from '@theia/core/shared/react';
-import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import styled from 'styled-components';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
+import RadioSelect from '../../../editors/browser/components/Common/Base/RadioSelect';
 import ButtonAssignment from '../../../editors/browser/components/Common/ButtonAssignment/ButtonAssignment';
-import { EmulatorCommands } from '../ves-emulator-commands';
+import { EmulatorCommands, EmulatorGamePadButton, emulatorGamePadCommand } from '../ves-emulator-commands';
+import { EMULATOR_FOCUS_CONTEXT } from '../ves-emulator-context-key-service';
+import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 
 const ControlsOverlay = styled.div`
   align-items: flex-start;
-  background-color: var(--theia-editor-background);
-  bottom: 0;
   display: flex;
-  left: 0;
-  overflow: auto;
+  height: 100%;
   padding: calc(var(--theia-ui-padding) * 4) calc(var(--theia-ui-padding) * 2);
-  position: absolute;
-  right: 0;
-  top: 50px;
-  z-index: 10;
 
   &>div {
     margin: auto;
@@ -60,6 +55,13 @@ const Controller = styled.div`
     }
 `;
 
+const SameControls = styled.label`
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: var(--theia-ui-padding);
+`;
+
 const ControllerImage = styled.div`
     margin: 0 calc(var(--theia-ui-padding) * 4);
     position: relative;
@@ -71,7 +73,7 @@ const ControllerImage = styled.div`
 `;
 
 const ControllerButtonOverlay = styled.div`
-    background-color: #fff;
+    border: 4px solid var(--theia-focusBorder);
     cursor: pointer;
     opacity: 0;
     position: absolute;
@@ -83,10 +85,9 @@ const ControllerButtonOverlay = styled.div`
 
     &.power {
         height: 4%;
-        left: 44.5%;
-        top: 36.3%;
-        transform: perspective(7px) rotateX(-10deg);
-        width: 11%;
+        left: 43.1%;
+        top: 35%;
+        width: 12.4%;
         border-radius: 2px;
     }
 
@@ -115,96 +116,98 @@ const ControllerButtonOverlay = styled.div`
     }
 
     &.select {
-        left: 27.2%;
-        top: 38.7%;
+        left: 26.5%;
+        top: 37.6%;
     }
 
     &.start {
-        left: 34.8%;
-        top: 42.2%;
+        left: 34.2%;
+        top: 41.35%;
     }
 
     &.lup {
         border-bottom-width: 0;
-        left: 15%;
-        top: 30%;
+        left: 14.3%;
+        top: 29%;
     }
 
     &.lleft {
         border-right-width: 0;
-        left: 10.9%;
-        top: 33.9%;
+        left: 10%;
+        top: 33.1%;
     }
 
     &.lright {
         border-left-width: 0;
         left: 19.5%;
-        top: 33.9%;
+        top: 33.1%;
     }
 
     &.ldown {
         border-top-width: 0;
-        left: 15%;
-        top: 38.4%;
+        left: 14.3%;
+        top: 38%;
     }
 
     &.lt {
-        left: 13.8%;
-        top: 7.7%;
+        left: 13.2%;
+        top: 6.9%;
     }
 
     &.b {
-        right: 34.8%;
-        top: 42.2%;
+        right: 34.2%;
+        top: 41.35%;
     }
 
     &.a {
-        right: 27.2%;
-        top: 38.7%;
+        right: 26.4%;
+        top: 37.6%;
     }
 
     &.rup {
         border-bottom-width: 0;
-        right: 15%;
-        top: 30%;
+        right: 14.2%;
+        top: 29%;
     }
 
     &.rleft {
         border-right-width: 0;
         right: 19.5%;
-        top: 33.9%;
+        top: 33.1%;
     }
 
     &.rright {
         border-left-width: 0;
-        right: 10.9%;
-        top: 33.9%;
+        right: 9.9%;
+        top: 33.1%;
     }
 
     &.rdown {
         border-top-width: 0;
-        right: 15%;
-        top: 38.4%;
+        right: 14.2%;
+        top: 38%;
     }
 
     &.rt {
-        right: 13.8%;
-        top: 7.7%;
+        right: 13%;
+        top: 6.9%;
     }
 `;
 
 export interface EmulatorControlsOverlayProps {
-    commandService: CommandService
     keybindingRegistry: KeybindingRegistry
+    preferenceService: PreferenceService
     vesCommonService: VesCommonService
 }
 
 export interface EmulatorControlsOverlayState {
+    /** Whose mappings are being looked at, which is not tied to any emulator. */
+    player: number
 }
 
 export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOverlayProps, EmulatorControlsOverlayState> {
-    protected commandService: CommandService;
     protected keybindingRegistry: KeybindingRegistry;
+    protected preferenceService: PreferenceService;
     protected vesCommonService: VesCommonService;
 
     protected controllerButtonAssignmentSelectRef = React.createRef<HTMLDivElement>();
@@ -241,70 +244,140 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
     constructor(props: EmulatorControlsOverlayProps) {
         super(props);
 
-        this.commandService = props.commandService;
         this.vesCommonService = props.vesCommonService;
         this.keybindingRegistry = props.keybindingRegistry;
+        this.preferenceService = props.preferenceService;
+        this.state = { player: 1 };
+    }
+
+    /**
+     * The command carrying one button's mapping for the player being looked
+     * at. Player 2 has a set of its own, which is what makes its controls
+     * separately configurable.
+     */
+    protected commandFor(button: EmulatorGamePadButton): Command {
+        return emulatorGamePadCommand(button, this.state.player);
+    }
+
+    protected setPlayer(player: number): void {
+        this.setState({ player });
+    }
+
+    /** Whether player 2 answers to player 1's keys. */
+    protected get sameControls(): boolean {
+        return this.preferenceService.get(
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS, true
+        ) ?? true;
+    }
+
+    protected async setSameControls(sameControls: boolean): Promise<void> {
+        await this.preferenceService.set(
+            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS,
+            sameControls,
+            PreferenceScope.User
+        );
+        // Nothing else here holds the answer, so the redraw has to be asked for.
+        this.forceUpdate();
     }
 
     render(): React.JSX.Element {
+        const isPlayer2 = this.state.player === 2;
+        // Nothing to configure while player 2 is on player 1's keys, and the
+        // function keys below are the application's rather than either
+        // player's, so they belong to the first player's page only.
+        const configurable = !isPlayer2 || !this.sameControls;
+
         return <ControlsOverlay>
             <div>
+                <div>
+                    <VContainer>
+                        <RadioSelect
+                            options={[
+                                { value: 1, label: nls.localize('vuengine/emulator/player1', 'Player 1') },
+                                { value: 2, label: nls.localize('vuengine/emulator/player2', 'Player 2') },
+                            ]}
+                            defaultValue={this.state.player}
+                            onChange={options => this.setPlayer(options[0].value as number)}
+                        />
+                        {isPlayer2 &&
+                            <SameControls>
+                                <input
+                                    type='checkbox'
+                                    checked={this.sameControls}
+                                    onChange={e => this.setSameControls(e.target.checked)}
+                                />
+                                {nls.localize('vuengine/emulator/sameAsPlayer1', 'Same as Player 1')}
+                            </SameControls>
+                        }
+                    </VContainer>
+                </div>
+                {!configurable &&
+                    <div>
+                        <VContainer>
+                            {nls.localize(
+                                'vuengine/emulator/player2SameControlsHint',
+                                'Player 2 answers to the same keys as player 1. Uncheck the box above to give it a set of its own.',
+                            )}
+                        </VContainer>
+                    </div>
+                }
+                {configurable && <>
                 <Controller>
                     <VContainer>
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_L_TRIGGER}
+                            command={this.commandFor('lTrigger')}
                             refObject={this.controllerButtonAssignmentLTRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
                         />
                         <br />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_L_UP}
-                            commandService={this.commandService}
+                            command={this.commandFor('lUp')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentLUpRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_L_RIGHT}
-                            commandService={this.commandService}
+                            command={this.commandFor('lRight')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentLRightRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_L_DOWN}
-                            commandService={this.commandService}
+                            command={this.commandFor('lDown')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentLDownRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_L_LEFT}
-                            commandService={this.commandService}
+                            command={this.commandFor('lLeft')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentLLeftRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
                         />
                         <br />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_SELECT}
-                            commandService={this.commandService}
+                            command={this.commandFor('select')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentSelectRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_START}
-                            commandService={this.commandService}
+                            command={this.commandFor('start')}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             refObject={this.controllerButtonAssignmentStartRef}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
@@ -315,258 +388,261 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                         <ControllerButtonOverlay
                             className='power'
                             ref={this.controllerButtonPowerRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_TOGGLE_LOW_POWER)}
+                            onClick={() => this.assignKeybinding(EmulatorCommands.INPUT_TOGGLE_LOW_POWER)}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
                         />
                         <ControllerButtonOverlay
                             className='select'
                             ref={this.controllerButtonSelectRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_SELECT)}
+                            onClick={() => this.assignKeybinding(this.commandFor('select'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
                         />
                         <ControllerButtonOverlay
                             className='start'
                             ref={this.controllerButtonStartRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_START)}
+                            onClick={() => this.assignKeybinding(this.commandFor('start'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
                         />
                         <ControllerButtonOverlay
                             className='a'
                             ref={this.controllerButtonARef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_A)}
+                            onClick={() => this.assignKeybinding(this.commandFor('a'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
                         />
                         <ControllerButtonOverlay
                             className='b'
                             ref={this.controllerButtonBRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_B)}
+                            onClick={() => this.assignKeybinding(this.commandFor('b'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
                         />
                         <ControllerButtonOverlay
                             className='lup'
                             ref={this.controllerButtonLUpRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_L_UP)}
+                            onClick={() => this.assignKeybinding(this.commandFor('lUp'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
                         />
                         <ControllerButtonOverlay
                             className='lleft'
                             ref={this.controllerButtonLLeftRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_L_LEFT)}
+                            onClick={() => this.assignKeybinding(this.commandFor('lLeft'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
                         />
                         <ControllerButtonOverlay
                             className='lright'
                             ref={this.controllerButtonLRightRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_L_RIGHT)}
+                            onClick={() => this.assignKeybinding(this.commandFor('lRight'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
                         />
                         <ControllerButtonOverlay
                             className='ldown'
                             ref={this.controllerButtonLDownRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_L_DOWN)}
+                            onClick={() => this.assignKeybinding(this.commandFor('lDown'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
                         />
                         <ControllerButtonOverlay
                             className='rup'
                             ref={this.controllerButtonRUpRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_R_UP)}
+                            onClick={() => this.assignKeybinding(this.commandFor('rUp'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
                         />
                         <ControllerButtonOverlay
                             className='rleft'
                             ref={this.controllerButtonRLeftRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_R_LEFT)}
+                            onClick={() => this.assignKeybinding(this.commandFor('rLeft'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
                         />
                         <ControllerButtonOverlay
                             className='rright'
                             ref={this.controllerButtonRRightRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_R_RIGHT)}
+                            onClick={() => this.assignKeybinding(this.commandFor('rRight'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
                         />
                         <ControllerButtonOverlay
                             className='rdown'
                             ref={this.controllerButtonRDownRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_R_DOWN)}
+                            onClick={() => this.assignKeybinding(this.commandFor('rDown'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
                         />
                         <ControllerButtonOverlay
                             className='lt'
                             ref={this.controllerButtonLTRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_L_TRIGGER)}
+                            onClick={() => this.assignKeybinding(this.commandFor('lTrigger'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
                         />
                         <ControllerButtonOverlay
                             className='rt'
                             ref={this.controllerButtonRTRef}
-                            onClick={() => this.openKeymaps(EmulatorCommands.INPUT_R_TRIGGER)}
+                            onClick={() => this.assignKeybinding(this.commandFor('rTrigger'))}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
                         />
                     </ControllerImage>
                     <VContainer>
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_R_TRIGGER}
+                            command={this.commandFor('rTrigger')}
                             refObject={this.controllerButtonAssignmentRTRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
                         />
                         <br />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_R_UP}
+                            command={this.commandFor('rUp')}
                             refObject={this.controllerButtonAssignmentRUpRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_R_RIGHT}
+                            command={this.commandFor('rRight')}
                             refObject={this.controllerButtonAssignmentRRightRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_R_DOWN}
+                            command={this.commandFor('rDown')}
                             refObject={this.controllerButtonAssignmentRDownRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_R_LEFT}
+                            command={this.commandFor('rLeft')}
                             refObject={this.controllerButtonAssignmentRLeftRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
                         />
                         <br />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_A}
+                            command={this.commandFor('a')}
                             refObject={this.controllerButtonAssignmentARef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonARef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonARef)}
                         />
                         <ButtonAssignment
-                            command={EmulatorCommands.INPUT_B}
+                            command={this.commandFor('b')}
                             refObject={this.controllerButtonAssignmentBRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
                         />
                     </VContainer>
                 </Controller>
+                </>}
+                {this.state.player === 1 &&
                 <HContainer>
                     <VContainer>
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_PAUSE_TOGGLE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_RESET}
                             refObject={this.controllerButtonAssignmentPowerRef}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                             onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
                             onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_AUDIO_MUTE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_TOGGLE_LOW_POWER}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                     </VContainer>
                     <VContainer>
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_FRAME_ADVANCE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_TOGGLE_SLOWMOTION}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_REWIND}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                     </VContainer>
                     <VContainer>
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_SAVE_STATE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_LOAD_STATE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_STATE_SLOT_INCREASE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_STATE_SLOT_DECREASE}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                     </VContainer>
                     <VContainer>
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_FULLSCREEN}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_SCREENSHOT}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                         <ButtonAssignment
                             command={EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY}
-                            commandService={this.commandService}
                             vesCommonService={this.vesCommonService}
+                            when={EMULATOR_FOCUS_CONTEXT}
                         />
                     </VContainer>
                 </HContainer>
+                }
             </div>
         </ControlsOverlay>;
     }
@@ -574,10 +650,15 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
     protected toggleRefHighlighted = (buttonOverlayRef: React.RefObject<HTMLDivElement>) =>
         buttonOverlayRef.current?.classList.toggle('highlighted');
 
-    protected openKeymaps = async (command: Command) => this.commandService.executeCommand(
-        KeymapsCommands.OPEN_KEYMAPS.id, command.category
-        ? `${command.category}: ${command.label}`
-        : command.label
-    );
+    /**
+     * Clicking a button on the picture maps a key to it, the same as clicking
+     * its row. The rows read their mapping from the keybinding registry as
+     * they render, so a change made here needs a redraw to show up in them.
+     */
+    protected assignKeybinding = async (command: Command) => {
+        if (await this.vesCommonService.captureKeybinding(command, EMULATOR_FOCUS_CONTEXT)) {
+            this.forceUpdate();
+        }
+    };
 
 }

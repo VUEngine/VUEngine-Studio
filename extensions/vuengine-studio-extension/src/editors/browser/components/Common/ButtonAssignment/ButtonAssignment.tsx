@@ -1,6 +1,5 @@
-import { Command, CommandService, nls } from '@theia/core';
-import { KeymapsCommands } from '@theia/keymaps/lib/browser';
-import React, { MouseEventHandler, RefObject } from 'react';
+import { Command, nls } from '@theia/core';
+import React, { MouseEventHandler, RefObject, useState } from 'react';
 import styled from 'styled-components';
 import { VesCommonService } from '../../../../../core/browser/ves-common-service';
 import { EditorCommand } from '../../../ves-editors-types';
@@ -47,8 +46,13 @@ const StyledButtonAssignment = styled.div`
 
 interface ButtonAssignmentProps {
     command: Command | EditorCommand
-    commandService: CommandService
     vesCommonService: VesCommonService
+    /**
+     * The context a mapping made here applies in, e.g. `emulatorFocus`. Worth
+     * passing for a command that may have no mapping yet, since there is then
+     * nothing for the capture to copy a context from.
+     */
+    when?: string
     className?: string
     width?: number
     refObject?: RefObject<HTMLDivElement>
@@ -57,18 +61,21 @@ interface ButtonAssignmentProps {
 }
 
 export default function ButtonAssignment(props: ButtonAssignmentProps): React.JSX.Element {
-    const { command, commandService, vesCommonService, className, width, refObject, onMouseEnter, onMouseLeave } = props;
+    const { command, vesCommonService, when, className, width, refObject, onMouseEnter, onMouseLeave } = props;
+    // The mapping is read from the keybinding registry as this renders, so a
+    // change made in the dialog shows up by rendering again.
+    const [, setChanged] = useState(0);
 
     const classNames = [];
     if (className) {
         classNames.push(className);
     }
 
-    const openKeymaps = async () => commandService.executeCommand(
-        KeymapsCommands.OPEN_KEYMAPS.id, command.category
-        ? `${command.category}: ${command.label}`
-        : command.label
-    );
+    const assign = async () => {
+        if (await vesCommonService.captureKeybinding(command as Command, when)) {
+            setChanged(changed => changed + 1);
+        }
+    };
     let label = vesCommonService.getKeybindingLabel(command.id, false);
     if (label === '') {
         classNames.push('none');
@@ -79,7 +86,7 @@ export default function ButtonAssignment(props: ButtonAssignmentProps): React.JS
         <StyledButtonAssignment
             className={classNames.join(' ')}
             ref={refObject}
-            onClick={openKeymaps}
+            onClick={assign}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             style={{
