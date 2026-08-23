@@ -18389,7 +18389,7 @@ vary@^1, vary@^1.1.2, vary@~1.1.2:
 
 "vb-image-converter@git+https://github.com/VUEngine/VB-Image-Converter.git#v1.0.0":
   version "1.0.0"
-  resolved "git+ssh://git@github.com/VUEngine/VB-Image-Converter.git#db1e12e8558131e9b7d2bbb906d88bf2ed9d0339"
+  resolved "git+https://github.com/VUEngine/VB-Image-Converter.git#db1e12e8558131e9b7d2bbb906d88bf2ed9d0339"
   dependencies:
     "@camoto/pngjs" "^6.1.0"
     image-q "^4.0.0"
