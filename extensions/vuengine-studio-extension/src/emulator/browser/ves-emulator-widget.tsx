@@ -26,6 +26,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import styled from 'styled-components';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import AdvancedSelect from '../../editors/browser/components/Common/Base/AdvancedSelect';
 import HContainer from '../../editors/browser/components/Common/Base/HContainer';
@@ -46,10 +47,17 @@ import {
   VbPalette,
   VbRenderingMode,
 } from '../common/ves-vb-constants';
+import { VesVbProfileResult } from '../common/ves-vb-protocol';
 import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
 import EmulatorPalettes, { AnaglyphSwatch, PaletteSwatch } from './components/EmulatorPalettes';
 import { readBuildModeFromMap, readElf, readElfPathFromMap } from './core/ves-emulator-elf';
-import { indexElfSymbols, VesEmulatorSymbolIndex } from './core/ves-emulator-symbols';
+import {
+  findFunctionAt,
+  functionDisplayName,
+  indexElfSymbols,
+  VesEmulatorSymbolIndex,
+} from './core/ves-emulator-symbols';
+import { toFirefoxProfile } from '../common/ves-emulator-profile';
 import { VesVbCore, VesVbSim } from './core/ves-vb-core';
 import { VesEmulatorDock, VesEmulatorDockLayout } from './panels/ves-emulator-dock';
 import { EmulatorPanelType } from './panels/ves-emulator-panel';
@@ -234,6 +242,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   protected readonly localStorageService!: LocalStorageService;
   @inject(MessageService)
   protected readonly messageService!: MessageService;
+  @inject(VesProjectService)
+  protected readonly vesProjectService!: VesProjectService;
   @inject(PreferenceService)
   protected readonly preferenceService!: PreferenceService;
   @inject(VesBuildService)
@@ -919,6 +929,129 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
         ? undefined
         : { address, name: symbols.rumbleSpecNames.get(address) };
     }
+  }
+
+  // --- Profiling ------------------------------------------------------------
+
+  /** True while a session is being recorded for profiling. */
+  isProfiling(): boolean {
+    return this.profiling;
+  }
+
+  protected profiling = false;
+
+  /**
+   * Begin recording the session, so it can be profiled once it is over.
+   *
+   * The recording is input, not execution: the machine as it stands plus what
+   * it is told from here on. That is enough because emulation is
+   * deterministic, and it means watching costs almost nothing while the game
+   * is trying to run — the expensive part happens afterwards.
+   */
+  async startProfiling(): Promise<void> {
+    if (!this.sim || this.profiling) {
+      return;
+    }
+    await this.sim.startProfileRecording();
+    this.profiling = true;
+    this.update();
+    this.messageService.info(nls.localize(
+      'vuengine/emulator/profilingStarted',
+      'Profiling. Play the part you want to measure, then stop profiling to export it.'
+    ));
+  }
+
+  /**
+   * Stop recording, replay what was recorded, and write the profile out.
+   *
+   * The replay occupies the emulator for a few seconds — it is the whole
+   * session again, following every instruction — so the game is stopped for
+   * the duration and put back exactly as it was.
+   */
+  async stopProfiling(): Promise<void> {
+    const sim = this.sim;
+    if (!sim || !this.profiling) {
+      return;
+    }
+    this.profiling = false;
+    this.update();
+
+    try {
+      const recording = await sim.stopProfileRecording();
+      if (recording.chunks === 0) {
+        this.messageService.warn(nls.localize(
+          'vuengine/emulator/profilingNothing', 'Nothing was recorded.'
+        ));
+        return;
+      }
+
+      const progress = await this.messageService.showProgress({
+        text: nls.localize('vuengine/emulator/profilingReplaying', 'Replaying to collect the profile…'),
+      });
+      let result;
+      try {
+        result = await sim.replayProfile(recording);
+      } finally {
+        progress.cancel();
+      }
+
+      const uri = await this.writeProfile(result);
+      this.messageService.info(nls.localize(
+        'vuengine/emulator/profilingWritten',
+        'Profiled {0} instructions over {1} s of play into {2}. Open it at profiler.firefox.com.',
+        result.instructions.toLocaleString(),
+        (recording.chunks / VB_FRAME_RATE).toFixed(1),
+        this.vesCommonService.basename(uri)
+      ));
+      if (result.resets > 0) {
+        this.messageService.warn(nls.localize(
+          'vuengine/emulator/profilingResets',
+          'The machine restarted {0} times while recording, so the profile covers more than one run.',
+          result.resets
+        ));
+      }
+    } catch (error) {
+      this.messageService.error(
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
+
+  /**
+   * Turn a collected tree into a Firefox Profiler file beside the ROM.
+   *
+   * Named for when it was taken rather than after the ROM, since profiling the
+   * same game twice is the normal case and overwriting the first one would be
+   * the wrong default.
+   */
+  protected async writeProfile(result: VesVbProfileResult): Promise<URI> {
+    const symbols = await this.loadSymbols();
+    const romUri = this.getResourceUri();
+    const romSize = this.state.romSize * 131072;
+
+    // The game's own name, so a capture says what it is of. Falling back to
+    // the ROM's file name rather than to nothing, since a profile with no
+    // title is indistinguishable from every other one.
+    const product = await this.vesProjectService.getProjectName()
+      .catch(() => undefined) || romUri!.path.name;
+
+    const profile = toFirefoxProfile(
+      result.nodes.map((node, id) => ({ ...node, id, children: new Map() })),
+      address => {
+        const symbol = symbols && findFunctionAt(symbols, address, romSize);
+        return {
+          name: symbol
+            ? functionDisplayName(symbols!, symbol.name)
+            : `0x${(address >>> 0).toString(16).toUpperCase().padStart(8, '0')}`,
+        };
+      },
+      product
+    );
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const uri = romUri!.parent.resolve(`${romUri!.path.name}-${stamp}.profile.json`);
+    await this.fileService.writeFile(uri, BinaryBuffer.fromString(JSON.stringify(profile)));
+    return uri;
   }
 
   /**
@@ -1857,6 +1990,34 @@ granularity records less often and costs proportionally less.',
                   className={
                     this.isLinked() ? 'ph ph-link-break' : 'ph ph-link-simple'
                   }
+                ></i>
+              </button>
+            </div>
+            <div>
+              <button
+                className={
+                  this.profiling ? 'theia-button' : 'theia-button secondary'
+                }
+                title={`${this.profiling
+                  ? EmulatorCommands.PROFILE_STOP.label
+                  : EmulatorCommands.PROFILE_START.label
+                  }${this.vesCommonService.getKeybindingLabel(
+                    this.profiling
+                      ? EmulatorCommands.PROFILE_STOP.id
+                      : EmulatorCommands.PROFILE_START.id,
+                    true,
+                  )}`}
+                onClick={e =>
+                  this.commandService.executeCommand(
+                    this.profiling
+                      ? EmulatorCommands.PROFILE_STOP.id
+                      : EmulatorCommands.PROFILE_START.id
+                  )
+                }
+                disabled={!this.state.loaded}
+              >
+                <i
+                  className={this.profiling ? 'fa fa-stop' : 'fa fa-circle'}
                 ></i>
               </button>
             </div>

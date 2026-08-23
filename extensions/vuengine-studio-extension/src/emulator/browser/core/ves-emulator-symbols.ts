@@ -11,6 +11,7 @@
 import { readClassHierarchy } from './ves-emulator-classes';
 import { readDwarfStructs, VesStruct } from './ves-emulator-dwarf';
 import { VesElfImage, VesElfSymbol } from './ves-emulator-elf';
+import { romOffsetOf } from './ves-emulator-line-table';
 
 /** A symbol's address and the size the linker gave it. */
 export interface VesSymbolExtent {
@@ -52,6 +53,69 @@ export interface VesEmulatorSymbolIndex {
      * actor's `actorSpec` back into the spec the project wrote.
      */
     dataSymbols: VesElfSymbol[];
+    /**
+     * Every function, ordered by address, for naming code rather than data —
+     * see `findFunctionAt`. This is what turns a profiled address back into
+     * the method the developer wrote.
+     */
+    codeSymbols: VesElfSymbol[];
+}
+
+/**
+ * The function an address is inside.
+ *
+ * Unlike `findSymbolAt` this does not require the address to fall within the
+ * symbol's recorded size: a profiler's addresses land in the middle of a
+ * function, and a linker does not always record a size. So the search is for
+ * the last function beginning at or before the address, bounded by the size
+ * when there is one.
+ *
+ * Addresses are compared as offsets into the ROM, because a program counter
+ * may arrive through the cartridge window or through the mirror at the top of
+ * memory while the symbol table only ever names the former.
+ */
+export function findFunctionAt(
+    index: VesEmulatorSymbolIndex, address: number, romSize: number
+): VesElfSymbol | undefined {
+    const symbols = index.codeSymbols;
+    const target = romOffsetOf(address, romSize);
+
+    let low = 0;
+    let high = symbols.length - 1;
+    let found: VesElfSymbol | undefined;
+    while (low <= high) {
+        const middle = (low + high) >> 1;
+        if (romOffsetOf(symbols[middle].address, romSize) <= target) {
+            found = symbols[middle];
+            low = middle + 1;
+        } else {
+            high = middle - 1;
+        }
+    }
+    if (!found) {
+        return undefined;
+    }
+    const start = romOffsetOf(found.address, romSize);
+    return found.size === 0 || target < start + found.size ? found : undefined;
+}
+
+/**
+ * What the developer calls a function, from what the linker calls it.
+ *
+ * The preprocessor turns `Class::method` into `Class_method` on its way to C,
+ * and the linker adds the ABI's underscore on top. Undoing both makes a flame
+ * graph read in the language the code was written in. The class list is what
+ * makes this safe: only a prefix that really is a class becomes a `::`, so an
+ * ordinary function with an underscore in its name is left alone.
+ */
+export function functionDisplayName(index: VesEmulatorSymbolIndex, symbol: string): string {
+    const name = symbol.replace(/^_/, '');
+    const split = name.indexOf('_');
+    if (split <= 0) {
+        return name;
+    }
+    const owner = name.slice(0, split);
+    return index.classes.has(owner) ? `${owner}::${name.slice(split + 1)}` : name;
 }
 
 /**
@@ -132,6 +196,9 @@ export function indexElfSymbols(image: VesElfImage): VesEmulatorSymbolIndex {
         structs: readDwarfStructs(image),
         dataSymbols: image.symbols
             .filter(symbol => !symbol.isFunction)
+            .sort((a, b) => a.address - b.address),
+        codeSymbols: image.symbols
+            .filter(symbol => symbol.isFunction)
             .sort((a, b) => a.address - b.address),
     };
 

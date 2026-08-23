@@ -366,6 +366,33 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
+  /**
+   * Profiling, as two commands rather than one toggle.
+   *
+   * Which of the two applies is decided by whether a recording is running, and
+   * only that one is offered — a palette entry meaning opposite things at
+   * different times is worse than two that each say what they do.
+   */
+  export const PROFILE_START: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.profile.start',
+      label: 'Start Profiling',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/profileStart',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const PROFILE_STOP: Command = Command.toLocalizedCommand(
+    {
+      id: 'emulator.profile.stop',
+      label: 'Stop Profiling and Export',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/commands/profileStop',
+    'vuengine/emulator/commands/category'
+  );
+
   export const LINK_SECOND_PLAYER: Command = Command.toLocalizedCommand(
     {
       id: 'emulator.link.second',

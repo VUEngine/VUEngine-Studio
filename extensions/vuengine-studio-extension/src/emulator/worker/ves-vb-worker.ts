@@ -46,17 +46,27 @@ import {
   VesVbEvent,
   VesVbParams,
   VesVbDisassemblyLine,
+  VesVbProfileResult,
+  VesVbRecording,
   VesVbRegisters,
   VesVbRequest,
   VesVbResponse,
   VesVbSimHandle,
 } from '../common/ves-vb-protocol';
+import {
+  decodeRomKinds,
+  VesInstructionKind,
+  VesProfileCollector,
+} from '../common/ves-emulator-profile';
 import { ES_SOUND_INIT } from '../common/ves-emulator-essound';
 import { applyDelta, createRunScratch, encodeDelta } from './ves-vb-rewind';
 import { VesVbRenderer } from './ves-vb-renderer';
 import {
   installVesVbCallback,
   instantiateVesVbWasm,
+  releaseVesVbCallback,
+  VES_VB_EXECUTE_CALLBACK_ARITY,
+  VES_VB_WRITE_CALLBACK_ARITY,
   VesVbWasmExports,
 } from './ves-vb-wasm';
 
@@ -78,6 +88,8 @@ interface VesVbSimState {
   cartRomSize: number;
   cartRam: number;
   cartRamSize: number;
+  /** Last mask handed to the core, which is what a recording writes down. */
+  keys: number;
 }
 
 /**
@@ -281,6 +293,12 @@ class VesVbWorker {
         return this.reset(params as VesVbParams<'reset'>);
       case 'setKeys':
         return this.setKeys(params as VesVbParams<'setKeys'>);
+      case 'startProfileRecording':
+        return this.startProfileRecording(params as VesVbParams<'startProfileRecording'>);
+      case 'stopProfileRecording':
+        return this.stopProfileRecording(params as VesVbParams<'stopProfileRecording'>);
+      case 'replayProfile':
+        return this.replayProfile(params as VesVbParams<'replayProfile'>);
       case 'setDisplayMode':
         return this.setDisplayMode(params as VesVbParams<'setDisplayMode'>);
       case 'capture':
@@ -361,6 +379,7 @@ class VesVbWorker {
       cartRomSize: 0,
       cartRam: 0,
       cartRamSize: 0,
+      keys: 0,
     });
     this.refreshSimPointers();
     return pointer;
@@ -487,7 +506,9 @@ class VesVbWorker {
   }
 
   protected setKeys(params: VesVbParams<'setKeys'>): void {
-    this.wasm.vbSetKeys(this.requireSim(params.sim).pointer, params.keys);
+    const sim = this.requireSim(params.sim);
+    sim.keys = params.keys;
+    this.wasm.vbSetKeys(sim.pointer, params.keys);
   }
 
   /**
@@ -592,6 +613,169 @@ class VesVbWorker {
       VB_SAMPLES_PER_BUFFER,
     );
   }
+
+  // --- Profile recording ----------------------------------------------------
+
+  /**
+   * What is being recorded, if anything.
+   *
+   * Only one at a time, and only for one simulation: a recording is a
+   * developer deliberately capturing a run to profile, not something the
+   * emulator does by default.
+   */
+  protected recording?: {
+    pointer: number;
+    state: ArrayBuffer;
+    chunks: number;
+    keys: [number, number][];
+    lastMask: number;
+  };
+
+  protected startProfileRecording(params: VesVbParams<'startProfileRecording'>): void {
+    const sim = this.requireSim(params.sim);
+    this.recording = {
+      pointer: sim.pointer,
+      state: this.snapshot(sim),
+      chunks: 0,
+      // The mask in force at chunk zero, so a replay starts pressing what was
+      // being pressed rather than nothing.
+      keys: [[0, sim.keys]],
+      lastMask: sim.keys,
+    };
+  }
+
+  protected stopProfileRecording(params: VesVbParams<'stopProfileRecording'>): VesVbRecording {
+    const recording = this.recording;
+    this.recording = undefined;
+    if (!recording || recording.pointer !== this.requireSim(params.sim).pointer) {
+      throw new Error('That simulation is not being recorded.');
+    }
+    return { state: recording.state, chunks: recording.chunks, keys: recording.keys };
+  }
+
+  /**
+   * Note what a chunk is about to be emulated with.
+   *
+   * Called once per chunk, before it runs. Input only ever changes between
+   * chunks — `setKeys` arrives as a message and the drive loop is what runs
+   * them — so the mask at this point is exactly what the whole chunk saw, and
+   * writing down only the changes keeps a long session small.
+   */
+  protected recordChunk(sims: VesVbSimState[]): void {
+    const recording = this.recording;
+    if (!recording) {
+      return;
+    }
+    const sim = sims.find(candidate => candidate.pointer === recording.pointer);
+    if (!sim) {
+      // The simulation went away underneath the recording.
+      this.recording = undefined;
+      return;
+    }
+    if (sim.keys !== recording.lastMask) {
+      recording.keys.push([recording.chunks, sim.keys]);
+      recording.lastMask = sim.keys;
+    }
+    recording.chunks++;
+  }
+
+  /**
+   * Replay a recording, following every instruction, and return the call tree.
+   *
+   * On the recording's own simulation, borrowed for the duration: its current
+   * state is put aside, the recording is restored over it, the replay runs,
+   * and the state is put back. The simulation is stopped throughout, which is
+   * fine for an export — the developer asked for a profile and waits a few
+   * seconds for it.
+   *
+   * A scratch simulation would be tidier but is **not faithful**: a state
+   * restored into a different simulation executes differently, because the
+   * core keeps a copy of the cartridge pointer that `vbSetCartROM` does not
+   * reach, and the stale one then reads through a buffer belonging to
+   * somewhere else. Restored into the simulation it came from, the pointer is
+   * already right and the replay reproduces the run exactly — measured both
+   * ways in `tests/emulator/replay-probe.mjs`.
+   */
+  protected replayProfile(params: VesVbParams<'replayProfile'>): VesVbProfileResult {
+    const sim = this.requireSim(params.sim);
+    const { recording } = params;
+    if (recording.state.byteLength !== this.wasm.vbSizeOf()) {
+      throw new Error('That recording was made with a different emulator core.');
+    }
+
+    const rom = this.u8(sim.cartRom, sim.cartRomSize);
+    const kinds = decodeRomKinds(rom);
+    // The program counter runs in the cartridge's top-of-memory mirror, so an
+    // address has to come back to a ROM offset before it can be looked up.
+    const mask = sim.cartRomSize - 1;
+    const powerOfTwo = sim.cartRomSize > 0 && (sim.cartRomSize & mask) === 0;
+    const collector = new VesProfileCollector();
+
+    const slot = installVesVbCallback(this.wasm, (unused, address) => {
+      const offset = powerOfTwo
+        ? (address >>> 0) & mask
+        : ((address >>> 0) & 0x00ffffff) % sim.cartRomSize;
+      collector.push(address >>> 0, kinds[offset >> 1] as VesInstructionKind);
+      return 0;
+    }, VES_VB_EXECUTE_CALLBACK_ARITY);
+
+    // What the simulation was doing before it was borrowed, to be put back
+    // whatever happens below.
+    const borrowed = this.snapshot(sim);
+    const keysBefore = sim.keys;
+    const started = Date.now();
+
+    try {
+      this.restoreFrom(sim, new Uint8Array(recording.state));
+      this.wasm.vbSetExecuteCallback(sim.pointer, slot);
+
+      const keys = new Map(recording.keys);
+      const sims = this.wasm.Realloc(0, 4);
+      const clocks = this.wasm.Realloc(0, 4);
+      this.u32(sims, 1)[0] = sim.pointer;
+      try {
+        for (let chunk = 0; chunk < recording.chunks; chunk++) {
+          const pressed = keys.get(chunk);
+          if (pressed !== undefined) {
+            this.wasm.vbSetKeys(sim.pointer, pressed);
+          }
+          // Samples are rewound per chunk exactly as the drive loop does, so
+          // the core never runs past the end of the buffer it was given.
+          this.wasm.vbSetSamples(sim.pointer, sim.samples, VbDataType.F32, VB_SAMPLES_PER_BUFFER);
+          this.u32(clocks, 1)[0] = VB_CLOCKS_PER_BUFFER;
+          while (this.u32(clocks, 1)[0] !== 0) {
+            this.wasm.Emulate(sims, 1, clocks);
+          }
+        }
+      } finally {
+        this.wasm.Realloc(sims, 0);
+        this.wasm.Realloc(clocks, 0);
+      }
+    } finally {
+      this.wasm.vbSetExecuteCallback(sim.pointer, 0);
+      releaseVesVbCallback(this.wasm, slot);
+      this.restoreFrom(sim, new Uint8Array(borrowed));
+      this.wasm.vbSetKeys(sim.pointer, keysBefore);
+      // The replay left history describing a run that is being discarded.
+      this.clearRewind();
+    }
+
+    const nodes = collector.finish();
+    return {
+      nodes: nodes.map(node => ({
+        parent: node.parent,
+        address: node.address,
+        selfSamples: node.selfSamples,
+        totalSamples: node.totalSamples,
+      })),
+      instructions: collector.sampleCount,
+      overflows: collector.overflows,
+      resets: collector.resetCount,
+      elapsedMs: Date.now() - started,
+    };
+  }
+
+  // --- Save States -------------------------------------------------
 
   protected saveState(params: VesVbParams<'saveState'>): ArrayBuffer {
     return this.snapshot(this.requireSim(params.sim));
@@ -1092,6 +1276,7 @@ class VesVbWorker {
           }
           return 0;
         },
+        VES_VB_WRITE_CALLBACK_ARITY,
       );
     }
     this.wasm.vbSetWriteCallback(simPointer, this.writeWatchCallbackSlot);
@@ -1360,6 +1545,7 @@ class VesVbWorker {
 
   // Emulate one chunk: VB_CLOCKS_PER_BUFFER clocks, one full sample buffer.
   protected emulateChunk(sims: VesVbSimState[]): void {
+    this.recordChunk(sims);
     // Rewind each simulation's sample write position for this chunk.
     for (const sim of sims) {
       this.wasm.vbSetSamples(
@@ -1437,6 +1623,10 @@ class VesVbWorker {
    * Views are created on demand rather than cached, because the core grows
    * its own memory and a growth detaches every existing view.
    */
+  protected u8(pointer: number, length: number): Uint8Array {
+    return new Uint8Array(this.wasm.memory.buffer, pointer, length);
+  }
+
   protected u32(pointer: number, length = 1): Uint32Array {
     return new Uint32Array(this.wasm.memory.buffer, pointer, length);
   }

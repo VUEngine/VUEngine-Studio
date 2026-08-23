@@ -10,6 +10,46 @@ import { VbDisplayMode } from './ves-vb-constants';
 /** Opaque handle to a simulation living inside the worker. */
 export type VesVbSimHandle = number;
 
+/**
+ * A session, small enough to keep and exact enough to replay.
+ *
+ * The drive loop emulates fixed-size chunks and input only ever changes
+ * between them, so the whole of a session's input is the mask in effect at
+ * each chunk — and since most chunks change nothing, only the changes are
+ * kept.
+ */
+export interface VesVbRecording {
+    /** The machine when recording began. */
+    state: ArrayBuffer;
+    /** Chunks recorded, which is how long the replay runs for. */
+    chunks: number;
+    /** `[chunk, mask]` pairs, at the chunks where the mask changed. */
+    keys: [number, number][];
+}
+
+/** One node of a replayed call tree, flattened for the message channel. */
+export interface VesVbProfileNode {
+    parent: number;
+    address: number;
+    selfSamples: number;
+    totalSamples: number;
+}
+
+export interface VesVbProfileResult {
+    nodes: VesVbProfileNode[];
+    /** Instructions executed, which is what the samples add up to. */
+    instructions: number;
+    /** Calls dropped for depth, which should be zero on anything sane. */
+    overflows: number;
+    /**
+     * How many times the machine restarted while recording. A profile spanning
+     * several reboots describes several runs, and the reader should be told.
+     */
+    resets: number;
+    /** How long the replay took, for reporting against the time recorded. */
+    elapsedMs: number;
+}
+
 export interface VesVbCommands {
     /** Instantiate the WebAssembly core. Must be sent first. */
     init: { params: { wasmUrl: string }; result: void };
@@ -45,6 +85,26 @@ export interface VesVbCommands {
     saveState: { params: { sim: VesVbSimHandle }; result: ArrayBuffer };
     /** Restore a snapshot taken by saveState. */
     loadState: { params: { sim: VesVbSimHandle; state: ArrayBuffer }; result: void };
+    /**
+     * Begin recording what a simulation is told to do, so the session can be
+     * replayed later and profiled exhaustively. Emulation is deterministic, so
+     * the machine's state now plus the input from here on reproduces it
+     * exactly. Recording costs a snapshot and a few bytes per chunk.
+     */
+    startProfileRecording: { params: { sim: VesVbSimHandle }; result: void };
+    /** Stop recording and hand back what was recorded. */
+    stopProfileRecording: { params: { sim: VesVbSimHandle }; result: VesVbRecording };
+    /**
+     * Replay a recording on a scratch simulation, following every instruction,
+     * and return the call tree it produced.
+     *
+     * Runs to completion before replying — a minute of play takes some seconds
+     * (§6.3) — and never touches the simulation the recording came from.
+     */
+    replayProfile: {
+        params: { sim: VesVbSimHandle; recording: VesVbRecording };
+        result: VesVbProfileResult;
+    };
     /**
      * Emulation rate, where 1 is real time. Above 1 fast forwards, below 1
      * runs in slow motion. Applies to the whole session.

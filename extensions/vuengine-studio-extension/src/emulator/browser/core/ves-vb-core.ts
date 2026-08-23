@@ -9,6 +9,8 @@ import {
     VesVbCheatWrite,
     VesVbCommandName,
     VesVbDisassemblyLine,
+    VesVbProfileResult,
+    VesVbRecording,
     VesVbRegisters,
     VesVbOutbound,
     VesVbParams,
@@ -298,6 +300,35 @@ export class VesVbSim implements Disposable {
     /** Restore a snapshot. The buffer is transferred. */
     async loadState(state: ArrayBuffer): Promise<void> {
         await this.core.request('loadState', { sim: this.handle, state }, [state]);
+    }
+
+    /**
+     * Start recording this session so it can be profiled afterwards.
+     *
+     * Costs a snapshot now and a few bytes per frame after — the input, not
+     * the execution. What makes that enough is that emulation is
+     * deterministic: replaying the same input from the same state reproduces
+     * the run exactly, so the profile can be collected later and exhaustively
+     * rather than sampled while the game is trying to run.
+     */
+    async startProfileRecording(): Promise<void> {
+        await this.core.request('startProfileRecording', { sim: this.handle });
+    }
+
+    /** Stop recording and take what was recorded. */
+    async stopProfileRecording(): Promise<VesVbRecording> {
+        return this.core.request('stopProfileRecording', { sim: this.handle });
+    }
+
+    /**
+     * Replay a recording and collect a call tree from every instruction in it.
+     *
+     * Runs on a simulation of its own, so this one carries on undisturbed, but
+     * it occupies the worker until it finishes — roughly a sixth of the time
+     * that was recorded.
+     */
+    async replayProfile(recording: VesVbRecording): Promise<VesVbProfileResult> {
+        return this.core.request('replayProfile', { sim: this.handle, recording });
     }
 
     /**

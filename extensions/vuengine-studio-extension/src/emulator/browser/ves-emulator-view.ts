@@ -61,6 +61,19 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       });
     });
 
+    // Profiling. Only one of the two applies at any moment, so only one is
+    // offered — the same reasoning as the link commands below.
+    commandRegistry.registerCommand(EmulatorCommands.PROFILE_START, {
+      isEnabled: () => this.canProfile(false),
+      isVisible: () => this.canProfile(false),
+      execute: () => this.currentEmulator()?.startProfiling(),
+    });
+    commandRegistry.registerCommand(EmulatorCommands.PROFILE_STOP, {
+      isEnabled: () => this.canProfile(true),
+      isVisible: () => this.canProfile(true),
+      execute: () => this.currentEmulator()?.stopProfiling(),
+    });
+
     // The link cable. At most one of these applies at a time — a pair is
     // linked, or paired but running apart, or neither — so each is offered
     // only in the state it belongs to rather than listed and greyed out.
@@ -132,6 +145,13 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       isVisible: widget => this.emulatorFor(widget) !== undefined,
       execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Emulator'),
     });
+  }
+
+  /** Whether an emulator is loaded and is, or is not, already recording. */
+  protected canProfile(recording: boolean): boolean {
+    const emulator = this.currentEmulator();
+    return emulator !== undefined && emulator.isLoaded()
+      && emulator.isProfiling() === recording;
   }
 
   /** A second player can be opened: nothing is paired with this one yet. */

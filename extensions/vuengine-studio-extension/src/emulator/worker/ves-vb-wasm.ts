@@ -104,6 +104,18 @@ export interface VesVbWasmExports {
     vbSetWriteCallback(sim: number, callback: number): void;
     vbGetWriteCallback(sim: number): number;
 
+    /**
+     * Install a callback invoked before every instruction, or 0 to remove it.
+     *
+     * Takes four arguments, not the write callback's six — see
+     * VES_VB_EXECUTE_CALLBACK_ARITY. The second is the program counter, and
+     * returning non-zero halts `Emulate` *before* that instruction runs,
+     * leaving the program counter on it. `GetBreaks` does not report a stop
+     * raised this way; the callback's return is the only signal there is.
+     */
+    vbSetExecuteCallback(sim: number, callback: number): void;
+    vbGetExecuteCallback(sim: number): number;
+
     // --- Disassembler -------------------------------------------------------
 
     /**
@@ -185,9 +197,6 @@ export function patchVesVbTableLimit(bytes: Uint8Array, slots = VES_VB_TABLE_SLO
     throw new Error('Emulator core has no table section.');
 }
 
-// The signature every callback the core invokes must have: (i32 x6) -> i32.
-export const VES_VB_CALLBACK_ARITY = 6;
-
 /**
  * A callback the core can invoke.
  *
@@ -195,6 +204,17 @@ export const VES_VB_CALLBACK_ARITY = 6;
  * type, a pointer to the value being written, and two further out-parameters
  * the core leaves at zero. Returning 0 lets the access proceed normally.
  */
+/**
+ * How many arguments each kind of callback takes.
+ *
+ * There is no single signature: writes take six and execute takes four. A
+ * trampoline of the wrong shape is not a type error anywhere — the core simply
+ * throws `null function or function signature mismatch` the first time it
+ * calls it. Measured, not assumed: see `tests/emulator/breakpoint-probe.mjs`.
+ */
+export const VES_VB_WRITE_CALLBACK_ARITY = 6;
+export const VES_VB_EXECUTE_CALLBACK_ARITY = 4;
+
 export type VesVbCallback = (
     sim: number,
     address: number,
@@ -221,25 +241,36 @@ function uleb(value: number): number[] {
  * Build a wasm function of the core's callback signature that forwards to a
  * JS function.
  *
+ * The arity is deliberately a required argument rather than a default. It used
+ * to default to the write callback's six, written as the exported constant —
+ * which compiled to `exports.VES_VB_WRITE_CALLBACK_ARITY` and was then
+ * captured by this module's own parameter named `exports`, yielding
+ * `undefined`, a zero-argument trampoline, and `function signature mismatch`
+ * the first time the core called it. Making every caller say which signature
+ * it wants removes the trap along with the default.
+ *
  * A JS function cannot go into the table directly: the core is a pure wasm
  * module with no Emscripten glue, and `WebAssembly.Function` — which would wrap
  * one — is not available in the browsers this ships to. A one-function module
  * that imports the JS callback and exports it under the right wasm type is the
  * portable way to bridge that gap.
  */
-function makeCallbackTrampoline(callback: VesVbCallback): Function {
+function makeCallbackTrampoline(callback: VesVbCallback, arity: number): Function {
+    if (!Number.isInteger(arity) || arity < 1) {
+        throw new Error(`A callback trampoline needs a real argument count, not ${arity}.`);
+    }
     const I32 = 0x7f;
     const section = (id: number, payload: number[]): number[] => [id, ...uleb(payload.length), ...payload];
     const vector = (items: number[][]): number[] => [...uleb(items.length), ...items.flat()];
 
     const type = [
         0x60,
-        ...vector(Array.from({ length: VES_VB_CALLBACK_ARITY }, () => [I32])),
+        ...vector(Array.from({ length: arity }, () => [I32])),
         ...vector([[I32]]),
     ];
 
     const body: number[] = [];
-    for (let index = 0; index < VES_VB_CALLBACK_ARITY; index++) {
+    for (let index = 0; index < arity; index++) {
         body.push(0x20, ...uleb(index));   // local.get
     }
     body.push(0x10, 0x00);                 // call the import
@@ -267,11 +298,15 @@ function makeCallbackTrampoline(callback: VesVbCallback): Function {
  * Index 0 is the null function pointer and means "no callback" to the core, so
  * it is never handed out.
  */
-export function installVesVbCallback(exports: VesVbWasmExports, callback: VesVbCallback): number {
+export function installVesVbCallback(
+    exports: VesVbWasmExports,
+    callback: VesVbCallback,
+    arity: number
+): number {
     const table = exports.__indirect_function_table;
     for (let index = 1; index < table.length; index++) {
         if (table.get(index) === null) {
-            table.set(index, makeCallbackTrampoline(callback));
+            table.set(index, makeCallbackTrampoline(callback, arity));
             return index;
         }
     }
