@@ -8,7 +8,9 @@ import {
 } from '../common/ves-vb-constants';
 import {
   EMULATION_RENDERING_MODES,
-  EmulatorScale
+  EMULATOR_SRAM_INIT_LABELS,
+  EmulatorScale,
+  EmulatorSramInit,
 } from './ves-emulator-types';
 
 export namespace VesEmulatorPreferenceIds {
@@ -30,6 +32,7 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_FAST_FORWARD_RATIO = [CATEGORY, 'builtIn', 'fastForward', 'ratio'].join('.');
   export const EMULATOR_RED_VIPER_3DS_IP_ADDRESS = [CATEGORY, 'redViper', '3dsIpAddress'].join('.');
   export const EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS = [CATEGORY, 'builtIn', 'player2', 'sameControls'].join('.');
+  export const EMULATOR_BUILTIN_SRAM_INIT = [CATEGORY, 'builtIn', 'sram', 'init'].join('.');
 }
 
 export const VesEmulatorPreferenceSchema: PreferenceSchema = {
@@ -216,6 +219,26 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SRAM_INIT]: {
+      type: 'string',
+      title: nls.localize(
+        'vuengine/emulator/preferences/sramInitTitle',
+        'New Save File Contents'
+      ),
+      description: nls.localize(
+        'vuengine/emulator/preferences/sramInitDescription',
+        'What a save file is filled with before a game has written to it. A real cartridge powers up \
+holding whatever its memory settled on, which is why random is the default and what hardware \
+does. All zeroes is not a blank slate but one particular pattern, which a game may read as a \
+valid save. Choose zeroes when debugging save handling and a reproducible starting point \
+matters more than realism. Only affects newly created save files.'
+      ),
+      enum: Object.keys(EMULATOR_SRAM_INIT_LABELS),
+      enumItemLabels: Object.values(EMULATOR_SRAM_INIT_LABELS),
+      default: EmulatorSramInit.RANDOM,
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
     [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS]: {
       type: 'boolean',
       title: nls.localize(
@@ -224,9 +247,9 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       ),
       description: nls.localize(
         'vuengine/emulator/preferences/player2SameControlsDescription',
-        'Whether the second emulator of a link session answers to the same keys as the first. '
-        + 'Turn this off to map a separate set of keys for player 2, '
-        + "in the emulator's Configure Input window."
+        "Whether the second emulator of a link session answers to the same keys as the first. \
+Turn this off to map a separate set of keys for player 2, \
+in the emulator's Configure Input window."
       ),
       default: true,
       scope: PreferenceScope.Folder,

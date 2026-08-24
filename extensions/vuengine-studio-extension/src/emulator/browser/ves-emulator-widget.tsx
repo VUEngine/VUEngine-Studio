@@ -86,6 +86,7 @@ import {
   EmulatorGamePadKeyCode,
   EmulatorMode,
   EmulatorScale,
+  EmulatorSramInit,
   formatColor,
   resolveAnaglyphPalette,
   resolvePalette,
@@ -2391,8 +2392,14 @@ granularity records less often and costs proportionally less.',
    * the odd byte of every halfword stays as it is. Lemur seeds a fresh save
    * the same way.
    */
-  protected static freshSaveRam(): Uint8Array {
+  protected freshSaveRam(): Uint8Array {
     const ram = new Uint8Array(VesEmulatorWidget.DEFAULT_SAVE_RAM_SIZE);
+    const fill = this.preferenceService.get<EmulatorSramInit>(
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SRAM_INIT, EmulatorSramInit.RANDOM
+    );
+    if (fill === EmulatorSramInit.ZEROES) {
+      return ram;
+    }
     for (let i = 0; i < ram.length; i += 2) {
       ram[i] = Math.floor(Math.random() * 256);
     }
@@ -2401,7 +2408,7 @@ granularity records less often and costs proportionally less.',
 
   protected async loadSaveRam(): Promise<void> {
     const uri = await this.getSaveRamUri();
-    const ram = VesEmulatorWidget.freshSaveRam();
+    const ram = this.freshSaveRam();
 
     if (await this.fileService.exists(uri)) {
       const stored = (await this.fileService.readFile(uri)).value.buffer;

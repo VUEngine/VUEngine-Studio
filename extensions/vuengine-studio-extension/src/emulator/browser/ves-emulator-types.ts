@@ -272,3 +272,13 @@ export enum EmulatorAction {
   AudioMute = 'audioMute',
   Screenshot = 'screenshot',
 }
+
+export enum EmulatorSramInit {
+  RANDOM = 'random',
+  ZEROES = 'zeroes',
+}
+
+export const EMULATOR_SRAM_INIT_LABELS: Record<EmulatorSramInit, string> = {
+  [EmulatorSramInit.RANDOM]: nls.localize('vuengine/emulator/sramInit/random', 'Random'),
+  [EmulatorSramInit.ZEROES]: nls.localize('vuengine/emulator/sramInit/zeroes', 'Zeroes'),
+};
