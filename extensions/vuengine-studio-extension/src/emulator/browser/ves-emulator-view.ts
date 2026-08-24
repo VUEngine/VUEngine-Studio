@@ -1,5 +1,5 @@
 import { CommandContribution, CommandRegistry, CommandService, nls, QuickPickItemOrSeparator, QuickPickService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
+import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { TabBar, Widget } from '@theia/core/shared/@lumino/widgets';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -140,11 +140,6 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       isVisible: widget => this.emulatorFor(widget) !== undefined,
       execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
     });
-    commandRegistry.registerCommand(EmulatorCommands.WIDGET_SETTINGS, {
-      isEnabled: () => true,
-      isVisible: widget => this.emulatorFor(widget) !== undefined,
-      execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'Emulator'),
-    });
   }
 
   /** Whether an emulator is loaded and is, or is not, already recording. */
@@ -256,12 +251,6 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       command: EmulatorCommands.WIDGET_HELP.id,
       tooltip: EmulatorCommands.WIDGET_HELP.label,
       priority: 2,
-    });
-    toolbar.registerItem({
-      id: EmulatorCommands.WIDGET_SETTINGS.id,
-      command: EmulatorCommands.WIDGET_SETTINGS.id,
-      tooltip: EmulatorCommands.WIDGET_SETTINGS.label,
-      priority: 0,
     });
   }
 }

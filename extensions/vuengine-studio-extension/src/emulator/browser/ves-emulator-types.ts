@@ -115,7 +115,8 @@ export const EMULATION_RENDERING_MODES: Record<VbRenderingMode, string> = {
 };
 
 export const EMULATION_PALETTES: Record<string, string> = {
-  'red': nls.localize('vuengine/emulator/palettes/red', 'Red'),
+  'default': nls.localize('vuengine/emulator/palettes/default', 'Default'),
+  'red': nls.localize('vuengine/emulator/palettes/red', 'Pure Red'),
   'grey': nls.localize('vuengine/emulator/palettes/grey', 'Grey'),
   'green': nls.localize('vuengine/emulator/palettes/green', 'Green'),
   'blue': nls.localize('vuengine/emulator/palettes/blue', 'Blue'),

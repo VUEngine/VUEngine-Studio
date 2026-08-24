@@ -8,7 +8,6 @@ import {
     VB_DEFAULT_PALETTE_ID,
     VB_PALETTES,
 } from '../../common/ves-vb-constants';
-import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import {
@@ -18,6 +17,7 @@ import {
     EMULATION_PALETTES,
     getCustomPaletteId,
     formatColor,
+    resolveAnaglyphPalette,
     resolvePalette,
     toVbPalette,
 } from '../ves-emulator-types';
@@ -96,14 +96,52 @@ const Swatch = styled.div`
     }
 `;
 
-const PaletteEntry = styled(HContainer) <{ selected: boolean }>`
+const PaletteLayout = styled(VContainer)`
+    height: 100%;
+    min-height: 0;
+`;
+
+const PaletteChoices = styled.div`
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
+`;
+
+const PaletteList = styled.div`
+    display: flex;
+    flex-flow: wrap;
+    gap: calc(var(--theia-ui-padding) * 2);
+    padding: 2px;
+`;
+
+const ReadOnlyEntry = styled.div`
+    align-items: center;
+    background-color: var(--theia-list-activeSelectionBackground);
+    border: 1px solid var(--theia-focusBorder);
+    border-radius: 2px;
+    color: var(--theia-list-activeSelectionForeground);
+    display: flex;
+    gap: var(--theia-ui-padding);
+    padding: var(--theia-ui-padding);
+`;
+
+const ReadOnlyName = styled.div`
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const PaletteEntry = styled.div <{ selected: boolean }>`
     align-items: center;
     background-color: ${p => p.selected ? 'var(--theia-list-activeSelectionBackground)' : 'transparent'};
     border: 1px solid ${p => p.selected ? 'var(--theia-focusBorder)' : 'var(--theia-dropdown-border)'};
     border-radius: 2px;
     color: ${p => p.selected ? 'var(--theia-list-activeSelectionForeground)' : 'inherit'};
     cursor: pointer;
+    display: flex;
     padding: calc(var(--theia-ui-padding) / 2) var(--theia-ui-padding);
+    gap: var(--theia-ui-padding);
 
     input[type="color"] {
         background-color: transparent;
@@ -130,14 +168,6 @@ const PaletteName = styled.div`
 `;
 
 const DEFAULT_TINTS = VB_ANAGLYPH_PALETTES[VB_DEFAULT_ANAGLYPH_PALETTE_ID];
-
-/** What each colour of a palette is for, in the order they are edited. */
-const LEVEL_TITLES = [
-    nls.localize('vuengine/emulator/palettes/level0', 'Unlit pixel'),
-    nls.localize('vuengine/emulator/palettes/level1', 'Brightness level 1'),
-    nls.localize('vuengine/emulator/palettes/level2', 'Brightness level 2'),
-    nls.localize('vuengine/emulator/palettes/level3', 'Brightness level 3, fully lit'),
-];
 
 interface EmulatorPalettesProps {
     preferenceService: PreferenceService
@@ -329,167 +359,235 @@ export default function EmulatorPalettes(props: EmulatorPalettesProps): React.JS
         return () => listener.dispose();
     }, [preferenceService]);
 
-    return <VContainer gap={15}>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/emulator/palettes/defaultPalettes', 'Default Palettes')}
-            </label>
-            <HContainer gap={10} wrap='wrap'>
-                {Object.keys(VB_PALETTES).map(id =>
-                    <StyledPalette
-                        key={id}
-                        selected={palette === id}
-                        onClick={() => select(id)}
-                        onKeyDown={() => select(id)}
-                        // onFocus={disableCommands}
-                        // onBlur={enableCommands}
-                    >
-                        <PaletteSwatch colors={VB_PALETTES[id].map(formatColor)} />
-                        <PaletteName>{EMULATION_PALETTES[id] ?? id}</PaletteName>
-                    </StyledPalette>
-                )}
-            </HContainer>
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/emulator/palettes/customPalettes', 'Custom Palettes')}
-            </label>
-            <HContainer gap={10} wrap='wrap'>
-                {customPalettes.map((customPalette, index) => {
-                    const id = getCustomPaletteId(customPalette.name);
-                    return <StyledPalette
-                        key={`custom-${index}`}
-                        selected={palette === id}
-                        onClick={() => select(id)}
-                        onKeyDown={() => select(id)}
-                        // onFocus={disableCommands}
-                        // onBlur={enableCommands}
-                    >
-                        <PaletteSwatch colors={customPalette.colors} />
-                        <PaletteName>{customPalette.name}</PaletteName>
-                    </StyledPalette>;
-                })}
-                <StyledNewPalette onClick={addPalette}>
-                    <VContainer justifyContent='center' grow={1}>
-                        <i className='codicon codicon-plus' />
+    /**
+     * The palette in use, when it is one of the project's own.
+     *
+     * Undefined for a built-in, which is the signal to show it read-only: the
+     * index is what every edit needs, and a built-in has none.
+     */
+    const selectedPalette = React.useMemo(() => {
+        const index = customPalettes.findIndex(
+            entry => getCustomPaletteId(entry.name) === palette
+        );
+        return index < 0 ? undefined : { index, palette: customPalettes[index] };
+    }, [customPalettes, palette]);
+
+    const selectedAnaglyphPalette = React.useMemo(() => {
+        const index = customAnaglyphPalettes.findIndex(
+            entry => getCustomPaletteId(entry.name) === anaglyphPalette
+        );
+        return index < 0 ? undefined : { index, palette: customAnaglyphPalettes[index] };
+    }, [customAnaglyphPalettes, anaglyphPalette]);
+
+    const currentAnaglyph = resolveAnaglyphPalette(anaglyphPalette, customAnaglyphPalettes);
+
+    return <>
+        {!anaglyph &&
+            <PaletteLayout gap={20}>
+                <PaletteChoices>
+                    <VContainer gap={20}>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/emulator/palettes/defaultPalettes', 'Default Palettes')}
+                            </label>
+                            <PaletteList>
+                                {Object.keys(VB_PALETTES).map(id =>
+                                    <StyledPalette
+                                        key={id}
+                                        selected={palette === id}
+                                        onClick={() => select(id)}
+                                        onKeyDown={() => select(id)}
+                                    >
+                                        <PaletteSwatch colors={VB_PALETTES[id].map(formatColor)} />
+                                        <PaletteName>{EMULATION_PALETTES[id] ?? id}</PaletteName>
+                                    </StyledPalette>
+                                )}
+                            </PaletteList>
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/emulator/palettes/customPalettes', 'Custom Palettes')}
+                            </label>
+                            <PaletteList>
+                                {customPalettes.map((customPalette, index) => {
+                                    const id = getCustomPaletteId(customPalette.name);
+                                    return <StyledPalette
+                                        key={`custom-${index}`}
+                                        selected={palette === id}
+                                        onClick={() => select(id)}
+                                        onKeyDown={() => select(id)}
+                                    >
+                                        <PaletteSwatch colors={customPalette.colors} />
+                                        <PaletteName>{customPalette.name}</PaletteName>
+                                    </StyledPalette>;
+                                })}
+                                <StyledNewPalette onClick={addPalette}>
+                                    <VContainer justifyContent='center' grow={1}>
+                                        <i className='codicon codicon-plus' />
+                                    </VContainer>
+                                    <div>
+                                        {nls.localize('vuengine/emulator/palettes/newPalette', 'New Palette')}
+                                    </div>
+                                </StyledNewPalette>
+                            </PaletteList>
+                        </VContainer>
                     </VContainer>
+                </PaletteChoices>
+                <VContainer>
                     <div>
-                        {nls.localize('vuengine/emulator/palettes/newPalette', 'New Palette')}
+                        {nls.localize('vuengine/emulator/palettes/current', 'Current')}
                     </div>
-                </StyledNewPalette>
-            </HContainer>
-        </VContainer>
-        <VContainer>
-            {customPalettes.map((customPalette, index) => {
-                const id = getCustomPaletteId(customPalette.name);
-                return <PaletteEntry
-                    key={`custom-${index}`}
-                    selected={palette === id}
-                    onClick={() => select(id)}
-                >
-                    <PaletteSwatch colors={customPalette.colors} />
-                    <input
-                        type="text"
-                        className="theia-input"
-                        style={{ flexGrow: 1, width: 0 }}
-                        spellCheck={false}
-                        value={customPalette.name}
-                        onClick={e => e.stopPropagation()}
-                        onBlur={e => editPalette(index, { name: e.target.value })}
-                        onChange={e => editPalette(index, { name: e.target.value }, false)}
-                    />
-                    {customPalette.colors.map((color, level) =>
-                        <input
-                            key={level}
-                            type="color"
-                            title={LEVEL_TITLES[level]}
-                            value={color}
-                            onClick={e => e.stopPropagation()}
-                            onBlur={e => editPaletteColor(index, level, e.target.value)}
-                            onChange={e => editPaletteColor(index, level, e.target.value, false)}
-                        />
-                    )}
-                    <button
-                        className="theia-button secondary"
-                        title={nls.localizeByDefault('Remove')}
-                        onClick={e => {
-                            e.stopPropagation();
-                            removePalette(index);
-                        }}
-                    >
-                        <i className="codicon codicon-trash" />
-                    </button>
-                </PaletteEntry>;
-            })}
-        </VContainer>
-        {anaglyph &&
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/emulator/palettes/anaglyphColors', 'Anaglyph Colors')}
-                </label>
-                {Object.keys(VB_ANAGLYPH_PALETTES).map(id => {
-                    const colors = VB_ANAGLYPH_PALETTES[id];
-                    return <PaletteEntry
-                        key={id}
-                        selected={anaglyphPalette === id}
-                        onClick={() => selectAnaglyph(id)}
-                    >
-                        <AnaglyphSwatch left={formatColor(colors.left)} right={formatColor(colors.right)} />
-                        <PaletteName>{EMULATION_ANAGLYPH_PALETTES[id] ?? id}</PaletteName>
-                    </PaletteEntry>;
-                })}
-                {customAnaglyphPalettes.map((customPalette, index) => {
-                    const id = getCustomPaletteId(customPalette.name);
-                    return <PaletteEntry
-                        key={`custom-${index}`}
-                        selected={anaglyphPalette === id}
-                        onClick={() => selectAnaglyph(id)}
-                    >
-                        <AnaglyphSwatch left={customPalette.left} right={customPalette.right} />
-                        <input
-                            type="text"
-                            className="theia-input"
-                            style={{ flexGrow: 1, width: 0 }}
-                            spellCheck={false}
-                            value={customPalette.name}
-                            onClick={e => e.stopPropagation()}
-                            onBlur={e => editAnaglyphPalette(index, { name: e.target.value })}
-                            onChange={e => editAnaglyphPalette(index, { name: e.target.value }, false)}
-                        />
-                        <input
-                            type="color"
-                            title={nls.localize('vuengine/emulator/palettes/leftEyeTint', 'Tint of the left eye')}
-                            value={customPalette.left}
-                            onClick={e => e.stopPropagation()}
-                            onBlur={e => editAnaglyphPalette(index, { left: e.target.value })}
-                            onChange={e => editAnaglyphPalette(index, { left: e.target.value }, false)}
-                        />
-                        <input
-                            type="color"
-                            title={nls.localize('vuengine/emulator/palettes/rightEyeTint', 'Tint of the right eye')}
-                            value={customPalette.right}
-                            onClick={e => e.stopPropagation()}
-                            onBlur={e => editAnaglyphPalette(index, { right: e.target.value })}
-                            onChange={e => editAnaglyphPalette(index, { right: e.target.value }, false)}
-                        />
-                        <button
-                            className="theia-button secondary"
-                            title={nls.localizeByDefault('Remove')}
-                            onClick={e => {
-                                e.stopPropagation();
-                                removeAnaglyphPalette(index);
-                            }}
-                        >
-                            <i className="codicon codicon-trash" />
-                        </button>
-                    </PaletteEntry>;
-                })}
-                <div>
-                    <button className="theia-button secondary" onClick={addAnaglyphPalette}>
-                        {nls.localize('vuengine/emulator/palettes/addCustomAnaglyphColors', 'Add Custom Anaglyph Colors')}
-                    </button>
-                </div>
-            </VContainer>
+                    {selectedPalette
+                        ? <PaletteEntry key={`custom-${selectedPalette.index}`} selected={true}>
+                            <input
+                                type="text"
+                                className="theia-input"
+                                style={{ flexGrow: 1, width: 0 }}
+                                spellCheck={false}
+                                value={selectedPalette.palette.name}
+                                onBlur={e => editPalette(selectedPalette.index, { name: e.target.value })}
+                                onChange={e => editPalette(selectedPalette.index, { name: e.target.value }, false)}
+                            />
+                            {selectedPalette.palette.colors.map((color, level) =>
+                                <input
+                                    key={level}
+                                    type="color"
+                                    value={color}
+                                    onBlur={e => editPaletteColor(selectedPalette.index, level, e.target.value)}
+                                    onChange={e => editPaletteColor(selectedPalette.index, level, e.target.value, false)}
+                                />
+                            )}
+                            <button
+                                className="theia-button secondary"
+                                title={nls.localizeByDefault('Remove')}
+                                onClick={() => removePalette(selectedPalette.index)}
+                            >
+                                <i className="codicon codicon-trash" />
+                            </button>
+                        </PaletteEntry>
+                        : <ReadOnlyEntry>
+                            <ReadOnlyName>{EMULATION_PALETTES[palette] ?? palette}</ReadOnlyName>
+                            <PaletteSwatch colors={resolvePalette(palette, customPalettes).map(formatColor)} />
+                        </ReadOnlyEntry>
+                    }
+                </VContainer>
+            </PaletteLayout>
         }
-    </VContainer>;
+        {anaglyph &&
+            <PaletteLayout gap={20}>
+                <PaletteChoices>
+                    <VContainer gap={20}>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/emulator/palettes/defaultPalettes', 'Default Palettes')}
+                            </label>
+                            <PaletteList>
+                                {Object.keys(VB_ANAGLYPH_PALETTES).map(id =>
+                                    <StyledPalette
+                                        key={id}
+                                        selected={anaglyphPalette === id}
+                                        onClick={() => selectAnaglyph(id)}
+                                        onKeyDown={() => selectAnaglyph(id)}
+                                    >
+                                        <AnaglyphSwatch
+                                            left={formatColor(VB_ANAGLYPH_PALETTES[id].left)}
+                                            right={formatColor(VB_ANAGLYPH_PALETTES[id].right)}
+                                        />
+                                        <PaletteName>{EMULATION_ANAGLYPH_PALETTES[id] ?? id}</PaletteName>
+                                    </StyledPalette>
+                                )}
+                            </PaletteList>
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/emulator/palettes/customPalettes', 'Custom Palettes')}
+                            </label>
+                            <PaletteList>
+                                {customAnaglyphPalettes.map((customPalette, index) => {
+                                    const id = getCustomPaletteId(customPalette.name);
+                                    return <StyledPalette
+                                        key={`custom-${index}`}
+                                        selected={anaglyphPalette === id}
+                                        onClick={() => selectAnaglyph(id)}
+                                        onKeyDown={() => selectAnaglyph(id)}
+                                    >
+                                        <AnaglyphSwatch left={customPalette.left} right={customPalette.right} />
+                                        <PaletteName>{customPalette.name}</PaletteName>
+                                    </StyledPalette>;
+                                })}
+                                <StyledNewPalette onClick={addAnaglyphPalette}>
+                                    <VContainer justifyContent='center' grow={1}>
+                                        <i className='codicon codicon-plus' />
+                                    </VContainer>
+                                    <div>
+                                        {nls.localize('vuengine/emulator/palettes/newPalette', 'New Palette')}
+                                    </div>
+                                </StyledNewPalette>
+                            </PaletteList>
+                        </VContainer>
+                    </VContainer>
+                </PaletteChoices>
+                <VContainer>
+                    <div>
+                        {nls.localize('vuengine/emulator/palettes/current', 'Current')}
+                    </div>
+                    {selectedAnaglyphPalette
+                        ? <PaletteEntry key={`custom-${selectedAnaglyphPalette.index}`} selected={true}>
+                            <input
+                                type="text"
+                                className="theia-input"
+                                style={{ flexGrow: 1, width: 0 }}
+                                spellCheck={false}
+                                value={selectedAnaglyphPalette.palette.name}
+                                onBlur={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { name: e.target.value }
+                                )}
+                                onChange={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { name: e.target.value }, false
+                                )}
+                            />
+                            <input
+                                type="color"
+                                title={nls.localize('vuengine/emulator/palettes/leftEyeTint', 'Tint of the left eye')}
+                                value={selectedAnaglyphPalette.palette.left}
+                                onBlur={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { left: e.target.value }
+                                )}
+                                onChange={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { left: e.target.value }, false
+                                )}
+                            />
+                            <input
+                                type="color"
+                                title={nls.localize('vuengine/emulator/palettes/rightEyeTint', 'Tint of the right eye')}
+                                value={selectedAnaglyphPalette.palette.right}
+                                onBlur={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { right: e.target.value }
+                                )}
+                                onChange={e => editAnaglyphPalette(
+                                    selectedAnaglyphPalette.index, { right: e.target.value }, false
+                                )}
+                            />
+                            <button
+                                className="theia-button secondary"
+                                title={nls.localizeByDefault('Remove')}
+                                onClick={() => removeAnaglyphPalette(selectedAnaglyphPalette.index)}
+                            >
+                                <i className="codicon codicon-trash" />
+                            </button>
+                        </PaletteEntry>
+                        : <ReadOnlyEntry>
+                            <ReadOnlyName>
+                                {EMULATION_ANAGLYPH_PALETTES[anaglyphPalette] ?? anaglyphPalette}
+                            </ReadOnlyName>
+                            <AnaglyphSwatch
+                                left={formatColor(currentAnaglyph.left)}
+                                right={formatColor(currentAnaglyph.right)}
+                            />
+                        </ReadOnlyEntry>
+                    }
+                </VContainer>
+            </PaletteLayout>
+        }
+    </>;
 }

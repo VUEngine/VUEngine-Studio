@@ -4,6 +4,7 @@ import {
   ApplicationShell,
   BaseWidget,
   ConfirmDialog,
+  HoverService,
   KeybindingRegistry,
   LocalStorageService,
   Message,
@@ -50,6 +51,7 @@ import {
 import { VesVbProfileResult } from '../common/ves-vb-protocol';
 import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
 import EmulatorPalettes, { AnaglyphSwatch, PaletteSwatch } from './components/EmulatorPalettes';
+import EmulatorPreferences from './components/EmulatorPreferences';
 import { readBuildModeFromMap, readElf, readElfPathFromMap } from './core/ves-emulator-elf';
 import {
   findFunctionAt,
@@ -221,6 +223,8 @@ export interface vesEmulatorWidgetState {
   showControls: boolean;
   /** Whether the palette window is open. */
   showPalettes: boolean;
+  /** Whether the emulator's own settings window is open. */
+  showPreferences: boolean;
   /** Whether the currently selected slot holds a save state. */
   saveStateExists: boolean;
   romHeader: RomHeader;
@@ -241,6 +245,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(LocalStorageService)
   protected readonly localStorageService!: LocalStorageService;
+  @inject(HoverService)
+  protected readonly hoverService!: HoverService;
   @inject(MessageService)
   protected readonly messageService!: MessageService;
   @inject(VesProjectService)
@@ -724,6 +730,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       frameAdvance: false,
       showControls: false,
       showPalettes: false,
+      showPreferences: false,
       saveStateExists: false,
       romHeader: {
         name: '',
@@ -1313,7 +1320,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       e.repeat || // ... on repeated event firing
       !this.isVisible || // ... if emulator is not visible
       !this.state.loaded || // ... if emulator has not loaded yet
-      this.state.showPalettes // ... while the palette window is taking typing
+      this.state.showPalettes || // ... while the palette window is taking typing
+      this.state.showPreferences // ... or the settings window is
     ) {
       return;
     }
@@ -2109,6 +2117,8 @@ granularity records less often and costs proportionally less.',
               >
                 <i className="fa fa-camera"></i>
               </button>
+            </div>
+            <div>
               <button
                 className={
                   this.state.showControls
@@ -2128,6 +2138,20 @@ granularity records less often and costs proportionally less.',
                 disabled={!this.state.loaded}
               >
                 <i className="fa fa-keyboard-o"></i>
+              </button>
+              <button
+                className={
+                  this.state.showPreferences
+                    ? 'theia-button'
+                    : 'theia-button secondary'
+                }
+                title={nls.localize(
+                  'vuengine/emulator/emulatorSettings',
+                  'Emulator Settings',
+                )}
+                onClick={() => this.togglePreferencesWindow()}
+              >
+                <i className="fa fa-sliders"></i>
               </button>
             </div>
           </EmulatorControlsGroup>
@@ -2179,11 +2203,29 @@ granularity records less often and costs proportionally less.',
           onClose={() => this.togglePaletteWindow()}
           onOk={() => this.togglePaletteWindow()}
           height='640px'
-          width='674px'
+          width='690px'
+          overflow='hidden'
         >
           <EmulatorPalettes
             preferenceService={this.preferenceService}
             anaglyph={this.getRenderingMode() === VbRenderingMode.ANAGLYPH}
+          />
+        </PopUpDialog>
+      }
+      {this.state.showPreferences &&
+        <PopUpDialog
+          open={this.state.showPreferences}
+          title={nls.localize('vuengine/emulator/emulatorSettings', 'Emulator Settings')}
+          okLabel={nls.localizeByDefault('Close')}
+          cancelButton={false}
+          onClose={() => this.togglePreferencesWindow()}
+          onOk={() => this.togglePreferencesWindow()}
+          height='540px'
+          width='540px'
+        >
+          <EmulatorPreferences
+            preferenceService={this.preferenceService}
+            hoverService={this.hoverService}
           />
         </PopUpDialog>
       }
@@ -2886,6 +2928,11 @@ granularity records less often and costs proportionally less.',
 
   protected togglePaletteWindow(): void {
     this.state.showPalettes = !this.state.showPalettes;
+    this.update();
+  }
+
+  protected togglePreferencesWindow(): void {
+    this.state.showPreferences = !this.state.showPreferences;
     this.update();
   }
 

@@ -279,6 +279,7 @@ export interface VbAnaglyphPalette {
  * matter of taste, and so a custom palette.
  */
 export const VB_PALETTES: Record<string, VbPalette> = {
+    'default': [0x000000, 0x78010d, 0xa80016, 0xff0024],
     'red': [0x000000, 0x550000, 0xaa0000, 0xff0000],
     'grey': [0x000000, 0x555555, 0xaaaaaa, 0xffffff],
     'green': [0x000000, 0x005500, 0x00aa00, 0x00ff00],
@@ -291,23 +292,8 @@ export const VB_PALETTES: Record<string, VbPalette> = {
     'super-game-boy': [0x000000, 0x943A3A, 0xFF9494, 0xFFFF73],
 };
 
-/**
- * The palette to show when none is configured — and when what is configured
- * is not there any more, since the preference is a free-form string that
- * outlives a palette being renamed or a custom one being deleted.
- *
- * Read out of the table rather than written out again, so it cannot name a
- * palette that does not exist: everything downstream treats it as the one id
- * that is always resolvable, and an id that is not in the table resolves to
- * undefined and takes the renderer down with it.
- */
 export const VB_DEFAULT_PALETTE_ID = Object.keys(VB_PALETTES)[0];
 
-/**
- * Anaglyph tint pairs for the glasses people actually own: red/cyan is the
- * common case, red/blue and red/green the older ones, green/magenta what
- * TriOviz-style glasses filter, and yellow/blue the ColorCode 3D pair.
- */
 export const VB_ANAGLYPH_PALETTES: Record<string, VbAnaglyphPalette> = {
     'red-cyan': { left: VB_COLORS.RED, right: VB_COLORS.CYAN },
     'red-blue': { left: VB_COLORS.RED, right: VB_COLORS.BLUE },
@@ -318,25 +304,17 @@ export const VB_ANAGLYPH_PALETTES: Record<string, VbAnaglyphPalette> = {
 
 export const VB_DEFAULT_ANAGLYPH_PALETTE_ID = 'red-cyan';
 
-/** How the renderer arranges the two eyes. */
 export enum VbStereoLayout {
-    /** One image, taking its brightness from whichever eyes the mode shows. */
-    OVERLAY = 0,
-    /** Two full images next to each other. */
-    SIDE_BY_SIDE = 1,
-    /** Side by side, each eye squeezed to half width for the CyberScope. */
-    CYBERSCOPE = 2,
-    /** Alternating rows, for row-interleaved 3D displays. */
-    HLI = 3,
-    /** Alternating columns, for column-interleaved 3D displays. */
-    VLI = 4,
+    OVERLAY,
+    SIDE_BY_SIDE,
+    CYBERSCOPE,
+    HLI,
+    VLI,
 }
 
-/** Which eyes an OVERLAY pixel is composed from. */
 export enum VbEyes {
     LEFT = 0,
     RIGHT = 1,
-    /** Both, mixed as an anaglyph. */
     BOTH = 2,
 }
 

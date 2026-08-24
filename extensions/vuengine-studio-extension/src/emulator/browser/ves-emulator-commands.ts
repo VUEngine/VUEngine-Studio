@@ -355,17 +355,6 @@ export namespace EmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
-  export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
-    {
-      id: 'emulator.showSettings',
-      label: 'Show Emulator Preferences',
-      category: 'Emulator',
-      iconClass: 'codicon codicon-settings',
-    },
-    'vuengine/emulator/commands/showSettings',
-    'vuengine/emulator/commands/category'
-  );
-
   /**
    * Profiling, as two commands rather than one toggle.
    *

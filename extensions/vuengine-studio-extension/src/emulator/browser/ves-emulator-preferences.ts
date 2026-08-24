@@ -295,6 +295,7 @@ in the emulator's Configure Input window."
         + 'Higher values cover more time with the same amount of memory, at a coarser resolution.'
       ),
       default: 1,
+      multipleOf: 1,
       minimum: 1,
       maximum: 32,
       scope: PreferenceScope.Folder,
@@ -313,6 +314,7 @@ in the emulator's Configure Input window."
         + 'seconds at a granularity of 1 and proportionally longer above that.'
       ),
       default: 64,
+      multipleOf: 1,
       minimum: 8,
       maximum: 1024,
       scope: PreferenceScope.Folder,
@@ -329,9 +331,9 @@ in the emulator's Configure Input window."
         'When using slowmotion, content will slow down by this factor. High values might render the emulator unresponsive. Keep key pressed to exit slow motion.'
       ),
       default: 3.0,
+      multipleOf: 0.5,
       minimum: 1.0,
       maximum: 32.0,
-      // TODO: allow 0.1 steps
       scope: PreferenceScope.Folder,
       overridable: true,
     },
@@ -346,9 +348,9 @@ in the emulator's Configure Input window."
         'The rate at which content will be run when using fast forward. (E.g. 5.0 means 50 Hz * 5.0 = 250 fps).'
       ),
       default: 4.0,
+      multipleOf: 0.5,
       minimum: 1,
       maximum: 32,
-      // TODO: allow 0.1 steps
       scope: PreferenceScope.Folder,
       overridable: true,
     },
