@@ -174,10 +174,6 @@
       "resume": "Önéletrajz",
       "runQueued": "Run Queued",
       "scale": "Lépcsők",
-      "scales": {
-        "auto": "Autó",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Milyen emulátorkonfigurációt kell használni a lefordított projektek futtatásához?",
       "selectDefaultEmulatorTitle": "Alapértelmezett emulátor-konfiguráció kiválasztása",
       "showHelp": "Kézikönyv oldal megjelenítése",

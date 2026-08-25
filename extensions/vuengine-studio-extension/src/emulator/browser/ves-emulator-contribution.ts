@@ -4,6 +4,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 import { EMULATOR_GAMEPAD_BUTTONS, EMULATOR_GAMEPAD_INPUTS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from './ves-emulator-commands';
 import { EMULATOR_FOCUS_CONTEXT } from './ves-emulator-context-key-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -20,17 +21,17 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
   private readonly workspaceService!: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(EmulatorCommands.RUN, {
+    commandRegistry.registerCommand(VesEmulatorCommands.RUN, {
       isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.run(),
     });
-    commandRegistry.registerCommand(EmulatorCommands.SELECT, {
+    commandRegistry.registerCommand(VesEmulatorCommands.SELECT, {
       isEnabled: () => this.workspaceService.opened,
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.selectEmulator(),
     });
-    commandRegistry.registerCommand(EmulatorCommands.CANCEL_RED_VIPER_TRANSFER, {
+    commandRegistry.registerCommand(VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER, {
       isVisible: () => false,
       execute: () => this.vesEmulatorService.cancelRedViperTransfer(),
     });
@@ -112,7 +113,7 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
   registerKeybindings(registry: KeybindingRegistry): void {
     registry.registerKeybinding({
-      command: EmulatorCommands.RUN.id,
+      command: VesEmulatorCommands.RUN.id,
       keybinding: 'alt+shift+r',
     });
 
@@ -270,8 +271,8 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     const emulatorName = defaultEmulator ? defaultEmulator : nls.localize('vuengine/emulator/builtIn', 'Built-In');
 
     const menuAction: MenuAction = {
-      commandId: EmulatorCommands.SELECT.id,
-      label: `${EmulatorCommands.SELECT.label} (${emulatorName})`,
+      commandId: VesEmulatorCommands.SELECT.id,
+      label: `${VesEmulatorCommands.SELECT.label} (${emulatorName})`,
       order: '2',
     };
     menus.unregisterMenuAction(menuAction, VesBuildMenuSection.CONFIG);
@@ -280,13 +281,13 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
 
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
-      commandId: EmulatorCommands.RUN.id,
-      label: EmulatorCommands.RUN.label,
+      commandId: VesEmulatorCommands.RUN.id,
+      label: VesEmulatorCommands.RUN.label,
       order: '2',
     });
     menus.registerMenuAction(VesBuildMenuSection.CONFIG, {
-      commandId: EmulatorCommands.SELECT.id,
-      label: EmulatorCommands.SELECT.label,
+      commandId: VesEmulatorCommands.SELECT.id,
+      label: VesEmulatorCommands.SELECT.label,
       order: '2',
     });
   }

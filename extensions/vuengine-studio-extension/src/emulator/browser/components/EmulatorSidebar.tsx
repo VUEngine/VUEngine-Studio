@@ -1,6 +1,6 @@
 import { CommandService, nls, PreferenceService } from '@theia/core';
 import React from 'react';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from '../ves-emulator-commands';
 import EmulatorAutoQueuePreference from './EmulatorAutoQueuePreference';
 
 interface EmulatorSidebarProps {
@@ -11,7 +11,7 @@ interface EmulatorSidebarProps {
 
 export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.Element {
     const { isQueued, commandService, preferenceService } = props;
-    const run = () => commandService.executeCommand(EmulatorCommands.RUN.id);
+    const run = () => commandService.executeCommand(VesEmulatorCommands.RUN.id);
 
     return <div className='emulatorSidebarWidget'>
         <div className='runActions'>

@@ -174,10 +174,6 @@
       "resume": "CV",
       "runQueued": "Uruchom kolejkę",
       "scale": "Schody",
-      "scales": {
-        "auto": "Samochód",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Której konfiguracji emulatora należy użyć do uruchomienia skompilowanych projektów?",
       "selectDefaultEmulatorTitle": "Wybierz domyślną konfigurację emulatora",
       "showHelp": "Strona podręcznika pokazów",

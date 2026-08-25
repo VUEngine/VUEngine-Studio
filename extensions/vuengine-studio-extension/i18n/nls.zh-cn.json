@@ -174,10 +174,6 @@
       "resume": "简历",
       "runQueued": "运行排队",
       "scale": "楼梯",
-      "scales": {
-        "auto": "汽车",
-        "stretch": "伸展"
-      },
       "selectDefaultEmulatorPlaceholder": "应该使用哪种仿真器配置来运行已编译的项目?",
       "selectDefaultEmulatorTitle": "选择默认的仿真器配置",
       "showHelp": "展会手册页",

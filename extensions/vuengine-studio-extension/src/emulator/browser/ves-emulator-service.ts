@@ -14,15 +14,11 @@ import { VesSocketWatcher } from '../../socket/browser/ves-socket-service-watche
 import { VesSocketService } from '../../socket/common/ves-socket-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import {
-  defaultEmulatorConfig,
   EmulatorConfig,
-  RED_VIPER_CONFIG,
-  RED_VIPER_VBLINK_CHUNK_SIZE_BYTES,
-  RED_VIPER_VBLINK_PORT,
   VbLinkStatus,
   VbLinkStatusData,
-  VES_EMULATOR_WIDGET_ID,
 } from 'vueport-core/lib/browser/emulator-types';
+import { RED_VIPER_CONFIG, RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, RED_VIPER_VBLINK_PORT, VES_EMULATOR_WIDGET_ID, defaultEmulatorConfig } from './ves-emulator-types';
 // type only to not cause an injection loop
 import type { VesEmulatorWidget } from './ves-emulator-widget';
 

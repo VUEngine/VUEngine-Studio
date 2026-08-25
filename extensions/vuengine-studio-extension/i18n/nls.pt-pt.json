@@ -174,10 +174,6 @@
       "resume": "Currículo",
       "runQueued": "Funciona em fila de espera",
       "scale": "Escadas",
-      "scales": {
-        "auto": "Automóvel",
-        "stretch": "Esticar"
-      },
       "selectDefaultEmulatorPlaceholder": "Que configuração do emulador deve ser utilizada para executar projectos compilados?",
       "selectDefaultEmulatorTitle": "Seleccionar a configuração padrão do emulador",
       "showHelp": "Mostrar Página do Manual",

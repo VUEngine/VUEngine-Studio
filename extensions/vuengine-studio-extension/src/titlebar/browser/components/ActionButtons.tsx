@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { VesBuildCommands } from '../../../build/browser/ves-build-commands';
 import { BuildResult, BuildStatus } from '../../../build/browser/ves-build-types';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../../flash-cart/browser/ves-flash-cart-commands';
 
@@ -187,7 +187,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                     hoverService.requestHover({
                         content: runIsQueued
                             ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                            : `${EmulatorCommands.RUN.label}${vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`,
+                            : `${VesEmulatorCommands.RUN.label}${vesCommonService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });

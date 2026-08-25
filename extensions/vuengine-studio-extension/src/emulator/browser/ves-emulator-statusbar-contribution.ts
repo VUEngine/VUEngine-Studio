@@ -2,10 +2,13 @@ import { nls, PreferenceService } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
-import { RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, VbLinkStatus } from 'vueport-core/lib/browser/emulator-types';
+import {
+  VbLinkStatus,
+} from 'vueport-core/lib/browser/emulator-types';
+import { RED_VIPER_VBLINK_CHUNK_SIZE_BYTES } from './ves-emulator-types';
 
 @injectable()
 export class VesEmulatorStatusBarContribution implements FrontendApplicationContribution {
@@ -43,10 +46,10 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
             nls.localize('vuengine/emulator/builtIn', 'Built-In');
         this.statusBar.setElement('ves-current-emulator', {
             alignment: StatusBarAlignment.LEFT,
-            command: EmulatorCommands.SELECT.id,
+            command: VesEmulatorCommands.SELECT.id,
             priority: 2,
             text: `$(codicon-play) ${label}`,
-            tooltip: EmulatorCommands.SELECT.label,
+            tooltip: VesEmulatorCommands.SELECT.label,
         });
     }
 
@@ -65,7 +68,7 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
             }
             this.statusBar.setElement('ves-vblink-status', {
                 alignment: StatusBarAlignment.LEFT,
-                command: EmulatorCommands.CANCEL_RED_VIPER_TRANSFER.id,
+                command: VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER.id,
                 priority: 1,
                 text: `$(codicon-loading~spin) ${label}`,
             });

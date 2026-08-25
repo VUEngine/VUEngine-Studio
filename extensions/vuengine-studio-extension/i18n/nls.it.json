@@ -174,10 +174,6 @@
       "resume": "Il curriculum",
       "runQueued": "Esecuzione in coda",
       "scale": "Scale",
-      "scales": {
-        "auto": "Auto",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Quale configurazione dell'emulatore deve essere utilizzata per eseguire i progetti compilati?",
       "selectDefaultEmulatorTitle": "Selezionare la configurazione predefinita dell'emulatore",
       "showHelp": "Pagina del manuale dello spettacolo",

@@ -13,7 +13,7 @@ import { buildMenuPath } from '../../build/browser/ves-build-contribution';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -202,7 +202,7 @@ export class TitlebarWidget extends ReactWidget {
     }
 
     protected build = () => this.commandService.executeCommand(VesBuildCommands.BUILD.id);
-    protected run = () => this.commandService.executeCommand(EmulatorCommands.RUN.id);
+    protected run = () => this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
     protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
     protected exportRom = () => this.commandService.executeCommand(VesExportCommands.EXPORT.id);
     protected clean = () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);

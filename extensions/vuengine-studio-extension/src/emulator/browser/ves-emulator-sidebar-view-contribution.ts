@@ -4,7 +4,7 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from './ves-emulator-commands';
 
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
@@ -63,9 +63,9 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
         toolbar.registerItem({
-            id: EmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
-            command: EmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
-            tooltip: EmulatorCommands.CONFIG_WIDGET_TOGGLE.label,
+            id: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
+            command: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
+            tooltip: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.label,
             priority: 1,
         });
         toolbar.registerItem({

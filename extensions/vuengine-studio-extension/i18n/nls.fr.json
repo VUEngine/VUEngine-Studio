@@ -174,10 +174,6 @@
       "resume": "Curriculum vitae",
       "runQueued": "Run Queued",
       "scale": "Escaliers",
-      "scales": {
-        "auto": "Voiture",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Quelle configuration d'émulateur doit être utilisée pour exécuter des projets compilés ?",
       "selectDefaultEmulatorTitle": "Sélectionner la configuration par défaut de l'émulateur",
       "showHelp": "Page du manuel d'exposition",

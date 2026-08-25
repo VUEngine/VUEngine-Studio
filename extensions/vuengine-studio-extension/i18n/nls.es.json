@@ -174,10 +174,6 @@
       "resume": "Curriculum vitae",
       "runQueued": "Ejecutar la cola",
       "scale": "Escaleras",
-      "scales": {
-        "auto": "Coche",
-        "stretch": "Estirar"
-      },
       "selectDefaultEmulatorPlaceholder": "¿Qué configuración del emulador debe utilizarse para ejecutar los proyectos compilados?",
       "selectDefaultEmulatorTitle": "Seleccione la configuración por defecto del emulador",
       "showHelp": "Mostrar la página del manual",

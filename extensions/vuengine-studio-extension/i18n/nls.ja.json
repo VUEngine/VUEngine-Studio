@@ -174,10 +174,6 @@
       "resume": "レジュメ",
       "runQueued": "ランキューブ",
       "scale": "階段",
-      "scales": {
-        "auto": "車",
-        "stretch": "ストレッチ"
-      },
       "selectDefaultEmulatorPlaceholder": "コンパイルされたプロジェクトを実行するには、どのエミュレータの設定を使用すればよいですか?",
       "selectDefaultEmulatorTitle": "デフォルトのエミュレータ構成を選択",
       "showHelp": "ショーハンドブックページ",

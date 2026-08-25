@@ -88,8 +88,8 @@ import {
   resolveAnaglyphPalette,
   resolvePalette,
   RomHeader,
-  VES_EMULATOR_WIDGET_ID,
 } from 'vueport-core/lib/browser/emulator-types';
+import { VES_EMULATOR_WIDGET_ID } from './ves-emulator-types';
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
 

@@ -4,6 +4,7 @@ import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EMULATOR_ACTION_COMMANDS, EMULATOR_ACTIONS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from './ves-emulator-commands';
 import { EMULATOR_PANEL_TYPES, emulatorPanelLabel, EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
@@ -135,7 +136,7 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       execute: widget => this.emulatorFor(widget)?.resetLayout(),
     });
 
-    commandRegistry.registerCommand(EmulatorCommands.WIDGET_HELP, {
+    commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_HELP, {
       isEnabled: () => true,
       isVisible: widget => this.emulatorFor(widget) !== undefined,
       execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
@@ -247,9 +248,9 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       priority: 3,
     });
     toolbar.registerItem({
-      id: EmulatorCommands.WIDGET_HELP.id,
-      command: EmulatorCommands.WIDGET_HELP.id,
-      tooltip: EmulatorCommands.WIDGET_HELP.label,
+      id: VesEmulatorCommands.WIDGET_HELP.id,
+      command: VesEmulatorCommands.WIDGET_HELP.id,
+      tooltip: VesEmulatorCommands.WIDGET_HELP.label,
       priority: 2,
     });
   }

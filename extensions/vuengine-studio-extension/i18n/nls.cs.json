@@ -174,10 +174,6 @@
       "resume": "Životopis",
       "runQueued": "Spustit ve frontě",
       "scale": "Schody",
-      "scales": {
-        "auto": "Auto",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Která konfigurace emulátoru by měla být použita ke spuštění zkompilovaných projektů?",
       "selectDefaultEmulatorTitle": "Výběr výchozí konfigurace emulátoru",
       "showHelp": "Zobrazit stránku příručky",

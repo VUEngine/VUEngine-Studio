@@ -8,7 +8,7 @@ import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
 import { VesFileOpenElectronMainApplication } from '../../core/electron-main/ves-file-open-electron-main-application';
-import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
@@ -118,7 +118,7 @@ export class VesTouchbarElectronMainApplication extends VesFileOpenElectronMainA
         });
         const buildMenuRunButton = new TouchBarButton({
             icon: runIcon,
-            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, EmulatorCommands.RUN.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesEmulatorCommands.RUN.id),
         });
         const buildMenuFlashButton = new TouchBarButton({
             icon: flashIcon,

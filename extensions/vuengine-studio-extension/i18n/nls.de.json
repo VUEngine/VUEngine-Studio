@@ -174,10 +174,6 @@
       "resume": "Fortsetzen",
       "runQueued": "Ausführen in der Warteschlange",
       "scale": "Skalieren",
-      "scales": {
-        "auto": "Automatisch",
-        "stretch": "Strecken"
-      },
       "selectDefaultEmulatorPlaceholder": "Welche Emulatorkonfiguration sollte verwendet werden, um kompilierte Projekte auszuführen?",
       "selectDefaultEmulatorTitle": "Standard-Emulatorkonfiguration auswählen",
       "showHelp": "Handbuchseite anzeigen",

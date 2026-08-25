@@ -1534,7 +1534,8 @@
         "category": "Emulator",
         "run": "Run on Emulator",
         "selectEmulator": "Set Default Emulator Config...",
-        "showSettings": "Show Emulator Preferences"
+        "showSettings": "Show Emulator Preferences",
+        "toggleConfigsView": "Toggle Emulator Configs View"
       },
       "configureInput": "Configure Input",
       "controller": {
@@ -1618,10 +1619,6 @@
       "run": "Run",
       "runQueued": "Run Queued",
       "scale": "Scale",
-      "scales": {
-        "auto": "Auto",
-        "stretch": "Stretch"
-      },
       "selectDefaultEmulatorPlaceholder": "Which emulator configuration should be used to run compiled projects?",
       "selectDefaultEmulatorTitle": "Select default emulator configuration",
       "selectEmulatorExecutable": "Select emulator executable",
@@ -1655,7 +1652,8 @@
         "sideBySide": "Side By Side",
         "vli": "Vertical Line Interlaced"
       },
-      "unmute": "Unmute"
+      "unmute": "Unmute",
+      "showDocumentation": "Show Documentation"
     },
     "engineConfigEditor": {
       "affine": {
@@ -1682,7 +1680,7 @@
         "earDisplacement": "Ear Displacement",
         "stereoAttenuationDistance": "Stereo Attenuation Distance",
         "stereoAttenuationDistanceDescription": "affects the amount of attenuation caused by the distance between the x coordinate and each ear's                             position defined by \"Ear Displacement\".",
-        "groups":{
+        "groups": {
           "general": "General",
           "music": "Music",
           "effects": "Effects",
