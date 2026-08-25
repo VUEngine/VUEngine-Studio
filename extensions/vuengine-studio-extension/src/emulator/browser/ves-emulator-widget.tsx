@@ -1,4 +1,4 @@
-import { CommandService, Disposable, MessageService, nls, PreferenceService } from '@theia/core';
+import { CommandService, Disposable, Emitter, MessageService, nls, PreferenceService } from '@theia/core';
 import {
   ApplicationShell,
   HoverService,
@@ -42,7 +42,7 @@ import {
   VbPalette,
   VbRenderingMode,
 } from 'vueport-core/lib/common/vb-constants';
-import { VesVbProfileResult } from 'vueport-core/lib/common/vb-protocol';
+import { VesVbProfileResult, VesVbSpeed } from 'vueport-core/lib/common/vb-protocol';
 import { EmulatorControlsOverlay } from 'vueport-core/lib/browser/components/EmulatorControlsOverlay';
 import { Emulator } from 'vueport-core/lib/browser/components/Emulator';
 import {
@@ -300,6 +300,27 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.time.stopRewinding();
   }
 
+  /**
+   * How fast emulation is actually running, as the worker last reported it,
+   * or undefined while no session is running.
+   *
+   * Reported rather than derived from the speed that was asked for: a fast
+   * forward the machine cannot sustain is clamped, and a machine can fall
+   * behind even at real time, so only the worker knows what is being achieved.
+   */
+  protected _emulationSpeed?: VesVbSpeed;
+  protected readonly onDidChangeEmulationSpeedEmitter = new Emitter<VesVbSpeed | undefined>();
+  readonly onDidChangeEmulationSpeed = this.onDidChangeEmulationSpeedEmitter.event;
+
+  get emulationSpeed(): VesVbSpeed | undefined {
+    return this._emulationSpeed;
+  }
+
+  protected setEmulationSpeed(speed: VesVbSpeed | undefined): void {
+    this._emulationSpeed = speed;
+    this.onDidChangeEmulationSpeedEmitter.fire(speed);
+  }
+
   get paused(): boolean {
     return this.state.paused;
   }
@@ -433,6 +454,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.bindings = new VesEmulatorTheiaBindings(this.vesCommonService, this.keybindingRegistry);
     this.cheats = new VesEmulatorCheatStore(this.storage);
     this.toDispose.push(Disposable.create(() => this.cheats.dispose()));
+    this.toDispose.push(this.onDidChangeEmulationSpeedEmitter);
     this.esSound = new VesEmulatorEsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
     this.dock = new VesEmulatorDock(
@@ -610,6 +632,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
     this.sim = undefined;
     this.core = undefined;
+    // Nothing is emulating any more, so there is no rate to report.
+    this.setEmulationSpeed(undefined);
     this.dock.setSim(undefined);
     this.cheats.setSim(undefined);
     this.esSound.setSim(undefined);
@@ -1300,6 +1324,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       const core = session.core;
       this.core = core;
       this.toDispose.push(core.onError(message => this.handleCoreError(message)));
+      // What the status bar shows, sampled by the worker about once a second.
+      this.toDispose.push(core.onSpeed(speed => this.setEmulationSpeed(speed)));
 
       this.sim = session.sim;
       this.dock.setSim(this.sim);
@@ -1559,8 +1585,8 @@ granularity records less often and costs proportionally less.',
           cancelButton={false}
           onClose={() => this.togglePaletteWindow()}
           onOk={() => this.togglePaletteWindow()}
-          height='640px'
-          width='690px'
+          height='90%'
+          width='80%'
           overflow='hidden'
         >
           <EmulatorPalettes

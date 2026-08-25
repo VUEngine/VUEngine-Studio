@@ -1566,6 +1566,7 @@
         "accurate": "Accurate",
         "fast": "Fast"
       },
+      "emulationSpeed": "Emulation speed: {0} of {1} fps",
       "emulator": "Emulator",
       "emulatorPathDoesNotExist": "Emulator Path \"{0}\" does not exist.",
       "input": {
