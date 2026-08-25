@@ -4,7 +4,7 @@
  *
  * Runs the compiled class from `lib/` with the Electron-facing parts stubbed, so
  * the decisions it makes can be checked without launching the application.
- * Run from the repository root: node scripts/open-file-routing-probe.mjs
+ * Usage: node extensions/vuengine-studio-extension/tests/open-file-routing-probe.mjs
  */
 import { mkdtempSync, mkdirSync, writeFileSync, realpathSync } from 'fs';
 import { tmpdir } from 'os';
@@ -14,7 +14,7 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const { VesFileOpenElectronMainApplication } =
-    require('../../extensions/vuengine-studio-extension/lib/core/electron-main/ves-file-open-electron-main-application');
+    require('../lib/core/electron-main/ves-file-open-electron-main-application');
 
 // Resolved, because the paths the application reports are: on macOS the temporary
 // directory is a symlink, and a file named on the command line is realpath'd.

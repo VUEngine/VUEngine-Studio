@@ -1,8 +1,8 @@
 import { URI } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { VesEmulatorSession } from '../../../../../emulator/browser/ves-emulator-core-service.js';
-import { VB_CART_RAM_BASE } from '../../../../../emulator/common/ves-vb-constants.js';
+import { VesEmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
+import { VB_CART_RAM_BASE } from 'vueport-core/lib/common/vb-constants';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
 import { SoundData, SUB_NOTE_RESOLUTION, TrackSettings } from '../SoundEditorTypes.js';
 import PlayerRomBuilder from './PlayerRomBuilder.js';

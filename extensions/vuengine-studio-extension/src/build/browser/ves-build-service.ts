@@ -24,7 +24,7 @@ import { Systeminformation } from 'systeminformation';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { clamp } from '../../editors/browser/components/Common/Utils';
 import { GameConfigData } from '../../editors/browser/components/GameConfigEditor/GameConfigEditorTypes';
-import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';

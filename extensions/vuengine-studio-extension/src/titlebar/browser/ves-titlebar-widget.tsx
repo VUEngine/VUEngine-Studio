@@ -13,7 +13,7 @@ import { buildMenuPath } from '../../build/browser/ves-build-contribution';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';

@@ -1,11 +1,11 @@
+import { TabBar, Widget } from '@lumino/widgets';
 import { CommandContribution, CommandRegistry, CommandService, nls, QuickPickItemOrSeparator, QuickPickService } from '@theia/core';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { TabBar, Widget } from '@theia/core/shared/@lumino/widgets';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { EMULATOR_ACTION_COMMANDS, EMULATOR_ACTIONS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import { EMULATOR_PANEL_TYPES, emulatorPanelLabel, EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { EMULATOR_PANEL_LABELS, EmulatorPanelType } from './panels/ves-emulator-panel';
-import { EMULATOR_ACTION_COMMANDS, EMULATOR_ACTIONS, EmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorService } from './ves-emulator-service';
 import { VesEmulatorWidget } from './ves-emulator-widget';
@@ -196,18 +196,18 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
     const openDescription = target
       ? nls.localize('vuengine/emulator/panels/moveHere', 'Move here')
       : nls.localize('vuengine/emulator/panels/alreadyOpen', 'Already open');
-    Object.keys(EMULATOR_PANEL_LABELS)
+    EMULATOR_PANEL_TYPES
       .filter(panelType => panelType !== EmulatorPanelType.SCREEN)
       // By label, not by key: the keys are an implementation detail, and the
       // labels are localized, so which order reads as alphabetical depends on
       // the language the list is being shown in. Sorting here rather than per
       // group orders both of them, since they are filled in this one pass.
-      .sort((a, b) => EMULATOR_PANEL_LABELS[a as EmulatorPanelType]
-        .localeCompare(EMULATOR_PANEL_LABELS[b as EmulatorPanelType]))
+      .sort((a, b) => emulatorPanelLabel(a as EmulatorPanelType)
+        .localeCompare(emulatorPanelLabel(b as EmulatorPanelType)))
       .forEach(panelType => {
         const item = {
           id: panelType,
-          label: EMULATOR_PANEL_LABELS[panelType as EmulatorPanelType]
+          label: emulatorPanelLabel(panelType as EmulatorPanelType)
         };
         if (widget.isPanelOpen(panelType as EmulatorPanelType)) {
           open.push({ ...item, description: openDescription });

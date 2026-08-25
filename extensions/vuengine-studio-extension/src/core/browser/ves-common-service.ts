@@ -83,7 +83,7 @@ export class VesCommonService {
       : ';';
   }
 
-  base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
+  base64ToBytes(base64: string): Uint8Array {
     const binString = atob(base64);
     return Uint8Array.from(binString, m => m.codePointAt(0) ?? 0);
   }
@@ -117,7 +117,7 @@ export class VesCommonService {
     }
 
     const compressed = this.base64ToBytes(data);
-    const stream = new Blob([compressed], {
+    const stream = new Blob([compressed.buffer as ArrayBuffer], {
       type: 'application/json',
     }).stream();
     const compressedReadableStream = stream.pipeThrough(

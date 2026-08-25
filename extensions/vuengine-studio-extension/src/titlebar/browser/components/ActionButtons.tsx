@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { VesBuildCommands } from '../../../build/browser/ves-build-commands';
 import { BuildResult, BuildStatus } from '../../../build/browser/ves-build-types';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { EmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesExportCommands } from '../../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../../flash-cart/browser/ves-flash-cart-commands';
 

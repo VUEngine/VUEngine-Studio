@@ -1,190 +1,97 @@
-import { FileX } from '@phosphor-icons/react';
-import { CommandService, Disposable, MessageService, nls, PreferenceScope, PreferenceService } from '@theia/core';
+import { CommandService, Disposable, MessageService, nls, PreferenceService } from '@theia/core';
 import {
   ApplicationShell,
-  BaseWidget,
-  ConfirmDialog,
   HoverService,
   KeybindingRegistry,
   LocalStorageService,
   Message,
-  NavigatableWidget,
-  ScopedKeybinding
+  NavigatableWidget
 } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
-import { PanelLayout, TabBar, Widget } from '@theia/core/shared/@lumino/widgets';
+import { TabBar, Widget } from '@lumino/widgets';
 import {
   inject,
   injectable,
   postConstruct,
 } from '@theia/core/shared/inversify';
-import * as React from '@theia/core/shared/react';
+import * as React from 'react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { crc32 } from 'crc';
 import * as iconv from 'iconv-lite';
-import styled from 'styled-components';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import AdvancedSelect from '../../editors/browser/components/Common/Base/AdvancedSelect';
-import HContainer from '../../editors/browser/components/Common/Base/HContainer';
-import Input from '../../editors/browser/components/Common/Base/Input';
-import PopUpDialog from '../../editors/browser/components/Common/Base/PopUpDialog';
-import RadioSelect from '../../editors/browser/components/Common/Base/RadioSelect';
-import EmptyContainer from '../../editors/browser/components/Common/EmptyContainer';
+import PopUpDialog from 'vueport-core/lib/browser/components/kit/PopUpDialog';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { VesEmulatorTheiaRumblePack } from './ves-emulator-theia-rumble';
+import { VueportRumblePack } from 'vueport-core/lib/common/emulator-rumble';
+import { formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { VueportInputBindings, VueportSettings } from 'vueport-core/lib/common/emulator-settings';
+import { VueportHover } from 'vueport-core/lib/browser/components/kit/KitContext';
+import { VesEmulatorTheiaSettings } from './ves-emulator-theia-settings';
+import { VesEmulatorTheiaBindings } from './ves-emulator-theia-bindings';
 import {
   buildVbDisplayMode,
-  VB_DEFAULT_ANAGLYPH_PALETTE_ID,
-  VB_DEFAULT_PALETTE_ID,
-  VB_DEFAULT_RENDERING_MODE,
   VB_FRAME_RATE,
   VbAnaglyphPalette,
   VbDisplayMode,
-  VbKey,
   VbPalette,
   VbRenderingMode,
-} from '../common/ves-vb-constants';
-import { VesVbProfileResult } from '../common/ves-vb-protocol';
-import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
-import EmulatorPalettes, { AnaglyphSwatch, PaletteSwatch } from './components/EmulatorPalettes';
-import EmulatorPreferences from './components/EmulatorPreferences';
-import { readBuildModeFromMap, readElf, readElfPathFromMap } from './core/ves-emulator-elf';
+} from 'vueport-core/lib/common/vb-constants';
+import { VesVbProfileResult } from 'vueport-core/lib/common/vb-protocol';
+import { EmulatorControlsOverlay } from 'vueport-core/lib/browser/components/EmulatorControlsOverlay';
+import { Emulator } from 'vueport-core/lib/browser/components/Emulator';
+import {
+  freshSaveRam,
+  unwrapSaveState,
+  VesEmulatorSaveStateIdentity,
+  wrapSaveState,
+} from 'vueport-core/lib/common/emulator-save-state';
+import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib/browser/emulator-input';
+import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
+import { VesEmulatorTheiaNotifications } from './ves-emulator-theia-notifications';
+import { VesEmulatorTheiaStorage } from './ves-emulator-theia-storage';
+import { VueportNotifications, VueportStorage } from 'vueport-core/lib/common/emulator-host';
+import EmulatorPalettes, { AnaglyphSwatch, PaletteSwatch } from 'vueport-core/lib/browser/components/EmulatorPalettes';
+import EmulatorPreferences from 'vueport-core/lib/browser/components/EmulatorPreferences';
+import { readBuildModeFromMap, readElf, readElfPathFromMap } from 'vueport-core/lib/browser/core/emulator-elf';
 import {
   findFunctionAt,
   functionDisplayName,
   indexElfSymbols,
   VesEmulatorSymbolIndex,
-} from './core/ves-emulator-symbols';
-import { toFirefoxProfile } from '../common/ves-emulator-profile';
-import { VesVbCore, VesVbSim } from './core/ves-vb-core';
-import { VesEmulatorDock, VesEmulatorDockLayout } from './panels/ves-emulator-dock';
-import { EmulatorPanelType } from './panels/ves-emulator-panel';
-import { VesEmulatorCheatStore } from './ves-emulator-cheat-store';
+} from 'vueport-core/lib/browser/core/emulator-symbols';
+import { toFirefoxProfile } from 'vueport-core/lib/common/emulator-profile';
+import { VesVbCore, VesVbSim } from 'vueport-core/lib/browser/core/vb-core';
+import { VesEmulatorAreaLayout, VesEmulatorDock, VesEmulatorDockLayout } from 'vueport-core/lib/browser/panels/emulator-dock';
+import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
+import { VesEmulatorCheatStore } from 'vueport-core/lib/browser/emulator-cheat-store';
 import {
   EMULATOR_ACTION_COMMANDS,
-  EMULATOR_ACTIONS,
-  EMULATOR_GAMEPAD_BUTTONS,
-  EMULATOR_GAMEPAD_INPUTS,
   EmulatorCommands,
-  emulatorGamePadCommand,
-} from './ves-emulator-commands';
-import { VesEmulatorCoreService, VesEmulatorSession } from './ves-emulator-core-service';
-import { VesEmulatorEsSoundPlayer } from './ves-emulator-essound-player';
-import { readGamepadKeys } from './ves-emulator-gamepad';
-import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
+} from 'vueport-core/lib/browser/emulator-commands';
+import { VesEmulatorCoreService, VesEmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
+import { VesEmulatorEsSoundPlayer } from 'vueport-core/lib/browser/emulator-essound-player';
 import {
   CUSTOM_PALETTE_PREFIX,
-  CustomAnaglyphPalette,
-  CustomPalette,
-  EMULATION_ANAGLYPH_PALETTES,
-  EMULATION_PALETTES,
-  EMULATION_RENDERING_MODES,
-  EMULATOR_SCALE_OPTIONS,
+  emulationAnaglyphPalettes,
+  emulationPalettes,
   EmulatorAction,
   EmulatorGamePadKeyCode,
   EmulatorMode,
-  EmulatorScale,
-  EmulatorSramInit,
+  EmulatorRomStatus,
   formatColor,
   resolveAnaglyphPalette,
   resolvePalette,
   RomHeader,
   VES_EMULATOR_WIDGET_ID,
-} from './ves-emulator-types';
-
-/**
- * One mapping: the keys currently bound to it, and what pressing them does.
- *
- * A game pad button is held, so it carries the pad code the core wants; an
- * action is run once, so it carries the action. Which of the two it is decides
- * how the key handler treats press and release.
- */
-interface EmulatorInputBinding {
-  keys: ScopedKeybinding[];
-  command: EmulatorAction | EmulatorGamePadKeyCode;
-}
-
-enum EmulatorRomStatus {
-  CHECKING = 'checking',
-  EXISTS = 'exists',
-  NOT_EXISTS = 'not_exists',
-}
-
-const GAMEPAD_KEY_TO_VB_KEY: Record<EmulatorGamePadKeyCode, VbKey> = {
-  [EmulatorGamePadKeyCode.A]: VbKey.A,
-  [EmulatorGamePadKeyCode.B]: VbKey.B,
-  [EmulatorGamePadKeyCode.Start]: VbKey.STA,
-  [EmulatorGamePadKeyCode.Select]: VbKey.SEL,
-  [EmulatorGamePadKeyCode.LUp]: VbKey.LU,
-  [EmulatorGamePadKeyCode.LRight]: VbKey.LR,
-  [EmulatorGamePadKeyCode.LDown]: VbKey.LD,
-  [EmulatorGamePadKeyCode.LLeft]: VbKey.LL,
-  [EmulatorGamePadKeyCode.RUp]: VbKey.RU,
-  [EmulatorGamePadKeyCode.RRight]: VbKey.RR,
-  [EmulatorGamePadKeyCode.RDown]: VbKey.RD,
-  [EmulatorGamePadKeyCode.RLeft]: VbKey.RL,
-  [EmulatorGamePadKeyCode.LT]: VbKey.LT,
-  [EmulatorGamePadKeyCode.RT]: VbKey.RT,
-};
-
-const EmulatorControls = styled.div`
-  display: flex;
-  gap: 5px;
-  justify-content: space-between;
-  min-width: 384px;
-  padding: calc(var(--theia-ui-padding) * 2);
-`;
-
-const EmulatorControlsGroup = styled.div`
-  display: flex;
-  gap: calc(var(--theia-ui-padding) * 2);
-
-  & button.theia-button {
-    height: 26px;
-    margin: 0 2px;
-    min-width: 32px;
-    vertical-align: middle;
-  }
-
-  & select.theia-select {
-    margin: 0 2px;
-    vertical-align: middle;
-  }
-`;
-
-const SaveSlotInputWrapper = styled.div`
-  position: relative;
-
-  i {
-    left: 7px;
-    position: absolute;
-    top: 7px;
-    z-index: 1;
-  }
-
-  input {
-    padding-left: 20px;
-  }
-`;
-
-const PaletteButton = styled.button`
-  border: 1px solid transparent;
-  padding: 0;
-`;
-
-const SELECT_STYLE = { width: 'auto' };
+} from 'vueport-core/lib/browser/emulator-types';
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
-/** A save state file, taken apart: one block per simulation, and the audio. */
-interface VesEmulatorSaveState {
-  states: ArrayBuffer[];
-  /** The ESSound section, absent in files written before version 2. */
-  esSound: string | undefined;
-}
 
 export interface VesEmulatorWidgetOptions {
   uri: string;
@@ -229,16 +136,61 @@ export interface vesEmulatorWidgetState {
   saveStateExists: boolean;
   romHeader: RomHeader;
   romSize: number;
-  input: Record<string, EmulatorInputBinding>;
   mode: EmulatorMode;
 }
 
+/**
+ * The arrangement an emulator opens with in the studio.
+ *
+ * vueport's own default leaves Memory Pools and Actors closed, because they
+ * read VUEngine's heap and class hierarchy and say nothing about a ROM built
+ * any other way. Here every ROM is a VUEngine build, so they are worth having
+ * open — which is what this layout adds, and the only thing it changes.
+ */
+const VES_EMULATOR_STUDIO_LAYOUT: VesEmulatorAreaLayout = {
+  type: 'split-area',
+  orientation: 'horizontal',
+  sizes: [50, 50],
+  children: [
+    {
+      type: 'split-area',
+      orientation: 'vertical',
+      sizes: [70, 30],
+      children: [
+        { type: 'tab-area', panels: [EmulatorPanelType.SCREEN], currentIndex: 0 },
+        {
+          type: 'tab-area',
+          panels: [
+            EmulatorPanelType.ROM_INFO,
+            EmulatorPanelType.MEMORY,
+            EmulatorPanelType.TERMINAL,
+          ],
+          currentIndex: 0,
+        },
+      ],
+    },
+    {
+      type: 'tab-area',
+      panels: [
+        EmulatorPanelType.MEMORY_POOLS,
+        EmulatorPanelType.ACTORS,
+        EmulatorPanelType.VIP_CHARACTERS,
+        EmulatorPanelType.VIP_BGMAPS,
+        EmulatorPanelType.VIP_WORLDS,
+        EmulatorPanelType.VIP_OBJECTS,
+        EmulatorPanelType.REGISTERS,
+      ],
+      currentIndex: 0,
+    },
+  ],
+};
+
 @injectable()
-export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
+export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget {
   @inject(ApplicationShell)
   protected readonly shell!: ApplicationShell;
   @inject(CommandService)
-  protected readonly commandService!: CommandService;
+  readonly commandService!: CommandService;
   @inject(FileService)
   protected readonly fileService!: FileService;
   @inject(KeybindingRegistry)
@@ -252,11 +204,11 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   @inject(VesProjectService)
   protected readonly vesProjectService!: VesProjectService;
   @inject(PreferenceService)
-  protected readonly preferenceService!: PreferenceService;
+  readonly preferenceService!: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService!: VesBuildService;
   @inject(VesCommonService)
-  protected readonly vesCommonService!: VesCommonService;
+  readonly vesCommonService!: VesCommonService;
   @inject(VesEmulatorCoreService)
   protected readonly vesEmulatorCoreService!: VesEmulatorCoreService;
   @inject(VesEmulatorWidgetOptions)
@@ -272,33 +224,13 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     'Emulator'
   );
 
-  protected status: EmulatorRomStatus = EmulatorRomStatus.CHECKING;
+  status: EmulatorRomStatus = EmulatorRomStatus.CHECKING;
 
   static readonly RESOLUTIONX = 384;
   static readonly RESOLUTIONY = 224;
 
   /** Unity gain. The core accepts 0 to 10. */
   static readonly DEFAULT_VOLUME = 1;
-
-  /**
-   * Save RAM allocated for a cartridge that has no save file yet.
-   *
-   * This is a size in the cartridge's *address space*, not a count of storage
-   * cells: only the low byte of each halfword is wired to the SRAM chip, so
-   * the 8 KiB a game pak actually holds spans 16 KiB of bus. The core indexes
-   * the buffer by masked address (`cart.ram[address & ramMask]`), so a buffer
-   * that is only as large as the chip makes the upper half of the window
-   * mirror onto the lower half and a game's own writes corrupt each other.
-   * Lemur, which runs the same core, allocates the same 16 KiB.
-   */
-  static readonly DEFAULT_SAVE_RAM_SIZE = 16384;
-
-  /** Fallbacks for preferences that are unset or meaningless. */
-  static readonly DEFAULT_FAST_FORWARD_RATIO = 4;
-  static readonly DEFAULT_SLOW_MOTION_RATIO = 3;
-
-  /** How much history a single rewind tick may make up for after a stall. */
-  static readonly REWIND_MAX_CATCHUP_MS = 100;
 
   /**
    * The actions that still work while the emulator is paused: the one that
@@ -315,39 +247,18 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
 
   /** The emulation session backing this widget, created on first boot. */
   protected session?: VesEmulatorSession;
-  protected core?: VesVbCore;
-  protected sim?: VesVbSim;
+  core?: VesVbCore;
+  sim?: VesVbSim;
   /** The other half of a linked pair, if any — see getLinkedPeer. */
-  protected linkedPeer?: VesEmulatorWidget;
-  /** Fixed toolbar above the dock area. */
-  protected toolbar: VesEmulatorToolbar;
+  linkedPeer?: VesEmulatorWidget;
   /** Rearrangeable panels: the screen plus whichever inspectors are open. */
-  protected dock: VesEmulatorDock;
+  dock: VesEmulatorDock;
   /** The ROM's cheats: loaded with it, and in effect whether or not the panel is open. */
   protected cheats: VesEmulatorCheatStore;
   /** ESSound playback, likewise independent of its panel being open. */
-  protected esSound: VesEmulatorEsSoundPlayer;
-  /** Controller reference, laid over everything. */
-  protected overlay: VesEmulatorOverlay;
-
-  /** Currently held keyboard buttons, as a VbKey mask. */
-  protected pressedKeys = 0;
-  /** Currently held physical controller buttons, as a VbKey mask. */
-  protected gamepadKeys = 0;
-  /** Last mask handed to the core, so unchanged frames cost nothing. */
-  protected appliedKeys = -1;
-  protected gamepadPollHandle?: number;
-  /** True from the moment rewind input is pressed until it is released. */
-  protected rewinding = false;
-  protected rewindHandle?: number;
-  /** Timestamp of the last rewind tick, for pacing playback by the wall clock. */
-  protected rewindLastTick = 0;
-  /** History entries owed from earlier ticks, kept fractional so pacing does not drift. */
-  protected rewindOwed = 0;
-  /** Serializes run/suspend, so a release can never overtake its own press. */
-  protected coreTransition: Promise<void> = Promise.resolve();
+  esSound: VesEmulatorEsSoundPlayer;
   /** Cached location of the selected slot's save state, for the file watcher. */
-  protected saveStateUri?: URI;
+  protected saveStatePath?: string;
   /** Live subscription forwarding link port traffic to a rumble pack, if any. */
   protected rumbleForwarding?: Disposable;
   /** Live subscription following which RumbleEffectSpec the game started. */
@@ -355,10 +266,123 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   /** The current ROM's symbol table, in flight or read — see loadSymbols. */
   protected symbols?: Promise<VesEmulatorSymbolIndex | undefined>;
 
+  /**
+   * The host's side of things: files, and telling the user something. Built
+   * here from the Theia services above, and the only place the emulator's
+   * own code learns that Theia exists.
+   */
+  protected storage: VueportStorage;
+  protected notifications: VueportNotifications;
+  protected rumblePack: VueportRumblePack;
+  settings: VueportSettings;
+  bindings: VueportInputBindings;
+
+  /** Speed, rewind, and the ordering of run/suspend transitions. */
+  protected time: EmulatorTimeControl;
+
+  /** Whether rewind input is currently held — read by the toolbar. */
+  get rewinding(): boolean {
+    return this.time.rewinding;
+  }
+
+  /**
+   * Rewind, as the chrome and the key handler reach it.
+   *
+   * Delegated rather than exposing the time controls themselves, so that what
+   * the toolbar and the keyboard can ask for stays a short, named list.
+   */
+  isRewindEnabled(): boolean {
+    return this.time.isRewindEnabled();
+  }
+
+  stopRewinding(): void {
+    this.time.stopRewinding();
+  }
+
+  get paused(): boolean {
+    return this.state.paused;
+  }
+
+  get fastForward(): boolean {
+    return this.state.fastForward;
+  }
+
+  get slowMotion(): boolean {
+    return this.state.slowmotion;
+  }
+
+  get loaded(): boolean {
+    return this.state.loaded;
+  }
+
+  /** Everything the time controls read, gathered out of the settings. */
+  timeSettings(): EmulatorTimeSettings {
+    return {
+      fastForwardRatio: this.settings.get('fastForwardRatio'),
+      slowMotionRatio: this.settings.get('slowMotionRatio'),
+      rewindEnabled: this.settings.get('rewindEnabled'),
+      rewindGranularity: this.settings.get('rewindGranularity'),
+      rewindBufferBytes: this.settings.get('rewindBufferSize') * 1024 * 1024,
+    };
+  }
+
+  /**
+   * Theia's hover service, as the copied controls want it.
+   *
+   * They ask only to show and hide an explanation somewhere; how it is placed
+   * and styled stays the host's business.
+   */
+  readonly hover: VueportHover = {
+    show: (target, content) => this.hoverService.requestHover({ content, target, position: 'top' }),
+    hide: () => this.hoverService.cancelHover(),
+  };
+
+  /** Run one of the emulator's commands, for the chrome's buttons. */
+  runCommand(id: string): void {
+    this.commandService.executeCommand(id);
+  }
+
+  /** Redraw, for subsystems that changed something the chrome shows. */
+  onDidChange(): void {
+    this.update();
+  }
+
+  /** Report a failure from a subsystem that cannot show one itself. */
+  onError(message: string): void {
+    this.handleCoreError(message);
+  }
+
+  /** Keyboard and game pad input, which owns the key masks the core is told. */
+  protected input: EmulatorInputController;
+
+  /** The low battery signal, which the input controller folds into every mask. */
+  get lowPower(): boolean {
+    return this.state.lowPower;
+  }
+
+  /**
+   * Whether key input should reach the game.
+   *
+   * False before the ROM has booted, and while the palette or settings window
+   * is open, so that typing in one of those does not also play the game behind
+   * it.
+   */
+  isAcceptingInput(): boolean {
+    return this.state.loaded && !this.state.showPalettes && !this.state.showPreferences;
+  }
+
+  /** What a save state's header is stamped with, so it cannot load into another game. */
+  protected get saveStateIdentity(): VesEmulatorSaveStateIdentity {
+    return { romIdentity: this.romIdentity, romSize: this.state.romSize };
+  }
+
+  /** The ROM's CRC32, which is how the built-in cheats are looked up. */
+  protected romId: string | undefined;
+
   /** The ROM's 32-byte header, used to bind save states to their cartridge. */
   protected romIdentity = new Uint8Array(32);
 
-  protected state: vesEmulatorWidgetState;
+  state: vesEmulatorWidgetState;
 
   @postConstruct()
   protected init(): void {
@@ -393,36 +417,37 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
    * stays put above it, and the controller overlay sits on top of both.
    */
   protected buildLayout(): void {
-    this.addClass('ves-emulator-widget');
+    // vueport's stylesheet is what dresses this node, so the class is its.
+    this.addClass('vueport-widget');
+    // ReactWidget defaults to a PerfectScrollbar-managed scroll container,
+    // which this widget has no use for: it is a flex column that sizes its
+    // own children and never scrolls as a whole.
+    this.scrollOptions = undefined;
 
     const instanceId = this.options?.instanceId ?? 'default';
-    this.toolbar = new VesEmulatorToolbar(this);
-    this.cheats = new VesEmulatorCheatStore(this.fileService);
+    this.storage = new VesEmulatorTheiaStorage(this.fileService, this.workspaceService);
+    this.notifications = new VesEmulatorTheiaNotifications(this.messageService);
+    this.rumblePack = new VesEmulatorTheiaRumblePack(this.vesRumblePackService);
+    this.settings = new VesEmulatorTheiaSettings(this.preferenceService);
+    this.bindings = new VesEmulatorTheiaBindings(this.vesCommonService, this.keybindingRegistry);
+    this.cheats = new VesEmulatorCheatStore(this.storage);
     this.toDispose.push(Disposable.create(() => this.cheats.dispose()));
-    this.esSound = new VesEmulatorEsSoundPlayer(this.fileService);
+    this.esSound = new VesEmulatorEsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
     this.dock = new VesEmulatorDock(
-      instanceId, this.shell, this.vesRumblePackService, this.cheats, this.esSound,
+      instanceId,
+      // Theia's shell tracks pointer drags across the whole window; a drag
+      // inside this dock has to clear that or the shell keeps believing one of
+      // its own is in progress. Standing alone there is no such shell.
+      {
+        cancelForeignDrag: () => { (this.shell as unknown as { dragState?: unknown }).dragState = undefined; },
+        defaultLayout: VES_EMULATOR_STUDIO_LAYOUT,
+      },
+      this.rumblePack, this.cheats, this.notifications, this.esSound,
       () => this.loadSymbols()
     );
-    this.overlay = new VesEmulatorOverlay(this);
-
-    // A plain PanelLayout just inserts each widget's node into the DOM in
-    // order and leaves sizing to CSS, unlike BoxLayout, which explicitly
-    // positions and sizes every child from a stretch factor and a size hint
-    // that has to be set by hand — with the hint left at its default of 0,
-    // BoxLayout was giving the toolbar zero height regardless of its content.
-    // Flexbox is what actually makes "sized by its content, dock gets the
-    // rest" (see the CSS) true.
-    const layout = new PanelLayout();
-    layout.addWidget(this.toolbar);
-    layout.addWidget(this.dock);
-    this.layout = layout;
-
-    // The overlay is deliberately not in the box layout, so that it can cover
-    // the whole widget rather than take space in it. That means attaching it by
-    // hand, which has to wait until this widget's own node is in the document —
-    // see onAfterAttach.
+    this.input = new EmulatorInputController(this, this.bindings);
+    this.time = new EmulatorTimeControl(this);
 
     // Restoring the dock layout has to wait until state.mode is known (loaded
     // asynchronously in initState), so it happens once, from doInit, rather
@@ -463,7 +488,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   }
 
   protected get dockLayoutStorageKey(): string {
-    return 'ves-emulator-dock-layout';
+    return 'emulator-dock-layout';
   }
 
   protected async restoreDockLayout(): Promise<void> {
@@ -496,9 +521,9 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   }
 
   update(): void {
+    // One React tree now, so a single update redraws the toolbar, the overlays
+    // and everything else the chrome shows.
     super.update();
-    this.toolbar?.update();
-    this.overlay?.update();
   }
 
   protected async checkRomExists(): Promise<void> {
@@ -518,7 +543,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     // fallback it was passed rather than what is configured: the emulator
     // would come up in the default palette on every start-up and only pick up
     // the configured one when something changed a preference afterwards.
-    await this.preferenceService.ready;
+    await this.settings.ready;
     await this.initState();
 
     await this.restoreDockLayout();
@@ -551,16 +576,16 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   }
 
   protected disposeSession(): void {
-    this.stopRewinding();
+    this.time.stopRewinding();
     // Bound to the simulation that is going away; a new session re-establishes
     // it from startEmulator.
     this.rumbleForwarding?.dispose();
     this.rumbleForwarding = undefined;
     this.rumbleSpecWatch?.dispose();
     this.rumbleSpecWatch = undefined;
-    this.vesRumblePackService.emulatorForwarding = false;
+    this.rumblePack.forwarding = false;
     // The whole record belongs to the run that is ending, not just the spec.
-    this.vesRumblePackService.clearEmulatedTraffic();
+    this.rumblePack.clearEmulatedTraffic();
     if (this.session) {
       this.vesEmulatorCoreService.disposeSession(this.session);
       this.session = undefined;
@@ -691,9 +716,9 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       return;
     }
     if (deleteSram) {
-      const saveRamUri = await this.getSaveRamUri();
-      if (await this.fileService.exists(saveRamUri)) {
-        await this.fileService.delete(saveRamUri);
+      const saveRamPath = await this.getSaveRamPath();
+      if (await this.storage.exists(saveRamPath)) {
+        await this.storage.delete(saveRamPath);
       }
     } else {
       await this.saveSaveRam();
@@ -707,7 +732,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     await this.refreshSaveStateExists();
     await this.resetSim();
     // initState cleared the paused and low power flags, so make the core agree.
-    await this.applyKeys();
+    await this.input.applyKeys();
     await this.core?.run();
     this.state.loaded = true;
     this.update();
@@ -739,13 +764,12 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
         version: 0,
       },
       romSize: 0,
-      input: {},
       mode:
         (await this.localStorageService.getData<EmulatorMode>(
           'ves-emulator-state-mode'
         )) || EmulatorMode.DEBUG,
     };
-    this.keybindingToState();
+    this.input.refreshBindings();
   }
 
   protected bindEvents(): void {
@@ -768,53 +792,45 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
         }
 
         // A save state may have been written or deleted outside the emulator.
-        const saveStateUri = this.saveStateUri;
-        if (saveStateUri && fileChangesEvent.changes.some(change => change.resource.isEqual(saveStateUri))) {
+        const saveStatePath = this.saveStatePath;
+        if (saveStatePath && fileChangesEvent.changes.some(change => change.resource.toString() === saveStatePath)) {
           this.refreshSaveStateExists();
         }
       }),
       this.keybindingRegistry.onKeybindingsChanged(() => {
-        this.keybindingToState();
+        this.input.refreshBindings();
         this.update();
       }),
-      this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
+      this.settings.onDidChange(setting => {
         // Switching display mode is now a handful of uniforms and a resize, so
         // it no longer costs a restart.
         if ([
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_ANAGLYPH_PALETTES,
-        ].includes(preferenceName)) {
+          'renderingMode', 'palette', 'anaglyphPalette',
+          'customPalettes', 'customAnaglyphPalettes',
+        ].includes(setting)) {
           this.applyDisplayMode();
           this.update();
-        } else if (preferenceName === VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE) {
+        } else if (setting === 'scale') {
           this.applyScale();
           // The toolbar's scale select is controlled: it shows what the
-          // preference says, not what was last clicked in it, so picking an
+          // setting says, not what was last clicked in it, so picking an
           // entry only moves the selection once the toolbar re-renders.
           this.update();
         } else if ([
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_BUFFER_SIZE,
-        ].includes(preferenceName)) {
-          this.applyRewindSettings();
+          'rewindEnabled', 'rewindGranularity', 'rewindBufferSize',
+        ].includes(setting)) {
+          this.time.applyRewindSettings();
           // The toolbar button greys out when the feature is off.
           this.update();
-        } else if ([
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO,
-          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO,
-        ].includes(preferenceName)) {
-          this.applySpeed();
-        } else if (preferenceName === VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS) {
+        } else if (['slowMotionRatio', 'fastForwardRatio'].includes(setting)) {
+          this.time.applySpeed();
+        } else if (setting === 'player2SameControls') {
           // Which set of mappings this emulator answers to has changed.
-          this.keybindingToState();
+          this.input.refreshBindings();
           this.update();
         }
       }),
-      this.vesRumblePackService.onDidChangeConnectedRumblePack(() => this.applyRumbleForwarding()),
+      this.rumblePack.onDidChangeConnected(() => this.applyRumbleForwarding()),
     ]);
   }
 
@@ -841,7 +857,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   protected async applyRumbleForwarding(): Promise<void> {
     const sim = this.sim;
     const wanted = sim !== undefined && (
-      this.vesRumblePackService.connectedRumblePack !== undefined
+      this.rumblePack.connected
       || this.dock.isPanelVisible(EmulatorPanelType.RUMBLE_PACK)
     );
     if (wanted === (this.rumbleForwarding !== undefined)) {
@@ -853,8 +869,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       this.rumbleForwarding = undefined;
       this.rumbleSpecWatch?.dispose();
       this.rumbleSpecWatch = undefined;
-      this.vesRumblePackService.emulatorForwarding = false;
-      this.vesRumblePackService.emulatedSpec = undefined;
+      this.rumblePack.forwarding = false;
+      this.rumblePack.emulatedSpec = undefined;
       // Only worth turning off for a simulation that is still there; a
       // disposed one takes its capture with it.
       if (sim) {
@@ -871,7 +887,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     this.rumbleForwarding = sim!.onLink(bytes => this.forwardToRumblePack(bytes));
     try {
       await sim!.setLinkCapture(true);
-      this.vesRumblePackService.emulatorForwarding = true;
+      this.rumblePack.forwarding = true;
       // After capture, and not awaited alongside it: reading a build's symbol
       // table takes long enough to be worth not holding up the bytes.
       this.applyRumbleSpecWatch(sim!).catch(error =>
@@ -883,7 +899,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       // tinguishable from a game that simply never rumbles.
       this.rumbleForwarding.dispose();
       this.rumbleForwarding = undefined;
-      this.vesRumblePackService.emulatorForwarding = false;
+      this.rumblePack.forwarding = false;
       // Logged rather than run through handleCoreError, which tears the
       // running emulator down — losing rumble is not losing the session.
       console.error('[emulator] rumble pack forwarding could not be enabled:', error);
@@ -933,7 +949,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
   protected resolveRumbleSpec(symbols: VesEmulatorSymbolIndex, values: number[]): void {
     for (const value of values) {
       const address = value >>> 0;
-      this.vesRumblePackService.emulatedSpec = address === 0
+      this.rumblePack.emulatedSpec = address === 0
         ? undefined
         : { address, name: symbols.rumbleSpecNames.get(address) };
     }
@@ -946,7 +962,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     return this.profiling;
   }
 
-  protected profiling = false;
+  profiling = false;
 
   /**
    * Begin recording the session, so it can be profiled once it is over.
@@ -963,7 +979,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     await this.sim.startProfileRecording();
     this.profiling = true;
     this.update();
-    this.messageService.info(nls.localize(
+    this.notifications.info(nls.localize(
       'vuengine/emulator/profilingStarted',
       'Profiling. Play the part you want to measure, then stop profiling to export it.'
     ));
@@ -987,15 +1003,15 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     try {
       const recording = await sim.stopProfileRecording();
       if (recording.chunks === 0) {
-        this.messageService.warn(nls.localize(
+        this.notifications.warn(nls.localize(
           'vuengine/emulator/profilingNothing', 'Nothing was recorded.'
         ));
         return;
       }
 
-      const progress = await this.messageService.showProgress({
-        text: nls.localize('vuengine/emulator/profilingReplaying', 'Replaying to collect the profile…'),
-      });
+      const progress = await this.notifications.progress(
+        nls.localize('vuengine/emulator/profilingReplaying', 'Replaying to collect the profile…')
+      );
       let result;
       try {
         result = await sim.replayProfile(recording);
@@ -1004,7 +1020,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       }
 
       const uri = await this.writeProfile(result);
-      this.messageService.info(nls.localize(
+      this.notifications.info(nls.localize(
         'vuengine/emulator/profilingWritten',
         'Profiled {0} instructions over {1} s of play into {2}. Open it at profiler.firefox.com.',
         result.instructions.toLocaleString(),
@@ -1012,14 +1028,14 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
         this.vesCommonService.basename(uri)
       ));
       if (result.resets > 0) {
-        this.messageService.warn(nls.localize(
+        this.notifications.warn(nls.localize(
           'vuengine/emulator/profilingResets',
           'The machine restarted {0} times while recording, so the profile covers more than one run.',
           result.resets
         ));
       }
     } catch (error) {
-      this.messageService.error(
+      this.notifications.error(
         error instanceof Error ? error.message : String(error)
       );
     }
@@ -1169,7 +1185,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
    * describing settings the game no longer believes it has sent.
    */
   protected async resetSim(): Promise<void> {
-    this.vesRumblePackService.clearEmulatedTraffic();
+    this.rumblePack.clearEmulatedTraffic();
     await this.sim?.reset();
   }
 
@@ -1177,7 +1193,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     for (const byte of bytes) {
       // Not awaited: writes queue on the port's writer in the order they are
       // made, and the emulator must not wait on a serial line to keep running.
-      this.vesRumblePackService.sendCommandEmulateVbByte(byte).catch(() => {
+      this.rumblePack.sendByte(byte).catch(() => {
         // A pack unplugged mid-effect. Detection notices, and the change
         // event that follows tears this forwarding down.
       });
@@ -1186,31 +1202,42 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
 
   protected onBeforeAttach(msg: Message): void {
     super.onBeforeAttach(msg);
-    this.bindListeners();
+    this.input.attach(this.node, this.dock.screen.node);
   }
 
   /**
-   * Attach the controller overlay.
-   *
-   * Lumino refuses to attach to a host that is not in the document, so this
-   * cannot happen while the layout is being built: the shell has not put this
-   * widget anywhere yet at that point.
+   * Redraw once this node is in the document, so that the Emulator component
+   * can attach the dock — Lumino refuses a host that is not itself attached.
    */
   protected onAfterAttach(msg: Message): void {
     super.onAfterAttach(msg);
-    if (!this.overlay.isAttached) {
-      Widget.attach(this.overlay, this.node);
-    }
+    this.update();
   }
 
   protected onBeforeDetach(msg: Message): void {
     super.onBeforeDetach(msg);
-    // Detached alongside its host, so that reattaching the widget later does
-    // not find the overlay already claimed by a node that has gone away.
-    if (this.overlay.isAttached) {
-      Widget.detach(this.overlay);
-    }
-    this.unbindListeners();
+    this.input.detach();
+  }
+
+  /**
+   * Hide and show the dock along with this widget.
+   *
+   * The dock used to be a child of this widget's Lumino layout, which
+   * propagated visibility to it and on to every panel — and the panels stop
+   * polling while hidden, which is what keeps a stack of closed tabs free. It
+   * is attached into a plain container now (see the Emulator component), so it
+   * has no Lumino parent to hear that from and has to be told directly.
+   * `setHidden` is what does the telling: it carries on down the dock's own
+   * tree to the panels, which is the part that matters.
+   */
+  protected onAfterShow(msg: Message): void {
+    super.onAfterShow(msg);
+    this.dock.setHidden(false);
+  }
+
+  protected onAfterHide(msg: Message): void {
+    super.onAfterHide(msg);
+    this.dock.setHidden(true);
   }
 
   /**
@@ -1219,152 +1246,14 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
    * Only the second emulator of a link session can, and only while the
    * preference says its controls are not shared with the first player's.
    */
-  protected usesPlayer2Controls(): boolean {
-    return this.player === 2 && !this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS, true
-    );
-  }
-
-  /**
-   * Re-read every mapping out of the keybinding registry.
-   *
-   * Built from the two tables that already say what exists — the game pad's
-   * buttons and the emulator's actions — rather than listed again here, so a
-   * new action needs adding in one place and gets its mapping for free.
-   */
-  protected keybindingToState(): void {
-    const player = this.usesPlayer2Controls() ? 2 : 1;
-    const input: Record<string, EmulatorInputBinding> = {};
-
-    for (const button of EMULATOR_GAMEPAD_BUTTONS) {
-      input[button] = {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          emulatorGamePadCommand(button, player).id
-        ),
-        command: EMULATOR_GAMEPAD_INPUTS[button].key,
-      };
-    }
-
-    for (const action of EMULATOR_ACTIONS) {
-      input[action] = {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EMULATOR_ACTION_COMMANDS[action].id
-        ),
-        command: action,
-      };
-    }
-
-    this.state.input = input;
-  }
-
-  protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
-
-  /**
-   * Reclaim keyboard focus for the widget that owns the keydown listener.
-   *
-   * The screen used to be an iframe, which is its own focus scope, so
-   * clicking into it and then pressing a key just worked. It is a plain
-   * canvas now, nested inside the debug dock's own Lumino DockPanel — clicking
-   * around inside that dock (switching tabs, focusing another panel's input)
-   * moves DOM focus without ever involving this widget, so the keydown
-   * listener on `this.node` stops receiving anything. Scoped to the screen
-   * rather than the whole widget, so it does not fight over focus with, say,
-   * typing an address into the Memory panel.
-   */
-  protected focusListener = () => this.node.focus();
-
-  /**
-   * Focus leaving the widget swallows the release, which would leave rewind
-   * stuck on. Moves within the widget are fine and must not end it, since the
-   * toolbar button lives here too.
-   */
-  protected focusOutListener = (e: FocusEvent) => {
-    const next = e.relatedTarget;
-    if (!(next instanceof Node) || !this.node.contains(next)) {
-      this.stopRewinding();
-    }
-  };
-
-  protected bindListeners(): void {
-    this.node.tabIndex = 0;
-    this.node.addEventListener('keydown', this.keyEventListerner);
-    this.node.addEventListener('keyup', this.keyEventListerner);
-    this.node.addEventListener('focusout', this.focusOutListener);
-    this.dock.screen.node.addEventListener('mousedown', this.focusListener);
-    this.startGamepadPolling();
-  }
-
-  protected unbindListeners(): void {
-    this.node.removeEventListener('keydown', this.keyEventListerner);
-    this.node.removeEventListener('keyup', this.keyEventListerner);
-    this.node.removeEventListener('focusout', this.focusOutListener);
-    this.dock.screen.node.removeEventListener('mousedown', this.focusListener);
-    this.stopGamepadPolling();
-  }
-
-  protected processKeyEvent(e: KeyboardEvent): void {
-    // Releasing rewind always ends it, before any of the guards below, since a
-    // release that got filtered out would leave the emulator suspended with no
-    // way back: pausing, or opening the controls overlay, while the key is held
-    // is enough to change what those guards allow through.
-    if (
-      e.type === 'keyup' &&
-      this.rewinding &&
-      this.matchKey(this.state.input[EmulatorAction.Rewind]?.keys ?? [], e.code)
-    ) {
-      this.stopRewinding();
-    }
-
-    // do not process key input...
-    if (
-      e.repeat || // ... on repeated event firing
-      !this.isVisible || // ... if emulator is not visible
-      !this.state.loaded || // ... if emulator has not loaded yet
-      this.state.showPalettes || // ... while the palette window is taking typing
-      this.state.showPreferences // ... or the settings window is
-    ) {
-      return;
-    }
-
-    for (const key in this.state.input) {
-      if (!this.state.input.hasOwnProperty(key)) {
-        continue;
-      }
-      const input = this.state.input[key];
-      if (!this.matchKey(input.keys, e.code)) {
-        continue;
-      }
-      // A game pad button is held, so it needs the press and the release;
-      // rewind is held too, and its release is what ends it. Everything else
-      // is an action, and acts once, through its command.
-      if (GAMEPAD_KEY_TO_VB_KEY[input.command as EmulatorGamePadKeyCode] !== undefined
-        || input.command === EmulatorAction.Rewind) {
-        this.sendCommand(e.type, input.command);
-      } else if (e.type === 'keydown' && this.canRunAction(input.command as EmulatorAction)) {
-        this.runAction(input.command as EmulatorAction);
-      }
-    }
+  usesPlayer2Controls(): boolean {
+    return this.player === 2 && !this.settings.get('player2SameControls');
   }
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.node.tabIndex = 0;
     this.node.focus();
-  }
-
-  protected matchKey(
-    scopedKeybindings: ScopedKeybinding[],
-    keyCode: string
-  ): boolean {
-    for (const keyBinding of scopedKeybindings) {
-      // @ts-ignore
-      for (const resolvedKeyBinding of keyBinding.resolved) {
-        if (keyCode === resolvedKeyBinding.key.code) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /**
@@ -1402,16 +1291,16 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       await this.sim.attachCanvas(canvas);
       await this.sim.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
 
-      await this.applySpeed();
-      await this.applyRewindSettings();
+      await this.time.applySpeed();
+      await this.time.applyRewindSettings();
       await this.applyRumbleForwarding();
 
       await this.loadRom();
       const romUri = await this.getRomUri();
-      await this.cheats.load(romUri);
+      await this.cheats.load(romUri.toString(), this.romId);
       // Scanned before the port is watched, since whether there is anything to
       // play is what decides whether watching it is worth the callback.
-      await this.esSound.scan(romUri);
+      await this.esSound.scan(romUri.toString());
       await this.esSound.setSim(this.sim);
       this.esSound.setMuted(this.state.muted);
       this.toDispose.push(this.sim.onEsSound(commands => commands.forEach(raw => this.esSound.handle(raw))));
@@ -1431,7 +1320,7 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
       } else {
         await this.resetSim();
       }
-      await this.applyKeys();
+      await this.input.applyKeys();
       await core.run();
 
       this.state.loaded = true;
@@ -1471,6 +1360,14 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     };
     this.state.romSize = romContentBuffer.length / 131072;
     this.romIdentity = new Uint8Array(romContentHeaderBuffer);
+    // Over the whole file, which is what the preservation catalogues the cheat
+    // database is drawn from key on. Computed here because the ROM is already
+    // in memory; reading it again just to checksum it would be the only cost.
+    // A view over the same bytes rather than a copy, and a Buffer because
+    // that is what `crc` is typed for.
+    this.romId = formatRomId(crc32(Buffer.from(
+      romContentBuffer.buffer, romContentBuffer.byteOffset, romContentBuffer.byteLength
+    )));
     // Dropped rather than reread here: whatever a rebuild changed, the symbols
     // that described the previous build no longer describe this one, and
     // nothing needs them until something asks. See loadSymbols.
@@ -1493,8 +1390,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
    * shortcut. The pointer is captured so that releasing off the button, or
    * dragging away from it, still ends the rewind.
    */
-  protected onRewindButtonDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (!this.isRewindEnabled()) {
+  onRewindButtonDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
+    if (!this.time.isRewindEnabled()) {
       // Nothing to hold down. Left alone, the press turns into an ordinary
       // click, which is what offers to enable the feature.
       return;
@@ -1504,14 +1401,8 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
     // click is exactly what the old handler had to undo afterwards.
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    this.startRewinding();
+    this.time.startRewinding();
   };
-
-  protected isRewindEnabled(): boolean {
-    return this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE
-    ) as boolean;
-  }
 
   /**
    * Offer to turn rewind on, from the greyed-out toolbar button.
@@ -1520,13 +1411,10 @@ export class VesEmulatorWidget extends BaseWidget implements NavigatableWidget {
    * button explains what switching it on costs rather than either hiding the
    * feature or quietly making everyone pay for it.
    */
-  protected promptEnableRewind = async (): Promise<void> => {
-    const bufferSize = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_BUFFER_SIZE
-    ) as number;
+  promptEnableRewind = async (): Promise<void> => {
+    const bufferSize = this.settings.get('rewindBufferSize');
 
-    const message = this.node.ownerDocument.createElement('div');
-    for (const paragraph of [
+    const message = [
       nls.localize(
         'vuengine/emulator/rewindWhat',
         'Rewind runs the game backwards for as long as you hold the button. \
@@ -1541,31 +1429,23 @@ Both are adjustable in the emulator preferences: a coarser rewind  \
 granularity records less often and costs proportionally less.',
         bufferSize
       ),
-    ]) {
-      const node = this.node.ownerDocument.createElement('p');
-      node.textContent = paragraph;
-      message.appendChild(node);
-    }
+    ];
 
-    const dialog = new ConfirmDialog({
+    const confirmed = await this.notifications.confirm({
       title: nls.localize('vuengine/emulator/enableRewindTitle', 'Enable Rewind?'),
-      msg: message,
-      ok: nls.localize('vuengine/emulator/enableRewindConfirm', 'Enable'),
+      message,
+      okLabel: nls.localize('vuengine/emulator/enableRewindConfirm', 'Enable'),
     });
-    if (await dialog.open()) {
-      await this.preferenceService.set(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
-        true,
-        PreferenceScope.User
-      );
+    if (confirmed) {
+      await this.settings.set('rewindEnabled', true);
     }
   };
 
-  protected onRewindButtonUp = (event: React.PointerEvent<HTMLButtonElement>): void => {
+  onRewindButtonUp = (event: React.PointerEvent<HTMLButtonElement>): void => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    this.stopRewinding();
+    this.time.stopRewinding();
     // Hand the keyboard back, so the shortcuts keep working after a click.
     this.node.focus();
   };
@@ -1612,552 +1492,8 @@ granularity records less often and costs proportionally less.',
     await this.sendCommand('keyPress', action);
   }
 
-  /** Content of the fixed toolbar above the dock area. */
-  renderToolbar(): React.ReactNode {
-    const rewindEnabled = this.isRewindEnabled();
-    return this.status === EmulatorRomStatus.NOT_EXISTS ? (
-      <EmptyContainer
-        title={nls.localize('vuengine/emulator/romNotFound', 'ROM not found')}
-        icon={<FileX size={32} />}
-      />
-    ) : (
-      <>
-        <EmulatorControls>
-          <EmulatorControlsGroup>
-            <div>
-              <button
-                className={
-                  this.state.paused ? 'theia-button' : 'theia-button secondary'
-                }
-                title={`${this.state.paused
-                  ? nls.localize('vuengine/emulator/resume', 'Resume')
-                  : nls.localize('vuengine/emulator/pause', 'Pause')
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_PAUSE_TOGGLE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.PauseToggle)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-pause"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_RESET.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_RESET.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.Reset)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-refresh"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${this.state.muted
-                  ? nls.localize('vuengine/emulator/unmute', 'Unmute')
-                  : nls.localize('vuengine/emulator/mute', 'Mute')
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_AUDIO_MUTE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.AudioMute)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i
-                  className={
-                    this.state.muted ? 'fa fa-volume-off' : 'fa fa-volume-up'
-                  }
-                ></i>
-              </button>
-              <button
-                className={
-                  this.state.lowPower
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_LOW_POWER.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.ToggleLowPower)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i
-                  className={
-                    this.state.lowPower
-                      ? 'fa fa-battery-quarter'
-                      : 'fa fa-battery-full'
-                  }
-                ></i>
-              </button>
-            </div>
-            <div>
-              <button
-                // Greyed out rather than truly disabled when the feature is
-                // off: the click is what offers to turn it on, and a disabled
-                // button would never see one.
-                className={
-                  (this.rewinding ? 'theia-button' : 'theia-button secondary')
-                  + (rewindEnabled ? '' : ' ves-emulator-button-off')
-                }
-                title={`${EmulatorCommands.INPUT_REWIND.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_REWIND.id,
-                    true,
-                  )}${rewindEnabled ? '' : ` — ${nls.localize(
-                    'vuengine/emulator/rewindIsOff',
-                    'off, click to enable'
-                  )}`}`}
-                onPointerDown={this.onRewindButtonDown}
-                onPointerUp={this.onRewindButtonUp}
-                onPointerCancel={this.onRewindButtonUp}
-                onLostPointerCapture={() => this.stopRewinding()}
-                onClick={e => {
-                  if (!rewindEnabled) {
-                    this.promptEnableRewind();
-                  } else if (e.detail === 0) {
-                    // Pointer presses rewind for as long as they are held, and
-                    // have already stepped by the time the click arrives. A
-                    // click with no pointer behind it is the button being
-                    // activated from the keyboard: step back once.
-                    this.runAction(EmulatorAction.Rewind);
-                  }
-                }}
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-backward"></i>
-              </button>
-              <button
-                className={
-                  this.state.slowmotion
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.ToggleSlowmotion)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-eject fa-rotate-90"></i>
-              </button>
-              <button
-                className={
-                  this.state.frameAdvance
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_FRAME_ADVANCE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_FRAME_ADVANCE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.FrameAdvance)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  (this.state.paused && !this.state.frameAdvance)
-                }
-              >
-                <i className="fa fa-step-forward"></i>
-              </button>
-
-              <button
-                className={
-                  this.state.fastForward
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.ToggleFastForward)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-forward"></i>
-              </button>
-            </div>
-            <HContainer alignItems='center' gap={0}>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_SAVE_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_SAVE_STATE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.SaveState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className='fa fa-save' />
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_LOAD_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_LOAD_STATE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.LoadState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused ||
-                  !this.state.saveStateExists
-                }
-              >
-                <i className="fa fa-level-down"></i>
-              </button>
-              <SaveSlotInputWrapper>
-                <i className="fa fa-bookmark-o"></i>
-                <Input
-                  value={this.state.saveSlot}
-                  type='number'
-                  width={56}
-                  min={1}
-                  max={99}
-                  title={nls.localize(
-                    'vuengine/emulator/currentSaveStateSlot',
-                    'Current Save State Slot',
-                  )}
-                  disabled={
-                    !this.state.loaded ||
-                    this.state.showControls ||
-                    this.state.paused
-                  }
-                />
-              </SaveSlotInputWrapper>
-            </HContainer>
-            {/*
-            <div>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_SAVE_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_SAVE_STATE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.SaveState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-level-down"></i>{' '}
-                <i className="fa fa-bookmark-o"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_LOAD_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_LOAD_STATE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.LoadState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused ||
-                  !this.state.saveStateExists
-                }
-              >
-                <i className="fa fa-bookmark-o"></i>{' '}
-                <i className="fa fa-level-up"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={nls.localize(
-                  'vuengine/emulator/currentSaveState',
-                  'Current Save State',
-                )}
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-bookmark-o"></i> {this.state.saveSlot}
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_STATE_SLOT_DECREASE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.StateSlotDecrease)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused ||
-                  this.state.saveSlot <= 0
-                }
-              >
-                <i className="fa fa-chevron-down"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_STATE_SLOT_INCREASE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.StateSlotIncrease)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-chevron-up"></i>
-              </button>
-            </div>
-            */}
-            <div>
-              <button
-                className={
-                  this.isLinked() ? 'theia-button' : 'theia-button secondary'
-                }
-                title={
-                  this.isLinked()
-                    ? nls.localize('vuengine/emulator/unlink', 'Unlink')
-                    : this.linkedPeer
-                      ? nls.localize('vuengine/emulator/relink', 'Re-link')
-                      : nls.localize(
-                        'vuengine/emulator/linkSecondPlayer',
-                        'Link Second Player',
-                      )
-                }
-                // Through the commands, so the button and the palette are the
-                // same three operations; which one this is depends on how the
-                // pair currently stands, exactly as the label above does.
-                onClick={e =>
-                  this.commandService.executeCommand(
-                    this.isLinked()
-                      ? EmulatorCommands.UNLINK_PLAYERS.id
-                      : this.linkedPeer
-                        ? EmulatorCommands.RELINK_PLAYERS.id
-                        : EmulatorCommands.LINK_SECOND_PLAYER.id
-                  )
-                }
-                disabled={!this.state.loaded}
-              >
-                <i
-                  className={
-                    this.isLinked() ? 'ph ph-link-break' : 'ph ph-link-simple'
-                  }
-                ></i>
-              </button>
-            </div>
-            <div>
-              <button
-                className={
-                  this.profiling ? 'theia-button' : 'theia-button secondary'
-                }
-                title={`${this.profiling
-                  ? EmulatorCommands.PROFILE_STOP.label
-                  : EmulatorCommands.PROFILE_START.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    this.profiling
-                      ? EmulatorCommands.PROFILE_STOP.id
-                      : EmulatorCommands.PROFILE_START.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.commandService.executeCommand(
-                    this.profiling
-                      ? EmulatorCommands.PROFILE_STOP.id
-                      : EmulatorCommands.PROFILE_START.id
-                  )
-                }
-                disabled={!this.state.loaded}
-              >
-                <i
-                  className={this.profiling ? 'fa fa-stop' : 'fa fa-circle'}
-                ></i>
-              </button>
-            </div>
-          </EmulatorControlsGroup>
-          <EmulatorControlsGroup>
-            <div>
-              <RadioSelect
-                options={[
-                  {
-                    value: EmulatorMode.PLAY,
-                    label: nls.localize('vuengine/emulator/play', 'Play'),
-                  },
-                  {
-                    value: EmulatorMode.DEBUG,
-                    label: nls.localize('vuengine/emulator/debug', 'Debug'),
-                  },
-                ]}
-                defaultValue={this.state.mode}
-                onChange={options =>
-                  this.setMode(options[0].value as EmulatorMode)
-                }
-              />
-            </div>
-            <HContainer>
-              <AdvancedSelect
-                title={nls.localize('vuengine/emulator/scale', 'Scale')}
-                options={EMULATOR_SCALE_OPTIONS}
-                defaultValue={this.preferenceService.get(
-                  VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE,
-                ) ?? EmulatorScale.AUTO}
-                onChange={option => this.setScale(option[0] as string)}
-                disabled={!this.state.loaded || this.state.showControls}
-                style={SELECT_STYLE}
-              />
-              <AdvancedSelect
-                title={nls.localize(
-                  'vuengine/emulator/renderingMode',
-                  'Rendering Mode',
-                )}
-                options={Object.entries(EMULATION_RENDERING_MODES).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-                defaultValue={this.getRenderingMode()}
-                onChange={option => this.setRenderingMode(option[0] as string)}
-                disabled={!this.state.loaded || this.state.showControls}
-                style={SELECT_STYLE}
-              />
-              <PaletteButton
-                className={
-                  this.state.showPalettes
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${nls.localize('vuengine/emulator/colors', 'Colors')}: ${this.getPaletteLabel()}`}
-                onClick={() => this.togglePaletteWindow()}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                {this.renderPalettePreview()}
-              </PaletteButton>
-            </HContainer>
-            <div>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_FULLSCREEN.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_FULLSCREEN.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.Fullscreen)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-arrows-alt"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_SCREENSHOT.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_SCREENSHOT.id,
-                    true,
-                  )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.Screenshot)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-camera"></i>
-              </button>
-            </div>
-            <div>
-              <button
-                className={
-                  this.state.showControls
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${nls.localize(
-                  'vuengine/emulator/configureInput',
-                  'Configure Input',
-                )}${this.vesCommonService.getKeybindingLabel(
-                  EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
-                  true,
-                )}`}
-                onClick={e =>
-                  this.runAction(EmulatorAction.ToggleControlsOverlay)
-                }
-                disabled={!this.state.loaded}
-              >
-                <i className="fa fa-keyboard-o"></i>
-              </button>
-              <button
-                className={
-                  this.state.showPreferences
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={nls.localize(
-                  'vuengine/emulator/emulatorSettings',
-                  'Emulator Settings',
-                )}
-                onClick={() => this.togglePreferencesWindow()}
-              >
-                <i className="fa fa-sliders"></i>
-              </button>
-            </div>
-          </EmulatorControlsGroup>
-        </EmulatorControls>
-      </>
-    );
+  protected render(): React.ReactNode {
+    return <Emulator emulator={this} attached={this.isAttached} />;
   }
 
   renderPalettePreview(): React.ReactNode {
@@ -2172,7 +1508,6 @@ granularity records less often and costs proportionally less.',
     return <PaletteSwatch colors={this.getPalette().map(formatColor)} small />;
   }
 
-  /** The controller mapping and the palette window. */
   renderOverlay(): React.ReactNode {
     return <>
       {this.state.showControls &&
@@ -2188,9 +1523,8 @@ granularity records less often and costs proportionally less.',
           overflow='auto'
         >
           <EmulatorControlsOverlay
-            keybindingRegistry={this.keybindingRegistry}
-            preferenceService={this.preferenceService}
-            vesCommonService={this.vesCommonService}
+            settings={this.settings}
+            bindings={this.bindings}
           />
         </PopUpDialog>
       }
@@ -2207,7 +1541,8 @@ granularity records less often and costs proportionally less.',
           overflow='hidden'
         >
           <EmulatorPalettes
-            preferenceService={this.preferenceService}
+            settings={this.settings}
+            notifications={this.notifications}
             anaglyph={this.getRenderingMode() === VbRenderingMode.ANAGLYPH}
           />
         </PopUpDialog>
@@ -2224,31 +1559,22 @@ granularity records less often and costs proportionally less.',
           width='540px'
         >
           <EmulatorPreferences
-            preferenceService={this.preferenceService}
-            hoverService={this.hoverService}
+            settings={this.settings}
+            hover={this.hover}
           />
         </PopUpDialog>
       }
     </>;
   }
 
-  protected async sendCommand(command: string, data?: any): Promise<void> {
+  async sendCommand(command: string, data?: any): Promise<void> {
     // Game pad input maps straight onto the core's key mask.
     const vbKey = GAMEPAD_KEY_TO_VB_KEY[data as EmulatorGamePadKeyCode];
     if (vbKey !== undefined) {
-      if (command === 'keydown' || command === 'keyPress') {
-        this.pressedKeys |= vbKey;
-      } else if (command === 'keyup') {
-        this.pressedKeys &= ~vbKey;
-      }
-      await this.applyKeys();
       if (command === 'keyPress') {
-        // The on-screen controls send a press rather than a hold, so release
-        // it again after long enough for the ROM to notice.
-        setTimeout(() => {
-          this.pressedKeys &= ~vbKey;
-          this.applyKeys();
-        }, 50);
+        await this.input.tapKey(vbKey);
+      } else {
+        await this.input.setKey(vbKey, command === 'keydown');
       }
       return;
     }
@@ -2257,13 +1583,13 @@ granularity records less often and costs proportionally less.',
     // release, unlike the function keys below which act on release.
     if (data === EmulatorAction.Rewind) {
       if (command === 'keydown') {
-        this.startRewinding();
+        this.time.startRewinding();
       } else if (command === 'keyup') {
-        this.stopRewinding();
+        this.time.stopRewinding();
       } else if (command === 'keyPress') {
         // Activating the toolbar button from the keyboard has no release to
         // wait for, so it steps back once.
-        this.queueCoreTransition(async core => {
+        this.time.queueCoreTransition(async core => {
           await core.suspend();
           await core.rewindStep();
           if (!this.state.paused) {
@@ -2302,19 +1628,19 @@ granularity records less often and costs proportionally less.',
           break;
         case EmulatorAction.ToggleLowPower:
           this.state.lowPower = !this.state.lowPower;
-          await this.applyKeys();
+          await this.input.applyKeys();
           this.update();
           break;
         case EmulatorAction.ToggleSlowmotion:
           this.state.slowmotion = !this.state.slowmotion;
           this.state.fastForward = false;
-          await this.applySpeed();
+          await this.time.applySpeed();
           this.update();
           break;
         case EmulatorAction.ToggleFastForward:
           this.state.fastForward = !this.state.fastForward;
           this.state.slowmotion = false;
-          await this.applySpeed();
+          await this.time.applySpeed();
           this.update();
           break;
         case EmulatorAction.FrameAdvance:
@@ -2369,91 +1695,28 @@ granularity records less often and costs proportionally less.',
     }
   }
 
-  /** Push the current key mask to the core, if it changed. */
-  protected async applyKeys(): Promise<void> {
-    const keys = VbKey.SGN                                  // marks a controller as present
-      | (this.state.lowPower ? VbKey.PWR : 0)               // low battery signal
-      | this.pressedKeys
-      | this.gamepadKeys;
-
-    // The gamepad is polled every frame, and most frames change nothing.
-    if (keys === this.appliedKeys) {
-      return;
-    }
-    this.appliedKeys = keys;
-    await this.sim?.setKeys(keys);
-  }
-
-  protected startGamepadPolling(): void {
-    if (this.gamepadPollHandle !== undefined) {
-      return;
-    }
-    const poll = () => {
-      this.gamepadPollHandle = requestAnimationFrame(poll);
-      const keys = readGamepadKeys();
-      if (keys !== this.gamepadKeys) {
-        this.gamepadKeys = keys;
-        this.applyKeys();
-      }
-    };
-    this.gamepadPollHandle = requestAnimationFrame(poll);
-  }
-
-  protected stopGamepadPolling(): void {
-    if (this.gamepadPollHandle !== undefined) {
-      cancelAnimationFrame(this.gamepadPollHandle);
-      this.gamepadPollHandle = undefined;
-    }
-  }
-
   protected async getRomUri(): Promise<URI> {
     return this.options ? new URI(this.options.uri) : this.vesBuildService.getDefaultRomUri();
   }
 
-  /** Which player this emulator is; see VesEmulatorWidgetOptions.player. */
   protected get player(): number {
     return this.options?.player ?? 1;
   }
 
-  /**
-   * Save RAM lives next to the ROM, as `<rom>.p{player}.sram` — Lemur's
-   * convention, so the two emulators can read each other's saves.
-   */
-  protected async getSaveRamUri(): Promise<URI> {
-    const romUri = await this.getRomUri();
-    return romUri.parent.resolve(`${romUri.path.name}.p${this.player}.sram`);
-  }
-
-  /**
-   * Cartridge RAM as it comes out of the box.
-   *
-   * Powered-up SRAM holds whatever its cells settled on, and a game tells "no
-   * save yet" from "a save" by looking for its own signature there — so an
-   * all-zero buffer is not a neutral starting point but a specific pattern a
-   * game may mistake for valid data. Only even addresses reach the chip, so
-   * the odd byte of every halfword stays as it is. Lemur seeds a fresh save
-   * the same way.
-   */
-  protected freshSaveRam(): Uint8Array {
-    const ram = new Uint8Array(VesEmulatorWidget.DEFAULT_SAVE_RAM_SIZE);
-    const fill = this.preferenceService.get<EmulatorSramInit>(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SRAM_INIT, EmulatorSramInit.RANDOM
+  // Save RAM lives next to the ROM, as <rom>.p{player}.sram
+  protected async getSaveRamPath(): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    return this.storage.join(
+      this.storage.parent(rom), `${this.storage.stem(rom)}.p${this.player}.sram`
     );
-    if (fill === EmulatorSramInit.ZEROES) {
-      return ram;
-    }
-    for (let i = 0; i < ram.length; i += 2) {
-      ram[i] = Math.floor(Math.random() * 256);
-    }
-    return ram;
   }
 
   protected async loadSaveRam(): Promise<void> {
-    const uri = await this.getSaveRamUri();
-    const ram = this.freshSaveRam();
+    const path = await this.getSaveRamPath();
+    const ram = freshSaveRam(this.settings.get('sramInit'));
 
-    if (await this.fileService.exists(uri)) {
-      const stored = (await this.fileService.readFile(uri)).value.buffer;
+    if (await this.storage.exists(path)) {
+      const stored = await this.storage.read(path);
       // The core requires a power of two, so a truncated or hand-edited file
       // starts the game fresh rather than failing to boot. A file shorter than
       // the full window — anything written before DEFAULT_SAVE_RAM_SIZE covered
@@ -2461,7 +1724,7 @@ granularity records less often and costs proportionally less.',
       // correctly sized buffer, since handing the core the short one is what
       // makes the window mirror in the first place.
       if (stored.length === 0 || (stored.length & (stored.length - 1)) !== 0) {
-        console.warn(`[emulator] ignoring save RAM of unusable size ${stored.length}: ${uri.toString()}`);
+        console.warn(`[emulator] ignoring save RAM of unusable size ${stored.length}: ${path}`);
       } else if (stored.length >= ram.length) {
         await this.sim?.setCartRam(stored.slice().buffer);
         return;
@@ -2478,134 +1741,26 @@ granularity records less often and costs proportionally less.',
     if (!ram || ram.byteLength === 0) {
       return;
     }
-    await this.fileService.writeFile(
-      await this.getSaveRamUri(),
-      BinaryBuffer.wrap(new Uint8Array(ram))
+    await this.storage.write(await this.getSaveRamPath(), new Uint8Array(ram));
+  }
+
+  // Save states live next to the ROM, as <rom>.<slot>.state
+  protected async getSaveStatePath(slot: number): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    return this.storage.join(
+      this.storage.parent(rom), `${this.storage.stem(rom)}.${slot}.state`
     );
   }
 
-  /** Save states live next to the ROM, as `<rom>.<slot>.state`. */
-  protected async getSaveStateUri(slot: number): Promise<URI> {
-    const romUri = await this.getRomUri();
-    return romUri.parent.resolve(`${romUri.path.name}.${slot}.state`);
-  }
-
-  /**
-   * Track whether the selected slot holds a state, so that loading an empty
-   * one is not offered. Caches the URI, which the file watcher compares
-   * against without having to resolve the ROM on every change event.
-   */
   protected async refreshSaveStateExists(): Promise<void> {
-    this.saveStateUri = await this.getSaveStateUri(this.state.saveSlot);
-    const exists = await this.fileService.exists(this.saveStateUri);
+    this.saveStatePath = await this.getSaveStatePath(this.state.saveSlot);
+    const exists = await this.storage.exists(this.saveStatePath);
     if (exists !== this.state.saveStateExists) {
       this.state.saveStateExists = exists;
       this.update();
     }
   }
 
-  /**
-   * Save state container.
-   *
-   * The header guards against loading a state into the wrong game, or one
-   * produced by a core whose state layout differs, either of which would
-   * otherwise restore convincing nonsense.
-   */
-  protected static readonly STATE_MAGIC = 0x56455353; // 'VESS'
-  /**
-   * Version 2 added the ESSound section; version 1 files are still read, and
-   * simply restore no audio.
-   */
-  protected static readonly STATE_VERSION = 2;
-  protected static readonly STATE_HEADER_BYTES = 48;
-  /** Version 2's extra header word: how many bytes of ESSound state follow the machine's. */
-  protected static readonly STATE_EXTRA_BYTES = 4;
-
-  /**
-   * A linked pair is snapshotted as a unit: restoring one machine but not the
-   * other leaves them disagreeing about the conversation on the link port.
-   * The blobs are all the same size, so their count is implied by the file
-   * length and needs no field of its own.
-   */
-  /**
-   * The file a save state is written as: a header, one block per simulation of
-   * the session, and what ESSound was playing.
-   *
-   * The audio is played on this side rather than by the core, so its state is
-   * nowhere in the blocks the core hands over — without this last section,
-   * loading a state would leave whatever was playing before running on.
-   */
-  protected wrapSaveState(states: ArrayBuffer[]): Uint8Array {
-    const size = states[0].byteLength;
-    const esSound = new TextEncoder().encode(JSON.stringify(this.esSound.snapshot()));
-    const start = VesEmulatorWidget.STATE_HEADER_BYTES + VesEmulatorWidget.STATE_EXTRA_BYTES;
-    const out = new Uint8Array(start + size * states.length + esSound.length);
-    const header = new DataView(out.buffer, 0, start);
-    header.setUint32(0, VesEmulatorWidget.STATE_MAGIC);
-    header.setUint32(4, VesEmulatorWidget.STATE_VERSION);
-    header.setUint32(8, this.state.romSize);
-    header.setUint32(12, size);
-    out.set(this.romIdentity, 16);
-    header.setUint32(VesEmulatorWidget.STATE_HEADER_BYTES, esSound.length);
-    states.forEach((state, index) => {
-      out.set(new Uint8Array(state), start + size * index);
-    });
-    out.set(esSound, start + size * states.length);
-    return out;
-  }
-
-  protected unwrapSaveState(stored: Uint8Array, expectedCount: number): VesEmulatorSaveState {
-    if (stored.length <= VesEmulatorWidget.STATE_HEADER_BYTES) {
-      throw new Error('This save state file is truncated.');
-    }
-    // Over the whole file rather than the fixed header: version 2's length
-    // word sits just past it.
-    const header = new DataView(stored.buffer, stored.byteOffset, stored.byteLength);
-    if (header.getUint32(0) !== VesEmulatorWidget.STATE_MAGIC) {
-      throw new Error('This is not a save state file.');
-    }
-    const version = header.getUint32(4);
-    if (version > VesEmulatorWidget.STATE_VERSION || version < 1) {
-      throw new Error('This save state was written by a different version of VUEngine Studio.');
-    }
-
-    const identity = stored.subarray(16, 16 + this.romIdentity.length);
-    if (!this.romIdentity.every((byte, index) => byte === identity[index])) {
-      throw new Error('This save state belongs to a different ROM.');
-    }
-
-    const size = header.getUint32(12);
-    // Version 1 had no ESSound section and no word to say how long it is.
-    const start = VesEmulatorWidget.STATE_HEADER_BYTES
-      + (version >= 2 ? VesEmulatorWidget.STATE_EXTRA_BYTES : 0);
-    if (stored.length <= start) {
-      throw new Error('This save state file is truncated.');
-    }
-    const esSoundBytes = version >= 2 ? header.getUint32(VesEmulatorWidget.STATE_HEADER_BYTES) : 0;
-    const body = stored.length - start - esSoundBytes;
-    if (size === 0 || body <= 0 || body % size !== 0) {
-      throw new Error('This save state file is malformed.');
-    }
-
-    const count = body / size;
-    if (count !== expectedCount) {
-      throw new Error(count > expectedCount
-        ? 'This save state was made by a linked pair of emulators and needs both to be running.'
-        : 'This save state was made by a single emulator and cannot be loaded into a linked pair.');
-    }
-
-    return {
-      states: Array.from({ length: count }, (unused, index) => {
-        const from = start + size * index;
-        return stored.slice(from, from + size).buffer;
-      }),
-      esSound: esSoundBytes > 0
-        ? new TextDecoder().decode(stored.subarray(start + body, start + body + esSoundBytes))
-        : undefined,
-    };
-  }
-
-  /** Put ESSound back as the state being loaded found it, if it says. */
   protected restoreEsSound(stored: string | undefined): void {
     if (!stored) {
       return;
@@ -2626,12 +1781,12 @@ granularity records less often and costs proportionally less.',
     for (const sim of sims) {
       states.push(await sim.saveState());
     }
-    await this.fileService.writeFile(
-      await this.getSaveStateUri(this.state.saveSlot),
-      BinaryBuffer.wrap(this.wrapSaveState(states))
+    await this.storage.write(
+      await this.getSaveStatePath(this.state.saveSlot),
+      wrapSaveState(states, this.saveStateIdentity, this.esSound.snapshot())
     );
     await this.refreshSaveStateExists();
-    this.messageService.info(
+    this.notifications.info(
       nls.localize('vuengine/emulator/saveStateSaved', 'Save state saved to slot {0}.', this.state.saveSlot)
     );
   }
@@ -2641,13 +1796,14 @@ granularity records less often and costs proportionally less.',
     if (!sims?.length) {
       return;
     }
-    const uri = await this.getSaveStateUri(this.state.saveSlot);
-    if (!await this.fileService.exists(uri)) {
+    const path = await this.getSaveStatePath(this.state.saveSlot);
+    if (!await this.storage.exists(path)) {
       return;
     }
     try {
-      const stored = (await this.fileService.readFile(uri)).value.buffer;
-      const { states, esSound } = this.unwrapSaveState(new Uint8Array(stored), sims.length);
+      const { states, esSound } = unwrapSaveState(
+        await this.storage.read(path), sims.length, this.saveStateIdentity
+      );
       // Suspended across the restore so the pair cannot emulate half-loaded.
       const running = !this.state.paused;
       if (running) {
@@ -2656,13 +1812,12 @@ granularity records less often and costs proportionally less.',
       for (let i = 0; i < sims.length; i++) {
         await sims[i].loadState(states[i]);
       }
-      // After the machine's own state, so the audio follows what it belongs
-      // to rather than leading it.
+      // After the machine's own state, so the audio follows what it belongs to
       this.restoreEsSound(esSound);
       if (running) {
         await this.core?.run();
       }
-      this.messageService.info(
+      this.notifications.info(
         nls.localize('vuengine/emulator/saveStateLoaded', 'Save state loaded from slot {0}.', this.state.saveSlot)
       );
     } catch (error) {
@@ -2670,173 +1825,9 @@ granularity records less often and costs proportionally less.',
     }
   }
 
-  /** Ratio at which fast forward and slow motion run, from the preferences. */
-  protected async applySpeed(): Promise<void> {
-    let speed = 1;
-    if (this.state.fastForward) {
-      const ratio = this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO
-      ) as number;
-      speed = ratio > 1 ? ratio : VesEmulatorWidget.DEFAULT_FAST_FORWARD_RATIO;
-    } else if (this.state.slowmotion) {
-      const ratio = this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO
-      ) as number;
-      speed = 1 / (ratio > 1 ? ratio : VesEmulatorWidget.DEFAULT_SLOW_MOTION_RATIO);
-    }
-    await this.core?.setSpeed(speed);
-    // ESSound runs at the machine's speed, so fast forward and slow motion
-    // carry its audio with them.
-    this.esSound.setSpeed(speed);
-  }
-
-  protected async applyRewindSettings(): Promise<void> {
-    await this.core?.setRewind(
-      this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE) as boolean,
-      this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY) as number,
-      (this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_BUFFER_SIZE) as number) * 1024 * 1024
-    );
-  }
-
-  /**
-   * Rewinding suspends normal emulation and walks the history backwards for as
-   * long as the input is held.
-   *
-   * Whether it is held is tracked in a flag rather than in the animation frame
-   * handle, because both the suspend and every step are round trips to the
-   * worker: a release landing while one is in flight would otherwise be lost,
-   * and the loop would keep running until it had eaten the entire history.
-   */
-  protected startRewinding(): void {
-    if (
-      this.rewinding ||
-      !this.core ||
-      !this.state.loaded ||
-      // With no history being recorded there is nothing to walk back through,
-      // and suspending for the length of the hold would just look like a freeze.
-      !this.isRewindEnabled()
-    ) {
-      return;
-    }
-    this.rewinding = true;
-    this.esSound.setRewinding(true);
-    this.rewindLastTick = 0;
-    // Owe one entry up front, so even a tap steps back immediately.
-    this.rewindOwed = 1;
-    // Lights the toolbar button up for the length of the hold, whether it was
-    // the button or the keyboard that started it.
-    this.update();
-    this.queueCoreTransition(async core => {
-      await core.suspend();
-      // The input may already have been released while the core was still
-      // suspending, in which case the queued resume takes it from here.
-      if (this.rewinding) {
-        this.rewindHandle = requestAnimationFrame(now => { this.rewindTick(now); });
-      }
-    });
-  }
-
-  protected stopRewinding(): void {
-    if (!this.rewinding) {
-      return;
-    }
-    this.rewinding = false;
-    // Winds the tracks back by everything the core gave up, and starts them
-    // again if the machine is running.
-    this.esSound.setRewinding(false);
-    if (this.rewindHandle !== undefined) {
-      cancelAnimationFrame(this.rewindHandle);
-      this.rewindHandle = undefined;
-    }
-    // Not on the way out: disposeSession stops any rewind as it tears down.
-    if (!this.isDisposed) {
-      this.update();
-    }
-    this.queueCoreTransition(async core => {
-      if (!this.state.paused) {
-        await core.run();
-      }
-    });
-  }
-
-  /**
-   * Play the history back at the speed it was recorded at.
-   *
-   * Pacing is by elapsed time rather than one entry per animation frame: the
-   * machine runs at VB_FRAME_RATE and an entry covers `granularity` frames of
-   * it, so a 120 Hz display would otherwise rewind at more than twice speed and
-   * tear through a minute of history in seconds.
-   */
-  protected async rewindTick(now: number): Promise<void> {
-    this.rewindHandle = undefined;
-    if (!this.rewinding) {
-      return;
-    }
-
-    // Cap the catch-up so a stalled frame cannot jump back by seconds at once.
-    const elapsed = this.rewindLastTick
-      ? Math.min(now - this.rewindLastTick, VesEmulatorWidget.REWIND_MAX_CATCHUP_MS)
-      : 0;
-    this.rewindLastTick = now;
-    const granularity = Math.max(1, this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY
-    ) as number);
-    this.rewindOwed += (elapsed / 1000) * (VB_FRAME_RATE / granularity);
-
-    const count = Math.floor(this.rewindOwed);
-    if (count > 0) {
-      this.rewindOwed -= count;
-      const applied = await this.core?.rewindStep(count) ?? 0;
-      // An entry covers `granularity` frames, so this is how much emulated
-      // time the machine has just given up.
-      this.esSound.rewind((applied * granularity) / VB_FRAME_RATE);
-      if (!this.rewinding) {
-        return;
-      }
-      if (applied === 0) {
-        // Nothing left to go back to. Hold on the oldest state rather than
-        // resuming under the user's finger; the release resumes as usual.
-        return;
-      }
-    }
-
-    this.rewindHandle = requestAnimationFrame(next => { this.rewindTick(next); });
-  }
-
-  /**
-   * Serialize transitions between running and suspended.
-   *
-   * Both VesVbCore#run and #suspend touch the audio context as well as the
-   * worker, so overlapping them can leave the context suspended while the
-   * worker believes it is emulating — which stalls emulation outright, since it
-   * is the audio graph that clocks it. Pressing and releasing rewind faster
-   * than a suspend completes is exactly that case.
-   *
-   * The action is bound to the core that was current when it was queued and is
-   * skipped if the session has been torn down or rebuilt since, so a release
-   * queued on the way out cannot resume a disposed core or a fresh one.
-   */
-  protected queueCoreTransition(action: (core: VesVbCore) => Promise<void>): void {
-    const core = this.core;
-    if (!core) {
-      return;
-    }
-    this.coreTransition = this.coreTransition
-      .then(() => this.core === core ? action(core) : undefined)
-      .catch(error => this.handleCoreError(
-        error instanceof Error ? error.message : String(error)
-      ));
-  }
-
   protected async takeScreenshot(): Promise<void> {
     const png = await this.sim?.capture();
     if (!png) {
-      return;
-    }
-
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
       return;
     }
 
@@ -2847,59 +1838,36 @@ granularity records less often and costs proportionally less.',
     const romUri = await this.getRomUri();
     const screenshotFilename = `${romUri.path.name}-${timestamp}.png`;
 
-    await this.fileService.writeFile(
-      workspaceRootUri.resolve('screenshots').resolve(screenshotFilename),
-      BinaryBuffer.wrap(new Uint8Array(png))
-    );
-    this.messageService.info(
+    await this.storage.export(`screenshots/${screenshotFilename}`, new Uint8Array(png));
+    this.notifications.info(
       nls.localize('vuengine/emulator/screenshotSaved', 'Screenshot saved to screenshots/{0}.', screenshotFilename)
     );
   }
 
-  protected setRenderingMode = async (mode: string): Promise<void> => {
-    await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
-      mode,
-      PreferenceScope.User
-    );
+  setRenderingMode = async (mode: string): Promise<void> => {
+    await this.settings.set('renderingMode', mode);
   };
 
-  protected setScale = async (scale: string): Promise<void> => {
-    await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE,
-      scale,
-      PreferenceScope.User
-    );
+  setScale = async (scale: string): Promise<void> => {
+    await this.settings.set('scale', scale);
     this.applyScale();
   };
 
-  protected getRenderingMode(): string {
-    return this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
-      VB_DEFAULT_RENDERING_MODE
-    );
+  getRenderingMode(): string {
+    return this.settings.get('renderingMode');
   }
 
-  /** The colours the current rendering mode is shown in. */
   protected getPalette(): VbPalette {
     return resolvePalette(
-      this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE, VB_DEFAULT_PALETTE_ID
-      ),
-      this.preferenceService.get<CustomPalette[]>(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES, []
-      )
+      this.settings.get('palette'),
+      this.settings.get('customPalettes')
     );
   }
 
   protected getAnaglyphPalette(): VbAnaglyphPalette {
     return resolveAnaglyphPalette(
-      this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE, VB_DEFAULT_ANAGLYPH_PALETTE_ID
-      ),
-      this.preferenceService.get<CustomAnaglyphPalette[]>(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_ANAGLYPH_PALETTES, []
-      )
+      this.settings.get('anaglyphPalette'),
+      this.settings.get('customAnaglyphPalettes')
     );
   }
 
@@ -2911,27 +1879,23 @@ granularity records less often and costs proportionally less.',
     );
   }
 
-  /** Name of the palette in use, built-in or custom. */
-  protected getPaletteLabel(): string {
+  getPaletteLabel(): string {
     const anaglyph = this.getRenderingMode() === VbRenderingMode.ANAGLYPH;
-    const id = this.preferenceService.get(
-      anaglyph
-        ? VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE
-        : VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
-      anaglyph ? VB_DEFAULT_ANAGLYPH_PALETTE_ID : VB_DEFAULT_PALETTE_ID
-    );
+    const id = anaglyph
+      ? this.settings.get('anaglyphPalette')
+      : this.settings.get('palette');
     if (id.startsWith(CUSTOM_PALETTE_PREFIX)) {
       return id.slice(CUSTOM_PALETTE_PREFIX.length);
     }
-    return (anaglyph ? EMULATION_ANAGLYPH_PALETTES : EMULATION_PALETTES)[id] ?? id;
+    return (anaglyph ? emulationAnaglyphPalettes() : emulationPalettes())[id] ?? id;
   }
 
-  protected togglePaletteWindow(): void {
+  togglePaletteWindow(): void {
     this.state.showPalettes = !this.state.showPalettes;
     this.update();
   }
 
-  protected togglePreferencesWindow(): void {
+  togglePreferencesWindow(): void {
     this.state.showPreferences = !this.state.showPreferences;
     this.update();
   }
@@ -2944,7 +1908,7 @@ granularity records less often and costs proportionally less.',
 
   protected applyScale(): void {
     this.dock.screen.setScale(
-      this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE) as string
+      this.settings.get('scale')
     );
   }
 
@@ -2960,63 +1924,17 @@ granularity records less often and costs proportionally less.',
     this.update();
   }
 
-  protected toButton(
-    keyCode: EmulatorGamePadKeyCode | EmulatorAction
-  ): string {
-    let button: string = keyCode;
-    if (keyCode.startsWith('Key')) {
-      button = keyCode.substring(3);
-    } else if (keyCode.startsWith('Arrow')) {
-      button = keyCode.substring(5);
-    }
-    return button.toLowerCase();
-  }
-
-  /**
-   * Throw away the cartridge's save memory and boot again.
-   *
-   * Reached only through its command — see `EmulatorCommands.DELETE_SRAM`.
-   */
   public deleteSramAndRestart = async () => {
-    const dialog = new ConfirmDialog({
+    const confirmed = await this.notifications.confirm({
       title: nls.localize('vuengine/emulator/deleteSram', 'Delete SRAM'),
-      msg: nls.localize(
+      message: nls.localize(
         'vuengine/emulator/areYouSureYouWantToDeleteSram',
         'Are you sure you want to delete SRAM and restart? Any saved progress will be lost.'
       ),
     });
-    if (await dialog.open()) {
+    if (confirmed) {
       this.reload(true);
     }
   };
 
-}
-
-/**
- * The fixed toolbar above the dock area.
- *
- * Its content stays on the emulator widget, which owns the state the controls
- * act on; this is only the surface it renders into.
- */
-class VesEmulatorToolbar extends ReactWidget {
-  constructor(protected readonly emulator: VesEmulatorWidget) {
-    super();
-    this.addClass('ves-emulator-toolbar');
-  }
-
-  protected render(): React.ReactNode {
-    return this.emulator.renderToolbar();
-  }
-}
-
-/** The controller reference, laid over the whole emulator widget. */
-class VesEmulatorOverlay extends ReactWidget {
-  constructor(protected readonly emulator: VesEmulatorWidget) {
-    super();
-    this.addClass('ves-emulator-overlay');
-  }
-
-  protected render(): React.ReactNode {
-    return this.emulator.renderOverlay();
-  }
 }

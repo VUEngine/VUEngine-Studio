@@ -1,14 +1,14 @@
-import { CommandService, PreferenceService, URI, deepClone, isWindows, nls } from '@theia/core';
+import { CommandService, deepClone, isWindows, nls, PreferenceService, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
+import { EmulatorConfig } from 'vueport-core/lib/browser/emulator-types';
 import { WINDOWS_EXECUTABLE_EXTENSIONS } from '../../../core/browser/ves-common-types';
 import { VesCoreCommands } from '../../../core/browser/ves-core-commands';
 import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
-import { EmulatorConfig } from '../ves-emulator-types';
 
 interface EmulatorConfigsProps {
     commandService: CommandService

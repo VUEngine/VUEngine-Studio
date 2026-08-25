@@ -4,7 +4,7 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
-import { EmulatorCommands } from './ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(

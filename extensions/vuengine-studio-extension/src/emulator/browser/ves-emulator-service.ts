@@ -14,7 +14,7 @@ import { VesSocketWatcher } from '../../socket/browser/ves-socket-service-watche
 import { VesSocketService } from '../../socket/common/ves-socket-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import {
-  DEFAULT_EMULATOR_CONFIG,
+  defaultEmulatorConfig,
   EmulatorConfig,
   RED_VIPER_CONFIG,
   RED_VIPER_VBLINK_CHUNK_SIZE_BYTES,
@@ -22,7 +22,7 @@ import {
   VbLinkStatus,
   VbLinkStatusData,
   VES_EMULATOR_WIDGET_ID,
-} from './ves-emulator-types';
+} from 'vueport-core/lib/browser/emulator-types';
 // type only to not cause an injection loop
 import type { VesEmulatorWidget } from './ves-emulator-widget';
 
@@ -123,7 +123,7 @@ export class VesEmulatorService {
         return;
       }
 
-      const selectedEmulator = (selection.label === DEFAULT_EMULATOR_CONFIG.name)
+      const selectedEmulator = (selection.label === defaultEmulatorConfig().name)
         ? ''
         : selection.label;
 
@@ -275,19 +275,19 @@ export class VesEmulatorService {
   }
 
   async runInEmulator(): Promise<void> {
-    const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
+    const selected = this.getDefaultEmulatorConfig();
     const romUri = await this.vesBuildService.getDefaultRomUri();
-    if (defaultEmulatorConfig.name === DEFAULT_EMULATOR_CONFIG.name) {
+    if (selected.name === defaultEmulatorConfig().name) {
       return this.runInBuiltInEmulator(romUri);
-    } else if (defaultEmulatorConfig.name === RED_VIPER_CONFIG.name) {
+    } else if (selected.name === RED_VIPER_CONFIG.name) {
       return this.runInRedViper();
     } else {
-      const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
-        ? `/${defaultEmulatorConfig.path}`
-        : defaultEmulatorConfig.path;
+      const emulatorPath = isWindows && !selected.path.startsWith('/')
+        ? `/${selected.path}`
+        : selected.path;
       const emulatorUri = new URI(emulatorPath).withScheme('file');
       const romPath = await this.fileService.fsPath(romUri);
-      let args = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
+      let args = selected.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
       if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         this.messageService.error(
@@ -438,21 +438,21 @@ export class VesEmulatorService {
     const emulatorConfigs: EmulatorConfig[] = this.getEmulatorConfigs();
     const defaultEmulatorName: string = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) as string;
 
-    let defaultEmulatorConfig = DEFAULT_EMULATOR_CONFIG;
+    let selected = defaultEmulatorConfig();
     for (const emulatorConfig of emulatorConfigs) {
       if (emulatorConfig.name === defaultEmulatorName) {
-        defaultEmulatorConfig = emulatorConfig;
+        selected = emulatorConfig;
       }
     }
 
-    return defaultEmulatorConfig;
+    return selected;
   }
 
   getEmulatorConfigs(): EmulatorConfig[] {
     const customEmulatorConfigs: EmulatorConfig[] = this.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS) ?? [];
 
     const emulatorConfigs = [
-      DEFAULT_EMULATOR_CONFIG,
+      defaultEmulatorConfig(),
       {
         ...RED_VIPER_CONFIG,
         path: this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, ''),

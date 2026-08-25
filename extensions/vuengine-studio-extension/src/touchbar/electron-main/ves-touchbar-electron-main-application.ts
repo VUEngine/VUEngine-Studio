@@ -8,7 +8,7 @@ import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
 import { VesFileOpenElectronMainApplication } from '../../core/electron-main/ves-file-open-electron-main-application';
-import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';

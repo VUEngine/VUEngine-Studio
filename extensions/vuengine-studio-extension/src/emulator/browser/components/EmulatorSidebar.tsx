@@ -1,6 +1,6 @@
 import { CommandService, nls, PreferenceService } from '@theia/core';
 import React from 'react';
-import { EmulatorCommands } from '../ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import EmulatorAutoQueuePreference from './EmulatorAutoQueuePreference';
 
 interface EmulatorSidebarProps {

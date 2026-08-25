@@ -24,7 +24,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
-import { VesEmulatorCoreService } from '../../emulator/browser/ves-emulator-core-service';
+import { VesEmulatorCoreService } from 'vueport-core/lib/browser/emulator-core-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';

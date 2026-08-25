@@ -3,7 +3,7 @@ import { CommandContribution, CommandRegistry, MenuAction, MenuContribution, Men
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
-import { EMULATOR_GAMEPAD_BUTTONS, EMULATOR_GAMEPAD_INPUTS, EmulatorCommands } from './ves-emulator-commands';
+import { EMULATOR_GAMEPAD_BUTTONS, EMULATOR_GAMEPAD_INPUTS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { EMULATOR_FOCUS_CONTEXT } from './ves-emulator-context-key-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';

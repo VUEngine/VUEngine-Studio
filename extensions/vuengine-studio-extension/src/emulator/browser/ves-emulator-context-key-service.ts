@@ -1,8 +1,8 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { ContextKeyService, ContextKey } from '@theia/core/lib/browser/context-key-service';
+import { EMULATOR_FOCUS_CONTEXT } from 'vueport-core/lib/browser/emulator-commands';
 
-/** The `when` clause every emulator input mapping is scoped to. */
-export const EMULATOR_FOCUS_CONTEXT = 'emulatorFocus';
+export { EMULATOR_FOCUS_CONTEXT };
 
 @injectable()
 export class VesEmulatorContextKeyService {

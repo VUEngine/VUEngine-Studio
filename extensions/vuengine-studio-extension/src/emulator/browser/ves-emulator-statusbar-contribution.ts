@@ -2,10 +2,10 @@ import { nls, PreferenceService } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { EmulatorCommands } from './ves-emulator-commands';
+import { EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
-import { RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, VbLinkStatus } from './ves-emulator-types';
+import { RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, VbLinkStatus } from 'vueport-core/lib/browser/emulator-types';
 
 @injectable()
 export class VesEmulatorStatusBarContribution implements FrontendApplicationContribution {
