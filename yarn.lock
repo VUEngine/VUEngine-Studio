@@ -1856,6 +1856,11 @@
   resolved "https://registry.npmjs.org/@lumino/algorithm/-/algorithm-2.0.4.tgz"
   integrity sha512-gddBhESPqu25KWLeAK9Kz8tS9Ph7P45i0CNG7Ia4XMhK9PHLtTsBdJTC9jP+MqhbzC8zDT/4ekvYRV9ojRPj7Q==
 
+"@lumino/algorithm@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@lumino/algorithm/-/algorithm-2.0.5.tgz#1471b489a3a354838bcf0a7ce828b10b2a5d05d7"
+  integrity sha512-yW5k0IRrNlNDL9/hLOPr0XaMYf7YSZ5a/uJ++a92ziBe7v7a3xzBJ1+Awhb6fMyanE0Mz97UOQIsHa3vWB0UQA==
+
 "@lumino/collections@^2.0.4":
   version "2.0.4"
   resolved "https://registry.npmjs.org/@lumino/collections/-/collections-2.0.4.tgz"
@@ -1882,6 +1887,13 @@
   integrity sha512-zaKJaK7rawPATn2BGHkbMrR6oK3s9PxNe9KreLwWF2dB4ZBHDiEmNLRyHRorfJ7XqVOEXAsAAj0jFn+qJPC/4Q==
   dependencies:
     "@lumino/algorithm" "^2.0.4"
+
+"@lumino/coreutils@^2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@lumino/coreutils/-/coreutils-2.2.3.tgz#81689c1b386d54630f89a85779959560e4c22bf0"
+  integrity sha512-YxmayMeq8VJCPqo1okpsA3oOoz0eZeG5qedOLmopm+N/GwQT7S34QPPts49omVUwTJ0Xo8fGzOsxnS/LwnVl1Q==
+  dependencies:
+    "@lumino/algorithm" "^2.0.5"
 
 "@lumino/disposable@^2.1.5":
   version "2.1.5"
@@ -1928,6 +1940,14 @@
   dependencies:
     "@lumino/algorithm" "^2.0.4"
     "@lumino/coreutils" "^2.2.2"
+
+"@lumino/signaling@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@lumino/signaling/-/signaling-2.1.6.tgz#bdf909d9f6c1a65a610dbab487d47d365e9d4e3f"
+  integrity sha512-PEB2nuNyippF/vj28oiDm7Zy8vAeVq07NE59L79GhaTe9i37TCjtA3+67DJnVGn1+fQPfexs6HdrY/90JFFwiw==
+  dependencies:
+    "@lumino/algorithm" "^2.0.5"
+    "@lumino/coreutils" "^2.2.3"
 
 "@lumino/virtualdom@^2.0.4":
   version "2.0.4"

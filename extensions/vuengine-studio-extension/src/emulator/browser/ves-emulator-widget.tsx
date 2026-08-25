@@ -72,6 +72,7 @@ import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-pane
 import { VesEmulatorCheatStore } from 'vueport-core/lib/browser/emulator-cheat-store';
 import {
   EMULATOR_ACTION_COMMANDS,
+  resetLayoutConfirmation,
   EmulatorCommands,
 } from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorCoreService, VesEmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
@@ -458,6 +459,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.commandService.executeCommand(EmulatorCommands.ADD_PANEL.id, this, tabBar)
     ));
 
+    // The Reset Layout button the dock's tab bars carry beside the "+".
+    this.toDispose.push(this.dock.onDidRequestResetLayout(() =>
+      this.commandService.executeCommand(EmulatorCommands.RESET_LAYOUT.id, this)
+    ));
+
     this.toDispose.push(this.dock.onDidChangeLayout(() => {
       this.persistDockLayout();
       // Opening or closing the Rumble Pack panel is what decides whether link
@@ -481,8 +487,20 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return this.dock.isPanelOpen(kind);
   }
 
-  /** Put the panels back to just the screen. */
-  resetLayout(): void {
+  /**
+   * Put the panels back to their default arrangement, having asked first.
+   *
+   * Worth a question wherever it is triggered from -- the tab bar's button or
+   * the widget toolbar's command: an arrangement takes a while to build up and
+   * resetting it cannot be undone.
+   */
+  async resetLayout(): Promise<void> {
+    // The wording is the emulator's own, so it is translated once in
+    // vueport-core and both hosts ask in the same words.
+    const agreed = await this.notifications.confirm(resetLayoutConfirmation());
+    if (!agreed) {
+      return;
+    }
     this.dock.resetLayout();
     this.persistDockLayout();
   }

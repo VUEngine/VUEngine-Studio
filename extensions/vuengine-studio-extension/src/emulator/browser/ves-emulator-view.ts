@@ -242,12 +242,6 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
 
   registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
     toolbar.registerItem({
-      id: EmulatorCommands.RESET_LAYOUT.id,
-      command: EmulatorCommands.RESET_LAYOUT.id,
-      tooltip: EmulatorCommands.RESET_LAYOUT.label,
-      priority: 3,
-    });
-    toolbar.registerItem({
       id: VesEmulatorCommands.WIDGET_HELP.id,
       command: VesEmulatorCommands.WIDGET_HELP.id,
       tooltip: VesEmulatorCommands.WIDGET_HELP.label,
