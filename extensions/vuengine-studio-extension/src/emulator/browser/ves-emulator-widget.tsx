@@ -1392,7 +1392,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.symbols = undefined;
     // Pushed to the dock rather than read from widget state, because the ROM
     // Info panel only has access to what VesEmulatorDebugSource exposes.
-    this.dock.setRomInfo(this.state.romHeader, this.state.romSize, await this.readBuildMode(romUri));
+    this.dock.setRomInfo(
+      this.state.romHeader,
+      this.state.romSize,
+      await this.readBuildMode(romUri),
+      this.romId,
+    );
 
     // The buffer is transferred into the worker, so hand over a copy that owns
     // an exactly sized ArrayBuffer.
