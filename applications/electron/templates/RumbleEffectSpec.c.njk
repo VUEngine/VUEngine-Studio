@@ -11,6 +11,12 @@
 
 RumbleEffectROMSpec {{ sanitizedSpecName }}RumbleEffectSpec =
 {
+	// Version #
+	{% if item.firmwareVersion >= 0 and item.firmwareVersion <= 10 -%}
+		{{ item.firmwareVersion }}
+	{%- else -%}
+		1
+	{%- endif %},
 	// Effect #
 	{% if item.effect >= 1 and item.effect <= 123 -%}
 		{{ item.effect }}

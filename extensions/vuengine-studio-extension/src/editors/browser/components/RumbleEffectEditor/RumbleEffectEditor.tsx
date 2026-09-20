@@ -10,12 +10,15 @@ import VContainer from '../Common/Base/VContainer';
 import { clamp } from '../Common/Utils';
 import {
     BUILT_IN_RUMBLE_EFFECTS,
+    DEFAULT_RUMBLE_FIRMWARE_VERSION,
     DEFAULT_RUMBLE_EFFECT,
     DEFAULT_RUMBLE_EFFECT_BREAK,
     DEFAULT_RUMBLE_EFFECT_FREQUENCY,
     DEFAULT_RUMBLE_EFFECT_OVERDRIVE,
     DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
     DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
+    MIN_RUMBLE_FIRMWARE_VERSION,
+    MAX_RUMBLE_FIRMWARE_VERSION,
     MAX_RUMBLE_EFFECT_BREAK,
     MAX_RUMBLE_EFFECT_OVERDRIVE,
     MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
@@ -106,6 +109,17 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     }
 
     protected rumblePakLogLineLastElementRef = React.createRef<HTMLDivElement>();
+
+    protected setFirmwareVersion = (sustain: number) => {
+        this.props.updateData({
+            ...this.props.data,
+            firmwareVersion: clamp(
+                sustain,
+                MIN_RUMBLE_FIRMWARE_VERSION,
+                MAX_RUMBLE_FIRMWARE_VERSION
+            ),
+        });
+    };
 
     protected setEffect = (effect: number) => {
         this.props.updateData({
@@ -311,6 +325,17 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 sideLabel={nls.localize('vuengine/editors/rumbleEffect/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
                 checked={data.stopBeforeStarting}
                 setChecked={this.toggleStopBeforeStarting}
+            />
+            <input
+                type="number"
+                className="theia-input"
+                title={nls.localize('vuengine/editors/rumbleEffect/version', 'Version')}
+                onChange={e => this.setFirmwareVersion(parseInt(e.target.value))}
+                value={data.firmwareVersion < MIN_RUMBLE_FIRMWARE_VERSION || data.firmwareVersion > MAX_RUMBLE_FIRMWARE_VERSION
+                    ? DEFAULT_RUMBLE_FIRMWARE_VERSION
+                    : data.firmwareVersion}
+                min={MIN_RUMBLE_FIRMWARE_VERSION}
+                max={MAX_RUMBLE_FIRMWARE_VERSION}
             />
             <ConnectionStatus>
                 {nls.localize('vuengine/editors/rumbleEffect/rumbleEffectEditorConnectionStatus', 'Rumble Pack connection status')}: {
