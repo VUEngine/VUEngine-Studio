@@ -26,13 +26,13 @@ const uint8 {{ sanitizedSpecName }}SoundTrack1SxLRV[]
 #endif
 };
 
-PCMSoundROMSpec {{ sanitizedSpecName }}oSoundSpec =
+PCMSoundROMSpec {{ sanitizedSpecName }}SoundSpec =
 {
 	// Timer configuration
 	{
 		__TIMER_{{ item.timer.resolution }},
 		{{ item.timer.targetTimePerInterrupt}},
-		k{{ item.timer.targetTimePerInterrupttUnits}}
+		kUS
 	},
 	
 	// Name

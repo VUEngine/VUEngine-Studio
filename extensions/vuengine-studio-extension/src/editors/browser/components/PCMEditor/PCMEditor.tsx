@@ -147,7 +147,7 @@ export default function PCMEditor(props: PCMProps): React.JSX.Element {
                     <RadioSelect
                         options={[{ value: TimerTargetTimePerInterruptUnits.MS }, { value: TimerTargetTimePerInterruptUnits.US }]}
                         defaultValue={data.timer.targetTimePerInterruptUnits}
-                        onChange={options => setTargetTimePerInterruptUnits(options[0].value as TimerTargetTimePerInterruptUnits)}
+                        onChange={options => setTargetTimePerInterruptUnits(options[1].value as TimerTargetTimePerInterruptUnits)}
                     />
                 </HContainer>
             </VContainer>
