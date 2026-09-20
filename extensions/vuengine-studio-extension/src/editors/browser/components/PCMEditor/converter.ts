@@ -2,9 +2,9 @@ import { URI } from '@theia/core';
 import { BinaryBufferReadableStream } from '@theia/core/lib/common/buffer';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
-export const convertPcm = async (configFileUri: URI, filePath: string, range: number, fileService: FileService): Promise<number[]> => {
+export const convertPcm = async (configFileUri: URI, filePath: string, fileService: FileService): Promise<number[]> => {
     const result: number[] = [];
-    const amplitude = range * 15;
+    const amplitude = 5 * 15;
     const scale = amplitude / 63 / 4;
 
     const fileUri = configFileUri.parent.resolve(filePath);
@@ -21,7 +21,7 @@ export const convertPcm = async (configFileUri: URI, filePath: string, range: nu
         let value = fileBinaryBuffer.readUInt8(i);
         // apply scaling
         value = Math.floor(value * scale);
-        // clamp at amplitude max
+        // clamp at max amplitude
         value = Math.min(amplitude, value);
         result.push(value);
       });

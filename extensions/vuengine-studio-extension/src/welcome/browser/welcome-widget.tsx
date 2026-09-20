@@ -193,21 +193,21 @@ const StyledRecentProjectActions = styled.div`
 @injectable()
 export class WelcomeWidget extends ReactWidget {
     @inject(ApplicationServer)
-    protected readonly appServer: ApplicationServer;
+    protected readonly appServer!: ApplicationServer;
     @inject(CommandRegistry)
-    protected readonly commandRegistry: CommandRegistry;
+    protected readonly commandRegistry!: CommandRegistry;
     @inject(EnvVariablesServer)
-    protected readonly environments: EnvVariablesServer;
+    protected readonly environments!: EnvVariablesServer;
     @inject(FileService)
-    protected readonly fileService: FileService;
+    protected readonly fileService!: FileService;
     @inject(LabelProvider)
-    protected readonly labelProvider: LabelProvider;
+    protected readonly labelProvider!: LabelProvider;
     @inject(VesProjectService)
-    protected readonly vesProjectService: VesProjectService;
+    protected readonly vesProjectService!: VesProjectService;
     @inject(WindowService)
-    protected readonly windowService: WindowService;
+    protected readonly windowService!: WindowService;
     @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService;
+    protected readonly workspaceService!: WorkspaceService;
 
     static readonly ID = 'welcomeWidget';
     static readonly LABEL = nls.localizeByDefault('Welcome');

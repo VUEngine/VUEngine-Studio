@@ -1,5 +1,5 @@
 {%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
-{%- set soundData = itemUri | convertPcm(item.sourceFile, item.range) -%}
+{%- set soundData = itemUri | convertPcm(item.sourceFile) -%}
 
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.c.njk') %}

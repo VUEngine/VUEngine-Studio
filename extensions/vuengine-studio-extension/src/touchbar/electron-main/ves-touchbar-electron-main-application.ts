@@ -1,6 +1,5 @@
 import { isOSX, MaybePromise, nls } from '@theia/core';
 import { BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
-import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
 import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 import { injectable } from '@theia/core/shared/inversify';
@@ -8,6 +7,7 @@ import { SegmentedControlSegment } from 'electron';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
 import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
+import { VesFileOpenElectronMainApplication } from '../../core/electron-main/ves-file-open-electron-main-application';
 import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -16,7 +16,7 @@ import { VesTouchBarIcons } from '../common/images/touch-bar-icons';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 
 @injectable()
-export class VesElectronMainApplication extends ElectronMainApplication {
+export class VesTouchbarElectronMainApplication extends VesFileOpenElectronMainApplication {
     protected grayscaleCss: string = '';
 
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultOptions()): Promise<BrowserWindow> {
