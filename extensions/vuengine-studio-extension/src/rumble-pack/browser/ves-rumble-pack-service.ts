@@ -137,7 +137,7 @@ export class VesRumblePackService {
   }
 
   async sendCommandPlayEffect(effect: number): Promise<void> {
-    return this.sendCommand(`TEF ${(++effect).toString().padStart(3, '0')}`);
+    return this.sendCommand(`TEF ${effect.toString().padStart(3, '0')}`);
   }
 
   async sendCommandSetFrequency(frequency: number): Promise<void> {
