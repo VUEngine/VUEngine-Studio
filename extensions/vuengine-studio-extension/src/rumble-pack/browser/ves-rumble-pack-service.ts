@@ -12,23 +12,23 @@ import { RUMBLE_PACK_IDS, RumblePakLogLine } from './ves-rumble-pack-types';
 @injectable()
 export class VesRumblePackService {
   @inject(CommandService)
-  protected commandService: CommandService;
+  protected commandService!: CommandService;
   @inject(FileService)
-  protected fileService: FileService;
+  protected fileService!: FileService;
   @inject(MessageService)
-  protected readonly messageService: MessageService;
+  protected readonly messageService!: MessageService;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  protected readonly preferenceService!: PreferenceService;
   @inject(VesBuildService)
-  protected readonly vesBuildService: VesBuildService;
+  protected readonly vesBuildService!: VesBuildService;
   @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
+  protected readonly vesCommonService!: VesCommonService;
   @inject(VesProcessService)
-  protected readonly vesProcessService: VesProcessService;
+  protected readonly vesProcessService!: VesProcessService;
   @inject(VesProcessWatcher)
-  protected readonly vesProcessWatcher: VesProcessWatcher;
+  protected readonly vesProcessWatcher!: VesProcessWatcher;
   @inject(VesProjectService)
-  protected readonly vesProjectsService: VesProjectService;
+  protected readonly vesProjectsService!: VesProjectService;
 
   // connected rumble pack
   protected _connectedRumblePack: SerialPort | undefined;
@@ -142,22 +142,6 @@ export class VesRumblePackService {
 
   async sendCommandSetFrequency(frequency: number): Promise<void> {
     return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetOverdrive(overdrive: number): Promise<void> {
-    return this.sendCommand(`SCO ODC ${overdrive.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetPositiveSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SCO SPT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetNegativeSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SCO SNT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetBreak(breakValue: number): Promise<void> {
-    return this.sendCommand(`SCO BRT ${breakValue.toString().padStart(3, '0')}`);
   }
 
   async sendCommandEmulateVbByte(byte: string): Promise<void> {

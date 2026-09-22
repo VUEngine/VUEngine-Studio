@@ -25,30 +25,6 @@ export const RumbleEffectType: ProjectDataType = {
                 type: 'integer',
                 default: 160
             },
-            sustainPositive: {
-                type: 'integer',
-                maximum: 255,
-                minimum: 0,
-                default: 255
-            },
-            sustainNegative: {
-                type: 'integer',
-                maximum: 255,
-                minimum: 0,
-                default: 255
-            },
-            overdrive: {
-                type: 'integer',
-                maximum: 126,
-                minimum: 0,
-                default: 126
-            },
-            break: {
-                type: 'integer',
-                maximum: 255,
-                minimum: 0,
-                default: 255
-            },
             stopBeforeStarting: {
                 type: 'boolean',
                 default: true
