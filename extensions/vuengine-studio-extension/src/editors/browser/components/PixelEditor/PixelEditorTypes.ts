@@ -3,6 +3,8 @@ import { Displays } from '../Common/VUEngineTypes';
 
 export const DEFAULT_IMAGE_SIZE = 16;
 
+export const TILE_SIZE = 8;
+
 export interface LayerPixelData {
     id: string;
     data: (number | null)[][];

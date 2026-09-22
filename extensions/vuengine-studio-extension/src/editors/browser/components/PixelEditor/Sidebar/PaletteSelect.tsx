@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import { DottingRef, useBrush, useHandlers } from 'dotting';
+import { DottingRef, useBrush, useHandlers } from '../../Common/Dotting';
 import React, { useContext, useEffect } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorCommand, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -219,25 +219,29 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
                             : nls.localizeByDefault('Default')}
                     </PixelEditorTool>
                 }
-                {[...Array(paletteColors.length)].map((p, paletteIndex) =>
-                    <PixelEditorTool
+                {[...Array(paletteColors.length)].map((p, paletteIndex) => {
+                    // without the transparent slot, the first swatch is selected through the "1" command
+                    const paletteCommand = PALETTE_COMMANDS[includeTransparent ? paletteIndex : paletteIndex + 1];
+                    return <PixelEditorTool
                         key={paletteIndex}
                         className={primaryColorIndex === paletteIndex ? 'active' : ''}
                         style={{
-                            backgroundColor: paletteIndex === 0 ? 'var(--theia-editor-background)' : paletteColors[paletteIndex],
+                            backgroundColor: includeTransparent && paletteIndex === 0
+                                ? 'var(--theia-editor-background)'
+                                : paletteColors[paletteIndex],
                             color: '#fff',
                         }}
                         title={
-                            PALETTE_COMMANDS[paletteIndex].label +
-                            services.vesCommonService.getKeybindingLabel(PALETTE_COMMANDS[paletteIndex].id, true)
+                            paletteCommand.label +
+                            services.vesCommonService.getKeybindingLabel(paletteCommand.id, true)
                         }
                         onClick={() => setPrimaryColorIndex(paletteIndex)}
                         onContextMenu={() => setSecondaryColorIndex(paletteIndex)}
                     >
                         {primaryColorIndex === paletteIndex && 'L'}
                         {secondaryColorIndex === paletteIndex && 'R'}
-                    </PixelEditorTool>
-                )}
+                    </PixelEditorTool>;
+                })}
             </HContainer>
             { /* }
             <RadioSelect

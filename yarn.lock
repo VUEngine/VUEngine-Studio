@@ -8531,11 +8531,6 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dotting@^2.1.13:
-  version "2.1.13"
-  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.13.tgz#c9e3967fd341bb33574f49a0875938f704c05438"
-  integrity sha512-M+RMm2IMnVamoms+5vOJaaU1NURwfCM40hSjZhG5gJHCJRu9iH3x8iLDhsW5u+9zP2i5ANbtgHjkafYSyotWkA==
-
 drivelist@^12.0.2:
   version "12.0.2"
   resolved "https://registry.yarnpkg.com/drivelist/-/drivelist-12.0.2.tgz#2821250ccc0ee3161cc86b72724ee64bca72aa29"

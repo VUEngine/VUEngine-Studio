@@ -1,6 +1,6 @@
 import { Circle, Eraser, Hand, Minus, PaintBucket, PencilSimple, Selection, Square } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import { BrushTool, DottingRef, useBrush } from 'dotting';
+import { BrushTool, DottingRef, useBrush } from '../../Common/Dotting';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';

@@ -1,4 +1,4 @@
-import { BrushTool, DottingRef, useBrush } from 'dotting';
+import { BrushTool, DottingRef, useBrush } from '../../Common/Dotting';
 import React, { useContext } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';

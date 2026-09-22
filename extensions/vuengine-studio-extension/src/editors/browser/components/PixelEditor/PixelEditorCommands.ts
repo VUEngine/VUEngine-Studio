@@ -121,4 +121,9 @@ export namespace PixelEditorCommands {
         label: nls.localize('vuengine/editors/pixel/commands/toggleGrid', 'Toggle Grid'),
         category: nls.localize('vuengine/editors/pixel/commands/category', 'Pixel Editor'),
     };
+    export const TOGGLE_SECONDARY_GRID: EditorCommand = {
+        id: 'editors.pixelEditor.toggleSecondaryGrid',
+        label: nls.localize('vuengine/editors/pixel/commands/toggleSecondaryGrid', 'Toggle Tile Grid (8×8)'),
+        category: nls.localize('vuengine/editors/pixel/commands/category', 'Pixel Editor'),
+    };
 };

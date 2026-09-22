@@ -1,5 +1,5 @@
 import { StatusBarAlignment } from '@theia/core/lib/browser';
-import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
+import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from '../Common/Dotting';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { PixelEditorCommands } from './PixelEditorCommands';
@@ -7,12 +7,14 @@ import { PixelEditorCommands } from './PixelEditorCommands';
 interface PixelEditorStatusProps {
     gridSize: number
     setGridSize: (gridSize: number) => void
+    secondaryGridSize?: number
+    setSecondaryGridSize?: (secondaryGridSize: number) => void
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorStatus(props: PixelEditorStatusProps): React.JSX.Element {
     const { setStatusBarItem, removeStatusBarItem, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
-    const { gridSize, setGridSize, dottingRef } = props;
+    const { gridSize, setGridSize, secondaryGridSize, setSecondaryGridSize, dottingRef } = props;
     const {
         addHoverPixelChangeListener,
         removeHoverPixelChangeListener,
@@ -27,15 +29,31 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         setGridSize(gridSize > 0 ? 0 : 1);
     };
 
+    const toggleSecondaryGrid = (): void => {
+        if (setSecondaryGridSize) {
+            setSecondaryGridSize(secondaryGridSize ? 0 : 1);
+        }
+    };
+
     const setStatusBarItems = () => {
         setStatusBarItem('ves-editors-sprite-grid-toggle', {
             alignment: StatusBarAlignment.RIGHT,
             command: PixelEditorCommands.TOGGLE_GRID.id,
             className: gridSize === 0 ? 'disabled' : undefined,
             priority: 7,
-            text: '$(fa-th-large)',
+            text: '$(fa-th)',
             tooltip: PixelEditorCommands.TOGGLE_GRID.label,
         });
+        if (setSecondaryGridSize) {
+            setStatusBarItem('ves-editors-sprite-secondary-grid-toggle', {
+                alignment: StatusBarAlignment.RIGHT,
+                command: PixelEditorCommands.TOGGLE_SECONDARY_GRID.id,
+                className: secondaryGridSize ? undefined : 'disabled',
+                priority: 6,
+                text: '$(fa-th-large)',
+                tooltip: PixelEditorCommands.TOGGLE_SECONDARY_GRID.label,
+            });
+        }
         if (canvasPanZoom) {
             setStatusBarItem('ves-editors-sprite-pan-zoom', {
                 alignment: StatusBarAlignment.RIGHT,
@@ -61,6 +79,7 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
 
     const removeStatusBarItems = () => {
         removeStatusBarItem('ves-editors-sprite-grid-toggle');
+        removeStatusBarItem('ves-editors-sprite-secondary-grid-toggle');
         removeStatusBarItem('ves-editors-sprite-dimensions');
         removeStatusBarItem('ves-editors-sprite-hover-coordinates');
         removeStatusBarItem('ves-editors-sprite-pan-zoom');
@@ -78,6 +97,9 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         switch (commandId) {
             case PixelEditorCommands.TOGGLE_GRID.id:
                 toggleGrid();
+                break;
+            case PixelEditorCommands.TOGGLE_SECONDARY_GRID.id:
+                toggleSecondaryGrid();
                 break;
         }
     };
@@ -97,6 +119,7 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         return () => disp.dispose();
     }, [
         gridSize,
+        secondaryGridSize,
     ]);
 
     useEffect(() => {
@@ -108,6 +131,7 @@ export default function PixelEditorStatus(props: PixelEditorStatusProps): React.
         canvasPanZoom,
         dimensions,
         gridSize,
+        secondaryGridSize,
         hoveredPixel,
     ]);
 

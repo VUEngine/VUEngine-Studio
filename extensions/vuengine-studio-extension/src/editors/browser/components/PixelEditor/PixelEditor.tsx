@@ -8,7 +8,7 @@ import {
     PixelModifyItem,
     useDotting,
     useHandlers
-} from 'dotting';
+} from '../Common/Dotting';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
@@ -18,7 +18,7 @@ import { PixelEditorCommands } from './PixelEditorCommands';
 import PixelEditorFrames from './PixelEditorFrames';
 import PixelEditorLayers from './PixelEditorLayers';
 import PixelEditorStatus from './PixelEditorStatus';
-import { LayerPixelData, PixelData } from './PixelEditorTypes';
+import { LayerPixelData, PixelData, TILE_SIZE } from './PixelEditorTypes';
 import PaletteSelect from './Sidebar/PaletteSelect';
 import PixelEditorActions from './Sidebar/PixelEditorActions';
 import PixelEditorCurrentToolSettings from './Sidebar/PixelEditorCurrentToolSettings';
@@ -67,6 +67,10 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const [currentFrame, setCurrentFrame] = useState<number>(0);
     const [gridSize, setGridSize] = useState<number>(1);
+    const [secondaryGridSize, setSecondaryGridSize] = useState<number>(1);
+    const [canvasReload, setCanvasReload] = useState<number>(0);
+
+    const reloadCanvas = (): void => setCanvasReload(c => c + 1);
 
     const commandListener = (commandId: string): void => {
         switch (commandId) {
@@ -139,34 +143,44 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
         }
         */
 
-        if (change.delta?.modifiedPixels) {
-            const updatedFrames = deepClone(data.frames);
-            updatedFrames[currentFrame] = [
-                ...updatedFrames[currentFrame].map(layer => ({
-                    ...layer,
-                    data: layer.data.map((row, rowIndex) => row.map((column, columnIndex) => {
-                        const modifiedPixel = change.delta?.modifiedPixels.find(m => m.columnIndex === columnIndex && m.rowIndex === rowIndex);
-                        if (modifiedPixel) {
-                            return modifiedPixel.color === '' ? null : PALETTE_INDICES[data.colorMode][modifiedPixel.color];
-                        }
-
-                        return column;
-                    }))
-                }))];
-
-            setFrames(updatedFrames);
+        if (!change.delta?.modifiedPixels.length) {
+            return;
         }
+
+        const modifiedPixels = new Map<string, string>();
+        change.delta.modifiedPixels.forEach(m => modifiedPixels.set(`${m.rowIndex}:${m.columnIndex}`, m.color));
+
+        const updatedFrames = deepClone(data.frames);
+        updatedFrames[currentFrame] = updatedFrames[currentFrame].map(layer => layer.id !== change.layerId
+            ? layer
+            : {
+                ...layer,
+                data: layer.data.map((row, rowIndex) => row.map((column, columnIndex) => {
+                    const modifiedPixelColor = modifiedPixels.get(`${rowIndex}:${columnIndex}`);
+                    if (modifiedPixelColor === undefined) {
+                        return column;
+                    }
+
+                    return modifiedPixelColor === '' ? null : PALETTE_INDICES[data.colorMode][modifiedPixelColor];
+                }))
+            });
+
+        setFrames(updatedFrames);
     };
 
     const dottingElem = useMemo(() => (
         <Dotting
             ref={dottingRef}
             backgroundColor='transparent'
-            brushColor={PALETTE_COLORS[data.colorMode][primaryColorIndex]}
+            brushColor={PALETTE_COLORS[data.colorMode][primaryColorIndex - 1] ?? '' /* index 0 is transparent, see PaletteSelect */}
             defaultPixelColor="#111" // {PALETTE_COLORS[data.colorMode][0]}
             gridStrokeColor="#222"
             gridStrokeWidth={gridSize}
             isGridVisible={gridSize > 0}
+            secondaryGridCellCount={TILE_SIZE}
+            secondaryGridStrokeColor="#555"
+            secondaryGridStrokeWidth={secondaryGridSize}
+            isSecondaryGridVisible={secondaryGridSize > 0}
             height={canvasHeight}
             initAutoScale={true}
             initLayers={convertToLayerProps(data.frames[currentFrame], data.colorMode)}
@@ -185,6 +199,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
     ), [
         data.colorMode,
         gridSize,
+        secondaryGridSize,
         canvasHeight,
         canvasWidth
     ]);
@@ -277,7 +292,7 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                             colorMode={data.colorMode}
                             frames={data.frames}
                             setFrames={setFrames}
-                            currentFrame={currentFrame}
+                            reloadCanvas={reloadCanvas}
                             dottingRef={dottingRef}
                         />
                     </VContainer>
@@ -317,11 +332,15 @@ export default function PixelEditor(props: PixelEditorProps): React.JSX.Element 
                 currentFrame={currentFrame}
                 setCurrentFrame={setCurrentFrame}
                 colorMode={data.colorMode}
+                canvasReload={canvasReload}
+                reloadCanvas={reloadCanvas}
                 dottingRef={dottingRef}
             />
             <PixelEditorStatus
                 gridSize={gridSize}
                 setGridSize={setGridSize}
+                secondaryGridSize={secondaryGridSize}
+                setSecondaryGridSize={setSecondaryGridSize}
                 dottingRef={dottingRef}
             />
         </VContainer>

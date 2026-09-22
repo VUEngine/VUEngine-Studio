@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import { CanvasInfoChangeHandler, DottingRef, useDotting, useHandlers } from 'dotting';
+import { CanvasInfoChangeHandler, DottingRef, useDotting, useHandlers } from '../../Common/Dotting';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import VContainer from '../../Common/Base/VContainer';
@@ -75,12 +75,12 @@ export default function PixelEditorNavigator(props: PixelEditorNavigatorProps): 
             : 0
         );
 
-        const r = canvasInfo.bottomRightCornerOffset.x - canvas.width;
+        const r = canvas ? canvasInfo.bottomRightCornerOffset.x - canvas.width : 0;
         setRightOffset(r > 0
             ? r / canvasInfo.gridSquareSize * scale
             : 0
         );
-        const b = canvasInfo.bottomRightCornerOffset.y - canvas.height;
+        const b = canvas ? canvasInfo.bottomRightCornerOffset.y - canvas.height : 0;
         setBottomOffset(b > 0
             ? b / canvasInfo.gridSquareSize * scale
             : 0

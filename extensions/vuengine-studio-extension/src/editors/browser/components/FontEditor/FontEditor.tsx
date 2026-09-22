@@ -1,7 +1,7 @@
 import { deepClone, nls } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
 import { ImageCompressionType } from 'vb-image-converter';
-import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
+import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from '../Common/Dotting';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
