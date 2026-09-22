@@ -108,6 +108,7 @@
     "@types/uuid": "^8.3.2",
     "@types/w3c-web-serial": "^1.0.5",
     "@types/w3c-web-usb": "^1.0.9",
+    "@types/yargs": "^17",
     "rimraf": "^2.7.1",
     "tslint": "^5.20.1",
     "typescript": "~5.9.3"
