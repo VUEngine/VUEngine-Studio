@@ -1,5 +1,5 @@
-import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, MessageService, PreferenceScope, PreferenceService, isOSX, isWindows, nls } from '@theia/core/lib/common';
+import { ApplicationShell, ConfirmDialog, OpenerService, QuickPickItem, QuickPickOptions, WidgetManager } from '@theia/core/lib/browser';
+import { CommandService, isOSX, isWindows, MessageService, nls, PreferenceScope, PreferenceService } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -14,43 +14,47 @@ import { VesSocketWatcher } from '../../socket/browser/ves-socket-service-watche
 import { VesSocketService } from '../../socket/common/ves-socket-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import {
-  DEFAULT_EMULATOR_CONFIG,
   EmulatorConfig,
-  RED_VIPER_CONFIG,
-  RED_VIPER_VBLINK_CHUNK_SIZE_BYTES,
-  RED_VIPER_VBLINK_PORT,
+  emulatorHardwareModeLabels,
+  VbHardwareMode,
   VbLinkStatus,
   VbLinkStatusData,
-} from './ves-emulator-types';
+} from 'vueport-core/lib/browser/emulator-types';
+import { EMULATOR_SAVE_SLOTS } from 'vueport-core/lib/common/emulator-sram';
+import { RED_VIPER_CONFIG, RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, RED_VIPER_VBLINK_PORT, VES_EMULATOR_WIDGET_ID, defaultEmulatorConfig } from './ves-emulator-types';
+// type only to not cause an injection loop
+import type { VesEmulatorWidget } from './ves-emulator-widget';
 
 export const ROM_PLACEHOLDER = '%ROM%';
 
 @injectable()
 export class VesEmulatorService {
   @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
+  protected readonly shell!: ApplicationShell;
   @inject(CommandService)
-  protected readonly commandService: CommandService;
+  protected readonly commandService!: CommandService;
   @inject(FileService)
-  private readonly fileService: FileService;
+  private readonly fileService!: FileService;
   @inject(MessageService)
-  private readonly messageService: MessageService;
+  private readonly messageService!: MessageService;
   @inject(OpenerService)
-  private readonly openerService: OpenerService;
+  private readonly openerService!: OpenerService;
   @inject(PreferenceService)
-  private readonly preferenceService: PreferenceService;
+  private readonly preferenceService!: PreferenceService;
   @inject(QuickPickService)
-  private readonly quickPickService: QuickPickService;
+  private readonly quickPickService!: QuickPickService;
   @inject(VesBuildService)
-  private readonly vesBuildService: VesBuildService;
+  private readonly vesBuildService!: VesBuildService;
   @inject(VesProcessService)
-  private readonly vesProcessService: VesProcessService;
+  private readonly vesProcessService!: VesProcessService;
   @inject(VesProjectService)
-  protected readonly vesProjectsService: VesProjectService;
+  protected readonly vesProjectsService!: VesProjectService;
   @inject(VesSocketService)
-  protected readonly vesSocketService: VesSocketService;
+  protected readonly vesSocketService!: VesSocketService;
   @inject(VesSocketWatcher)
-  protected readonly vesSocketWatcher: VesSocketWatcher;
+  protected readonly vesSocketWatcher!: VesSocketWatcher;
+  @inject(WidgetManager)
+  protected readonly widgetManager!: WidgetManager;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -118,12 +122,64 @@ export class VesEmulatorService {
         return;
       }
 
-      const selectedEmulator = (selection.label === DEFAULT_EMULATOR_CONFIG.name)
+      const selectedEmulator = (selection.label === defaultEmulatorConfig().name)
         ? ''
         : selection.label;
 
       this.preferenceService.set(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, selectedEmulator, PreferenceScope.User);
     });
+  }
+
+  async selectHardwareMode(): Promise<void> {
+    const labels = emulatorHardwareModeLabels();
+    const current = this.preferenceService.get<string>(
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_HARDWARE_MODE, VbHardwareMode.AUTO
+    );
+    const modes = [VbHardwareMode.AUTO, VbHardwareMode.VIRTUAL_BOY, VbHardwareMode.VB_COLOR];
+    const selection = await this.quickPickService.show<QuickPickItem>(
+      modes.map(mode => ({
+        id: mode,
+        label: labels[mode],
+        iconClasses: ['codicon', mode === current ? 'codicon-pass-filled' : 'codicon-circle-large'],
+      })),
+      {
+        title: nls.localize('vuengine/emulator/selectHardwareModeTitle', 'Select hardware mode'),
+        placeholder: nls.localize(
+          'vuengine/emulator/selectHardwareModePlaceholder',
+          'Which console should be emulated?'
+        ),
+      }
+    );
+    if (selection?.id) {
+      await this.preferenceService.set(
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_HARDWARE_MODE, selection.id, PreferenceScope.User
+      );
+    }
+  }
+
+  async selectSaveGameSlot(): Promise<void> {
+    const current = this.preferenceService.get<string>(
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SAVE_GAME_SLOT, EMULATOR_SAVE_SLOTS[0]
+    );
+    const selection = await this.quickPickService.show<QuickPickItem>(
+      EMULATOR_SAVE_SLOTS.map(slot => ({
+        id: slot,
+        label: nls.localize('vuengine/emulator/saveGameSlotItem', 'Slot {0}', slot),
+        iconClasses: ['codicon', slot === current ? 'codicon-pass-filled' : 'codicon-circle-large'],
+      })),
+      {
+        title: nls.localize('vuengine/emulator/selectSaveGameSlotTitle', 'Select save game slot'),
+        placeholder: nls.localize(
+          'vuengine/emulator/selectSaveGameSlotPlaceholder',
+          'Which save file should the game save on?'
+        ),
+      }
+    );
+    if (selection?.id) {
+      await this.preferenceService.set(
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SAVE_GAME_SLOT, selection.id, PreferenceScope.User
+      );
+    }
   }
 
   async run(): Promise<void> {
@@ -270,19 +326,19 @@ export class VesEmulatorService {
   }
 
   async runInEmulator(): Promise<void> {
-    const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
+    const selected = this.getDefaultEmulatorConfig();
     const romUri = await this.vesBuildService.getDefaultRomUri();
-    if (defaultEmulatorConfig.name === DEFAULT_EMULATOR_CONFIG.name) {
+    if (selected.name === defaultEmulatorConfig().name) {
       return this.runInBuiltInEmulator(romUri);
-    } else if (defaultEmulatorConfig.name === RED_VIPER_CONFIG.name) {
+    } else if (selected.name === RED_VIPER_CONFIG.name) {
       return this.runInRedViper();
     } else {
-      const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
-        ? `/${defaultEmulatorConfig.path}`
-        : defaultEmulatorConfig.path;
+      const emulatorPath = isWindows && !selected.path.startsWith('/')
+        ? `/${selected.path}`
+        : selected.path;
       const emulatorUri = new URI(emulatorPath).withScheme('file');
       const romPath = await this.fileService.fsPath(romUri);
-      let args = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
+      let args = selected.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
       if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         this.messageService.error(
@@ -309,6 +365,55 @@ export class VesEmulatorService {
   async runInBuiltInEmulator(romUri: URI): Promise<void> {
     const opener = await this.openerService.getOpener(romUri);
     await opener.open(romUri);
+  }
+
+  async linkSecondPlayer(primary: VesEmulatorWidget): Promise<void> {
+    if (primary.isLinked()) {
+      return;
+    }
+    if (primary.getLinkedPeer()) {
+      return this.relinkPlayers(primary);
+    }
+
+    const romUri = primary.getResourceUri();
+    if (!romUri) {
+      return;
+    }
+
+    const uri = romUri.withoutFragment().toString();
+
+    const widget = await this.widgetManager.getOrCreateWidget<VesEmulatorWidget>(
+      VES_EMULATOR_WIDGET_ID,
+      { uri, instanceId: `link-${Date.now()}-2`, player: 2 }
+    );
+    primary.setLinkedPeer(widget);
+    widget.setLinkedPeer(primary);
+
+    if (!widget.isAttached) {
+      this.shell.addWidget(widget, {
+        area: 'main',
+        mode: 'split-right',
+        ref: primary,
+      });
+    }
+    await this.shell.activateWidget(widget.id);
+
+    primary.setPlayerLabel(1);
+    await widget.linkTo(primary);
+  }
+
+  async unlinkPlayers(widget: VesEmulatorWidget): Promise<void> {
+    await widget.unlinkFromPeer();
+  }
+
+  async relinkPlayers(widget: VesEmulatorWidget): Promise<void> {
+    const peer = widget.getLinkedPeer();
+    if (!peer || widget.isLinked()) {
+      return;
+    }
+    const [host, guest] = widget.player === 2 ? [peer, widget] : [widget, peer];
+    await host.startLink();
+    await guest.linkTo(host);
   }
 
   async runInRedViper(): Promise<void> {
@@ -343,21 +448,21 @@ export class VesEmulatorService {
     const emulatorConfigs: EmulatorConfig[] = this.getEmulatorConfigs();
     const defaultEmulatorName: string = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) as string;
 
-    let defaultEmulatorConfig = DEFAULT_EMULATOR_CONFIG;
+    let selected = defaultEmulatorConfig();
     for (const emulatorConfig of emulatorConfigs) {
       if (emulatorConfig.name === defaultEmulatorName) {
-        defaultEmulatorConfig = emulatorConfig;
+        selected = emulatorConfig;
       }
     }
 
-    return defaultEmulatorConfig;
+    return selected;
   }
 
   getEmulatorConfigs(): EmulatorConfig[] {
     const customEmulatorConfigs: EmulatorConfig[] = this.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS) ?? [];
 
     const emulatorConfigs = [
-      DEFAULT_EMULATOR_CONFIG,
+      defaultEmulatorConfig(),
       {
         ...RED_VIPER_CONFIG,
         path: this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, ''),

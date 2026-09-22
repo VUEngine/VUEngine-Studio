@@ -14,6 +14,7 @@ const StyledContainer = styled.div`
     justify-content: center;
     padding: calc(var(--theia-ui-padding) * 2);
     position: absolute;
+    text-align: center;
 `;
 
 interface EmptyContainerProps {

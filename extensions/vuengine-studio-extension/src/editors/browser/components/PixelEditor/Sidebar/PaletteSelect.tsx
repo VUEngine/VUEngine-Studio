@@ -229,7 +229,7 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
                         }}
                         title={
                             PALETTE_COMMANDS[paletteIndex].label +
-                            services.vesCommonService.getKeybindingLabel(PALETTE_COMMANDS[paletteIndex].id, true)
+                            services.vesKeybindingService.getKeybindingLabel(PALETTE_COMMANDS[paletteIndex].id, true)
                         }
                         onClick={() => setPrimaryColorIndex(paletteIndex)}
                         onContextMenu={() => setSecondaryColorIndex(paletteIndex)}

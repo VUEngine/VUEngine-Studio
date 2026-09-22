@@ -6,3 +6,21 @@
     background-color: var(--theia-titleBar-activeBackground);
     color: #fff;
 }
+
+.ves-capture-keybinding-current {
+    opacity: 0.7;
+    padding-top: calc(var(--theia-ui-padding) * 2);
+    text-align: center;
+}
+
+.ves-capture-keybinding-preview:not(:empty) {
+    align-self: center;
+    background-color: var(--theia-keybindingLabel-background);
+    border: 1px solid var(--theia-keybindingLabel-border);
+    border-radius: 3px;
+    color: var(--theia-keybindingLabel-foreground);
+    display: inline-block;
+    font-family: var(--theia-ui-font-family);
+    margin-top: calc(var(--theia-ui-padding) * 2);
+    padding: 2px 6px;
+}

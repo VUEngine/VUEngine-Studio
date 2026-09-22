@@ -121,7 +121,7 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                         <InputWithActionButton
                             className='theia-button secondary'
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
-                            title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesCommonService.getKeybindingLabel(
+                            title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesKeybindingService.getKeybindingLabel(
                                 SoundEditorCommands.ADD_TRACK.id,
                                 true
                             )}`}

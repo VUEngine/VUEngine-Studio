@@ -17,6 +17,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Prefer HTTPS over SSH for GitHub
+        shell: bash
+        run: |
+          git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+
       - name: Checkout
         uses: actions/checkout@v3
         with:

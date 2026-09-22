@@ -2,7 +2,7 @@ import { HoverService } from '@theia/core/lib/browser';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import React from 'react';
 import styled from 'styled-components';
-import { VesCommonService } from '../../../core/browser/ves-common-service';
+import { VesKeybindingService } from '../../../core/browser/ves-keybinding-service';
 
 const StyledApplicationTitle = styled.button`
     -webkit-app-region: no-drag;
@@ -63,12 +63,12 @@ interface ApplicationTitleProps {
     isCollaboration: boolean
     openRecentWorkspace: () => void
     closeWorkspace: () => void
-    vesCommonService: VesCommonService
+    vesKeybindingService: VesKeybindingService
     hoverService: HoverService
 }
 
 export default function ApplicationTitle(props: ApplicationTitleProps): React.JSX.Element {
-    const { applicationTitle, isWorkspaceOpened, isCollaboration, openRecentWorkspace, closeWorkspace, vesCommonService, hoverService } = props;
+    const { applicationTitle, isWorkspaceOpened, isCollaboration, openRecentWorkspace, closeWorkspace, vesKeybindingService, hoverService } = props;
 
     return (
         <StyledApplicationTitle
@@ -76,7 +76,7 @@ export default function ApplicationTitle(props: ApplicationTitleProps): React.JS
             onMouseEnter={event => {
                 hoverService.requestHover({
                     content: WorkspaceCommands.OPEN_RECENT_WORKSPACE.label +
-                        vesCommonService.getKeybindingLabel(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id, true),
+                        vesKeybindingService.getKeybindingLabel(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id, true),
                     target: event.currentTarget,
                     position: 'bottom',
                 });
@@ -95,7 +95,7 @@ export default function ApplicationTitle(props: ApplicationTitleProps): React.JS
                     onMouseEnter={event => {
                         hoverService.requestHover({
                             content: WorkspaceCommands.CLOSE.label +
-                                vesCommonService.getKeybindingLabel(WorkspaceCommands.CLOSE.id, true),
+                                vesKeybindingService.getKeybindingLabel(WorkspaceCommands.CLOSE.id, true),
                             target: event.currentTarget,
                             position: 'bottom',
                         });

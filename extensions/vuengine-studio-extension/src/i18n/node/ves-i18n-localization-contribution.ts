@@ -4,6 +4,7 @@ import { LocalizationContribution, LocalizationRegistry } from '@theia/core/lib/
 @injectable()
 export class VesLocalizationContribution implements LocalizationContribution {
   async registerLocalizations(registry: LocalizationRegistry): Promise<void> {
+    // VES
     registry.registerLocalizationFromRequire('cs', require('../../../i18n/nls.cs.json'));
     registry.registerLocalizationFromRequire('de', require('../../../i18n/nls.de.json'));
     registry.registerLocalizationFromRequire('en', require('../../../i18n/nls.json'));
@@ -17,5 +18,20 @@ export class VesLocalizationContribution implements LocalizationContribution {
     registry.registerLocalizationFromRequire('pt-pt', require('../../../i18n/nls.pt-pt.json'));
     registry.registerLocalizationFromRequire('ru', require('../../../i18n/nls.ru.json'));
     registry.registerLocalizationFromRequire('zh-cn', require('../../../i18n/nls.zh-cn.json'));
+
+    // VUEPort
+    registry.registerLocalizationFromRequire('cs', require('vueport-core/i18n/nls.cs.json'));
+    registry.registerLocalizationFromRequire('de', require('vueport-core/i18n/nls.de.json'));
+    registry.registerLocalizationFromRequire('en', require('vueport-core/i18n/nls.json'));
+    registry.registerLocalizationFromRequire('es', require('vueport-core/i18n/nls.es.json'));
+    registry.registerLocalizationFromRequire('fr', require('vueport-core/i18n/nls.fr.json'));
+    registry.registerLocalizationFromRequire('hu', require('vueport-core/i18n/nls.hu.json'));
+    registry.registerLocalizationFromRequire('it', require('vueport-core/i18n/nls.it.json'));
+    registry.registerLocalizationFromRequire('ja', require('vueport-core/i18n/nls.ja.json'));
+    registry.registerLocalizationFromRequire('pl', require('vueport-core/i18n/nls.pl.json'));
+    registry.registerLocalizationFromRequire('pt-br', require('vueport-core/i18n/nls.pt-br.json'));
+    registry.registerLocalizationFromRequire('pt-pt', require('vueport-core/i18n/nls.pt-pt.json'));
+    registry.registerLocalizationFromRequire('ru', require('vueport-core/i18n/nls.ru.json'));
+    registry.registerLocalizationFromRequire('zh-cn', require('vueport-core/i18n/nls.zh-cn.json'));
   }
 }

@@ -66,7 +66,7 @@ interface PianoRollHeaderProps {
     currentSequenceIndex: number
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -94,7 +94,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         tool,
         currentTrackId, currentPatternId, currentSequenceIndex,
         currentPlayerPosition, setCurrentPlayerPosition,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         pianoRollNoteWidth, pianoRollNoteHeight,
@@ -147,7 +147,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             currentPatternId={currentPatternId}
             currentSequenceIndex={currentSequenceIndex}
             setCurrentPlayerPosition={setCurrentPlayerPosition}
-            setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+            setPlayerSeekRequest={setPlayerSeekRequest}
             playRangeStart={playRangeStart}
             setPlayRangeStart={setPlayRangeStart}
             playRangeEnd={playRangeEnd}

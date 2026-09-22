@@ -22,6 +22,7 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { PROJECT_TYPES } from '../../project/browser/ves-project-data';
 import { nanoid, stringify } from './components/Common/Utils';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
+import { GRAPHICAL_EDITOR_FOCUS_CONTEXT } from './ves-editors-context-key-service';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
 
@@ -237,7 +238,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     command.keybinding.map(keybinding =>
                         registry.registerKeybindings({
                             command: command.id,
-                            when: 'graphicalEditorFocus',
+                            when: GRAPHICAL_EDITOR_FOCUS_CONTEXT,
                             keybinding,
                         })
                     );

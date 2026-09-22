@@ -23,7 +23,9 @@ import { VesBuildPathsService } from '../../build/browser/ves-build-paths-servic
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesKeybindingService } from '../../core/browser/ves-keybinding-service';
 import { EditorsContext } from '../../editors/browser/ves-editors-types';
+import { EmulatorCoreService } from 'vueport-core/lib/browser/emulator-core-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -81,6 +83,10 @@ export class VesProjectDashboardWidget extends ReactWidget {
     protected readonly vesCodeGenService!: VesCodeGenService;
     @inject(VesCommonService)
     protected readonly vesCommonService!: VesCommonService;
+    @inject(VesKeybindingService)
+    protected readonly vesKeybindingService!: VesKeybindingService;
+    @inject(EmulatorCoreService)
+    protected readonly vesEmulatorCoreService!: EmulatorCoreService;
     @inject(VesImagesService)
     protected readonly vesImagesService!: VesImagesService;
     @inject(VesPluginsService)
@@ -218,7 +224,9 @@ export class VesProjectDashboardWidget extends ReactWidget {
                             vesBuildService: this.vesBuildService,
                             vesCodeGenService: this.vesCodeGenService,
                             vesCommonService: this.vesCommonService,
+                            vesEmulatorCoreService: this.vesEmulatorCoreService,
                             vesImagesService: this.vesImagesService,
+                            vesKeybindingService: this.vesKeybindingService,
                             vesPluginsService: this.vesPluginsService,
                             vesProcessService: this.vesProcessService,
                             vesProcessWatcher: this.vesProcessWatcher,

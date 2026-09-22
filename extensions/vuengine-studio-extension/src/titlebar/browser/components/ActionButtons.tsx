@@ -4,8 +4,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { VesBuildCommands } from '../../../build/browser/ves-build-commands';
 import { BuildResult, BuildStatus } from '../../../build/browser/ves-build-types';
-import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { EmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
+import { VesKeybindingService } from '../../../core/browser/ves-keybinding-service';
+import { VesEmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../../flash-cart/browser/ves-flash-cart-commands';
 
@@ -116,7 +116,7 @@ interface ActionButtonsProps {
     exportRom: () => void
     clean: () => void
     openBuildMenu: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
-    vesCommonService: VesCommonService
+    vesKeybindingService: VesKeybindingService
     hoverService: HoverService
 }
 
@@ -131,7 +131,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
         romExists,
         build, run, flash, exportRom, clean,
         openBuildMenu,
-        vesCommonService,
+        vesKeybindingService,
         hoverService,
     } = props;
 
@@ -162,7 +162,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                     hoverService.requestHover({
                         content: buildStatus.active
                             ? `${nls.localize('vuengine/build/building', 'Building')}... ${buildStatus.progress}%`
-                            : `${VesBuildCommands.BUILD.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`,
+                            : `${VesBuildCommands.BUILD.label}${vesKeybindingService.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });
@@ -187,7 +187,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                     hoverService.requestHover({
                         content: runIsQueued
                             ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                            : `${EmulatorCommands.RUN.label}${vesCommonService.getKeybindingLabel(EmulatorCommands.RUN.id, true)}`,
+                            : `${VesEmulatorCommands.RUN.label}${vesKeybindingService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });
@@ -213,7 +213,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                             ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
                             : isFlashing
                                 ? `Flashing... ${flashingProgress}%`
-                                : `${VesFlashCartCommands.FLASH.label}${vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`,
+                                : `${VesFlashCartCommands.FLASH.label}${vesKeybindingService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });
@@ -234,7 +234,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                 className="export"
                 onMouseEnter={event => {
                     hoverService.requestHover({
-                        content: `${VesExportCommands.EXPORT.label}${vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`,
+                        content: `${VesExportCommands.EXPORT.label}${vesKeybindingService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });
@@ -251,7 +251,7 @@ export default function ActionButtons(props: ActionButtonsProps): React.JSX.Elem
                 className={'clean' + (isCleaning ? ' active' : '')}
                 onMouseEnter={event => {
                     hoverService.requestHover({
-                        content: isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`,
+                        content: isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${vesKeybindingService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`,
                         target: event.currentTarget,
                         position: 'bottom',
                     });

@@ -166,7 +166,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
             <StyledToggleButton
                 onClick={toggleEffectsPanel}
                 title={
-                    `${SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                    `${SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.label}${services.vesKeybindingService.getKeybindingLabel(
                         SoundEditorCommands.TOGGLE_EFFECTS_PANEL_VISIBILITY.id, true
                     )}`
                 }

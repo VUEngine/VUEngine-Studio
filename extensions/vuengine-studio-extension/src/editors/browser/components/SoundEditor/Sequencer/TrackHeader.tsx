@@ -194,7 +194,7 @@ export default function TrackHeader(props: TrackHeaderProps): React.JSX.Element 
         onClick={onClick}
         onContextMenu={onClick}
         onDoubleClick={editCurrentTrack}
-        title={`${trackCommand.label}${services.vesCommonService.getKeybindingLabel(trackCommand.id, true)}`}
+        title={`${trackCommand.label}${services.vesKeybindingService.getKeybindingLabel(trackCommand.id, true)}`}
         style={{
             cursor: tool === SoundEditorTool.ERASER ? getToolModeCursor(tool) : undefined,
             minHeight: sequencerPatternHeight,

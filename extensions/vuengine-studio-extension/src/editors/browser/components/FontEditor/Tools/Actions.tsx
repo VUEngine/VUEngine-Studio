@@ -137,7 +137,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/rotate', 'Rotate') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.ROTATE.id, true)
+                        services.vesKeybindingService.getKeybindingLabel(FontEditorCommands.ROTATE.id, true)
                     }
                     onClick={rotate}
                 >
@@ -146,7 +146,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/mirrorHorizontally', 'Mirror Horizontally') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_HORIZONTALLY.id, true)
+                        services.vesKeybindingService.getKeybindingLabel(FontEditorCommands.MIRROR_HORIZONTALLY.id, true)
                     }
                     onClick={mirrorHorizontally}
                 >
@@ -155,7 +155,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/mirrorVertically', 'Mirror Vertically') +
-                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_VERTICALLY.id, true)
+                        services.vesKeybindingService.getKeybindingLabel(FontEditorCommands.MIRROR_VERTICALLY.id, true)
                     }
                     onClick={mirrorVertically}
                 >
@@ -165,7 +165,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/copy', 'Copy Current Character') +
-                        services.vesCommonService.getKeybindingLabel(CommonCommands.COPY.id, true)
+                        services.vesKeybindingService.getKeybindingLabel(CommonCommands.COPY.id, true)
                     }
                     onClick={copy}
                 >
@@ -174,7 +174,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <PixelEditorTool
                     title={
                         nls.localize('vuengine/editors/font/actions/paste', 'Paste To Current Character') +
-                        services.vesCommonService.getKeybindingLabel(CommonCommands.PASTE.id, true)
+                        services.vesKeybindingService.getKeybindingLabel(CommonCommands.PASTE.id, true)
                     }
                     onClick={paste}
                 >

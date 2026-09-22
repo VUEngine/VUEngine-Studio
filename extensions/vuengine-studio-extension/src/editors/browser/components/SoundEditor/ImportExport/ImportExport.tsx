@@ -65,7 +65,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
                 className='theia-button secondary'
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.IMPORT.id)}
                 title={SoundEditorCommands.IMPORT.label +
-                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.IMPORT.id, true)}
+                    services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.IMPORT.id, true)}
             >
                 <FileArrowDown size={17} /> {nls.localize('vuengine/editors/sound/import', 'Import')}
             </button>
@@ -73,7 +73,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
                 className='theia-button secondary'
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.EXPORT.id)}
                 title={SoundEditorCommands.EXPORT.label +
-                    services.vesCommonService.getKeybindingLabel(SoundEditorCommands.EXPORT.id, true)}
+                    services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.EXPORT.id, true)}
             >
                 <FileArrowUp size={17} /> {nls.localize('vuengine/editors/sound/export', 'Export')}
             </button>

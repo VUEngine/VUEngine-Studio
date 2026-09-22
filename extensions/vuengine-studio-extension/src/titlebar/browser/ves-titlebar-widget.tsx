@@ -11,9 +11,9 @@ import styled from 'styled-components';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { buildMenuPath } from '../../build/browser/ves-build-contribution';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesKeybindingService } from '../../core/browser/ves-keybinding-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
-import { EmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -75,8 +75,8 @@ export class TitlebarWidget extends ReactWidget {
     protected readonly hoverService!: HoverService;
     @inject(KeybindingRegistry)
     protected readonly keybindingRegistry!: KeybindingRegistry;
-    @inject(VesCommonService)
-    protected readonly vesCommonService!: VesCommonService;
+    @inject(VesKeybindingService)
+    protected readonly vesKeybindingService!: VesKeybindingService;
     @inject(WindowTitleService)
     private readonly windowTitleService!: WindowTitleService;
     @inject(VesBuildService)
@@ -156,7 +156,7 @@ export class TitlebarWidget extends ReactWidget {
                         isCollaboration={this.workspaceService.isCollaboration()}
                         openRecentWorkspace={this.openRecentWorkspace.bind(this)}
                         closeWorkspace={this.closeWorkspace.bind(this)}
-                        vesCommonService={this.vesCommonService}
+                        vesKeybindingService={this.vesKeybindingService}
                         hoverService={this.hoverService}
                     />
                 </div>
@@ -164,7 +164,7 @@ export class TitlebarWidget extends ReactWidget {
                     <MaximizeToggle
                         isMaximizedEditor={this.isMaximizedEditor}
                         collapse={this.collapse.bind(this)}
-                        vesCommonService={this.vesCommonService}
+                        vesKeybindingService={this.vesKeybindingService}
                         hoverService={this.hoverService}
                     />
                     <ActionButtons
@@ -185,7 +185,7 @@ export class TitlebarWidget extends ReactWidget {
                         exportRom={this.exportRom.bind(this)}
                         clean={this.clean.bind(this)}
                         openBuildMenu={this.openBuildMenu.bind(this)}
-                        vesCommonService={this.vesCommonService}
+                        vesKeybindingService={this.vesKeybindingService}
                         hoverService={this.hoverService}
                     />
                     <WindowControls
@@ -202,7 +202,7 @@ export class TitlebarWidget extends ReactWidget {
     }
 
     protected build = () => this.commandService.executeCommand(VesBuildCommands.BUILD.id);
-    protected run = () => this.commandService.executeCommand(EmulatorCommands.RUN.id);
+    protected run = () => this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
     protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
     protected exportRom = () => this.commandService.executeCommand(VesExportCommands.EXPORT.id);
     protected clean = () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);

@@ -1,7 +1,5 @@
 #vesEmulatorWidget {
-  container: emulator / inline-size;
   display: flex;
   flex-direction: column;
   outline: none;
-  padding: calc(var(--theia-ui-padding) * 2);
 }

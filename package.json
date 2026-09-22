@@ -138,10 +138,10 @@
   ],
   "workspaces": [
     "applications/*",
-    "extensions/*",
-    "packages/*"
+    "extensions/*"
   ],
   "resolutions": {
+    "@types/d3-dispatch": "3.0.6",
     "@types/node": "^22.20.1",
     "@types/puppeteer": "^5.4.7",
     "@yarnpkg/parsers": "3.0.0-rc.44",

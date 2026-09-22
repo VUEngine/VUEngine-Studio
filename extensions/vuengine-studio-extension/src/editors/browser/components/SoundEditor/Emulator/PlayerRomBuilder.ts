@@ -83,7 +83,7 @@ export default class PlayerRomBuilder {
                 isSoundEditorPreview: true,
                 miniVisualizer,
                 trackSettings,
-                startFromSramTick: false, // currentPlayerPosition > 0,
+                startFromSramTick: true,
                 currentPlayerPosition,
                 playRangeStart,
                 playRangeEnd,

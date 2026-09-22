@@ -370,6 +370,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
     const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
     const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
+    const [playerSeekRequest, setPlayerSeekRequest] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
     const [sidebarTab, setSidebarTab] = useState<SidebarTab>(SidebarTab.none);
@@ -1450,6 +1451,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             setNotes={setNotes}
                             setTrack={setTrack}
                             forcePlayerRomRebuild={forcePlayerRomRebuild}
+                            playerSeekRequest={playerSeekRequest}
                             setPlaying={setPlaying}
                         />
                         {soundData.tracks.length === 0
@@ -1507,7 +1509,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setRangeDragStartStep={setRangeDragStartStep}
                                         rangeDragEndStep={rangeDragEndStep}
                                         setRangeDragEndStep={setRangeDragEndStep}
-                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        setPlayerSeekRequest={setPlayerSeekRequest}
                                         noteCursor={noteCursor}
                                         setNoteCursor={updateNoteCursor}
                                         stepsPerNote={stepsPerNote}
@@ -1533,7 +1535,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         marqueeMode={marqueeMode}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
-                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        setPlayerSeekRequest={setPlayerSeekRequest}
                                         noteCursor={noteCursor}
                                         setNoteCursor={updateNoteCursor}
                                         currentPatternId={currentPatternId}

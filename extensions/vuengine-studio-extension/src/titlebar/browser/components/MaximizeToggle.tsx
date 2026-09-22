@@ -1,17 +1,17 @@
 import { CommonCommands, HoverService } from '@theia/core/lib/browser';
 import React from 'react';
-import { VesCommonService } from '../../../core/browser/ves-common-service';
+import { VesKeybindingService } from '../../../core/browser/ves-keybinding-service';
 import { WindowControlButton } from './WindowControls';
 
 interface MaximizeToggleProps {
     isMaximizedEditor: boolean
     collapse: () => void
-    vesCommonService: VesCommonService
+    vesKeybindingService: VesKeybindingService
     hoverService: HoverService
 }
 
 export default function MaximizeToggle(props: MaximizeToggleProps): React.JSX.Element {
-    const { isMaximizedEditor, collapse, vesCommonService, hoverService } = props;
+    const { isMaximizedEditor, collapse, vesKeybindingService, hoverService } = props;
 
     return (
         <WindowControlButton
@@ -21,7 +21,7 @@ export default function MaximizeToggle(props: MaximizeToggleProps): React.JSX.El
             }}
             onMouseEnter={event => {
                 hoverService.requestHover({
-                    content: `${CommonCommands.TOGGLE_MAXIMIZED.label}${vesCommonService.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`,
+                    content: `${CommonCommands.TOGGLE_MAXIMIZED.label}${vesKeybindingService.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`,
                     target: event.currentTarget,
                     position: 'bottom',
                 });

@@ -22,7 +22,7 @@ The following third party binaries that are shipped with VUEngine Studio come wi
 - HyperFlasherCli by thunderstruck
 - MSYS by the MinGW Project
 - prog-vb by William D. Jones
-- Retroarch Web with Beetle VB Core by the RetroArch and Mednafen teams
+- shrooms-vb-core by GuyPerfect
 
 ## Usage
 

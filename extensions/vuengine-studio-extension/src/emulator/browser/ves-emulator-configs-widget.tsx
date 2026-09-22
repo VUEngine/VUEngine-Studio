@@ -1,7 +1,7 @@
 import { CommandService, nls, PreferenceService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import * as React from '@theia/core/shared/react';
+import * as React from 'react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
@@ -11,15 +11,15 @@ import EmulatorConfigs from './components/EmulatorConfigs';
 @injectable()
 export class EmulatorConfigsWidget extends ReactWidget {
   @inject(CommandService)
-  private readonly commandService: CommandService;
+  private readonly commandService!: CommandService;
   @inject(FileService)
-  private readonly fileService: FileService;
+  private readonly fileService!: FileService;
   @inject(FileDialogService)
-  private readonly fileDialogService: FileDialogService;
+  private readonly fileDialogService!: FileDialogService;
   @inject(PreferenceService)
-  private readonly preferenceService: PreferenceService;
+  private readonly preferenceService!: PreferenceService;
   @inject(VesWorkspaceService)
-  private readonly workspaceService: VesWorkspaceService;
+  private readonly workspaceService!: VesWorkspaceService;
 
   static readonly ID = 'emulatorConfigsWidget';
   static readonly LABEL = nls.localize(

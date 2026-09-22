@@ -79,8 +79,10 @@
 		{%- set startTick = currentPlayerPosition * subNoteResolution -%}
 	{%- endif -%}
 
+	{%- set startFromTickValue = 0 if startFromSramTick else startTick -%}
+
 	{{- '\n\nconst bool startFromSramTick = ' ~ startFromSramTick ~ ';\n' -}}
-	{{- 'const uint32 startFromTick = ' ~ startTick ~ ';\n' -}}
+	{{- 'const uint32 startFromTick = ' ~ startFromTickValue ~ ';\n' -}}
 	{{- 'const bool miniVisualizer = ' ~ miniVisualizer ~ ';' -}}
 {%- endif -%}
 
