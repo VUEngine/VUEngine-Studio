@@ -3,8 +3,8 @@ import { AbstractViewContribution, CommonMenus, FrontendApplication, KeybindingR
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
+import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
-import { EmulatorCommands } from './ves-emulator-commands';
 
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
@@ -63,9 +63,9 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
         toolbar.registerItem({
-            id: EmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
-            command: EmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
-            tooltip: EmulatorCommands.CONFIG_WIDGET_TOGGLE.label,
+            id: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
+            command: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.id,
+            tooltip: VesEmulatorCommands.CONFIG_WIDGET_TOGGLE.label,
             priority: 1,
         });
         toolbar.registerItem({

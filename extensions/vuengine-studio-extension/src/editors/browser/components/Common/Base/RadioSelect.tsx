@@ -162,7 +162,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
             updateValue([i]);
         }
 
-        enableCommands();
+        enableCommands?.();
     };
 
     const updateValue = (i: number[]): void => {
@@ -179,15 +179,11 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     };
 
     const handleOnFocus = () => {
-        if (disableCommands) {
-            disableCommands();
-        }
+        disableCommands?.();
     };
 
     const handleOnBlur = () => {
-        if (enableCommands) {
-            enableCommands();
-        }
+        enableCommands?.();
     };
 
     useEffect(() => {

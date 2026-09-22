@@ -1,5 +1,4 @@
-import { isOSX, isWindows, nls } from '@theia/core';
-import { KeybindingRegistry } from '@theia/core/lib/browser';
+import { isOSX, isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -10,8 +9,6 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 export class VesCommonService {
   @inject(EnvVariablesServer)
   protected envVariablesServer!: EnvVariablesServer;
-  @inject(KeybindingRegistry)
-  protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(VesProcessService)
   protected readonly vesProcessService!: VesProcessService;
   @inject(VesProcessWatcher)
@@ -78,7 +75,7 @@ export class VesCommonService {
       : ';';
   }
 
-  base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
+  base64ToBytes(base64: string): Uint8Array {
     const binString = atob(base64);
     return Uint8Array.from(binString, m => m.codePointAt(0) ?? 0);
   }
@@ -112,7 +109,7 @@ export class VesCommonService {
     }
 
     const compressed = this.base64ToBytes(data);
-    const stream = new Blob([compressed], {
+    const stream = new Blob([compressed.buffer as ArrayBuffer], {
       type: 'application/json',
     }).stream();
     const compressedReadableStream = stream.pipeThrough(
@@ -132,30 +129,6 @@ export class VesCommonService {
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
     return !!urlPattern.test(url);
-  }
-
-  getKeybindingLabel(
-    commandId: string,
-    wrapInBrackets: boolean = false
-  ): string {
-    const keybindings = this.keybindingRegistry.getKeybindingsForCommand(commandId);
-    const keybindingAccelerators: string[] = [];
-    keybindings.forEach(k => {
-      if (k) {
-        keybindingAccelerators.push(
-          this.keybindingRegistry.acceleratorFor(k, '').join(', ')
-            .replace(/\s/, nls.localize('vuengine/general/space', 'Space'))
-            .replace(/\+/, nls.localize('vuengine/general/plus', 'Plus'))
-        );
-      }
-    });
-
-    let keybindingAccelerator = keybindingAccelerators.join(` ${nls.localize('vuengine/general/or', 'or')} `);
-    if (wrapInBrackets && keybindingAccelerator !== '') {
-      keybindingAccelerator = ` (${keybindingAccelerator})`;
-    }
-
-    return keybindingAccelerator;
   }
 
   protected async determineIsWslInstalled(): Promise<void> {

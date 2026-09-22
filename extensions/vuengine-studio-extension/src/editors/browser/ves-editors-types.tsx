@@ -16,10 +16,12 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { createContext } from 'react';
+import { EmulatorCoreService } from 'vueport-core/lib/browser/emulator-core-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesKeybindingService } from '../../core/browser/ves-keybinding-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -45,7 +47,9 @@ export interface EditorsServices {
     vesBuildService: VesBuildService
     vesCodeGenService: VesCodeGenService
     vesCommonService: VesCommonService
+    vesEmulatorCoreService: EmulatorCoreService
     vesImagesService: VesImagesService
+    vesKeybindingService: VesKeybindingService
     vesPluginsService: VesPluginsService,
     vesProcessService: VesProcessService,
     vesProcessWatcher: VesProcessWatcher,
@@ -55,8 +59,7 @@ export interface EditorsServices {
     workspaceService: WorkspaceService
 };
 
-// @ts-ignore
-export const EditorsContext = createContext<EditorsContextType>({});
+export const EditorsContext = createContext<EditorsContextType>({} as EditorsContextType);
 
 export interface EditorsContextType {
     fileUri: URI

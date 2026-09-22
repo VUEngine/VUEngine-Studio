@@ -121,7 +121,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                             className='theia-button secondary'
                             title={
                                 SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.label +
-                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.id, true)
+                                services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.id, true)
                             }
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.id)}
                         >
@@ -131,7 +131,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                             className='theia-button secondary'
                             title={
                                 SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.label +
-                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id, true)
+                                services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id, true)
                             }
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_STEP.id)}
                         >
@@ -141,7 +141,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                             className='theia-button secondary'
                             title={
                                 SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.label +
-                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id, true)
+                                services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id, true)
                             }
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_STEP.id)}
                         >
@@ -151,7 +151,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                             className='theia-button secondary'
                             title={
                                 SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.label +
-                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id, true)
+                                services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id, true)
                             }
                             onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id)}
                         >
@@ -211,7 +211,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                         options={[{
                                             label: <Magnet size={17} />,
                                             tooltip: SoundEditorCommands.TOGGLE_NOTE_SNAPPING.label +
-                                                services.vesCommonService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
+                                                services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.TOGGLE_NOTE_SNAPPING.id, true),
                                             value: true
                                         }]}
                                     />
@@ -335,7 +335,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                     className='theia-button secondary'
                                     title={
                                         SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.label +
-                                        services.vesCommonService.getKeybindingLabel(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true)
+                                        services.vesKeybindingService.getKeybindingLabel(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id, true)
                                     }
                                     onClick={() => {
                                         services.commandService.executeCommand(SoundEditorCommands.OPEN_INSTRUMENT_EDITOR.id);

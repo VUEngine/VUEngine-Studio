@@ -135,7 +135,7 @@ interface SequencerProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     noteCursor: number
     setNoteCursor: (step: number) => void
     stepsPerNote: number
@@ -169,7 +169,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         playRangeEnd, setPlayRangeEnd,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         noteCursor, setNoteCursor,
         stepsPerNote, stepsPerBar,
     } = props;
@@ -487,7 +487,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         <ScaleControls className="vertical">
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id)}
-                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id,
                     true
                 )}`}
@@ -496,7 +496,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id)}
-                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_RESET.id,
                     true
                 )}`}
@@ -505,7 +505,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id)}
-                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_INCREASE.id,
                     true
                 )}`}
@@ -516,7 +516,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         <ScaleControls>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id)}
-                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_REDUCE.id,
                     true
                 )}`}
@@ -525,7 +525,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id)}
-                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_RESET.id,
                     true
                 )}`}
@@ -534,7 +534,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id)}
-                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.SEQUENCER_HORIZONTAL_SCALE_INCREASE.id,
                     true
                 )}`}
@@ -567,7 +567,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             {soundData.tracks.length < VSU_NUMBER_OF_CHANNELS &&
                 <StyledAddTrackButton
                     onClick={() => services.commandService.executeCommand(SoundEditorCommands.ADD_TRACK.id)}
-                    title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesCommonService.getKeybindingLabel(
+                    title={`${SoundEditorCommands.ADD_TRACK.label}${services.vesKeybindingService.getKeybindingLabel(
                         SoundEditorCommands.ADD_TRACK.id,
                         true
                     )}`}
@@ -622,7 +622,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 rangeDragEndStep={rangeDragEndStep}
                 setRangeDragEndStep={setRangeDragEndStep}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
-                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                setPlayerSeekRequest={setPlayerSeekRequest}
                 trackSettings={trackSettings}
                 soloTrack={soloTrack}
                 editCurrentPattern={editCurrentPattern}

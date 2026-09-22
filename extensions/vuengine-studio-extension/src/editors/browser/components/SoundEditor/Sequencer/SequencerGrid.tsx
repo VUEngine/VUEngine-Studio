@@ -60,7 +60,7 @@ interface SequencerGridProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     trackSettings: TrackSettings[]
     soloTrack: number
     editCurrentPattern: () => void
@@ -94,7 +94,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         setCurrentPlayerPosition,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         trackSettings,
         soloTrack,
         editCurrentPattern,
@@ -560,7 +560,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             } else {
                 const step = Math.round(x / sequencerNoteWidth);
                 setCurrentPlayerPosition(step);
-                setForcePlayerRomRebuild(prev => prev + 1);
+                setPlayerSeekRequest(prev => prev + 1);
             }
         }
     };

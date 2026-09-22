@@ -1,8 +1,8 @@
 import { CommandService, nls, PreferenceService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { Message } from '@theia/core/shared/@lumino/messaging';
+import { Message } from '@lumino/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import * as React from '@theia/core/shared/react';
+import * as React from 'react';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import EmulatorSidebar from './components/EmulatorSidebar';

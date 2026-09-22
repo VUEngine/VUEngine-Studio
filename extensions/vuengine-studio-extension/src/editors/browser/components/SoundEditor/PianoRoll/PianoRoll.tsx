@@ -164,7 +164,7 @@ interface PianoRollProps {
     setCurrentInstrumentId: (instrumentId: string) => void
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -214,7 +214,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentSequenceIndex, setCurrentSequenceIndex,
         currentInstrumentId, setCurrentInstrumentId,
         currentPlayerPosition, setCurrentPlayerPosition,
-        setForcePlayerRomRebuild,
+        setPlayerSeekRequest,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
@@ -673,7 +673,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         <ScaleControls className="vertical">
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id,
                     true
                 )}`}
@@ -682,7 +682,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_RESET.id,
                     true
                 )}`}
@@ -691,7 +691,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_INCREASE.id,
                     true
                 )}`}
@@ -702,7 +702,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         <ScaleControls>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_REDUCE.id,
                     true
                 )}`}
@@ -711,7 +711,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_RESET.id,
                     true
                 )}`}
@@ -720,7 +720,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </button>
             <button
                 onClick={() => services.commandService.executeCommand(SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id)}
-                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.label}${services.vesCommonService.getKeybindingLabel(
+                title={`${SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.label}${services.vesKeybindingService.getKeybindingLabel(
                     SoundEditorCommands.PIANO_ROLL_HORIZONTAL_SCALE_INCREASE.id,
                     true
                 )}`}
@@ -751,7 +751,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             <StyledToggleButtonContainer>
                 <StyledToggleButton
                     onClick={() => setEventListHidden(prev => !prev)}
-                    title={`${SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                    title={`${SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.label}${services.vesKeybindingService.getKeybindingLabel(
                         SoundEditorCommands.TOGGLE_EVENT_LIST_VISIBILITY.id,
                         true
                     )}`}
@@ -761,7 +761,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 </StyledToggleButton>
                 <StyledToggleButton
                     onClick={() => setSequencerHidden(prev => !prev)}
-                    title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesCommonService.getKeybindingLabel(
+                    title={`${SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.label}${services.vesKeybindingService.getKeybindingLabel(
                         SoundEditorCommands.TOGGLE_SEQUENCER_VISIBILITY.id,
                         true
                     )}`}
@@ -778,7 +778,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentSequenceIndex={currentSequenceIndex}
                 currentPlayerPosition={currentPlayerPosition}
                 setCurrentPlayerPosition={setCurrentPlayerPosition}
-                setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                setPlayerSeekRequest={setPlayerSeekRequest}
                 playRangeStart={playRangeStart}
                 setPlayRangeStart={setPlayRangeStart}
                 playRangeEnd={playRangeEnd}

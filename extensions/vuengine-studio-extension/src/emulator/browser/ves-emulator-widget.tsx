@@ -1,207 +1,476 @@
-import { FileX } from '@phosphor-icons/react';
-import { CommandService, isWindows, nls, PreferenceScope, PreferenceService } from '@theia/core';
+import { CommandService, Disposable, Emitter, MessageService, nls, PreferenceService } from '@theia/core';
 import {
-  Endpoint,
+  ApplicationShell,
+  HoverService,
   KeybindingRegistry,
   LocalStorageService,
   Message,
-  NavigatableWidget,
-  ScopedKeybinding
+  NavigatableWidget
 } from '@theia/core/lib/browser';
+import { Endpoint } from '@theia/core/lib/browser/endpoint';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
+import { TabBar, Widget } from '@lumino/widgets';
 import {
   inject,
   injectable,
   postConstruct,
 } from '@theia/core/shared/inversify';
-import * as React from '@theia/core/shared/react';
+import * as React from 'react';
+import {
+  Camera,
+  Cpu,
+  FloppyDisk,
+  Keyboard,
+  Monitor,
+  SpeakerHigh,
+  Trophy,
+} from '@phosphor-icons/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import * as iconv from 'iconv-lite';
-import styled from 'styled-components';
+import { crc32 } from 'crc';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import EmptyContainer from '../../editors/browser/components/Common/EmptyContainer';
-import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
-import { EmulatorCommands } from './ves-emulator-commands';
-import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
-import { VesEmulatorService } from './ves-emulator-service';
+import { VesKeybindingService } from '../../core/browser/ves-keybinding-service';
+import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
+import { VesEmulatorRumblePack } from './ves-emulator-rumble';
+import { VueportRumblePack } from 'vueport-core/lib/common/emulator-rumble';
+import { formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { CachedAnswer, CachedAnswerRead } from 'vueport-core/lib/common/emulator-cached-answer';
+import { EmulatorCompanionLocation } from 'vueport-core/lib/common/emulator-sram';
+import { VueportInputBindings, VueportSettings } from 'vueport-core/lib/common/emulator-settings';
+import { VueportHover } from 'vueport-core/lib/browser/components/kit/KitContext';
+import { VesEmulatorSettings } from './ves-emulator-settings';
+import { VesEmulatorBindings } from './ves-emulator-bindings';
 import {
-  EMULATION_MODES,
-  EMULATION_SCALES,
-  EMULATION_STEREO_MODES,
-  EmulatorFunctionKeyCode,
+  buildDisplayMode,
+  VB_FRAME_RATE,
+  VbAnaglyphPalette,
+  DisplayMode,
+  VbPalette,
+  VbRenderingMode,
+} from 'vueport-core/lib/common/vb-constants';
+import { ProfileResult, Speed } from 'vueport-core/lib/common/vb-protocol';
+import InputSettings from 'vueport-core/lib/browser/components/settings/InputSettings';
+import { Emulator } from 'vueport-core/lib/browser/components/Emulator';
+import { EmulatorControlStrip } from 'vueport-core/lib/browser/components/EmulatorControlStrip';
+import {
+  freshSaveRam,
+  saveRamFileSize,
+  saveRamWindowBytes,
+  VesEmulatorSaveStateIdentity,
+} from 'vueport-core/lib/common/emulator-save-state';
+import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib/browser/emulator-input';
+import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
+import { VesEmulatorNotifications } from './ves-emulator-notifications';
+import { VesEmulatorStorage } from './ves-emulator-storage';
+import { VueportNotifications, VueportStorage } from 'vueport-core/lib/common/emulator-host';
+import { AnaglyphSwatch, PaletteSwatch } from 'vueport-core/lib/browser/components/EmulatorPalettes';
+import DisplaySettings from 'vueport-core/lib/browser/components/settings/DisplaySettings';
+import EmulationSettings from 'vueport-core/lib/browser/components/settings/EmulationSettings';
+import SaveDataSettings from 'vueport-core/lib/browser/components/settings/SaveDataSettings';
+import ScreenshotSettings from 'vueport-core/lib/browser/components/settings/ScreenshotSettings';
+import SoundSettings from 'vueport-core/lib/browser/components/settings/SoundSettings';
+import VbColorSettings from 'vueport-core/lib/browser/components/settings/VbColorSettings';
+import {
+  DISPLAY_SETTINGS,
+  EMULATION_SETTINGS,
+  SAVE_DATA_SETTINGS,
+  SCREENSHOT_SETTINGS,
+  SOUND_SETTINGS,
+  VB_COLOR_SETTINGS,
+} from 'vueport-core/lib/browser/components/settings/settings-index';
+import EmulatorScreenPreview from 'vueport-core/lib/browser/components/EmulatorScreenPreview';
+import EmulatorAchievementsSettings from 'vueport-core/lib/browser/components/EmulatorAchievementsSettings';
+import TitleBar from 'vueport-core/lib/browser/components/TitleBar';
+import {
+  SettingsTabSpec,
+  SettingsWindow,
+} from 'vueport-core/lib/browser/components/SettingsWindow';
+import { VbColorIcon } from 'vueport-core/lib/browser/components/kit/VbColorIcon';
+import { BreakpointManager } from '@theia/debug/lib/browser/breakpoint/breakpoint-manager';
+import { EditorManager } from '@theia/editor/lib/browser';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
+import { EsSoundSnapshot } from 'vueport-core/lib/browser/emulator-essound-player';
+import { VB_DEFAULT_DISPLAY_MODE } from 'vueport-core/lib/common/vb-constants';
+import { CompanionRom } from 'vueport-core/lib/browser/emulator-companion-files';
+import { SaveStateEntry, SaveStateMachine, SaveStateStore } from 'vueport-core/lib/browser/emulator-save-state-store';
+import { VesEmulatorCompanionFiles } from './ves-emulator-companion-files';
+import { readBuildModeFromMap, readElf, readElfPathFromMap } from 'vueport-core/lib/browser/core/emulator-elf';
+import {
+  makeSourcePathMapper,
+  parseDwarfLineTable,
+  recordedPathFor,
+  romOffsetOf,
+  sourcePathCandidates,
+  VesLineTable,
+  VesSourceRoot,
+} from 'vueport-core/lib/browser/core/emulator-line-table';
+import {
+  findFunctionAt,
+  functionDisplayName,
+  indexElfSymbols,
+  SymbolIndex,
+} from 'vueport-core/lib/browser/core/emulator-symbols';
+import { toFirefoxProfile } from 'vueport-core/lib/common/emulator-profile';
+import { Core, Sim } from 'vueport-core/lib/browser/core/vb-core';
+import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/browser/panels/emulator-dock';
+import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
+import EmulatorSaveStates from 'vueport-core/lib/browser/components/EmulatorSaveStates';
+import EmulatorCheats from 'vueport-core/lib/browser/components/EmulatorCheats';
+import EmulatorColors from 'vueport-core/lib/browser/components/EmulatorColors';
+import EmulatorMacros from 'vueport-core/lib/browser/components/EmulatorMacros';
+import EmulatorPatches from 'vueport-core/lib/browser/components/EmulatorPatches';
+import EmulatorAchievements from 'vueport-core/lib/browser/components/EmulatorAchievements';
+import { CheatFinder } from 'vueport-core/lib/browser/emulator-cheat-finder';
+import { MacroActivity, MacroStore } from 'vueport-core/lib/browser/emulator-macro-store';
+import { MoviePlayer } from 'vueport-core/lib/browser/emulator-movie-player';
+import { PatchStore } from 'vueport-core/lib/browser/emulator-patch-store';
+import { ColorStore } from 'vueport-core/lib/browser/emulator-vb-color-store';
+import { VbcPatchDocument } from 'vueport-core/lib/common/emulator-vb-color';
+import { RetroAchievementsService } from 'vueport-core/lib/browser/emulator-retroachievements';
+import {
+  VesEmulatorTheiaRetroAchievementsCredentials,
+  VesEmulatorRetroAchievementsTransport,
+} from './ves-emulator-retroachievements';
+import { CheatStore } from 'vueport-core/lib/browser/emulator-cheat-store';
+import {
+  EMULATOR_ACTION_COMMANDS,
+  resetLayoutConfirmation,
+  EmulatorCommands,
+} from 'vueport-core/lib/browser/emulator-commands';
+import { EmulatorCoreService, EmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
+import { EsSoundPlayer } from 'vueport-core/lib/browser/emulator-essound-player';
+import {
+  EMPTY_ROM_HEADER,
+  parseRomHeader,
+  romSizeInMBit,
+  ROM_HEADER_OFFSET_FROM_END,
+  CUSTOM_PALETTE_PREFIX,
+  emulationAnaglyphPalettes,
+  emulationPalettes,
+  EmulatorAction,
   EmulatorGamePadKeyCode,
-  ROM_HEADER_MAKERS,
+  EmulatorMode,
+  EmulatorRomStatus,
+  formatColor,
+  resolveVbHardwareMode,
+  VbHardwareMode,
+  resolveAnaglyphPalette,
+  resolvePalette,
   RomHeader,
-} from './ves-emulator-types';
+} from 'vueport-core/lib/browser/emulator-types';
+import { VES_EMULATOR_WIDGET_ID } from './ves-emulator-types';
 
-enum EmulatorRomStatus {
-  CHECKING = 'checking',
-  EXISTS = 'exists',
-  NOT_EXISTS = 'not_exists',
+function ownedCopy(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
 }
-
-const EmulatorControls = styled.div`
-  min-width: 384px;
-  padding-bottom: calc(var(--theia-ui-padding) * 2);
-  text-align: center;
-
-  &>div {
-    display: inline-block;
-    margin: var(--theia-ui-padding);
-  }
-
-  & button.theia-button {
-    height: 26px;
-    margin: 0 2px;
-    min-width: 32px;
-    vertical-align: middle;
-}
-
-  & select.theia-select {
-    margin: 0 2px;
-    vertical-align: middle;
-  }
-`;
-
-const EmulatorWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
-  min-height: 224px;
-  min-width: 384px;
-  overflow: hidden;
-`;
-
-const EmulatorHeader = styled.div`
-  display: flex;
-  gap: var(--theia-ui-padding);
-  justify-content: center;
-  min-width: 384px;
-  opacity: .5;
-  padding-bottom: calc(var(--theia-ui-padding) * 2);
-  white-space: nowrap;
-
-  @container emulator (max-width: 560px) {
-    display: none;
-  }
-
-  &>div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-  }
-
-  &>div:last-child {
-    padding-left: 32px;
-  }
-
-  & span {
-    background: #000;
-    border-radius: 3px;
-    color: #fff;
-    padding: 2px 4px;
-  }
-`;
-
-const EmulatorIframeWrapper = styled.div`
-  align-items: center;
-  background: rgba(0,0,0,.3);
-  border-radius: 2px;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-
-  iframe {
-    border: none;
-    position: relative;
-    z-index: 2;
-  }
-
-  .focusBlocker {
-    height: 100%;
-    position: absolute;
-    width: 100%;
-    z-index: 3;
-  }
-
-  .loading {
-    opacity: .3;
-    position: absolute;
-    z-index: 1;
-  }
-`;
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
+
 export interface VesEmulatorWidgetOptions {
   uri: string;
+  instanceId?: string;
+  player?: number;
 }
+
+export type VesEmulatorSettingsTab =
+  | 'display'
+  | 'input'
+  | 'vbcolor'
+  | 'sound'
+  | 'emulation'
+  | 'saveData'
+  | 'screenshots'
+  | 'achievements';
 
 export interface vesEmulatorWidgetState {
   loaded: boolean;
   paused: boolean;
   lowPower: boolean;
   muted: boolean;
-  saveSlot: number;
+  showSaveStates: boolean;
   slowmotion: boolean;
   fastForward: boolean;
   frameAdvance: boolean;
   showControls: boolean;
+  showPalettes: boolean;
+  showPreferences: boolean;
+  showCheats: boolean;
+  showMacros: boolean;
+  showPatches: boolean;
+  showColors: boolean;
+  showAchievements: boolean;
+  saveStateExists: boolean;
   romHeader: RomHeader;
   romSize: number;
-  input: any /* eslint-disable-line */;
+  mode: EmulatorMode;
 }
+
+const VES_EMULATOR_STUDIO_LAYOUT: AreaLayout = {
+  type: 'split-area',
+  orientation: 'horizontal',
+  sizes: [50, 50],
+  children: [
+    {
+      type: 'split-area',
+      orientation: 'vertical',
+      sizes: [70, 30],
+      children: [
+        { type: 'tab-area', panels: [EmulatorPanelType.SCREEN], currentIndex: 0 },
+        {
+          type: 'tab-area',
+          panels: [
+            EmulatorPanelType.ROM_INFO,
+            EmulatorPanelType.MEMORY,
+            EmulatorPanelType.TERMINAL,
+          ],
+          currentIndex: 0,
+        },
+      ],
+    },
+    {
+      type: 'tab-area',
+      panels: [
+        EmulatorPanelType.MEMORY_POOLS,
+        EmulatorPanelType.ACTORS,
+        EmulatorPanelType.VIP_CHARACTERS,
+        EmulatorPanelType.VIP_BGMAPS,
+        EmulatorPanelType.VIP_WORLDS,
+        EmulatorPanelType.VIP_OBJECTS,
+        EmulatorPanelType.REGISTERS,
+      ],
+      currentIndex: 0,
+    },
+  ],
+};
 
 @injectable()
 export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget {
+  @inject(ApplicationShell)
+  protected readonly shell!: ApplicationShell;
   @inject(CommandService)
-  protected readonly commandService: CommandService;
+  readonly commandService!: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer!: EnvVariablesServer;
+  @inject(BreakpointManager)
+  protected readonly breakpointManager!: BreakpointManager;
+  @inject(EditorManager)
+  protected readonly editorManager!: EditorManager;
   @inject(FileService)
-  protected readonly fileService: FileService;
+  protected readonly fileService!: FileService;
+  @inject(VesBuildPathsService)
+  protected readonly vesBuildPathsService!: VesBuildPathsService;
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(LocalStorageService)
-  protected readonly localStorageService: LocalStorageService;
+  protected readonly localStorageService!: LocalStorageService;
+  @inject(HoverService)
+  protected readonly hoverService!: HoverService;
+  @inject(MessageService)
+  protected readonly messageService!: MessageService;
+  @inject(VesProjectService)
+  protected readonly vesProjectService!: VesProjectService;
   @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
+  readonly preferenceService!: PreferenceService;
   @inject(VesBuildService)
-  protected readonly vesBuildService: VesBuildService;
+  protected readonly vesBuildService!: VesBuildService;
   @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
-  @inject(VesEmulatorService)
-  protected readonly vesEmulatorService: VesEmulatorService;
+  readonly vesCommonService!: VesCommonService;
+  @inject(VesKeybindingService)
+  readonly vesKeybindingService!: VesKeybindingService;
+  @inject(EmulatorCoreService)
+  protected readonly vesEmulatorCoreService!: EmulatorCoreService;
   @inject(VesEmulatorWidgetOptions)
-  protected readonly options: VesEmulatorWidgetOptions;
+  protected readonly options!: VesEmulatorWidgetOptions;
+  @inject(VesRumblePackService)
+  protected readonly vesRumblePackService!: VesRumblePackService;
   @inject(WorkspaceService)
-  protected readonly workspaceService: WorkspaceService;
+  protected readonly workspaceService!: WorkspaceService;
 
-  static readonly ID = 'vesEmulatorWidget';
+  protected static readonly colorPatches = new Map<string, Promise<unknown>>();
+
+  static readonly ID = VES_EMULATOR_WIDGET_ID;
   static readonly LABEL = nls.localize(
     'vuengine/emulator/emulator',
     'Emulator'
   );
 
-  protected status: EmulatorRomStatus = EmulatorRomStatus.CHECKING;
+  status: EmulatorRomStatus = EmulatorRomStatus.CHECKING;
 
   static readonly RESOLUTIONX = 384;
   static readonly RESOLUTIONY = 224;
 
-  protected wrapperRef = React.createRef<HTMLDivElement>();
-  protected iframeRef = React.createRef<HTMLIFrameElement>();
+  static readonly DEFAULT_VOLUME = 1;
 
-  protected resource = '';
+  static readonly ACTIONS_WHILE_PAUSED: EmulatorAction[] = [
+    EmulatorAction.PauseToggle,
+    EmulatorAction.Fullscreen,
+    EmulatorAction.AudioMute,
+    EmulatorAction.Reset,
+    EmulatorAction.Screenshot,
+    EmulatorAction.ToggleControlsOverlay,
+  ];
 
-  protected state: vesEmulatorWidgetState;
+  protected session?: EmulatorSession;
+  core?: Core;
+  sim?: Sim;
+  linkedPeer?: VesEmulatorWidget;
+  protected linkHost?: VesEmulatorWidget;
+  protected ownsSession = true;
+  dock: VueportDock;
+  protected cheats: CheatStore;
+  protected cheatFinder: CheatFinder;
+  protected macros: MacroStore;
+  protected moviePlayer: MoviePlayer;
+  protected patches: PatchStore;
+  protected colors: ColorStore;
+  retroAchievements: RetroAchievementsService;
+  esSound: EsSoundPlayer;
+  protected companions!: VesEmulatorCompanionFiles;
+  saveStates!: SaveStateStore;
+  protected configRoot: string | undefined;
+  protected rumbleForwarding?: Disposable;
+  protected rumbleSpecWatch?: Disposable;
+  protected readonly symbols = new CachedAnswer<SymbolIndex>(
+    () => this.readSymbols(), VesEmulatorWidget.SYMBOL_RETRY_DELAY
+  );
+
+  protected readonly lineTable = new CachedAnswer<VesLineTable>(
+    () => this.readLineTable(), VesEmulatorWidget.SYMBOL_RETRY_DELAY
+  );
+
+  protected readonly sourceFiles = new Map<string, string | undefined>();
+
+  protected storage: VueportStorage;
+  protected notifications: VueportNotifications;
+  rumblePack: VueportRumblePack;
+  settings: VueportSettings;
+  bindings: VueportInputBindings;
+
+  protected time: EmulatorTimeControl;
+
+  get rewinding(): boolean {
+    return this.time.rewinding;
+  }
+
+  isRewindEnabled(): boolean {
+    return this.time.isRewindEnabled();
+  }
+
+  stopRewinding(): void {
+    this.time.stopRewinding();
+  }
+
+  protected _emulationSpeed?: Speed;
+  protected readonly onDidChangeEmulationSpeedEmitter = new Emitter<Speed | undefined>();
+  readonly onDidChangeEmulationSpeed = this.onDidChangeEmulationSpeedEmitter.event;
+
+  protected readonly onDidChangeModeEmitter = new Emitter<EmulatorMode>();
+  readonly onDidChangeMode = this.onDidChangeModeEmitter.event;
+
+  get emulationSpeed(): Speed | undefined {
+    return this._emulationSpeed;
+  }
+
+  protected setEmulationSpeed(speed: Speed | undefined): void {
+    this._emulationSpeed = speed;
+    this.onDidChangeEmulationSpeedEmitter.fire(speed);
+  }
+
+  get paused(): boolean {
+    return this.state.paused;
+  }
+
+  get fastForward(): boolean {
+    return this.state.fastForward;
+  }
+
+  get slowMotion(): boolean {
+    return this.state.slowmotion;
+  }
+
+  get romLoaded(): boolean {
+    return this.state.loaded;
+  }
+
+  timeSettings(): EmulatorTimeSettings {
+    return {
+      fastForwardRatio: this.settings.get('fastForwardRatio'),
+      slowMotionRatio: this.settings.get('slowMotionRatio'),
+      rewindEnabled: this.settings.get('rewindEnabled'),
+      rewindGranularity: this.settings.get('rewindGranularity'),
+      rewindBufferBytes: this.settings.get('rewindBufferSize') * 1024 * 1024,
+    };
+  }
+
+  readonly hover: VueportHover = {
+    show: (target, content) => this.hoverService.requestHover({ content, target, position: 'top' }),
+    hide: () => this.hoverService.cancelHover(),
+  };
+
+  runCommand(id: string): void {
+    this.commandService.executeCommand(id, this);
+  }
+
+  onDidChange(): void {
+    this.update();
+  }
+
+  onError(message: string): void {
+    this.handleCoreError(message);
+  }
+
+  protected input: EmulatorInputController;
+
+  get lowPower(): boolean {
+    return this.state.lowPower;
+  }
+
+  isAcceptingInput(): boolean {
+    return this.state.loaded && !this.state.showPreferences;
+  }
+
+  protected get saveStateIdentity(): VesEmulatorSaveStateIdentity {
+    return { romIdentity: this.romIdentity, romSize: this.state.romSize };
+  }
+
+  protected romId: string | undefined;
+  protected sourceRom: Uint8Array | undefined;
+  protected romIdentity = new Uint8Array(32);
+
+  state: vesEmulatorWidgetState = {
+    loaded: false,
+    paused: false,
+    lowPower: false,
+    muted: false,
+    showSaveStates: false,
+    slowmotion: false,
+    fastForward: false,
+    frameAdvance: false,
+    showControls: false,
+    showPalettes: false,
+    showPreferences: false,
+    showCheats: false,
+    showMacros: false,
+    showPatches: false,
+    showColors: false,
+    showAchievements: false,
+    saveStateExists: false,
+    romHeader: EMPTY_ROM_HEADER,
+    romSize: 0,
+    mode: EmulatorMode.DEBUG,
+  };
 
   @postConstruct()
   protected init(): void {
+    this.buildLayout();
     this.doInit();
     this.bindEvents();
 
@@ -212,11 +481,173 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       ? this.options.uri.replace('file://', '')
       : VesEmulatorWidget.LABEL;
 
-    this.id = VesEmulatorWidget.ID;
+    this.id = this.options?.instanceId
+      ? `${VesEmulatorWidget.ID}:${this.options.instanceId}`
+      : VesEmulatorWidget.ID;
     this.title.label = label;
     this.title.caption = caption;
     this.title.iconClass = 'codicon codicon-play';
     this.title.closable = true;
+  }
+
+  protected buildLayout(): void {
+    this.addClass('vueport-widget');
+    this.scrollOptions = undefined;
+
+    const instanceId = this.options?.instanceId ?? 'default';
+    this.storage = new VesEmulatorStorage(this.fileService, this.workspaceService);
+    this.notifications = new VesEmulatorNotifications(this.messageService);
+    this.rumblePack = new VesEmulatorRumblePack(this.vesRumblePackService);
+    this.settings = new VesEmulatorSettings(this.preferenceService);
+    this.bindings = new VesEmulatorBindings(this.vesKeybindingService, this.keybindingRegistry);
+    this.companions = new VesEmulatorCompanionFiles(
+      this.storage,
+      () => this.settings.get('companionFiles'),
+      () => this.configRoot
+    );
+    this.saveStates = new SaveStateStore(this.storage, this.companions);
+    this.toDispose.push(Disposable.create(() => this.saveStates.dispose()));
+    this.toDispose.push(this.saveStates.onDidChange(() => {
+      const exists = this.saveStates.latestManual !== undefined;
+      if (exists !== this.state.saveStateExists) {
+        this.state.saveStateExists = exists;
+      }
+      this.update();
+    }));
+    this.cheats = new CheatStore(this.storage);
+    this.toDispose.push(Disposable.create(() => this.cheats.dispose()));
+    this.toDispose.push(this.cheats.onDidChange(() => this.update()));
+    this.cheatFinder = new CheatFinder();
+    this.toDispose.push(this.onDidChangeEmulationSpeedEmitter);
+    this.toDispose.push(this.onDidChangeModeEmitter);
+    this.esSound = new EsSoundPlayer(this.storage);
+    this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
+    this.macros = new MacroStore(this.storage, undefined, () => this.globalMacrosPath);
+    this.toDispose.push(this.macros.onDidChange(() => this.update()));
+    this.moviePlayer = new MoviePlayer();
+    this.toDispose.push(this.moviePlayer.onDidChange(() => this.update()));
+    this.patches = new PatchStore(this.storage);
+    this.toDispose.push(this.patches.onDidChange(change => {
+      if (change.affectsRom) {
+        this.refreshRomHeader();
+      }
+      this.update();
+    }));
+    this.colors = this.buildColorStore();
+    this.toDispose.push(this.colors.onDidChange(() => this.update()));
+    this.retroAchievements = new RetroAchievementsService(
+      new VesEmulatorRetroAchievementsTransport(),
+      new VesEmulatorTheiaRetroAchievementsCredentials(this.localStorageService),
+      this.notifications,
+      () => this.settings.get('retroAchievementsEnabled'),
+    );
+    this.toDispose.push(this.retroAchievements);
+    this.retroAchievements.setHardcoreControls({
+      isEnabled: () => this.settings.get('retroAchievementsHardcore'),
+      persist: enabled => this.settings.set('retroAchievementsHardcore', enabled),
+      enter: () => this.enterHardcoreDiscipline(),
+    });
+    this.retroAchievements.restore().catch(() => undefined);
+    this.dock = new VueportDock(
+      instanceId,
+      {
+        cancelForeignDrag: () => { (this.shell as unknown as { dragState?: unknown }).dragState = undefined; },
+        defaultLayout: VES_EMULATOR_STUDIO_LAYOUT,
+        isProfiling: () => this.profiling,
+        toggleProfiling: () => this.commandService.executeCommand(EmulatorCommands.PROFILE_START.id),
+        isPaused: () => this.state.paused,
+        setPaused: (paused: boolean) => {
+          if (paused !== this.state.paused) {
+            this.performAction(EmulatorAction.PauseToggle);
+          }
+        },
+        lineTable: () => this.loadLineTable(),
+        readSource: path => this.readSourceFile(path),
+        readPanelPreferences: () => this.settings.get('debugPanelState'),
+        writePanelPreferences: state => {
+          this.settings.set('debugPanelState', state).catch(() => undefined);
+        },
+      },
+      this.rumblePack,
+      this.esSound,
+      () => this.loadSymbols()
+    );
+    this.input = new EmulatorInputController(this, this.bindings);
+    this.macros.setInput(this.input);
+    this.input.setMacroHook(this.macros);
+    this.time = new EmulatorTimeControl(this);
+
+    this.toDispose.push(this.dock.onDidRequestAddPanel(tabBar =>
+      this.commandService.executeCommand(EmulatorCommands.ADD_PANEL.id, this, tabBar)
+    ));
+
+    this.toDispose.push(this.dock.onDidRequestResetLayout(() =>
+      this.commandService.executeCommand(EmulatorCommands.RESET_LAYOUT.id, this)
+    ));
+
+    this.toDispose.push(this.dock.onDidChangeLayout(() => {
+      this.persistDockLayout();
+      this.applyRumbleForwarding();
+    }));
+  }
+
+  togglePanel(kind: EmulatorPanelType): void {
+    this.dock.togglePanel(kind);
+  }
+
+  addPanelTo(kind: EmulatorPanelType, tabBar: TabBar<Widget>): void {
+    this.dock.addPanelTo(kind, tabBar);
+  }
+
+  isPanelOpen(kind: EmulatorPanelType): boolean {
+    return this.dock.isPanelOpen(kind);
+  }
+
+  async resetLayout(): Promise<void> {
+    const agreed = await this.notifications.confirm(resetLayoutConfirmation());
+    if (!agreed) {
+      return;
+    }
+    this.dock.resetLayout();
+    this.persistDockLayout();
+  }
+
+  protected get dockLayoutStorageKey(): string {
+    return 'emulator-dock-layout';
+  }
+
+  protected async restoreDockLayout(): Promise<void> {
+    const stored = await this.localStorageService.getData<VueportDockLayout>(
+      this.dockLayoutStorageKey
+    );
+    this.dock.applySerializedLayout(stored);
+  }
+
+  protected persistDockLayout(): void {
+    if (this.state.mode !== EmulatorMode.DEBUG) {
+      return;
+    }
+    this.localStorageService.setData(this.dockLayoutStorageKey, this.dock.serializeLayout());
+  }
+
+  setMode(mode: EmulatorMode): void {
+    if (this.state.mode === mode) {
+      return;
+    }
+    this.state.mode = mode;
+    this.localStorageService.setData('ves-emulator-state-mode', mode);
+    this.dock.setPlayMode(mode === EmulatorMode.PLAY);
+    if (mode === EmulatorMode.PLAY) {
+      this.dock.showScreenOnly();
+    } else {
+      this.restoreDockLayout();
+    }
+    this.update();
+    this.onDidChangeModeEmitter.fire(mode);
+  }
+
+  update(): void {
+    super.update();
   }
 
   protected async checkRomExists(): Promise<void> {
@@ -229,21 +660,56 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected async doInit(): Promise<void> {
+    await this.settings.ready;
+    await this.resolveGlobalMacrosPath();
     await this.initState();
-    this.resource = await this.getResource();
+
+    await this.restoreDockLayout();
+    this.dock.setPlayMode(this.state.mode === EmulatorMode.PLAY);
+    if (this.state.mode === EmulatorMode.PLAY) {
+      this.dock.showScreenOnly();
+    }
+
     await this.checkRomExists();
 
-    // TODO: find out why the emulator is only x1 size initially, without setTimeout
+    if (this.status === EmulatorRomStatus.EXISTS) {
+      await this.startEmulator();
+    }
+
     setTimeout(() => {
       this.update();
     }, 50);
   }
 
   protected onCloseRequest(msg: Message): void {
-    this.sendCommand('saveSram');
-    setTimeout(() => {
-      super.onCloseRequest(msg);
-    }, 250);
+    this.saveSaveRam().finally(() => this.disposeSession());
+    super.onCloseRequest(msg);
+  }
+
+  protected disposeSession(): void {
+    this.time.stopRewinding();
+    this.rumbleForwarding?.dispose();
+    this.rumbleForwarding = undefined;
+    this.rumbleSpecWatch?.dispose();
+    this.rumbleSpecWatch = undefined;
+    this.rumblePack.forwarding = false;
+    this.rumblePack.clearEmulatedTraffic();
+    if (this.session) {
+      if (this.ownsSession) {
+        this.vesEmulatorCoreService.disposeSession(this.session);
+      }
+      this.session = undefined;
+    }
+    this.sim = undefined;
+    this.core = undefined;
+    this.setEmulationSpeed(undefined);
+    this.dock.setSim(undefined);
+    this.cheats.setSim(undefined);
+    this.cheatFinder.setSim(undefined);
+    this.colors.setSim(undefined);
+    this.moviePlayer.stop().catch(() => undefined);
+    this.patches.unload();
+    this.esSound.setSim(undefined);
   }
 
   getResourceUri(): URI | undefined {
@@ -258,331 +724,592 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return this.state.loaded;
   }
 
-  async reload(deleteSram = false): Promise<void> {
-    if (deleteSram) {
-      this.sendCommand('deleteSram');
-    } else {
-      this.sendCommand('saveSram');
-    }
+  isLinked(): boolean {
+    return !!this.session?.mirror;
+  }
 
-    if (this.iframeRef.current) {
-      const currentIframeRef = this.iframeRef.current;
-      setTimeout(async () => {
-        this.sendCoreOptions();
-        currentIframeRef.src += '';
-        await this.initState();
-        this.update();
-      }, 250);
+  linkStatus(): 'idle' | 'relinkable' | 'waiting' | 'linked' {
+    if (this.isLinked()) {
+      return 'linked';
+    }
+    return this.linkedPeer ? 'relinkable' : 'idle';
+  }
+
+  canInspectPeer(): boolean {
+    return this.dock.hasPeerSim;
+  }
+
+  isInspectingPeer(): boolean {
+    return this.dock.inspecting === 'peer';
+  }
+
+  getLinkedPeer(): VesEmulatorWidget | undefined {
+    return this.linkedPeer;
+  }
+
+  setLinkedPeer(peer: VesEmulatorWidget): void {
+    this.linkedPeer = peer;
+    this.toDispose.push(peer.onDidDispose(() => this.handlePeerClosed()));
+  }
+
+  protected async handlePeerClosed(): Promise<void> {
+    this.linkedPeer = undefined;
+    if (!this.isDisposed && (this.isLinked() || this.isLinkGuest())) {
+      await this.leaveLink();
     }
   }
 
+  protected baseLabel(): string {
+    return this.options
+      ? this.vesCommonService.basename(this.options.uri)
+      : VesEmulatorWidget.LABEL;
+  }
+
+  setPlayerLabel(player: number): void {
+    this.title.label = `${this.baseLabel()} (P${player})`;
+  }
+
+  protected resetPlayerLabel(): void {
+    this.title.label = this.baseLabel();
+  }
+
+  async startLink(): Promise<void> {
+    if (!this.session || !this.sourceRom) {
+      return;
+    }
+    this.setPlayerLabel(1);
+    await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    this.update();
+  }
+
+  async lendMirrorSeat(): Promise<EmulatorSession | undefined> {
+    if (!this.session || !this.sourceRom) {
+      return undefined;
+    }
+    await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    this.update();
+    return this.session;
+  }
+
+  async linkTo(host: VesEmulatorWidget): Promise<void> {
+    this.linkHost = host;
+    this.setPlayerLabel(2);
+    await this.rebuildSession();
+  }
+
+  isLinkGuest(): boolean {
+    return !!this.linkHost;
+  }
+
+  async unlinkFromPeer(): Promise<void> {
+    const peer = this.linkedPeer;
+    if (!peer || !(this.isLinked() || this.isLinkGuest())) {
+      return;
+    }
+    const [guest, host] = this.isLinkGuest() ? [this, peer] : [peer, this];
+    await guest.leaveLink();
+    await host.leaveLink();
+  }
+
+  async leaveLink(): Promise<void> {
+    if (this.linkHost) {
+      this.linkHost = undefined;
+      this.resetPlayerLabel();
+      await this.rebuildSession();
+      return;
+    }
+    if (!this.isLinked()) {
+      return;
+    }
+    this.resetPlayerLabel();
+    await this.session?.detachMirror();
+    this.update();
+  }
+
+  protected async rebuildSession(): Promise<void> {
+    let snapshot: ArrayBuffer | undefined;
+    let cartRam: ArrayBuffer | undefined;
+    if (this.state.loaded && this.sim) {
+      snapshot = await this.sim.saveState();
+      cartRam = await this.sim.getCartRam((await this.sim.cartRamInfo()).used);
+    }
+    await this.startEmulator(snapshot, cartRam);
+  }
+
+  async reload(deleteSram = false): Promise<void> {
+    if (!this.sim) {
+      return;
+    }
+    if (deleteSram) {
+      const saveRamPath = await this.getSaveRamPath();
+      if (await this.storage.exists(saveRamPath)) {
+        await this.storage.delete(saveRamPath);
+      }
+    } else {
+      await this.saveSaveRam();
+    }
+
+    await this.initState();
+    await this.loadRom();
+    await this.loadSaveRam();
+    await this.attachSaveStates();
+    await this.resetSim();
+    await this.input.applyKeys();
+    await this.core?.run();
+    this.state.loaded = true;
+    this.update();
+  }
+
   protected async initState(): Promise<void> {
-    this.state = {
-      loaded: false,
-      paused: false,
-      lowPower: false,
-      muted:
-        (await this.localStorageService.getData('ves-emulator-state-muted')) ||
-        false,
-      saveSlot:
-        (await this.localStorageService.getData(
-          'ves-emulator-state-save-slot'
-        )) || 0,
-      slowmotion: false,
-      fastForward: false,
-      frameAdvance: false,
-      showControls: false,
-      romHeader: {
-        name: '',
-        maker: '',
-        code: '',
-        version: 0,
-      },
-      romSize: 0,
-      input: {},
-    };
-    this.keybindingToState();
+    this.state.muted =
+      (await this.localStorageService.getData('ves-emulator-state-muted')) || false;
+    this.state.mode =
+      (await this.localStorageService.getData<EmulatorMode>('ves-emulator-state-mode'))
+      || EmulatorMode.DEBUG;
+    this.input.refreshBindings();
   }
 
   protected bindEvents(): void {
     const resourceUri = this.getResourceUri();
     this.toDispose.pushAll([
       this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-        fileChangesEvent.changes.map(change => {
-          if (change.type !== FileChangeType.DELETED && resourceUri && change.resource.isEqual(resourceUri)) {
+        const romRebuilt = fileChangesEvent.changes.some(change =>
+          change.type !== FileChangeType.DELETED && resourceUri && change.resource.isEqual(resourceUri)
+        );
+        if (romRebuilt) {
+          if (this.sim) {
+            this.reload();
+          } else {
+            this.status = EmulatorRomStatus.EXISTS;
             this.startEmulator();
           }
-        });
-      }),
-      this.keybindingRegistry.onKeybindingsChanged(() => {
-        this.keybindingToState();
-        this.update();
-      }),
-      this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
-        if ([VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE].includes(preferenceName)) {
-          this.update();
-        } else if (
-          [
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO,
-            VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO,
-          ].includes(preferenceName)
-        ) {
-          this.update();
-          this.reload();
+          return;
+        }
+
+        if (fileChangesEvent.changes.some(change => change.resource.path.ext === '.state')) {
+          this.saveStates.refresh().catch(() => undefined);
         }
       }),
+      this.keybindingRegistry.onKeybindingsChanged(() => {
+        this.input.refreshBindings();
+        this.update();
+      }),
+      this.settings.onDidChange(setting => {
+        if ([
+          'renderingMode', 'palette', 'anaglyphPalette',
+          'customPalettes', 'customAnaglyphPalettes',
+        ].includes(setting)) {
+          this.applyDisplayMode();
+          this.update();
+        } else if (setting === 'scale') {
+          this.applyScale();
+          this.update();
+        } else if ([
+          'rewindEnabled', 'rewindGranularity', 'rewindBufferSize',
+        ].includes(setting)) {
+          this.time.applyRewindSettings();
+          // The toolbar button greys out when the feature is off.
+          this.update();
+        } else if (['slowMotionRatio', 'fastForwardRatio'].includes(setting)) {
+          this.time.applySpeed();
+        } else if (setting === 'player2SameControls') {
+          // Which set of mappings this emulator answers to has changed.
+          this.input.refreshBindings();
+          this.update();
+        } else if (['hardwareMode', 'vbcSupportEnabled'].includes(setting)) {
+          this.applyHardwareConfiguration();
+        }
+      }),
+      this.rumblePack.onDidChangeConnected(() => this.applyRumbleForwarding()),
     ]);
+  }
+
+  protected async applyRumbleForwarding(): Promise<void> {
+    const sim = this.sim;
+    const wanted = sim !== undefined && (
+      this.rumblePack.connected
+      || this.dock.isPanelVisible(EmulatorPanelType.RUMBLE_PACK)
+    );
+    if (wanted === (this.rumbleForwarding !== undefined)) {
+      return;
+    }
+
+    if (!wanted) {
+      this.rumbleForwarding?.dispose();
+      this.rumbleForwarding = undefined;
+      this.rumbleSpecWatch?.dispose();
+      this.rumbleSpecWatch = undefined;
+      this.rumblePack.forwarding = false;
+      this.rumblePack.emulatedSpec = undefined;
+      if (sim) {
+        await Promise.all([
+          sim.setLinkCapture(false),
+          sim.setPointerWatch(0),
+        ]).catch(() => {
+          // NOOP
+        });
+      }
+      return;
+    }
+
+    this.rumbleForwarding = sim!.onLink(bytes => this.forwardToRumblePack(bytes));
+    try {
+      await sim!.setLinkCapture(true);
+      this.rumblePack.forwarding = true;
+      this.applyRumbleSpecWatch(sim!).catch(error =>
+        console.error('[emulator] rumble spec watch could not be set up:', error)
+      );
+    } catch (error) {
+      this.rumbleForwarding.dispose();
+      this.rumbleForwarding = undefined;
+      this.rumblePack.forwarding = false;
+      console.error('[emulator] rumble pack forwarding could not be enabled:', error);
+    }
+  }
+
+  protected async applyRumbleSpecWatch(sim: Sim): Promise<void> {
+    const symbols = await this.loadSymbols();
+    if (symbols?.rumbleSpecPointer === undefined || this.sim !== sim || !this.rumbleForwarding) {
+      return;
+    }
+
+    this.rumbleSpecWatch = sim.onPointerWrite(values => this.resolveRumbleSpec(symbols, values));
+    try {
+      await sim.setPointerWatch(symbols.rumbleSpecPointer);
+    } catch (error) {
+      this.rumbleSpecWatch.dispose();
+      this.rumbleSpecWatch = undefined;
+      console.error('[emulator] rumble spec watch could not be enabled:', error);
+    }
+  }
+
+  protected resolveRumbleSpec(symbols: SymbolIndex, values: number[]): void {
+    for (const value of values) {
+      const address = value >>> 0;
+      this.rumblePack.emulatedSpec = address === 0
+        ? undefined
+        : { address, name: symbols.rumbleSpecNames.get(address) };
+    }
+  }
+
+  isProfiling(): boolean {
+    return this.profiling;
+  }
+
+  profiling = false;
+
+  async startProfiling(): Promise<void> {
+    if (!this.sim || this.profiling) {
+      return;
+    }
+    await this.sim.startProfileRecording();
+    this.profiling = true;
+    this.update();
+    this.notifications.info(nls.localize(
+      'vuengine/emulator/profilingStarted',
+      'Profiling. Play the part you want to measure, then stop profiling to export it.'
+    ));
+  }
+
+  async stopProfiling(): Promise<void> {
+    const sim = this.sim;
+    if (!sim || !this.profiling) {
+      return;
+    }
+    this.profiling = false;
+    this.update();
+
+    try {
+      const recording = await sim.stopProfileRecording();
+      if (recording.chunks === 0) {
+        this.notifications.warn(nls.localize(
+          'vuengine/emulator/profilingNothing', 'Nothing was recorded.'
+        ));
+        return;
+      }
+
+      const progress = await this.notifications.progress(
+        nls.localize('vuengine/emulator/profilingReplaying', 'Replaying to collect the profile…')
+      );
+      let result;
+      try {
+        result = await sim.replayProfile(recording);
+      } finally {
+        progress.cancel();
+      }
+
+      const uri = await this.writeProfile(result);
+      this.notifications.info(nls.localize(
+        'vuengine/emulator/profilingWritten',
+        'Profiled {0} instructions over {1} s of play into {2}. Open it at profiler.firefox.com.',
+        result.instructions.toLocaleString(),
+        (recording.chunks / VB_FRAME_RATE).toFixed(1),
+        this.vesCommonService.basename(uri)
+      ));
+      if (result.resets > 0) {
+        this.notifications.warn(nls.localize(
+          'vuengine/emulator/profilingResets',
+          'The machine restarted {0} times while recording, so the profile covers more than one run.',
+          result.resets
+        ));
+      }
+    } catch (error) {
+      this.notifications.error(
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
+
+  protected async writeProfile(result: ProfileResult): Promise<URI> {
+    const symbols = await this.loadSymbols();
+    const romUri = this.getResourceUri();
+    const romSize = this.state.romSize * 131072;
+    const product = await this.vesProjectService.getProjectName()
+      .catch(() => undefined) || romUri!.path.name;
+
+    const profile = toFirefoxProfile(
+      result.nodes.map((node, id) => ({ ...node, id, children: new Map() })),
+      address => {
+        const symbol = symbols && findFunctionAt(symbols, address, romSize);
+        return {
+          name: symbol
+            ? functionDisplayName(symbols!, symbol.name)
+            : `0x${(address >>> 0).toString(16).toUpperCase().padStart(8, '0')}`,
+        };
+      },
+      product
+    );
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const uri = romUri!.parent.resolve(`${romUri!.path.name}-${stamp}.profile.json`);
+    await this.fileService.writeFile(uri, BinaryBuffer.fromString(JSON.stringify(profile)));
+    return uri;
+  }
+
+  loadSymbols(): Promise<SymbolIndex | undefined> {
+    return this.symbols.get();
+  }
+
+  loadLineTable(): Promise<VesLineTable | undefined> {
+    return this.lineTable.get();
+  }
+
+  // breakpoints from editors
+  protected async sourceRoots(): Promise<VesSourceRoot[]> {
+    const roots: VesSourceRoot[] = [];
+    try {
+      const core = await this.vesBuildPathsService.getEngineCoreUri();
+      roots.push({ name: core.path.base, root: core.path.fsPath() });
+
+      const plugins = await this.vesBuildPathsService.getEnginePluginsUri();
+      if (await this.fileService.exists(plugins)) {
+        for (const vendor of (await this.fileService.resolve(plugins)).children ?? []) {
+          if (!vendor.isDirectory) {
+            continue;
+          }
+          for (const plugin of (await this.fileService.resolve(vendor.resource)).children ?? []) {
+            if (plugin.isDirectory) {
+              roots.push({
+                name: `${vendor.resource.path.base}/${plugin.resource.path.base}`,
+                root: plugin.resource.path.fsPath(),
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('[emulator] engine paths could not be read:', error);
+    }
+
+    for (const folder of this.workspaceService.tryGetRoots()) {
+      roots.push({ name: folder.resource.path.base, root: folder.resource.path.fsPath() });
+    }
+    return roots;
+  }
+
+  protected async syncEditorBreakpoints(uri: URI): Promise<void> {
+    const table = await this.loadLineTable();
+    if (!table) {
+      return;
+    }
+    const mapper = makeSourcePathMapper(await this.sourceRoots());
+    const recorded = recordedPathFor(table, mapper, uri.path.fsPath());
+    if (recorded === undefined) {
+      // A file this build did not compile
+      return;
+    }
+    this.dock.breakpoints.setForFile(
+      recorded,
+      this.breakpointManager.getBreakpoints(uri)
+        .map(point => ({ line: point.line, enabled: point.enabled })),
+      table
+    );
+  }
+
+  protected async revealStop(address: number): Promise<void> {
+    const table = await this.loadLineTable();
+    const rom = await this.getRomUri();
+    if (!table || !rom) {
+      return;
+    }
+    const romBytes = (await this.fileService.readFile(rom)).value.buffer.byteLength;
+    const found = table.locate(romOffsetOf(address, romBytes));
+    if (!found) {
+      return;
+    }
+    const mapper = makeSourcePathMapper(await this.sourceRoots());
+    const source = new URI(mapper(found.file)).withScheme('file');
+    if (!await this.fileService.exists(source)) {
+      return;
+    }
+    const editor = await this.editorManager.open(source, { mode: 'reveal' });
+    editor.editor.cursor = { line: Math.max(0, found.line - 1), character: 0 };
+    editor.editor.revealPosition(editor.editor.cursor);
+  }
+
+  protected async syncAllEditorBreakpoints(): Promise<void> {
+    for (const uri of [...this.breakpointManager.getUris()]) {
+      await this.syncEditorBreakpoints(new URI(uri));
+    }
+  }
+
+  static readonly SYMBOL_RETRY_DELAY = 2000;
+
+  protected async readLineTable(): Promise<CachedAnswerRead<VesLineTable>> {
+    try {
+      const romUri = await this.getRomUri();
+      const elfUri = await this.findElfUri(romUri);
+      if (!elfUri || !romUri) {
+        return { settled: true };
+      }
+      const image = readElf((await this.fileService.readFile(elfUri)).value.buffer);
+      const section = image?.section('.debug_line');
+      if (!section) {
+        return { settled: true };
+      }
+      const rom = await this.fileService.readFile(romUri);
+      return {
+        value: parseDwarfLineTable(section, rom.value.buffer.byteLength),
+        settled: true,
+      };
+    } catch (error) {
+      console.warn('[emulator] ROM line table could not be read:', error);
+      return { settled: false };
+    }
+  }
+
+  protected async readSourceFile(path: string): Promise<string | undefined> {
+    if (this.sourceFiles.has(path)) {
+      return this.sourceFiles.get(path);
+    }
+    let text: string | undefined;
+    try {
+      const romUri = await this.getRomUri();
+      if (romUri) {
+        for (const candidate of sourcePathCandidates(path, romUri.parent.path.fsPath())) {
+          const uri = new URI(candidate);
+          if (await this.fileService.exists(uri)) {
+            text = (await this.fileService.readFile(uri)).value.toString();
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('[emulator] source file could not be read:', error);
+    }
+    this.sourceFiles.set(path, text);
+    return text;
+  }
+
+  protected async readSymbols(): Promise<CachedAnswerRead<SymbolIndex>> {
+    try {
+      const romUri = await this.getRomUri();
+      const elfUri = await this.findElfUri(romUri);
+      if (!elfUri) {
+        return { settled: true };
+      }
+      const image = readElf((await this.fileService.readFile(elfUri)).value.buffer);
+      return { value: image ? indexElfSymbols(image) : undefined, settled: true };
+    } catch (error) {
+      console.warn('[emulator] ROM symbols could not be read:', error);
+      return { settled: false };
+    }
+  }
+
+  protected async readBuildMode(romUri: URI): Promise<string | undefined> {
+    try {
+      const mapUri = romUri.parent.resolve(`${romUri.path.name}.map`);
+      if (!await this.fileService.exists(mapUri)) {
+        return undefined;
+      }
+      return readBuildModeFromMap((await this.fileService.readFile(mapUri)).value.toString());
+    } catch (error) {
+      console.warn('[emulator] build mode could not be read:', error);
+      return undefined;
+    }
+  }
+
+  protected async findElfUri(romUri: URI): Promise<URI | undefined> {
+    const sibling = romUri.parent.resolve(`${romUri.path.name}.elf`);
+    if (await this.fileService.exists(sibling)) {
+      return sibling;
+    }
+
+    const mapUri = romUri.parent.resolve(`${romUri.path.name}.map`);
+    if (!await this.fileService.exists(mapUri)) {
+      return undefined;
+    }
+    const declared = readElfPathFromMap((await this.fileService.readFile(mapUri)).value.toString());
+    if (!declared) {
+      return undefined;
+    }
+
+    await this.workspaceService.ready;
+    const root = this.workspaceService.tryGetRoots()[0]?.resource;
+    const elfUri = declared.startsWith('/') ? new URI(declared) : root?.resolve(declared);
+    return elfUri && await this.fileService.exists(elfUri) ? elfUri : undefined;
+  }
+
+  protected async resetSim(): Promise<void> {
+    this.rumblePack.clearEmulatedTraffic();
+    await this.sim?.reset();
+  }
+
+  protected forwardToRumblePack(bytes: number[]): void {
+    for (const byte of bytes) {
+      this.rumblePack.sendByte(byte).catch(() => {
+        // A pack unplugged mid-effect
+      });
+    }
   }
 
   protected onBeforeAttach(msg: Message): void {
     super.onBeforeAttach(msg);
-    this.bindListeners();
+    this.input.attach(this.node, this.dock.screen.node);
+  }
+
+  protected onAfterAttach(msg: Message): void {
+    super.onAfterAttach(msg);
+    this.update();
   }
 
   protected onBeforeDetach(msg: Message): void {
     super.onBeforeDetach(msg);
-    this.unbindListeners();
+    this.input.detach();
   }
 
-  protected keybindingToState(): void {
-    this.state.input = {
-      lUp: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_L_UP.id
-        ),
-        command: EmulatorGamePadKeyCode.LUp,
-      },
-      lRight: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_L_RIGHT.id
-        ),
-        command: EmulatorGamePadKeyCode.LRight,
-      },
-      lDown: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_L_DOWN.id
-        ),
-        command: EmulatorGamePadKeyCode.LDown,
-      },
-      lLeft: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_L_LEFT.id
-        ),
-        command: EmulatorGamePadKeyCode.LLeft,
-      },
-      start: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_START.id
-        ),
-        command: EmulatorGamePadKeyCode.Start,
-      },
-      select: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_SELECT.id
-        ),
-        command: EmulatorGamePadKeyCode.Select,
-      },
-      rUp: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_R_UP.id
-        ),
-        command: EmulatorGamePadKeyCode.RUp,
-      },
-      rRight: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_R_RIGHT.id
-        ),
-        command: EmulatorGamePadKeyCode.RRight,
-      },
-      rDown: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_R_DOWN.id
-        ),
-        command: EmulatorGamePadKeyCode.RDown,
-      },
-      rLeft: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_R_LEFT.id
-        ),
-        command: EmulatorGamePadKeyCode.RLeft,
-      },
-      b: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_B.id
-        ),
-        command: EmulatorGamePadKeyCode.B,
-      },
-      a: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_A.id
-        ),
-        command: EmulatorGamePadKeyCode.A,
-      },
-      lTrigger: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_L_TRIGGER.id
-        ),
-        command: EmulatorGamePadKeyCode.LT,
-      },
-      rTrigger: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_R_TRIGGER.id
-        ),
-        command: EmulatorGamePadKeyCode.RT,
-      },
-      pauseToggle: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_PAUSE_TOGGLE.id
-        ),
-        command: EmulatorFunctionKeyCode.PauseToggle,
-      },
-      reset: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_RESET.id
-        ),
-        command: EmulatorFunctionKeyCode.Reset,
-      },
-      audioMute: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_AUDIO_MUTE.id
-        ),
-        command: EmulatorFunctionKeyCode.AudioMute,
-      },
-      saveState: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_SAVE_STATE.id
-        ),
-        command: EmulatorFunctionKeyCode.SaveState,
-      },
-      loadState: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_LOAD_STATE.id
-        ),
-        command: EmulatorFunctionKeyCode.LoadState,
-      },
-      stateSlotDecrease: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id
-        ),
-        command: EmulatorFunctionKeyCode.StateSlotDecrease,
-      },
-      stateSlotIncrease: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id
-        ),
-        command: EmulatorFunctionKeyCode.StateSlotIncrease,
-      },
-      frameAdvance: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_FRAME_ADVANCE.id
-        ),
-        command: EmulatorFunctionKeyCode.FrameAdvance,
-      },
-      rewind: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_REWIND.id
-        ),
-        command: EmulatorFunctionKeyCode.Rewind,
-      },
-      toggleFastForward: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleFastForward,
-      },
-      toggleSlowmotion: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleSlowmotion,
-      },
-      toggleLowPower: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleLowPower,
-      },
-      fullscreen: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_FULLSCREEN.id
-        ),
-        command: EmulatorFunctionKeyCode.Fullscreen,
-      },
-      toggleControlsOverlay: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id
-        ),
-        command: EmulatorFunctionKeyCode.ToggleControlsOverlay,
-      },
-      screenshot: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(
-          EmulatorCommands.INPUT_SCREENSHOT.id
-        ),
-        command: EmulatorFunctionKeyCode.Screenshot,
-      },
-    };
+  protected onAfterShow(msg: Message): void {
+    super.onAfterShow(msg);
+    this.dock.setHidden(false);
   }
 
-  protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
-  protected messageEventListerner = async (e: MessageEvent) =>
-    this.processIframeMessage(e);
-
-  protected bindListeners(): void {
-    this.node.addEventListener('keydown', this.keyEventListerner);
-    this.node.addEventListener('keyup', this.keyEventListerner);
-    window.addEventListener('message', this.messageEventListerner);
+  protected onAfterHide(msg: Message): void {
+    super.onAfterHide(msg);
+    this.dock.setHidden(true);
   }
 
-  protected unbindListeners(): void {
-    this.node.removeEventListener('keydown', this.keyEventListerner);
-    this.node.removeEventListener('keyup', this.keyEventListerner);
-    window.removeEventListener('message', this.messageEventListerner);
-  }
-
-  protected processKeyEvent(e: KeyboardEvent): void {
-    // do not process key input...
-    if (
-      e.repeat || // ... on repeated event firing
-      !this.isVisible || // ... if emulator is not visible
-      !this.state.loaded // ... if emulator has not loaded yet
-    ) {
-      return;
-    }
-
-    for (const key in this.state.input) {
-      if (this.state.input.hasOwnProperty(key)) {
-        if (
-          (!this.state.paused && !this.state.showControls) ||
-          this.state.input[key].command ===
-          EmulatorFunctionKeyCode.ToggleControlsOverlay ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.PauseToggle) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.Fullscreen) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.AudioMute) ||
-          (!this.state.showControls &&
-            this.state.input[key].command === EmulatorFunctionKeyCode.Reset) ||
-          (!this.state.showControls &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.Screenshot) ||
-          (this.state.frameAdvance &&
-            this.state.input[key].command ===
-            EmulatorFunctionKeyCode.FrameAdvance)
-        ) {
-          if (this.matchKey(this.state.input[key].keys, e.code)) {
-            this.sendCommand(e.type, this.state.input[key].command);
-          }
-        }
-      }
-    }
+  usesPlayer2Controls(): boolean {
+    return this.player === 2 && !this.settings.get('player2SameControls');
   }
 
   protected onActivateRequest(msg: Message): void {
@@ -591,1001 +1318,1160 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.node.focus();
   }
 
-  protected async processIframeMessage(e: MessageEvent): Promise<void> {
-    switch (e.data.type) {
-      case 'loaded':
-        setTimeout(() => {
-          this.state.loaded = true;
-          this.update();
-        }, 200);
-        break;
-      case 'sram':
-        await this.processSram(e.data.data);
-        break;
-      case 'screenshot':
-        await this.processScreenshot(e.data.data, e.data.filename);
-        break;
-    }
-  }
+  protected starting: Promise<void> = Promise.resolve();
 
-  protected matchKey(
-    scopedKeybindings: ScopedKeybinding[],
-    keyCode: string
-  ): boolean {
-    for (const keyBinding of scopedKeybindings) {
-      // @ts-ignore
-      for (const resolvedKeyBinding of keyBinding.resolved) {
-        if (keyCode === resolvedKeyBinding.key.code) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  protected getRomPath = async () => {
-    const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
-    let romPath = this.options ? this.options.uri : defaultRomUri;
-    if (typeof romPath !== 'string') {
-      romPath = await this.fileService.fsPath(romPath);
-    }
-    if (isWindows && !romPath.startsWith('/')) {
-      romPath = `/${romPath}`;
-    }
-
-    return romPath;
+  protected startEmulator = (snapshot?: ArrayBuffer, cartRam?: ArrayBuffer): Promise<void> => {
+    this.starting = this.starting
+      .catch(() => undefined)
+      .then(() => this.buildSession(snapshot, cartRam));
+    return this.starting;
   };
 
-  protected startEmulator = async () => {
+  protected buildSession = async (snapshot?: ArrayBuffer, cartRam?: ArrayBuffer): Promise<void> => {
+    this.disposeSession();
+    const displayMode = this.getDisplayMode();
+    this.dock.screen.setDisplayMode(displayMode);
+    const canvas = this.dock.screen.takeCanvas();
+
+    try {
+      const host = this.linkHost;
+      const session = host
+        ? await host.lendMirrorSeat()
+        : await this.vesEmulatorCoreService.createSession();
+      if (!session) {
+        this.linkHost = undefined;
+        return this.buildSession(snapshot, cartRam);
+      }
+      this.session = session;
+      this.ownsSession = !host;
+      const core = session.core;
+      this.core = core;
+      this.toDispose.push(core.onError(message => this.handleCoreError(message)));
+      this.syncAllEditorBreakpoints().catch(() => undefined);
+      this.toDispose.push(this.breakpointManager.onDidChangeBreakpoints(event => {
+        this.syncEditorBreakpoints(event.uri).catch(() => undefined);
+      }));
+      this.toDispose.push(core.onStopped(stop => {
+        this.state.paused = true;
+        this.state.frameAdvance = false;
+        this.esSound.setPaused(true);
+        this.update();
+        this.revealStop(stop.address).catch(() => undefined);
+      }));
+      this.toDispose.push(core.onSpeed(speed => this.setEmulationSpeed(speed)));
+
+      this.sim = host ? session.mirror ?? session.sim : session.sim;
+      this.dock.setSim(this.sim);
+      this.cheats.setSim(this.sim);
+      this.cheatFinder.setSim(this.sim);
+      this.colors.setSim(this.sim);
+      this.applyScale();
+      await this.sim.setDisplayMode(displayMode);
+      await this.sim.attachCanvas(canvas);
+      await this.sim.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
+
+      await this.time.applySpeed();
+      await this.time.applyRewindSettings();
+      await this.applyRumbleForwarding();
+
+      await this.loadRom();
+      const romUri = await this.getRomUri();
+      await this.cheats.load(await this.companionRomPath(), this.romId);
+      await this.esSound.scan(romUri.toString());
+      await this.esSound.setSim(this.sim);
+      this.esSound.setMuted(this.state.muted);
+      this.toDispose.push(this.sim.onEsSound(commands => commands.forEach(raw => this.esSound.handle(raw))));
+      if (cartRam && cartRam.byteLength > 0) {
+        const window = saveRamWindowBytes(this.settings.get('sramWindow'));
+        const whole = new Uint8Array(window);
+        whole.set(new Uint8Array(cartRam, 0, Math.min(cartRam.byteLength, window)));
+        await this.sim.setCartRam(whole.buffer as ArrayBuffer);
+      } else {
+        await this.loadSaveRam();
+      }
+      await this.attachSaveStates();
+      if (snapshot) {
+        await this.sim.loadState(snapshot);
+      } else {
+        await this.resetSim();
+      }
+      await this.input.applyKeys();
+      await core.run();
+
+      this.state.loaded = true;
+      this.state.paused = false;
+      this.esSound.setPaused(false);
+      this.update();
+    } catch (error) {
+      this.handleCoreError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  protected handleCoreError(message: string): void {
+    console.error('[emulator]', message);
+    this.state.loaded = false;
+    this.update();
+  }
+
+  protected appliedHardware?: { vbc: boolean, mode: string };
+
+  protected applyHardwareConfiguration(): void {
+    const wanted = {
+      vbc: this.vbcSupportEnabled,
+      mode: this.selectedHardwareMode,
+    };
+    if (this.appliedHardware
+      && this.appliedHardware.vbc === wanted.vbc
+      && this.appliedHardware.mode === wanted.mode) {
+      return;
+    }
+    this.appliedHardware = wanted;
+    this.restartForHardwareChange();
+  }
+
+  protected async restartForHardwareChange(): Promise<void> {
+    const wasLinked = this.isLinked() || this.isLinkGuest();
+    await this.unlinkFromPeer();
+    if (wasLinked) {
+      this.notifications.info(nls.localize(
+        'vuengine/emulator/hardwareLinkEnded',
+        'The link session ended because the hardware configuration changed.'
+      ));
+    }
+    if (this.status !== EmulatorRomStatus.EXISTS) {
+      this.update();
+      return;
+    }
+    const wasPaused = this.state.paused;
+    await this.startEmulator();
+    if (wasPaused && this.core && this.state.loaded) {
+      await this.core.suspend();
+      this.state.paused = true;
+      this.esSound.setPaused(true);
+    }
+    this.update();
+  }
+
+  protected async loadRom(): Promise<void> {
     const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
     const romUri = this.options ? new URI(this.options.uri) : defaultRomUri;
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
-    const romContentHeaderBuffer = romContentBuffer.slice(-544).slice(0, 32);
-    const romHeaderName = iconv.decode(
-      Buffer.from(romContentHeaderBuffer.slice(0, 20)),
-      'Shift_JIS'
+    this.state.romHeader = parseRomHeader(romContentBuffer);
+    this.state.romSize = romSizeInMBit(romContentBuffer);
+    this.romIdentity = new Uint8Array(
+      romContentBuffer.slice(-ROM_HEADER_OFFSET_FROM_END).slice(0, 32)
     );
-    const romHeaderMaker = romContentHeaderBuffer.slice(25, 27).toString();
-    const romHeaderCode = romContentHeaderBuffer.slice(27, 31).toString();
-    const romHeaderVersion = romContentHeaderBuffer.slice(31, 32)[0];
-    this.state.romHeader = {
-      name: romHeaderName.padEnd(20, ' '),
-      maker: romHeaderMaker,
-      code: romHeaderCode,
-      version: romHeaderVersion,
-    };
-    this.state.romSize = romContentBuffer.length / 131072;
+    this.romId = formatRomId(crc32(Buffer.from(
+      romContentBuffer.buffer, romContentBuffer.byteOffset, romContentBuffer.byteLength
+    )));
+    this.symbols.clear();
+    this.lineTable.clear();
+    this.sourceFiles.clear();
+    this.loadLineTable()
+      .then(table => {
+        if (!table) {
+          return undefined;
+        }
+        this.dock.breakpoints.reresolve(table);
+        return this.syncAllEditorBreakpoints();
+      })
+      .catch(() => undefined);
+    this.dock.setRomInfo(
+      this.state.romHeader,
+      this.state.romSize,
+      await this.readBuildMode(romUri),
+      this.romId,
+    );
 
-    const romBase64 = this.vesCommonService.bytesToBase64(romContentBuffer);
-    this.sendRetroArchConfig();
-    this.sendCoreOptions();
-    this.sendCommand('start', {
-      namespace: await this.getRomPath(),
-      rom: `data:application/octet-stream;base64,${romBase64}`,
-    });
-  };
+    this.sourceRom = romContentBuffer;
+    await this.patches.load(await this.companionRomPath(), this.romId, romContentBuffer);
+    if (this.isHardcore()) {
+      this.patches.disableAll();
+    }
+    await this.colors.load(this.romId, romContentBuffer);
+    await this.macros.load(await this.companionRomPath());
+    this.refreshRomHeader();
+
+    this.appliedHardware = { vbc: this.vbcSupportEnabled, mode: this.selectedHardwareMode };
+    await this.sim?.setHardwareMode(this.resolvedHardwareMode === VbHardwareMode.VB_COLOR);
+    this.dock.setVbcSupportEnabled(this.vbcSupportEnabled, this.vbcHardwareActive);
+
+    if (this.ownsSession) {
+      await this.sim?.setCartRom(ownedCopy(this.patchedRom()));
+    }
+  }
+
+  protected patchedRom(): Uint8Array {
+    const source = this.sourceRom;
+    if (!source) {
+      return new Uint8Array();
+    }
+    try {
+      return this.patches.apply(source);
+    } catch (error) {
+      console.warn('[emulator] could not apply the ROM patches:', error);
+      return source;
+    }
+  }
+
+  protected buildColorStore(): ColorStore {
+    function prune<T>(all: Record<string, T>, id: string, value: T): Record<string, T> {
+      const next = { ...all };
+      if (Object.keys(value as object).length === 0) {
+        delete next[id];
+      } else {
+        next[id] = value;
+      }
+      return next;
+    }
+
+    return new ColorStore(
+      this.patches,
+      id => this.settings.get('vbcColorPaletteOverrides')[id] ?? {},
+      (id, overrides) => {
+        this.settings.set(
+          'vbcColorPaletteOverrides',
+          prune(this.settings.get('vbcColorPaletteOverrides'), id, overrides)
+        ).catch(() => undefined);
+      },
+      id => this.settings.get('vbcColorPaletteNames')[id] ?? {},
+      (id, names) => {
+        this.settings.set(
+          'vbcColorPaletteNames',
+          prune(this.settings.get('vbcColorPaletteNames'), id, names)
+        ).catch(() => undefined);
+      },
+      () => ({
+        autoApply: this.settings.get('vbcAutoApplyColorPatches') && !this.isHardcore(),
+        disabled: this.settings.get('vbcColorPatchesDisabled'),
+      }),
+      (id, apply) => this.rememberColorChoice(id, apply),
+      (name, data) => this.storage.export(name, data),
+      config => this.loadColorPatch(config),
+      () => this.readCreatedColorPatch(),
+      document => this.writeCreatedColorPatch(document),
+    );
+  }
+
+  protected rememberColorChoice(id: string, apply: boolean): void {
+    const disabled = this.settings.get('vbcColorPatchesDisabled');
+    this.settings.set(
+      'vbcColorPatchesDisabled',
+      apply ? disabled.filter(entry => entry !== id) : [...disabled.filter(entry => entry !== id), id]
+    ).catch(() => undefined);
+    if (apply && !this.settings.get('vbcAutoApplyColorPatches')) {
+      this.settings.set('vbcAutoApplyColorPatches', true).catch(() => undefined);
+    }
+  }
+
+  protected loadColorPatch(config: string): Promise<unknown> {
+    let pending = VesEmulatorWidget.colorPatches.get(config);
+    if (!pending) {
+      pending = fetch(new Endpoint({ path: `/emulator/${config}` }).getRestUrl().toString())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`${config}: ${response.status} ${response.statusText}`);
+          }
+          return response.json() as Promise<unknown>;
+        });
+      VesEmulatorWidget.colorPatches.set(config, pending);
+    }
+    return pending;
+  }
+
+  protected async colorPatchPath(): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    return this.storage.join(
+      await this.companionDirectory(), `${this.storage.stem(rom)}.vbc.json`
+    );
+  }
+
+  protected async readCreatedColorPatch(): Promise<unknown> {
+    const path = await this.colorPatchPath();
+    try {
+      return await this.storage.exists(path)
+        ? JSON.parse(await this.storage.readText(path)) as unknown
+        : undefined;
+    } catch (error) {
+      console.warn(`[emulator] could not read the color patch at ${path}:`, error);
+      return undefined;
+    }
+  }
+
+  protected async writeCreatedColorPatch(document: VbcPatchDocument | undefined): Promise<void> {
+    const path = await this.colorPatchPath();
+    if (!document) {
+      if (await this.storage.exists(path)) {
+        await this.storage.delete(path);
+      }
+      return;
+    }
+    await this.storage.writeText(path, `${JSON.stringify(document, undefined, 2)}\n`);
+  }
+
+  protected refreshRomHeader(): void {
+    if (!this.sourceRom) {
+      this.state.romHeader = EMPTY_ROM_HEADER;
+      return;
+    }
+    this.state.romHeader = parseRomHeader(this.patchedRom());
+    this.dock.setRomInfo(
+      this.state.romHeader, this.state.romSize, undefined, this.romId
+    );
+  }
 
   protected onResize(): void {
     this.update();
   }
 
-  public sendKeypress = (
-    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode
-  ): void => {
-    if (
-      this.state.loaded &&
-      (!this.state.showControls ||
-        keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay)
-    ) {
-      this.sendCommand('keyPress', keyCode);
+  onRewindButtonDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
+    if (!this.time.isRewindEnabled()) {
+      return;
     }
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    this.time.startRewinding();
+  };
+
+  promptEnableRewind = async (): Promise<void> => {
+    const bufferSize = this.settings.get('rewindBufferSize');
+
+    const message = [
+      nls.localize(
+        'vuengine/emulator/rewindWhat',
+        'Rewind runs the game backwards for as long as you hold the button. \
+To make that possible, the emulator records what changes in the \
+machine on every frame while you play.'
+      ),
+      nls.localize(
+        'vuengine/emulator/rewindCost',
+        'Recording makes emulation roughly a third more expensive and uses up  \
+to {0} MB of memory, which holds a bit over a minute of history.  \
+Both are adjustable in the emulator preferences: a coarser rewind  \
+granularity records less often and costs proportionally less.',
+        bufferSize
+      ),
+    ];
+
+    const confirmed = await this.notifications.confirm({
+      title: nls.localize('vuengine/emulator/enableRewindTitle', 'Enable Rewind?'),
+      message,
+      okLabel: nls.localize('vuengine/emulator/enableRewindConfirm', 'Enable'),
+    });
+    if (confirmed) {
+      await this.settings.set('rewindEnabled', true);
+    }
+  };
+
+  onRewindButtonUp = (event: React.PointerEvent<HTMLButtonElement>): void => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    this.time.stopRewinding();
     this.node.focus();
   };
 
+  public runAction = (action: EmulatorAction): void => {
+    this.commandService.executeCommand(EMULATOR_ACTION_COMMANDS[action].id);
+    // Hand the keyboard back, so the shortcuts keep working after a click.
+    this.node.focus();
+  };
+
+  public canRunAction(action: EmulatorAction): boolean {
+    if (!this.state.loaded) {
+      return false;
+    }
+    if (this.state.showControls) {
+      return action === EmulatorAction.ToggleControlsOverlay;
+    }
+    if (this.state.paused) {
+      return VesEmulatorWidget.ACTIONS_WHILE_PAUSED.includes(action)
+        || (this.state.frameAdvance && action === EmulatorAction.FrameAdvance);
+    }
+    return true;
+  }
+
+  public async performAction(action: EmulatorAction): Promise<void> {
+    await this.sendCommand('keyPress', action);
+  }
+
   protected render(): React.ReactNode {
-    const canvasDimensions = this.getCanvasDimensions();
-    return this.status === EmulatorRomStatus.NOT_EXISTS
-      ? <EmptyContainer
-        title={nls.localize('vuengine/emulator/romNotFound', 'ROM not found')}
-        icon={<FileX size={32} />}
+    return <>
+      <TitleBar
+        emulator={this}
+        title={
+          <div className='vueport-titlebar-toolbar'>
+            <EmulatorControlStrip host={this} inline />
+          </div>
+        }
       />
-      : (
-        <>
-          <EmulatorControls>
-            <div>
-              <button
-                className={
-                  this.state.paused ? 'theia-button' : 'theia-button secondary'
-                }
-                title={`${this.state.paused
-                  ? nls.localize('vuengine/emulator/resume', 'Resume')
-                  : nls.localize('vuengine/emulator/pause', 'Pause')
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_PAUSE_TOGGLE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-pause"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_RESET.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_RESET.id,
-                    true
-                  )}`}
-                onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Reset)}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-refresh"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${this.state.muted
-                  ? nls.localize('vuengine/emulator/unmute', 'Unmute')
-                  : nls.localize('vuengine/emulator/mute', 'Mute')
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_AUDIO_MUTE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.AudioMute)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i
-                  className={
-                    this.state.muted ? 'fa fa-volume-off' : 'fa fa-volume-up'
-                  }
-                ></i>
-              </button>
-              <button
-                className={
-                  this.state.lowPower ? 'theia-button' : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_LOW_POWER.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i
-                  className={
-                    this.state.lowPower
-                      ? 'fa fa-battery-quarter'
-                      : 'fa fa-battery-full'
-                  }
-                ></i>
-              </button>
-            </div>
-            <div>
-              {(this.preferenceService.get(
-                VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE
-              ) as boolean) && (
-                  <button
-                    className="theia-button secondary"
-                    title={`${EmulatorCommands.INPUT_REWIND.label
-                      }${this.vesCommonService.getKeybindingLabel(
-                        EmulatorCommands.INPUT_REWIND.id,
-                        true
-                      )}`}
-                    onClick={e =>
-                      this.sendKeypress(EmulatorFunctionKeyCode.Rewind)
-                    }
-                    disabled={
-                      !this.state.loaded ||
-                      this.state.showControls ||
-                      this.state.paused
-                    }
-                  >
-                    <i className="fa fa-backward"></i>
-                  </button>
-                )}
-              <button
-                className={
-                  this.state.slowmotion
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-eject fa-rotate-90"></i>
-              </button>
-              <button
-                className={
-                  this.state.frameAdvance
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_FRAME_ADVANCE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_FRAME_ADVANCE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  (this.state.paused && !this.state.frameAdvance)
-                }
-              >
-                <i className="fa fa-step-forward"></i>
-              </button>
-
-              <button
-                className={
-                  this.state.fastForward
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-forward"></i>
-              </button>
-            </div>
-            <div>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_SAVE_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_SAVE_STATE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.SaveState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-level-down"></i>{' '}
-                <i className="fa fa-bookmark-o"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_LOAD_STATE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_LOAD_STATE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.LoadState)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-bookmark-o"></i>{' '}
-                <i className="fa fa-level-up"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={nls.localize(
-                  'vuengine/emulator/currentSaveState',
-                  'Current Save State'
-                )}
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-bookmark-o"></i> {this.state.saveSlot}
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_STATE_SLOT_DECREASE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused ||
-                  this.state.saveSlot <= 0
-                }
-              >
-                <i className="fa fa-chevron-down"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_STATE_SLOT_INCREASE.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-chevron-up"></i>
-              </button>
-            </div>
-            <div>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_DUMP_SRAM.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_DUMP_SRAM.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.DumpSram)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-microchip"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title="Delete SRAM and restart"
-                onClick={this.deleteSramAndRestart}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-trash-o"></i>
-              </button>
-            </div>
-            <div>
-              <select
-                className="theia-select"
-                title={nls.localize('vuengine/emulator/scale', 'Scale')}
-                value={this.preferenceService.get(
-                  VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE
-                )}
-                onChange={this.setScale}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                {Object.keys(EMULATION_SCALES).map((value, index) => (
-                  <option key={index} value={value}>
-                    {Object.values(EMULATION_SCALES)[index]}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="theia-select"
-                title={nls.localize(
-                  'vuengine/emulator/stereoMode',
-                  'Stereo Mode'
-                )}
-                value={this.preferenceService.get(
-                  VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
-                )}
-                onChange={this.setStereoMode}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                {Object.keys(EMULATION_STEREO_MODES).map((value, index) => (
-                  <option key={index} value={value}>
-                    {Object.values(EMULATION_STEREO_MODES)[index]}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="theia-select"
-                title={nls.localize(
-                  'vuengine/emulator/emulationMode',
-                  'Emulation Mode'
-                )}
-                value={this.preferenceService.get(
-                  VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE
-                )}
-                onChange={this.setEmulationMode}
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                {Object.keys(EMULATION_MODES).map((value, index) => (
-                  <option key={index} value={value}>
-                    {Object.values(EMULATION_MODES)[index]}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_FULLSCREEN.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_FULLSCREEN.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-arrows-alt"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title={`${EmulatorCommands.INPUT_SCREENSHOT.label
-                  }${this.vesCommonService.getKeybindingLabel(
-                    EmulatorCommands.INPUT_SCREENSHOT.id,
-                    true
-                  )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Screenshot)
-                }
-                disabled={!this.state.loaded || this.state.showControls}
-              >
-                <i className="fa fa-camera"></i>
-              </button>
-              <button
-                className={
-                  this.state.showControls
-                    ? 'theia-button'
-                    : 'theia-button secondary'
-                }
-                title={`${nls.localize(
-                  'vuengine/emulator/configureInput',
-                  'Configure Input'
-                )}${this.vesCommonService.getKeybindingLabel(
-                  EmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
-                  true
-                )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.ToggleControlsOverlay)
-                }
-                disabled={!this.state.loaded}
-              >
-                <i className="fa fa-keyboard-o"></i>
-              </button>
-            </div>
-          </EmulatorControls>
-          <EmulatorWrapper ref={this.wrapperRef}>
-            {this.state.loaded && (
-              <EmulatorHeader>
-                <div>
-                  <div>Name:</div>
-                  <div>
-                    <span>{this.state.romHeader.name}</span>
-                  </div>
-                </div>
-                <div>
-                  <div>Code:</div>
-                  <div>
-                    <span>{this.state.romHeader.code}</span>
-                  </div>
-                </div>
-                <div>
-                  <div>Maker:</div>
-                  <div>
-                    <span>
-                      {this.state.romHeader.maker}
-                      {ROM_HEADER_MAKERS[this.state.romHeader.maker] && (
-                        <> ({ROM_HEADER_MAKERS[this.state.romHeader.maker]})</>
-                      )}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <div>Version:</div>
-                  <div>
-                    1.<span>{this.state.romHeader.version}</span>
-                  </div>
-                </div>
-                <div>
-                  <div>Size:</div>
-                  <div>
-                    <span>{this.state.romSize} MBit</span>
-                  </div>
-                </div>
-              </EmulatorHeader>
-            )}
-            <EmulatorIframeWrapper
-              style={{
-                width: canvasDimensions.width,
-                height: canvasDimensions.height,
-              }}
-            >
-              <div className='focusBlocker' />
-              <iframe
-                ref={this.iframeRef}
-                src={this.resource}
-                width="100%"
-                height="100%"
-                onLoad={this.startEmulator}
-                tabIndex={0}
-                allow="gamepad"
-              ></iframe>
-              <div className='loading'>
-                {nls.localize('vuengine/emulator/startingUpEmulator', 'Starting up emulator...')}
-              </div>
-            </EmulatorIframeWrapper>
-          </EmulatorWrapper>
-          {this.state.showControls && (
-            <EmulatorControlsOverlay
-              commandService={this.commandService}
-              keybindingRegistry={this.keybindingRegistry}
-              vesCommonService={this.vesCommonService}
-            />
-          )}
-        </>
-      );
+      <Emulator emulator={this} attached={this.isAttached} chrome='hosted' />
+    </>;
   }
 
-  protected async getResource(): Promise<string> {
-    return new Endpoint({ path: '/emulator/index.html' })
-      .getRestUrl()
-      .toString();
+  renderPalettePreview(): React.ReactNode {
+    if (this.getRenderingMode() === VbRenderingMode.ANAGLYPH) {
+      const anaglyph = this.getAnaglyphPalette();
+      return <AnaglyphSwatch
+        left={formatColor(anaglyph.left)}
+        right={formatColor(anaglyph.right)}
+        small
+      />;
+    }
+    return <PaletteSwatch colors={this.getPalette().map(formatColor)} small />;
   }
 
-  protected async sendCommand(command: string, data?: any): Promise<void> {
-    /* eslint-disable-line */
-    this.iframeRef.current?.contentWindow?.postMessage(
-      { command, data },
-      this.resource
-    );
+  renderOverlay(): React.ReactNode {
+    return this.state.showPreferences
+      ? <SettingsWindow<VesEmulatorSettingsTab>
+        tabs={this.settingsTabs()}
+        tab={this.settingsTab ?? 'display'}
+        onTab={next => { this.activeSettingsTab = next; this.update(); }}
+        onClose={() => this.togglePreferencesWindow()}
+        renderPane={(tab, search) => this.renderSettingsPane(tab, search)}
+      />
+      : undefined;
+  }
+
+  protected activeSettingsTab: VesEmulatorSettingsTab = 'display';
+
+  get settingsTab(): VesEmulatorSettingsTab | undefined {
+    return this.state.showPreferences ? this.activeSettingsTab : undefined;
+  }
+
+  protected settingsTabs(): SettingsTabSpec<VesEmulatorSettingsTab>[] {
+    return [
+      {
+        id: 'display',
+        label: nls.localize('vuengine/emulator/settings/display', 'Display'),
+        icon: <Monitor size={18} />,
+        settings: DISPLAY_SETTINGS,
+      },
+      {
+        id: 'input',
+        label: nls.localize('vuengine/emulator/configureInput', 'Configure Input'),
+        icon: <Keyboard size={18} />,
+        keywords: nls.localize(
+          'vuengine/emulator/settings/inputKeywords',
+          'input keybinding keyboard controller game pad button rebind d-pad player 2'
+        ),
+      },
+      {
+        id: 'vbcolor',
+        label: nls.localize('vuengine/emulator/settings/vbColor', 'VB Color'),
+        icon: <VbColorIcon size={16} />,
+        settings: VB_COLOR_SETTINGS,
+      },
+      {
+        id: 'sound',
+        label: nls.localize('vuengine/emulator/settings/sound', 'Sound'),
+        icon: <SpeakerHigh size={18} />,
+        settings: SOUND_SETTINGS,
+      },
+      {
+        id: 'emulation',
+        label: nls.localize('vuengine/emulator/settings/emulation', 'Emulation'),
+        icon: <Cpu size={18} />,
+        settings: EMULATION_SETTINGS,
+      },
+      {
+        id: 'saveData',
+        label: nls.localize('vuengine/emulator/settings/saveData', 'Save Data'),
+        icon: <FloppyDisk size={18} />,
+        settings: SAVE_DATA_SETTINGS,
+      },
+      {
+        id: 'screenshots',
+        label: nls.localize('vuengine/emulator/settings/screenshots', 'Screenshots'),
+        icon: <Camera size={18} />,
+        settings: SCREENSHOT_SETTINGS,
+      },
+      {
+        id: 'achievements',
+        label: nls.localize('vuengine/emulator/settings/achievements', 'Achievements'),
+        icon: <Trophy size={18} />,
+        keywords: nls.localize(
+          'vuengine/emulator/settings/achievementsKeywords',
+          'retroachievements achievements leaderboards score account sign in hardcore points'
+        ),
+      },
+    ];
+  }
+
+  protected renderSettingsPane(tab: VesEmulatorSettingsTab, search: string): React.ReactNode {
+    const pane = { settings: this.settings, hover: this.hover, search };
+    switch (tab) {
+      case 'display':
+        return <DisplaySettings
+          {...pane}
+          notifications={this.notifications}
+          preview={<EmulatorScreenPreview screen={this.dock.screen} loaded={this.state.loaded} />}
+        />;
+      case 'screenshots':
+        return <ScreenshotSettings {...pane} notifications={this.notifications} />;
+      case 'input':
+        return <InputSettings
+          settings={this.settings}
+          bindings={this.bindings}
+          onChange={() => this.update()}
+        />;
+      case 'emulation':
+        return <EmulationSettings {...pane} />;
+      case 'saveData':
+        return <SaveDataSettings {...pane} />;
+      case 'vbcolor':
+        return <VbColorSettings {...pane} />;
+      case 'sound':
+        return <SoundSettings {...pane} />;
+      case 'achievements':
+        return <EmulatorAchievementsSettings
+          settings={this.settings}
+          achievements={this.retroAchievements}
+        />;
+    }
+  }
+
+  async sendCommand(command: string, data?: any): Promise<void> {
+    // Game pad input maps straight onto the core's key mask.
+    const vbKey = GAMEPAD_KEY_TO_VB_KEY[data as EmulatorGamePadKeyCode];
+    if (vbKey !== undefined) {
+      if (command === 'keyPress') {
+        await this.input.tapKey(vbKey);
+      } else {
+        await this.input.setKey(vbKey, command === 'keydown');
+      }
+      return;
+    }
+
+    if (data === EmulatorAction.Rewind) {
+      if (command === 'keydown') {
+        this.time.startRewinding();
+      } else if (command === 'keyup') {
+        this.time.stopRewinding();
+      } else if (command === 'keyPress') {
+        this.time.queueCoreTransition(async core => {
+          await core.suspend();
+          await core.rewindStep();
+          if (!this.state.paused) {
+            await core.run();
+          }
+        });
+      }
+      return;
+    }
 
     if (command === 'keyPress' || command === 'keyup') {
       switch (data) {
-        case EmulatorFunctionKeyCode.AudioMute:
+        case EmulatorAction.AudioMute:
           this.state.muted = !this.state.muted;
+          await this.sim?.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
+          this.esSound.setMuted(this.state.muted);
           await this.localStorageService.setData(
             'ves-emulator-state-muted',
             this.state.muted
           );
           this.update();
           break;
-        case EmulatorFunctionKeyCode.PauseToggle:
+        case EmulatorAction.PauseToggle:
           this.state.paused = !this.state.paused;
           this.state.frameAdvance = false;
+          if (this.state.paused) {
+            await this.core?.suspend();
+          } else {
+            await this.core?.run();
+          }
+          this.esSound.setPaused(this.state.paused);
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleLowPower:
+        case EmulatorAction.ToggleLowPower:
           this.state.lowPower = !this.state.lowPower;
+          await this.input.applyKeys();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleSlowmotion:
+        case EmulatorAction.ToggleSlowmotion:
           this.state.slowmotion = !this.state.slowmotion;
+          this.state.fastForward = false;
+          await this.time.applySpeed();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleFastForward:
+        case EmulatorAction.ToggleFastForward:
           this.state.fastForward = !this.state.fastForward;
+          this.state.slowmotion = false;
+          await this.time.applySpeed();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.FrameAdvance:
-          this.state.paused = true;
+        case EmulatorAction.FrameAdvance:
+          if (!this.state.paused) {
+            this.state.paused = true;
+            await this.core?.suspend();
+            this.esSound.setPaused(true);
+          }
           this.state.frameAdvance = true;
+          await this.core?.stepFrame();
           this.update();
           break;
-        case EmulatorFunctionKeyCode.Fullscreen:
+        case EmulatorAction.Fullscreen:
           this.enterFullscreen();
           break;
-        case EmulatorFunctionKeyCode.ToggleControlsOverlay:
+        case EmulatorAction.ToggleControlsOverlay:
           this.toggleControlsOverlay();
           break;
-        case EmulatorFunctionKeyCode.Reset:
-          await this.reload();
+        case EmulatorAction.Reset:
+          await this.resetSim();
           break;
-        case EmulatorFunctionKeyCode.StateSlotDecrease:
-          if (this.state.saveSlot > 0) {
-            this.state.saveSlot--;
-            this.update();
-            await this.localStorageService.setData(
-              'ves-emulator-state-save-slot',
-              this.state.saveSlot
-            );
-          }
+        case EmulatorAction.SaveState:
+          await this.saveState();
           break;
-        case EmulatorFunctionKeyCode.StateSlotIncrease:
-          this.state.saveSlot++;
-          this.update();
-          await this.localStorageService.setData(
-            'ves-emulator-state-save-slot',
-            this.state.saveSlot
-          );
+        case EmulatorAction.LoadState:
+          await this.loadState();
           break;
-        case EmulatorFunctionKeyCode.Screenshot:
-          this.sendCommand('sendScreenshot');
-          break;
-        case EmulatorFunctionKeyCode.DumpSram:
-          this.sendCommand('sendSram');
+        case EmulatorAction.Screenshot:
+          await this.takeScreenshot();
           break;
       }
     }
   }
 
-  protected async processScreenshot(
-    data: string,
-    filename: string
-  ): Promise<void> {
-    // eslint-disable-next-line deprecation/deprecation
-    const byteString = atob(data);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (workspaceRootUri) {
-      const fileUri = workspaceRootUri.resolve('screenshots').resolve(filename);
-      this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
-    }
+  protected async getRomUri(): Promise<URI> {
+    return this.options ? new URI(this.options.uri) : this.vesBuildService.getDefaultRomUri();
   }
 
-  protected async processSram(data: string): Promise<void> {
-    // eslint-disable-next-line deprecation/deprecation
-    const byteString = atob(data);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    const romPath = await this.getRomPath();
-    const sramPath = romPath.replace(new RegExp('.vb$'), '.srm');
-
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (workspaceRootUri) {
-      this.fileService.writeFile(new URI(sramPath), BinaryBuffer.wrap(ia));
-    }
+  get player(): 1 | 2 {
+    return this.options?.player === 2 ? 2 : 1;
   }
 
-  protected setEmulationMode = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ): Promise<void> => {
-    e.target.blur();
-    await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
-      e.target.value,
-      PreferenceScope.User
-    );
-    await this.reload();
-  };
-
-  protected setStereoMode = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ): Promise<void> => {
-    e.target.blur();
-    await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
-      e.target.value,
-      PreferenceScope.User
-    );
-    await this.reload();
-  };
-
-  protected setScale = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ): Promise<void> => {
-    e.target.blur();
-    await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE,
-      e.target.value,
-      PreferenceScope.User
-    );
-    this.update();
-  };
-
-  protected sendCoreOptions(): void {
-    const emulationMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE
-    ) as string;
-    let stereoMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
-    ) as string;
-    let anaglyphPreset = 'disabled';
-    let colorMode = 'black & red';
-
-    if (stereoMode.startsWith('2d')) {
-      colorMode = stereoMode.substring(3).replace('-', ' & ').replace('-', ' ');
-      anaglyphPreset = 'disabled';
-      stereoMode = 'anaglyph';
-    } else if (stereoMode.startsWith('anaglyph')) {
-      anaglyphPreset = stereoMode
-        .substring(9)
-        .replace('-', ' & ')
-        .replace('-', ' ');
-      stereoMode = 'anaglyph';
+  protected async companionDirectory(): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    if (this.settings.get('companionFiles') === EmulatorCompanionLocation.ROM) {
+      return this.storage.parent(rom);
     }
+    const config = new URI(await this.envVariablesServer.getConfigDirUri());
+    return config.resolve('vueport').resolve('roms')
+      .resolve(this.storage.stem(rom)).toString();
+  }
 
-    this.sendCommand(
-      'setCoreOptions',
-      `
-        vb_3dmode = "${stereoMode}"
-        vb_anaglyph_preset = "${anaglyphPreset}"
-        vb_color_mode = "${colorMode}"
-        vb_right_analog_to_digital = "disabled"
-        vb_cpu_emulation = "${emulationMode}"
-      `
+  protected globalMacrosPath: string | undefined;
+
+  protected async ensureConfigRoot(): Promise<void> {
+    if (this.configRoot !== undefined) {
+      return;
+    }
+    const config = new URI(await this.envVariablesServer.getConfigDirUri());
+    this.configRoot = config.resolve('vueport').toString();
+  }
+
+  protected async resolveGlobalMacrosPath(): Promise<void> {
+    await this.ensureConfigRoot();
+    this.globalMacrosPath = this.companions.globalMacros();
+  }
+
+  protected async companionRomPath(): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    return this.storage.join(await this.companionDirectory(), this.storage.name(rom));
+  }
+
+  protected loadedSaveRamBytes = 0;
+
+  protected async getSaveRamPath(): Promise<string> {
+    const rom = (await this.getRomUri()).toString();
+    return this.storage.join(
+      await this.companionDirectory(), `${this.storage.stem(rom)}.p${this.player}.sram`
     );
   }
 
-  protected sendRetroArchConfig(): void {
-    this.sendCommand(
-      'setRetroArchConfig',
-      `
-        menu_driver = "glui"
-        history_list_enable = false
-        perfcnt_enable = false
-        config_save_on_exit = false
-        suspend_screensaver_enable  = true
-        fps_show = false
-        framecount_show = false
-        memory_show = false
-        video_windowed_fullscreen = false
-        video_vsync = true
-        video_font_enable = true
-        cheevos_enable = false
-        cheevos_hardcore_mode_enable = false
-        quit_press_twice = false
-        rewind_enable = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE
-      ) as boolean
+  protected async loadSaveRam(): Promise<void> {
+    const path = await this.getSaveRamPath();
+    const window = saveRamWindowBytes(this.settings.get('sramWindow'));
+    const ram = freshSaveRam(this.settings.get('sramInit'), window);
+    this.loadedSaveRamBytes = 0;
+
+    if (await this.storage.exists(path)) {
+      const stored = await this.storage.read(path);
+      if (stored.length === 0 || (stored.length & (stored.length - 1)) !== 0) {
+        console.warn(`[emulator] ignoring save RAM of unusable size ${stored.length}: ${path}`);
+      } else {
+        ram.set(stored.subarray(0, Math.min(stored.length, ram.length)));
+        this.loadedSaveRamBytes = stored.length;
       }
-        rewind_granularity = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY
-      ) as number
-      }
-        rewind_buffer_size = 50
-        pause_nonactive = true
-        
-        audio_mute_enable = ${this.state.muted}
-        state_slot = ${this.state.saveSlot}
+    }
 
-      ${/* keyboard input */ ''}
-      input_player1_select = ${this.toButton(EmulatorGamePadKeyCode.Select)}
-        input_player1_start = ${this.toButton(EmulatorGamePadKeyCode.Start)}
-        input_player1_l = ${this.toButton(EmulatorGamePadKeyCode.LT)}
-        input_player1_r = ${this.toButton(EmulatorGamePadKeyCode.RT)}
-        input_player1_a = ${this.toButton(EmulatorGamePadKeyCode.A)}
-        input_player1_b = ${this.toButton(EmulatorGamePadKeyCode.B)}
-        input_player1_up = ${this.toButton(EmulatorGamePadKeyCode.LUp)}
-        input_player1_left = ${this.toButton(EmulatorGamePadKeyCode.LLeft)}
-        input_player1_down = ${this.toButton(EmulatorGamePadKeyCode.LDown)}
-        input_player1_right = ${this.toButton(EmulatorGamePadKeyCode.LRight)}
-        input_player1_l2 = ${this.toButton(EmulatorGamePadKeyCode.RUp)}
-        input_player1_r2 = ${this.toButton(EmulatorGamePadKeyCode.RLeft)}
-        input_player1_l3 = ${this.toButton(EmulatorGamePadKeyCode.RDown)}
-        input_player1_r3 = ${this.toButton(EmulatorGamePadKeyCode.RRight)}
-        input_player1_l_x_minus = ${this.toButton(EmulatorGamePadKeyCode.LLeft)}
-        input_player1_l_x_plus = ${this.toButton(EmulatorGamePadKeyCode.LRight)}
-        input_player1_l_y_minus = ${this.toButton(EmulatorGamePadKeyCode.LDown)}
-        input_player1_l_y_plus = ${this.toButton(EmulatorGamePadKeyCode.LUp)}
-        input_player1_r_x_minus = ${this.toButton(EmulatorGamePadKeyCode.RLeft)}
-        input_player1_r_x_plus = ${this.toButton(EmulatorGamePadKeyCode.RRight)}
-        input_player1_r_y_minus = ${this.toButton(EmulatorGamePadKeyCode.RDown)}
-        input_player1_r_y_plus = ${this.toButton(EmulatorGamePadKeyCode.RUp)}
-        input_player1_turbo = nul
-
-        ${/* vb usb adapter input */ ''}
-        input_player1_up_btn = "0"
-        input_player1_down_btn = "1"
-        input_player1_left_btn = "2"
-        input_player1_right_btn = "3"
-        input_player1_a_btn = "4"
-        input_player1_b_btn = "5"
-        input_player1_select_btn = "7"
-        input_player1_start_btn = "6"
-        input_player1_l_btn = "9"
-        input_player1_r_btn = "8"
-        input_player1_l2_btn = "10"
-        input_player1_r3_btn = "11"
-        input_player1_l3_btn = "12"
-        input_player1_r2_btn = "13"
-
-        input_save_state = ${this.toButton(EmulatorFunctionKeyCode.SaveState)}
-        input_load_state = ${this.toButton(EmulatorFunctionKeyCode.LoadState)}
-        input_state_slot_decrease = ${this.toButton(
-        EmulatorFunctionKeyCode.StateSlotDecrease
-      )}
-        input_state_slot_increase = ${this.toButton(
-        EmulatorFunctionKeyCode.StateSlotIncrease
-      )}
-        input_toggle_fast_forward = ${this.toButton(
-        EmulatorFunctionKeyCode.ToggleFastForward
-      )}
-        input_toggle_slowmotion = ${this.toButton(
-        EmulatorFunctionKeyCode.ToggleSlowmotion
-      )}
-        input_pause_toggle = ${this.toButton(
-        EmulatorFunctionKeyCode.PauseToggle
-      )}
-        input_rewind = ${this.toButton(EmulatorFunctionKeyCode.Rewind)}
-        input_frame_advance = ${this.toButton(
-        EmulatorFunctionKeyCode.FrameAdvance
-      )}
-        input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
-        input_screenshot = ${this.toButton(EmulatorFunctionKeyCode.Screenshot)}
-
-        auto_screenshot_filename = "true"
-        screenshot_directory = "/home/web_user/retroarch/userdata"
-
-        slowmotion_ratio = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO
-      ) as number
-      }
-        fastforward_ratio = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO
-      ) as number
-      }
-
-        input_reset = nul
-        input_toggle_fullscreen = nul
-        input_hold_fast_forward = nul
-        input_hold_slowmotion = nul
-        input_exit_emulator = nul
-        input_shader_next = nul
-        input_shader_prev = nul
-        input_movie_record_toggle = nul
-        input_slowmotion = nul
-        input_enable_hotkey_btn = nul
-        input_hotkey_block_delay = nul
-        input_volume_up = nul
-        input_volume_down = nul
-        input_menu_toggle = nul
-      `
-    );
+    await this.sim?.setCartRam(ram.buffer as ArrayBuffer);
   }
 
-  protected getCanvasDimensions(): { height: number; width: number } {
-    const canvasScale = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE
-    ) as string;
-    const screenResolution = this.getScreenResolution();
-    const wrapperHeight =
-      this.wrapperRef.current?.offsetHeight || screenResolution.height;
-    const wrapperWidth =
-      this.wrapperRef.current?.offsetWidth || screenResolution.width;
+  protected async saveSaveRam(): Promise<void> {
+    const info = await this.sim?.cartRamInfo();
+    if (!info || info.size === 0) {
+      return;
+    }
+    const bytes = Math.min(info.size, saveRamFileSize(info.used, this.loadedSaveRamBytes));
+    const ram = await this.sim?.getCartRam(bytes);
+    if (!ram || ram.byteLength === 0) {
+      return;
+    }
+    const path = await this.getSaveRamPath();
+    let out = new Uint8Array(ram);
+    if (this.loadedSaveRamBytes > out.length && await this.storage.exists(path)) {
+      const existing = await this.storage.read(path);
+      if (existing.length > out.length) {
+        const merged = existing.slice();
+        merged.set(out);
+        out = merged;
+      }
+    }
+    await this.storage.write(path, out);
+    this.loadedSaveRamBytes = out.length;
+  }
 
-    if (canvasScale === 'full') {
-      const fullSizeCanvasScale = Math.min(
-        wrapperHeight / screenResolution.height,
-        wrapperWidth / screenResolution.width,
+  protected async attachSaveStates(): Promise<void> {
+    await this.ensureConfigRoot();
+    const uri = (await this.getRomUri()).toString();
+    const rom: CompanionRom = { name: this.storage.name(uri), location: uri };
+    await this.saveStates.attach(rom, this.createSaveStateMachine());
+  }
+
+  protected createSaveStateMachine(): SaveStateMachine {
+    const host = this;
+    return {
+      get machineCount(): number {
+        return host.sims.length || 1;
+      },
+      snapshot: async () => {
+        const sims = host.sims;
+        if (!sims.length) {
+          return undefined;
+        }
+        const states: ArrayBuffer[] = [];
+        for (const sim of sims) {
+          states.push(await sim.saveState());
+        }
+        return states;
+      },
+      restore: async states => {
+        const sims = host.sims;
+        for (let index = 0; index < sims.length; index++) {
+          await sims[index].loadState(states[index]);
+        }
+      },
+      thumbnail: async () => {
+        if (!host.sim || !host.state.loaded) {
+          return undefined;
+        }
+        const png = await host.sim.capture(VB_DEFAULT_DISPLAY_MODE, 1);
+        return png ? new Uint8Array(png) : undefined;
+      },
+      identity: () => host.saveStateIdentity,
+      esSoundSnapshot: () => host.esSound.snapshot(),
+      esSoundRestore: snapshot => host.esSound.restore(snapshot as EsSoundSnapshot),
+    };
+  }
+
+  protected restoreEsSound(stored: string | undefined): void {
+    if (!stored) {
+      return;
+    }
+    try {
+      this.esSound.restore(JSON.parse(stored));
+    } catch (error) {
+      console.warn('[emulator] could not restore ESSound playback from the save state:', error);
+    }
+  }
+
+  protected get sims(): Sim[] {
+    if (!this.session) {
+      return [];
+    }
+    return this.session.mirror
+      ? [this.session.sim, this.session.mirror]
+      : [this.session.sim];
+  }
+
+  protected async saveState(): Promise<void> {
+    if (!this.sims.length) {
+      return;
+    }
+    try {
+      const entry = await this.saveStates.create('manual');
+      if (entry) {
+        this.notifications.info(
+          nls.localize('vuengine/emulator/saveStateSaved', 'Save state created.')
+        );
+      }
+    } catch (error) {
+      this.handleCoreError(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  protected async loadState(): Promise<void> {
+    if (!this.sims.length) {
+      return;
+    }
+    const entry = this.saveStates.latestManual;
+    if (!entry) {
+      this.notifications.warn(
+        nls.localize('vuengine/emulator/saveStateNone', 'This game has no save state to load.')
       );
-      return {
-        height: fullSizeCanvasScale * screenResolution.height,
-        width: fullSizeCanvasScale * screenResolution.width,
-      };
-    } else if (canvasScale === 'auto') {
-      const maxScale = this.determineMaxCanvasScaleFactor();
-      return {
-        height: maxScale * screenResolution.height,
-        width: maxScale * screenResolution.width,
-      };
-    } else {
-      const preferredScale = parseInt(canvasScale.substring(1));
-      const maxScale = this.determineMaxCanvasScaleFactor();
-      const actualScale = Math.min(maxScale, preferredScale);
-      return {
-        height: actualScale * screenResolution.height,
-        width: actualScale * screenResolution.width,
-      };
+      return;
+    }
+    await this.loadSaveState(entry);
+  }
+
+  async loadSaveState(entry: SaveStateEntry): Promise<void> {
+    if (!this.sims.length) {
+      return;
+    }
+    const running = !this.state.paused;
+    try {
+      if (running) {
+        await this.core?.suspend();
+      }
+      await this.saveStates.restore(entry);
+      this.notifications.info(
+        nls.localize('vuengine/emulator/saveStateLoaded', 'Save state loaded.')
+      );
+    } catch (error) {
+      this.handleCoreError(error instanceof Error ? error.message : String(error));
+    } finally {
+      if (running) {
+        await this.core?.run();
+      }
     }
   }
 
-  protected determineMaxCanvasScaleFactor(): number {
-    const screenResolution = this.getScreenResolution();
-    const wrapperHeight =
-      this.wrapperRef.current?.offsetHeight || screenResolution.height;
-    const wrapperWidth =
-      this.wrapperRef.current?.offsetWidth || screenResolution.width;
+  protected async takeScreenshot(): Promise<void> {
+    const png = await this.sim?.capture();
+    if (!png) {
+      return;
+    }
 
-    return Math.min(
-      Math.floor(wrapperHeight / screenResolution.height),
-      Math.floor(wrapperWidth / screenResolution.width),
+    const now = new Date();
+    const pad = (value: number) => `${value}`.padStart(2, '0');
+    const timestamp = `${pad(now.getFullYear() % 100)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+      + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const romUri = await this.getRomUri();
+    const screenshotFilename = `${romUri.path.name}-${timestamp}.png`;
+
+    await this.storage.export(`screenshots/${screenshotFilename}`, new Uint8Array(png));
+    this.notifications.info(
+      nls.localize('vuengine/emulator/screenshotSaved', 'Screenshot saved to screenshots/{0}.', screenshotFilename)
     );
   }
 
-  protected getScreenResolution(): { height: number; width: number } {
-    const stereoMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
-    ) as string;
-    let x = VesEmulatorWidget.RESOLUTIONX;
-    let y = VesEmulatorWidget.RESOLUTIONY;
+  setRenderingMode = async (mode: string): Promise<void> => {
+    await this.settings.set('renderingMode', mode);
+  };
 
-    if (stereoMode === 'side-by-side') {
-      x = VesEmulatorWidget.RESOLUTIONX * 2;
-    } else if (stereoMode === 'cyberscope') {
-      x = 512;
-      y = VesEmulatorWidget.RESOLUTIONX;
-    } else if (stereoMode === 'hli') {
-      y = VesEmulatorWidget.RESOLUTIONY * 2;
-    } else if (stereoMode === 'vli') {
-      x = VesEmulatorWidget.RESOLUTIONX * 2;
+  setScale = async (scale: string): Promise<void> => {
+    await this.settings.set('scale', scale);
+    this.applyScale();
+  };
+
+  getRenderingMode(): string {
+    return this.settings.get('renderingMode');
+  }
+
+  protected getPalette(): VbPalette {
+    return resolvePalette(
+      this.settings.get('palette'),
+      this.settings.get('customPalettes')
+    );
+  }
+
+  protected getAnaglyphPalette(): VbAnaglyphPalette {
+    return resolveAnaglyphPalette(
+      this.settings.get('anaglyphPalette'),
+      this.settings.get('customAnaglyphPalettes')
+    );
+  }
+
+  protected getDisplayMode(): DisplayMode {
+    return buildDisplayMode(
+      this.getRenderingMode(),
+      this.getPalette(),
+      this.getAnaglyphPalette()
+    );
+  }
+
+  getPaletteLabel(): string {
+    const anaglyph = this.getRenderingMode() === VbRenderingMode.ANAGLYPH;
+    const id = anaglyph
+      ? this.settings.get('anaglyphPalette')
+      : this.settings.get('palette');
+    if (id.startsWith(CUSTOM_PALETTE_PREFIX)) {
+      return id.slice(CUSTOM_PALETTE_PREFIX.length);
     }
+    return (anaglyph ? emulationAnaglyphPalettes() : emulationPalettes())[id] ?? id;
+  }
 
-    return { height: y, width: x };
+  get activeCheats(): number {
+    return this.cheats.list.filter(cheat => cheat.enabled).length;
+  }
+
+  toggleCheats(): void {
+    this.showSideStrip(this.state.showCheats ? undefined : 'cheats');
+  }
+
+  protected showSideStrip(
+    which: 'saveStates' | 'cheats' | 'macros' | 'patches' | 'colors' | 'achievements' | undefined,
+  ): void {
+    if (which !== undefined && which !== 'achievements' && this.refuseForHardcore()) {
+      return;
+    }
+    this.state.showSaveStates = which === 'saveStates';
+    this.state.showCheats = which === 'cheats';
+    this.state.showMacros = which === 'macros';
+    this.state.showPatches = which === 'patches';
+    this.state.showColors = which === 'colors';
+    this.state.showAchievements = which === 'achievements';
+    this.update();
+  }
+
+  protected refuseForHardcore(): boolean {
+    if (!this.isHardcore()) {
+      return false;
+    }
+    this.notifications.info(nls.localize(
+      'vuengine/emulator/hardcoreRefused',
+      'Hardcore Mode is on, so this is not available.'
+    ));
+    return true;
+  }
+
+  isHardcore(): boolean {
+    return this.settings.get('retroAchievementsEnabled')
+      && this.settings.get('retroAchievementsHardcore');
+  }
+
+  protected async enterHardcoreDiscipline(): Promise<void> {
+    this.showSideStrip(undefined);
+    this.setMode(EmulatorMode.PLAY);
+    this.cheats.disableAll();
+    this.patches.disableAll();
+    this.macros.stop();
+    this.macros.cancelRecording();
+    await this.time.applyRewindSettings();
+    this.update();
+  }
+
+  get hasRom(): boolean {
+    return this.status === EmulatorRomStatus.EXISTS;
+  }
+
+  get settingsOpen(): boolean {
+    return this.settingsTab !== undefined;
+  }
+
+  get vbcSupportEnabled(): boolean {
+    return this.settings.get('vbcSupportEnabled');
+  }
+
+  get selectedHardwareMode(): string {
+    return this.vbcSupportEnabled
+      ? this.settings.get('hardwareMode')
+      : VbHardwareMode.VIRTUAL_BOY;
+  }
+
+  get resolvedHardwareMode(): VbHardwareMode.VIRTUAL_BOY | VbHardwareMode.VB_COLOR {
+    return resolveVbHardwareMode(this.selectedHardwareMode, this.state.romHeader.vbcSupport);
+  }
+
+  get vbcHardwareActive(): boolean {
+    return this.sim?.isVbcHardware ?? this.resolvedHardwareMode === VbHardwareMode.VB_COLOR;
+  }
+
+  get saveGameSlot(): string {
+    return this.settings.get('saveGameSlot');
+  }
+
+  toggleDebugMode(): void {
+    this.setMode(this.state.mode === EmulatorMode.DEBUG ? EmulatorMode.PLAY : EmulatorMode.DEBUG);
+  }
+
+  async offerToLeaveHardcore(): Promise<void> {
+    await this.retroAchievements.offerToLeaveHardcore();
+  }
+
+  toggleMacros(): void {
+    this.showSideStrip(this.state.showMacros ? undefined : 'macros');
+  }
+
+  togglePatches(): void {
+    this.showSideStrip(this.state.showPatches ? undefined : 'patches');
+  }
+
+  toggleColors(): void {
+    this.showSideStrip(this.state.showColors ? undefined : 'colors');
+  }
+
+  toggleAchievements(): void {
+    this.showSideStrip(this.state.showAchievements ? undefined : 'achievements');
+  }
+
+  toggleSaveStates(): void {
+    this.showSideStrip(this.state.showSaveStates ? undefined : 'saveStates');
+  }
+
+  showSaveStates(): void {
+    this.showSideStrip('saveStates');
+  }
+
+  showCheats(): void {
+    this.showSideStrip('cheats');
+  }
+
+  showMacros(): void {
+    this.showSideStrip('macros');
+  }
+
+  showPatches(): void {
+    this.showSideStrip('patches');
+  }
+
+  showColors(): void {
+    this.showSideStrip('colors');
+  }
+
+  showAchievements(): void {
+    this.showSideStrip('achievements');
+  }
+
+  get macroActivity(): MacroActivity {
+    return this.macros.activity;
+  }
+
+  cancelMacroRecording(): void {
+    this.macros.cancelRecording();
+    this.update();
+  }
+
+  get moviePlaying(): boolean {
+    return this.moviePlayer.playing;
+  }
+
+  get movieFrame(): number {
+    return this.moviePlayer.frame;
+  }
+
+  get movieLength(): number {
+    return this.moviePlayer.length;
+  }
+
+  stopMoviePlayback(): void {
+    this.moviePlayer.stop().catch(() => undefined);
+    this.update();
+  }
+
+  renderSaveStates(): React.ReactNode {
+    return <EmulatorSaveStates
+      states={this.saveStates}
+      notifications={this.notifications}
+      canSave={this.state.loaded}
+      hardcore={this.isHardcore()}
+      onSave={() => { this.saveState().catch(error => this.handleCoreError(String(error))); }}
+      onLoad={entry => {
+        this.loadSaveState(entry).catch(error => this.handleCoreError(String(error)));
+      }}
+      onClose={() => this.toggleSaveStates()}
+    />;
+  }
+
+  renderCheats(): React.ReactNode {
+    return <EmulatorCheats
+      cheats={this.cheats}
+      finder={this.cheatFinder}
+      notifications={this.notifications}
+      onClose={() => this.toggleCheats()}
+    />;
+  }
+
+  renderMacros(): React.ReactNode {
+    return <EmulatorMacros
+      macros={this.macros}
+      notifications={this.notifications}
+      onClose={() => this.toggleMacros()}
+    />;
+  }
+
+  renderPatches(): React.ReactNode {
+    return <EmulatorPatches
+      patches={this.patches}
+      notifications={this.notifications}
+      onClose={() => this.togglePatches()}
+    />;
+  }
+
+  renderColors(): React.ReactNode {
+    return <EmulatorColors
+      colors={this.colors}
+      notifications={this.notifications}
+      onClose={() => this.toggleColors()}
+    />;
+  }
+
+  renderAchievements(): React.ReactNode {
+    return <EmulatorAchievements
+      achievements={this.retroAchievements}
+      onClose={() => this.toggleAchievements()}
+      onOpenSettings={() => this.commandService.executeCommand(
+        'preferences:open', 'emulator.builtIn.retroAchievements'
+      )}
+    />;
+  }
+
+  togglePaletteWindow(): void {
+    this.toggleSettingsTab('display');
+  }
+
+  togglePreferencesWindow(): void {
+    this.toggleSettingsTab('emulation');
+  }
+
+  protected toggleSettingsTab(tab: VesEmulatorSettingsTab): void {
+    const open = !(this.state.showPreferences && this.activeSettingsTab === tab);
+    if (open) {
+      this.activeSettingsTab = tab;
+      this.showSideStrip(undefined);
+    }
+    this.state.showPreferences = open;
+    this.state.showPalettes = open && tab === 'display';
+    this.state.showControls = open && tab === 'input';
+    this.update();
+  }
+
+  protected async applyDisplayMode(): Promise<void> {
+    const mode = this.getDisplayMode();
+    this.dock.screen.setDisplayMode(mode);
+    await this.sim?.setDisplayMode(mode);
+  }
+
+  protected applyScale(): void {
+    this.dock.screen.setScale(
+      this.settings.get('scale')
+    );
   }
 
   protected enterFullscreen(): void {
-    this.wrapperRef.current?.requestFullscreen();
+    this.node.requestFullscreen();
   }
 
   protected toggleControlsOverlay(): void {
     if (!this.state.paused) {
-      this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle);
+      this.runAction(EmulatorAction.PauseToggle);
     }
-    this.state.showControls = !this.state.showControls;
-    this.update();
+    this.toggleSettingsTab('input');
   }
 
-  protected toButton(
-    keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode
-  ): string {
-    let button: string = keyCode;
-    if (keyCode.startsWith('Key')) {
-      button = keyCode.substring(3);
-    } else if (keyCode.startsWith('Arrow')) {
-      button = keyCode.substring(5);
+  public deleteSramAndRestart = async () => {
+    const confirmed = await this.notifications.confirm({
+      title: nls.localize('vuengine/emulator/deleteSram', 'Delete SRAM'),
+      message: nls.localize(
+        'vuengine/emulator/areYouSureYouWantToDeleteSram',
+        'Are you sure you want to delete SRAM and restart? Any saved progress will be lost.'
+      ),
+    });
+    if (confirmed) {
+      this.reload(true);
     }
-    return button.toLowerCase();
-  }
-
-  protected deleteSramAndRestart = async () => {
-    this.reload(true);
   };
 
-  // TODO: Investigate why the clean command does not work
-  protected cleanStorage = async () => {
-    const romPath = await this.getRomPath();
-    const dbName = `RetroArch ${romPath}`;
-    console.info(`Attempting to delete Indexed DB "${dbName}"`);
-    localStorage.clear();
-    const req = indexedDB.deleteDatabase(dbName);
-    req.onsuccess = () => {
-      console.info('Deleted database successfully');
-    };
-    req.onerror = () => {
-      console.info("Couldn't delete database");
-    };
-    req.onblocked = () => {
-      console.info(
-        "Couldn't delete database due to the operation being blocked"
-      );
-    };
-  };
 }
