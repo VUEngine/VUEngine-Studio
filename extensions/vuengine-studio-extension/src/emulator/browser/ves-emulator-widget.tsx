@@ -896,7 +896,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }),
       this.settings.onDidChange(setting => {
         if ([
-          'renderingMode', 'palette', 'anaglyphPalette',
+          'renderingMode', 'swapEyes', 'palette', 'anaglyphPalette',
           'customPalettes', 'customAnaglyphPalettes',
         ].includes(setting)) {
           this.applyDisplayMode();
@@ -2188,7 +2188,8 @@ granularity records less often and costs proportionally less.',
     return buildDisplayMode(
       this.getRenderingMode(),
       this.getPalette(),
-      this.getAnaglyphPalette()
+      this.getAnaglyphPalette(),
+      this.settings.get('swapEyes')
     );
   }
 
