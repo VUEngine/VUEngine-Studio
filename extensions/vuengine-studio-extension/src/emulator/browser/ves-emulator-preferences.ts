@@ -10,6 +10,7 @@ export namespace VesEmulatorPreferenceIds {
   export const DEFAULT_EMULATOR = [CATEGORY, 'custom', 'default'].join('.');
   export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
   export const EMULATOR_BUILTIN_RENDERING_MODE = [CATEGORY, 'builtIn', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_SWAP_EYES = [CATEGORY, 'builtIn', 'swapEyes'].join('.');
   export const EMULATOR_BUILTIN_PALETTE = [CATEGORY, 'builtIn', 'palette'].join('.');
   export const EMULATOR_BUILTIN_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_CUSTOM_PALETTES = [CATEGORY, 'builtIn', 'customPalettes'].join('.');
@@ -67,6 +68,7 @@ export namespace VesEmulatorPreferenceIds {
 
 export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     renderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
+    swapEyes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SWAP_EYES,
     palette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
     anaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE,
     customPalettes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES,
