@@ -122,7 +122,6 @@ import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/bro
 import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import EmulatorSaveStates from 'vueport-core/lib/browser/components/EmulatorSaveStates';
 import EmulatorCheats from 'vueport-core/lib/browser/components/EmulatorCheats';
-import EmulatorColors from 'vueport-core/lib/browser/components/EmulatorColors';
 import EmulatorMacros from 'vueport-core/lib/browser/components/EmulatorMacros';
 import EmulatorPatches from 'vueport-core/lib/browser/components/EmulatorPatches';
 import EmulatorAchievements from 'vueport-core/lib/browser/components/EmulatorAchievements';
@@ -205,7 +204,6 @@ export interface vesEmulatorWidgetState {
   showCheats: boolean;
   showMacros: boolean;
   showPatches: boolean;
-  showColors: boolean;
   showAchievements: boolean;
   saveStateExists: boolean;
   romHeader: RomHeader;
@@ -460,7 +458,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     showCheats: false,
     showMacros: false,
     showPatches: false,
-    showColors: false,
     showAchievements: false,
     saveStateExists: false,
     romHeader: EMPTY_ROM_HEADER,
@@ -1554,12 +1551,19 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     );
   }
 
+  protected pendingColorPatchesDisabled: string[] | undefined;
+
   protected rememberColorChoice(id: string, apply: boolean): void {
-    const disabled = this.settings.get('vbcColorPatchesDisabled');
-    this.settings.set(
-      'vbcColorPatchesDisabled',
-      apply ? disabled.filter(entry => entry !== id) : [...disabled.filter(entry => entry !== id), id]
-    ).catch(() => undefined);
+    const disabled = this.pendingColorPatchesDisabled ?? this.settings.get('vbcColorPatchesDisabled');
+    const next = apply ? disabled.filter(entry => entry !== id) : [...disabled.filter(entry => entry !== id), id];
+    this.pendingColorPatchesDisabled = next;
+    this.settings.set('vbcColorPatchesDisabled', next)
+      .catch(() => undefined)
+      .then(() => {
+        if (this.pendingColorPatchesDisabled === next) {
+          this.pendingColorPatchesDisabled = undefined;
+        }
+      });
     if (apply && !this.settings.get('vbcAutoApplyColorPatches')) {
       this.settings.set('vbcAutoApplyColorPatches', true).catch(() => undefined);
     }
@@ -2213,7 +2217,7 @@ granularity records less often and costs proportionally less.',
   }
 
   protected showSideStrip(
-    which: 'saveStates' | 'cheats' | 'macros' | 'patches' | 'colors' | 'achievements' | undefined,
+    which: 'saveStates' | 'cheats' | 'macros' | 'patches' | 'achievements' | undefined,
   ): void {
     if (which !== undefined && which !== 'achievements' && this.refuseForHardcore()) {
       return;
@@ -2222,7 +2226,6 @@ granularity records less often and costs proportionally less.',
     this.state.showCheats = which === 'cheats';
     this.state.showMacros = which === 'macros';
     this.state.showPatches = which === 'patches';
-    this.state.showColors = which === 'colors';
     this.state.showAchievements = which === 'achievements';
     this.update();
   }
@@ -2300,10 +2303,6 @@ granularity records less often and costs proportionally less.',
     this.showSideStrip(this.state.showPatches ? undefined : 'patches');
   }
 
-  toggleColors(): void {
-    this.showSideStrip(this.state.showColors ? undefined : 'colors');
-  }
-
   toggleAchievements(): void {
     this.showSideStrip(this.state.showAchievements ? undefined : 'achievements');
   }
@@ -2326,10 +2325,6 @@ granularity records less often and costs proportionally less.',
 
   showPatches(): void {
     this.showSideStrip('patches');
-  }
-
-  showColors(): void {
-    this.showSideStrip('colors');
   }
 
   showAchievements(): void {
@@ -2396,16 +2391,9 @@ granularity records less often and costs proportionally less.',
   renderPatches(): React.ReactNode {
     return <EmulatorPatches
       patches={this.patches}
-      notifications={this.notifications}
-      onClose={() => this.togglePatches()}
-    />;
-  }
-
-  renderColors(): React.ReactNode {
-    return <EmulatorColors
       colors={this.colors}
       notifications={this.notifications}
-      onClose={() => this.toggleColors()}
+      onClose={() => this.togglePatches()}
     />;
   }
 
