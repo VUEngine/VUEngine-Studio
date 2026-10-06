@@ -26,7 +26,7 @@ import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
-import { KeymapsFrontendContribution, KeymapsService } from '@theia/keymaps/lib/browser';
+import { KeymapsFrontendContribution } from '@theia/keymaps/lib/browser';
 import { KeybindingWidget } from '@theia/keymaps/lib/browser/keybindings-widget';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
@@ -56,7 +56,7 @@ import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
 import { VesFilterContribution } from './ves-filter-contribution';
-import { VesKeybindingService, VesKeymapsServiceProvider } from './ves-keybinding-service';
+import { VesKeybindingService } from './ves-keybinding-service';
 import { VesKeybindingWidget } from './ves-keybindings-widget';
 import { VesKeymapsFrontendContribution } from './ves-keymaps-frontend-contribution';
 import { VesOutlineViewContribution } from './ves-outline-view-contribution';
@@ -150,8 +150,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // override keybindings widget to allow querying through OPEN_KEYMAPS command parameter
     rebind(KeymapsFrontendContribution).to(VesKeymapsFrontendContribution).inSingletonScope();
     rebind(KeybindingWidget).to(VesKeybindingWidget);
-    // fetched on demand instead of being injected to avoid circle dependencies with VesKeybindingService
-    bind(VesKeymapsServiceProvider).toDynamicValue(({ container }) => () => container.get(KeymapsService));
 
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();

@@ -22,6 +22,7 @@ The following third party binaries that are shipped with VUEngine Studio come wi
 - HyperFlasherCli by thunderstruck
 - MSYS by the MinGW Project
 - prog-vb by William D. Jones
+- vueport-core by KR155E
 - shrooms-vb-core by GuyPerfect
 
 ## Usage

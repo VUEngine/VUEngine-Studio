@@ -6,15 +6,12 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { KeymapsService } from '@theia/keymaps/lib/browser';
 import { isValidKeybinding, VesCaptureKeybindingDialog } from './ves-capture-keybinding-dialog';
 
-export const VesKeymapsServiceProvider = Symbol('VesKeymapsServiceProvider');
-export type VesKeymapsServiceProvider = () => KeymapsService;
-
 @injectable()
 export class VesKeybindingService {
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
-  @inject(VesKeymapsServiceProvider)
-  protected readonly keymapsServiceProvider!: VesKeymapsServiceProvider;
+  @inject(KeymapsService)
+  protected readonly keymapsService!: KeymapsService;
 
   getKeybindingLabel(
     commandId: string,
@@ -42,8 +39,6 @@ export class VesKeybindingService {
 
   async captureKeybinding(command: Command, when?: string): Promise<boolean> {
     const existing = this.keybindingRegistry.getKeybindingsForCommand(command.id);
-    // Either button changes the mappings without closing the dialog, so a
-    // caller showing them has to redraw even when no key was captured.
     let changed = false;
 
     const dialog = new VesCaptureKeybindingDialog({
@@ -59,7 +54,7 @@ export class VesKeybindingService {
         changed = true;
       },
       resetToDefault: async () => {
-        await this.keymapsServiceProvider().removeKeybinding(command.id);
+        await this.keymapsService.removeKeybinding(command.id);
         changed = true;
       },
     });
@@ -73,7 +68,7 @@ export class VesKeybindingService {
   }
 
   protected async addKeybinding(command: Command, keybinding: string, when?: string): Promise<void> {
-    const keymaps = this.keymapsServiceProvider();
+    const keymaps = this.keymapsService;
     const sameKey = (candidate: Keybinding): boolean =>
       candidate.keybinding === keybinding && (candidate.when || undefined) === (when || undefined);
 
@@ -130,15 +125,15 @@ export class VesKeybindingService {
   }
 
   async resetKeybindingsFor(commandId: string): Promise<void> {
-    await this.keymapsServiceProvider().removeKeybinding(commandId);
+    await this.keymapsService.removeKeybinding(commandId);
   }
 
   protected async clearKeybindings(commandId: string): Promise<void> {
-    await this.keymapsServiceProvider().removeKeybinding(commandId);
+    await this.keymapsService.removeKeybinding(commandId);
     const defaults = this.keybindingRegistry.getKeybindingsForCommand(commandId)
       .filter(keybinding => keybinding.scope === KeybindingScope.DEFAULT);
     for (const keybinding of defaults) {
-      await this.keymapsServiceProvider().unsetKeybinding(keybinding);
+      await this.keymapsService.unsetKeybinding(keybinding);
     }
   }
 }
