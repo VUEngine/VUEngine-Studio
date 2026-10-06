@@ -65,6 +65,8 @@ import {
   VesEmulatorSaveStateIdentity,
 } from 'vueport-core/lib/common/emulator-save-state';
 import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib/browser/emulator-input';
+import { connectedGamepadList, GamepadProfileResolver, StoredGamepadProfiles } from 'vueport-core/lib/browser/emulator-gamepad';
+import { GamepadRumble } from 'vueport-core/lib/browser/emulator-gamepad-rumble';
 import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
 import { VesEmulatorNotifications } from './ves-emulator-notifications';
 import { VesEmulatorStorage } from './ves-emulator-storage';
@@ -427,6 +429,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected input: EmulatorInputController;
+  protected gamepadResolver: StoredGamepadProfiles;
 
   get lowPower(): boolean {
     return this.state.lowPower;
@@ -436,9 +439,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return this.state.loaded && !this.state.showPreferences;
   }
 
-  // Only while this is the widget being worked in: the input controller
-  // otherwise reclaims focus on any click or whenever it falls to the body,
-  // which would take the keys away from an editor open beside the emulator.
   mayTakeFocus(): boolean {
     return this.shell.activeWidget === this;
   }
@@ -581,6 +581,16 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.macros.setInput(this.input);
     this.input.setMacroHook(this.macros);
     this.time = new EmulatorTimeControl(this);
+    this.gamepadResolver = new StoredGamepadProfiles(
+      () => this.settings.get('gamepadProfiles'),
+      () => this.settings.get('gamepadPlayers'),
+    );
+    this.toDispose.push(new GamepadRumble(
+      this.rumblePack,
+      () => connectedGamepadList()
+        .filter(pad => this.gamepadResolver.drivesPlayer(pad, this.gamepadPlayer())),
+      () => this.settings.get('gamepadRumbleEnabled'),
+    ).start());
 
     this.toDispose.push(this.dock.onDidRequestAddPanel(tabBar =>
       this.commandService.executeCommand(EmulatorCommands.ADD_PANEL.id, this, tabBar)
@@ -926,6 +936,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           // Which set of mappings this emulator answers to has changed.
           this.input.refreshBindings();
           this.update();
+        } else if (['gamepadProfiles', 'gamepadPlayers'].includes(setting)) {
+          this.gamepadResolver.invalidate();
         } else if (['hardwareMode', 'vbcSupportEnabled'].includes(setting)) {
           this.applyHardwareConfiguration();
         }
@@ -1325,6 +1337,14 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   usesPlayer2Controls(): boolean {
     return this.player === 2 && !this.settings.get('player2SameControls');
+  }
+
+  gamepadPlayer(): number | undefined {
+    return this.isLinked() || this.isLinkGuest() ? this.player : undefined;
+  }
+
+  gamepadProfiles(): GamepadProfileResolver {
+    return this.gamepadResolver;
   }
 
   protected onActivateRequest(msg: Message): void {
