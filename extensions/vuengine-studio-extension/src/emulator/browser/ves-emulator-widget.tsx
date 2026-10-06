@@ -27,6 +27,7 @@ import {
   Monitor,
   SpeakerHigh,
   Trophy,
+  VideoCamera,
 } from '@phosphor-icons/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
@@ -77,6 +78,7 @@ import EmulationSettings from 'vueport-core/lib/browser/components/settings/Emul
 import SaveDataSettings from 'vueport-core/lib/browser/components/settings/SaveDataSettings';
 import ScreenshotSettings from 'vueport-core/lib/browser/components/settings/ScreenshotSettings';
 import SoundSettings from 'vueport-core/lib/browser/components/settings/SoundSettings';
+import VideoSettings from 'vueport-core/lib/browser/components/settings/VideoSettings';
 import VbColorSettings from 'vueport-core/lib/browser/components/settings/VbColorSettings';
 import {
   DISPLAY_SETTINGS,
@@ -85,6 +87,7 @@ import {
   SCREENSHOT_SETTINGS,
   SOUND_SETTINGS,
   VB_COLOR_SETTINGS,
+  VIDEO_SETTINGS,
 } from 'vueport-core/lib/browser/components/settings/settings-index';
 import EmulatorScreenPreview from 'vueport-core/lib/browser/components/EmulatorScreenPreview';
 import EmulatorAchievementsSettings from 'vueport-core/lib/browser/components/EmulatorAchievementsSettings';
@@ -146,6 +149,7 @@ import {
 } from 'vueport-core/lib/browser/emulator-commands';
 import { EmulatorCoreService, EmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
 import { EsSoundPlayer } from 'vueport-core/lib/browser/emulator-essound-player';
+import { VideoRecorder } from 'vueport-core/lib/browser/emulator-video-recorder';
 import {
   EMPTY_ROM_HEADER,
   parseRomHeader,
@@ -189,6 +193,7 @@ export type VesEmulatorSettingsTab =
   | 'emulation'
   | 'saveData'
   | 'screenshots'
+  | 'video'
   | 'achievements';
 
 export interface vesEmulatorWidgetState {
@@ -316,6 +321,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     EmulatorAction.AudioMute,
     EmulatorAction.Reset,
     EmulatorAction.Screenshot,
+    EmulatorAction.VideoRecord,
     EmulatorAction.ToggleControlsOverlay,
   ];
 
@@ -334,6 +340,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected colors: ColorStore;
   retroAchievements: RetroAchievementsService;
   esSound: EsSoundPlayer;
+  protected videoRecorder?: VideoRecorder;
+  protected videoRecorderFailure?: Disposable;
   protected companions!: VesEmulatorCompanionFiles;
   saveStates!: SaveStateStore;
   protected configRoot: string | undefined;
@@ -496,7 +504,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected buildLayout(): void {
-    this.addClass('vueport-widget');
+    this.addClass('vp-widget');
     this.scrollOptions = undefined;
 
     const instanceId = this.options?.instanceId ?? 'default';
@@ -700,7 +708,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected onCloseRequest(msg: Message): void {
-    this.saveSaveRam().finally(() => this.disposeSession());
+    this.finishVideoRecording()
+      .then(() => this.saveSaveRam())
+      .finally(() => this.disposeSession());
     super.onCloseRequest(msg);
   }
 
@@ -1363,6 +1373,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   };
 
   protected buildSession = async (snapshot?: ArrayBuffer, cartRam?: ArrayBuffer): Promise<void> => {
+    await this.finishVideoRecording();
     this.disposeSession();
     const displayMode = this.getDisplayMode();
     this.dock.screen.setDisplayMode(displayMode);
@@ -1760,7 +1771,7 @@ granularity records less often and costs proportionally less.',
       <TitleBar
         emulator={this}
         title={
-          <div className='vueport-titlebar-toolbar'>
+          <div className='vp-titlebar-toolbar'>
             <EmulatorControlStrip host={this} inline />
           </div>
         }
@@ -1847,6 +1858,12 @@ granularity records less often and costs proportionally less.',
         settings: SCREENSHOT_SETTINGS,
       },
       {
+        id: 'video',
+        label: nls.localize('vuengine/emulator/settings/video', 'Video'),
+        icon: <VideoCamera size={18} />,
+        settings: VIDEO_SETTINGS,
+      },
+      {
         id: 'achievements',
         label: nls.localize('vuengine/emulator/settings/achievements', 'Achievements'),
         icon: <Trophy size={18} />,
@@ -1869,6 +1886,8 @@ granularity records less often and costs proportionally less.',
         />;
       case 'screenshots':
         return <ScreenshotSettings {...pane} notifications={this.notifications} />;
+      case 'video':
+        return <VideoSettings {...pane} notifications={this.notifications} />;
       case 'input':
         return <InputSettings
           settings={this.settings}
@@ -1987,6 +2006,9 @@ granularity records less often and costs proportionally less.',
           break;
         case EmulatorAction.Screenshot:
           await this.takeScreenshot();
+          break;
+        case EmulatorAction.VideoRecord:
+          await this.toggleVideoRecording();
           break;
       }
     }
@@ -2203,17 +2225,118 @@ granularity records less often and costs proportionally less.',
       return;
     }
 
-    const now = new Date();
-    const pad = (value: number) => `${value}`.padStart(2, '0');
-    const timestamp = `${pad(now.getFullYear() % 100)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
-      + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    const romUri = await this.getRomUri();
-    const screenshotFilename = `${romUri.path.name}-${timestamp}.png`;
+    const screenshotFilename = `${await this.exportStem()}.png`;
 
     await this.storage.export(`screenshots/${screenshotFilename}`, new Uint8Array(png));
     this.notifications.info(
       nls.localize('vuengine/emulator/screenshotSaved', 'Screenshot saved to screenshots/{0}.', screenshotFilename)
     );
+  }
+
+  protected async exportStem(): Promise<string> {
+    const now = new Date();
+    const pad = (value: number) => `${value}`.padStart(2, '0');
+    const timestamp = `${pad(now.getFullYear() % 100)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+      + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const romUri = await this.getRomUri();
+    return `${romUri.path.name}-${timestamp}`;
+  }
+
+  get recordingVideo(): boolean {
+    return this.videoRecorder !== undefined;
+  }
+
+  recordedSeconds = (): number => this.videoRecorder?.seconds ?? 0;
+
+  protected getVideoMode(): DisplayMode {
+    if (this.settings.get('videoUseDisplaySettings')) {
+      return this.getDisplayMode();
+    }
+    return buildDisplayMode(
+      this.settings.get('videoRenderingMode'),
+      resolvePalette(this.settings.get('videoPalette'), this.settings.get('customPalettes')),
+      resolveAnaglyphPalette(
+        this.settings.get('videoAnaglyphPalette'),
+        this.settings.get('customAnaglyphPalettes')
+      ),
+      false,
+      this.settings.get('videoFrameBlending')
+    );
+  }
+
+  protected async toggleVideoRecording(): Promise<void> {
+    if (this.videoRecorder) {
+      await this.finishVideoRecording();
+      return;
+    }
+    if (!this.core || !this.sim || !this.state.loaded) {
+      return;
+    }
+    if (!VideoRecorder.isSupported()) {
+      this.notifications.warn(nls.localize('vuengine/emulator/video/unsupported',
+        'Video recording is not supported here.'));
+      return;
+    }
+    try {
+      this.videoRecorder = await VideoRecorder.start({
+        core: this.core,
+        sim: this.sim,
+        esSound: this.esSound,
+        mode: this.getVideoMode(),
+        scale: this.settings.get('videoScale'),
+        quality: this.settings.get('videoQuality'),
+        format: this.settings.get('videoFormat'),
+      });
+      this.videoRecorderFailure = this.videoRecorder.onDidFail(reason => {
+        this.notifications.error(nls.localize('vuengine/emulator/video/failed',
+          'The video recording stopped: the video could not be encoded ({0}).', reason));
+        this.finishVideoRecording().catch(() => undefined);
+      });
+      this.videoRecorder.setPaused(this.state.paused);
+      this.notifications.info(nls.localize('vuengine/emulator/video/started',
+        'Recording video. Press again to stop and save it.'));
+    } catch (error) {
+      this.videoRecorder = undefined;
+      this.notifications.error(error instanceof Error ? error.message : String(error));
+    }
+    this.update();
+  }
+
+  protected async finishVideoRecording(): Promise<void> {
+    const recorder = this.videoRecorder;
+    if (!recorder) {
+      return;
+    }
+    this.videoRecorder = undefined;
+    this.videoRecorderFailure?.dispose();
+    this.videoRecorderFailure = undefined;
+    this.update();
+    try {
+      const recording = await recorder.stop();
+      if (recording.blob.size === 0) {
+        this.notifications.warn(nls.localize('vuengine/emulator/video/empty', 'Nothing was recorded.'));
+        return;
+      }
+      const filename = `${await this.exportStem()}.${recording.extension}`;
+      await this.storage.export(`videos/${filename}`, new Uint8Array(await recording.blob.arrayBuffer()));
+      const whole = Math.round(recording.seconds);
+      this.notifications.info(nls.localize('vuengine/emulator/video/saved',
+        'Video saved to videos/{0} — {1} at {2} MB.',
+        filename,
+        `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`,
+        (recording.blob.size / 1_000_000).toFixed(1)));
+      if (recording.failure) {
+        this.notifications.warn(nls.localize('vuengine/emulator/video/partial',
+          'It ends where the encoder gave up ({0}).', recording.failure));
+      }
+    } catch (error) {
+      this.notifications.error(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  protected onUpdateRequest(msg: Message): void {
+    this.videoRecorder?.setPaused(!this.state.loaded || this.state.paused);
+    super.onUpdateRequest(msg);
   }
 
   setRenderingMode = async (mode: string): Promise<void> => {
