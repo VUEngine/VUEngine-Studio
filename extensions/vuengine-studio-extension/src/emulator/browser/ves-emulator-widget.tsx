@@ -293,6 +293,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected readonly workspaceService!: WorkspaceService;
 
   protected static readonly colorPatches = new Map<string, Promise<unknown>>();
+  protected static readonly shippedPatches = new Map<string, Promise<Uint8Array>>();
 
   static readonly ID = VES_EMULATOR_WIDGET_ID;
   static readonly LABEL = nls.localize(
@@ -435,6 +436,13 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return this.state.loaded && !this.state.showPreferences;
   }
 
+  // Only while this is the widget being worked in: the input controller
+  // otherwise reclaims focus on any click or whenever it falls to the body,
+  // which would take the keys away from an editor open beside the emulator.
+  mayTakeFocus(): boolean {
+    return this.shell.activeWidget === this;
+  }
+
   protected get saveStateIdentity(): VesEmulatorSaveStateIdentity {
     return { romIdentity: this.romIdentity, romSize: this.state.romSize };
   }
@@ -523,7 +531,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
     this.moviePlayer = new MoviePlayer();
     this.toDispose.push(this.moviePlayer.onDidChange(() => this.update()));
-    this.patches = new PatchStore(this.storage);
+    this.patches = new PatchStore(this.storage, undefined, undefined, file => this.loadShippedPatch(file));
     this.toDispose.push(this.patches.onDidChange(change => {
       if (change.affectsRom) {
         this.refreshRomHeader();
@@ -658,6 +666,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected async doInit(): Promise<void> {
     await this.settings.ready;
+    // The Display preview's still is drawn at the depth setting too, and no
+    // core draws it — so it gets the setting before any session exists.
+    this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
     await this.resolveGlobalMacrosPath();
     await this.initState();
 
@@ -894,7 +905,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.settings.onDidChange(setting => {
         if ([
           'renderingMode', 'swapEyes', 'palette', 'anaglyphPalette',
-          'customPalettes', 'customAnaglyphPalettes',
+          'customPalettes', 'customAnaglyphPalettes', 'frameBlending',
         ].includes(setting)) {
           this.applyDisplayMode();
           this.update();
@@ -907,6 +918,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           this.time.applyRewindSettings();
           // The toolbar button greys out when the feature is off.
           this.update();
+        } else if (setting === 'stereoDepth') {
+          this.applyStereoDepth();
         } else if (['slowMotionRatio', 'fastForwardRatio'].includes(setting)) {
           this.time.applySpeed();
         } else if (setting === 'player2SameControls') {
@@ -919,6 +932,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }),
       this.rumblePack.onDidChangeConnected(() => this.applyRumbleForwarding()),
     ]);
+  }
+
+  protected async applyStereoDepth(): Promise<void> {
+    this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
+    await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
   }
 
   protected async applyRumbleForwarding(): Promise<void> {
@@ -1369,6 +1387,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
       await this.time.applySpeed();
       await this.time.applyRewindSettings();
+      await this.applyStereoDepth();
       await this.applyRumbleForwarding();
 
       await this.loadRom();
@@ -1580,6 +1599,22 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           return response.json() as Promise<unknown>;
         });
       VesEmulatorWidget.colorPatches.set(config, pending);
+    }
+    return pending;
+  }
+
+  protected loadShippedPatch(file: string): Promise<Uint8Array> {
+    let pending = VesEmulatorWidget.shippedPatches.get(file);
+    if (!pending) {
+      pending = fetch(new Endpoint({ path: `/emulator/${file}` }).getRestUrl().toString())
+        .then(async response => {
+          if (!response.ok) {
+            throw new Error(`${file}: ${response.status} ${response.statusText}`);
+          }
+          return new Uint8Array(await response.arrayBuffer());
+        });
+      pending.catch(() => VesEmulatorWidget.shippedPatches.delete(file));
+      VesEmulatorWidget.shippedPatches.set(file, pending);
     }
     return pending;
   }
@@ -2193,7 +2228,8 @@ granularity records less often and costs proportionally less.',
       this.getRenderingMode(),
       this.getPalette(),
       this.getAnaglyphPalette(),
-      this.settings.get('swapEyes')
+      this.settings.get('swapEyes'),
+      this.settings.get('frameBlending')
     );
   }
 
@@ -2210,6 +2246,10 @@ granularity records less often and costs proportionally less.',
 
   get activeCheats(): number {
     return this.cheats.list.filter(cheat => cheat.enabled).length;
+  }
+
+  get activePatches(): number {
+    return this.patches.activeOutsideColor;
   }
 
   toggleCheats(): void {

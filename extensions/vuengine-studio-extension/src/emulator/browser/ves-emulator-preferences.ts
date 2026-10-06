@@ -11,6 +11,8 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
   export const EMULATOR_BUILTIN_RENDERING_MODE = [CATEGORY, 'builtIn', 'renderingMode'].join('.');
   export const EMULATOR_BUILTIN_SWAP_EYES = [CATEGORY, 'builtIn', 'swapEyes'].join('.');
+  export const EMULATOR_BUILTIN_STEREO_DEPTH = [CATEGORY, 'builtIn', 'stereoDepth'].join('.');
+  export const EMULATOR_BUILTIN_FRAME_BLENDING = [CATEGORY, 'builtIn', 'frameBlending'].join('.');
   export const EMULATOR_BUILTIN_PALETTE = [CATEGORY, 'builtIn', 'palette'].join('.');
   export const EMULATOR_BUILTIN_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_CUSTOM_PALETTES = [CATEGORY, 'builtIn', 'customPalettes'].join('.');
@@ -41,11 +43,13 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_DECORATION_INTENSITY = [CATEGORY, 'builtIn', 'decoration', 'intensity'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_USE_DISPLAY_SETTINGS = [CATEGORY, 'builtIn', 'screenshot', 'useDisplaySettings'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_RENDERING_MODE = [CATEGORY, 'builtIn', 'screenshot', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_SCREENSHOT_FRAME_BLENDING = [CATEGORY, 'builtIn', 'screenshot', 'frameBlending'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_SCALE = [CATEGORY, 'builtIn', 'screenshot', 'scale'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_PALETTE = [CATEGORY, 'builtIn', 'screenshot', 'palette'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'screenshot', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_USE_DISPLAY_SETTINGS = [CATEGORY, 'builtIn', 'video', 'useDisplaySettings'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_RENDERING_MODE = [CATEGORY, 'builtIn', 'video', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_VIDEO_FRAME_BLENDING = [CATEGORY, 'builtIn', 'video', 'frameBlending'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_SCALE = [CATEGORY, 'builtIn', 'video', 'scale'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_PALETTE = [CATEGORY, 'builtIn', 'video', 'palette'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'video', 'anaglyphPalette'].join('.');
@@ -69,6 +73,8 @@ export namespace VesEmulatorPreferenceIds {
 export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     renderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
     swapEyes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SWAP_EYES,
+    stereoDepth: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_DEPTH,
+    frameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FRAME_BLENDING,
     palette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
     anaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE,
     customPalettes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES,
@@ -90,11 +96,13 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     decorationIntensity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_DECORATION_INTENSITY,
     screenshotUseDisplaySettings: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_USE_DISPLAY_SETTINGS,
     screenshotRenderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_RENDERING_MODE,
+    screenshotFrameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_FRAME_BLENDING,
     screenshotScale: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_SCALE,
     screenshotPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_PALETTE,
     screenshotAnaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_ANAGLYPH_PALETTE,
     videoUseDisplaySettings: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_USE_DISPLAY_SETTINGS,
     videoRenderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_RENDERING_MODE,
+    videoFrameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_FRAME_BLENDING,
     videoScale: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_SCALE,
     videoPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_PALETTE,
     videoAnaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_ANAGLYPH_PALETTE,
@@ -123,7 +131,7 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
 
 const UNUSED_HERE: readonly (keyof VueportConfig)[] = [
   'videoUseDisplaySettings', 'videoRenderingMode', 'videoScale', 'videoPalette',
-  'videoAnaglyphPalette', 'videoQuality', 'videoFormat',
+  'videoAnaglyphPalette', 'videoQuality', 'videoFormat', 'videoFrameBlending',
 ];
 
 function builtInProperties(): PreferenceSchema['properties'] {
