@@ -1,4 +1,4 @@
-import { Command } from '@theia/core';
+import { Command, nls } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
 import { Key, KeyCode } from '@theia/core/lib/common/keys';
 import * as React from 'react';
@@ -110,6 +110,30 @@ export class VesEmulatorBindings implements VueportInputBindings {
             added = true;
         });
         return added;
+    }
+
+    unbind(commandId: string, code: string): Promise<void> {
+        return this.enqueue(async () => {
+            const remaining = this.keyCodes(commandId)
+                .filter(existing => existing !== code)
+                .map(keybindingOf)
+                .filter((keybinding): keybinding is string => keybinding !== undefined);
+            if (remaining.length === 0) {
+                await this.vesKeybindingService.clearKeybindingsFor(commandId);
+            } else {
+                await this.vesKeybindingService.replaceKeybindingsFor(commandId, remaining);
+            }
+        });
+    }
+
+    keyLabel(code: string): string {
+        const keybinding = keybindingOf(code);
+        if (!keybinding) {
+            return code;
+        }
+        return this.keybindingRegistry.acceleratorForKeyCode(KeyCode.parse(keybinding), '')
+            .replace(/\s/, nls.localize('vuengine/general/space', 'Space'))
+            .replace(/\+/, nls.localize('vuengine/general/plus', 'Plus'));
     }
 
     clear(commandId: string): Promise<void> {

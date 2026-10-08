@@ -597,7 +597,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.rumblePack,
       () => connectedGamepadList()
         .filter(pad => this.gamepadResolver.drivesPlayer(pad, this.gamepadPlayer())),
-      () => this.settings.get('gamepadRumbleEnabled'),
+      () => this.settings.get('gamepadRumbleIntensity') / 100,
     ).start());
 
     this.toDispose.push(this.dock.onDidRequestAddPanel(tabBar =>
