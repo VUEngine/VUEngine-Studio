@@ -13,6 +13,9 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_SWAP_EYES = [CATEGORY, 'builtIn', 'swapEyes'].join('.');
   export const EMULATOR_BUILTIN_STEREO_DEPTH = [CATEGORY, 'builtIn', 'stereoDepth'].join('.');
   export const EMULATOR_BUILTIN_FRAME_BLENDING = [CATEGORY, 'builtIn', 'frameBlending'].join('.');
+  export const EMULATOR_BUILTIN_COLUMN_TABLE = [CATEGORY, 'builtIn', 'columnTable'].join('.');
+  export const EMULATOR_BUILTIN_MIRROR_SPIN_UP = [CATEGORY, 'builtIn', 'mirrorSpinUp'].join('.');
+  export const EMULATOR_BUILTIN_MIRROR_SPIN_UP_DELAY = [CATEGORY, 'builtIn', 'mirrorSpinUpDelay'].join('.');
   export const EMULATOR_BUILTIN_PALETTE = [CATEGORY, 'builtIn', 'palette'].join('.');
   export const EMULATOR_BUILTIN_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_CUSTOM_PALETTES = [CATEGORY, 'builtIn', 'customPalettes'].join('.');
@@ -75,6 +78,9 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     swapEyes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SWAP_EYES,
     stereoDepth: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_DEPTH,
     frameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FRAME_BLENDING,
+    columnTable: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_COLUMN_TABLE,
+    mirrorSpinUp: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_MIRROR_SPIN_UP,
+    mirrorSpinUpDelay: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_MIRROR_SPIN_UP_DELAY,
     palette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
     anaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE,
     customPalettes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES,

@@ -940,6 +940,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           this.update();
         } else if (setting === 'stereoDepth') {
           this.applyStereoDepth();
+        } else if (['columnTable', 'mirrorSpinUp', 'mirrorSpinUpDelay'].includes(setting)) {
+          this.applyColumnSettings();
         } else if (['slowMotionRatio', 'fastForwardRatio'].includes(setting)) {
           this.time.applySpeed();
         } else if (setting === 'player2SameControls') {
@@ -959,6 +961,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected async applyStereoDepth(): Promise<void> {
     this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
     await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
+  }
+
+  /** Where the column table puts columns, and whether a game comes up as the display unit does — see `web-emulator.tsx`. */
+  protected async applyColumnSettings(): Promise<void> {
+    await this.core?.setColumnGeometry(this.settings.get('columnTable'));
+    await this.core?.setMirrorSpinUp(this.settings.get('mirrorSpinUp'), this.settings.get('mirrorSpinUpDelay'));
   }
 
   protected async applyRumbleForwarding(): Promise<void> {
@@ -1419,6 +1427,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       await this.time.applySpeed();
       await this.time.applyRewindSettings();
       await this.applyStereoDepth();
+      await this.applyColumnSettings();
       await this.applyRumbleForwarding();
 
       await this.loadRom();
