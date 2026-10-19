@@ -375,7 +375,20 @@ TextureROMSpec* const {{ spriteName }}TextureSpecs[] =
 		__TRANSPARENCY_{{ sprite.transparency | upper }},
 
 		// Displacement added to the sprite's position
-		{{ '{' ~ sprite.displacement.x ~ ', ' ~ sprite.displacement.y ~ ', ' ~ sprite.displacement.z ~ ', ' ~ sprite.displacement.parallax ~ '}' }}
+		{{ '{' ~ sprite.displacement.x ~ ', ' ~ sprite.displacement.y ~ ', ' ~ sprite.displacement.z ~ ', ' ~ sprite.displacement.parallax ~ '}' }},
+
+		// Flag that determines which transformation elements affect the sprite (position, rotation, scale)
+		{%- set transformationFlags = [] -%}
+		{%- if sprite.transform.position !== false %}{% set transformationFlags = (transformationFlags.push('__INVALIDATE_POSITION'), transformationFlags) %}{% endif -%}
+		{%- if sprite.transform.rotation !== false %}{% set transformationFlags = (transformationFlags.push('__INVALIDATE_ROTATION'), transformationFlags) %}{% endif -%}
+		{%- if sprite.transform.scale !== false %}{% set transformationFlags = (transformationFlags.push('__INVALIDATE_SCALE'), transformationFlags) %}{% endif -%}
+		{%- if transformationFlags | length == 3 %}
+		__INVALIDATE_TRANSFORMATION
+		{%- elif transformationFlags | length %}
+		{{ transformationFlags | join(' | ') }}
+		{%- else %}
+		__VALID_TRANSFORMATION
+		{%- endif %}
 	},
 
 	// Flag to indicate in which display to show the texture (__WORLD_ON, __WORLD_LON or __WORLD_RON)

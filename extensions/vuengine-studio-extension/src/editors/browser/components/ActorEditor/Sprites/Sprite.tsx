@@ -193,6 +193,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const toggleTransform = (aspect: 'position' | 'scale' | 'rotation'): void => {
+        const transform = {
+            position: sprite.transform?.position ?? true,
+            scale: sprite.transform?.scale ?? true,
+            rotation: sprite.transform?.rotation ?? true,
+        };
+        updateSprite({
+            transform: {
+                ...transform,
+                [aspect]: !transform[aspect],
+            },
+        });
+    };
+
     const toggleIsAnimated = (): void => {
         updateSprite({
             isAnimated: !!!sprite.isAnimated,
@@ -877,6 +891,35 @@ If 0, the value is inferred from the texture.'
                                 'vuengine/editors/actor/shareDescription',
                                 "When enabled, this Sprite's TileSet will be shared with other instances using the same TileSet."
                             )}
+                        />
+                    </HContainer>
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/editors/actor/transform', 'Transform')}
+                        tooltip={nls.localize(
+                            'vuengine/editors/actor/transformDescription',
+                            "Which of the actor's transformations are applied to this sprite. \
+Turn off those the sprite does not need to save CPU time."
+                        )}
+                    />
+                    <HContainer gap={15} wrap='wrap'>
+                        <Checkbox
+                            sideLabel={nls.localize('vuengine/editors/actor/transformPosition', 'Position')}
+                            checked={sprite.transform?.position ?? true}
+                            setChecked={() => toggleTransform('position')}
+                        />
+                        <Checkbox
+                            sideLabel={nls.localize('vuengine/editors/actor/transformScale', 'Scale')}
+                            checked={sprite.transform?.scale ?? true}
+                            setChecked={() => toggleTransform('scale')}
+                        />
+                    </HContainer>
+                    <HContainer gap={15} wrap='wrap'>
+                        <Checkbox
+                            sideLabel={nls.localize('vuengine/editors/actor/transformRotation', 'Rotation')}
+                            checked={sprite.transform?.rotation ?? true}
+                            setChecked={() => toggleTransform('rotation')}
                         />
                     </HContainer>
                 </VContainer>

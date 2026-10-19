@@ -197,6 +197,11 @@ export interface SpriteData {
     isAnimated: boolean
     transparency: Transparency
     displacement: PixelVector
+    transform: {
+        position: boolean
+        scale: boolean
+        rotation: boolean
+    }
     manipulationFunction: string
     optimizeTiles: boolean
     maxTiles: number
