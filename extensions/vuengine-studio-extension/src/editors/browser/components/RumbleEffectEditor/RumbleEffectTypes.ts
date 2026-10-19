@@ -5,10 +5,6 @@ export type RumbleEffectFrequency = 160 | 240 | 320 | 400 | 50 | 95 | 130;
 export interface RumbleEffectData {
     effect: number
     frequency: RumbleEffectFrequency
-    sustainPositive: number
-    sustainNegative: number
-    overdrive: number
-    break: number
     stopBeforeStarting: boolean
 }
 
@@ -140,17 +136,8 @@ export const BUILT_IN_RUMBLE_EFFECTS = [
     `122) ${nls.localize('vuengine/editors/rumbleEffect/effects/smoothHum', 'Smooth Hum {0} (No kick or brake pulse)', 4)} – 20 % `,
     `123) ${nls.localize('vuengine/editors/rumbleEffect/effects/smoothHum', 'Smooth Hum {0} (No kick or brake pulse)', 5)} – 10 % `,
 ];
-export const DEFAULT_RUMBLE_EFFECT = 1;
 
-export const MIN_RUMBLE_EFFECT_BREAK = 0;
-export const MAX_RUMBLE_EFFECT_BREAK = 255;
-export const DEFAULT_RUMBLE_EFFECT_BREAK = MAX_RUMBLE_EFFECT_BREAK;
-export const MIN_RUMBLE_EFFECT_OVERDRIVE = 0;
-export const MAX_RUMBLE_EFFECT_OVERDRIVE = 126;
-export const DEFAULT_RUMBLE_EFFECT_OVERDRIVE = MAX_RUMBLE_EFFECT_OVERDRIVE;
-export const MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE = 0;
-export const MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE = 255;
-export const DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE = MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE;
-export const MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE = 0;
-export const MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE = 255;
-export const DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE = MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE;
+export const DEFAULT_RUMBLE_FIRMWARE_VERSION = 1;
+export const MIN_RUMBLE_FIRMWARE_VERSION = 0;
+export const MAX_RUMBLE_FIRMWARE_VERSION = 10;
+export const DEFAULT_RUMBLE_EFFECT = 1;

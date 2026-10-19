@@ -422,6 +422,24 @@ export const ActorType: ProjectDataType = {
                                     },
                                     additionalProperties: false
                                 },
+                                transform: {
+                                    type: 'object',
+                                    properties: {
+                                        position: {
+                                            type: 'boolean',
+                                            default: true
+                                        },
+                                        scale: {
+                                            type: 'boolean',
+                                            default: true
+                                        },
+                                        rotation: {
+                                            type: 'boolean',
+                                            default: true
+                                        }
+                                    },
+                                    additionalProperties: false
+                                },
                                 manipulationFunction: {
                                     type: 'string'
                                 },

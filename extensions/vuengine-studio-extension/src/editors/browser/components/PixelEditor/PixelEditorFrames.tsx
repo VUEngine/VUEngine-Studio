@@ -1,12 +1,12 @@
 import { DotsSixVertical } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
-import { DottingRef, useDotting } from 'dotting';
+import { DottingRef, useDotting } from '../Common/Dotting';
 import React, { useEffect } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import CanvasImage from '../Common/CanvasImage';
-import { arrayMove, nanoid } from '../Common/Utils';
+import { arrayMove } from '../Common/Utils';
 import { DisplayMode } from '../Common/VUEngineTypes';
 import { convertToLayerProps } from './PixelEditor';
 import { LayerPixelData } from './PixelEditorTypes';
@@ -102,6 +102,10 @@ export const mergeLayers = (layers: LayerPixelData[]): number[][] => {
     }
 
     deepClone(layers).reverse().forEach(layer => {
+        if (layer.isVisible === false) {
+            return;
+        }
+
         layer.data.forEach((row, rowIndex) => row.forEach((color, columnIndex) => {
             if (color !== null) {
                 if (result[rowIndex] !== undefined && result[rowIndex][columnIndex] !== undefined) {
@@ -120,40 +124,57 @@ interface PixelEditorFramesProps {
     currentFrame: number
     setCurrentFrame: React.Dispatch<React.SetStateAction<number>>
     colorMode: ColorMode
+    canvasReload: number
+    reloadCanvas: () => void
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorFrames(props: PixelEditorFramesProps): React.JSX.Element {
-    const { frames, setFrames, currentFrame, setCurrentFrame, colorMode, dottingRef } = props;
+    const { frames, setFrames, currentFrame, setCurrentFrame, colorMode, canvasReload, reloadCanvas, dottingRef } = props;
     const { setLayers } = useDotting(dottingRef);
 
     const removeFrame = (index: number): void => {
-        if (currentFrame === (frames.length - 1)) {
-            setCurrentFrame(frames.length - 2);
-        }
+        const updatedFrames = frames.filter((_, i) => i !== index);
+        const updatedCurrentFrame = Math.max(0, Math.min(
+            index < currentFrame ? currentFrame - 1 : currentFrame,
+            updatedFrames.length - 1,
+        ));
 
-        setFrames(frames.filter((_, i) => i !== index));
+        setCurrentFrame(updatedCurrentFrame);
+        setFrames(updatedFrames);
+        reloadCanvas();
     };
 
     const addFrame = (): void => {
         setFrames([
             ...frames,
-            [
-                ...(frames[frames.length - 1].map(layer => ({ ...layer, id: nanoid() })))
-            ],
+            deepClone(frames[frames.length - 1]),
         ]);
         setCurrentFrame(frames.length);
     };
 
     const onSortEnd = (oldIndex: number, newIndex: number): void => {
         setFrames(arrayMove(frames, oldIndex, newIndex));
-        setCurrentFrame(newIndex);
+
+        if (currentFrame === oldIndex) {
+            setCurrentFrame(newIndex);
+        } else if (oldIndex < currentFrame && newIndex >= currentFrame) {
+            setCurrentFrame(currentFrame - 1);
+        } else if (oldIndex > currentFrame && newIndex <= currentFrame) {
+            setCurrentFrame(currentFrame + 1);
+        }
     };
 
     useEffect(() => {
-        setLayers(convertToLayerProps(frames[currentFrame], colorMode));
-        // setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
+        const frameLayers = frames[currentFrame];
+        if (!frameLayers?.length) {
+            return;
+        }
+
+        setLayers(convertToLayerProps(frameLayers, colorMode));
     }, [
+        // NOTE: deliberately not reacting to colorMode, since palette indices are not remapped on a mode switch yet
+        canvasReload,
         currentFrame
     ]);
 

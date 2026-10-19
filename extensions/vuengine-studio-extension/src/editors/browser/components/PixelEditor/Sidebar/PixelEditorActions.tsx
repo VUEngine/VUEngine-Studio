@@ -3,7 +3,7 @@ import {
 } from '@phosphor-icons/react';
 import { deepClone, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { DottingRef, useDotting, useGrids } from 'dotting';
+import { DottingRef, useDotting, useGrids } from '../../Common/Dotting';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
@@ -11,7 +11,6 @@ import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import PopUpDialog from '../../Common/Base/PopUpDialog';
 import VContainer from '../../Common/Base/VContainer';
-import { convertLayerPixelDataToPixelModifyItem, convertToLayerProps } from '../PixelEditor';
 import { LayerPixelData } from '../PixelEditorTypes';
 import { PixelEditorTool } from './PixelEditorTool';
 
@@ -34,13 +33,13 @@ interface PixelEditorActionsProps {
     colorMode: ColorMode
     frames: LayerPixelData[][]
     setFrames: (frames: LayerPixelData[][]) => void
-    currentFrame: number
+    reloadCanvas: () => void
     dottingRef: React.RefObject<DottingRef>
 }
 
 export default function PixelEditorActions(props: PixelEditorActionsProps): React.JSX.Element {
-    const { colorMode, frames, setFrames, currentFrame, dottingRef } = props;
-    const { clear, downloadImage, setData, setLayers } = useDotting(dottingRef);
+    const { colorMode, frames, setFrames, reloadCanvas, dottingRef } = props;
+    const { clear, downloadImage } = useDotting(dottingRef);
     const { dimensions } = useGrids(dottingRef);
     const [resizeDialogOpen, setResizeDialogOpen] = useState<boolean>(false);
     const [resizeHeight, setResizeHeight] = useState<number>(0);
@@ -149,17 +148,17 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
         }
 
         if (addRowsTop || addRowsBottom || removeRowsTop || removeRowsBottom) {
-            const emptyRow = [...Array(updatedFrames[0][0].data[0].length)].map(e => null);
+            const createEmptyRow = (): null[] => [...Array(updatedFrames[0][0].data[0].length)].map(() => null);
             frames.forEach((frame, frameIndex) =>
                 frame.forEach((layer, layerIndex) => {
                     if (addRowsTop) {
                         for (let i = 0; i < addRowsTop; i++) {
-                            updatedFrames[frameIndex][layerIndex].data.unshift(emptyRow);
+                            updatedFrames[frameIndex][layerIndex].data.unshift(createEmptyRow());
                         }
                     }
                     if (addRowsBottom) {
                         for (let i = 0; i < addRowsBottom; i++) {
-                            updatedFrames[frameIndex][layerIndex].data.push(emptyRow);
+                            updatedFrames[frameIndex][layerIndex].data.push(createEmptyRow());
                         }
                     }
                     if (removeRowsTop) {
@@ -177,8 +176,7 @@ export default function PixelEditorActions(props: PixelEditorActionsProps): Reac
         }
 
         setFrames(updatedFrames);
-        setLayers(convertToLayerProps(frames[currentFrame], colorMode));
-        setData(convertLayerPixelDataToPixelModifyItem(frames[currentFrame][0], colorMode));
+        reloadCanvas();
     };
 
     useEffect(() => {

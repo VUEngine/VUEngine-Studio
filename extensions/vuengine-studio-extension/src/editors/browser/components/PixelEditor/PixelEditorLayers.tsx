@@ -7,7 +7,7 @@ import {
     LayerProps,
     useHandlers,
     useLayers
-} from 'dotting';
+} from '../Common/Dotting';
 import React, { BaseSyntheticEvent, useEffect } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import styled from 'styled-components';

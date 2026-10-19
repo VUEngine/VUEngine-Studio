@@ -1,7 +1,7 @@
 import { Clipboard, CopySimple, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
-import { DottingRef, PixelModifyItem, useData, useDotting } from 'dotting';
+import { DottingRef, PixelModifyItem, useData, useDotting } from '../../Common/Dotting';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';

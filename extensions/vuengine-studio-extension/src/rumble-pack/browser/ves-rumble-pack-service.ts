@@ -8,7 +8,7 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { EmulatedRumbleSpec, RumbleCommand, RumbleState, RumbleStreamDecoder } from './ves-rumble-pack-protocol';
-import { isRumblePack, RUMBLE_PACK_FILTERS, RumblePakLogLine } from './ves-rumble-pack-types';
+import { isRumblePack, RUMBLE_EFFECT_DURATIONS_MS, RUMBLE_PACK_FILTERS, RumblePakLogLine } from './ves-rumble-pack-types';
 
 @injectable()
 export class VesRumblePackService {
@@ -288,39 +288,18 @@ export class VesRumblePackService {
   }
 
   async sendCommandPlayEffect(effect: number): Promise<void> {
-    return this.sendCommand(`TEF ${(++effect).toString().padStart(3, '0')}`);
+    return this.sendCommand(`TEF ${effect.toString().padStart(3, '0')}`);
   }
 
   async sendCommandSetFrequency(frequency: number): Promise<void> {
     return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
   }
 
-  async sendCommandSetOverdrive(overdrive: number): Promise<void> {
-    return this.sendCommand(`SCO ODC ${overdrive.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetPositiveSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SCO SPT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetNegativeSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SCO SNT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetBreak(breakValue: number): Promise<void> {
-    return this.sendCommand(`SCO BRT ${breakValue.toString().padStart(3, '0')}`);
-  }
-
   async sendCommandEmulateVbByte(byte: number): Promise<void> {
-    this._emulatedByteCount++;
-    const command = this.emulatedDecoder.push(byte);
-    if (command) {
-      this._emulatedCommands.push(command);
-      if (this._emulatedCommands.length > VesRumblePackService.EMULATED_COMMAND_HISTORY_LENGTH) {
-        this._emulatedCommands.shift();
-      }
-    }
+    return this.sendCommand(`VB ${byte}`);
+  }
 
-    return this.sendCommand(`VB ${byte.toString().padStart(3, '0')}`);
+  getEffectDuration(effect: number): number {
+    return RUMBLE_EFFECT_DURATIONS_MS[effect - 1] ?? 0;
   }
 }

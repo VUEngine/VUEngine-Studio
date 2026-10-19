@@ -27,6 +27,7 @@ import {
   Monitor,
   SpeakerHigh,
   Trophy,
+  VideoCamera,
 } from '@phosphor-icons/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
@@ -65,6 +66,8 @@ import {
   VesEmulatorSaveStateIdentity,
 } from 'vueport-core/lib/common/emulator-save-state';
 import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib/browser/emulator-input';
+import { connectedGamepadList, GamepadProfileResolver, StoredGamepadProfiles } from 'vueport-core/lib/browser/emulator-gamepad';
+import { GamepadRumble } from 'vueport-core/lib/browser/emulator-gamepad-rumble';
 import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
 import { VesEmulatorNotifications } from './ves-emulator-notifications';
 import { VesEmulatorStorage } from './ves-emulator-storage';
@@ -75,6 +78,7 @@ import EmulationSettings from 'vueport-core/lib/browser/components/settings/Emul
 import SaveDataSettings from 'vueport-core/lib/browser/components/settings/SaveDataSettings';
 import ScreenshotSettings from 'vueport-core/lib/browser/components/settings/ScreenshotSettings';
 import SoundSettings from 'vueport-core/lib/browser/components/settings/SoundSettings';
+import VideoSettings from 'vueport-core/lib/browser/components/settings/VideoSettings';
 import VbColorSettings from 'vueport-core/lib/browser/components/settings/VbColorSettings';
 import {
   DISPLAY_SETTINGS,
@@ -83,6 +87,7 @@ import {
   SCREENSHOT_SETTINGS,
   SOUND_SETTINGS,
   VB_COLOR_SETTINGS,
+  VIDEO_SETTINGS,
 } from 'vueport-core/lib/browser/components/settings/settings-index';
 import EmulatorScreenPreview from 'vueport-core/lib/browser/components/EmulatorScreenPreview';
 import EmulatorAchievementsSettings from 'vueport-core/lib/browser/components/EmulatorAchievementsSettings';
@@ -122,7 +127,6 @@ import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/bro
 import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import EmulatorSaveStates from 'vueport-core/lib/browser/components/EmulatorSaveStates';
 import EmulatorCheats from 'vueport-core/lib/browser/components/EmulatorCheats';
-import EmulatorColors from 'vueport-core/lib/browser/components/EmulatorColors';
 import EmulatorMacros from 'vueport-core/lib/browser/components/EmulatorMacros';
 import EmulatorPatches from 'vueport-core/lib/browser/components/EmulatorPatches';
 import EmulatorAchievements from 'vueport-core/lib/browser/components/EmulatorAchievements';
@@ -130,8 +134,6 @@ import { CheatFinder } from 'vueport-core/lib/browser/emulator-cheat-finder';
 import { MacroActivity, MacroStore } from 'vueport-core/lib/browser/emulator-macro-store';
 import { MoviePlayer } from 'vueport-core/lib/browser/emulator-movie-player';
 import { PatchStore } from 'vueport-core/lib/browser/emulator-patch-store';
-import { ColorStore } from 'vueport-core/lib/browser/emulator-vb-color-store';
-import { VbcPatchDocument } from 'vueport-core/lib/common/emulator-vb-color';
 import { RetroAchievementsService } from 'vueport-core/lib/browser/emulator-retroachievements';
 import {
   VesEmulatorTheiaRetroAchievementsCredentials,
@@ -145,6 +147,7 @@ import {
 } from 'vueport-core/lib/browser/emulator-commands';
 import { EmulatorCoreService, EmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
 import { EsSoundPlayer } from 'vueport-core/lib/browser/emulator-essound-player';
+import { VideoRecorder } from 'vueport-core/lib/browser/emulator-video-recorder';
 import {
   EMPTY_ROM_HEADER,
   parseRomHeader,
@@ -188,6 +191,7 @@ export type VesEmulatorSettingsTab =
   | 'emulation'
   | 'saveData'
   | 'screenshots'
+  | 'video'
   | 'achievements';
 
 export interface vesEmulatorWidgetState {
@@ -205,7 +209,6 @@ export interface vesEmulatorWidgetState {
   showCheats: boolean;
   showMacros: boolean;
   showPatches: boolean;
-  showColors: boolean;
   showAchievements: boolean;
   saveStateExists: boolean;
   romHeader: RomHeader;
@@ -294,7 +297,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   @inject(WorkspaceService)
   protected readonly workspaceService!: WorkspaceService;
 
-  protected static readonly colorPatches = new Map<string, Promise<unknown>>();
+  protected static readonly shippedPatches = new Map<string, Promise<Uint8Array>>();
 
   static readonly ID = VES_EMULATOR_WIDGET_ID;
   static readonly LABEL = nls.localize(
@@ -315,6 +318,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     EmulatorAction.AudioMute,
     EmulatorAction.Reset,
     EmulatorAction.Screenshot,
+    EmulatorAction.VideoRecord,
     EmulatorAction.ToggleControlsOverlay,
   ];
 
@@ -330,9 +334,10 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected macros: MacroStore;
   protected moviePlayer: MoviePlayer;
   protected patches: PatchStore;
-  protected colors: ColorStore;
   retroAchievements: RetroAchievementsService;
   esSound: EsSoundPlayer;
+  protected videoRecorder?: VideoRecorder;
+  protected videoRecorderFailure?: Disposable;
   protected companions!: VesEmulatorCompanionFiles;
   saveStates!: SaveStateStore;
   protected configRoot: string | undefined;
@@ -428,6 +433,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected input: EmulatorInputController;
+  protected gamepadResolver: StoredGamepadProfiles;
 
   get lowPower(): boolean {
     return this.state.lowPower;
@@ -435,6 +441,10 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   isAcceptingInput(): boolean {
     return this.state.loaded && !this.state.showPreferences;
+  }
+
+  mayTakeFocus(): boolean {
+    return this.shell.activeWidget === this;
   }
 
   protected get saveStateIdentity(): VesEmulatorSaveStateIdentity {
@@ -460,7 +470,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     showCheats: false,
     showMacros: false,
     showPatches: false,
-    showColors: false,
     showAchievements: false,
     saveStateExists: false,
     romHeader: EMPTY_ROM_HEADER,
@@ -491,7 +500,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected buildLayout(): void {
-    this.addClass('vueport-widget');
+    this.addClass('vp-widget');
     this.scrollOptions = undefined;
 
     const instanceId = this.options?.instanceId ?? 'default';
@@ -526,15 +535,19 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
     this.moviePlayer = new MoviePlayer();
     this.toDispose.push(this.moviePlayer.onDidChange(() => this.update()));
-    this.patches = new PatchStore(this.storage);
+    this.patches = new PatchStore(this.storage, undefined, undefined, file => this.loadShippedPatch(file), {
+      choice: () => ({
+        autoApply: this.settings.get('vbcAutoApplyColorPatches') && !this.isHardcore(),
+        disabled: this.settings.get('vbcColorPatchesDisabled'),
+      }),
+      remember: (id, apply) => this.rememberColorChoice(id, apply),
+    });
     this.toDispose.push(this.patches.onDidChange(change => {
       if (change.affectsRom) {
         this.refreshRomHeader();
       }
       this.update();
     }));
-    this.colors = this.buildColorStore();
-    this.toDispose.push(this.colors.onDidChange(() => this.update()));
     this.retroAchievements = new RetroAchievementsService(
       new VesEmulatorRetroAchievementsTransport(),
       new VesEmulatorTheiaRetroAchievementsCredentials(this.localStorageService),
@@ -576,6 +589,16 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.macros.setInput(this.input);
     this.input.setMacroHook(this.macros);
     this.time = new EmulatorTimeControl(this);
+    this.gamepadResolver = new StoredGamepadProfiles(
+      () => this.settings.get('gamepadProfiles'),
+      () => this.settings.get('gamepadPlayers'),
+    );
+    this.toDispose.push(new GamepadRumble(
+      this.rumblePack,
+      () => connectedGamepadList()
+        .filter(pad => this.gamepadResolver.drivesPlayer(pad, this.gamepadPlayer())),
+      () => this.settings.get('gamepadRumbleIntensity') / 100,
+    ).start());
 
     this.toDispose.push(this.dock.onDidRequestAddPanel(tabBar =>
       this.commandService.executeCommand(EmulatorCommands.ADD_PANEL.id, this, tabBar)
@@ -661,6 +684,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected async doInit(): Promise<void> {
     await this.settings.ready;
+    // The Display preview's still is drawn at the depth setting too, and no
+    // core draws it — so it gets the setting before any session exists.
+    this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
     await this.resolveGlobalMacrosPath();
     await this.initState();
 
@@ -682,7 +708,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected onCloseRequest(msg: Message): void {
-    this.saveSaveRam().finally(() => this.disposeSession());
+    this.finishVideoRecording()
+      .then(() => this.saveSaveRam())
+      .finally(() => this.disposeSession());
     super.onCloseRequest(msg);
   }
 
@@ -706,7 +734,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.dock.setSim(undefined);
     this.cheats.setSim(undefined);
     this.cheatFinder.setSim(undefined);
-    this.colors.setSim(undefined);
     this.moviePlayer.stop().catch(() => undefined);
     this.patches.unload();
     this.esSound.setSim(undefined);
@@ -896,8 +923,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }),
       this.settings.onDidChange(setting => {
         if ([
-          'renderingMode', 'palette', 'anaglyphPalette',
-          'customPalettes', 'customAnaglyphPalettes',
+          'renderingMode', 'swapEyes', 'palette', 'anaglyphPalette',
+          'customPalettes', 'customAnaglyphPalettes', 'frameBlending',
         ].includes(setting)) {
           this.applyDisplayMode();
           this.update();
@@ -910,18 +937,35 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           this.time.applyRewindSettings();
           // The toolbar button greys out when the feature is off.
           this.update();
+        } else if (setting === 'stereoDepth') {
+          this.applyStereoDepth();
+        } else if (['columnTable', 'mirrorSpinUp', 'mirrorSpinUpDelay'].includes(setting)) {
+          this.applyColumnSettings();
         } else if (['slowMotionRatio', 'fastForwardRatio'].includes(setting)) {
           this.time.applySpeed();
         } else if (setting === 'player2SameControls') {
           // Which set of mappings this emulator answers to has changed.
           this.input.refreshBindings();
           this.update();
+        } else if (['gamepadProfiles', 'gamepadPlayers'].includes(setting)) {
+          this.gamepadResolver.invalidate();
         } else if (['hardwareMode', 'vbcSupportEnabled'].includes(setting)) {
           this.applyHardwareConfiguration();
         }
       }),
       this.rumblePack.onDidChangeConnected(() => this.applyRumbleForwarding()),
     ]);
+  }
+
+  protected async applyStereoDepth(): Promise<void> {
+    this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
+    await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
+  }
+
+  /** Where the column table puts columns, and whether a game comes up as the display unit does — see `web-emulator.tsx`. */
+  protected async applyColumnSettings(): Promise<void> {
+    await this.core?.setColumnGeometry(this.settings.get('columnTable'));
+    await this.core?.setMirrorSpinUp(this.settings.get('mirrorSpinUp'), this.settings.get('mirrorSpinUpDelay'));
   }
 
   protected async applyRumbleForwarding(): Promise<void> {
@@ -1312,6 +1356,14 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return this.player === 2 && !this.settings.get('player2SameControls');
   }
 
+  gamepadPlayer(): number | undefined {
+    return this.isLinked() || this.isLinkGuest() ? this.player : undefined;
+  }
+
+  gamepadProfiles(): GamepadProfileResolver {
+    return this.gamepadResolver;
+  }
+
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.node.tabIndex = 0;
@@ -1328,6 +1380,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   };
 
   protected buildSession = async (snapshot?: ArrayBuffer, cartRam?: ArrayBuffer): Promise<void> => {
+    await this.finishVideoRecording();
     this.disposeSession();
     const displayMode = this.getDisplayMode();
     this.dock.screen.setDisplayMode(displayMode);
@@ -1364,7 +1417,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.dock.setSim(this.sim);
       this.cheats.setSim(this.sim);
       this.cheatFinder.setSim(this.sim);
-      this.colors.setSim(this.sim);
       this.applyScale();
       await this.sim.setDisplayMode(displayMode);
       await this.sim.attachCanvas(canvas);
@@ -1372,6 +1424,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
       await this.time.applySpeed();
       await this.time.applyRewindSettings();
+      await this.applyStereoDepth();
+      await this.applyColumnSettings();
       await this.applyRumbleForwarding();
 
       await this.loadRom();
@@ -1489,7 +1543,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     if (this.isHardcore()) {
       this.patches.disableAll();
     }
-    await this.colors.load(this.romId, romContentBuffer);
     await this.macros.load(await this.companionRomPath());
     this.refreshRomHeader();
 
@@ -1515,99 +1568,38 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
   }
 
-  protected buildColorStore(): ColorStore {
-    function prune<T>(all: Record<string, T>, id: string, value: T): Record<string, T> {
-      const next = { ...all };
-      if (Object.keys(value as object).length === 0) {
-        delete next[id];
-      } else {
-        next[id] = value;
-      }
-      return next;
-    }
-
-    return new ColorStore(
-      this.patches,
-      id => this.settings.get('vbcColorPaletteOverrides')[id] ?? {},
-      (id, overrides) => {
-        this.settings.set(
-          'vbcColorPaletteOverrides',
-          prune(this.settings.get('vbcColorPaletteOverrides'), id, overrides)
-        ).catch(() => undefined);
-      },
-      id => this.settings.get('vbcColorPaletteNames')[id] ?? {},
-      (id, names) => {
-        this.settings.set(
-          'vbcColorPaletteNames',
-          prune(this.settings.get('vbcColorPaletteNames'), id, names)
-        ).catch(() => undefined);
-      },
-      () => ({
-        autoApply: this.settings.get('vbcAutoApplyColorPatches') && !this.isHardcore(),
-        disabled: this.settings.get('vbcColorPatchesDisabled'),
-      }),
-      (id, apply) => this.rememberColorChoice(id, apply),
-      (name, data) => this.storage.export(name, data),
-      config => this.loadColorPatch(config),
-      () => this.readCreatedColorPatch(),
-      document => this.writeCreatedColorPatch(document),
-    );
-  }
+  protected pendingColorPatchesDisabled: string[] | undefined;
 
   protected rememberColorChoice(id: string, apply: boolean): void {
-    const disabled = this.settings.get('vbcColorPatchesDisabled');
-    this.settings.set(
-      'vbcColorPatchesDisabled',
-      apply ? disabled.filter(entry => entry !== id) : [...disabled.filter(entry => entry !== id), id]
-    ).catch(() => undefined);
+    const disabled = this.pendingColorPatchesDisabled ?? this.settings.get('vbcColorPatchesDisabled');
+    const next = apply ? disabled.filter(entry => entry !== id) : [...disabled.filter(entry => entry !== id), id];
+    this.pendingColorPatchesDisabled = next;
+    this.settings.set('vbcColorPatchesDisabled', next)
+      .catch(() => undefined)
+      .then(() => {
+        if (this.pendingColorPatchesDisabled === next) {
+          this.pendingColorPatchesDisabled = undefined;
+        }
+      });
     if (apply && !this.settings.get('vbcAutoApplyColorPatches')) {
       this.settings.set('vbcAutoApplyColorPatches', true).catch(() => undefined);
     }
   }
 
-  protected loadColorPatch(config: string): Promise<unknown> {
-    let pending = VesEmulatorWidget.colorPatches.get(config);
+  protected loadShippedPatch(file: string): Promise<Uint8Array> {
+    let pending = VesEmulatorWidget.shippedPatches.get(file);
     if (!pending) {
-      pending = fetch(new Endpoint({ path: `/emulator/${config}` }).getRestUrl().toString())
-        .then(response => {
+      pending = fetch(new Endpoint({ path: `/emulator/${file}` }).getRestUrl().toString())
+        .then(async response => {
           if (!response.ok) {
-            throw new Error(`${config}: ${response.status} ${response.statusText}`);
+            throw new Error(`${file}: ${response.status} ${response.statusText}`);
           }
-          return response.json() as Promise<unknown>;
+          return new Uint8Array(await response.arrayBuffer());
         });
-      VesEmulatorWidget.colorPatches.set(config, pending);
+      pending.catch(() => VesEmulatorWidget.shippedPatches.delete(file));
+      VesEmulatorWidget.shippedPatches.set(file, pending);
     }
     return pending;
-  }
-
-  protected async colorPatchPath(): Promise<string> {
-    const rom = (await this.getRomUri()).toString();
-    return this.storage.join(
-      await this.companionDirectory(), `${this.storage.stem(rom)}.vbc.json`
-    );
-  }
-
-  protected async readCreatedColorPatch(): Promise<unknown> {
-    const path = await this.colorPatchPath();
-    try {
-      return await this.storage.exists(path)
-        ? JSON.parse(await this.storage.readText(path)) as unknown
-        : undefined;
-    } catch (error) {
-      console.warn(`[emulator] could not read the color patch at ${path}:`, error);
-      return undefined;
-    }
-  }
-
-  protected async writeCreatedColorPatch(document: VbcPatchDocument | undefined): Promise<void> {
-    const path = await this.colorPatchPath();
-    if (!document) {
-      if (await this.storage.exists(path)) {
-        await this.storage.delete(path);
-      }
-      return;
-    }
-    await this.storage.writeText(path, `${JSON.stringify(document, undefined, 2)}\n`);
   }
 
   protected refreshRomHeader(): void {
@@ -1701,7 +1693,7 @@ granularity records less often and costs proportionally less.',
       <TitleBar
         emulator={this}
         title={
-          <div className='vueport-titlebar-toolbar'>
+          <div className='vp-titlebar-toolbar'>
             <EmulatorControlStrip host={this} inline />
           </div>
         }
@@ -1788,6 +1780,12 @@ granularity records less often and costs proportionally less.',
         settings: SCREENSHOT_SETTINGS,
       },
       {
+        id: 'video',
+        label: nls.localize('vuengine/emulator/settings/video', 'Video'),
+        icon: <VideoCamera size={18} />,
+        settings: VIDEO_SETTINGS,
+      },
+      {
         id: 'achievements',
         label: nls.localize('vuengine/emulator/settings/achievements', 'Achievements'),
         icon: <Trophy size={18} />,
@@ -1810,6 +1808,8 @@ granularity records less often and costs proportionally less.',
         />;
       case 'screenshots':
         return <ScreenshotSettings {...pane} notifications={this.notifications} />;
+      case 'video':
+        return <VideoSettings {...pane} notifications={this.notifications} />;
       case 'input':
         return <InputSettings
           settings={this.settings}
@@ -1928,6 +1928,9 @@ granularity records less often and costs proportionally less.',
           break;
         case EmulatorAction.Screenshot:
           await this.takeScreenshot();
+          break;
+        case EmulatorAction.VideoRecord:
+          await this.toggleVideoRecording();
           break;
       }
     }
@@ -2144,17 +2147,118 @@ granularity records less often and costs proportionally less.',
       return;
     }
 
-    const now = new Date();
-    const pad = (value: number) => `${value}`.padStart(2, '0');
-    const timestamp = `${pad(now.getFullYear() % 100)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
-      + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    const romUri = await this.getRomUri();
-    const screenshotFilename = `${romUri.path.name}-${timestamp}.png`;
+    const screenshotFilename = `${await this.exportStem()}.png`;
 
     await this.storage.export(`screenshots/${screenshotFilename}`, new Uint8Array(png));
     this.notifications.info(
       nls.localize('vuengine/emulator/screenshotSaved', 'Screenshot saved to screenshots/{0}.', screenshotFilename)
     );
+  }
+
+  protected async exportStem(): Promise<string> {
+    const now = new Date();
+    const pad = (value: number) => `${value}`.padStart(2, '0');
+    const timestamp = `${pad(now.getFullYear() % 100)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+      + `-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const romUri = await this.getRomUri();
+    return `${romUri.path.name}-${timestamp}`;
+  }
+
+  get recordingVideo(): boolean {
+    return this.videoRecorder !== undefined;
+  }
+
+  recordedSeconds = (): number => this.videoRecorder?.seconds ?? 0;
+
+  protected getVideoMode(): DisplayMode {
+    if (this.settings.get('videoUseDisplaySettings')) {
+      return this.getDisplayMode();
+    }
+    return buildDisplayMode(
+      this.settings.get('videoRenderingMode'),
+      resolvePalette(this.settings.get('videoPalette'), this.settings.get('customPalettes')),
+      resolveAnaglyphPalette(
+        this.settings.get('videoAnaglyphPalette'),
+        this.settings.get('customAnaglyphPalettes')
+      ),
+      false,
+      this.settings.get('videoFrameBlending')
+    );
+  }
+
+  protected async toggleVideoRecording(): Promise<void> {
+    if (this.videoRecorder) {
+      await this.finishVideoRecording();
+      return;
+    }
+    if (!this.core || !this.sim || !this.state.loaded) {
+      return;
+    }
+    if (!VideoRecorder.isSupported()) {
+      this.notifications.warn(nls.localize('vuengine/emulator/video/unsupported',
+        'Video recording is not supported here.'));
+      return;
+    }
+    try {
+      this.videoRecorder = await VideoRecorder.start({
+        core: this.core,
+        sim: this.sim,
+        esSound: this.esSound,
+        mode: this.getVideoMode(),
+        scale: this.settings.get('videoScale'),
+        quality: this.settings.get('videoQuality'),
+        format: this.settings.get('videoFormat'),
+      });
+      this.videoRecorderFailure = this.videoRecorder.onDidFail(reason => {
+        this.notifications.error(nls.localize('vuengine/emulator/video/failed',
+          'The video recording stopped: the video could not be encoded ({0}).', reason));
+        this.finishVideoRecording().catch(() => undefined);
+      });
+      this.videoRecorder.setPaused(this.state.paused);
+      this.notifications.info(nls.localize('vuengine/emulator/video/started',
+        'Recording video. Press again to stop and save it.'));
+    } catch (error) {
+      this.videoRecorder = undefined;
+      this.notifications.error(error instanceof Error ? error.message : String(error));
+    }
+    this.update();
+  }
+
+  protected async finishVideoRecording(): Promise<void> {
+    const recorder = this.videoRecorder;
+    if (!recorder) {
+      return;
+    }
+    this.videoRecorder = undefined;
+    this.videoRecorderFailure?.dispose();
+    this.videoRecorderFailure = undefined;
+    this.update();
+    try {
+      const recording = await recorder.stop();
+      if (recording.blob.size === 0) {
+        this.notifications.warn(nls.localize('vuengine/emulator/video/empty', 'Nothing was recorded.'));
+        return;
+      }
+      const filename = `${await this.exportStem()}.${recording.extension}`;
+      await this.storage.export(`videos/${filename}`, new Uint8Array(await recording.blob.arrayBuffer()));
+      const whole = Math.round(recording.seconds);
+      this.notifications.info(nls.localize('vuengine/emulator/video/saved',
+        'Video saved to videos/{0} — {1} at {2} MB.',
+        filename,
+        `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`,
+        (recording.blob.size / 1_000_000).toFixed(1)));
+      if (recording.failure) {
+        this.notifications.warn(nls.localize('vuengine/emulator/video/partial',
+          'It ends where the encoder gave up ({0}).', recording.failure));
+      }
+    } catch (error) {
+      this.notifications.error(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  protected onUpdateRequest(msg: Message): void {
+    this.videoRecorder?.setPaused(!this.state.loaded || this.state.paused);
+    super.onUpdateRequest(msg);
   }
 
   setRenderingMode = async (mode: string): Promise<void> => {
@@ -2188,7 +2292,9 @@ granularity records less often and costs proportionally less.',
     return buildDisplayMode(
       this.getRenderingMode(),
       this.getPalette(),
-      this.getAnaglyphPalette()
+      this.getAnaglyphPalette(),
+      this.settings.get('swapEyes'),
+      this.settings.get('frameBlending')
     );
   }
 
@@ -2207,12 +2313,16 @@ granularity records less often and costs proportionally less.',
     return this.cheats.list.filter(cheat => cheat.enabled).length;
   }
 
+  get activePatches(): number {
+    return this.patches.activeOutsideColor;
+  }
+
   toggleCheats(): void {
     this.showSideStrip(this.state.showCheats ? undefined : 'cheats');
   }
 
   protected showSideStrip(
-    which: 'saveStates' | 'cheats' | 'macros' | 'patches' | 'colors' | 'achievements' | undefined,
+    which: 'saveStates' | 'cheats' | 'macros' | 'patches' | 'achievements' | undefined,
   ): void {
     if (which !== undefined && which !== 'achievements' && this.refuseForHardcore()) {
       return;
@@ -2221,7 +2331,6 @@ granularity records less often and costs proportionally less.',
     this.state.showCheats = which === 'cheats';
     this.state.showMacros = which === 'macros';
     this.state.showPatches = which === 'patches';
-    this.state.showColors = which === 'colors';
     this.state.showAchievements = which === 'achievements';
     this.update();
   }
@@ -2299,10 +2408,6 @@ granularity records less often and costs proportionally less.',
     this.showSideStrip(this.state.showPatches ? undefined : 'patches');
   }
 
-  toggleColors(): void {
-    this.showSideStrip(this.state.showColors ? undefined : 'colors');
-  }
-
   toggleAchievements(): void {
     this.showSideStrip(this.state.showAchievements ? undefined : 'achievements');
   }
@@ -2325,10 +2430,6 @@ granularity records less often and costs proportionally less.',
 
   showPatches(): void {
     this.showSideStrip('patches');
-  }
-
-  showColors(): void {
-    this.showSideStrip('colors');
   }
 
   showAchievements(): void {
@@ -2397,14 +2498,6 @@ granularity records less often and costs proportionally less.',
       patches={this.patches}
       notifications={this.notifications}
       onClose={() => this.togglePatches()}
-    />;
-  }
-
-  renderColors(): React.ReactNode {
-    return <EmulatorColors
-      colors={this.colors}
-      notifications={this.notifications}
-      onClose={() => this.toggleColors()}
     />;
   }
 

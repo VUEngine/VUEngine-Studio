@@ -1,34 +1,21 @@
 import { nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
+import styled from 'styled-components';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import Checkbox from '../Common/Base/Checkbox';
 import HContainer from '../Common/Base/HContainer';
 import VContainer from '../Common/Base/VContainer';
-import { clamp } from '../Common/Utils';
 import {
     BUILT_IN_RUMBLE_EFFECTS,
     DEFAULT_RUMBLE_EFFECT,
-    DEFAULT_RUMBLE_EFFECT_BREAK,
     DEFAULT_RUMBLE_EFFECT_FREQUENCY,
-    DEFAULT_RUMBLE_EFFECT_OVERDRIVE,
-    DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
-    DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
-    MAX_RUMBLE_EFFECT_BREAK,
-    MAX_RUMBLE_EFFECT_OVERDRIVE,
-    MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
-    MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
-    MIN_RUMBLE_EFFECT_BREAK,
-    MIN_RUMBLE_EFFECT_OVERDRIVE,
-    MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
-    MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
     RUMBLE_EFFECT_FREQUENCIES,
     RumbleEffectData,
-    RumbleEffectFrequency,
+    RumbleEffectFrequency
 } from './RumbleEffectTypes';
-import styled from 'styled-components';
 
 const ConnectionStatus = styled.div`
     padding-top: 20px;
@@ -121,50 +108,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         });
     };
 
-    protected setStateSustainPositive = (sustain: number) => {
-        this.props.updateData({
-            ...this.props.data,
-            sustainPositive: clamp(
-                sustain,
-                MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
-                MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE
-            ),
-        });
-    };
-
-    protected setStateSustainNegative = (sustain: number) => {
-        this.props.updateData({
-            ...this.props.data,
-            sustainNegative: clamp(
-                sustain,
-                MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
-                MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
-            ),
-        });
-    };
-
-    protected setStateOverdrive = (overdrive: number) => {
-        this.props.updateData({
-            ...this.props.data,
-            overdrive: clamp(
-                overdrive,
-                MIN_RUMBLE_EFFECT_OVERDRIVE,
-                MAX_RUMBLE_EFFECT_OVERDRIVE
-            ),
-        });
-    };
-
-    protected setStateBreak = (breakValue: number) => {
-        this.props.updateData({
-            ...this.props.data,
-            break: clamp(
-                breakValue,
-                MIN_RUMBLE_EFFECT_BREAK,
-                MAX_RUMBLE_EFFECT_BREAK
-            ),
-        });
-    };
-
     protected toggleStopBeforeStarting = () => {
         this.props.updateData({
             ...this.props.data,
@@ -189,10 +132,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         }
 
         services.vesRumblePackService.sendCommandSetFrequency(frequencyId);
-        services.vesRumblePackService.sendCommandSetOverdrive(data.overdrive);
-        services.vesRumblePackService.sendCommandSetPositiveSustain(data.sustainPositive);
-        services.vesRumblePackService.sendCommandSetNegativeSustain(data.sustainNegative);
-        services.vesRumblePackService.sendCommandSetBreak(data.break);
         service.sendCommandPlayEffect(data.effect);
     };
 
@@ -238,72 +177,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             value: f.toString(),
                         }))}
                         onChange={option => this.setFrequency(option.value ? parseInt(option.value) as RumbleEffectFrequency : DEFAULT_RUMBLE_EFFECT_FREQUENCY)}
-                    />
-                </VContainer>
-            </HContainer>
-            <HContainer gap={15}>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localize('vuengine/editors/rumbleEffect/overdrive', 'Overdrive')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        title={nls.localize('vuengine/editors/rumbleEffect/overdrive', 'Overdrive')}
-                        onChange={e => this.setStateOverdrive(parseInt(e.target.value))}
-                        value={data.overdrive < MIN_RUMBLE_EFFECT_OVERDRIVE || data.overdrive > MAX_RUMBLE_EFFECT_OVERDRIVE
-                            ? DEFAULT_RUMBLE_EFFECT_OVERDRIVE
-                            : data.overdrive}
-                        min={MIN_RUMBLE_EFFECT_OVERDRIVE}
-                        max={MAX_RUMBLE_EFFECT_OVERDRIVE}
-                    />
-                </VContainer>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localize('vuengine/editors/rumbleEffect/break', 'Break')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        title={nls.localize('vuengine/editors/rumbleEffect/break', 'Break')}
-                        onChange={e => this.setStateBreak(parseInt(e.target.value))}
-                        value={data.break < MIN_RUMBLE_EFFECT_BREAK || data.break > MAX_RUMBLE_EFFECT_BREAK
-                            ? DEFAULT_RUMBLE_EFFECT_BREAK
-                            : data.break}
-                        min={MIN_RUMBLE_EFFECT_BREAK}
-                        max={MAX_RUMBLE_EFFECT_BREAK}
-                    />
-                </VContainer>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localize('vuengine/editors/rumbleEffect/sustainPos', 'Sustain (Pos.)')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        title={nls.localize('vuengine/editors/rumbleEffect/positiveSustain', 'Positive Sustain')}
-                        onChange={e => this.setStateSustainPositive(parseInt(e.target.value))}
-                        value={data.sustainPositive < MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE || data.sustainPositive > MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE
-                            ? DEFAULT_RUMBLE_EFFECT_SUSTAIN_POSITIVE
-                            : data.sustainPositive}
-                        min={MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE}
-                        max={MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE}
-                    />
-                </VContainer>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localize('vuengine/editors/rumbleEffect/sustainNeg', 'Sustain (Neg.)')}
-                    </label>
-                    <input
-                        type="number"
-                        className="theia-input"
-                        title={nls.localize('vuengine/editors/rumbleEffect/negativeSustain', 'Negative Sustain')}
-                        onChange={e => this.setStateSustainNegative(parseInt(e.target.value))}
-                        value={data.sustainNegative < MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE || data.sustainNegative > MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
-                            ? DEFAULT_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
-                            : data.sustainNegative}
-                        min={MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE}
-                        max={MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE}
                     />
                 </VContainer>
             </HContainer>

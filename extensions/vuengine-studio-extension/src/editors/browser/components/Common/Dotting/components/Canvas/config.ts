@@ -1,0 +1,80 @@
+import { PanZoom } from './types';
+
+export const DefaultPanZoom: PanZoom = {
+  scale: 1,
+  offset: { x: 0, y: 0 },
+};
+
+export const DefaultGridSquareLength = 20;
+
+export const DefaultSecondaryGridCellCount = 8;
+export const DefaultSecondaryGridStrokeColor = '#555555';
+export const DefaultSecondaryGridStrokeWidth = 1;
+
+export const DefaultButtonHeight = 30;
+
+export const DefaultButtonMargin = DefaultButtonHeight / 2;
+
+export const MaxImageBitMapSideLength = 2500;
+
+export enum ButtonDirection {
+  TOP = 'TOP',
+  BOTTOM = 'BOTTOM',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+  TOPLEFT = 'TOPLEFT',
+  TOPRIGHT = 'TOPRIGHT',
+  BOTTOMLEFT = 'BOTTOMLEFT',
+  BOTTOMRIGHT = 'BOTTOMRIGHT',
+}
+
+export const DefaultPixelDataDimensions = {
+  columnCount: 10,
+  rowCount: 10,
+};
+
+export enum MouseMode {
+  PANNING = 'PANNING',
+  PINCHZOOMING = 'PINCHZOOMING',
+  EXTENDING = 'EXTENDING',
+  DRAWING = 'DRAWING',
+  NULL = 'NULL',
+}
+
+export const DefaultZoomSensitivity = 200;
+
+export const DefaultMaxScale = 1.5;
+
+export const DefaultMinScale = 0.3;
+
+export const CurrentDeviceUserId = 'current-device-user-id';
+
+// this is used so that we can handle the case when multiplayer user colors a pixel
+// when the current device user is changing the size of the grid
+export const TemporaryUserId = 'temporary-user-id';
+
+export type UserId = string;
+
+export type DimensionChangeRecord = {
+  direction: ButtonDirection;
+  amount: number;
+} | null;
+
+export const InteractionExtensionAllowanceRatio = 2;
+export const InteractionEdgeTouchingRange = 6;
+
+export const DefaultPixelExtendRatio = 1;
+
+export const DashedLineOffsetFromPixelCanvas = 15;
+
+export const ExtensionGuideCircleRadius = 3;
+
+export const DefaultExtendArrowPadding = 2;
+
+export const DefaultBackgroundColor = '#999999';
+
+export const DefaultPixelColor = '#ffffff';
+
+export const GridMinimumScale = 0.2;
+
+export const MinColumnOrRowCount = 2; // the grid size should be at least 2x2

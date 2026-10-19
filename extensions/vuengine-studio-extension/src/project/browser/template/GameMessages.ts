@@ -1,9 +1,9 @@
 import { ProjectDataTemplate, ProjectDataTemplateTargetRoot } from '../ves-project-types';
 
-export const MessagesTemplate: ProjectDataTemplate = {
+export const GameMessagesTemplate: ProjectDataTemplate = {
     targets: [{
-        path: 'headers/Messages.h',
+        path: 'headers/GameMessages.h',
         root: ProjectDataTemplateTargetRoot.project
     }],
-    template: 'Messages.h.njk'
+    template: 'GameMessages.h.njk'
 };

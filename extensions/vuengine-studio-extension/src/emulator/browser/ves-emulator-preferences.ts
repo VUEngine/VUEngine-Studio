@@ -10,6 +10,12 @@ export namespace VesEmulatorPreferenceIds {
   export const DEFAULT_EMULATOR = [CATEGORY, 'custom', 'default'].join('.');
   export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
   export const EMULATOR_BUILTIN_RENDERING_MODE = [CATEGORY, 'builtIn', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_SWAP_EYES = [CATEGORY, 'builtIn', 'swapEyes'].join('.');
+  export const EMULATOR_BUILTIN_STEREO_DEPTH = [CATEGORY, 'builtIn', 'stereoDepth'].join('.');
+  export const EMULATOR_BUILTIN_FRAME_BLENDING = [CATEGORY, 'builtIn', 'frameBlending'].join('.');
+  export const EMULATOR_BUILTIN_COLUMN_TABLE = [CATEGORY, 'builtIn', 'columnTable'].join('.');
+  export const EMULATOR_BUILTIN_MIRROR_SPIN_UP = [CATEGORY, 'builtIn', 'mirrorSpinUp'].join('.');
+  export const EMULATOR_BUILTIN_MIRROR_SPIN_UP_DELAY = [CATEGORY, 'builtIn', 'mirrorSpinUpDelay'].join('.');
   export const EMULATOR_BUILTIN_PALETTE = [CATEGORY, 'builtIn', 'palette'].join('.');
   export const EMULATOR_BUILTIN_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_CUSTOM_PALETTES = [CATEGORY, 'builtIn', 'customPalettes'].join('.');
@@ -40,11 +46,13 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_DECORATION_INTENSITY = [CATEGORY, 'builtIn', 'decoration', 'intensity'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_USE_DISPLAY_SETTINGS = [CATEGORY, 'builtIn', 'screenshot', 'useDisplaySettings'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_RENDERING_MODE = [CATEGORY, 'builtIn', 'screenshot', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_SCREENSHOT_FRAME_BLENDING = [CATEGORY, 'builtIn', 'screenshot', 'frameBlending'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_SCALE = [CATEGORY, 'builtIn', 'screenshot', 'scale'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_PALETTE = [CATEGORY, 'builtIn', 'screenshot', 'palette'].join('.');
   export const EMULATOR_BUILTIN_SCREENSHOT_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'screenshot', 'anaglyphPalette'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_USE_DISPLAY_SETTINGS = [CATEGORY, 'builtIn', 'video', 'useDisplaySettings'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_RENDERING_MODE = [CATEGORY, 'builtIn', 'video', 'renderingMode'].join('.');
+  export const EMULATOR_BUILTIN_VIDEO_FRAME_BLENDING = [CATEGORY, 'builtIn', 'video', 'frameBlending'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_SCALE = [CATEGORY, 'builtIn', 'video', 'scale'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_PALETTE = [CATEGORY, 'builtIn', 'video', 'palette'].join('.');
   export const EMULATOR_BUILTIN_VIDEO_ANAGLYPH_PALETTE = [CATEGORY, 'builtIn', 'video', 'anaglyphPalette'].join('.');
@@ -52,7 +60,7 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_VIDEO_FORMAT = [CATEGORY, 'builtIn', 'video', 'format'].join('.');
   export const EMULATOR_BUILTIN_GAMEPAD_PROFILES = [CATEGORY, 'builtIn', 'gamepad', 'profiles'].join('.');
   export const EMULATOR_BUILTIN_GAMEPAD_PLAYERS = [CATEGORY, 'builtIn', 'gamepad', 'players'].join('.');
-  export const EMULATOR_BUILTIN_GAMEPAD_RUMBLE_ENABLE = [CATEGORY, 'builtIn', 'gamepad', 'rumble', 'enable'].join('.');
+  export const EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY = [CATEGORY, 'builtIn', 'gamepad', 'rumble', 'intensity'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE = [CATEGORY, 'builtIn', 'retroAchievements', 'enable'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE = [CATEGORY, 'builtIn', 'retroAchievements', 'hardcore'].join('.');
   export const EMULATOR_BUILTIN_DEBUG_PANEL_STATE = [CATEGORY, 'builtIn', 'debug', 'panelState'].join('.');
@@ -61,12 +69,16 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_VB_COLOR_ENABLE = [CATEGORY, 'builtIn', 'vbColor', 'enable'].join('.');
   export const EMULATOR_BUILTIN_VB_COLOR_AUTO_APPLY_PATCHES = [CATEGORY, 'builtIn', 'vbColor', 'autoApplyPatches'].join('.');
   export const EMULATOR_BUILTIN_VB_COLOR_DISABLED_PATCHES = [CATEGORY, 'builtIn', 'vbColor', 'disabledPatches'].join('.');
-  export const EMULATOR_BUILTIN_VB_COLOR_PALETTE_OVERRIDES = [CATEGORY, 'builtIn', 'vbColor', 'paletteOverrides'].join('.');
-  export const EMULATOR_BUILTIN_VB_COLOR_PALETTE_NAMES = [CATEGORY, 'builtIn', 'vbColor', 'paletteNames'].join('.');
 }
 
 export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     renderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RENDERING_MODE,
+    swapEyes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SWAP_EYES,
+    stereoDepth: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_DEPTH,
+    frameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FRAME_BLENDING,
+    columnTable: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_COLUMN_TABLE,
+    mirrorSpinUp: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_MIRROR_SPIN_UP,
+    mirrorSpinUpDelay: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_MIRROR_SPIN_UP_DELAY,
     palette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PALETTE,
     anaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_ANAGLYPH_PALETTE,
     customPalettes: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_CUSTOM_PALETTES,
@@ -88,11 +100,13 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     decorationIntensity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_DECORATION_INTENSITY,
     screenshotUseDisplaySettings: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_USE_DISPLAY_SETTINGS,
     screenshotRenderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_RENDERING_MODE,
+    screenshotFrameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_FRAME_BLENDING,
     screenshotScale: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_SCALE,
     screenshotPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_PALETTE,
     screenshotAnaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCREENSHOT_ANAGLYPH_PALETTE,
     videoUseDisplaySettings: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_USE_DISPLAY_SETTINGS,
     videoRenderingMode: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_RENDERING_MODE,
+    videoFrameBlending: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_FRAME_BLENDING,
     videoScale: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_SCALE,
     videoPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_PALETTE,
     videoAnaglyphPalette: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_ANAGLYPH_PALETTE,
@@ -100,7 +114,7 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     videoFormat: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VIDEO_FORMAT,
     gamepadProfiles: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_PROFILES,
     gamepadPlayers: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_PLAYERS,
-    gamepadRumbleEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_RUMBLE_ENABLE,
+    gamepadRumbleIntensity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY,
     retroAchievementsEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE,
     retroAchievementsHardcore: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE,
     debugPanelState: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_DEBUG_PANEL_STATE,
@@ -109,8 +123,6 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     vbcSupportEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_ENABLE,
     vbcAutoApplyColorPatches: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_AUTO_APPLY_PATCHES,
     vbcColorPatchesDisabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_DISABLED_PATCHES,
-    vbcColorPaletteOverrides: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_PALETTE_OVERRIDES,
-    vbcColorPaletteNames: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_PALETTE_NAMES,
     player2SameControls: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS,
     rewindEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
     rewindGranularity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
@@ -121,7 +133,7 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
 
 const UNUSED_HERE: readonly (keyof VueportConfig)[] = [
   'videoUseDisplaySettings', 'videoRenderingMode', 'videoScale', 'videoPalette',
-  'videoAnaglyphPalette', 'videoQuality', 'videoFormat',
+  'videoAnaglyphPalette', 'videoQuality', 'videoFormat', 'videoFrameBlending',
 ];
 
 function builtInProperties(): PreferenceSchema['properties'] {
