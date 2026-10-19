@@ -219,9 +219,8 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
                             : nls.localizeByDefault('Default')}
                     </PixelEditorTool>
                 }
-                {[...Array(paletteColors.length)].map((p, paletteIndex) => {
-                    // without the transparent slot, the first swatch is selected through the "1" command
-                    return <PixelEditorTool
+                {[...Array(paletteColors.length)].map((p, paletteIndex) =>
+                    <PixelEditorTool
                         key={paletteIndex}
                         className={primaryColorIndex === paletteIndex ? 'active' : ''}
                         style={{
@@ -239,8 +238,8 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
                     >
                         {primaryColorIndex === paletteIndex && 'L'}
                         {secondaryColorIndex === paletteIndex && 'R'}
-                    </PixelEditorTool>;
-                })}
+                    </PixelEditorTool>
+                )}
             </HContainer>
             { /* }
             <RadioSelect
