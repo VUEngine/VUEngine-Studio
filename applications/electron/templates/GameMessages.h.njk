@@ -2,8 +2,8 @@
 {%- import 'templates/partials/macros.njk' as macros -%}
 {% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
-#ifndef MESSAGES_H_
-#define MESSAGES_H_
+#ifndef GAME_MESSAGES_H_
+#define GAME_MESSAGES_H_
 
 {{ macros.sectionHeader('Includes') }}
 
@@ -15,7 +15,7 @@
 enum Messages
 {
 	{%- for message in messages | values | removeEmpty | sort %}
-	kMessage{{ message | sanitizeSpecName }}{% if loop.first %} = kMessageLastEngine + 1{% endif %},
+	kMessage{{ message | sanitizeSpecName }}{% if loop.first %} = kMessagePlatformFirst + 1{% endif %},
 	{%- endfor %}
 };
 {%- endif %}

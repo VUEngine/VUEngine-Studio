@@ -9,7 +9,7 @@ import { RomInfoTemplate } from '../template/RomInfo';
 import { GameEventsTemplate } from '../template/GameEvents';
 import { ColliderLayersTemplate } from '../template/ColliderLayers';
 import { InGameTypesTemplate } from '../template/InGameTypes';
-import { MessagesTemplate } from '../template/Messages';
+import { GameMessagesTemplate } from '../template/GameMessages';
 
 export const GameConfigType: ProjectDataType = {
     file: 'GameConfig',
@@ -828,6 +828,6 @@ export const GameConfigType: ProjectDataType = {
         GameEventsTemplate,
         ColliderLayersTemplate,
         InGameTypesTemplate,
-        MessagesTemplate,
+        GameMessagesTemplate,
     ]
 };

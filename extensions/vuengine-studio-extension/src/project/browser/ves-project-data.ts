@@ -13,7 +13,7 @@ import { ImageTemplate } from './template/Image';
 import { InGameTypesTemplate } from './template/InGameTypes';
 import { LanguagesCTemplate } from './template/LanguagesC';
 import { LanguagesHTemplate } from './template/LanguagesH';
-import { MessagesTemplate } from './template/Messages';
+import { GameMessagesTemplate } from './template/GameMessages';
 import { PcmSpecTemplate } from './template/PCM';
 import { PluginConfigTemplate } from './template/PluginConfig';
 import { PluginConfigMakeTemplate } from './template/PluginConfigMake';
@@ -56,7 +56,7 @@ export const PROJECT_TEMPLATES: ProjectDataTemplates = {
   InGameTypes: InGameTypesTemplate,
   LanguagesC: LanguagesCTemplate,
   LanguagesH: LanguagesHTemplate,
-  Messages: MessagesTemplate,
+  Messages: GameMessagesTemplate,
   PcmSpec: PcmSpecTemplate,
   PluginConfig: PluginConfigTemplate,
   PluginConfigMake: PluginConfigMakeTemplate,
