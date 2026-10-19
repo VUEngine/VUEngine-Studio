@@ -221,7 +221,6 @@ which simulates 7 colors by blending together adjacent frames to create mix colo
                 }
                 {[...Array(paletteColors.length)].map((p, paletteIndex) => {
                     // without the transparent slot, the first swatch is selected through the "1" command
-                    const paletteCommand = PALETTE_COMMANDS[includeTransparent ? paletteIndex : paletteIndex + 1];
                     return <PixelEditorTool
                         key={paletteIndex}
                         className={primaryColorIndex === paletteIndex ? 'active' : ''}

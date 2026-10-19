@@ -69,8 +69,6 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_VB_COLOR_ENABLE = [CATEGORY, 'builtIn', 'vbColor', 'enable'].join('.');
   export const EMULATOR_BUILTIN_VB_COLOR_AUTO_APPLY_PATCHES = [CATEGORY, 'builtIn', 'vbColor', 'autoApplyPatches'].join('.');
   export const EMULATOR_BUILTIN_VB_COLOR_DISABLED_PATCHES = [CATEGORY, 'builtIn', 'vbColor', 'disabledPatches'].join('.');
-  export const EMULATOR_BUILTIN_VB_COLOR_PALETTE_OVERRIDES = [CATEGORY, 'builtIn', 'vbColor', 'paletteOverrides'].join('.');
-  export const EMULATOR_BUILTIN_VB_COLOR_PALETTE_NAMES = [CATEGORY, 'builtIn', 'vbColor', 'paletteNames'].join('.');
 }
 
 export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
@@ -125,8 +123,6 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     vbcSupportEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_ENABLE,
     vbcAutoApplyColorPatches: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_AUTO_APPLY_PATCHES,
     vbcColorPatchesDisabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_DISABLED_PATCHES,
-    vbcColorPaletteOverrides: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_PALETTE_OVERRIDES,
-    vbcColorPaletteNames: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_VB_COLOR_PALETTE_NAMES,
     player2SameControls: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_PLAYER_2_SAME_CONTROLS,
     rewindEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
     rewindGranularity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,

@@ -39,6 +39,7 @@ export interface RumblePakLogLine {
   text: string
 }
 
+// not included: ~38ms motor decay time per effect
 export const RUMBLE_EFFECT_DURATIONS_MS: number[] =
 [
      53,  58,  50,  34,  47,  37,  85,  79,  79, 175,

@@ -134,8 +134,6 @@ import { CheatFinder } from 'vueport-core/lib/browser/emulator-cheat-finder';
 import { MacroActivity, MacroStore } from 'vueport-core/lib/browser/emulator-macro-store';
 import { MoviePlayer } from 'vueport-core/lib/browser/emulator-movie-player';
 import { PatchStore } from 'vueport-core/lib/browser/emulator-patch-store';
-import { ColorStore } from 'vueport-core/lib/browser/emulator-vb-color-store';
-import { VbcPatchDocument } from 'vueport-core/lib/common/emulator-vb-color';
 import { RetroAchievementsService } from 'vueport-core/lib/browser/emulator-retroachievements';
 import {
   VesEmulatorTheiaRetroAchievementsCredentials,
@@ -299,7 +297,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   @inject(WorkspaceService)
   protected readonly workspaceService!: WorkspaceService;
 
-  protected static readonly colorPatches = new Map<string, Promise<unknown>>();
   protected static readonly shippedPatches = new Map<string, Promise<Uint8Array>>();
 
   static readonly ID = VES_EMULATOR_WIDGET_ID;
@@ -337,7 +334,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected macros: MacroStore;
   protected moviePlayer: MoviePlayer;
   protected patches: PatchStore;
-  protected colors: ColorStore;
   retroAchievements: RetroAchievementsService;
   esSound: EsSoundPlayer;
   protected videoRecorder?: VideoRecorder;
@@ -539,15 +535,19 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
     this.moviePlayer = new MoviePlayer();
     this.toDispose.push(this.moviePlayer.onDidChange(() => this.update()));
-    this.patches = new PatchStore(this.storage, undefined, undefined, file => this.loadShippedPatch(file));
+    this.patches = new PatchStore(this.storage, undefined, undefined, file => this.loadShippedPatch(file), {
+      choice: () => ({
+        autoApply: this.settings.get('vbcAutoApplyColorPatches') && !this.isHardcore(),
+        disabled: this.settings.get('vbcColorPatchesDisabled'),
+      }),
+      remember: (id, apply) => this.rememberColorChoice(id, apply),
+    });
     this.toDispose.push(this.patches.onDidChange(change => {
       if (change.affectsRom) {
         this.refreshRomHeader();
       }
       this.update();
     }));
-    this.colors = this.buildColorStore();
-    this.toDispose.push(this.colors.onDidChange(() => this.update()));
     this.retroAchievements = new RetroAchievementsService(
       new VesEmulatorRetroAchievementsTransport(),
       new VesEmulatorTheiaRetroAchievementsCredentials(this.localStorageService),
@@ -734,7 +734,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.dock.setSim(undefined);
     this.cheats.setSim(undefined);
     this.cheatFinder.setSim(undefined);
-    this.colors.setSim(undefined);
     this.moviePlayer.stop().catch(() => undefined);
     this.patches.unload();
     this.esSound.setSim(undefined);
@@ -1418,7 +1417,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.dock.setSim(this.sim);
       this.cheats.setSim(this.sim);
       this.cheatFinder.setSim(this.sim);
-      this.colors.setSim(this.sim);
       this.applyScale();
       await this.sim.setDisplayMode(displayMode);
       await this.sim.attachCanvas(canvas);
@@ -1545,7 +1543,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     if (this.isHardcore()) {
       this.patches.disableAll();
     }
-    await this.colors.load(this.romId, romContentBuffer);
     await this.macros.load(await this.companionRomPath());
     this.refreshRomHeader();
 
@@ -1571,45 +1568,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
   }
 
-  protected buildColorStore(): ColorStore {
-    function prune<T>(all: Record<string, T>, id: string, value: T): Record<string, T> {
-      const next = { ...all };
-      if (Object.keys(value as object).length === 0) {
-        delete next[id];
-      } else {
-        next[id] = value;
-      }
-      return next;
-    }
-
-    return new ColorStore(
-      this.patches,
-      id => this.settings.get('vbcColorPaletteOverrides')[id] ?? {},
-      (id, overrides) => {
-        this.settings.set(
-          'vbcColorPaletteOverrides',
-          prune(this.settings.get('vbcColorPaletteOverrides'), id, overrides)
-        ).catch(() => undefined);
-      },
-      id => this.settings.get('vbcColorPaletteNames')[id] ?? {},
-      (id, names) => {
-        this.settings.set(
-          'vbcColorPaletteNames',
-          prune(this.settings.get('vbcColorPaletteNames'), id, names)
-        ).catch(() => undefined);
-      },
-      () => ({
-        autoApply: this.settings.get('vbcAutoApplyColorPatches') && !this.isHardcore(),
-        disabled: this.settings.get('vbcColorPatchesDisabled'),
-      }),
-      (id, apply) => this.rememberColorChoice(id, apply),
-      (name, data) => this.storage.export(name, data),
-      config => this.loadColorPatch(config),
-      () => this.readCreatedColorPatch(),
-      document => this.writeCreatedColorPatch(document),
-    );
-  }
-
   protected pendingColorPatchesDisabled: string[] | undefined;
 
   protected rememberColorChoice(id: string, apply: boolean): void {
@@ -1628,21 +1586,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
   }
 
-  protected loadColorPatch(config: string): Promise<unknown> {
-    let pending = VesEmulatorWidget.colorPatches.get(config);
-    if (!pending) {
-      pending = fetch(new Endpoint({ path: `/emulator/${config}` }).getRestUrl().toString())
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`${config}: ${response.status} ${response.statusText}`);
-          }
-          return response.json() as Promise<unknown>;
-        });
-      VesEmulatorWidget.colorPatches.set(config, pending);
-    }
-    return pending;
-  }
-
   protected loadShippedPatch(file: string): Promise<Uint8Array> {
     let pending = VesEmulatorWidget.shippedPatches.get(file);
     if (!pending) {
@@ -1657,36 +1600,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       VesEmulatorWidget.shippedPatches.set(file, pending);
     }
     return pending;
-  }
-
-  protected async colorPatchPath(): Promise<string> {
-    const rom = (await this.getRomUri()).toString();
-    return this.storage.join(
-      await this.companionDirectory(), `${this.storage.stem(rom)}.vbc.json`
-    );
-  }
-
-  protected async readCreatedColorPatch(): Promise<unknown> {
-    const path = await this.colorPatchPath();
-    try {
-      return await this.storage.exists(path)
-        ? JSON.parse(await this.storage.readText(path)) as unknown
-        : undefined;
-    } catch (error) {
-      console.warn(`[emulator] could not read the color patch at ${path}:`, error);
-      return undefined;
-    }
-  }
-
-  protected async writeCreatedColorPatch(document: VbcPatchDocument | undefined): Promise<void> {
-    const path = await this.colorPatchPath();
-    if (!document) {
-      if (await this.storage.exists(path)) {
-        await this.storage.delete(path);
-      }
-      return;
-    }
-    await this.storage.writeText(path, `${JSON.stringify(document, undefined, 2)}\n`);
   }
 
   protected refreshRomHeader(): void {
@@ -2583,7 +2496,6 @@ granularity records less often and costs proportionally less.',
   renderPatches(): React.ReactNode {
     return <EmulatorPatches
       patches={this.patches}
-      colors={this.colors}
       notifications={this.notifications}
       onClose={() => this.togglePatches()}
     />;

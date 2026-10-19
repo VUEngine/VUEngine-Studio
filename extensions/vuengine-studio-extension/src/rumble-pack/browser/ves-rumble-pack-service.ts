@@ -295,7 +295,7 @@ export class VesRumblePackService {
     return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
   }
 
-  async sendCommandEmulateVbByte(byte: string): Promise<void> {
+  async sendCommandEmulateVbByte(byte: number): Promise<void> {
     return this.sendCommand(`VB ${byte}`);
   }
 
