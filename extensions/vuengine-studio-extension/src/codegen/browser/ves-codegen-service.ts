@@ -9,12 +9,12 @@ import crc32 from 'crc/crc32';
 import * as iconv from 'iconv-lite';
 import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
+import { compressTiles } from 'vb-image-converter';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { intToHex, toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
 import { convertPcm } from '../../editors/browser/components/PCMEditor/converter';
 import { getTrackKeyframes } from '../../editors/browser/components/SoundEditor/Other/templating';
-import { compressTiles } from 'vb-image-converter';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { ImageConfigWithName } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
@@ -29,6 +29,7 @@ import {
   ProjectDataTemplateTargetForEachOfType,
   WithFileUri
 } from '../../project/browser/ves-project-types';
+import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import {
   CODEGEN_CHANNEL_NAME,
   FILE_UPDATE_DEBOUNCE,
@@ -69,6 +70,8 @@ export class VesCodeGenService {
   protected readonly vesProcessService!: VesProcessService;
   @inject(VesProjectService)
   protected readonly vesProjectService!: VesProjectService;
+  @inject(VesRumblePackService)
+  protected readonly vesRumblePackService!: VesRumblePackService;
   @inject(VesWorkspaceService)
   protected readonly workspaceService!: VesWorkspaceService;
 
@@ -875,6 +878,7 @@ export class VesCodeGenService {
     // add functions
     env.addGlobal('compressTiles', compressTiles);
     env.addGlobal('getTrackKeyframes', getTrackKeyframes);
+    env.addGlobal('getEffectDuration', this.vesRumblePackService.getEffectDuration);
 
     return env;
   }

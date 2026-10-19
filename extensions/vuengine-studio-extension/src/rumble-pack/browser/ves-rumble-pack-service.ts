@@ -8,7 +8,7 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { EmulatedRumbleSpec, RumbleCommand, RumbleState, RumbleStreamDecoder } from './ves-rumble-pack-protocol';
-import { isRumblePack, RUMBLE_PACK_FILTERS, RumblePakLogLine } from './ves-rumble-pack-types';
+import { isRumblePack, RUMBLE_EFFECT_DURATIONS_MS, RUMBLE_PACK_FILTERS, RumblePakLogLine } from './ves-rumble-pack-types';
 
 @injectable()
 export class VesRumblePackService {
@@ -297,5 +297,9 @@ export class VesRumblePackService {
 
   async sendCommandEmulateVbByte(byte: string): Promise<void> {
     return this.sendCommand(`VB ${byte}`);
+  }
+
+  getEffectDuration(effect: number): number {
+    return RUMBLE_EFFECT_DURATIONS_MS[effect - 1] ?? 0;
   }
 }
