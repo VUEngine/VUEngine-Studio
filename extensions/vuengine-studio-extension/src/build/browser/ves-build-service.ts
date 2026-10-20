@@ -1578,7 +1578,7 @@ Beware! This is usually not necessary and will result in the next build taking l
     await this.fileService.copy(modeRomUri, archiveRomUri, { overwrite: true });
   }
 
-  protected async clean(full: boolean, buildMode: BuildMode): Promise<void> {
+async clean(full: boolean, buildMode: BuildMode): Promise<void> {
     this.isCleaning = true;
     const buildPathUri = await this.getBuildPathUri();
 

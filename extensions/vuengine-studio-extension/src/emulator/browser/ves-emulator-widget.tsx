@@ -123,6 +123,7 @@ import {
 } from 'vueport-core/lib/browser/core/emulator-symbols';
 import { toFirefoxProfile } from 'vueport-core/lib/common/emulator-profile';
 import { Core, Sim } from 'vueport-core/lib/browser/core/vb-core';
+import type { ProbeTarget } from 'vueport-core/lib/probe/probe-session';
 import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/browser/panels/emulator-dock';
 import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import EmulatorSaveStates from 'vueport-core/lib/browser/components/EmulatorSaveStates';
@@ -453,6 +454,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected romId: string | undefined;
   protected sourceRom: Uint8Array | undefined;
+  protected romUri: URI | undefined;
   protected romIdentity = new Uint8Array(32);
 
   state: vesEmulatorWidgetState = {
@@ -826,6 +828,34 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   isLinkGuest(): boolean {
     return !!this.linkHost;
+  }
+
+  // for AI agents
+  probeTarget(): ProbeTarget | undefined {
+    const sim = this.sim;
+    const romUri = this.romUri;
+    if (!sim || !romUri || !this.state.loaded) {
+      return undefined;
+    }
+    return {
+      name: romUri.path.base,
+      sim,
+      romAsRun: () => this.patchedRom(),
+      elf: async () => {
+        const elfUri = await this.findElfUri(romUri);
+        return elfUri ? (await this.fileService.readFile(elfUri)).value.buffer : undefined;
+      },
+      esSoundSnapshot: () => this.esSound.snapshot(),
+      esSound: this.esSound.hasTracks,
+      hardcore: this.isHardcore(),
+      linked: this.isLinked() || this.isLinkGuest(),
+      paused: this.state.paused,
+      setPaused: async paused => {
+        if (this.state.paused !== paused) {
+          await this.performAction(EmulatorAction.PauseToggle);
+        }
+      },
+    };
   }
 
   async unlinkFromPeer(): Promise<void> {
@@ -1509,6 +1539,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected async loadRom(): Promise<void> {
     const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
     const romUri = this.options ? new URI(this.options.uri) : defaultRomUri;
+    this.romUri = romUri;
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
     this.state.romHeader = parseRomHeader(romContentBuffer);

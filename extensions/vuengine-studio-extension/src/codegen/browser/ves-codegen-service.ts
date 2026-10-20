@@ -34,6 +34,7 @@ import {
   CODEGEN_CHANNEL_NAME,
   FILE_UPDATE_DEBOUNCE,
   GenerationMode,
+  GenerationReport,
   GenerationResult,
   IsGeneratingFilesStatus,
   RENDER_TIMEOUT,
@@ -42,7 +43,6 @@ import {
 
 interface RenderTarget {
   uri: URI
-  // The forEachOf bindings this target was expanded from, empty for plain targets.
   bindings: object
 }
 
@@ -78,6 +78,7 @@ export class VesCodeGenService {
   protected timeout: number = 0;
 
   protected numberOfGeneratedFiles = 0;
+  protected readonly errorCollectors = new Set<string[]>();
 
   protected env: Promise<nunjucks.Environment> | undefined;
 
@@ -237,14 +238,14 @@ export class VesCodeGenService {
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
         const generationMode: GenerationMode = changedOnlySelection?.id as GenerationMode ?? GenerationMode.All;
-        return this.generate(selectedTypes, generationMode);
+        await this.generate(selectedTypes, generationMode);
       }
     }
   }
 
   async generateAllChanged(): Promise<void> {
     const items = await this.getTemplatableTypes();
-    return this.generate(items.map(i => i.id as string), GenerationMode.ChangedOnly);
+    await this.generate(items.map(i => i.id as string), GenerationMode.ChangedOnly);
   }
 
   protected async getTemplatableTypes(): Promise<QuickPickItem[]> {
@@ -338,10 +339,23 @@ export class VesCodeGenService {
     return this.quickPickService.show(items, quickPickOptions);
   }
 
-  async generate(types: string[], generationMode: GenerationMode, fileUri?: URI): Promise<void> {
+  async generateForFile(fileUri: URI): Promise<GenerationReport> {
+    const key = fileUri.toString();
+    window.clearTimeout(this.pendingFileUpdates.get(key));
+    this.pendingFileUpdates.delete(key);
+    const typeIds = Object.keys(PROJECT_TYPES).filter(typeId =>
+      [fileUri.path.ext, fileUri.path.base].includes(PROJECT_TYPES[typeId].file) && PROJECT_TYPES[typeId].templates?.length);
+    return typeIds.length > 0
+      ? this.generate(typeIds, GenerationMode.All, fileUri)
+      : { generated: 0, failed: 0, errors: [] };
+  }
+
+  async generate(types: string[], generationMode: GenerationMode, fileUri?: URI): Promise<GenerationReport> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
     let numberOfFailedFiles = 0;
+    const errors: string[] = [];
+    this.errorCollectors.add(errors);
 
     this.logLine(`Generating ${generationMode} for ${types.length} type(s): ${types.join(', ') || '<none>'}.`);
 
@@ -372,6 +386,8 @@ export class VesCodeGenService {
     this.isGeneratingFiles = numberOfFailedFiles > 0
       ? IsGeneratingFilesStatus.error
       : IsGeneratingFilesStatus.done;
+    this.errorCollectors.delete(errors);
+    return { generated: numberOfGeneratedFiles, failed: numberOfFailedFiles, errors };
   }
 
   protected fileHasChanged(itemFileStat: FileStatWithMetadata, targetFileStat?: FileStatWithMetadata): boolean {
@@ -496,6 +512,9 @@ export class VesCodeGenService {
   }
 
   protected logLine(message: string, severity: OutputChannelSeverity = OutputChannelSeverity.Info): void {
+    if (severity === OutputChannelSeverity.Error && message) {
+      this.errorCollectors.forEach(errors => errors.push(message));
+    }
     const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
     if (message) {
       const date = new Date();

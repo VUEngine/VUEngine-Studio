@@ -1,3 +1,4 @@
+import { bindToolProvider } from '@theia/ai-core/lib/common';
 import { PreferenceContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
@@ -9,6 +10,7 @@ import '../../../src/project/browser/style/index.css';
 import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
 import { AssetsBrowserViewContribution } from './assets-browser/assets-browser-view-contribution';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
+import { VesProjectAgentTool } from './ves-project-agent-tool';
 import { VesProjectCommands } from './ves-project-commands';
 import { VesProjectContribution } from './ves-project-contribution';
 import { VesProjectDashboardViewContribution } from './ves-project-dashboard-view';
@@ -27,6 +29,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectPreferenceSchema });
+
+    // AI project tool
+    bindToolProvider(VesProjectAgentTool, bind);
 
     // status bar entry
     bind(VesProjectStatusBarContribution).toSelf().inSingletonScope();

@@ -13,9 +13,14 @@
     "@lumino/messaging": "^2.0.4",
     "@lumino/signaling": "^2.1.6",
     "@lumino/widgets": "2.7.5",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@octokit/rest": "^20.0.2",
     "@phosphor-icons/react": "2.0.15",
     "@phosphor-icons/web": "^2.1.2",
+    "@theia/ai-chat": "1.74.0",
+    "@theia/ai-chat-ui": "1.74.0",
+    "@theia/ai-core": "1.74.0",
+    "@theia/ai-ide": "1.74.0",
     "@theia/bulk-edit": "1.74.0",
     "@theia/callhierarchy": "1.74.0",
     "@theia/collaboration": "1.74.0",
@@ -44,6 +49,7 @@
     "@theia/typehierarchy": "1.74.0",
     "@theia/vsx-registry": "1.74.0",
     "@theia/workspace": "1.74.0",
+    "ajv": "^6.12.0",
     "chroma-js": "^3.1.2",
     "crc": "^4.3.2",
     "datauri": "^3.0.0",
@@ -119,6 +125,10 @@
     },
     {
       "frontend": "lib/about/browser/ves-about-frontend-module"
+    },
+    {
+      "frontend": "lib/ai/browser/ves-ai-frontend-module",
+      "backend": "lib/ai/node/ves-ai-backend-module"
     },
     {
       "frontend": "lib/build/browser/ves-build-frontend-module"

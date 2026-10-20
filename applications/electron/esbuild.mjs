@@ -126,6 +126,7 @@ nodeOptions.plugins.push(copy({
 
 browserOptions.entryPoints['vb-worker'] = require.resolve('vueport-core/lib/worker/vb-worker.js');
 browserOptions.entryPoints['vb-audio-worklet'] = require.resolve('vueport-core/lib/worker/vb-audio-worklet.js');
+browserOptions.entryPoints['probe-worker'] = require.resolve('vueport-core/lib/probe/probe-fork-worker.js');
 nodeOptions.entryPoints['image-converter-worker'] = require.resolve('vb-image-converter/lib/worker.js');
 
 const browserContext = await esbuild.context(browserOptions);

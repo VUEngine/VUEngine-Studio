@@ -1,9 +1,11 @@
+import { bindToolProvider } from '@theia/ai-core/lib/common';
 import { CommandContribution, MenuContribution, PreferenceContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { FileNavigatorFilter } from '@theia/navigator/lib/browser/navigator-filter';
 import '../../../src/build/browser/style/index.css';
+import { VesBuildAgentTool } from './ves-build-agent-tool';
 import { VesBuildContribution } from './ves-build-contribution';
 import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceSchema } from './ves-build-preferences';
@@ -24,6 +26,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).toService(VesBuildContribution);
     bind(KeybindingContribution).toService(VesBuildContribution);
     bind(MenuContribution).toService(VesBuildContribution);
+
+    // AI build tool
+    bindToolProvider(VesBuildAgentTool, bind);
 
     // status bar entry
     bind(VesBuildStatusBarContribution).toSelf().inSingletonScope();
