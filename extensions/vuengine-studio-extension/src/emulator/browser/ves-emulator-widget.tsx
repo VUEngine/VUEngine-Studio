@@ -95,7 +95,9 @@ import TitleBar from 'vueport-core/lib/browser/components/TitleBar';
 import {
   SettingsTabSpec,
   SettingsWindow,
+  SettingsWindowParts,
 } from 'vueport-core/lib/browser/components/SettingsWindow';
+import PopUpDialog from '../../editors/browser/components/Common/Base/PopUpDialog';
 import { VbColorIcon } from 'vueport-core/lib/browser/components/kit/VbColorIcon';
 import { BreakpointManager } from '@theia/debug/lib/browser/breakpoint/breakpoint-manager';
 import { EditorManager } from '@theia/editor/lib/browser';
@@ -123,6 +125,11 @@ import {
 } from 'vueport-core/lib/browser/core/emulator-symbols';
 import { toFirefoxProfile } from 'vueport-core/lib/common/emulator-profile';
 import { Core, Sim } from 'vueport-core/lib/browser/core/vb-core';
+import {
+  BACKDROP_COLUMNS,
+  BACKDROP_ROWS,
+  EmulatorDecorationSpec,
+} from 'vueport-core/lib/browser/panels/emulator-screen-panel';
 import type { ProbeTarget } from 'vueport-core/lib/probe/probe-session';
 import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/browser/panels/emulator-dock';
 import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
@@ -158,10 +165,12 @@ import {
   emulationAnaglyphPalettes,
   emulationPalettes,
   EmulatorAction,
+  EmulatorDecoration,
   EmulatorGamePadKeyCode,
   EmulatorMode,
   EmulatorRomStatus,
   formatColor,
+  paletteDecorationColor,
   resolveVbHardwareMode,
   VbHardwareMode,
   resolveAnaglyphPalette,
@@ -533,6 +542,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.onDidChangeModeEmitter);
     this.esSound = new EsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
+    this.toDispose.push(Disposable.create(() => this.stopDecorationSampling()));
     this.macros = new MacroStore(this.storage, undefined, () => this.globalMacrosPath);
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
     this.moviePlayer = new MoviePlayer();
@@ -582,6 +592,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
         writePanelPreferences: state => {
           this.settings.set('debugPanelState', state).catch(() => undefined);
         },
+        exportFile: (name, data) => this.exportPanelFile(name, data),
       },
       this.rumblePack,
       this.esSound,
@@ -739,6 +750,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.moviePlayer.stop().catch(() => undefined);
     this.patches.unload();
     this.esSound.setSim(undefined);
+    this.applyDecoration();
   }
 
   getResourceUri(): URI | undefined {
@@ -914,6 +926,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     await this.input.applyKeys();
     await this.core?.run();
     this.state.loaded = true;
+    this.applyDecoration();
     this.update();
   }
 
@@ -957,7 +970,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           'customPalettes', 'customAnaglyphPalettes', 'frameBlending',
         ].includes(setting)) {
           this.applyDisplayMode();
+          this.applyDecoration();
           this.update();
+        } else if ([
+          'decoration', 'decorationColor', 'decorationColorFromPalette', 'decorationIntensity',
+        ].includes(setting)) {
+          this.applyDecoration();
         } else if (setting === 'scale') {
           this.applyScale();
           this.update();
@@ -1485,6 +1503,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.state.loaded = true;
       this.state.paused = false;
       this.esSound.setPaused(false);
+      this.applyDecoration();
       this.update();
     } catch (error) {
       this.handleCoreError(error instanceof Error ? error.message : String(error));
@@ -1494,6 +1513,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected handleCoreError(message: string): void {
     console.error('[emulator]', message);
     this.state.loaded = false;
+    this.applyDecoration();
     this.update();
   }
 
@@ -1751,10 +1771,37 @@ granularity records less often and costs proportionally less.',
         tabs={this.settingsTabs()}
         tab={this.settingsTab ?? 'display'}
         onTab={next => { this.activeSettingsTab = next; this.update(); }}
-        onClose={() => this.togglePreferencesWindow()}
+        onClose={() => this.closeSettings()}
         renderPane={(tab, search) => this.renderSettingsPane(tab, search)}
+        frame={parts => this.renderSettingsDialog(parts)}
       />
       : undefined;
+  }
+
+  protected renderSettingsDialog(parts: SettingsWindowParts): React.ReactNode {
+    return <PopUpDialog
+      open
+      onClose={() => this.closeSettings()}
+      onOk={() => this.closeSettings()}
+      title={parts.title}
+      height='100%'
+      width='100%'
+      overflow='hidden'
+    >
+      <div className='vp-window-main ves-emulator-settings'>
+        <div className='vp-window-sidebar vp-scroll'>{parts.rail}</div>
+        <div className='vp-window-body vp-scroll'>{parts.pane}</div>
+      </div>
+    </PopUpDialog>;
+  }
+
+  protected closeSettings(): void {
+    this.state.showPreferences = false;
+    this.state.showPalettes = false;
+    this.state.showControls = false;
+    this.applyDecoration();
+    this.update();
+    this.node.focus();
   }
 
   protected activeSettingsTab: VesEmulatorSettingsTab = 'display';
@@ -2186,6 +2233,14 @@ granularity records less often and costs proportionally less.',
     );
   }
 
+  protected async exportPanelFile(name: string, data: Uint8Array): Promise<void> {
+    const filename = `${await this.exportStem()}-${name}`;
+    await this.storage.export(`exports/${filename}`, data);
+    this.notifications.info(
+      nls.localize('vuengine/emulator/exportSaved', 'Saved to exports/{0}.', filename)
+    );
+  }
+
   protected async exportStem(): Promise<string> {
     const now = new Date();
     const pad = (value: number) => `${value}`.padStart(2, '0');
@@ -2559,7 +2614,62 @@ granularity records less often and costs proportionally less.',
     this.state.showPreferences = open;
     this.state.showPalettes = open && tab === 'display';
     this.state.showControls = open && tab === 'input';
+    this.applyDecoration();
     this.update();
+  }
+
+  protected decorationTimer?: ReturnType<typeof setInterval>;
+  protected decorationSampling = false;
+
+  protected applyDecoration(): void {
+    const shown = this.hasRom || this.settingsTab === 'display';
+    const choice = shown ? this.settings.get('decoration') : EmulatorDecoration.NONE;
+
+    const intensity = Math.max(0, Math.min(this.settings.get('decorationIntensity'), 100)) / 100;
+    let spec: EmulatorDecorationSpec | undefined;
+    if (choice === EmulatorDecoration.BLACK) {
+      spec = { kind: 'black' };
+    } else if (choice === EmulatorDecoration.AMBIENT) {
+      const color = this.settings.get('decorationColorFromPalette')
+        ? paletteDecorationColor(this.getRenderingMode(), this.getPalette(), this.vbcHardwareActive)
+        : this.settings.get('decorationColor');
+      spec = { kind: 'ambient', color, intensity };
+    } else if (choice === EmulatorDecoration.IMMERSION) {
+      spec = { kind: 'immersion', intensity };
+    }
+    this.dock.screen.setDecoration(spec);
+
+    const sampling = spec?.kind === 'immersion' && this.state.loaded;
+    if (sampling && this.decorationTimer === undefined) {
+      this.decorationTimer = setInterval(
+        () => this.sampleDecoration(), VesEmulatorWidget.DECORATION_POLL_MS);
+    } else if (!sampling) {
+      this.stopDecorationSampling();
+    }
+  }
+
+  protected static readonly DECORATION_POLL_MS = 160;
+
+  protected stopDecorationSampling(): void {
+    if (this.decorationTimer !== undefined) {
+      clearInterval(this.decorationTimer);
+      this.decorationTimer = undefined;
+    }
+  }
+
+  protected async sampleDecoration(): Promise<void> {
+    if (this.decorationSampling || !this.sim || this.state.paused) {
+      return;
+    }
+    this.decorationSampling = true;
+    try {
+      const grid = await this.sim.readBackdrop(BACKDROP_COLUMNS, BACKDROP_ROWS);
+      this.dock.screen.pushBackdrop(grid.pixels, BACKDROP_COLUMNS, BACKDROP_ROWS, grid.colorMode);
+    } catch {
+      // A frame the halo does not get. The next tick tries again.
+    } finally {
+      this.decorationSampling = false;
+    }
   }
 
   protected async applyDisplayMode(): Promise<void> {
@@ -2575,7 +2685,11 @@ granularity records less often and costs proportionally less.',
   }
 
   protected enterFullscreen(): void {
-    this.node.requestFullscreen();
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => undefined);
+    } else {
+      this.node.requestFullscreen().catch(() => undefined);
+    }
   }
 
   protected toggleControlsOverlay(): void {

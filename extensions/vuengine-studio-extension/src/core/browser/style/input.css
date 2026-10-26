@@ -32,7 +32,7 @@
     background-color: transparent;
 }
 
-input[type="range"] {
+input[type="range"]:where(:not(.vp-widget *)) {
     appearance: none;
     background: transparent;
     border-radius: 100px;
@@ -44,7 +44,7 @@ input[type="range"] {
     width: 100%;
 }
 
-input[type="range"]::before {
+input[type="range"]:where(:not(.vp-widget *))::before {
     background: var(--theia-input-background);
     border-radius: 100px;
     content: '';
@@ -153,17 +153,17 @@ input[type="range"].value-98::before { width: 98%; }
 input[type="range"].value-99::before { width: 99%; }
 input[type="range"].value-100::before { width: 100%; }
 
-input[type="range"]:active,
-input[type="range"]:focus {
+input[type="range"]:where(:not(.vp-widget *)):active,
+input[type="range"]:where(:not(.vp-widget *)):focus {
     outline: 1px solid var(--theia-focusBorder);
 }
 
-input[type="range"]:active::before,
-input[type="range"]:focus::before {
+input[type="range"]:where(:not(.vp-widget *)):active::before,
+input[type="range"]:where(:not(.vp-widget *)):focus::before {
     background: var(--theia-focusBorder);
 }
 
-input[type="range"]::-webkit-slider-thumb {
+input[type="range"]:where(:not(.vp-widget *))::-webkit-slider-thumb {
     appearance: none;
     background: var(--theia-editor-foreground);
     border-radius: 100px;
@@ -174,7 +174,7 @@ input[type="range"]::-webkit-slider-thumb {
     z-index: 100;
 }
 
-input[type="range"]:disabled::-webkit-slider-thumb {
+input[type="range"]:where(:not(.vp-widget *)):disabled::-webkit-slider-thumb {
     background: var(--theia-dropdown-border);
 }
 
@@ -185,7 +185,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 */
 
-input[type=range]::-webkit-slider-runnable-track {
+input[type=range]:where(:not(.vp-widget *))::-webkit-slider-runnable-track {
     -webkit-appearance: none;
     box-shadow: none;
     border: none;
