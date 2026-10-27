@@ -114,10 +114,6 @@ nodeOptions.plugins.push(copy({
             to: backendEmulatorDir
         },
         {
-            from: path.join(vueportRoot, 'src', 'data', 'vb-color', '*.json'),
-            to: path.join(backendEmulatorDir, 'vb-color')
-        },
-        {
             from: path.join(vueportRoot, 'src', 'data', 'patches', '**', '*'),
             to: path.join(backendEmulatorDir, 'patches')
         }
