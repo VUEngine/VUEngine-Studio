@@ -140,6 +140,7 @@ import EmulatorPatches from 'vueport-core/lib/browser/components/EmulatorPatches
 import EmulatorAchievements from 'vueport-core/lib/browser/components/EmulatorAchievements';
 import { CheatFinder } from 'vueport-core/lib/browser/emulator-cheat-finder';
 import { MacroActivity, MacroStore } from 'vueport-core/lib/browser/emulator-macro-store';
+import { clampTurboRate } from 'vueport-core/lib/common/emulator-turbo';
 import { MoviePlayer } from 'vueport-core/lib/browser/emulator-movie-player';
 import { PatchStore } from 'vueport-core/lib/browser/emulator-patch-store';
 import { RetroAchievementsService } from 'vueport-core/lib/browser/emulator-retroachievements';
@@ -444,6 +445,17 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected input: EmulatorInputController;
   protected gamepadResolver: StoredGamepadProfiles;
+
+  get turboRate(): number {
+    return clampTurboRate(this.settings.get('turboRate'));
+  }
+
+  playMacroSlot(slot: number): void {
+    if (!this.state.loaded || this.refuseForHardcore()) {
+      return;
+    }
+    this.macros.playSlot(slot);
+  }
 
   get lowPower(): boolean {
     return this.state.lowPower;
@@ -923,7 +935,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     await this.loadSaveRam();
     await this.attachSaveStates();
     await this.resetSim();
+    this.input.invalidate();
     await this.input.applyKeys();
+    await this.input.applyTurbo();
     await this.core?.run();
     this.state.loaded = true;
     this.applyDecoration();
@@ -997,6 +1011,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           this.update();
         } else if (['gamepadProfiles', 'gamepadPlayers'].includes(setting)) {
           this.gamepadResolver.invalidate();
+        } else if (setting === 'turboRate') {
+          this.input.applyTurbo();
         } else if (['hardwareMode', 'vbcSupportEnabled'].includes(setting)) {
           this.applyHardwareConfiguration();
         }
@@ -1497,7 +1513,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       } else {
         await this.resetSim();
       }
+      this.input.invalidate();
       await this.input.applyKeys();
+      await this.input.applyTurbo();
       await core.run();
 
       this.state.loaded = true;
@@ -1892,6 +1910,7 @@ granularity records less often and costs proportionally less.',
         return <InputSettings
           settings={this.settings}
           bindings={this.bindings}
+          notifications={this.notifications}
           onChange={() => this.update()}
         />;
       case 'emulation':

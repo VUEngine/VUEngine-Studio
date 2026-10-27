@@ -7,6 +7,9 @@ import {
     EMULATOR_ACTION_COMMANDS,
     EMULATOR_GAMEPAD_BUTTONS,
     EMULATOR_GAMEPAD_INPUTS,
+    EMULATOR_MACRO_SLOT_COMMANDS,
+    EMULATOR_TURBO_BUTTONS,
+    emulatorTurboCommand,
 } from 'vueport-core/lib/browser/emulator-commands';
 import { VueportBindableCommand, VueportInputBindings } from 'vueport-core/lib/common/emulator-settings';
 
@@ -16,6 +19,10 @@ function bindableCommandIds(): string[] {
         const input = EMULATOR_GAMEPAD_INPUTS[button];
         ids.push(input.command.id, input.player2.id);
     }
+    for (const button of EMULATOR_TURBO_BUTTONS) {
+        ids.push(emulatorTurboCommand(button, 1).id, emulatorTurboCommand(button, 2).id);
+    }
+    ids.push(...EMULATOR_MACRO_SLOT_COMMANDS.map(command => command.id));
     return ids;
 }
 

@@ -163,7 +163,6 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
     const openDescription = target
       ? nls.localize('vuengine/emulator/panels/moveHere', 'Move here')
       : nls.localize('vuengine/emulator/panels/alreadyOpen', 'Already open');
-    // Grouped by family, the same as in VUEPort's own picker
     EMULATOR_PANEL_CATEGORIES.forEach(category => {
       const availableHere: QuickPickItemOrSeparator[] = [];
       EMULATOR_PANEL_TYPES

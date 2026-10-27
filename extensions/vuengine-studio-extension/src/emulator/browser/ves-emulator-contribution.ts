@@ -3,7 +3,14 @@ import { CommandContribution, CommandRegistry, MenuAction, MenuContribution, Men
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
-import { EMULATOR_GAMEPAD_BUTTONS, EMULATOR_GAMEPAD_INPUTS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
+import {
+  EMULATOR_GAMEPAD_BUTTONS,
+  EMULATOR_GAMEPAD_INPUTS,
+  EMULATOR_MACRO_SLOT_COMMANDS,
+  EMULATOR_TURBO_BUTTONS,
+  EmulatorCommands,
+  emulatorTurboCommand,
+} from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { EMULATOR_FOCUS_CONTEXT } from './ves-emulator-context-key-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
@@ -105,6 +112,19 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     // player 2
     EMULATOR_GAMEPAD_BUTTONS.forEach(button => {
       commandRegistry.registerCommand(EMULATOR_GAMEPAD_INPUTS[button].player2, {
+        execute: () => { },
+        isVisible: () => false,
+      });
+    });
+
+    EMULATOR_TURBO_BUTTONS.forEach(button => {
+      [1, 2].forEach(player => commandRegistry.registerCommand(emulatorTurboCommand(button, player), {
+        execute: () => { },
+        isVisible: () => false,
+      }));
+    });
+    EMULATOR_MACRO_SLOT_COMMANDS.forEach(command => {
+      commandRegistry.registerCommand(command, {
         execute: () => { },
         isVisible: () => false,
       });

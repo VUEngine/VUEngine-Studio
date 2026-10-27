@@ -61,6 +61,7 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_GAMEPAD_PROFILES = [CATEGORY, 'builtIn', 'gamepad', 'profiles'].join('.');
   export const EMULATOR_BUILTIN_GAMEPAD_PLAYERS = [CATEGORY, 'builtIn', 'gamepad', 'players'].join('.');
   export const EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY = [CATEGORY, 'builtIn', 'gamepad', 'rumble', 'intensity'].join('.');
+  export const EMULATOR_BUILTIN_TURBO_RATE = [CATEGORY, 'builtIn', 'turbo', 'rate'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE = [CATEGORY, 'builtIn', 'retroAchievements', 'enable'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE = [CATEGORY, 'builtIn', 'retroAchievements', 'hardcore'].join('.');
   export const EMULATOR_BUILTIN_DEBUG_PANEL_STATE = [CATEGORY, 'builtIn', 'debug', 'panelState'].join('.');
@@ -115,6 +116,7 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     gamepadProfiles: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_PROFILES,
     gamepadPlayers: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_PLAYERS,
     gamepadRumbleIntensity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY,
+    turboRate: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TURBO_RATE,
     retroAchievementsEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE,
     retroAchievementsHardcore: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE,
     debugPanelState: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_DEBUG_PANEL_STATE,

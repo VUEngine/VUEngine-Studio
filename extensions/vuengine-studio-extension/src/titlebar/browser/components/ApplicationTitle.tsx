@@ -14,10 +14,11 @@ const StyledApplicationTitle = styled.button`
     color: var(--theia-titleBar-activeForeground);
     cursor: pointer;
     display: flex;
+    font-size: 120%;
+    font-weight: 600;
     gap: 5px;
     height: calc(var(--theia-private-menubar-height) - 7px);
     justify-content: center;
-    line-height: calc(var(--theia-private-menubar-height) - 7px);
     max-width: 560px;
     outline-width: 0 !important;
     overflow: hidden;
