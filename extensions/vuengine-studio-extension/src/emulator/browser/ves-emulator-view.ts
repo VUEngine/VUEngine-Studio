@@ -6,6 +6,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { EMULATOR_ACTION_COMMANDS, EMULATOR_ACTIONS, EmulatorCommands } from 'vueport-core/lib/browser/emulator-commands';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { EMULATOR_PANEL_TYPES, emulatorPanelLabel, EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
+import { EMULATOR_PANEL_CATEGORIES, emulatorPanelCategory } from 'vueport-core/lib/browser/panels/emulator-panel-icons';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -162,21 +163,31 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
     const openDescription = target
       ? nls.localize('vuengine/emulator/panels/moveHere', 'Move here')
       : nls.localize('vuengine/emulator/panels/alreadyOpen', 'Already open');
-    EMULATOR_PANEL_TYPES
-      .filter(panelType => panelType !== EmulatorPanelType.SCREEN)
-      .sort((a, b) => emulatorPanelLabel(a as EmulatorPanelType)
-        .localeCompare(emulatorPanelLabel(b as EmulatorPanelType)))
-      .forEach(panelType => {
-        const item = {
-          id: panelType,
-          label: emulatorPanelLabel(panelType as EmulatorPanelType)
-        };
-        if (widget.isPanelOpen(panelType as EmulatorPanelType)) {
-          open.push({ ...item, description: openDescription });
-        } else {
-          available.push(item);
-        }
-      });
+    EMULATOR_PANEL_CATEGORIES.forEach(category => {
+      const availableHere: QuickPickItemOrSeparator[] = [];
+      EMULATOR_PANEL_TYPES
+        .filter(panelType => panelType !== EmulatorPanelType.SCREEN
+          && emulatorPanelCategory(panelType as EmulatorPanelType).id === category.id)
+        .sort((a, b) => emulatorPanelLabel(a as EmulatorPanelType)
+          .localeCompare(emulatorPanelLabel(b as EmulatorPanelType)))
+        .forEach(panelType => {
+          const item = {
+            id: panelType,
+            label: emulatorPanelLabel(panelType as EmulatorPanelType)
+          };
+          if (widget.isPanelOpen(panelType as EmulatorPanelType)) {
+            open.push({ ...item, description: openDescription });
+          } else {
+            availableHere.push(item);
+          }
+        });
+      if (availableHere.length > 0) {
+        available.push(
+          { type: 'separator', label: category.label() },
+          ...availableHere
+        );
+      }
+    });
 
     if (open.length > 0) {
       available.push(

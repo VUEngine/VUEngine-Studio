@@ -320,6 +320,15 @@ export class VesProjectService {
       return;
     }
 
+    return this.createItem(typeId, filename, cloneItem);
+  }
+
+  async createItem(typeId: string, filename: string, cloneItem?: ItemData): Promise<{ fileUri: URI, data: ProjectDataItem }> {
+    const type = PROJECT_TYPES[typeId];
+    if (this.workspaceProjectFolderUri === undefined || !type || !type.file.startsWith('.')) {
+      throw new Error(`Items of type ${typeId} cannot be created.`);
+    }
+
     const typeBaseUri = this.workspaceProjectFolderUri.resolve('assets').resolve(typeId);
     let folderUri = typeBaseUri.resolve(filename);
     let count = 1;
@@ -584,33 +593,37 @@ export class VesProjectService {
       await this.readProjectData();
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
     } else {
-      Object.keys(PROJECT_TYPES).map(async typeId => {
-        const type = PROJECT_TYPES[typeId];
-        if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
-          const items = this.getProjectDataItemsForType(typeId) || {};
-          const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
-          try {
-            const fileContents = await this.fileService.readFile(fileUri);
-            const fileContentsJson = JSON.parse(fileContents.value.toString());
-            if (itemIdByUri) {
-              this.enableFileChangeEventLock();
-              this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
-            } else if (type.file.startsWith('.')) {
-              if (fileContentsJson._id) {
-                this.enableFileChangeEventLock();
-                this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
-              } else {
-                this.logLine(`Can not update project data, missing _id property. Type: ${typeId}`, OutputChannelSeverity.Error);
-              }
-            } else {
-              this.enableFileChangeEventLock();
-              this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
-            }
-          } catch (error) {
-          }
-        }
-      });
+      await this.updateItemFromFile(fileUri).catch(() => undefined);
     }
+  }
+
+  async updateItemFromFile(fileUri: URI): Promise<string> {
+    const typeId = Object.keys(PROJECT_TYPES).find(id => [fileUri.path.ext, fileUri.path.base].includes(PROJECT_TYPES[id].file));
+    if (!typeId) {
+      throw new Error(`${fileUri.path.base} is not a file of any project data type.`);
+    }
+    const type = PROJECT_TYPES[typeId];
+    const items = this.getProjectDataItemsForType(typeId) || {};
+    const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
+    const fileContents = await this.fileService.readFile(fileUri);
+    const fileContentsJson = JSON.parse(fileContents.value.toString());
+    if (itemIdByUri) {
+      this.enableFileChangeEventLock();
+      this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
+    } else if (type.file.startsWith('.')) {
+      if (!fileContentsJson._id) {
+        this.logLine(`Can not update project data, missing _id property. Type: ${typeId}`, OutputChannelSeverity.Error);
+        throw new Error(`${fileUri.path.base} has no _id.`);
+      }
+      this.enableFileChangeEventLock();
+      if (!this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri)) {
+        throw new Error(`${fileUri.path.base} is outside the project, the engine and its plugins.`);
+      }
+    } else {
+      this.enableFileChangeEventLock();
+      this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
+    }
+    return typeId;
   }
 
   protected async setKnownContributors(): Promise<void> {

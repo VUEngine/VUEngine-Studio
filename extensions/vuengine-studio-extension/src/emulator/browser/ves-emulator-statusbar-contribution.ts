@@ -166,7 +166,7 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
         this.setReadout(
             'ves-emulator-save-slot', 88, 'save',
             nls.localize('vuengine/emulator/status/saveSlot', 'Save Slot'),
-            `${nls.localize('vuengine/emulator/status/saveSlot', 'Save Slot')} ${emulator?.saveGameSlot}`,
+            emulator && `${nls.localize('vuengine/emulator/status/saveSlot', 'Save Slot')} ${emulator.saveGameSlot}`,
             { command: EmulatorCommands.SET_SAVE_SLOT.id }
         );
     }

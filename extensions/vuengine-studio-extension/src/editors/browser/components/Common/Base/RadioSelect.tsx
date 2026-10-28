@@ -1,71 +1,83 @@
 import { deepClone } from '@theia/core';
 import { HoverPosition, HoverService } from '@theia/core/lib/browser';
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
 const StyledRadioSelect = styled.div`
-    border-radius: 2px;
+    background: var(--theia-editor-background);
+    border: 1px solid var(--theia-secondaryButton-background);
+    border-radius: 6px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: row;
+    gap: 2px;
     outline: none !important;
+    padding: 2px;
+    position: relative;
     user-select: none;
 
-    & .canSelectMany {
+    &.canSelectMany {
         gap: 4px;
     }
 
-    & .disabled {
+    &.disabled {
         opacity: .5;
     }
+
+    &:hover,
+    &:focus {
+        border-color: var(--theia-button-background);
+    }
+`;
+
+const StyledThumb = styled.div`
+    background-color: var(--theia-secondaryButton-background);
+    border-radius: var(--theia-border-radius, 3px);
+    bottom: 2px;
+    box-shadow: 0 1px 2px var(--theia-widget-shadow);
+    left: 0;
+    position: absolute;
+    top: 2px;
+    transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1),
+                width 200ms cubic-bezier(0.32, 0.72, 0, 1);
 `;
 
 const StyledRadioSelectOption = styled.div`
     align-items: center;
-    // background-color: var(--theia-secondaryButton-background);
-    border: 1px solid var(--theia-dropdown-border);
-    // color: var(--theia-secondaryButton-foreground);
-    color: var(--theia-dropdown-border);
+    border-radius: var(--theia-border-radius, 3px);
+    box-sizing: border-box;
+    color: var(--theia-descriptionForeground);
     cursor: pointer;
     display: flex;
     font-family: var(--theia-ui-font-family);
     font-size: var(--theia-ui-font-size1);
-    height: 22px;
+    height: 24px;
     justify-content: center;
-    line-height: var(--theia-content-line-height);
-    margin-right: -1px;
-    padding: 1px 8px;
+    line-height: 1;
+    padding: 0 var(--theia-ui-padding);
+    position: relative;
     text-align: center;
+    transition: color 120ms ease;
     white-space: nowrap;
+    z-index: 1;
+
+    &:hover {
+        color: var(--theia-foreground);
+    }
 
     &.selected {
-        // background-color: var(--theia-focusBorder);
-        background-color: var(--theia-activityBar-background);
-        // border-color: var(--theia-focusBorder);
-        color: var(--theia-input-foreground);
-        position: relative;
+        color: var(--theia-list-activeSelectionForeground);
     }
 
-    &:first-child {
-        border-bottom-left-radius: 2px;
-        border-top-left-radius: 2px;
-    }
-
-    &:last-child {
-        border-bottom-right-radius: 2px;
-        border-top-right-radius: 2px;
-        margin-right: 0;
+    ${StyledRadioSelect}.no-thumb &.selected {
+        background-color: var(--theia-secondaryButton-background);
+        box-shadow: 0 1px 2px var(--theia-widget-shadow);
     }
 
     ${StyledRadioSelect}.disabled & {
         cursor: default;
-    }
-
-    ${StyledRadioSelect}:focus &.selected {
-        // border-radius: 1px;
-        outline: 1px solid var(--theia-button-background);
-        // outline-offset: 1px;
     }
 `;
 
@@ -87,27 +99,68 @@ interface RadioSelectProps {
     hoverService?: HoverService
 }
 
+function indexesOf(
+    value: string | number | boolean | (string | number | boolean)[],
+    options: RadioSelectOption[],
+): number[] {
+    const wanted = Array.isArray(value) ? value : [value];
+    const found: number[] = [];
+    options.forEach((o, i) => {
+        if (wanted.includes(o.value)) {
+            found.push(i);
+        }
+    });
+    return found;
+}
+
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
     const { allowBlank, options, canSelectMany, defaultValue, onChange, fitSpace, disabled, hoverService } = props;
     const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
+    const [currentIndexes, setCurrentIndexes] = useState<number[]>(() => indexesOf(defaultValue, options));
     const [classes, setClasses] = useState<string>();
     const numberOfOptions = options.length;
 
-    const getValues = () => {
-        let defaultValueArray: (string | number | boolean)[] = [];
-        if (!Array.isArray(defaultValue)) {
-            defaultValueArray = [defaultValue];
-        } else {
-            defaultValueArray = defaultValue;
+    const containerRef = useRef<HTMLDivElement>(null);
+    const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
+    const [thumb, setThumb] = useState<{ x: number, w: number } | null>(null);
+    const [animate, setAnimate] = useState(false);
+
+    const soleIndex = !canSelectMany && currentIndexes.length === 1 ? currentIndexes[0] : -1;
+
+    const placeThumb = useCallback(() => {
+        const container = containerRef.current;
+        const option = soleIndex >= 0 ? optionRefs.current[soleIndex] : null;
+        if (!container || !option) {
+            setThumb(null);
+            return;
         }
-        const defaultValueIndexes: number[] = [];
-        options.map((o, i) => {
-            if (defaultValueArray.includes(o.value)) {
-                defaultValueIndexes.push(i);
-            }
-        });
-        setCurrentIndexes(defaultValueIndexes);
+        const c = container.getBoundingClientRect();
+        const o = option.getBoundingClientRect();
+        setThumb({ x: o.left - c.left - container.clientLeft, w: o.width });
+    }, [soleIndex]);
+
+    useLayoutEffect(placeThumb, [placeThumb, options, fitSpace, canSelectMany]);
+
+    useEffect(() => {
+        if (thumb && !animate) {
+            const id = requestAnimationFrame(() => setAnimate(true));
+            return () => cancelAnimationFrame(id);
+        }
+        return undefined;
+    }, [thumb, animate]);
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) {
+            return undefined;
+        }
+        const observer = new ResizeObserver(() => placeThumb());
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, [placeThumb]);
+
+    const getValues = () => {
+        setCurrentIndexes(indexesOf(defaultValue, options));
     };
 
     const getClasses = () => {
@@ -195,16 +248,27 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         disabled,
     ]);
 
+    const showThumb = soleIndex >= 0 && thumb !== null;
+
     return <StyledRadioSelect
-        className={classes}
+        ref={containerRef}
+        className={[classes, soleIndex < 0 ? 'no-thumb' : undefined].filter(Boolean).join(' ')}
+        style={{ width: fitSpace ? undefined : 'max-content' }}
         onKeyDown={handleKeyPress}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         tabIndex={0}
     >
+        {showThumb && thumb &&
+            <StyledThumb style={{
+                transform: `translateX(${thumb.x}px)`,
+                width: `${thumb.w}px`,
+                transition: animate ? undefined : 'none',
+            }} />}
         {options.map((o, i) =>
             <StyledRadioSelectOption
                 key={`radio-select-option-${i}`}
+                ref={el => { optionRefs.current[i] = el; }}
                 className={currentIndexes.includes(i) ? 'selected' : ''}
                 onClick={() => toggleValue(i)}
                 style={{ flexGrow: fitSpace ? 1 : 0 }}

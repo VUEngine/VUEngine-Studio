@@ -23,6 +23,7 @@ import {
   Camera,
   Cpu,
   FloppyDisk,
+  GoogleCardboardLogo,
   Keyboard,
   Monitor,
   SpeakerHigh,
@@ -95,7 +96,11 @@ import TitleBar from 'vueport-core/lib/browser/components/TitleBar';
 import {
   SettingsTabSpec,
   SettingsWindow,
+  SettingsWindowParts,
 } from 'vueport-core/lib/browser/components/SettingsWindow';
+import XrSettings from 'vueport-core/lib/browser/components/settings/XrSettings';
+import { EmulatorXrController } from 'vueport-core/lib/browser/emulator-xr-controller';
+import PopUpDialog from '../../editors/browser/components/Common/Base/PopUpDialog';
 import { VbColorIcon } from 'vueport-core/lib/browser/components/kit/VbColorIcon';
 import { BreakpointManager } from '@theia/debug/lib/browser/breakpoint/breakpoint-manager';
 import { EditorManager } from '@theia/editor/lib/browser';
@@ -123,6 +128,12 @@ import {
 } from 'vueport-core/lib/browser/core/emulator-symbols';
 import { toFirefoxProfile } from 'vueport-core/lib/common/emulator-profile';
 import { Core, Sim } from 'vueport-core/lib/browser/core/vb-core';
+import {
+  BACKDROP_COLUMNS,
+  BACKDROP_ROWS,
+  EmulatorDecorationSpec,
+} from 'vueport-core/lib/browser/panels/emulator-screen-panel';
+import type { ProbeTarget } from 'vueport-core/lib/probe/probe-session';
 import { AreaLayout, VueportDock, VueportDockLayout } from 'vueport-core/lib/browser/panels/emulator-dock';
 import { EmulatorPanelType } from 'vueport-core/lib/browser/panels/emulator-panel';
 import EmulatorSaveStates from 'vueport-core/lib/browser/components/EmulatorSaveStates';
@@ -132,6 +143,7 @@ import EmulatorPatches from 'vueport-core/lib/browser/components/EmulatorPatches
 import EmulatorAchievements from 'vueport-core/lib/browser/components/EmulatorAchievements';
 import { CheatFinder } from 'vueport-core/lib/browser/emulator-cheat-finder';
 import { MacroActivity, MacroStore } from 'vueport-core/lib/browser/emulator-macro-store';
+import { clampTurboRate } from 'vueport-core/lib/common/emulator-turbo';
 import { MoviePlayer } from 'vueport-core/lib/browser/emulator-movie-player';
 import { PatchStore } from 'vueport-core/lib/browser/emulator-patch-store';
 import { RetroAchievementsService } from 'vueport-core/lib/browser/emulator-retroachievements';
@@ -157,10 +169,12 @@ import {
   emulationAnaglyphPalettes,
   emulationPalettes,
   EmulatorAction,
+  EmulatorDecoration,
   EmulatorGamePadKeyCode,
   EmulatorMode,
   EmulatorRomStatus,
   formatColor,
+  paletteDecorationColor,
   resolveVbHardwareMode,
   VbHardwareMode,
   resolveAnaglyphPalette,
@@ -192,7 +206,8 @@ export type VesEmulatorSettingsTab =
   | 'saveData'
   | 'screenshots'
   | 'video'
-  | 'achievements';
+  | 'achievements'
+  | 'vr';
 
 export interface vesEmulatorWidgetState {
   loaded: boolean;
@@ -433,7 +448,19 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected input: EmulatorInputController;
+  protected xr: EmulatorXrController;
   protected gamepadResolver: StoredGamepadProfiles;
+
+  get turboRate(): number {
+    return clampTurboRate(this.settings.get('turboRate'));
+  }
+
+  playMacroSlot(slot: number): void {
+    if (!this.state.loaded || this.refuseForHardcore()) {
+      return;
+    }
+    this.macros.playSlot(slot);
+  }
 
   get lowPower(): boolean {
     return this.state.lowPower;
@@ -453,6 +480,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected romId: string | undefined;
   protected sourceRom: Uint8Array | undefined;
+  protected romUri: URI | undefined;
   protected romIdentity = new Uint8Array(32);
 
   state: vesEmulatorWidgetState = {
@@ -505,7 +533,23 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
     const instanceId = this.options?.instanceId ?? 'default';
     this.storage = new VesEmulatorStorage(this.fileService, this.workspaceService);
-    this.notifications = new VesEmulatorNotifications(this.messageService);
+    const notifications = new VesEmulatorNotifications(this.messageService);
+    this.notifications = notifications;
+    this.xr = new EmulatorXrController({
+      sim: () => this.sim,
+      core: () => this.core,
+      input: () => this.input,
+      displayMode: () => this.getDisplayMode(),
+      hudSource: () => this,
+      romTitle: () => this.state.romHeader?.name?.trim() || this.title.label,
+      runAction: action => this.runAction(action),
+      canLoadState: () => !this.isHardcore() && this.saveStates.latestManual !== undefined,
+      applyStereoDepth: () => this.applyStereoDepth(),
+      update: () => this.update(),
+      notifyError: message => this.notifications.error(message),
+      setHeadset: headset => { notifications.headset = headset; },
+    });
+    this.toDispose.push(this.xr);
     this.rumblePack = new VesEmulatorRumblePack(this.vesRumblePackService);
     this.settings = new VesEmulatorSettings(this.preferenceService);
     this.bindings = new VesEmulatorBindings(this.vesKeybindingService, this.keybindingRegistry);
@@ -531,6 +575,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.onDidChangeModeEmitter);
     this.esSound = new EsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
+    this.toDispose.push(Disposable.create(() => this.stopDecorationSampling()));
     this.macros = new MacroStore(this.storage, undefined, () => this.globalMacrosPath);
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
     this.moviePlayer = new MoviePlayer();
@@ -580,6 +625,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
         writePanelPreferences: state => {
           this.settings.set('debugPanelState', state).catch(() => undefined);
         },
+        exportFile: (name, data) => this.exportPanelFile(name, data),
       },
       this.rumblePack,
       this.esSound,
@@ -708,6 +754,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected onCloseRequest(msg: Message): void {
+    this.xr.end().catch(() => undefined);
     this.finishVideoRecording()
       .then(() => this.saveSaveRam())
       .finally(() => this.disposeSession());
@@ -728,6 +775,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }
       this.session = undefined;
     }
+    this.xr.setSim(undefined).catch(() => undefined);
     this.sim = undefined;
     this.core = undefined;
     this.setEmulationSpeed(undefined);
@@ -737,6 +785,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.moviePlayer.stop().catch(() => undefined);
     this.patches.unload();
     this.esSound.setSim(undefined);
+    this.applyDecoration();
   }
 
   getResourceUri(): URI | undefined {
@@ -828,6 +877,34 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return !!this.linkHost;
   }
 
+  // for AI agents
+  probeTarget(): ProbeTarget | undefined {
+    const sim = this.sim;
+    const romUri = this.romUri;
+    if (!sim || !romUri || !this.state.loaded) {
+      return undefined;
+    }
+    return {
+      name: romUri.path.base,
+      sim,
+      romAsRun: () => this.patchedRom(),
+      elf: async () => {
+        const elfUri = await this.findElfUri(romUri);
+        return elfUri ? (await this.fileService.readFile(elfUri)).value.buffer : undefined;
+      },
+      esSoundSnapshot: () => this.esSound.snapshot(),
+      esSound: this.esSound.hasTracks,
+      hardcore: this.isHardcore(),
+      linked: this.isLinked() || this.isLinkGuest(),
+      paused: this.state.paused,
+      setPaused: async paused => {
+        if (this.state.paused !== paused) {
+          await this.performAction(EmulatorAction.PauseToggle);
+        }
+      },
+    };
+  }
+
   async unlinkFromPeer(): Promise<void> {
     const peer = this.linkedPeer;
     if (!peer || !(this.isLinked() || this.isLinkGuest())) {
@@ -881,9 +958,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     await this.loadSaveRam();
     await this.attachSaveStates();
     await this.resetSim();
+    this.input.invalidate();
     await this.input.applyKeys();
+    await this.input.applyTurbo();
     await this.core?.run();
     this.state.loaded = true;
+    this.applyDecoration();
     this.update();
   }
 
@@ -927,7 +1007,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           'customPalettes', 'customAnaglyphPalettes', 'frameBlending',
         ].includes(setting)) {
           this.applyDisplayMode();
+          this.applyDecoration();
           this.update();
+        } else if ([
+          'decoration', 'decorationColor', 'decorationColorFromPalette', 'decorationIntensity',
+        ].includes(setting)) {
+          this.applyDecoration();
         } else if (setting === 'scale') {
           this.applyScale();
           this.update();
@@ -949,6 +1034,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
           this.update();
         } else if (['gamepadProfiles', 'gamepadPlayers'].includes(setting)) {
           this.gamepadResolver.invalidate();
+        } else if (setting === 'turboRate') {
+          this.input.applyTurbo();
         } else if (['hardwareMode', 'vbcSupportEnabled'].includes(setting)) {
           this.applyHardwareConfiguration();
         }
@@ -959,7 +1046,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected async applyStereoDepth(): Promise<void> {
     this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
-    await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
+    await this.core?.setStereoDepth(this.xr.stereoDepth(this.settings.get('stereoDepth')));
   }
 
   /** Where the column table puts columns, and whether a game comes up as the display unit does — see `web-emulator.tsx`. */
@@ -1420,6 +1507,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.applyScale();
       await this.sim.setDisplayMode(displayMode);
       await this.sim.attachCanvas(canvas);
+      await this.xr.setSim(this.sim);
       await this.sim.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
 
       await this.time.applySpeed();
@@ -1449,12 +1537,15 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       } else {
         await this.resetSim();
       }
+      this.input.invalidate();
       await this.input.applyKeys();
+      await this.input.applyTurbo();
       await core.run();
 
       this.state.loaded = true;
       this.state.paused = false;
       this.esSound.setPaused(false);
+      this.applyDecoration();
       this.update();
     } catch (error) {
       this.handleCoreError(error instanceof Error ? error.message : String(error));
@@ -1464,6 +1555,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected handleCoreError(message: string): void {
     console.error('[emulator]', message);
     this.state.loaded = false;
+    this.applyDecoration();
     this.update();
   }
 
@@ -1509,6 +1601,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected async loadRom(): Promise<void> {
     const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
     const romUri = this.options ? new URI(this.options.uri) : defaultRomUri;
+    this.romUri = romUri;
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
     this.state.romHeader = parseRomHeader(romContentBuffer);
@@ -1664,6 +1757,18 @@ granularity records less often and costs proportionally less.',
     this.node.focus();
   };
 
+  get xrSupported(): boolean {
+    return this.xr.supported && !this.isLinkGuest();
+  }
+
+  get xrActive(): boolean {
+    return this.xr.active;
+  }
+
+  toggleXr(): Promise<void> {
+    return this.xr.toggle();
+  }
+
   public runAction = (action: EmulatorAction): void => {
     this.commandService.executeCommand(EMULATOR_ACTION_COMMANDS[action].id);
     // Hand the keyboard back, so the shortcuts keep working after a click.
@@ -1720,10 +1825,37 @@ granularity records less often and costs proportionally less.',
         tabs={this.settingsTabs()}
         tab={this.settingsTab ?? 'display'}
         onTab={next => { this.activeSettingsTab = next; this.update(); }}
-        onClose={() => this.togglePreferencesWindow()}
+        onClose={() => this.closeSettings()}
         renderPane={(tab, search) => this.renderSettingsPane(tab, search)}
+        frame={parts => this.renderSettingsDialog(parts)}
       />
       : undefined;
+  }
+
+  protected renderSettingsDialog(parts: SettingsWindowParts): React.ReactNode {
+    return <PopUpDialog
+      open
+      onClose={() => this.closeSettings()}
+      onOk={() => this.closeSettings()}
+      title={parts.title}
+      height='100%'
+      width='100%'
+      overflow='hidden'
+    >
+      <div className='vp-window-main ves-emulator-settings'>
+        <div className='vp-window-sidebar vp-scroll'>{parts.rail}</div>
+        <div className='vp-window-body vp-scroll'>{parts.pane}</div>
+      </div>
+    </PopUpDialog>;
+  }
+
+  protected closeSettings(): void {
+    this.state.showPreferences = false;
+    this.state.showPalettes = false;
+    this.state.showControls = false;
+    this.applyDecoration();
+    this.update();
+    this.node.focus();
   }
 
   protected activeSettingsTab: VesEmulatorSettingsTab = 'display';
@@ -1794,6 +1926,14 @@ granularity records less often and costs proportionally less.',
           'retroachievements achievements leaderboards score account sign in hardcore points'
         ),
       },
+      {
+        id: 'vr',
+        label: nls.localize('vueport/settings/tabs/vr', 'VR'),
+        icon: <GoogleCardboardLogo size={18} />,
+        keywords: nls.localize('vueport/settings/keywords/vr',
+          'vr virtual reality xr webxr headset quest meta screen size width depth 3d \
+backdrop passthrough hologram room ar'),
+      },
     ];
   }
 
@@ -1814,6 +1954,7 @@ granularity records less often and costs proportionally less.',
         return <InputSettings
           settings={this.settings}
           bindings={this.bindings}
+          notifications={this.notifications}
           onChange={() => this.update()}
         />;
       case 'emulation':
@@ -1828,6 +1969,14 @@ granularity records less often and costs proportionally less.',
         return <EmulatorAchievementsSettings
           settings={this.settings}
           achievements={this.retroAchievements}
+        />;
+      case 'vr':
+        return <XrSettings
+          availability={this.xr.availability}
+          screen={this.xr.screen}
+          backdrop={this.xr.backdrop}
+          onScreen={screen => this.xr.setScreen(screen)}
+          onBackdrop={backdrop => this.xr.setBackdrop(backdrop)}
         />;
     }
   }
@@ -2152,6 +2301,14 @@ granularity records less often and costs proportionally less.',
     await this.storage.export(`screenshots/${screenshotFilename}`, new Uint8Array(png));
     this.notifications.info(
       nls.localize('vuengine/emulator/screenshotSaved', 'Screenshot saved to screenshots/{0}.', screenshotFilename)
+    );
+  }
+
+  protected async exportPanelFile(name: string, data: Uint8Array): Promise<void> {
+    const filename = `${await this.exportStem()}-${name}`;
+    await this.storage.export(`exports/${filename}`, data);
+    this.notifications.info(
+      nls.localize('vuengine/emulator/exportSaved', 'Saved to exports/{0}.', filename)
     );
   }
 
@@ -2528,12 +2685,68 @@ granularity records less often and costs proportionally less.',
     this.state.showPreferences = open;
     this.state.showPalettes = open && tab === 'display';
     this.state.showControls = open && tab === 'input';
+    this.applyDecoration();
     this.update();
+  }
+
+  protected decorationTimer?: ReturnType<typeof setInterval>;
+  protected decorationSampling = false;
+
+  protected applyDecoration(): void {
+    const shown = this.hasRom || this.settingsTab === 'display';
+    const choice = shown ? this.settings.get('decoration') : EmulatorDecoration.NONE;
+
+    const intensity = Math.max(0, Math.min(this.settings.get('decorationIntensity'), 100)) / 100;
+    let spec: EmulatorDecorationSpec | undefined;
+    if (choice === EmulatorDecoration.BLACK) {
+      spec = { kind: 'black' };
+    } else if (choice === EmulatorDecoration.AMBIENT) {
+      const color = this.settings.get('decorationColorFromPalette')
+        ? paletteDecorationColor(this.getRenderingMode(), this.getPalette(), this.vbcHardwareActive)
+        : this.settings.get('decorationColor');
+      spec = { kind: 'ambient', color, intensity };
+    } else if (choice === EmulatorDecoration.IMMERSION) {
+      spec = { kind: 'immersion', intensity };
+    }
+    this.dock.screen.setDecoration(spec);
+
+    const sampling = spec?.kind === 'immersion' && this.state.loaded;
+    if (sampling && this.decorationTimer === undefined) {
+      this.decorationTimer = setInterval(
+        () => this.sampleDecoration(), VesEmulatorWidget.DECORATION_POLL_MS);
+    } else if (!sampling) {
+      this.stopDecorationSampling();
+    }
+  }
+
+  protected static readonly DECORATION_POLL_MS = 160;
+
+  protected stopDecorationSampling(): void {
+    if (this.decorationTimer !== undefined) {
+      clearInterval(this.decorationTimer);
+      this.decorationTimer = undefined;
+    }
+  }
+
+  protected async sampleDecoration(): Promise<void> {
+    if (this.decorationSampling || !this.sim || this.state.paused) {
+      return;
+    }
+    this.decorationSampling = true;
+    try {
+      const grid = await this.sim.readBackdrop(BACKDROP_COLUMNS, BACKDROP_ROWS);
+      this.dock.screen.pushBackdrop(grid.pixels, BACKDROP_COLUMNS, BACKDROP_ROWS, grid.colorMode);
+    } catch {
+      // A frame the halo does not get. The next tick tries again.
+    } finally {
+      this.decorationSampling = false;
+    }
   }
 
   protected async applyDisplayMode(): Promise<void> {
     const mode = this.getDisplayMode();
     this.dock.screen.setDisplayMode(mode);
+    this.xr.setDisplayMode(mode);
     await this.sim?.setDisplayMode(mode);
   }
 
@@ -2544,7 +2757,11 @@ granularity records less often and costs proportionally less.',
   }
 
   protected enterFullscreen(): void {
-    this.node.requestFullscreen();
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => undefined);
+    } else {
+      this.node.requestFullscreen().catch(() => undefined);
+    }
   }
 
   protected toggleControlsOverlay(): void {

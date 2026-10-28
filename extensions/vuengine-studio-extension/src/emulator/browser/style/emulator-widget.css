@@ -3,3 +3,7 @@
   flex-direction: column;
   outline: none;
 }
+
+.ves-emulator-settings .vp-window-sidebar {
+  border-right: none;
+}

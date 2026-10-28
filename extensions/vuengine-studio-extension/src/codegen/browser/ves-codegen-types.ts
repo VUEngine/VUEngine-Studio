@@ -25,3 +25,7 @@ export enum GenerationMode {
   All = 'all',
   ChangedOnly = 'changedOnly',
 }
+
+export interface GenerationReport extends GenerationResult {
+  errors: string[];
+}
