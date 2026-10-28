@@ -18184,7 +18184,7 @@ vscode-uri@^2.1.1:
 
 "vueport-core@file:vendor/vueport-core-1.0.0.tgz":
   version "1.0.0"
-  resolved "file:vendor/vueport-core-1.0.0.tgz#2937117d37fed4b20deff025e3f7b6ca15412751"
+  resolved "file:vendor/vueport-core-1.0.0.tgz#6436b84ca9215f37b52fda77baa0e07c7f46fa88"
   dependencies:
     "@lumino/dragdrop" "^2.1.8"
     "@lumino/messaging" "^2.0.4"
