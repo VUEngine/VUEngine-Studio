@@ -23,7 +23,6 @@ import {
   Camera,
   Cpu,
   FloppyDisk,
-  GoogleCardboardLogo,
   Keyboard,
   Monitor,
   SpeakerHigh,
@@ -98,8 +97,6 @@ import {
   SettingsWindow,
   SettingsWindowParts,
 } from 'vueport-core/lib/browser/components/SettingsWindow';
-import XrSettings from 'vueport-core/lib/browser/components/settings/XrSettings';
-import { EmulatorXrController } from 'vueport-core/lib/browser/emulator-xr-controller';
 import PopUpDialog from '../../editors/browser/components/Common/Base/PopUpDialog';
 import { VbColorIcon } from 'vueport-core/lib/browser/components/kit/VbColorIcon';
 import { BreakpointManager } from '@theia/debug/lib/browser/breakpoint/breakpoint-manager';
@@ -206,8 +203,7 @@ export type VesEmulatorSettingsTab =
   | 'saveData'
   | 'screenshots'
   | 'video'
-  | 'achievements'
-  | 'vr';
+  | 'achievements';
 
 export interface vesEmulatorWidgetState {
   loaded: boolean;
@@ -448,7 +444,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected input: EmulatorInputController;
-  protected xr: EmulatorXrController;
   protected gamepadResolver: StoredGamepadProfiles;
 
   get turboRate(): number {
@@ -533,23 +528,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
     const instanceId = this.options?.instanceId ?? 'default';
     this.storage = new VesEmulatorStorage(this.fileService, this.workspaceService);
-    const notifications = new VesEmulatorNotifications(this.messageService);
-    this.notifications = notifications;
-    this.xr = new EmulatorXrController({
-      sim: () => this.sim,
-      core: () => this.core,
-      input: () => this.input,
-      displayMode: () => this.getDisplayMode(),
-      hudSource: () => this,
-      romTitle: () => this.state.romHeader?.name?.trim() || this.title.label,
-      runAction: action => this.runAction(action),
-      canLoadState: () => !this.isHardcore() && this.saveStates.latestManual !== undefined,
-      applyStereoDepth: () => this.applyStereoDepth(),
-      update: () => this.update(),
-      notifyError: message => this.notifications.error(message),
-      setHeadset: headset => { notifications.headset = headset; },
-    });
-    this.toDispose.push(this.xr);
+    this.notifications = new VesEmulatorNotifications(this.messageService);
     this.rumblePack = new VesEmulatorRumblePack(this.vesRumblePackService);
     this.settings = new VesEmulatorSettings(this.preferenceService);
     this.bindings = new VesEmulatorBindings(this.vesKeybindingService, this.keybindingRegistry);
@@ -754,7 +733,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected onCloseRequest(msg: Message): void {
-    this.xr.end().catch(() => undefined);
     this.finishVideoRecording()
       .then(() => this.saveSaveRam())
       .finally(() => this.disposeSession());
@@ -775,7 +753,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }
       this.session = undefined;
     }
-    this.xr.setSim(undefined).catch(() => undefined);
     this.sim = undefined;
     this.core = undefined;
     this.setEmulationSpeed(undefined);
@@ -1046,7 +1023,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected async applyStereoDepth(): Promise<void> {
     this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
-    await this.core?.setStereoDepth(this.xr.stereoDepth(this.settings.get('stereoDepth')));
+    await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
   }
 
   /** Where the column table puts columns, and whether a game comes up as the display unit does — see `web-emulator.tsx`. */
@@ -1507,7 +1484,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.applyScale();
       await this.sim.setDisplayMode(displayMode);
       await this.sim.attachCanvas(canvas);
-      await this.xr.setSim(this.sim);
       await this.sim.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
 
       await this.time.applySpeed();
@@ -1757,18 +1733,6 @@ granularity records less often and costs proportionally less.',
     this.node.focus();
   };
 
-  get xrSupported(): boolean {
-    return this.xr.supported && !this.isLinkGuest();
-  }
-
-  get xrActive(): boolean {
-    return this.xr.active;
-  }
-
-  toggleXr(): Promise<void> {
-    return this.xr.toggle();
-  }
-
   public runAction = (action: EmulatorAction): void => {
     this.commandService.executeCommand(EMULATOR_ACTION_COMMANDS[action].id);
     // Hand the keyboard back, so the shortcuts keep working after a click.
@@ -1926,14 +1890,6 @@ granularity records less often and costs proportionally less.',
           'retroachievements achievements leaderboards score account sign in hardcore points'
         ),
       },
-      {
-        id: 'vr',
-        label: nls.localize('vueport/settings/tabs/vr', 'VR'),
-        icon: <GoogleCardboardLogo size={18} />,
-        keywords: nls.localize('vueport/settings/keywords/vr',
-          'vr virtual reality xr webxr headset quest meta screen size width depth 3d \
-backdrop passthrough hologram room ar'),
-      },
     ];
   }
 
@@ -1969,14 +1925,6 @@ backdrop passthrough hologram room ar'),
         return <EmulatorAchievementsSettings
           settings={this.settings}
           achievements={this.retroAchievements}
-        />;
-      case 'vr':
-        return <XrSettings
-          availability={this.xr.availability}
-          screen={this.xr.screen}
-          backdrop={this.xr.backdrop}
-          onScreen={screen => this.xr.setScreen(screen)}
-          onBackdrop={backdrop => this.xr.setBackdrop(backdrop)}
         />;
     }
   }
@@ -2746,7 +2694,6 @@ backdrop passthrough hologram room ar'),
   protected async applyDisplayMode(): Promise<void> {
     const mode = this.getDisplayMode();
     this.dock.screen.setDisplayMode(mode);
-    this.xr.setDisplayMode(mode);
     await this.sim?.setDisplayMode(mode);
   }
 
