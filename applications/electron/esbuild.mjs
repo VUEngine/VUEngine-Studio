@@ -99,22 +99,24 @@ for (const options of [browserOptions, nodeOptions, electronOptions]) {
 
 const vueportRoot = path.dirname(resolvePackagePath('vueport-core', __dirname));
 const backendEmulatorDir = path.join(__dirname, 'lib', 'backend', 'emulator');
+
+const globOf = (...parts) => path.join(...parts).split(path.sep).join('/');
 nodeOptions.plugins.push(copy({
     assets: [
         {
-            from: path.join(vueportRoot, 'wasm', 'shrooms', 'core.wasm'),
+            from: globOf(vueportRoot, 'wasm', 'shrooms', 'core.wasm'),
             to: backendEmulatorDir
         },
         {
-            from: path.join(vueportRoot, 'wasm', 'rcheevos', 'rcheevos.wasm'),
+            from: globOf(vueportRoot, 'wasm', 'rcheevos', 'rcheevos.wasm'),
             to: backendEmulatorDir
         },
         {
-            from: path.join(vueportRoot, 'wasm', 'rcheevos', 'rcheevos.js'),
+            from: globOf(vueportRoot, 'wasm', 'rcheevos', 'rcheevos.js'),
             to: backendEmulatorDir
         },
         {
-            from: path.join(vueportRoot, 'src', 'data', 'patches', '**', '*'),
+            from: globOf(vueportRoot, 'src', 'data', 'patches', '**', '*'),
             to: path.join(backendEmulatorDir, 'patches')
         }
     ]
