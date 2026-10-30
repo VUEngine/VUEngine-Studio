@@ -30,7 +30,7 @@ import TrackHeader from './TrackHeader';
 type PatternClipboard = Record<string, string>;
 
 const StyledSequencerContainer = styled.div`
-    align-self: start;
+    align-self: stretch;
     box-sizing: border-box;
     display: flex;
     margin: 0 var(--padding);
@@ -138,8 +138,7 @@ interface SequencerProps {
     setPlayerSeekRequest: Dispatch<SetStateAction<number>>
     noteCursor: number
     setNoteCursor: (step: number) => void
-    stepsPerNote: number
-    stepsPerBar: number
+    openSongLengthDialog: () => void
 }
 
 export default function Sequencer(props: SequencerProps): React.JSX.Element {
@@ -171,7 +170,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         rangeDragEndStep, setRangeDragEndStep,
         setPlayerSeekRequest,
         noteCursor, setNoteCursor,
-        stepsPerNote, stepsPerBar,
+        openSongLengthDialog,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
@@ -633,8 +632,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 noteSnapping={noteSnapping}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}
-                stepsPerNote={stepsPerNote}
-                stepsPerBar={stepsPerBar}
+                openSongLengthDialog={openSongLengthDialog}
             />
             {tool === SoundEditorTool.EDIT && soundData.patterns[currentPatternId] &&
                 <SequencerPlacedPattern
@@ -660,7 +658,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     sequencerNoteWidth={sequencerNoteWidth}
                     setPatternSizes={setPatternSizes}
                     removePatternsFromSequence={removePatternsFromSequence}
-                    stepsPerBar={stepsPerBar}
                 />
             }
         </StyledSequencerGridContainer>

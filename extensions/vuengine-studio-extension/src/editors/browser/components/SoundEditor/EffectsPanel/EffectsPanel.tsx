@@ -8,21 +8,18 @@ import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EFFECTS_PANEL_COLLAPSED_HEIGHT,
     EFFECTS_PANEL_EXPANDED_HEIGHT,
+    EFFECTS_PANEL_EXPANDED_HEIGHT_MAX,
+    EFFECTS_PANEL_EXPANDED_HEIGHT_MIN,
+    EventsMap,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
-    SoundData
+    SoundData,
+    SoundEditorTool,
+    SoundEvent
 } from '../SoundEditorTypes';
+import ResizeHandle from '../Other/ResizeHandle';
 import EffectsPanelGrid from './EffectsPanelGrid';
 import EffectsPanelGridOverview from './EffectsPanelGridOverview';
-
-const NotYetImplementedLabel = styled.div`
-    font-size: 14px;
-    font-style: italic;
-    left: ${PIANO_ROLL_KEY_WIDTH + 15}px;
-    opacity: .5;
-    position: absolute;
-    top: ${EFFECTS_PANEL_COLLAPSED_HEIGHT + 15}px;
-`;
 
 const StyledToggleButton = styled.button`
     align-items: center;
@@ -59,51 +56,91 @@ const StyledTabList = styled(TabList)`
     }
 `;
 
-const EffectsPanelTabs = [
-    nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
-    nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
-    nls.localize('vuengine/editors/sound/trackVolume', 'Track Volume'),
-    nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
+interface EffectsPanelTab {
+    label: string
+    eventType: SoundEvent
+    shortLabel: string
+}
+
+const EffectsPanelTabs: EffectsPanelTab[] = [
+    {
+        label: nls.localize('vuengine/editors/sound/volume', 'Volume'),
+        eventType: SoundEvent.Volume,
+        shortLabel: nls.localize('vuengine/editors/sound/volumeShort', 'V'),
+    },
+    {
+        label: nls.localize('vuengine/editors/sound/panning', 'Panning'),
+        eventType: SoundEvent.Panning,
+        shortLabel: nls.localize('vuengine/editors/sound/panningShort', 'P'),
+    },
+    {
+        label: nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
+        eventType: SoundEvent.MasterVolume,
+        shortLabel: nls.localize('vuengine/editors/sound/masterVolumeShort', 'M'),
+    },
+    {
+        label: nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
+        eventType: SoundEvent.TimeSignature,
+        shortLabel: nls.localize('vuengine/editors/sound/timeSignatureShort', 'T'),
+    },
 ];
 
 interface EffectsPanelProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: (step: number) => void
+    setNotes: (notes: EventsMap) => void
+    setGlobalEvents: (events: EventsMap) => void
+    tool: SoundEditorTool
     currentTrackId: number
     currentPatternId: string
     currentSequenceIndex: number
     effectsPanelHidden: boolean
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
+    effectsPanelHeight: number
+    setEffectsPanelHeight: (height: number) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
+    editGlobalEvent: (step: number, eventType: SoundEvent) => void
+    noteSnapping: boolean
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
-    stepsPerNote: number
-    stepsPerBar: number
 }
 
 export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Element {
     const {
         soundData,
         noteCursor: noteCursor, setNoteCursor,
+        setNotes,
+        setGlobalEvents,
+        tool,
         currentTrackId,
         currentPatternId,
         currentSequenceIndex,
         effectsPanelHidden, setEffectsPanelHidden,
+        effectsPanelHeight, setEffectsPanelHeight,
+        setCurrentSequenceIndex,
+        editGlobalEvent,
+        noteSnapping,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
-        stepsPerNote, stepsPerBar
     } = props;
     const { services, onCommandExecute, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
 
-    const width = Math.min(
-        pianoRollScrollWindow.w,
-        soundData.size * pianoRollNoteWidth
-    );
+    // always as wide as the view, even if the sound is shorter
+    const width = pianoRollScrollWindow.w;
 
     const toggleEffectsPanel = () => {
         setEffectsPanelHidden(prev => !prev);
         focusEditor();
+    };
+
+    const expandEffectsPanel = (eventType?: SoundEvent) => {
+        const tabIndex = EffectsPanelTabs.findIndex(t => eventType !== undefined && t.eventType === eventType);
+        if (tabIndex > -1) {
+            setTab(tabIndex);
+        }
+        toggleEffectsPanel();
     };
 
     const commandListener = (commandId: string): void => {
@@ -118,30 +155,33 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
     if (effectsPanelHidden) {
         grid = <EffectsPanelGridOverview
             soundData={soundData}
-            expandPanel={toggleEffectsPanel}
+            effects={EffectsPanelTabs.map(t => ({ eventType: t.eventType, shortLabel: t.shortLabel ?? t.label.charAt(0) }))}
+            currentTrackId={currentTrackId}
+            currentPatternId={currentPatternId}
+            currentSequenceIndex={currentSequenceIndex}
+            expandPanel={expandEffectsPanel}
             pianoRollNoteWidth={pianoRollNoteWidth}
             pianoRollScrollWindow={pianoRollScrollWindow}
-            stepsPerNote={stepsPerNote}
-            stepsPerBar={stepsPerBar}
         />;
     } else {
-        switch (tab) {
-            default:
-            case 0:
-                grid = <EffectsPanelGrid
-                    soundData={soundData}
-                    noteCursor={noteCursor}
-                    currentTrackId={currentTrackId}
-                    currentPatternId={currentPatternId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    setNoteCursor={setNoteCursor}
-                    pianoRollNoteWidth={pianoRollNoteWidth}
-                    pianoRollScrollWindow={pianoRollScrollWindow}
-                    stepsPerNote={stepsPerNote}
-                    stepsPerBar={stepsPerBar}
-                />;
-                break;
-        }
+        grid = <EffectsPanelGrid
+            soundData={soundData}
+            eventType={EffectsPanelTabs[tab]?.eventType}
+            noteCursor={noteCursor}
+            currentTrackId={currentTrackId}
+            currentPatternId={currentPatternId}
+            currentSequenceIndex={currentSequenceIndex}
+            setNoteCursor={setNoteCursor}
+            setNotes={setNotes}
+            setGlobalEvents={setGlobalEvents}
+            setCurrentSequenceIndex={setCurrentSequenceIndex}
+            editGlobalEvent={editGlobalEvent}
+            tool={tool}
+            noteSnapping={noteSnapping}
+            height={effectsPanelHeight}
+            pianoRollNoteWidth={pianoRollNoteWidth}
+            pianoRollScrollWindow={pianoRollScrollWindow}
+        />;
     }
 
     useEffect(() => {
@@ -153,10 +193,22 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
         style={{
             bottom: 0,
             borderTopWidth: 1,
-            minHeight: effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT,
+            minHeight: effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : effectsPanelHeight,
             width: width + PIANO_ROLL_KEY_WIDTH + 2,
         }}
     >
+        {!effectsPanelHidden &&
+            <ResizeHandle
+                direction='vertical'
+                size={effectsPanelHeight}
+                setSize={setEffectsPanelHeight}
+                min={EFFECTS_PANEL_EXPANDED_HEIGHT_MIN}
+                max={EFFECTS_PANEL_EXPANDED_HEIGHT_MAX}
+                defaultSize={EFFECTS_PANEL_EXPANDED_HEIGHT}
+                inverted
+                style={{ left: 0, position: 'absolute', right: 0, top: -3 }}
+            />
+        }
         <MetaLineHeader
             style={{
                 borderBottomWidth: 0,
@@ -185,16 +237,11 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
         >
             {!effectsPanelHidden && <>
                 <StyledTabList>
-                    {EffectsPanelTabs.map(n => <Tab key={`tab-${n}`}>{n}</Tab>)}
+                    {EffectsPanelTabs.map(t => <Tab key={`tab-${t.label}`}>{t.label}</Tab>)}
                 </StyledTabList>
-                {EffectsPanelTabs.map(n => <TabPanel key={`tabpanel-${n}`}></TabPanel>)}
+                {EffectsPanelTabs.map(t => <TabPanel key={`tabpanel-${t.label}`}></TabPanel>)}
             </>}
             {grid}
-            {!effectsPanelHidden &&
-                <NotYetImplementedLabel>
-                    Not yet implemented
-                </NotYetImplementedLabel>
-            }
         </Tabs>
     </MetaLine>;
 }

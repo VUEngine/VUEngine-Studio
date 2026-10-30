@@ -31,6 +31,9 @@ import {
     INSTRUMENT_VOLUME_DEFAULT,
     INSTRUMENT_VOLUME_MAX,
     INSTRUMENT_VOLUME_MIN,
+    MASTER_VOLUME_DEFAULT,
+    MASTER_VOLUME_MAX,
+    MASTER_VOLUME_MIN,
     SoundEditorTrackType,
     SoundGroup,
     TRACK_PRIORITY_DEFAULT
@@ -309,6 +312,23 @@ export const SoundType: ProjectDataType = {
             loopPoint: {
                 type: 'number',
                 default: 0
+            },
+            volume: {
+                type: 'integer',
+                default: MASTER_VOLUME_DEFAULT,
+                minimum: MASTER_VOLUME_MIN,
+                maximum: MASTER_VOLUME_MAX
+            },
+            events: {
+                type: 'object',
+                properties: {},
+                additionalProperties: {
+                    type: 'object',
+                    properties: {},
+                    additionalProperties: {
+                        type: ['integer', 'string']
+                    }
+                }
             },
             section: {
                 type: 'string',

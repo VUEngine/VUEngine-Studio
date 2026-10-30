@@ -7,6 +7,7 @@ import EffectsPanel from '../EffectsPanel/EffectsPanel';
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    AUTO_SCROLL_DELAY,
     DEFAULT_NEW_NOTE,
     EventsMap,
     NOTES_LABELS,
@@ -39,8 +40,10 @@ const StyledPianoRollContainer = styled.div`
     align-self: start;
     box-sizing: border-box;
     display: flex;
+    flex-grow: 1;
     height: 100%;
     max-width: 100%;
+    min-width: 0;
     position: relative;
 `;
 
@@ -171,11 +174,14 @@ interface PianoRollProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     effectsPanelHidden: boolean,
     setEffectsPanelHidden: Dispatch<SetStateAction<boolean>>
+    effectsPanelHeight: number
+    setEffectsPanelHeight: (height: number) => void
     sequencerHidden: boolean,
     setSequencerHidden: Dispatch<SetStateAction<boolean>>
     eventListHidden: boolean,
     setEventListHidden: Dispatch<SetStateAction<boolean>>
     setNotes: (notes: EventsMap) => void
+    setGlobalEvents: (events: EventsMap) => void
     playNote: (note: string, instrumentId?: string) => void
     playing: boolean
     testNote: string
@@ -194,13 +200,13 @@ interface PianoRollProps {
     setPianoRollScrollWindow: Dispatch<SetStateAction<ScrollWindow>>
     editCurrentPattern: () => void
     editCurrentNote: () => void
+    openSongLengthDialog: () => void
+    editGlobalEvent: (step: number, eventType: SoundEvent) => void
     trackSettings: TrackSettings[]
     rangeDragStartStep: number
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
-    stepsPerNote: number
-    stepsPerBar: number
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -219,8 +225,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         playRangeEnd, setPlayRangeEnd,
         sequencerHidden, setSequencerHidden,
         effectsPanelHidden, setEffectsPanelHidden,
+        effectsPanelHeight, setEffectsPanelHeight,
         eventListHidden, setEventListHidden,
         setNotes,
+        setGlobalEvents,
         playNote,
         playing, testNote,
         selectedNotes, setSelectedNotes,
@@ -233,10 +241,11 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         pianoRollScrollWindow, setPianoRollScrollWindow,
         editCurrentPattern,
         editCurrentNote,
+        openSongLengthDialog,
+        editGlobalEvent,
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
-        stepsPerNote, stepsPerBar,
     } = props;
     const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
@@ -633,11 +642,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         }
 
         // auto scroll to current pattern in piano roll
-        pianoRollRef?.current?.scrollTo({
+        const timeout = setTimeout(() => pianoRollRef?.current?.scrollTo({
             left: currentSequenceIndex * pianoRollNoteWidth,
             top,
             behavior: 'smooth',
-        });
+        }), AUTO_SCROLL_DELAY);
+
+        return () => clearTimeout(timeout);
     }, [
         currentSequenceIndex,
         currentTrackId,
@@ -648,6 +659,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     }, [
         songLength,
         effectsPanelHidden,
+        effectsPanelHeight,
         pianoRollNoteWidth,
         sequencerNoteWidth,
     ]);
@@ -797,7 +809,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 sequencerNoteWidth={sequencerNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
                 noteSnapping={noteSnapping}
-                stepsPerBar={stepsPerBar}
             />
             <PianoRollEditor
                 soundData={soundData}
@@ -823,22 +834,28 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 pianoRollScrollWindow={pianoRollScrollWindow}
                 pianoRollRef={pianoRollRef}
                 trackSettings={trackSettings}
-                stepsPerNote={stepsPerNote}
-                stepsPerBar={stepsPerBar}
+                editCurrentNote={editCurrentNote}
+                openSongLengthDialog={openSongLengthDialog}
             />
             <EffectsPanel
                 soundData={soundData}
                 noteCursor={noteCursor}
                 setNoteCursor={setNoteCursor}
+                setNotes={setNotes}
+                setGlobalEvents={setGlobalEvents}
+                tool={tool}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 effectsPanelHidden={effectsPanelHidden}
                 setEffectsPanelHidden={setEffectsPanelHidden}
+                effectsPanelHeight={effectsPanelHeight}
+                setEffectsPanelHeight={setEffectsPanelHeight}
+                setCurrentSequenceIndex={setCurrentSequenceIndex}
+                editGlobalEvent={editGlobalEvent}
+                noteSnapping={noteSnapping}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 pianoRollScrollWindow={pianoRollScrollWindow}
-                stepsPerNote={stepsPerNote}
-                stepsPerBar={stepsPerBar}
             />
         </StyledPianoRoll>
     </StyledPianoRollContainer>;

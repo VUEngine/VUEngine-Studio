@@ -137,6 +137,8 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [xOffsetFromGrid, setXOffsetFromGrid] = useState<number>(0);
     const nodeRef = useRef(null);
+    // a mouse down and up without moving in between is a click, not a drag
+    const hasMovedRef = useRef<boolean>(false);
 
     const noteId = NOTES_LABELS.indexOf(noteLabel);
     const currentSequenceIndexStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
@@ -333,6 +335,12 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onDrag = (e: DraggableEvent, data: DraggableData) => {
+        // align to the grid only once the note actually moves, so it does not jump when being clicked
+        if (!hasMovedRef.current && noteSnapping) {
+            setXOffsetFromGrid(-1 * left % gridWidth);
+        }
+        hasMovedRef.current = true;
+
         setNoteDragDelta(prev => ({
             x: prev.x + data.deltaX,
             y: prev.y + data.deltaY
@@ -342,9 +350,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     };
 
     const onDragStart = (e: DraggableEvent, data: DraggableData) => {
-        if (noteSnapping) {
-            setXOffsetFromGrid(-1 * left % gridWidth);
-        }
+        hasMovedRef.current = false;
         setIsDragging(true);
         setCancelNoteDrag(false);
     };
@@ -360,6 +366,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
 
         if (cancelNoteDrag) {
             setCancelNoteDrag(false);
+            return;
+        }
+
+        if (!hasMovedRef.current) {
             return;
         }
 

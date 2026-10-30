@@ -3,15 +3,19 @@ import React from 'react';
 import styled from 'styled-components';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
-import { getInstrumentName, getNoteSlideLabel, getStereoLevelsFromVolumeEventValue } from '../SoundEditor';
+import { EFFECT_LANES, getEffectLaneValues, withGlobalEvent } from '../EffectsPanel/EffectsPanelGrid';
+import TimeSignatureInput from '../Other/TimeSignatureInput';
+import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import {
     EventsMap,
+    GLOBAL_SOUND_EVENTS,
     PatternConfig,
     SOUND_EVENT_LABELS,
     SoundData,
     SoundEvent,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
+import EffectSelect from './EffectSelect';
 import InstrumentSelect from './InstrumentSelect';
 import NoteSelect from './NoteSelect';
 import StepInput from './StepInput';
@@ -83,6 +87,13 @@ const StyledTable = styled.table`
                     padding: 0 2px;
                 }
 
+                .timeSignatureInput {
+                    input, select {
+                        min-width: 40px !important;
+                        width: 40px !important;
+                    }
+                }
+
                 &:nth-child(3) {
                     max-width: 72px;
                     min-width: 72px;
@@ -139,22 +150,44 @@ interface EventListProps {
     noteSnapping: boolean
     pattern: PatternConfig
     noteCursor: number
-    setNotes: (notes: EventsMap) => void
+    setNotes: (notes: EventsMap, globalEvents?: EventsMap) => void
+    setGlobalEvents: (events: EventsMap) => void
     setNoteCursor: (step: number) => void
+    width: number
 }
 
 export default function EventList(props: EventListProps): React.JSX.Element {
-    const { soundData, currentTrackId, currentSequenceIndex, noteSnapping, pattern, noteCursor, setNotes, setNoteCursor } = props;
+    const { soundData, currentTrackId, currentSequenceIndex, noteSnapping, pattern, noteCursor, setNotes, setGlobalEvents, setNoteCursor, width } = props;
 
-    const eventsKeys = Object.keys(pattern?.events ?? {});
+    const patternStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
+    const globalEvents = soundData.events ?? {};
+    // global events within the pattern's range get listed along with the pattern's own events
+    const globalEventSteps = pattern
+        ? Object.keys(globalEvents)
+            .map(s => parseInt(s) - patternStartStep)
+            .filter(s => s >= 0 && s < pattern.size * SUB_NOTE_RESOLUTION)
+        : [];
+    const eventsKeys = [...new Set([
+        ...Object.keys(pattern?.events ?? {}).map(s => parseInt(s)),
+        ...globalEventSteps,
+    ])].sort((a, b) => a - b);
     const formatter = new Intl.NumberFormat(nls.locale);
+
+    const getEffectSelect = (eventType: SoundEvent, value: number, setValue: (value: number) => void, key: number) =>
+        <EffectSelect
+            key={key}
+            value={value}
+            values={getEffectLaneValues(EFFECT_LANES[eventType])}
+            format={EFFECT_LANES[eventType].format}
+            setValue={setValue}
+        />;
 
     return (
         <VContainer
             overflow="hidden"
             style={{
-                maxWidth: 360,
-                minWidth: 360,
+                maxWidth: width,
+                minWidth: width,
             }}
         >
             <StyledTableContainer>
@@ -172,12 +205,16 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                         {pattern
                             ? eventsKeys.length > 0
                                 ? <>
-                                    {eventsKeys.map((k, i) => {
-                                        const localStep = parseInt(k);
-                                        const globalStep = currentSequenceIndex * SUB_NOTE_RESOLUTION + localStep;
-                                        const stepEvents = pattern.events[localStep];
-                                        const stepEventsKeys = Object.keys(stepEvents);
+                                    {eventsKeys.map((localStep, i) => {
+                                        const globalStep = patternStartStep + localStep;
+                                        const stepEvents = pattern.events[localStep] ?? {};
+                                        const stepGlobalEvents = globalEvents[globalStep] ?? {};
+                                        const hasGlobalEvents = Object.keys(stepGlobalEvents).length > 0;
+                                        const listedEvents = { ...stepEvents, ...stepGlobalEvents };
+                                        const stepEventsKeys = Object.keys(listedEvents);
                                         const isSelectedNote = noteCursor === globalStep;
+                                        const hasPatternEvents = Object.keys(stepEvents).length > 0;
+                                        const hasNote = stepEvents[SoundEvent.Note] !== undefined;
                                         const duration = stepEvents[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
 
                                         return (
@@ -187,7 +224,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                 onClick={() => setNoteCursor(globalStep)}
                                             >
                                                 <td valign="top">
-                                                    {isSelectedNote &&
+                                                    {isSelectedNote && hasPatternEvents &&
                                                         <StepInput
                                                             step={localStep}
                                                             events={stepEvents}
@@ -198,10 +235,10 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             setNoteCursor={setNoteCursor}
                                                         />
                                                     }
-                                                    {!isSelectedNote && formatter.format(localStep)}
+                                                    {!(isSelectedNote && hasPatternEvents) && formatter.format(localStep)}
                                                 </td>
                                                 <td valign="top">
-                                                    {isSelectedNote && <Input
+                                                    {isSelectedNote && hasNote && <Input
                                                         type='number'
                                                         min={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
                                                         step={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
@@ -215,12 +252,21 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             });
                                                         }}
                                                     />}
-                                                    {!isSelectedNote && formatter.format(duration)}
+                                                    {!isSelectedNote && hasNote && formatter.format(duration)}
                                                 </td>
                                                 <td valign="top">
                                                     {stepEventsKeys.map((eventType, j) => {
                                                         if (eventType === SoundEvent.Duration) {
                                                             return;
+                                                        }
+                                                        if (GLOBAL_SOUND_EVENTS.includes(eventType as SoundEvent)) {
+                                                            return <div
+                                                                key={j}
+                                                                title={nls.localize('vuengine/editors/sound/globalEffect', 'Global effect, applies to all tracks')}
+                                                            >
+                                                                <i className='codicon codicon-globe' style={{ fontSize: 10, marginRight: 2, verticalAlign: 'middle' }} />
+                                                                {SOUND_EVENT_LABELS[eventType as SoundEvent]}
+                                                            </div>;
                                                         }
                                                         return <div key={j}>
                                                             {SOUND_EVENT_LABELS[eventType as SoundEvent]}
@@ -229,7 +275,7 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                 </td>
                                                 <td valign="top">
                                                     {stepEventsKeys.map((eventType, j) => {
-                                                        let value = stepEvents[eventType];
+                                                        let value = listedEvents[eventType];
 
                                                         switch (eventType) {
                                                             case SoundEvent.Duration:
@@ -271,8 +317,34 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 break;
 
                                                             case SoundEvent.Volume:
-                                                                const volume = getStereoLevelsFromVolumeEventValue(stepEvents[SoundEvent.Volume]);
-                                                                value = `${volume.left}/${volume.right}`;
+                                                            case SoundEvent.Panning:
+                                                                if (isSelectedNote) {
+                                                                    return getEffectSelect(eventType, value, v => setNotes({
+                                                                        [localStep]: { [eventType]: v },
+                                                                    }), j);
+                                                                }
+                                                                value = EFFECT_LANES[eventType].format(value);
+                                                                break;
+
+                                                            case SoundEvent.MasterVolume:
+                                                                if (isSelectedNote) {
+                                                                    return getEffectSelect(eventType, value, v => setGlobalEvents(
+                                                                        withGlobalEvent(globalEvents, globalStep, SoundEvent.MasterVolume, v)
+                                                                    ), j);
+                                                                }
+                                                                value = EFFECT_LANES[eventType].format(value);
+                                                                break;
+
+                                                            case SoundEvent.TimeSignature:
+                                                                if (isSelectedNote) {
+                                                                    return <TimeSignatureInput
+                                                                        key={j}
+                                                                        value={value}
+                                                                        setValue={v => setGlobalEvents(
+                                                                            withGlobalEvent(globalEvents, globalStep, SoundEvent.TimeSignature, v)
+                                                                        )}
+                                                                    />;
+                                                                }
                                                                 break;
                                                         }
 
@@ -285,9 +357,14 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                     <button
                                                         className='theia-button secondary small'
                                                         onClick={() => {
-                                                            setNotes({
-                                                                [localStep]: {},
-                                                            });
+                                                            // remove all of the step's events, including global ones
+                                                            const { [globalStep]: removed, ...remainingGlobalEvents } = globalEvents;
+                                                            setNotes(
+                                                                hasPatternEvents
+                                                                    ? { [localStep]: Object.fromEntries(Object.keys(stepEvents).map(e => [e, undefined])) }
+                                                                    : {},
+                                                                hasGlobalEvents ? remainingGlobalEvents : undefined
+                                                            );
                                                         }}
                                                     >
                                                         <i className='codicon codicon-x' />

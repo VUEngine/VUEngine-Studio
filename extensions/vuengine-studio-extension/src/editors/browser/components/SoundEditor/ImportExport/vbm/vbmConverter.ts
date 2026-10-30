@@ -16,6 +16,7 @@ import {
 import { DEFAULT_STEREO_LEVELS, getVolumeAndPanningFromStereoLevels } from '../../Other/volume';
 import {
     InstrumentConfig,
+    MASTER_VOLUME_DEFAULT,
     NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -66,6 +67,15 @@ const DEFAULT_INSTRUMENT = {
     waveform: DEFAULT_WAVEFORM,
 };
 
+const getVolumeEvents = (left: number, right: number): SoundEventMap => {
+    const { volume, panning } = getVolumeAndPanningFromStereoLevels({ left, right }, DEFAULT_ENVELOPE);
+
+    return {
+        [SoundEvent.Volume]: volume,
+        [SoundEvent.Panning]: panning,
+    };
+};
+
 interface ConvertedInstrument {
     id: string
     instrumentConfig: InstrumentConfig
@@ -97,6 +107,8 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         },
         loop: false,
         loopPoint: 0,
+        volume: MASTER_VOLUME_DEFAULT,
+        events: {},
         section: DataSection.ROM,
         group: SoundGroup.None,
     };
@@ -182,17 +194,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const instrumentId = foundSourcePattern.Row[0].Inst;
             const convertedInstrument = instrumentsLookup[instrumentId];
 
-            // get volume
-            const volumeAndPanning = foundSourcePattern?.Row[0].VolL !== undefined || foundSourcePattern?.Row[0].VolR !== undefined
-                ? getVolumeAndPanningFromStereoLevels({
-                    left: foundSourcePattern?.Row[0].VolL ?? DEFAULT_STEREO_LEVELS.left,
-                    right: foundSourcePattern?.Row[0].VolR ?? DEFAULT_STEREO_LEVELS.right,
-                }, convertedInstrument.instrumentConfig.envelope)
-                : {
-                    volume: convertedInstrument.instrumentConfig.volume,
-                    panning: convertedInstrument.instrumentConfig.panning,
-                };
-
             // get waveform/tap
             let waveform = convertedInstrument.instrumentConfig.waveform;
             let tap = convertedInstrument.instrumentConfig.tap;
@@ -227,7 +228,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
                 name: convertedInstrument.instrumentConfig.name + ` (CH${trackIndex + 1})`,
                 type: tracks[trackIndex].type,
                 tap,
-                ...volumeAndPanning,
                 waveform,
             };
 
@@ -251,7 +251,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const firstEventKey = parseInt(Object.keys(pattern.events)[0]);
             const updatedEvents = { ...pattern.events };
             delete updatedEvents[firstEventKey][SoundEvent.Instrument];
-            delete updatedEvents[firstEventKey][SoundEvent.Volume];
             result.patterns[firstPatternId] = {
                 ...pattern,
                 events: updatedEvents,
@@ -361,7 +360,9 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             }
 
             if (tick.VolL !== undefined || tick.VolR !== undefined) {
-                event[SoundEvent.Volume] = ((tick.VolL ?? 0) << 4) + (tick.VolR ?? 0);
+                Object.assign(event, getVolumeEvents(tick.VolL ?? 0, tick.VolR ?? 0));
+            } else if (tick.Inst !== undefined) {
+                Object.assign(event, getVolumeEvents(DEFAULT_STEREO_LEVELS.left, DEFAULT_STEREO_LEVELS.right));
             }
 
             [

@@ -13,7 +13,6 @@ import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { sortObjectByKeys } from '../Common/Utils';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
-import { VsuChannelStereoLevelsData } from './Emulator/VsuTypes';
 import EventList from './EventList/EventList';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
@@ -37,12 +36,21 @@ import Utilities, {
     getUnusedInstrumentIds,
     getUnusedPatternsMaps
 } from './Other/Utilities';
+import ResizeHandle from './Other/ResizeHandle';
+import SongLength from './Other/SongLength';
+import { getBarStartColumn, getTimeSignatureSegments } from './Other/timeSignature';
+import TimeSignatureInput from './Other/TimeSignatureInput';
+import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
     DEFAULT_TRACK_SETTINGS,
+    EFFECTS_PANEL_EXPANDED_HEIGHT,
+    EVENT_LIST_WIDTH_DEFAULT,
+    EVENT_LIST_WIDTH_MAX,
+    EVENT_LIST_WIDTH_MIN,
     EventsMap,
     InstrumentMap,
     NOTE_RESOLUTION,
@@ -54,6 +62,10 @@ import {
     ScrollWindow,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
+    SIDEBAR_WIDTH_DEFAULT,
+    SIDEBAR_WIDTH_MAX,
+    SIDEBAR_WIDTH_MIN,
+    SOUND_EVENT_LABELS,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -167,7 +179,6 @@ const StyledSidebar = styled.div`
     border-left: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
-    max-width: 40%;
     padding: 0 var(--padding) var(--padding);
 `;
 
@@ -182,7 +193,6 @@ const StyledSidebarContent = styled.div`
     max-width: 100%;
     overflow-y: auto;
     position: relative;
-    width: 440px;
 `;
 
 export const getTrackName = (type: SoundEditorTrackType, i: number): string => {
@@ -307,20 +317,10 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
     }
 };
 
-export const getSnappedStep = (step: number, noteSnapping: boolean, stepsPerBar: number) => noteSnapping
-    ? Math.floor(step / stepsPerBar) * stepsPerBar
+// with note snapping, the start of the bar the step lies in, according to the time signature at that step
+export const getSnappedStep = (step: number, noteSnapping: boolean, soundData: SoundData) => noteSnapping
+    ? getBarStartColumn(getTimeSignatureSegments(soundData), step)
     : step;
-
-export const getVolumeEventValueFromStereoLevels = (volume: VsuChannelStereoLevelsData) => volume
-    ? ((volume.left ?? 0) << 4) + (volume.right ?? 0)
-    : 0;
-
-export const getStereoLevelsFromVolumeEventValue = (volume: number) => {
-    const left = volume >> 4;
-    const right = volume - (left << 4);
-
-    return { left, right };
-};
 
 interface SoundEditorProps {
     soundData: SoundData
@@ -360,10 +360,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [sequencerNoteWidth, setSequencerNoteWidth] = useState<number>(SEQUENCER_PATTERN_WIDTH_DEFAULT);
     const [sequencerHidden, setSequencerHidden] = useState<boolean>(false);
     const [effectsPanelHidden, setEffectsPanelHidden] = useState<boolean>(true);
+    const [effectsPanelHeight, setEffectsPanelHeight] = useState<number>(EFFECTS_PANEL_EXPANDED_HEIGHT);
+    const [eventListWidth, setEventListWidth] = useState<number>(EVENT_LIST_WIDTH_DEFAULT);
+    const [sidebarWidth, setSidebarWidth] = useState<number>(SIDEBAR_WIDTH_DEFAULT);
     const [eventListHidden, setEventListHidden] = useState<boolean>(true);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, sequenceIndex: number, size?: number }>({ trackId: -1, sequenceIndex: -1 });
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
+    const [editedGlobalEvent, setEditedGlobalEvent] = useState<{ step: number, eventType: SoundEvent } | undefined>();
+    const [songLengthDialogOpen, setSongLengthDialogOpen] = useState<boolean>(false);
     const [transposeDialogOpen, setTransposeDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
@@ -380,11 +385,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length
         ? soundData.tracks[0].instrument ?? TRACK_DEFAULT_INSTRUMENT_ID
         : TRACK_DEFAULT_INSTRUMENT_ID);
-
-    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
-    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
-    const stepsPerNote = NOTE_RESOLUTION / bar;
-    const stepsPerBar = beats * stepsPerNote;
 
     const updateSelectedNotes = (sn: number[]) => {
         if (!sn) {
@@ -717,7 +717,15 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         ]);
     };
 
-    const setNotes = (notes: EventsMap): void => {
+    const setGlobalEvents = (events: EventsMap): void => {
+        updateSoundData({
+            ...soundData,
+            events,
+        });
+    };
+
+    // global events can be passed along to update them in the same go, as separate updates would overwrite each other
+    const setNotes = (notes: EventsMap, globalEvents?: EventsMap): void => {
         const currentPattern = soundData.patterns[currentPatternId];
         if (currentPattern === undefined) {
             return;
@@ -849,9 +857,23 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             .filter(sn => updatedEvents[sn] !== undefined)
             .sort((a, b) => a - b));
 
-        setPattern(currentPatternId, {
-            events: updatedEvents,
-        });
+        if (globalEvents !== undefined) {
+            updateSoundData({
+                ...soundData,
+                patterns: {
+                    ...soundData.patterns,
+                    [currentPatternId]: {
+                        ...currentPattern,
+                        events: updatedEvents,
+                    },
+                },
+                events: globalEvents,
+            });
+        } else {
+            setPattern(currentPatternId, {
+                events: updatedEvents,
+            });
+        }
     };
 
     const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
@@ -923,6 +945,26 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const editCurrentPattern = (): void => {
         updateSidebarTab(SidebarTab.currentPattern);
+    };
+
+    const editGlobalEvent = (step: number, eventType: SoundEvent): void => {
+        setEditedGlobalEvent({ step, eventType });
+    };
+
+    const openSongLengthDialog = (): void => {
+        setSongLengthDialogOpen(true);
+    };
+
+    const closeSongLengthDialog = (): void => {
+        setSongLengthDialogOpen(false);
+        enableCommands();
+        focusEditor();
+    };
+
+    const closeGlobalEventDialog = (): void => {
+        setEditedGlobalEvent(undefined);
+        enableCommands();
+        focusEditor();
     };
 
     const editCurrentNote = (): void => {
@@ -1512,8 +1554,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setPlayerSeekRequest={setPlayerSeekRequest}
                                         noteCursor={noteCursor}
                                         setNoteCursor={updateNoteCursor}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
+                                        openSongLengthDialog={openSongLengthDialog}
                                     />
                                 }
                                 <StyledLowerContainer>
@@ -1526,7 +1567,19 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                             pattern={soundData.patterns[currentPatternId]}
                                             noteCursor={noteCursor}
                                             setNotes={setNotes}
+                                            setGlobalEvents={setGlobalEvents}
                                             setNoteCursor={updateNoteCursor}
+                                            width={eventListWidth}
+                                        />
+                                    }
+                                    {!eventListHidden &&
+                                        <ResizeHandle
+                                            direction='horizontal'
+                                            size={eventListWidth}
+                                            setSize={setEventListWidth}
+                                            min={EVENT_LIST_WIDTH_MIN}
+                                            max={EVENT_LIST_WIDTH_MAX}
+                                            defaultSize={EVENT_LIST_WIDTH_DEFAULT}
                                         />
                                     }
                                     <PianoRoll
@@ -1552,11 +1605,14 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playing={playing}
                                         testNote={testNote}
                                         setNotes={setNotes}
+                                        setGlobalEvents={setGlobalEvents}
                                         addPattern={addPattern}
                                         sequencerHidden={sequencerHidden}
                                         setSequencerHidden={setSequencerHidden}
                                         effectsPanelHidden={effectsPanelHidden}
                                         setEffectsPanelHidden={setEffectsPanelHidden}
+                                        effectsPanelHeight={effectsPanelHeight}
+                                        setEffectsPanelHeight={setEffectsPanelHeight}
                                         eventListHidden={eventListHidden}
                                         setEventListHidden={setEventListHidden}
                                         selectedNotes={selectedNotes}
@@ -1573,34 +1629,41 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         pianoRollScrollWindow={pianoRollScrollWindow}
                                         editCurrentPattern={editCurrentPattern}
                                         editCurrentNote={editCurrentNote}
+                                        editGlobalEvent={editGlobalEvent}
+                                        openSongLengthDialog={openSongLengthDialog}
                                         trackSettings={trackSettings}
                                         rangeDragStartStep={rangeDragStartStep}
                                         setRangeDragStartStep={setRangeDragStartStep}
                                         rangeDragEndStep={rangeDragEndStep}
                                         setRangeDragEndStep={setRangeDragEndStep}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
                                     />
                                 </StyledLowerContainer>
                             </>}
                     </VContainer>
 
                     {sidebarTab !== SidebarTab.none &&
+                        <ResizeHandle
+                            direction='horizontal'
+                            size={sidebarWidth}
+                            setSize={setSidebarWidth}
+                            min={SIDEBAR_WIDTH_MIN}
+                            max={SIDEBAR_WIDTH_MAX}
+                            defaultSize={SIDEBAR_WIDTH_DEFAULT}
+                            inverted
+                        />
+                    }
+                    {sidebarTab !== SidebarTab.none &&
                         <StyledSidebar>
                             <StyledSidebarTitle>
                                 <h2>{SIDEBAR_TABS[sidebarTab].title}</h2>
                             </StyledSidebarTitle>
-                            <StyledSidebarContent>
+                            <StyledSidebarContent style={{ width: sidebarWidth }}>
                                 {sidebarTab === SidebarTab.properties &&
                                     <Properties
                                         soundData={soundData}
-                                        beats={beats}
-                                        bar={bar}
                                         updateSoundData={updateSoundData}
                                         setNewNoteDuration={setNewNoteDuration}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.instruments &&
@@ -1658,7 +1721,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playNote={playNote}
                                         setNotes={setNotes}
                                         newNoteDuration={newNoteDuration}
-                                        stepsPerBar={stepsPerBar}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.utilities &&
@@ -1697,6 +1759,47 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         )}
                     </StyledSidebarTabs>
                 </>}
+            {
+                songLengthDialogOpen &&
+                <PopUpDialog
+                    open={true}
+                    onClose={closeSongLengthDialog}
+                    onOk={closeSongLengthDialog}
+                    title={nls.localize('vuengine/editors/sound/length', 'Length')}
+                    height='160px'
+                    width='440px'
+                    cancelButton={false}
+                    okButton={true}
+                >
+                    <SongLength
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        setCurrentPlayerPosition={setCurrentPlayerPosition}
+                        hideLabel
+                    />
+                </PopUpDialog>
+            }
+            {
+                editedGlobalEvent !== undefined &&
+                <PopUpDialog
+                    open={true}
+                    onClose={closeGlobalEventDialog}
+                    onOk={closeGlobalEventDialog}
+                    title={SOUND_EVENT_LABELS[editedGlobalEvent.eventType]}
+                    height='160px'
+                    width='240px'
+                    cancelButton={false}
+                    okButton={true}
+                >
+                    {editedGlobalEvent.eventType === SoundEvent.TimeSignature &&
+                        <TimeSignatureInput
+                            value={soundData.events?.[editedGlobalEvent.step]?.[SoundEvent.TimeSignature] ?? soundData.timeSignature[0]}
+                            setValue={v => setGlobalEvents(withGlobalEvent(soundData.events ?? {}, editedGlobalEvent.step, SoundEvent.TimeSignature, v))}
+                            width={64}
+                        />
+                    }
+                </PopUpDialog>
+            }
             {
                 addTrackDialogOpen &&
                 <PopUpDialog
@@ -1761,7 +1864,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         selectedPatterns={selectedPatterns}
                         setSelectedPatterns={updateSelectedPatterns}
                         setAddPatternDialogOpen={setAddPatternDialogOpen}
-                        stepsPerBar={stepsPerBar}
                     />
                 </PopUpDialog>
             }

@@ -9,6 +9,7 @@ import {
     SoundData,
     SoundEditorTool
 } from '../SoundEditorTypes';
+import { getBarsLength, getTimeSignatureSegments } from '../Other/timeSignature';
 import PianoRollHeaderGrid from './PianoRollHeaderGrid';
 
 export const MetaLine = styled.div`
@@ -85,7 +86,6 @@ interface PianoRollHeaderProps {
     sequencerNoteWidth: number
     sequencerPatternHeight: number
     noteSnapping: boolean
-    stepsPerBar: number
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.Element {
@@ -107,7 +107,6 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         effectsPanelHidden,
         sequencerNoteWidth, sequencerPatternHeight,
         noteSnapping,
-        stepsPerBar,
     } = props;
 
     return <MetaLine
@@ -123,7 +122,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
                 style={{
                     left: PIANO_ROLL_KEY_WIDTH + 2 + Math.min(rangeDragStartStep, rangeDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
                     width: pianoRollNoteWidth * (rangeDragStartStep === rangeDragEndStep
-                        ? stepsPerBar * DEFAULT_BARS_PER_PATTERN
+                        ? getBarsLength(getTimeSignatureSegments(soundData), rangeDragStartStep, DEFAULT_BARS_PER_PATTERN)
                         : (Math.abs(rangeDragStartStep - rangeDragEndStep) + 1)),
                 }}
             />
@@ -162,7 +161,6 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             rangeDragEndStep={rangeDragEndStep}
             setRangeDragEndStep={setRangeDragEndStep}
             noteSnapping={noteSnapping}
-            stepsPerBar={stepsPerBar}
         />
     </MetaLine>;
 };

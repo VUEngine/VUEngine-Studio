@@ -49,6 +49,8 @@ const Marquee = styled.div`
 
 interface PianoRollEditorProps {
     soundData: SoundData
+    editCurrentNote: () => void
+    openSongLengthDialog: () => void
     tool: SoundEditorTool
     marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
@@ -71,8 +73,6 @@ interface PianoRollEditorProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
-    stepsPerNote: number
-    stepsPerBar: number
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -95,7 +95,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
-        stepsPerNote, stepsPerBar,
+        editCurrentNote,
+        openSongLengthDialog,
     } = props;
     const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
     const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
@@ -108,7 +109,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
     return (
         <StyledPianoRollEditor
             style={{
-                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size * pianoRollNoteWidth,
+                // fill the view, even if the sound is shorter
+                width: PIANO_ROLL_KEY_WIDTH + 2 + Math.max(soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.w),
             }}
         >
             <Piano
@@ -158,8 +160,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     playNote={playNote}
                     playing={playing}
                     testNote={testNote}
-                    stepsPerNote={stepsPerNote}
-                    stepsPerBar={stepsPerBar}
+                    editCurrentNote={editCurrentNote}
+                    openSongLengthDialog={openSongLengthDialog}
                 />
                 {noteDragNoteId > -1 &&
                     <CurrentlyPlacingNote

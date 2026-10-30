@@ -18,6 +18,7 @@ import {
 import { DEFAULT_STEREO_LEVELS, getVolumeAndPanningFromStereoLevels } from '../../Other/volume';
 import {
     InstrumentConfig,
+    MASTER_VOLUME_DEFAULT,
     NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -76,6 +77,8 @@ export const convertUgeSong = (song: Song): SoundData => {
         },
         loop: false,
         loopPoint: 0,
+        volume: MASTER_VOLUME_DEFAULT,
+        events: {},
         section: DataSection.ROM,
         group: SoundGroup.None,
     };
@@ -479,12 +482,12 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                         case EffectCommandType.NoteDelay: break;
                         case EffectCommandType.SetPanning: break;
                         case EffectCommandType.SetDutyCycle: break;
-                        case EffectCommandType.VolumeSlide: break;
                         case EffectCommandType.PositionJump: break;
                         case EffectCommandType.SetVolume:
                             // TODO: add support for "Change Envelope"
                             // event[SoundEvent.Volume] = ((value ?? 0) << 4) + (value ?? 0);
                             break;
+                        case EffectCommandType.VolumeSlide: break;
                         case EffectCommandType.PatternBreak: break;
                         case EffectCommandType.NoteCut: break;
                         case EffectCommandType.SetSpeed: break;

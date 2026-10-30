@@ -4,6 +4,8 @@ import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, use
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { drawSongEnd } from '../EffectsPanel/EffectsPanelGridOverview';
+import { getGridLine, getTimeSignatureSegments } from '../Other/timeSignature';
 import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
 import {
     EventsMap,
@@ -63,8 +65,8 @@ interface PianoRollGridProps {
     playNote: (note: string, instrumentId?: string) => void
     playing: boolean
     testNote: string
-    stepsPerNote: number
-    stepsPerBar: number
+    editCurrentNote: () => void
+    openSongLengthDialog: () => void
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
@@ -96,7 +98,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         selectedNotes, setSelectedNotes,
         playNote,
         playing, testNote,
-        stepsPerNote, stepsPerBar,
+        editCurrentNote,
+        openSongLengthDialog,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
@@ -109,10 +112,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     }
 
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
-    const width = Math.min(
-        pianoRollScrollWindow.w,
-        soundData.size * pianoRollNoteWidth
-    );
+    // always as wide as the view, even if the sound is shorter
+    const width = pianoRollScrollWindow.w;
 
     const getNoteLabel = (events: EventsMap, step: number) => {
         let noteLabel = events[step][SoundEvent.Note] ?? '';
@@ -199,7 +200,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // vertical lines
-        for (let x = 1; x <= soundData.size; x++) {
+        const timeSignatureSegments = getTimeSignatureSegments(soundData);
+        // the grid continues after the end of the sound, see drawSongEnd
+        const lastColumn = Math.max(soundData.size, Math.ceil((pianoRollScrollWindow.x + pianoRollScrollWindow.w) / pianoRollNoteWidth));
+        for (let x = 1; x <= lastColumn; x++) {
             const offsetElement = x * pianoRollNoteWidth;
             if (offsetElement < pianoRollScrollWindow.x) {
                 continue;
@@ -211,9 +215,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             context.beginPath();
             context.moveTo(offset, 0);
             context.lineTo(offset, height);
-            context.strokeStyle = x % stepsPerBar === 0
+            const gridLine = getGridLine(timeSignatureSegments, x);
+            context.strokeStyle = gridLine.isBarStart
                 ? hiColor
-                : x % stepsPerNote === 0
+                : gridLine.isBeatStart
                     ? medColor
                     : lowColor;
             context.stroke();
@@ -364,6 +369,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 });
             });
         });
+
+        drawSongEnd(context, currentThemeType, soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.x, width, height);
     };
 
     const findNoteStep = (step: number, noteId: number): number => {
@@ -689,10 +696,19 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
     };
 
+    // the area after the end of the sound only allows scrolling
+    const isWithinSong = (e: MouseEvent<HTMLCanvasElement>): boolean =>
+        e.clientX - e.currentTarget.getBoundingClientRect().left + pianoRollScrollWindow.x < soundData.size * pianoRollNoteWidth;
+
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
-        handleMouseDownNoteDrag(e);
         handleMouseDownDragScrolling(e);
-        handleMouseDownMarquee(e);
+        if (isWithinSong(e)) {
+            handleMouseDownNoteDrag(e);
+            handleMouseDownMarquee(e);
+        } else if (e.button === 0 && tool !== SoundEditorTool.DRAG) {
+            // clicking after the end of the sound offers to change its length
+            openSongLengthDialog();
+        }
     };
 
     const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -703,9 +719,26 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-        handleMouseMoveNoteDrag(e);
         handleMouseMoveDragScrolling(e);
-        handleMouseMoveMarquee(e);
+        if (isWithinSong(e)) {
+            handleMouseMoveNoteDrag(e);
+            handleMouseMoveMarquee(e);
+        }
+    };
+
+    // double-clicking a note opens it for editing, the first click has already moved the note cursor to it
+    const onDoubleClick = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (tool !== SoundEditorTool.EDIT) {
+            return;
+        }
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+        const y = e.clientY - rect.top;
+        const noteId = Math.floor(y / pianoRollNoteHeight);
+        const step = Math.floor(x / pianoRollNoteWidth);
+        if (findNoteStep((step - currentSequenceIndex) * SUB_NOTE_RESOLUTION, noteId) > -1) {
+            editCurrentNote();
+        }
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -759,6 +792,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
+            onDoubleClick={onDoubleClick}
             ref={canvasRef}
         />
     );

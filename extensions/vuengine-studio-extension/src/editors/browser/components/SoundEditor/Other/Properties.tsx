@@ -2,54 +2,41 @@ import { Minus, Plus } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
-import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import AdvancedSelect from '../../Common/Base/AdvancedSelect';
 import Checkbox from '../../Common/Base/Checkbox';
 import HContainer from '../../Common/Base/HContainer';
 import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import Range from '../../Common/Base/Range';
+import SongLength, { StyledSizeButton } from './SongLength';
+import { getTimeSignatureAt, getTimeSignatureSegments, parseTimeSignature } from './timeSignature';
+import TimeSignatureInput from './TimeSignatureInput';
 import VContainer from '../../Common/Base/VContainer';
 import { DataSection } from '../../Common/CommonTypes';
 import InfoLabel from '../../Common/InfoLabel';
 import SectionSelect from '../../Common/SectionSelect';
 import {
+    MASTER_VOLUME_DEFAULT,
+    MASTER_VOLUME_MAX,
+    MASTER_VOLUME_MIN,
     MAX_TICK_DURATION,
     MIN_TICK_DURATION,
     NOTE_RESOLUTION,
-    PATTERN_SIZE_MAX,
-    PATTERN_SIZE_MIN,
-    SequenceMap,
     SOUND_GROUP_LABELS,
     SoundData,
     SoundGroup
 } from '../SoundEditorTypes';
 import { clamp } from '../../Common/Utils';
 
-export const StyledSizeButton = styled.button`
-    font-size: 11px;
-    letter-spacing: -1px;
-    font-size: 11px;
-    gap: 0 !important;
-    min-width: 30px !important;
-    padding: 0 !important;
-    width: 30px;
-`;
-
 interface PropertiesProps {
     soundData: SoundData
-    beats: number
-    bar: number
     updateSoundData: (soundData: SoundData) => void
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
-    stepsPerNote: number
-    stepsPerBar: number
 }
 
 export default function Properties(props: PropertiesProps): React.JSX.Element {
-    const { soundData, beats, bar, updateSoundData, setNewNoteDuration, setCurrentPlayerPosition, stepsPerNote, stepsPerBar } = props;
+    const { soundData, updateSoundData, setNewNoteDuration, setCurrentPlayerPosition } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const handleOnFocus = () => {
@@ -79,6 +66,8 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         });
     };
 
+    const { stepsPerBeat, stepsPerBar } = getTimeSignatureAt(getTimeSignatureSegments(soundData), soundData.loopPoint);
+
     const increaseLoopPoint = (amount: number) =>
         setLoopPoint(soundData.loopPoint + amount);
 
@@ -91,6 +80,10 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         }
     };
 
+    const setMasterVolume = (masterVolume: number): void => {
+        updateSoundData({ ...soundData, volume: clamp(masterVolume, MASTER_VOLUME_MIN, MASTER_VOLUME_MAX) });
+    };
+
     const setSection = (section: DataSection): void => {
         updateSoundData({ ...soundData, section });
     };
@@ -99,57 +92,17 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         updateSoundData({ ...soundData, loop: !soundData.loop });
     };
 
-    const setSize = (size: number): void => {
-        if (size > PATTERN_SIZE_MAX || size < PATTERN_SIZE_MIN) {
-            return;
-        }
-
-        setCurrentPlayerPosition(-1);
-        updateSoundData({
-            ...soundData,
-            loopPoint: size > soundData.loopPoint ? soundData.loopPoint : 0,
-            tracks: [
-                ...soundData.tracks.map(t => {
-                    const updatedSequence: SequenceMap = {};
-                    Object.keys(t.sequence).map(k => {
-                        const step = parseInt(k);
-                        const patternId = t.sequence[step];
-                        const pattern = soundData.patterns[patternId];
-                        if (!pattern) {
-                            return;
-                        }
-                        const patternSize = pattern.size / NOTE_RESOLUTION;
-                        if (step + patternSize <= size) {
-                            updatedSequence[step] = patternId;
-                        }
-                    });
-                    return {
-                        ...t,
-                        sequence: updatedSequence
-                    };
-                })
-            ],
-            size,
-        });
-    };
-
-    const increaseSize = (amount: number) =>
-        setSize(Math.min(PATTERN_SIZE_MAX, soundData.size + amount));
-
-    const decreaseSize = (amount: number) =>
-        setSize(Math.max(PATTERN_SIZE_MIN, soundData.size - amount));
-
     const setGroup = (group: SoundGroup): void => {
         updateSoundData({ ...soundData, group });
     };
 
-    const setBeats = (b: number): void => {
-        updateSoundData({ ...soundData, timeSignature: { 0: `${b}/${bar}` } });
-    };
-
-    const setBar = (b: number): void => {
-        updateSoundData({ ...soundData, timeSignature: { 0: `${beats}/${b}` } });
-        setNewNoteDuration(NOTE_RESOLUTION / b);
+    const setTimeSignature = (timeSignature: string): void => {
+        updateSoundData({ ...soundData, timeSignature: { 0: timeSignature } });
+        // new notes default to the length of a beat
+        const { beatUnit } = parseTimeSignature(timeSignature);
+        if (beatUnit !== parseTimeSignature(soundData.timeSignature[0]).beatUnit) {
+            setNewNoteDuration(NOTE_RESOLUTION / beatUnit);
+        }
     };
 
     return <VContainer gap={20}>
@@ -181,52 +134,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
             />
         </VContainer>
 
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/sound/length', 'Length')}
-            </label>
-            <HContainer>
-                <StyledSizeButton
-                    className="theia-button secondary"
-                    onClick={() => decreaseSize(stepsPerBar)}
-                    title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                    disabled={soundData.size <= PATTERN_SIZE_MIN}
-                >
-                    <Minus size={10} />{stepsPerBar}
-                </StyledSizeButton>
-                <StyledSizeButton
-                    className="theia-button secondary"
-                    onClick={() => decreaseSize(stepsPerNote)}
-                    title={nls.localize('vuengine/editors/sound/decreaseLength', 'Decrease Length')}
-                    disabled={soundData.size <= PATTERN_SIZE_MIN}
-                >
-                    <Minus size={10} />{stepsPerNote}
-                </StyledSizeButton>
-                <Range
-                    value={soundData.size}
-                    max={PATTERN_SIZE_MAX}
-                    min={PATTERN_SIZE_MIN}
-                    setValue={setSize}
-                    containerStyle={{ flexGrow: 1 }}
-                />
-                <StyledSizeButton
-                    className="theia-button secondary"
-                    onClick={() => increaseSize(stepsPerNote)}
-                    title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                    disabled={soundData.size >= PATTERN_SIZE_MAX}
-                >
-                    <Plus size={10} />{stepsPerNote}
-                </StyledSizeButton>
-                <StyledSizeButton
-                    className="theia-button secondary"
-                    onClick={() => increaseSize(stepsPerBar)}
-                    title={nls.localize('vuengine/editors/sound/increaseLength', 'Increase Length')}
-                    disabled={soundData.size >= PATTERN_SIZE_MAX}
-                >
-                    <Plus size={10} />{stepsPerBar}
-                </StyledSizeButton>
-            </HContainer>
-        </VContainer>
+        <SongLength
+            soundData={soundData}
+            updateSoundData={updateSoundData}
+            setCurrentPlayerPosition={setCurrentPlayerPosition}
+        />
 
         <VContainer>
             <label>
@@ -241,42 +153,31 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
         </VContainer>
 
         <VContainer>
+            <InfoLabel
+                label={nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume')}
+                tooltip={nls.localize(
+                    'vuengine/editors/sound/masterVolumeDescription',
+                    "Scales the volume of all tracks, in percent. The result is limited to the soundchip's maximum volume. \
+The master volume effect lane can lower it further over time, e.g. for fading out a song."
+                )}
+            />
+            <Range
+                value={soundData.volume ?? MASTER_VOLUME_DEFAULT}
+                max={MASTER_VOLUME_MAX}
+                min={MASTER_VOLUME_MIN}
+                setValue={setMasterVolume}
+            />
+        </VContainer>
+
+        <VContainer>
             <label>
                 {nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature')}
             </label>
-            <HContainer alignItems='center'>
-                <Input
-                    type='number'
-                    value={beats}
-                    setValue={v => setBeats(v as number)}
-                    min={1}
-                    max={NOTE_RESOLUTION}
-                    width={64}
-                />
-                /
-                <AdvancedSelect
-                    defaultValue={`${bar}`}
-                    onChange={b => setBar(parseInt(b[0]))}
-                    options={[{
-                        value: '1',
-                        label: '1',
-                    }, {
-                        value: '2',
-                        label: '2',
-                    }, {
-                        value: '4',
-                        label: '4',
-                    }, {
-                        value: '8',
-                        label: '8',
-                    }, {
-                        value: '16',
-                        label: '16',
-                    }]}
-                    menuPlacement='top'
-                    width={64}
-                />
-            </HContainer>
+            <TimeSignatureInput
+                value={soundData.timeSignature[0]}
+                setValue={setTimeSignature}
+                width={64}
+            />
         </VContainer>
         <HContainer gap={10}>
             <Checkbox
@@ -300,11 +201,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                         </StyledSizeButton>
                         <StyledSizeButton
                             className="theia-button secondary"
-                            onClick={() => decreaseLoopPoint(stepsPerNote)}
+                            onClick={() => decreaseLoopPoint(stepsPerBeat)}
                             title={nls.localize('vuengine/editors/sound/decreaseLoopPoint', 'Decrease Loop Point')}
                             disabled={soundData.loopPoint <= 0}
                         >
-                            <Minus size={10} />{stepsPerNote}
+                            <Minus size={10} />{stepsPerBeat}
                         </StyledSizeButton>
                         <Input
                             value={soundData.loopPoint}
@@ -316,11 +217,11 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                         />
                         <StyledSizeButton
                             className="theia-button secondary"
-                            onClick={() => increaseLoopPoint(stepsPerNote)}
+                            onClick={() => increaseLoopPoint(stepsPerBeat)}
                             title={nls.localize('vuengine/editors/sound/increaseLoopPoint', 'Increase Loop Point')}
                             disabled={soundData.loopPoint >= soundData.size - 1}
                         >
-                            <Plus size={10} />{stepsPerNote}
+                            <Plus size={10} />{stepsPerBeat}
                         </StyledSizeButton>
                         <StyledSizeButton
                             className="theia-button secondary"

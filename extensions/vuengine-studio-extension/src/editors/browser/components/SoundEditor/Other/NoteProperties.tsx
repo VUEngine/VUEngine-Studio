@@ -27,6 +27,7 @@ import {
     TRACK_DEFAULT_INSTRUMENT_NAME,
     TRACK_TYPE_INSTRUMENT_COMPATIBILITY
 } from '../SoundEditorTypes';
+import { getBarsLength, getTimeSignatureSegments } from './timeSignature';
 
 const NoNote = styled.div`
     font-style: italic;
@@ -48,7 +49,6 @@ interface NotePropertiesProps {
     playNote: (note: string, instrumentId?: string) => void
     setNotes: (notes: EventsMap) => void
     newNoteDuration: number
-    stepsPerBar: number
 }
 
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
@@ -64,7 +64,6 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
         playNote,
         setNotes,
         newNoteDuration,
-        stepsPerBar,
     } = props;
     const { services, focusEditor } = useContext(EditorsContext) as EditorsContextType;
 
@@ -78,7 +77,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     const currentPatternSize = pattern
         ? pattern.size * SUB_NOTE_RESOLUTION
-        : stepsPerBar * DEFAULT_BARS_PER_PATTERN;
+        : getBarsLength(getTimeSignatureSegments(soundData), 0, DEFAULT_BARS_PER_PATTERN) * SUB_NOTE_RESOLUTION;
 
     const addNote = () => {
         setNotes({

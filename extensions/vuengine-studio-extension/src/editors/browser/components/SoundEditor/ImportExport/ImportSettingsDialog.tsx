@@ -11,7 +11,7 @@ import { DataSection } from '../../Common/CommonTypes';
 import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { getInstrumentName, getTrackTypeLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { SoundData, SoundEditorTrackType, SoundGroup } from '../SoundEditorTypes';
+import { MASTER_VOLUME_DEFAULT, SoundData, SoundEditorTrackType, SoundGroup } from '../SoundEditorTypes';
 import { SUPPORTED_IMPORT_FORMATS_ELEMENT } from './ImportExport';
 
 const StyledFileUri = styled.div`
@@ -88,6 +88,8 @@ export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
         instruments: {},
         loop: false,
         loopPoint: 0,
+        volume: MASTER_VOLUME_DEFAULT,
+        events: {},
         name: '',
         patterns: {},
         section: DataSection.ROM,

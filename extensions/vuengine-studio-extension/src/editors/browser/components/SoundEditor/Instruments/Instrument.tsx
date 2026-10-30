@@ -39,12 +39,13 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../Emulator/VsuTypes';
-import { getReachableVolumes } from '../Other/volume';
+import { getPanningLabel, getReachableVolumes, panningStepToPanning, panningToPanningStep } from '../Other/volume';
 import { getInstrumentName, getTrackTypeLabel } from '../SoundEditor';
 import {
     INSTRUMENT_PANNING_MAX,
     INSTRUMENT_PANNING_MIN,
     InstrumentConfig,
+    PANNING_STEPS,
     InstrumentMap,
     SoundData,
     SoundEditorTrackType,
@@ -615,7 +616,7 @@ While the hardware volume envelope is enabled, it refers to the envelope's loude
                                 max={reachableVolumes.length - 1}
                                 options={reachableVolumes.map((v, i) => ({
                                     value: i,
-                                    label: v.toString(),
+                                    label: `${v}%`,
                                 }))}
                                 setValue={i => setVolume(reachableVolumes[i])}
                                 disabled={reachableVolumes.length < 2}
@@ -627,18 +628,15 @@ While the hardware volume envelope is enabled, it refers to the envelope's loude
                                 {nls.localize('vuengine/editors/sound/panning', 'Panning')}
                             </label>
                             <Range
-                                value={instrument?.panning}
-                                min={INSTRUMENT_PANNING_MIN}
-                                max={INSTRUMENT_PANNING_MAX}
-                                options={[...Array(INSTRUMENT_PANNING_MAX - INSTRUMENT_PANNING_MIN + 1)].map((x, i) => {
-                                    const panning = INSTRUMENT_PANNING_MIN + i;
-                                    return {
-                                        value: panning,
-                                        label: panning < 0 ? `L${-panning}` : panning > 0 ? `R${panning}` : 'C',
-                                    };
-                                })}
-                                setValue={setPanning}
-                                selectWidth={64}
+                                value={panningToPanningStep(instrument?.panning)}
+                                min={-PANNING_STEPS}
+                                max={PANNING_STEPS}
+                                options={[...Array(2 * PANNING_STEPS + 1)].map((x, i) => ({
+                                    value: i - PANNING_STEPS,
+                                    label: getPanningLabel(panningStepToPanning(i - PANNING_STEPS)),
+                                }))}
+                                setValue={step => setPanning(panningStepToPanning(step))}
+                                selectWidth={72}
                             />
                         </BorderedVContainer>
                         {instrument.type === SoundEditorTrackType.NOISE &&

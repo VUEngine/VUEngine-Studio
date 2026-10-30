@@ -15,6 +15,8 @@ export interface SoundData {
     size: number
     speed: SpeedMap
     timeSignature: TimeSignatureMap
+    volume: number
+    events: EventsMap
     loop: boolean
     loopPoint: number
     section: DataSection
@@ -52,16 +54,22 @@ export enum SoundEditorMarqueeMode {
 export enum SoundEvent {
     Duration = 'duration',
     Instrument = 'instrument',
+    MasterVolume = 'masterVolume',
     Note = 'note',
     NoteSlide = 'noteSlide',
+    Panning = 'panning',
+    TimeSignature = 'timeSignature',
     Volume = 'volume',
 }
 
 export const SOUND_EVENT_LABELS = {
     [SoundEvent.Duration]: nls.localize('vuengine/editors/sound/duration', 'Duration'),
     [SoundEvent.Instrument]: nls.localize('vuengine/editors/sound/instrument', 'Instrument'),
+    [SoundEvent.MasterVolume]: nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
     [SoundEvent.Note]: nls.localize('vuengine/editors/sound/note', 'Note'),
     [SoundEvent.NoteSlide]: nls.localize('vuengine/editors/sound/noteSlide', 'Note Slide'),
+    [SoundEvent.Panning]: nls.localize('vuengine/editors/sound/panning', 'Panning'),
+    [SoundEvent.TimeSignature]: nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
     [SoundEvent.Volume]: nls.localize('vuengine/editors/sound/volume', 'Volume'),
 };
 
@@ -76,6 +84,11 @@ export const DEFAULT_TRACK_SETTINGS = {
     solo: false,
     seeThrough: true,
 };
+
+export const GLOBAL_SOUND_EVENTS = [
+    SoundEvent.MasterVolume,
+    SoundEvent.TimeSignature,
+];
 
 export const EXCLUDED_SOUND_EVENTS = [
     SoundEvent.Duration,
@@ -318,17 +331,36 @@ export const MAX_TICK_DURATION = 256;
 
 export const VOLUME_STEPS = 16;
 
-// instrument volume is the VSU's actual output level,
-// i.e. the combination of stereo level and envelope value
+// instrument volume is a percentage of the VSU's maximum output level
 export const INSTRUMENT_VOLUME_MIN = 0;
-export const INSTRUMENT_VOLUME_MAX = 29;
-export const INSTRUMENT_VOLUME_DEFAULT = 16;
-export const INSTRUMENT_PANNING_MIN = -15;
-export const INSTRUMENT_PANNING_MAX = 15;
+export const INSTRUMENT_VOLUME_MAX = 100;
+export const INSTRUMENT_VOLUME_DEFAULT = 65;
+// panning is a percentage, negative values pan to the left, positive values pan to the right
+export const INSTRUMENT_PANNING_MIN = -100;
+export const INSTRUMENT_PANNING_MAX = 100;
 export const INSTRUMENT_PANNING_DEFAULT = 0;
+// steps per side, enough to reach every stereo position the VSU supports
+export const PANNING_STEPS = 30;
+
+export const MASTER_VOLUME_MIN = 0;
+export const MASTER_VOLUME_MAX = 200;
+export const MASTER_VOLUME_DEFAULT = 100;
+export const MASTER_VOLUME_EVENT_MIN = 0;
+export const MASTER_VOLUME_EVENT_MAX = 100;
+
+// in milliseconds, lets double-clicks finish before the view scrolls away from under the mouse
+export const AUTO_SCROLL_DELAY = 300;
 
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
-export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;
+export const EFFECTS_PANEL_EXPANDED_HEIGHT = 160;
+export const EFFECTS_PANEL_EXPANDED_HEIGHT_MIN = 64;
+export const EFFECTS_PANEL_EXPANDED_HEIGHT_MAX = 384;
+export const EVENT_LIST_WIDTH_DEFAULT = 420;
+export const EVENT_LIST_WIDTH_MIN = 300;
+export const EVENT_LIST_WIDTH_MAX = 720;
+export const SIDEBAR_WIDTH_DEFAULT = 440;
+export const SIDEBAR_WIDTH_MIN = 320;
+export const SIDEBAR_WIDTH_MAX = 880;
 
 export const NEW_PATTERN_ID = '+';
 export const TRACK_DEFAULT_INSTRUMENT_ID = 'trackDefault';

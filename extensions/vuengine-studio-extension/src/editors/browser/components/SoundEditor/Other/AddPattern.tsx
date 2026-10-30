@@ -18,6 +18,7 @@ import {
     TRACK_TYPE_LABELS,
     TrackConfig
 } from '../SoundEditorTypes';
+import { getBarsLength, getTimeSignatureSegments } from './timeSignature';
 
 const StyledPattern = styled.button`
     background-color: var(--theia-secondaryButton-background);
@@ -82,7 +83,6 @@ interface AddPatternProps {
     selectedPatterns: string[]
     setSelectedPatterns: (sn: string[]) => void
     setAddPatternDialogOpen: Dispatch<SetStateAction<{ trackId: number, sequenceIndex: number, size?: number }>>
-    stepsPerBar: number,
 }
 
 export default function AddPattern(props: AddPatternProps): React.JSX.Element {
@@ -96,13 +96,13 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         setCurrentPatternId, setCurrentSequenceIndex,
         selectedPatterns, setSelectedPatterns,
         setAddPatternDialogOpen,
-        stepsPerBar,
     } = props;
     const { services, disableCommands, enableCommands, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [filter, setFilter] = React.useState<string>('');
+    const defaultPatternSize = getBarsLength(getTimeSignatureSegments(soundData), sequenceIndex, DEFAULT_BARS_PER_PATTERN);
 
     const addPatternToSequence = async (patternId: string): Promise<void> => {
-        const patternSize = size !== undefined && size > 1 ? size : stepsPerBar * DEFAULT_BARS_PER_PATTERN;
+        const patternSize = size !== undefined && size > 1 ? size : defaultPatternSize;
         const track = soundData.tracks[trackId];
         // create if it's a new pattern
         if (patternId === NEW_PATTERN_ID) {
@@ -218,7 +218,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                     {
                         size !== undefined && size > 1
                             ? size
-                            : stepsPerBar * DEFAULT_BARS_PER_PATTERN
+                            : defaultPatternSize
                     }
                 </div>
             </HContainer>

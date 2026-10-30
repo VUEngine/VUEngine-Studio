@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useRef, use
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
+import { getBarsLength, getNearestBarStartColumn, getNextBarStartColumn, getTimeSignatureSegments } from '../Other/timeSignature';
 import { getPatternName } from '../SoundEditor';
 import {
     PatternConfig,
@@ -77,7 +78,6 @@ interface SequencerPlacedPatternProps {
     sequencerNoteWidth: number
     setPatternSizes: (patterns: { [patternId: string]: number }) => void
     removePatternsFromSequence: (patterns: string[]) => void
-    stepsPerBar: number
 }
 
 export default function SequencerPlacedPattern(props: SequencerPlacedPatternProps): React.JSX.Element {
@@ -97,7 +97,6 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         sequencerPatternHeight, sequencerNoteWidth,
         setPatternSizes,
         removePatternsFromSequence,
-        stepsPerBar,
     } = props;
     const [isDragging, setIsDragging] = useState(false);
     const [patternDragDelta, setPatternDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -191,7 +190,16 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
-        const newSize = Math.ceil(data.size.width / sequencerNoteWidth);
+        let newSize = Math.ceil(data.size.width / sequencerNoteWidth);
+        // with note snapping, the pattern ends at the closest bar start, but spans at least one bar
+        if (noteSnapping) {
+            const timeSignatureSegments = getTimeSignatureSegments(soundData);
+            let end = getNearestBarStartColumn(timeSignatureSegments, sequenceIndex + newSize);
+            if (end <= sequenceIndex) {
+                end = getNextBarStartColumn(timeSignatureSegments, sequenceIndex);
+            }
+            newSize = end - sequenceIndex;
+        }
 
         const patterns: { [patternId: string]: number } = {
             [patternId]: newSize
@@ -238,7 +246,10 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
         }
 
         const newTrackId = Math.ceil((data.y - SEQUENCER_GRID_METER_HEIGHT) / sequencerPatternHeight);
-        const newSequenceIndex = Math.floor(data.x / sequencerNoteWidth);
+        // with note snapping, the pattern moves to the closest bar start, according to the time signature there
+        const newSequenceIndex = noteSnapping
+            ? getNearestBarStartColumn(getTimeSignatureSegments(soundData), Math.round(data.x / sequencerNoteWidth))
+            : Math.floor(data.x / sequencerNoteWidth);
         if (newTrackId === trackId && newSequenceIndex === sequenceIndex) {
             return;
         }
@@ -333,12 +344,7 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     return (
         <Draggable
             nodeRef={nodeRef}
-            grid={[
-                noteSnapping
-                    ? stepsPerBar * sequencerNoteWidth
-                    : sequencerNoteWidth,
-                sequencerPatternHeight
-            ]}
+            grid={[sequencerNoteWidth, sequencerPatternHeight]}
             handle=".placedPattern"
             cancel=".react-resizable-handle"
             onStart={onDragStart}
@@ -374,17 +380,12 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
                 <ResizableBox
                     width={width}
                     draggableOpts={{
-                        grid: [
-                            noteSnapping
-                                ? stepsPerBar * sequencerNoteWidth
-                                : sequencerNoteWidth,
-                            sequencerPatternHeight
-                        ]
+                        grid: [sequencerNoteWidth, sequencerPatternHeight]
                     }}
                     axis="x"
                     minConstraints={[
                         noteSnapping
-                            ? stepsPerBar * sequencerNoteWidth
+                            ? getBarsLength(getTimeSignatureSegments(soundData), sequenceIndex, 1) * sequencerNoteWidth
                             : sequencerNoteWidth,
                         sequencerPatternHeight
                     ]}
