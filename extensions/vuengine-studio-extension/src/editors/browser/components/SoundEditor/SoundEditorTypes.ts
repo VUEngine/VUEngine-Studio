@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import { DataSection } from '../Common/CommonTypes';
-import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
+import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelSweepModulationData } from './Emulator/VsuTypes';
 
 export type InstrumentMap = Record<string, InstrumentConfig>;
 
@@ -110,7 +110,8 @@ export interface InstrumentConfig {
     type: SoundEditorTrackType
     color: number
     waveform: number[]
-    volume: VsuChannelStereoLevelsData
+    volume: number
+    panning: number
     interval: VsuChannelIntervalData
     envelope: VsuChannelEnvelopeData
     sweepMod: VsuChannelSweepModulationData
@@ -316,6 +317,15 @@ export const MIN_TICK_DURATION = 5;
 export const MAX_TICK_DURATION = 256;
 
 export const VOLUME_STEPS = 16;
+
+// instrument volume is the VSU's actual output level,
+// i.e. the combination of stereo level and envelope value
+export const INSTRUMENT_VOLUME_MIN = 0;
+export const INSTRUMENT_VOLUME_MAX = 29;
+export const INSTRUMENT_VOLUME_DEFAULT = 16;
+export const INSTRUMENT_PANNING_MIN = -15;
+export const INSTRUMENT_PANNING_MAX = 15;
+export const INSTRUMENT_PANNING_DEFAULT = 0;
 
 export const EFFECTS_PANEL_COLLAPSED_HEIGHT = 18;
 export const EFFECTS_PANEL_EXPANDED_HEIGHT = 128;

@@ -9,12 +9,13 @@ import {
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VSU_VOLUME_DEFAULT,
+    VsuChannelEnvelopeData,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction,
     WaveformData
 } from '../../Emulator/VsuTypes';
+import { DEFAULT_STEREO_LEVELS, getVolumeAndPanningFromStereoLevels } from '../../Other/volume';
 import {
     InstrumentConfig,
     NOTES_LABELS_REVERSED,
@@ -236,23 +237,24 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
 
     instruments.forEach((i, index) => {
         // TODO: subpattern support
+        const envelope: VsuChannelEnvelopeData = {
+            direction: i.volume_sweep_change > 0
+                ? VsuEnvelopeDirection.Grow
+                : VsuEnvelopeDirection.Decay,
+            enabled: i.volume_sweep_change !== 0,
+            initialValue: i.initial_volume,
+            repeat: false,
+            stepTime: clamp(
+                Math.ceil((i.volume_sweep_change > 0 ? i.volume_sweep_change : i.volume_sweep_change + 8) / 2) - 1,
+                VSU_ENVELOPE_STEP_TIME_MIN,
+                VSU_ENVELOPE_STEP_TIME_MAX
+            )
+        };
         result.push({
             id: nanoid(),
             instrumentConfig: {
                 color: DUTY_COLORS[index],
-                envelope: {
-                    direction: i.volume_sweep_change > 0
-                        ? VsuEnvelopeDirection.Grow
-                        : VsuEnvelopeDirection.Decay,
-                    enabled: i.volume_sweep_change !== 0,
-                    initialValue: i.initial_volume,
-                    repeat: false,
-                    stepTime: clamp(
-                        Math.ceil((i.volume_sweep_change > 0 ? i.volume_sweep_change : i.volume_sweep_change + 8) / 2) - 1,
-                        VSU_ENVELOPE_STEP_TIME_MIN,
-                        VSU_ENVELOPE_STEP_TIME_MAX
-                    )
-                },
+                envelope,
                 interval: {
                     enabled: i.length !== null,
                     value: i.length !== null
@@ -286,10 +288,7 @@ const convertDutyInstruments = (instruments: DutyInstrument[]): ConvertedInstrum
                 type: index === 0
                     ? SoundEditorTrackType.SWEEPMOD
                     : SoundEditorTrackType.WAVE,
-                volume: {
-                    left: VSU_VOLUME_DEFAULT,
-                    right: VSU_VOLUME_DEFAULT
-                },
+                ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, envelope),
                 waveform: DUTY_WAVEFORMS[i.duty_cycle],
             },
         });
@@ -304,17 +303,18 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
     instruments.forEach((i, index) => {
         // TODO: subpattern support
         const volume = WAVE_CHANNEL_VOLUME_LOOKUP[i.volume];
+        const envelope: VsuChannelEnvelopeData = {
+            direction: VsuEnvelopeDirection.Decay,
+            enabled: false,
+            initialValue: volume,
+            repeat: false,
+            stepTime: VSU_ENVELOPE_STEP_TIME_MIN
+        };
         result.push({
             id: nanoid(),
             instrumentConfig: {
                 color: WAVE_COLORS[index],
-                envelope: {
-                    direction: VsuEnvelopeDirection.Decay,
-                    enabled: false,
-                    initialValue: volume,
-                    repeat: false,
-                    stepTime: VSU_ENVELOPE_STEP_TIME_MIN
-                },
+                envelope,
                 interval: {
                     enabled: i.length !== null,
                     value: i.length !== null
@@ -340,10 +340,7 @@ const convertWaveInstruments = (instruments: WaveInstrument[], waves: Uint8Array
                 },
                 tap: 0,
                 type: SoundEditorTrackType.WAVE,
-                volume: {
-                    left: VSU_VOLUME_DEFAULT,
-                    right: VSU_VOLUME_DEFAULT
-                },
+                ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, envelope),
                 waveform: convertWaveform(waves[(i as WaveInstrument).wave_index]),
             },
         });
@@ -357,23 +354,24 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
 
     instruments.forEach((i, index) => {
         // TODO: subpattern support
+        const envelope: VsuChannelEnvelopeData = {
+            direction: (i.volume_sweep_change) > 0
+                ? VsuEnvelopeDirection.Grow
+                : VsuEnvelopeDirection.Decay,
+            enabled: (i.volume_sweep_change) !== 0,
+            initialValue: Math.round(i.initial_volume * 0.9),
+            repeat: false,
+            stepTime: clamp(
+                Math.ceil((i.volume_sweep_change > 0 ? i.volume_sweep_change : i.volume_sweep_change + 8) / 2) - 1,
+                VSU_ENVELOPE_STEP_TIME_MIN,
+                VSU_ENVELOPE_STEP_TIME_MAX
+            )
+        };
         result.push({
             id: nanoid(),
             instrumentConfig: {
                 color: NOISE_COLORS[index],
-                envelope: {
-                    direction: (i.volume_sweep_change) > 0
-                        ? VsuEnvelopeDirection.Grow
-                        : VsuEnvelopeDirection.Decay,
-                    enabled: (i.volume_sweep_change) !== 0,
-                    initialValue: Math.round(i.initial_volume * 0.9),
-                    repeat: false,
-                    stepTime: clamp(
-                        Math.ceil((i.volume_sweep_change > 0 ? i.volume_sweep_change : i.volume_sweep_change + 8) / 2) - 1,
-                        VSU_ENVELOPE_STEP_TIME_MIN,
-                        VSU_ENVELOPE_STEP_TIME_MAX
-                    )
-                },
+                envelope,
                 interval: {
                     enabled: i.length !== null,
                     value: i.length !== null
@@ -399,10 +397,7 @@ const convertNoiseInstruments = (instruments: NoiseInstrument[]): ConvertedInstr
                 },
                 tap: 0,
                 type: SoundEditorTrackType.NOISE,
-                volume: {
-                    left: VSU_VOLUME_DEFAULT,
-                    right: VSU_VOLUME_DEFAULT
-                },
+                ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, envelope),
                 waveform: [
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ],

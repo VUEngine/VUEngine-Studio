@@ -27,6 +27,7 @@ import {
     SUB_NOTE_RESOLUTION,
     TrackConfig
 } from '../SoundEditorTypes';
+import { getInstrumentRegisterLevels } from './volume';
 
 interface withArtificialNotes {
     artificial?: true
@@ -102,8 +103,8 @@ const SxLRV = (volume: VsuChannelStereoLevelsData): string => hexFromBitsArray([
 
 const SxFQ = (frequency: number): string => intToHex(frequency, 4);
 
-const SxEV0 = (envelope: VsuChannelEnvelopeData): string => hexFromBitsArray([
-    [envelope.initialValue, 4],
+const SxEV0 = (envelope: VsuChannelEnvelopeData, initialValue: number): string => hexFromBitsArray([
+    [initialValue, 4],
     [envelope.direction, 1],
     [envelope.stepTime, 3]
 ]);
@@ -173,6 +174,10 @@ const S5MOD = (
 
     return 'NULL';
 };
+
+const getInstrumentVolumeEventValue = (instrument: InstrumentConfig | undefined): number => instrument
+    ? getVolumeEventValueFromStereoLevels(getInstrumentRegisterLevels(instrument).stereoLevels)
+    : 0;
 
 // create a single full-length sequence from patterns
 const mergePatterns = (
@@ -247,7 +252,7 @@ const applyTrackInitialVolume = (
         if (result[firstStepWithNote][SoundEvent.Instrument] === undefined &&
             result[firstStepWithNote][SoundEvent.Volume] === undefined
         ) {
-            result[firstStepWithNote][SoundEvent.Volume] = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
+            result[firstStepWithNote][SoundEvent.Volume] = getInstrumentVolumeEventValue(initialInstrument);
         }
     }
 
@@ -278,7 +283,7 @@ const applyNoteDuration = (
     const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
 
     const trackSteps: number[] = Object.keys(result).map(step => parseInt(step)).sort((a, b) => a - b);
-    let lastVolume = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
+    let lastVolume = getInstrumentVolumeEventValue(initialInstrument);
 
     trackSteps.forEach((step, stepIndex) => {
         const stepEvents = result[step];
@@ -289,7 +294,7 @@ const applyNoteDuration = (
         if (instrumentId !== undefined) {
             const instrument = instruments[instrumentId];
             if (instrument !== undefined) {
-                lastVolume = getVolumeEventValueFromStereoLevels(instrument.volume);
+                lastVolume = getInstrumentVolumeEventValue(instrument);
             }
         }
         const volume = stepEvents[SoundEvent.Volume];
@@ -451,7 +456,7 @@ const transformToKeyframes = (
             if (stepIndex !== 0) {
                 keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
                 if (currentInstrument.envelope.enabled || sweepEnabled) {
-                    keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
+                    keyframe.SxEV0 = SxEV0(currentInstrument.envelope, getInstrumentRegisterLevels(currentInstrument).envelopeInitialValue);
                     keyframe.SxEV1 = SxEV1(
                         currentInstrument.envelope,
                         currentInstrument.sweepMod,
@@ -472,9 +477,10 @@ const transformToKeyframes = (
             currentInstrumentId = stepEvents[SoundEvent.Instrument];
             currentInstrument = instruments[currentInstrumentId ?? track.instrument];
 
+            const registerLevels = getInstrumentRegisterLevels(currentInstrument);
             keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
-            keyframe.SxLRV = SxLRV(currentInstrument.volume);
-            keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
+            keyframe.SxLRV = SxLRV(registerLevels.stereoLevels);
+            keyframe.SxEV0 = SxEV0(currentInstrument.envelope, registerLevels.envelopeInitialValue);
             keyframe.SxEV1 = SxEV1(
                 currentInstrument.envelope,
                 currentInstrument.sweepMod,
@@ -604,7 +610,7 @@ const transformToKeyframesPrepared = (
     // set volume on first keyframe
     const firstKeyframe = trackKeyframes.keyframeMap[keyFrameSteps[0]];
     if (firstKeyframe !== undefined && firstKeyframe.SxLRV === undefined) {
-        trackKeyframes.keyframeMap[keyFrameSteps[0]].SxLRV = SxLRV(initialInstrument.volume);
+        trackKeyframes.keyframeMap[keyFrameSteps[0]].SxLRV = SxLRV(getInstrumentRegisterLevels(initialInstrument).stereoLevels);
     }
 
     keyFrameSteps.forEach((step, stepIndex) => {

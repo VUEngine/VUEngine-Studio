@@ -7,13 +7,13 @@ import {
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VSU_VOLUME_DEFAULT,
-    VsuChannelStereoLevelsData,
+    VsuChannelEnvelopeData,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction,
     WaveformData
 } from '../../Emulator/VsuTypes';
+import { DEFAULT_STEREO_LEVELS, getVolumeAndPanningFromStereoLevels } from '../../Other/volume';
 import {
     InstrumentConfig,
     NOTES_LABELS_REVERSED,
@@ -31,16 +31,18 @@ import {
 import { DEFAULT_WAVEFORM } from '../../Waveforms/WaveFormPresets';
 import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
 
+const DEFAULT_ENVELOPE: VsuChannelEnvelopeData = {
+    direction: VsuEnvelopeDirection.Decay,
+    enabled: false,
+    initialValue: 15,
+    repeat: false,
+    stepTime: VSU_ENVELOPE_STEP_TIME_MIN
+};
+
 const DEFAULT_INSTRUMENT_ID = 'default';
 const DEFAULT_INSTRUMENT = {
     color: 4,
-    envelope: {
-        direction: VsuEnvelopeDirection.Decay,
-        enabled: false,
-        initialValue: 15,
-        repeat: false,
-        stepTime: VSU_ENVELOPE_STEP_TIME_MIN
-    },
+    envelope: DEFAULT_ENVELOPE,
     interval: {
         enabled: false,
         value: VSU_INTERVAL_MIN
@@ -60,10 +62,7 @@ const DEFAULT_INSTRUMENT = {
     },
     tap: 0,
     type: SoundEditorTrackType.WAVE,
-    volume: {
-        left: VSU_VOLUME_DEFAULT,
-        right: VSU_VOLUME_DEFAULT
-    },
+    ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, DEFAULT_ENVELOPE),
     waveform: DEFAULT_WAVEFORM,
 };
 
@@ -184,10 +183,15 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const convertedInstrument = instrumentsLookup[instrumentId];
 
             // get volume
-            const volume: VsuChannelStereoLevelsData = {
-                left: foundSourcePattern?.Row[0].VolL ?? convertedInstrument.instrumentConfig.volume.left,
-                right: foundSourcePattern?.Row[0].VolR ?? convertedInstrument.instrumentConfig.volume.right,
-            };
+            const volumeAndPanning = foundSourcePattern?.Row[0].VolL !== undefined || foundSourcePattern?.Row[0].VolR !== undefined
+                ? getVolumeAndPanningFromStereoLevels({
+                    left: foundSourcePattern?.Row[0].VolL ?? DEFAULT_STEREO_LEVELS.left,
+                    right: foundSourcePattern?.Row[0].VolR ?? DEFAULT_STEREO_LEVELS.right,
+                }, convertedInstrument.instrumentConfig.envelope)
+                : {
+                    volume: convertedInstrument.instrumentConfig.volume,
+                    panning: convertedInstrument.instrumentConfig.panning,
+                };
 
             // get waveform/tap
             let waveform = convertedInstrument.instrumentConfig.waveform;
@@ -223,7 +227,7 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
                 name: convertedInstrument.instrumentConfig.name + ` (CH${trackIndex + 1})`,
                 type: tracks[trackIndex].type,
                 tap,
-                volume,
+                ...volumeAndPanning,
                 waveform,
             };
 
@@ -291,13 +295,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
             id: nanoid(),
             instrumentConfig: {
                 color: index * 8 % COLOR_PALETTE.length,
-                envelope: {
-                    direction: VsuEnvelopeDirection.Decay,
-                    enabled: false,
-                    initialValue: 15,
-                    repeat: false,
-                    stepTime: VSU_ENVELOPE_STEP_TIME_MIN
-                },
+                envelope: { ...DEFAULT_ENVELOPE },
                 interval: {
                     enabled: false,
                     value: VSU_INTERVAL_MIN
@@ -317,10 +315,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                 },
                 tap: 0,
                 type: SoundEditorTrackType.WAVE,
-                volume: {
-                    left: VSU_VOLUME_DEFAULT,
-                    right: VSU_VOLUME_DEFAULT
-                },
+                ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, DEFAULT_ENVELOPE),
                 waveform: DEFAULT_WAVEFORM,
             },
         });

@@ -20,14 +20,21 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_DEFAULT,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VSU_VOLUME_DEFAULT,
-    VSU_VOLUME_MAX,
-    VSU_VOLUME_MIN,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
-import { SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import {
+    INSTRUMENT_PANNING_DEFAULT,
+    INSTRUMENT_PANNING_MAX,
+    INSTRUMENT_PANNING_MIN,
+    INSTRUMENT_VOLUME_DEFAULT,
+    INSTRUMENT_VOLUME_MAX,
+    INSTRUMENT_VOLUME_MIN,
+    SoundEditorTrackType,
+    SoundGroup,
+    TRACK_PRIORITY_DEFAULT
+} from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { DEFAULT_WAVEFORM } from '../../../editors/browser/components/SoundEditor/Waveforms/WaveFormPresets';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
@@ -140,22 +147,16 @@ export const SoundType: ProjectDataType = {
                             default: DEFAULT_WAVEFORM,
                         },
                         volume: {
-                            type: 'object',
-                            properties: {
-                                left: {
-                                    type: 'integer',
-                                    default: VSU_VOLUME_DEFAULT,
-                                    minimum: VSU_VOLUME_MIN,
-                                    maximum: VSU_VOLUME_MAX
-                                },
-                                right: {
-                                    type: 'integer',
-                                    default: VSU_VOLUME_DEFAULT,
-                                    minimum: VSU_VOLUME_MIN,
-                                    maximum: VSU_VOLUME_MAX
-                                }
-                            },
-                            additionalProperties: false
+                            type: 'integer',
+                            default: INSTRUMENT_VOLUME_DEFAULT,
+                            minimum: INSTRUMENT_VOLUME_MIN,
+                            maximum: INSTRUMENT_VOLUME_MAX
+                        },
+                        panning: {
+                            type: 'integer',
+                            default: INSTRUMENT_PANNING_DEFAULT,
+                            minimum: INSTRUMENT_PANNING_MIN,
+                            maximum: INSTRUMENT_PANNING_MAX
                         },
                         interval: {
                             type: 'object',
