@@ -184,24 +184,38 @@ const mergePatterns = (
 ): EventsMapWithArtificialNotes => {
     const trackEventsMap: EventsMapWithArtificialNotes = {};
 
-    let patternStartStep = 0;
-    let patternStepSize = 0;
-    let pattern: PatternConfig = {} as PatternConfig;
-    for (let step = 0; step < totalSize; step++) {
-        // Does a pattern start at the current step?
-        const sequenceStep = track.sequence[step / SUB_NOTE_RESOLUTION];
-        if (sequenceStep) {
-            pattern = patterns[sequenceStep];
-            patternStepSize = pattern.size * SUB_NOTE_RESOLUTION;
-            patternStartStep = step;
-        }
+    // patterns can only start at whole steps
+    const sequenceColumns = Object.keys(track.sequence)
+        .map(column => parseFloat(column))
+        .filter(column => column >= 0
+            && track.sequence[column]
+            && Math.round(column * SUB_NOTE_RESOLUTION) / SUB_NOTE_RESOLUTION === column
+        )
+        .sort((a, b) => a - b);
 
-        // Is there an event for the current step in the current pattern?
-        const patternStep = step - patternStartStep;
-        if (pattern.events && patternStep < patternStepSize && pattern.events[patternStep]) {
-            trackEventsMap[step] = { ...pattern.events[patternStep] };
+    // only visit the patterns' events instead of every step of the sound
+    sequenceColumns.forEach((column, index) => {
+        const pattern: PatternConfig | undefined = patterns[track.sequence[column]];
+        if (!pattern) {
+            return;
         }
-    }
+        const patternStartStep = Math.round(column * SUB_NOTE_RESOLUTION);
+        // a pattern gets cut off by the next one in the sequence and by the end of the sound
+        const nextColumn = sequenceColumns[index + 1];
+        const patternEndStep = Math.min(
+            totalSize,
+            patternStartStep + pattern.size * SUB_NOTE_RESOLUTION,
+            nextColumn !== undefined ? nextColumn * SUB_NOTE_RESOLUTION : Infinity,
+        );
+
+        Object.keys(pattern.events ?? {}).forEach(patternStepStr => {
+            const patternStep = parseFloat(patternStepStr);
+            const step = patternStartStep + patternStep;
+            if (Number.isInteger(patternStep) && patternStep >= 0 && step < patternEndStep && pattern.events[patternStep]) {
+                trackEventsMap[step] = { ...pattern.events[patternStep] };
+            }
+        });
+    });
 
     return trackEventsMap;
 };
@@ -512,51 +526,44 @@ const transformToKeyframes = (
     };
 };
 
+const REDUCIBLE_REGISTERS: (keyof Keyframe)[] = ['SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'];
+
 // remove unnecessary steps, i.e. those which would cause no register value change
 const reduceKeyframes = (
     trackKeyframes: TrackKeyframes,
 ): TrackKeyframes => {
-    const result = deepClone(trackKeyframes);
+    const keyframeMap: KeyframeMap = {};
 
     const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap)
         .map(step => parseInt(step))
-        .sort((a, b) => a - b)
-        .reverse();
+        .sort((a, b) => a - b);
 
-    // remove values that are same as previous occurence
+    // remove values that are same as previous occurence, remembering the last value of each register in a single pass
+    const previousValues: Keyframe = {};
     trackSteps.forEach(step => {
         const stepValues = trackKeyframes.keyframeMap[step];
+        // remove empty keyframes
+        if (Object.keys(stepValues).length === 0) {
+            return;
+        }
 
-        ['SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
-            // @ts-ignore
-            if (stepValues[v] !== undefined) {
-                let foundPrev = false;
-                trackSteps.filter(prevStep => prevStep < step).forEach(prevStep => {
-                    const prevStepValues = result.keyframeMap[prevStep];
-                    // @ts-ignore
-                    if (!foundPrev && prevStepValues[v] !== undefined) {
-                        foundPrev = true;
-                        // @ts-ignore
-                        if (prevStepValues[v] === stepValues[v]) {
-                            // @ts-ignore
-                            delete result.keyframeMap[step][v];
-                        }
-                    }
-                });
+        const reducedStepValues: Keyframe = {};
+        (Object.keys(stepValues) as (keyof Keyframe)[]).forEach(v => {
+            const value = stepValues[v];
+            if (!REDUCIBLE_REGISTERS.includes(v) || value === undefined || previousValues[v] !== value) {
+                reducedStepValues[v] = value;
+            }
+            if (value !== undefined) {
+                previousValues[v] = value;
             }
         });
+        keyframeMap[step] = reducedStepValues;
     });
 
-    // remove empty keyframes
-    trackSteps.forEach(step => {
-        const stepValues = trackKeyframes.keyframeMap[step];
-
-        if (Object.keys(stepValues).length === 0) {
-            delete result.keyframeMap[step];
-        }
-    });
-
-    return result;
+    return {
+        ...trackKeyframes,
+        keyframeMap,
+    };
 };
 
 // find keyframe (step index) of looping point

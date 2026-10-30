@@ -139,6 +139,12 @@ export interface ScrollWindow {
     h: number
 }
 
+// keeps the previous scroll window if nothing changed, so setting it as state causes no needless re-renders
+export const keepUnchangedScrollWindow = (previous: ScrollWindow, next: ScrollWindow): ScrollWindow =>
+    previous.x === next.x && previous.y === next.y && previous.w === next.w && previous.h === next.h
+        ? previous
+        : next;
+
 export const ALL_TRACK_TYPES = 'any';
 export enum SoundEditorTrackType {
     WAVE = 'wave',

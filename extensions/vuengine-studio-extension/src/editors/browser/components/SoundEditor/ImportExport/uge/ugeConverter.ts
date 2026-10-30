@@ -484,7 +484,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                         case EffectCommandType.SetDutyCycle: break;
                         case EffectCommandType.PositionJump: break;
                         case EffectCommandType.SetVolume:
-                            // TODO: add support for "Change Envelope"
+                            // TODO
                             // event[SoundEvent.Volume] = ((value ?? 0) << 4) + (value ?? 0);
                             break;
                         case EffectCommandType.VolumeSlide: break;

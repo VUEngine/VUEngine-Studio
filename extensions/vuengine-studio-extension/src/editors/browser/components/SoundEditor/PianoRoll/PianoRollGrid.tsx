@@ -250,7 +250,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // notes
-        // sort current track to end to draw over eyerything else, 
+        // sort current track to end to draw over eyerything else,
         // but keep the tracks' indexes for their settings
         const trackIds = soundData.tracks.map((t, i) => i).filter(i => i !== currentTrackId);
         if (soundData.tracks[currentTrackId] !== undefined) {

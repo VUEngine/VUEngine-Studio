@@ -6,6 +6,7 @@ import { VSU_NUMBER_OF_CHANNELS } from '../Emulator/VsuTypes';
 import { ScaleControls } from '../PianoRoll/PianoRoll';
 import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
+    keepUnchangedScrollWindow,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SEQUENCER_ADD_TRACK_BUTTON_HEIGHT,
@@ -211,12 +212,13 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             return;
         }
 
-        setSequencerScrollWindow({
+        const scrollWindow = {
             x: sequencerGridContainerRef.current.scrollLeft,
             y: sequencerGridContainerRef.current.scrollTop,
             w: sequencerGridContainerRef.current.offsetWidth,
             h: sequencerGridContainerRef.current.offsetHeight,
-        });
+        };
+        setSequencerScrollWindow(previous => keepUnchangedScrollWindow(previous, scrollWindow));
     };
 
     // I am just here to prevent scrolling while resizing with the below event

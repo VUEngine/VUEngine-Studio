@@ -14,25 +14,7 @@
 {%- set soloTrack = -1 -%}
 
 {%- macro instrumentIsUsed(instrumentId) -%}
-	{%- set result = false -%}
-	{%- for track in item.tracks -%}
-		{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and ((trackSettings[loop.index0] is defined and trackSettings[loop.index0].muted) or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
-			{%- if track.instrument == instrumentId -%}
-				{%- set result = true -%}
-			{%- endif -%}
-			{%- for patternId in track.sequence | values -%}
-				{%- set pattern = item.patterns[patternId] -%}
-				{%- if pattern is defined and pattern.events | length -%}
-					{%- for step in pattern.events | values -%}
-						{%- if step.instrument is defined and step.instrument == instrumentId -%}
-							{%- set result = true -%}
-						{%- endif -%}
-					{%- endfor -%}
-				{%- endif -%}
-			{%- endfor -%}
-		{%- endif -%}
-	{%- endfor -%}
-	{{ result }}
+	{{ usedInstruments[instrumentId] is defined }}
 {%- endmacro -%}
 
 {%- macro printValueList(values, columnWidth, valueWhenEmpty) -%}
@@ -85,6 +67,23 @@
 	{{- 'const uint32 startFromTick = ' ~ startFromTickValue ~ ';\n' -}}
 	{{- 'const bool miniVisualizer = ' ~ miniVisualizer ~ ';' -}}
 {%- endif -%}
+
+{%- set usedInstruments = {} -%}
+{%- for track in item.tracks -%}
+	{%- if track.sequence | length and not track.instrument == '' and not (isSoundEditorPreview and ((trackSettings[loop.index0] is defined and trackSettings[loop.index0].muted) or (soloTrack > -1 and soloTrack !== loop.index0))) -%}
+		{%- set usedInstruments = usedInstruments | setProperty(track.instrument, true) -%}
+		{%- for patternId in track.sequence | values -%}
+			{%- set pattern = item.patterns[patternId] -%}
+			{%- if pattern is defined and pattern.events | length -%}
+				{%- for step in pattern.events | values -%}
+					{%- if step.instrument is defined -%}
+						{%- set usedInstruments = usedInstruments | setProperty(step.instrument, true) -%}
+					{%- endif -%}
+				{%- endfor -%}
+			{%- endif -%}
+		{%- endfor -%}
+	{%- endif -%}
+{%- endfor -%}
 
 {#- Render waveforms for all instruments -#}
 {%- set isFirstWaveform = true -%}

@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { MouseEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp, scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -367,6 +367,31 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         return result.sort((a, b) => a.step - b.step);
     };
 
+    const laneData = useMemo(() => {
+        const laneEvents = getLaneEvents();
+        if (!lane || eventType === undefined || lane.editInDialog) {
+            return { laneEvents, noteInstruments: [], setValues: [], volumeCurve: [] };
+        }
+
+        const track = soundData.tracks[currentTrackId];
+        const noteInstruments = isGlobal
+            ? []
+            : getTrackEvents(soundData, currentTrackId, currentSequenceIndex)
+                .filter(e => e.events[SoundEvent.Note] !== undefined)
+                .map(e => ({ step: e.step, instrumentId: e.events[SoundEvent.Instrument] ?? track?.instrument }));
+        const defaultValue = lane.getDefaultValue?.(soundData);
+        const globalDefaultValue = typeof defaultValue === 'number' ? defaultValue : undefined;
+
+        return {
+            laneEvents,
+            noteInstruments,
+            setValues: getTrackSetValues(soundData, currentTrackId, currentSequenceIndex, eventType, laneEvents, globalDefaultValue),
+            volumeCurve: eventType === SoundEvent.Volume
+                ? getTrackVolumeCurve(soundData, currentTrackId, currentSequenceIndex, laneEvents)
+                : [],
+        };
+    }, [soundData, eventType, currentTrackId, currentSequenceIndex, pendingEdits]);
+
     const draw = (): void => {
         const canvas = canvasRef.current;
         if (!canvas) {
@@ -402,7 +427,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         const growsFromBottom = lane.baseline === lane.min && !lane.inverted;
         const baselineY = growsFromBottom ? height : valueToY(lane, lane.baseline);
         const stepToX = (step: number) => step / SUB_NOTE_RESOLUTION * pianoRollNoteWidth - pianoRollScrollWindow.x;
-        const laneEvents = getLaneEvents();
+        const { laneEvents, noteInstruments, setValues, volumeCurve } = laneData;
 
         if (lane.editInDialog) {
             // labelled bars over the full height, a pale one shows the value before the first event
@@ -445,11 +470,6 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         const barWidth = Math.max(2, pianoRollNoteWidth - 1);
         // bars of track events have the color of the instrument active at their step, which is the one of the latest note
         const track = soundData.tracks[currentTrackId];
-        const noteInstruments = isGlobal
-            ? []
-            : getTrackEvents(soundData, currentTrackId, currentSequenceIndex)
-                .filter(e => e.events[SoundEvent.Note] !== undefined)
-                .map(e => ({ step: e.step, instrumentId: e.events[SoundEvent.Instrument] ?? track?.instrument }));
         const getBarColor = (step: number): string => {
             if (isGlobal) {
                 return textColor;
@@ -493,9 +513,6 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             context.lineWidth = 1;
         };
 
-        const defaultValue = lane.getDefaultValue?.(soundData);
-        const globalDefaultValue = typeof defaultValue === 'number' ? defaultValue : undefined;
-        const setValues = getTrackSetValues(soundData, currentTrackId, currentSequenceIndex, eventType!, laneEvents, globalDefaultValue);
         context.font = '9px sans-serif';
 
         // shadow bars where values change without an effect, e.g. with an instrument change
@@ -515,7 +532,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
 
         // the volume actually played, including side effects like envelopes and the master volume
         if (eventType === SoundEvent.Volume) {
-            drawStepLine(getTrackVolumeCurve(soundData, currentTrackId, currentSequenceIndex, laneEvents), highlightColor, 0.8, 1);
+            drawStepLine(volumeCurve, highlightColor, 0.8, 1);
         }
 
         // the values set by instruments and effects

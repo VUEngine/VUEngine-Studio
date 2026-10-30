@@ -10,6 +10,7 @@ import {
     AUTO_SCROLL_DELAY,
     DEFAULT_NEW_NOTE,
     EventsMap,
+    keepUnchangedScrollWindow,
     NOTES_LABELS,
     NOTES_PER_OCTAVE,
     NOTES_SPECTRUM,
@@ -453,12 +454,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             return;
         }
 
-        setPianoRollScrollWindow({
+        const scrollWindow = {
             x: pianoRollRef.current.scrollLeft,
             y: pianoRollRef.current.scrollTop,
             w: pianoRollRef.current.offsetWidth - PIANO_ROLL_KEY_WIDTH - 2 - SCROLL_BAR_WIDTH,
             h: pianoRollRef.current.offsetHeight - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - SCROLL_BAR_WIDTH,
-        });
+        };
+        setPianoRollScrollWindow(previous => keepUnchangedScrollWindow(previous, scrollWindow));
     };
 
     const onMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
