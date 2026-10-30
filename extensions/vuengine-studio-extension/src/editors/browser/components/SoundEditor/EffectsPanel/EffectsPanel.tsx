@@ -45,6 +45,10 @@ const StyledTabList = styled(TabList)`
     height: ${EFFECTS_PANEL_COLLAPSED_HEIGHT}px;
     box-sizing: border-box;
     padding: 0 var(--padding);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    white-space: nowrap;
 
     body.theia-light &,
     body.theia-hc & {

@@ -737,7 +737,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
             }
 
             if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                setSelectedPatterns([...deepClone(selectedPatterns), ...newSelectedPatterns]);
+                setSelectedPatterns([...selectedPatterns, ...newSelectedPatterns.filter(item => !selectedPatterns.includes(item))].sort());
             } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                 setSelectedPatterns(selectedPatterns
                     .filter(item => !newSelectedPatterns.includes(item))
@@ -874,7 +874,7 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         <StyledSequencerCanvas
             className={classNames.join(' ')}
             style={{
-                cursor: getToolModeCursor(tool, isDragScrolling),
+                cursor: getToolModeCursor(tool, isDragScrolling, marqueeMode),
             }}
             height={height}
             width={width}

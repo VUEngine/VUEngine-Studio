@@ -684,7 +684,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     );
 
                 if (marqueeMode === SoundEditorMarqueeMode.ADD) {
-                    setSelectedNotes([...deepClone(selectedNotes), ...newSelectedNotes]);
+                    setSelectedNotes([...selectedNotes, ...newSelectedNotes.filter(item => !selectedNotes.includes(item))]);
                 } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                     setSelectedNotes(selectedNotes.filter(item => !newSelectedNotes.includes(item)));
                 } else if (marqueeMode === SoundEditorMarqueeMode.REPLACE) {
@@ -788,7 +788,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         <canvas
             className={classNames.join(' ')}
             style={{
-                cursor: getToolModeCursor(tool, isDragScrolling),
+                cursor: getToolModeCursor(tool, isDragScrolling, marqueeMode),
             }}
             height={height}
             width={width}

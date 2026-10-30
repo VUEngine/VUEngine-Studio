@@ -1,5 +1,5 @@
 import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
-import { deepClone, environment, nls, URI } from '@theia/core';
+import { deepClone, environment, isOSX, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
@@ -299,7 +299,24 @@ export const getFoundPatternSequenceIndex = (soundData: SoundData, trackId: numb
     return result;
 };
 
-export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) => {
+// crosshair with a small plus or minus badge for the marquee modes, outlined to be visible on any background
+const MARQUEE_CURSOR_BADGES: Record<SoundEditorMarqueeMode, string> = {
+    [SoundEditorMarqueeMode.REPLACE]: '',
+    [SoundEditorMarqueeMode.ADD]: 'M15 18.5h7M18.5 15v7',
+    [SoundEditorMarqueeMode.SUBTRACT]: 'M15 18.5h7',
+};
+const getMarqueeCursor = (marqueeMode: SoundEditorMarqueeMode): string => {
+    const path = `M8.5 1v15M1 8.5h15${MARQUEE_CURSOR_BADGES[marqueeMode]}`;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">' +
+        `<path d="${path}" stroke="white" stroke-width="3" stroke-linecap="square"/>` +
+        `<path d="${path}" stroke="black" stroke-width="1"/>` +
+        '</svg>';
+
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 8 8, crosshair`;
+};
+
+// marquee mode is only to be given where the marquee can be used
+export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean, marqueeMode?: SoundEditorMarqueeMode) => {
     if (isDragging) {
         return 'grabbing';
     }
@@ -313,7 +330,7 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
         case SoundEditorTool.DRAG:
             return 'grab';
         case SoundEditorTool.MARQUEE:
-            return 'initial';
+            return marqueeMode !== undefined ? getMarqueeCursor(marqueeMode) : 'initial';
     }
 };
 
@@ -342,6 +359,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [newNoteDuration, setNewNoteDuration] = useState<number>(NOTE_RESOLUTION / parseInt(soundData.timeSignature[0].split('/')[1] ?? 4));
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
+    // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting
+    const [heldMarqueeMode, setHeldMarqueeMode] = useState<SoundEditorMarqueeMode | undefined>();
+    const effectiveMarqueeMode = tool === SoundEditorTool.MARQUEE && heldMarqueeMode !== undefined
+        ? heldMarqueeMode
+        : marqueeMode;
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
     const [currentTrackId, setCurrentTrackId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.tracks[0]
@@ -1426,6 +1448,25 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     }, []);
 
     useEffect(() => {
+        const updateHeldMarqueeMode = (e: KeyboardEvent) => setHeldMarqueeMode(e.shiftKey
+            ? SoundEditorMarqueeMode.ADD
+            : (isOSX ? e.altKey : e.ctrlKey)
+                ? SoundEditorMarqueeMode.SUBTRACT
+                : undefined
+        );
+        // keys released while the window is not focused would not be noticed otherwise
+        const resetHeldMarqueeMode = () => setHeldMarqueeMode(undefined);
+        window.addEventListener('keydown', updateHeldMarqueeMode);
+        window.addEventListener('keyup', updateHeldMarqueeMode);
+        window.addEventListener('blur', resetHeldMarqueeMode);
+        return () => {
+            window.removeEventListener('keydown', updateHeldMarqueeMode);
+            window.removeEventListener('keyup', updateHeldMarqueeMode);
+            window.removeEventListener('blur', resetHeldMarqueeMode);
+        };
+    }, []);
+
+    useEffect(() => {
         const disp = onCommandExecute(commandListener);
         return () => disp.dispose();
     }, [
@@ -1474,7 +1515,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             setNoteSnapping={setNoteSnapping}
                             tool={tool}
                             setTool={setTool}
-                            marqueeMode={marqueeMode}
+                            marqueeMode={effectiveMarqueeMode}
                             setMarqueeMode={setMarqueeMode}
                             newNoteDuration={newNoteDuration}
                             setNewNoteDuration={setNewNoteDuration}
@@ -1509,7 +1550,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     <Sequencer
                                         soundData={soundData}
                                         tool={tool}
-                                        marqueeMode={marqueeMode}
+                                        marqueeMode={effectiveMarqueeMode}
                                         updateSoundData={updateSoundData}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
@@ -1582,7 +1623,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     <PianoRoll
                                         soundData={soundData}
                                         tool={tool}
-                                        marqueeMode={marqueeMode}
+                                        marqueeMode={effectiveMarqueeMode}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
                                         setPlayerSeekRequest={setPlayerSeekRequest}
