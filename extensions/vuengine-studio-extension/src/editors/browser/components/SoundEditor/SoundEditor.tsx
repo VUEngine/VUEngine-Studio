@@ -449,9 +449,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const doRemoveTrack = (trackId: number): void => {
-        const newTrackCount = soundData.tracks.length - 2;
-        if (currentTrackId >= newTrackCount) {
-            setCurrentTrackId(newTrackCount);
+        // the index of the last remaining track, but at least 0,
+        // so that adding a track after removing the last one works
+        const newLastTrackId = Math.max(0, soundData.tracks.length - 2);
+        if (currentTrackId >= newLastTrackId) {
+            setCurrentTrackId(newLastTrackId);
         }
         setTrackSettings(prev => ([
             ...prev.slice(0, trackId),
@@ -501,7 +503,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             Object.keys(pattern.events).forEach(stepStr => {
                 const step = parseInt(stepStr);
                 if (step < patternSteps) {
-                    updatedEvents[step] = pattern.events[step];
+                    // a copy, as its duration might get changed below
+                    updatedEvents[step] = { ...pattern.events[step] };
 
                     // cut note duration if it would reach beyond the pattern limits
                     if (updatedEvents[step][SoundEvent.Duration] &&
@@ -526,6 +529,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const playNote = (note: string, instrumentId: string = ''): void => {
+        // without an instrument, there is nothing to play the note with
+        if (note && !soundData.instruments[instrumentId || soundData.tracks[currentTrackId]?.instrument]) {
+            return;
+        }
         setTestNote(note);
         setTestInstrumentId(instrumentId);
         setPlaying(!!note);
@@ -555,14 +562,14 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentSequenceIndex(newSequenceIndex);
         updateSelectedNotes([]);
         setNoteCursor(newSequenceIndex * SUB_NOTE_RESOLUTION);
-        updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+        updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, id);
     };
 
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
         setCurrentPatternId(patternId);
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
-            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
         }
 
         updateSelectedNotes([]);
@@ -571,7 +578,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
-            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
         }
         if (sequenceIndex < 0) {
             sequenceIndex = 0;
@@ -588,16 +595,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const updateNoteCursor = (step: number): void => {
         setNoteCursor(step);
-
-        // Select note at note cursor step, if there is one
-        const updatedSelectedNotes: number[] = [];
-        const currentPatternStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
-        const patternRelativeStep = step - currentPatternStartStep;
-        const currentPattern = soundData.patterns[currentPatternId];
-        const currentPatternEvents = currentPattern?.events;
-        if (currentPatternEvents[patternRelativeStep] && currentPatternEvents[patternRelativeStep][SoundEvent.Note]) {
-            updatedSelectedNotes.push(patternRelativeStep);
-        }
     };
 
     const selectAllNotesInCurrentPattern = (): void => {
@@ -817,10 +814,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             }
         });
 
-        // cap all note durations
+        // cap all note durations at the next note, other events like volume changes do not end notes
         let prevStep = -1;
         [
-            ...Object.keys(updatedEvents),
+            ...Object.keys(updatedEvents).filter(step => updatedEvents[parseInt(step)][SoundEvent.Note] !== undefined),
             (currentPattern.size * SUB_NOTE_RESOLUTION).toString(), // pattern size is last note's limit
         ].forEach(step => {
             const stepInt = parseInt(step);
@@ -913,15 +910,16 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setInstruments(updatedInstruments);
     };
 
-    const updateCurrentInstrumentId = (instrumentId: string): void => {
+    // the track can be passed along when it changes at the same time, as currentTrackId still holds the previous one then
+    const updateCurrentInstrumentId = (instrumentId: string, trackId: number = currentTrackId): void => {
         setCurrentInstrumentId(instrumentId);
-        updateCurrentEditedInstrumentId(instrumentId);
+        updateCurrentEditedInstrumentId(instrumentId, trackId);
     };
 
-    const updateCurrentEditedInstrumentId = (instrumentId: string): void => {
+    const updateCurrentEditedInstrumentId = (instrumentId: string, trackId: number = currentTrackId): void => {
         const actualInstrumentId = instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
             ? instrumentId
-            : soundData.tracks[currentTrackId].instrument;
+            : soundData.tracks[trackId]?.instrument ?? '';
         setCurrentEditedInstrumentId(actualInstrumentId);
     };
 
@@ -1195,17 +1193,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         // apply user changes
         const tracksToImport: TrackConfig[] = [];
         importSoundData.tracks
+            // keep the tracks' original indexes, which their settings refer to
+            .map((track, trackIndex) => ({ track, settings: importSettings.trackSettings[trackIndex] }))
             // filter out unselected tracks
-            .filter((track, trackIndex) =>
-                importSettings.trackSettings[trackIndex]
-                    ? importSettings.trackSettings[trackIndex].enabled
-                    : true
-            )
+            .filter(({ settings }) => settings ? settings.enabled : true)
             // for others, adjust type
-            .forEach((track, trackIndex) => {
-                const type = importSettings.trackSettings[trackIndex]
-                    ? importSettings.trackSettings[trackIndex].type
-                    : track.type;
+            .forEach(({ track, settings }) => {
+                const type = settings ? settings.type : track.type;
                 // update track
                 tracksToImport.push({ ...track, type });
                 // update patterns
@@ -1436,6 +1430,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         return () => disp.dispose();
     }, [
         currentTrackId,
+        currentPatternId,
+        currentSequenceIndex,
+        currentInstrumentId,
         noteCursor,
         playing,
         setPlaying,

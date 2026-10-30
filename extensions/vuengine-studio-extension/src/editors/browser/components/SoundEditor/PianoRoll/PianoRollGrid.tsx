@@ -250,13 +250,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         // notes
-        [
-            // sort current track to end to draw over eyerything else
-            ...soundData.tracks.filter((t, i) => i !== currentTrackId),
-            soundData.tracks[currentTrackId],
-        ].map((track, trackId) => {
+        // sort current track to end to draw over eyerything else, 
+        // but keep the tracks' indexes for their settings
+        const trackIds = soundData.tracks.map((t, i) => i).filter(i => i !== currentTrackId);
+        if (soundData.tracks[currentTrackId] !== undefined) {
+            trackIds.push(currentTrackId);
+        }
+        trackIds.forEach(trackId => {
+            const track = soundData.tracks[trackId];
             Object.keys(track.sequence).forEach(sequenceIndex => {
-                const isCurrentTrack = currentTrackId !== undefined && trackId === soundData.tracks.length - 1;
+                const isCurrentTrack = trackId === currentTrackId;
                 if (!isCurrentTrack && trackSettings[trackId] !== undefined && !trackSettings[trackId].seeThrough) {
                     return;
                 }
@@ -423,6 +426,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         setMarqueeEndNote(-1);
     };
 
+    // the instrument a new note gets, so its test sound uses it, too
+    const newNoteInstrumentId = currentInstrumentId && currentInstrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
+        ? currentInstrumentId
+        : undefined;
+
     const handleMouseDownNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0 && tool === SoundEditorTool.EDIT) {
             const rect = e.currentTarget.getBoundingClientRect();
@@ -448,7 +456,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         step >= currentSequenceIndex &&
                         step < currentSequenceIndexEndStep
                     ) {
-                        playNote(NOTES_LABELS[noteId]);
+                        playNote(NOTES_LABELS[noteId], newNoteInstrumentId);
                     }
                 }
             }
@@ -472,7 +480,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
             if (noteId !== noteDragNoteId) {
                 setNoteDragNoteId(noteId);
-                playNote(NOTES_LABELS[noteId]);
+                playNote(NOTES_LABELS[noteId], newNoteInstrumentId);
             }
             if (step !== noteDragEndStep) {
                 setNoteDragEndStep(step);
@@ -596,13 +604,12 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const step = Math.floor(x / pianoRollNoteWidth);
 
             const currentPattern = soundData.patterns[currentPatternId];
-            const currentSequenceIndexEndStep = (currentSequenceIndex + currentPattern.size);
 
             // if inside current pattern
             if (
                 currentPattern &&
                 step >= currentSequenceIndex &&
-                step < currentSequenceIndexEndStep
+                step < currentSequenceIndex + currentPattern.size
             ) {
                 setMarqueeStartStep(step);
                 setMarqueeEndStep(step);
@@ -668,7 +675,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     .map(n => parseInt(n))
                     .filter(eventStep =>
                         currentPattern.events[eventStep][SoundEvent.Note] !== undefined &&
-                        NOTES_LABELS.indexOf(currentPattern.events[eventStep][SoundEvent.Note]) > sortedMarqueeStartNote &&
+                        NOTES_LABELS.indexOf(currentPattern.events[eventStep][SoundEvent.Note]) >= sortedMarqueeStartNote &&
                         NOTES_LABELS.indexOf(currentPattern.events[eventStep][SoundEvent.Note]) <= sortedMarqueeEndNote &&
                         ((currentPattern.events[eventStep][SoundEvent.Duration] !== undefined &&
                             eventStep + parseInt(currentPattern.events[eventStep][SoundEvent.Duration]) > patternRelativeMarqueeStartStep) ||
@@ -679,10 +686,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 if (marqueeMode === SoundEditorMarqueeMode.ADD) {
                     setSelectedNotes([...deepClone(selectedNotes), ...newSelectedNotes]);
                 } else if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
-                    setSelectedNotes([...deepClone(selectedNotes), ...newSelectedNotes]
-                        .filter(item => !(selectedNotes.includes(item) && newSelectedNotes.includes(item)))
-                        .sort()
-                    );
+                    setSelectedNotes(selectedNotes.filter(item => !newSelectedNotes.includes(item)));
                 } else if (marqueeMode === SoundEditorMarqueeMode.REPLACE) {
                     setSelectedNotes(newSelectedNotes);
                 }

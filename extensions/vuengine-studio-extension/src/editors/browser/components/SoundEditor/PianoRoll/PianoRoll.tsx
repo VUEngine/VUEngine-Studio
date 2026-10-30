@@ -403,7 +403,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         Object.keys(noteClipboard).forEach(step => {
             const stepInt = parseInt(step);
             const stepRelativeToCursor = stepInt - smallestStep + relativeNoteCursor;
-            if (stepRelativeToCursor < currentPattern.size * SUB_NOTE_RESOLUTION) {
+            if (stepRelativeToCursor >= 0 && stepRelativeToCursor < currentPattern.size * SUB_NOTE_RESOLUTION) {
                 notesToPaste[stepRelativeToCursor] = noteClipboard[stepInt];
             }
         });
@@ -539,6 +539,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 }
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_NEXT_NOTE.id:
+                if (!currentPattern) {
+                    return;
+                }
                 const patternStepOffset1 = currentSequenceIndex * SUB_NOTE_RESOLUTION;
                 const followingEventSteps = Object.keys(currentPattern.events).map(s => parseInt(s)).filter(s => s > noteCursor - patternStepOffset1);
                 if (followingEventSteps.length === 0) {
@@ -548,6 +551,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setNoteCursor(nextStep + patternStepOffset1);
                 break;
             case SoundEditorCommands.PIANO_ROLL_SELECT_PREVIOUS_NOTE.id:
+                if (!currentPattern) {
+                    return;
+                }
                 const patternStepOffset2 = currentSequenceIndex * SUB_NOTE_RESOLUTION;
                 const previousEventSteps = Object.keys(currentPattern.events).map(s => parseInt(s)).filter(s => s < noteCursor - patternStepOffset2);
                 if (previousEventSteps.length === 0) {
@@ -623,6 +629,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         noteClipboard,
         noteCursor,
         selectedNotes,
+        currentTrackId,
+        currentPatternId,
+        currentSequenceIndex,
+        newNoteDuration,
     ]);
 
     useEffect(() => {

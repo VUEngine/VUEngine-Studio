@@ -198,10 +198,12 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const tickDurationUs = soundData.speed[0] * 1000 / SUB_NOTE_RESOLUTION;
     const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
 
+    // the test sound plays independently of the sound's global events
     const getTestSoundData = (): SoundData => ({
         ...soundData,
         loop: testInstrumentId !== '',
         size: 64,
+        events: {},
         instruments: {
             'testInstrument': soundData.instruments[testInstrumentId !== '' ? testInstrumentId : soundData.tracks[currentTrackId].instrument]
         },
@@ -287,9 +289,10 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         currentPlayerPosition={currentPlayerPosition}
                         setCurrentPlayerPosition={setCurrentPlayerPosition}
                         soundData={testNote ? getTestSoundData() : soundData}
-                        playRangeStart={playRangeStart}
-                        playRangeEnd={playRangeEnd}
-                        trackSettings={trackSettings}
+                        // the test sound has a single track and plays from its start, regardless of the sound's settings
+                        playRangeStart={testNote ? -1 : playRangeStart}
+                        playRangeEnd={testNote ? -1 : playRangeEnd}
+                        trackSettings={testNote ? [] : trackSettings}
                         forcePlayerRomRebuild={forcePlayerRomRebuild}
                         playerSeekRequest={playerSeekRequest}
                         setPlaying={setPlaying}

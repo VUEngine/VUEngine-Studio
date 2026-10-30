@@ -344,7 +344,7 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             const event: SoundEventMap = {};
 
             if (tick.Note !== undefined) {
-                event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM)];
+                event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM - 1)];
                 let length = 1;
                 while (pattern.Row[i + length] && pattern.Row[i + length].Note === undefined) {
                     length++;

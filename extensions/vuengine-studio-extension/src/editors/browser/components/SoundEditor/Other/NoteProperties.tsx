@@ -171,7 +171,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                                         events={events}
                                         noteSnapping={noteSnapping}
                                         patternSize={pattern.size}
-                                        patternStepOffset={patternStepOffset}
+                                        patternStepOffset={currentSequenceIndex}
                                         setNotes={setNotes}
                                         setNoteCursor={setNoteCursor}
                                         width={80}

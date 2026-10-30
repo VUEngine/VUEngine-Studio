@@ -456,7 +456,7 @@ const convertPatterns = (patterns: PatternCell[][][], instrumentsLookup: Convert
                 const event: SoundEventMap = {};
 
                 if (channelTick.note !== null) {
-                    event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(channelTick.note + GB_NOTE_OFFSET, 0, NOTES_SPECTRUM)];
+                    event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(channelTick.note + GB_NOTE_OFFSET, 0, NOTES_SPECTRUM - 1)];
 
                     let length = 1;
                     while (pattern[tickIndex + length] && pattern[tickIndex + length][trackIndex].note === null) {

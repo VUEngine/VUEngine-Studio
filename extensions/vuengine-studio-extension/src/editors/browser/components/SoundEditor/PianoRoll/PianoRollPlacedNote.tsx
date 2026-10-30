@@ -419,10 +419,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const onMouseDown = (e: MouseEvent) => {
         if (e.button === 0) {
             if (e.metaKey || e.ctrlKey) {
-                if (selectedNotes.includes(step)) {
-                    setSelectedNotes(selectedNotes.filter(sn => sn !== step));
+                if (selectedNotes.includes(relativeStep)) {
+                    setSelectedNotes(selectedNotes.filter(sn => sn !== relativeStep));
                 } else {
-                    setSelectedNotes([...deepClone(selectedNotes), step]);
+                    setSelectedNotes([...deepClone(selectedNotes), relativeStep]);
                 }
             } else {
                 const stepEvent = pattern.events[relativeStep];
@@ -438,10 +438,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         } else if ((e.button === 2)) {
             if ((e.metaKey || e.ctrlKey || e.altKey)) {
                 setNotes({ [relativeStep]: {} });
-            } else if (selectedNotes.includes(step)) {
-                setSelectedNotes(selectedNotes.filter(sn => sn !== step));
+            } else if (selectedNotes.includes(relativeStep)) {
+                setSelectedNotes(selectedNotes.filter(sn => sn !== relativeStep));
             } else {
-                setSelectedNotes([...deepClone(selectedNotes), step]);
+                setSelectedNotes([...deepClone(selectedNotes), relativeStep]);
             }
         }
 

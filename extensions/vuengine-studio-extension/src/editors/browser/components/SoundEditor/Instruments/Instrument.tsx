@@ -340,8 +340,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 }))
             ];
 
-            // remove references in pattern events
-            const updatedPatterns = { ...soundData.patterns };
+            // remove references in pattern events, on a copy, as the events get changed in place
+            const updatedPatterns = deepClone(soundData.patterns);
             Object.keys(soundData.patterns).forEach(patternId => {
                 Object.keys(soundData.patterns[patternId].events).forEach(eventStep => {
                     if (soundData.patterns[patternId].events[parseInt(eventStep)][SoundEvent.Instrument] === currentEditedInstrumentId) {

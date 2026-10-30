@@ -321,7 +321,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         });
 
         const updatedTracks = deepClone(soundData.tracks);
-        const noteCursorStep = noteCursor / SUB_NOTE_RESOLUTION;
+        const noteCursorStep = Math.floor(noteCursor / SUB_NOTE_RESOLUTION);
         Object.keys(patternClipboard).forEach(identifier => {
             const tId = parseInt(identifier.split('-')[0]);
             const si = parseInt(identifier.split('-')[1]);

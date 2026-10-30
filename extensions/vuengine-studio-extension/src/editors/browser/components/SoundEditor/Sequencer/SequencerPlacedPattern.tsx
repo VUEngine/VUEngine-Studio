@@ -117,76 +117,40 @@ export default function SequencerPlacedPattern(props: SequencerPlacedPatternProp
     const patternName = getPatternName(soundData, patternId);
     const width = pattern.size * sequencerNoteWidth - SEQUENCER_GRID_WIDTH * 2;
 
+    // the selected patterns limit how far the dragged one can move, as they move along
+    const selectedTrackIds = () => selectedPatterns.map(spId => parseInt(spId.split('-')[0]));
+
     const topDragBound = () => {
-        const topBound = SEQUENCER_GRID_METER_HEIGHT;
+        const topMostTrackId = Math.min(trackId, ...selectedTrackIds());
 
-        let topMostTrackDifference = 0;
-        const topMostTrackId = selectedPatterns
-            .map(spId => parseInt(spId.split('-')[0]))
-            .filter(spId => spId < trackId)
-            .sort()[0];
-        if (topMostTrackId !== undefined) {
-            topMostTrackDifference = (trackId - topMostTrackId) * sequencerPatternHeight;
-        }
-
-        return topBound + topMostTrackDifference;
+        return SEQUENCER_GRID_METER_HEIGHT + (trackId - topMostTrackId) * sequencerPatternHeight;
     };
 
     const rightDragBound = () => {
-        const rightBound = soundData.size * sequencerNoteWidth;
-        let rightMostPatternSize = pattern.size;
-
-        let rightMostPatternDifference = 0;
-        const rightMostPattern = selectedPatterns
-            .filter(sp => parseInt(sp.split('-')[1]) > sequenceIndex)
-            .sort().pop();
-        if (rightMostPattern !== undefined) {
-            const rightMostPatternTrackId = parseInt(rightMostPattern.split('-')[0]);
-            const rightMostPatternSequenceIndex = parseInt(rightMostPattern.split('-')[1]);
-            rightMostPatternDifference = (rightMostPatternSequenceIndex - sequenceIndex) * sequencerNoteWidth;
-            if (soundData.tracks[rightMostPatternTrackId]) {
-                const t = soundData.tracks[rightMostPatternTrackId];
-                const pId = t.sequence[rightMostPatternSequenceIndex];
-                const p = soundData.patterns[pId];
-                if (p) {
-                    rightMostPatternSize = p.size;
-                }
+        // the column at which the selected pattern which reaches furthest to the right ends
+        let rightMostEnd = sequenceIndex + pattern.size;
+        selectedPatterns.forEach(identifier => {
+            const tId = parseInt(identifier.split('-')[0]);
+            const si = parseInt(identifier.split('-')[1]);
+            const p = soundData.patterns[soundData.tracks[tId]?.sequence[si]];
+            if (p) {
+                rightMostEnd = Math.max(rightMostEnd, si + p.size);
             }
-        }
+        });
 
-        const rightMostPatternWidth = rightMostPatternSize * sequencerNoteWidth;
-
-        return rightBound - rightMostPatternDifference - rightMostPatternWidth;
+        return (soundData.size - (rightMostEnd - sequenceIndex)) * sequencerNoteWidth;
     };
 
     const bottomDragBound = () => {
-        const bottomBound = SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1) * sequencerPatternHeight;
+        const bottomMostTrackId = Math.max(trackId, ...selectedTrackIds());
 
-        let bottomMostTrackDifference = 0;
-        const bottomMostTrackId = selectedPatterns
-            .map(spId => parseInt(spId.split('-')[0]))
-            .filter(spId => spId > trackId)
-            .sort().pop();
-        if (bottomMostTrackId !== undefined) {
-            bottomMostTrackDifference = (bottomMostTrackId - trackId) * sequencerPatternHeight;
-        }
-
-        return bottomBound - bottomMostTrackDifference;
+        return SEQUENCER_GRID_METER_HEIGHT + (soundData.tracks.length - 1 - (bottomMostTrackId - trackId)) * sequencerPatternHeight;
     };
 
     const leftDragBound = () => {
-        const leftBound = 0;
+        const leftMostSequenceIndex = Math.min(sequenceIndex, ...selectedPatterns.map(spId => parseInt(spId.split('-')[1])));
 
-        let leftMostPatternDifference = 0;
-        const leftMostPatternSi = selectedPatterns
-            .map(spId => parseInt(spId.split('-')[1]))
-            .filter(sp => sp < sequenceIndex)
-            .sort()[0];
-        if (leftMostPatternSi !== undefined) {
-            leftMostPatternDifference = (sequenceIndex - leftMostPatternSi) * sequencerNoteWidth;
-        }
-
-        return leftBound + leftMostPatternDifference;
+        return (sequenceIndex - leftMostSequenceIndex) * sequencerNoteWidth;
     };
 
     const onResize = (event: SyntheticEvent, data: ResizeCallbackData) => {
