@@ -1494,7 +1494,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
       await this.loadRom();
       const romUri = await this.getRomUri();
-      await this.cheats.load(await this.companionRomPath(), this.romId);
+      await this.cheats.load(await this.companionRomPath(), this.romId, this.sourceRom?.byteLength);
       await this.esSound.scan(romUri.toString());
       await this.esSound.setSim(this.sim);
       this.esSound.setMuted(this.state.muted);
