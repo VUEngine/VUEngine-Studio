@@ -179,6 +179,8 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
         const highlightColor = services.colorRegistry.getCurrentColor('focusBorder') ?? 'red';
         const medHighlightColor = chroma(highlightColor).alpha(0.2).toString();
         const strongHighlightColor = chroma(highlightColor).alpha(0.6).toString();
+        const otherPlacementHighlightColor = chroma(highlightColor).alpha(0.2).toString();
+        const faintHighlightColor = chroma(highlightColor).alpha(0.1).toString();
         const patternBackgroundColor = services.colorRegistry.getCurrentColor('secondaryButton.background')!;
         const hiPatternBackgroundColor = chroma(patternBackgroundColor).alpha(0.5).toString();
         const patternForegroundColor = services.colorRegistry.getCurrentColor('secondaryButton.foreground')!;
@@ -359,16 +361,10 @@ export default function SequencerGrid(props: SequencerGridProps): React.JSX.Elem
                         : patternBackgroundColor;
                 context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
 
-                // pattern border
-                if (patternId === currentPatternId) {
-                    context.strokeStyle = highlightColor;
-                    context.beginPath();
-                    context.moveTo(patternXOffset, patternY);
-                    context.lineTo(patternXOffset + patternWidth, patternY);
-                    context.lineTo(patternXOffset + patternWidth, patternY + patternHeight);
-                    context.lineTo(patternXOffset, patternY + patternHeight);
-                    context.lineTo(patternXOffset, patternY);
-                    context.stroke();
+                // other placements of the current pattern get a faint highlight, outlines mark selected patterns
+                if (patternId === currentPatternId && !(trackId === currentTrackId && sequenceIndex === currentSequenceIndex)) {
+                    context.fillStyle = trackMuted ? faintHighlightColor : otherPlacementHighlightColor;
+                    context.fillRect(patternXOffset, patternY, patternWidth, patternHeight);
                 }
 
                 // pattern notes

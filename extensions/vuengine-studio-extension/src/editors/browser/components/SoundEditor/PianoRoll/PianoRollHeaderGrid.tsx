@@ -1,10 +1,11 @@
+import chroma from 'chroma-js';
 import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { drawSongEnd } from '../EffectsPanel/EffectsPanelGridOverview';
 import { getBarsLength, getGridLine, getTimeSignatureSegments } from '../Other/timeSignature';
-import { getFoundPatternSequenceIndex, getPatternNameWithUseCount, getSnappedStep, getToolModeCursor } from '../SoundEditor';
+import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_BARS_PER_PATTERN,
     PIANO_ROLL_GRID_METER_HEIGHT,
@@ -156,6 +157,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         const patternForeground = services.colorRegistry.getCurrentColor('editor.foreground')!;
         const patternBackgroundHighlight = services.colorRegistry.getCurrentColor('focusBorder')!;
         const patternForegroundHighlight = '#fff';
+        const otherPlacementHighlight = chroma(patternBackgroundHighlight).alpha(0.2).toString();
         const track = soundData.tracks[currentTrackId];
         Object.keys(track.sequence).forEach(key => {
             const step = parseInt(key);
@@ -181,8 +183,18 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 patternWidth,
                 PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
             );
+            // other placements of the current pattern get a faint highlight
+            if (patternId === currentPatternId && !isSelected) {
+                context.fillStyle = otherPlacementHighlight;
+                context.fillRect(
+                    patternxOffset,
+                    PIANO_ROLL_GRID_METER_HEIGHT,
+                    patternWidth,
+                    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
+                );
+            }
             context.fillStyle = isSelected ? patternForegroundHighlight : patternForeground;
-            context.fillText(getPatternNameWithUseCount(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
+            context.fillText(getPatternName(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
         });
 
         // bottom line

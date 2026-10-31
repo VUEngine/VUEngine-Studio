@@ -211,15 +211,6 @@ export const getPatternName = (soundData: SoundData, patternId: string): string 
         ? soundData.patterns[patternId].name
         : `(${patternId.slice(0, 4)})`;
 
-export const getPatternNameWithUseCount = (soundData: SoundData, patternId: string): string => {
-    const useCount = soundData.tracks.reduce((count, track) =>
-        count + Object.values(track.sequence).filter(pId => pId === patternId).length, 0);
-
-    return useCount > 1
-        ? `${getPatternName(soundData, patternId)} ×${useCount}`
-        : getPatternName(soundData, patternId);
-};
-
 export const getPatternLabel = (soundData: SoundData, patternId: string): ReactElement => {
     const pattern = soundData.patterns[patternId];
     const name = getPatternName(soundData, patternId);
