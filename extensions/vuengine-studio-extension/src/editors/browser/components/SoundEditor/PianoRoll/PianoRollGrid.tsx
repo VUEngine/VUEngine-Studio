@@ -1,10 +1,10 @@
-import { deepClone } from '@theia/core';
 import chroma from 'chroma-js';
 import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
-import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { clamp, scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { drawSongEnd } from '../EffectsPanel/EffectsPanelGridOverview';
+import { getMaxNoteDuration, getNoteMoveChanges } from '../Other/Note';
 import { getGridLine, getTimeSignatureSegments } from '../Other/timeSignature';
 import { getNoteSlideLabel, getToolModeCursor } from '../SoundEditor';
 import {
@@ -76,6 +76,29 @@ interface PianoRollGridProps {
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
+// how far the mouse has to move before grabbing a note moves or resizes it, so that clicks do not
+const NOTE_DRAG_THRESHOLD = 3;
+
+type NoteDragMode = 'move' | 'duration' | 'slide';
+
+const NOTE_DRAG_CURSORS: Record<NoteDragMode, string> = {
+    move: 'move',
+    duration: 'ew-resize',
+    slide: 'ns-resize',
+};
+
+interface NoteHit {
+    step: number
+    mode: NoteDragMode
+}
+
+interface NoteDrag extends NoteHit {
+    steps: number[]
+    startX: number
+    startY: number
+    changes?: EventsMap
+    stepOffset?: number
+}
 
 export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Element {
     const {
@@ -112,14 +135,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const [noteDragInitialX, setNoteDragInitialX] = useState<number>(-1);
+    const [noteDrag, setNoteDrag] = useState<NoteDrag>();
+    const [hoveredNoteDragMode, setHoveredNoteDragMode] = useState<NoteDragMode>();
     // the click which places pasted notes must not select anything when the mouse button gets released
     const ignoreNextMouseUpRef = useRef<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
-    const classNames = [];
-    if (marqueeStartStep !== -1) {
-        classNames.push('hasMarquee');
-    }
 
     const height = NOTES_SPECTRUM * pianoRollNoteHeight;
     // always as wide as the view, even if the sound is shorter
@@ -133,6 +153,24 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
         return noteLabel;
     };
+
+    // while resizing or sliding, the notes of the current pattern get drawn as they would become
+    const noteDragOverrides = noteDrag?.mode !== 'move' ? noteDrag?.changes : undefined;
+    const getDrawnEvents = (events: EventsMap): EventsMap => noteDragOverrides
+        ? {
+            ...events,
+            ...Object.fromEntries(Object.keys(noteDragOverrides).map(step => [step, {
+                ...events[parseInt(step)],
+                ...noteDragOverrides[parseInt(step)],
+            }])),
+        }
+        : events;
+
+    // while moving, the notes get previewed at their new positions, like pasted ones
+    const noteDragPreview = noteDrag?.mode === 'move' && noteDrag.changes
+        ? Object.fromEntries(Object.entries(noteDrag.changes).filter(([step, events]) => events[SoundEvent.Note] !== undefined))
+        : undefined;
+    const ghostNotes = previewNotes ?? noteDragPreview;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -279,6 +317,9 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 if (!pattern) {
                     return;
                 }
+                const events = isCurrentTrack && patternId === currentPatternId
+                    ? getDrawnEvents(pattern.events)
+                    : pattern.events;
 
                 const patternOffsetPx = patternSi * pianoRollNoteWidth;
                 const patternWidthPx = pattern.size * pianoRollNoteWidth;
@@ -287,11 +328,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                     return;
                 }
 
-                Object.keys(pattern.events).forEach(stepStr => {
+                Object.keys(events).forEach(stepStr => {
                     const step = parseInt(stepStr);
-                    const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
+                    const noteLabel = events[step][SoundEvent.Note] ?? '';
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
-                        const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
+                        const noteDurationPx = (events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
                         const noteId = NOTES_LABELS.indexOf(noteLabel);
                         const offset = (patternSi + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
@@ -306,7 +347,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         }
 
                         const noteXOffset = noteX - pianoRollScrollWindow.x;
-                        const instrumentId = pattern.events[step][SoundEvent.Instrument] ?? track.instrument;
+                        const instrumentId = events[step][SoundEvent.Instrument] ?? track.instrument;
                         const instrument = soundData.instruments[instrumentId];
                         const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
 
@@ -322,7 +363,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         );
 
                         // note slide triangle
-                        const noteSlide = pattern.events[step][SoundEvent.NoteSlide];
+                        const noteSlide = events[step][SoundEvent.NoteSlide];
                         if (noteSlide) {
                             const path = new Path2D();
                             const noteSlideStartY = noteSlide > 0 ? noteY : noteY + noteHeight;
@@ -340,16 +381,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                         ) {
                             context.fillStyle = chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black';
                             context.font = '10px monospace';
-                            context.fillText(getNoteLabel(pattern.events, step), noteXOffset + 2, noteY + 11, noteWidth - 4);
+                            context.fillText(getNoteLabel(events, step), noteXOffset + 2, noteY + 11, noteWidth - 4);
                         }
                     }
                 });
 
-                Object.keys(pattern.events).forEach(stepStr => {
+                Object.keys(events).forEach(stepStr => {
                     const step = parseInt(stepStr);
-                    const noteLabel = pattern.events[step][SoundEvent.Note] ?? '';
+                    const noteLabel = events[step][SoundEvent.Note] ?? '';
                     if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
-                        const noteDurationPx = (pattern.events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
+                        const noteDurationPx = (events[step][SoundEvent.Duration] ?? 1) * pianoRollNoteWidth;
                         const offset = (patternSi + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - 0.5;
                         const offsetWidth = noteDurationPx / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
 
@@ -384,11 +425,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         });
 
         // notes being pasted or dragged, at the positions they would get
-        if (previewNotes && currentPattern) {
+        if (ghostNotes && currentPattern) {
             const track = soundData.tracks[currentTrackId];
-            Object.keys(previewNotes).forEach(stepStr => {
+            Object.keys(ghostNotes).forEach(stepStr => {
                 const step = parseInt(stepStr);
-                const events = previewNotes[step];
+                const events = ghostNotes[step];
                 const noteId = NOTES_LABELS.indexOf(events[SoundEvent.Note]);
                 const noteX = (currentSequenceIndex + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - pianoRollScrollWindow.x;
                 const noteWidth = Math.max(1, (events[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION) * pianoRollNoteWidth / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH);
@@ -449,8 +490,8 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             const noteSlide = stepEvents[SoundEvent.NoteSlide] ?? 0;
             const distance = noteSlide > 0 ? stepEventNoteId - noteId : noteId - stepEventNoteId;
             if (slideResult === -1 && noteSlide !== 0 && distance >= 1 && distance <= Math.abs(noteSlide)) {
-                // how far the triangle reaches by the end of the clicked 1/16 note
-                const progress = Math.min(1, (step + SUB_NOTE_RESOLUTION - sInt) / stepEventNoteDuration);
+                // how far the triangle reaches at the clicked position
+                const progress = Math.min(1, (step - sInt) / stepEventNoteDuration);
                 if (distance - 1 < progress * Math.abs(noteSlide)) {
                     slideResult = sInt;
                 }
@@ -458,6 +499,213 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
 
         return slideResult;
+    };
+
+    const getMousePosition = (e: MouseEvent<HTMLCanvasElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left + pianoRollScrollWindow.x,
+            y: e.clientY - rect.top,
+        };
+    };
+
+    // the exact, possibly fractional, step relative to the current pattern at the given x position
+    const getPatternStep = (x: number): number =>
+        x * SUB_NOTE_RESOLUTION / pianoRollNoteWidth - currentSequenceIndex * SUB_NOTE_RESOLUTION;
+
+    // notes get resized at their right edge, slid at their top and bottom edges or by their slide triangle,
+    // and moved anywhere else
+    const getNoteHit = (x: number, y: number): NoteHit | undefined => {
+        const currentPattern = soundData.patterns[currentPatternId];
+        const step = findNoteStep(getPatternStep(x), Math.floor(y / pianoRollNoteHeight));
+        if (!currentPattern || step === -1) {
+            return;
+        }
+
+        const events = currentPattern.events[step];
+        const noteY = NOTES_LABELS.indexOf(events[SoundEvent.Note]) * pianoRollNoteHeight;
+        if (y < noteY || y >= noteY + pianoRollNoteHeight) {
+            return { step, mode: 'slide' };
+        }
+
+        const noteWidth = events[SoundEvent.Duration] * pianoRollNoteWidth / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH;
+        const noteRight = (currentSequenceIndex + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth + noteWidth;
+        if (noteWidth >= 8 && x >= noteRight - Math.min(6, noteWidth / 4)) {
+            return { step, mode: 'duration' };
+        }
+
+        const slideEdge = Math.min(3, Math.floor(pianoRollNoteHeight / 5));
+        if (pianoRollNoteHeight >= 10 && (y < noteY + slideEdge || y >= noteY + pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH - slideEdge)) {
+            return { step, mode: 'slide' };
+        }
+
+        return { step, mode: 'move' };
+    };
+
+    // with the marquee tool, only selected notes can be grabbed, as clicking elsewhere starts a marquee
+    const isGrabbable = (hit: NoteHit): boolean =>
+        tool === SoundEditorTool.EDIT ||
+        tool === SoundEditorTool.MARQUEE && marqueeMode === SoundEditorMarqueeMode.REPLACE && selectedNotes.includes(hit.step);
+
+    const getNoteDragChanges = (drag: NoteDrag, x: number, y: number): { changes: EventsMap, stepOffset: number } => {
+        const currentPattern = soundData.patterns[currentPatternId];
+        const events = currentPattern.events;
+        const steps = drag.steps.filter(step => events[step]?.[SoundEvent.Note] !== undefined);
+        const deltaSteps = (x - drag.startX) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth;
+        const deltaNotes = Math.round((y - drag.startY) / pianoRollNoteHeight);
+        const changes: EventsMap = {};
+
+        switch (drag.mode) {
+            case 'move': {
+                // with snapping, the grabbed note lands on the start of a 1/16 note
+                const stepOffset = clamp(
+                    noteSnapping
+                        ? Math.round((drag.step + deltaSteps) / SUB_NOTE_RESOLUTION) * SUB_NOTE_RESOLUTION - drag.step
+                        : Math.round(deltaSteps),
+                    Math.min(0, -Math.min(...steps)),
+                    Math.max(0, currentPattern.size * SUB_NOTE_RESOLUTION - Math.max(...steps.map(step => step + (events[step][SoundEvent.Duration] ?? 0))))
+                );
+                const noteIds = steps.map(step => NOTES_LABELS.indexOf(events[step][SoundEvent.Note]));
+                const noteOffset = clamp(deltaNotes, -Math.min(...noteIds), NOTES_SPECTRUM - 1 - Math.max(...noteIds));
+
+                return {
+                    changes: stepOffset !== 0 || noteOffset !== 0
+                        ? getNoteMoveChanges(events, steps, currentPattern.size, stepOffset, noteOffset)
+                        : {},
+                    stepOffset,
+                };
+            }
+            case 'duration': {
+                // all notes get longer or shorter by the same amount, in multiples of the new note duration with snapping
+                const unit = noteSnapping ? newNoteDuration * SUB_NOTE_RESOLUTION : 1;
+                const durationDelta = Math.round(deltaSteps / unit) * unit;
+                if (durationDelta === 0) {
+                    break;
+                }
+                steps.forEach(step => {
+                    const duration = events[step][SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION;
+                    const newDuration = clamp(
+                        duration + durationDelta,
+                        noteSnapping ? SUB_NOTE_RESOLUTION : 1,
+                        // notes which already overlap the next one do not get shortened by making them longer
+                        Math.max(duration, getMaxNoteDuration(events, step, currentPattern.size))
+                    );
+                    if (newDuration !== duration) {
+                        changes[step] = { [SoundEvent.Duration]: newDuration };
+                    }
+                });
+                break;
+            }
+            case 'slide': {
+                // all notes get the slide of the grabbed one, as far as their target notes exist
+                const slide = (events[drag.step][SoundEvent.NoteSlide] ?? 0) - deltaNotes;
+                steps.forEach(step => {
+                    const noteId = NOTES_LABELS.indexOf(events[step][SoundEvent.Note]);
+                    const newSlide = clamp(slide, noteId - NOTES_SPECTRUM + 1, noteId);
+                    if (newSlide !== (events[step][SoundEvent.NoteSlide] ?? 0)) {
+                        changes[step] = { [SoundEvent.NoteSlide]: newSlide !== 0 ? newSlide : undefined };
+                    }
+                });
+                break;
+            }
+        }
+
+        return { changes, stepOffset: 0 };
+    };
+
+    // clicking a note in the current pattern selects it and grabs it, together with all other selected notes
+    const handleMouseDownNote = (e: MouseEvent<HTMLCanvasElement>): boolean => {
+        if (tool !== SoundEditorTool.EDIT && tool !== SoundEditorTool.MARQUEE) {
+            return false;
+        }
+        const { x, y } = getMousePosition(e);
+        const hit = getNoteHit(x, y);
+        if (!hit || !isGrabbable(hit)) {
+            return false;
+        }
+
+        if (e.button === 2) {
+            // with modifiers, right clicking deletes the note on mouse up instead
+            if (tool !== SoundEditorTool.EDIT || e.metaKey || e.ctrlKey || e.altKey) {
+                return false;
+            }
+            setSelectedNotes(selectedNotes.includes(hit.step)
+                ? selectedNotes.filter(sn => sn !== hit.step)
+                : [...selectedNotes, hit.step]);
+            return true;
+        }
+        if (e.button !== 0) {
+            return false;
+        }
+
+        let steps = selectedNotes;
+        if (tool === SoundEditorTool.EDIT) {
+            if (e.metaKey || e.ctrlKey) {
+                if (selectedNotes.includes(hit.step)) {
+                    setSelectedNotes(selectedNotes.filter(sn => sn !== hit.step));
+                    return true;
+                }
+                steps = [...selectedNotes, hit.step];
+            } else {
+                const instrumentId = soundData.patterns[currentPatternId].events[hit.step][SoundEvent.Instrument];
+                setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
+                if (!selectedNotes.includes(hit.step)) {
+                    steps = [hit.step];
+                }
+                setNoteCursor(hit.step + currentSequenceIndex * SUB_NOTE_RESOLUTION);
+            }
+            if (steps !== selectedNotes) {
+                setSelectedNotes(steps);
+            }
+        }
+
+        setNoteDrag({ ...hit, steps, startX: x, startY: y });
+        return true;
+    };
+
+    const handleMouseMoveNote = (e: MouseEvent<HTMLCanvasElement>) => {
+        const { x, y } = getMousePosition(e);
+        if (noteDrag) {
+            if (!noteDrag.changes && Math.abs(x - noteDrag.startX) < NOTE_DRAG_THRESHOLD && Math.abs(y - noteDrag.startY) < NOTE_DRAG_THRESHOLD) {
+                return;
+            }
+            const { changes, stepOffset } = getNoteDragChanges(noteDrag, x, y);
+            if (!noteDrag.changes || JSON.stringify(changes) !== JSON.stringify(noteDrag.changes)) {
+                setNoteDrag({ ...noteDrag, changes, stepOffset });
+            }
+            return;
+        }
+
+        let mode: NoteDragMode | undefined;
+        if (noteDragStartStep === -1 && marqueeStartStep === -1) {
+            const hit = getNoteHit(x, y);
+            if (hit && isGrabbable(hit)) {
+                mode = hit.mode;
+            }
+        }
+        if (mode !== hoveredNoteDragMode) {
+            setHoveredNoteDragMode(mode);
+        }
+    };
+
+    const handleMouseUpNote = (): boolean => {
+        if (!noteDrag) {
+            return false;
+        }
+
+        const changes = noteDrag.changes;
+        setNoteDrag(undefined);
+        if (changes && Object.keys(changes).length) {
+            setNotes(changes);
+            if (noteDrag.mode === 'move') {
+                setSelectedNotes(Object.keys(changes)
+                    .map(n => parseInt(n))
+                    .filter(n => changes[n][SoundEvent.Note] !== undefined));
+                setNoteCursor(noteDrag.step + (noteDrag.stepOffset ?? 0) + currentSequenceIndex * SUB_NOTE_RESOLUTION);
+            }
+        }
+
+        return true;
     };
 
     const resetNoteDrag = () => {
@@ -484,15 +732,12 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
 
     const handleMouseDownNoteDrag = (e: MouseEvent<HTMLCanvasElement>) => {
         if (e.button === 0 && tool === SoundEditorTool.EDIT) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const y = e.clientY - rect.top;
+            const { x, y } = getMousePosition(e);
 
             const noteId = Math.floor(y / pianoRollNoteHeight);
             const step = Math.floor(x / pianoRollNoteWidth);
 
-            const relativeStep = (step - currentSequenceIndex) * SUB_NOTE_RESOLUTION;
-            const foundStep = findNoteStep(relativeStep, noteId);
+            const foundStep = findNoteStep(getPatternStep(x), noteId);
             if (foundStep === -1) {
                 setNoteDragNoteId(noteId);
                 setNoteDragStartStep(step);
@@ -581,43 +826,15 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
     };
 
-    const handleMouseUpNoteSelect = (e: MouseEvent<HTMLCanvasElement>) => {
+    const handleMouseUpNoteErase = (e: MouseEvent<HTMLCanvasElement>) => {
         if (tool === SoundEditorTool.EDIT || tool === SoundEditorTool.ERASER) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const y = e.clientY - rect.top;
-
-            const noteId = Math.floor(y / pianoRollNoteHeight);
-            const step = Math.floor(x / pianoRollNoteWidth);
-
-            const relativeStep = (step - currentSequenceIndex) * SUB_NOTE_RESOLUTION;
-            const foundStep = findNoteStep(relativeStep, noteId);
-            if (foundStep > -1) {
-                if (tool === SoundEditorTool.EDIT && e.button === 0) {
-                    if (e.metaKey || e.ctrlKey) {
-                        if (selectedNotes.includes(foundStep)) {
-                            setSelectedNotes(selectedNotes.filter(sn => sn !== foundStep));
-                        } else {
-                            setSelectedNotes([...deepClone(selectedNotes), foundStep]);
-                        }
-                    } else {
-                        const currentPattern = soundData.patterns[currentPatternId];
-                        const stepEvent = currentPattern.events[foundStep];
-                        if (stepEvent) {
-                            const instrumentId = stepEvent[SoundEvent.Instrument];
-                            setCurrentInstrumentId(instrumentId ?? TRACK_DEFAULT_INSTRUMENT_ID);
-                        }
-                        if (!selectedNotes.includes(foundStep)) {
-                            setSelectedNotes([foundStep]);
-                        }
-                        setNoteCursor(foundStep + (currentSequenceIndex * SUB_NOTE_RESOLUTION));
-                    }
-                } else if (
-                    tool === SoundEditorTool.ERASER && e.button === 0 ||
-                    (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2
-                ) {
-                    setNotes({ [foundStep]: {} });
-                }
+            const { x, y } = getMousePosition(e);
+            const foundStep = findNoteStep(getPatternStep(x), Math.floor(y / pianoRollNoteHeight));
+            if (foundStep > -1 && (
+                tool === SoundEditorTool.ERASER && e.button === 0 ||
+                (e.metaKey || e.ctrlKey || e.altKey) && e.button === 2
+            )) {
+                setNotes({ [foundStep]: {} });
             }
         }
     };
@@ -768,8 +985,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
         handleMouseDownDragScrolling(e);
         if (isWithinSong(e)) {
-            handleMouseDownNoteDrag(e);
-            handleMouseDownMarquee(e);
+            if (!handleMouseDownNote(e)) {
+                handleMouseDownNoteDrag(e);
+                handleMouseDownMarquee(e);
+            }
         } else if (e.button === 0 && tool !== SoundEditorTool.DRAG) {
             // clicking after the end of the sound offers to change its length
             openSongLengthDialog();
@@ -781,8 +1000,11 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             ignoreNextMouseUpRef.current = false;
             return;
         }
+        if (handleMouseUpNote()) {
+            return;
+        }
         handleMouseUpNoteDrag(e);
-        handleMouseUpNoteSelect(e);
+        handleMouseUpNoteErase(e);
         handleMouseUpDragScrolling(e);
         handleMouseUpMarquee(e);
     };
@@ -794,6 +1016,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         }
         handleMouseMoveDragScrolling(e);
         if (isWithinSong(e)) {
+            handleMouseMoveNote(e);
             handleMouseMoveNoteDrag(e);
             handleMouseMoveMarquee(e);
         }
@@ -804,18 +1027,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         if (tool !== SoundEditorTool.EDIT) {
             return;
         }
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-        const y = e.clientY - rect.top;
-        const noteId = Math.floor(y / pianoRollNoteHeight);
-        const step = Math.floor(x / pianoRollNoteWidth);
-        if (findNoteStep((step - currentSequenceIndex) * SUB_NOTE_RESOLUTION, noteId) > -1) {
+        const { x, y } = getMousePosition(e);
+        if (findNoteStep(getPatternStep(x), Math.floor(y / pianoRollNoteHeight)) > -1) {
             editCurrentNote();
         }
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
         setIsDragScrolling(false);
+        setNoteDrag(undefined);
+        setHoveredNoteDragMode(undefined);
         resetNoteDrag();
         resetMarquee();
     };
@@ -836,13 +1057,15 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         selectedNotes,
         trackSettings,
         previewNotes,
+        noteDrag,
     ]);
 
     const onKeyDown = (e: KeyboardEvent): void => {
         if (!e.repeat && e.code === 'Escape' &&
-            (noteDragStartStep !== -1 || marqueeStartStep !== -1)) {
+            (noteDragStartStep !== -1 || marqueeStartStep !== -1 || noteDrag)) {
             resetMarquee();
             resetNoteDrag();
+            setNoteDrag(undefined);
         }
     };
 
@@ -852,13 +1075,19 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     }, [
         noteDragStartStep,
         marqueeStartStep,
+        noteDrag,
     ]);
+
+    const noteDragMode = noteDrag?.mode ?? hoveredNoteDragMode;
 
     return (
         <canvas
-            className={classNames.join(' ')}
             style={{
-                cursor: pasting ? 'copy' : getToolModeCursor(tool, isDragScrolling, marqueeMode),
+                cursor: pasting
+                    ? 'copy'
+                    : noteDragMode && !isDragScrolling
+                        ? NOTE_DRAG_CURSORS[noteDragMode]
+                        : getToolModeCursor(tool, isDragScrolling, marqueeMode),
             }}
             height={height}
             width={width}

@@ -358,13 +358,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [newNoteDuration, setNewNoteDuration] = useState<number>(1);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
-    // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting
+    // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting,
+    // and makes the edit tool select like the marquee tool
     const [heldMarqueeMode, setHeldMarqueeMode] = useState<SoundEditorMarqueeMode | undefined>();
     // whether the effects panel was clicked last, so selection and clipboard commands work on effects rather than notes and patterns
     const [effectsFocused, setEffectsFocused] = useState<boolean>(false);
-    const effectiveMarqueeMode = tool === SoundEditorTool.MARQUEE && heldMarqueeMode !== undefined
+    const effectiveMarqueeMode = (tool === SoundEditorTool.MARQUEE || tool === SoundEditorTool.EDIT) && heldMarqueeMode !== undefined
         ? heldMarqueeMode
         : marqueeMode;
+    const effectiveTool = tool === SoundEditorTool.EDIT && heldMarqueeMode !== undefined
+        ? SoundEditorTool.MARQUEE
+        : tool;
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
     const [currentTrackId, setCurrentTrackId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.tracks[0]
@@ -1455,20 +1459,46 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     }, []);
 
     useEffect(() => {
-        const updateHeldMarqueeMode = (e: KeyboardEvent) => setHeldMarqueeMode(e.shiftKey
+        const getHeldMarqueeMode = (e: KeyboardEvent | MouseEvent) => e.shiftKey
             ? SoundEditorMarqueeMode.ADD
             : (isOSX ? e.altKey : e.ctrlKey)
                 ? SoundEditorMarqueeMode.SUBTRACT
-                : undefined
-        );
+                : undefined;
+        // the mode stays as it was while a mouse button is held, so that pressing or releasing a key does not switch
+        // tools in the middle of a marquee or drag. The grids handle mouse up before these listeners on the window.
+        let mouseButtonHeld = false;
+        const updateHeldMarqueeMode = (e: KeyboardEvent) => {
+            if (!mouseButtonHeld) {
+                setHeldMarqueeMode(getHeldMarqueeMode(e));
+            }
+        };
+        const onMouseDown = () => {
+            mouseButtonHeld = true;
+        };
+        const onMouseUp = (e: MouseEvent) => {
+            if (mouseButtonHeld && e.buttons === 0) {
+                mouseButtonHeld = false;
+                setHeldMarqueeMode(getHeldMarqueeMode(e));
+            }
+        };
         // keys released while the window is not focused would not be noticed otherwise
-        const resetHeldMarqueeMode = () => setHeldMarqueeMode(undefined);
+        const resetHeldMarqueeMode = () => {
+            mouseButtonHeld = false;
+            setHeldMarqueeMode(undefined);
+        };
         window.addEventListener('keydown', updateHeldMarqueeMode);
         window.addEventListener('keyup', updateHeldMarqueeMode);
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mouseup', onMouseUp);
+        // a mouse button released outside of the window
+        window.addEventListener('mousemove', onMouseUp);
         window.addEventListener('blur', resetHeldMarqueeMode);
         return () => {
             window.removeEventListener('keydown', updateHeldMarqueeMode);
             window.removeEventListener('keyup', updateHeldMarqueeMode);
+            window.removeEventListener('mousedown', onMouseDown);
+            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('mousemove', onMouseUp);
             window.removeEventListener('blur', resetHeldMarqueeMode);
         };
     }, []);
@@ -1558,7 +1588,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     <Sequencer
                                         soundData={soundData}
                                         effectsFocused={effectsFocused}
-                                        tool={tool}
+                                        tool={effectiveTool}
                                         marqueeMode={effectiveMarqueeMode}
                                         updateSoundData={updateSoundData}
                                         currentPlayerPosition={currentPlayerPosition}
@@ -1633,7 +1663,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         soundData={soundData}
                                         effectsFocused={effectsFocused}
                                         setEffectsFocused={setEffectsFocused}
-                                        tool={tool}
+                                        tool={effectiveTool}
                                         marqueeMode={effectiveMarqueeMode}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}

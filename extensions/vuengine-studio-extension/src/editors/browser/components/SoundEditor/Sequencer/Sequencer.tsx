@@ -24,7 +24,6 @@ import {
     TrackSettings
 } from '../SoundEditorTypes';
 import SequencerGrid from './SequencerGrid';
-import SequencerPlacedPattern from './SequencerPlacedPattern';
 import StepIndicator, { StepIndicatorPosition } from './StepIndicator';
 import TrackHeader from './TrackHeader';
 
@@ -180,7 +179,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     const [patternDragStartStep, setPatternDragStartStep] = useState<number>(-1);
     const [patternDragEndStep, setPatternDragEndStep] = useState<number>(-1);
     const [sequencerScrollWindow, setSequencerScrollWindow] = useState<ScrollWindow>({ x: 0, y: 0, w: 0, h: 0 });
-    const [cancelPatternDrag, setCancelPatternDrag] = useState<boolean>(false);
     const [patternClipboard, setPatternClipboard] = useState<PatternClipboard>({});
     const sequencerContainerRef = useRef<HTMLDivElement>(null);
     const sequencerGridContainerRef = useRef<HTMLDivElement>(null);
@@ -262,11 +260,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setPatternDragTrackId(-1);
         setPatternDragStartStep(-1);
         setPatternDragEndStep(-1);
-        setCancelPatternDrag(true);
-    };
-
-    const onMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
-        setCancelPatternDrag(false);
     };
 
     const removeSelectedPatterns = () => {
@@ -494,7 +487,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         }}
         ref={sequencerContainerRef}
         onWheel={onWheel}
-        onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
     >
         <ScaleControls className="vertical">
@@ -608,12 +600,15 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
             />
             <SequencerGrid
                 soundData={soundData}
+                updateSoundData={updateSoundData}
                 tool={tool}
                 marqueeMode={marqueeMode}
                 currentTrackId={currentTrackId}
                 currentPatternId={currentPatternId}
                 currentSequenceIndex={currentSequenceIndex}
                 setCurrentSequenceIndex={setCurrentSequenceIndex}
+                setCurrentPatternId={setCurrentPatternId}
+                setPatternSizes={setPatternSizes}
                 selectedPatterns={selectedPatterns}
                 setSelectedPatterns={setSelectedPatterns}
                 addPattern={addPattern}
@@ -648,32 +643,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 setNoteCursor={setNoteCursor}
                 openSongLengthDialog={openSongLengthDialog}
             />
-            {tool === SoundEditorTool.EDIT && soundData.patterns[currentPatternId] &&
-                <SequencerPlacedPattern
-                    soundData={soundData}
-                    updateSoundData={updateSoundData}
-                    tool={tool}
-                    sequenceIndex={currentSequenceIndex}
-                    trackId={currentTrackId}
-                    pattern={soundData.patterns[currentPatternId]}
-                    patternId={currentPatternId}
-                    selectedPatterns={selectedPatterns}
-                    setSelectedPatterns={setSelectedPatterns}
-                    currentTrackId={currentTrackId}
-                    currentPatternId={currentPatternId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    setCurrentSequenceIndex={setCurrentSequenceIndex}
-                    setCurrentPatternId={setCurrentPatternId}
-                    editCurrentPattern={editCurrentPattern}
-                    noteSnapping={noteSnapping}
-                    cancelPatternDrag={cancelPatternDrag}
-                    setCancelPatternDrag={setCancelPatternDrag}
-                    sequencerPatternHeight={sequencerPatternHeight}
-                    sequencerNoteWidth={sequencerNoteWidth}
-                    setPatternSizes={setPatternSizes}
-                    removePatternsFromSequence={removePatternsFromSequence}
-                />
-            }
         </StyledSequencerGridContainer>
     </StyledSequencerContainer>;
 }
