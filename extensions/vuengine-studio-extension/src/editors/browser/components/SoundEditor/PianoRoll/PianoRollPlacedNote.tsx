@@ -4,7 +4,7 @@ import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useMemo, us
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components';
-import { getMaxNoteDuration } from '../Other/Note';
+import { getMaxNoteDuration, getNoteMoveChanges } from '../Other/Note';
 import { getNoteSlideLabel } from '../SoundEditor';
 import {
     EventsMap,
@@ -37,6 +37,10 @@ const StyledPianoRollPlacedNote = styled.div`
     &.resizing,
     &.react-draggable-dragging:not(.cancelNoteDrag) {
         opacity: 1;
+    }
+
+    &.pasting {
+        pointer-events: none;
     }
 
     /*
@@ -105,12 +109,18 @@ interface PianoRollPlacedNoteProps {
     setSelectedNotes: (sn: number[]) => void
     cancelNoteDrag: boolean
     setCancelNoteDrag: Dispatch<SetStateAction<boolean>>
-    isSelected: boolean
-    noteDragDelta: { x: number, y: number }
-    setNoteDragDelta: Dispatch<SetStateAction<{ x: number, y: number }>>
+    setNoteDragOffset: Dispatch<SetStateAction<NoteDragOffset>>
     newNoteDuration: number
     editCurrentNote: () => void
+    pasting: boolean
 }
+
+export interface NoteDragOffset {
+    steps: number
+    notes: number
+}
+
+export const NO_NOTE_DRAG_OFFSET: NoteDragOffset = { steps: 0, notes: 0 };
 
 export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): React.JSX.Element {
     const {
@@ -128,10 +138,10 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         setCurrentInstrumentId,
         selectedNotes, setSelectedNotes,
         cancelNoteDrag, setCancelNoteDrag,
-        isSelected,
-        noteDragDelta, setNoteDragDelta,
+        setNoteDragOffset,
         newNoteDuration,
         editCurrentNote,
+        pasting,
     } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -150,6 +160,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     }
     if (cancelNoteDrag) {
         classNames.push('cancelNoteDrag');
+    }
+    if (pasting) {
+        classNames.push('pasting');
     }
 
     const left = step * pianoRollNoteWidth / SUB_NOTE_RESOLUTION;
@@ -251,6 +264,9 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const gridWidth = noteSnapping
         ? pianoRollNoteWidth * newNoteDuration
         : 1;
+    const moveGridWidth = noteSnapping
+        ? pianoRollNoteWidth
+        : 1;
     const maxWidth = pianoRollNoteWidth * getMaxNoteDuration(pattern.events, relativeStep, pattern.size) / SUB_NOTE_RESOLUTION;
 
     const getNoteSlide = () => {
@@ -334,17 +350,31 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
         setNoteSlide(-1 * data.size.height);
     };
 
+    const getDragOffset = (x: number, y: number): NoteDragOffset => {
+        const newStep = (noteSnapping
+            ? Math.round((x - PIANO_ROLL_KEY_WIDTH - 2) / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
+            : Math.round((x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth)
+        ) - currentSequenceIndexStartStep;
+        const newNoteId = Math.floor((y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
+
+        return {
+            steps: newStep - relativeStep,
+            notes: newNoteId - noteId,
+        };
+    };
+
     const onDrag = (e: DraggableEvent, data: DraggableData) => {
         // align to the grid only once the note actually moves, so it does not jump when being clicked
+        let offsetFromGrid = xOffsetFromGrid;
         if (!hasMovedRef.current && noteSnapping) {
-            setXOffsetFromGrid(-1 * left % gridWidth);
+            offsetFromGrid = -1 * left % moveGridWidth;
+            setXOffsetFromGrid(offsetFromGrid);
         }
         hasMovedRef.current = true;
 
-        setNoteDragDelta(prev => ({
-            x: prev.x + data.deltaX,
-            y: prev.y + data.deltaY
-        }));
+        // the other selected notes get previewed at their new positions by the grid
+        const offset = getDragOffset(data.x + offsetFromGrid, data.y);
+        setNoteDragOffset(prev => prev.steps === offset.steps && prev.notes === offset.notes ? prev : offset);
 
         e.stopPropagation();
     };
@@ -358,10 +388,11 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const onDragStop = (e: DraggableEvent, data: DraggableData) => {
         e.stopPropagation();
 
+        const offset = getDragOffset(data.x + xOffsetFromGrid, data.y);
         if (noteSnapping) {
             setXOffsetFromGrid(0);
         }
-        setNoteDragDelta({ x: 0, y: 0 });
+        setNoteDragOffset(NO_NOTE_DRAG_OFFSET);
         setIsDragging(false);
 
         if (cancelNoteDrag) {
@@ -369,51 +400,18 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
             return;
         }
 
-        if (!hasMovedRef.current) {
+        if (!hasMovedRef.current || (offset.steps === 0 && offset.notes === 0)) {
             return;
         }
 
-        const newStep = (noteSnapping
-            ? Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2 + xOffsetFromGrid) / pianoRollNoteWidth)) * SUB_NOTE_RESOLUTION
-            : Math.ceil(((data.x - PIANO_ROLL_KEY_WIDTH - 2) * SUB_NOTE_RESOLUTION / pianoRollNoteWidth))
-        ) - currentSequenceIndexStartStep;
-        const newNoteId = Math.floor((data.y - PIANO_ROLL_GRID_METER_HEIGHT - PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT) / pianoRollNoteHeight);
-
-        const newStepDifference = newStep - relativeStep;
-        const newNoteDifference = newNoteId - noteId;
-
-        if (newStepDifference === 0 && newNoteDifference === 0) {
-            return;
-        }
-
-        const notes: EventsMap = {};
-
-        // add previous notes to delete
-        notes[relativeStep] = {};
-        selectedNotes.forEach(sn => {
-            if (sn !== relativeStep && pattern.events[sn] !== undefined && pattern.events[sn][SoundEvent.Note] !== undefined) {
-                notes[sn] = {};
-            }
-        });
-
-        // add notes to set
-        notes[newStep] = {
-            ...pattern.events[relativeStep],
-            [SoundEvent.Note]: NOTES_LABELS[newNoteId],
-        };
-        selectedNotes.forEach(sn => {
-            if (sn !== relativeStep && pattern.events[sn] !== undefined && pattern.events[sn][SoundEvent.Note] !== undefined) {
-                const snNoteId = NOTES_LABELS.indexOf(pattern.events[sn][SoundEvent.Note]);
-                notes[sn + newStepDifference] = {
-                    ...pattern.events[sn],
-                    [SoundEvent.Note]: NOTES_LABELS[snNoteId + newNoteDifference],
-                };
-            }
-        });
-
+        // only the notes move, effects on their steps stay where they are
+        const movedSteps = [...new Set([relativeStep, ...selectedNotes])];
+        const notes = getNoteMoveChanges(pattern.events, movedSteps, pattern.size, offset.steps, offset.notes);
         setNotes(notes);
-        setSelectedNotes(Object.keys(notes).map(n => parseInt(n)));
-        setNoteCursor(newStep + currentSequenceIndexStartStep);
+        setSelectedNotes(Object.keys(notes)
+            .map(n => parseInt(n))
+            .filter(n => notes[n][SoundEvent.Note] !== undefined));
+        setNoteCursor(relativeStep + offset.steps + currentSequenceIndexStartStep);
     };
 
     const onMouseDown = (e: MouseEvent) => {
@@ -457,7 +455,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     const onKeyDown = (e: KeyboardEvent): void => {
         if (isDragging && !e.repeat && e.code === 'Escape') {
             setCancelNoteDrag(true);
-            setNoteDragDelta({ x: 0, y: 0 });
+            setNoteDragOffset(NO_NOTE_DRAG_OFFSET);
             setIsDragging(false);
         }
     };
@@ -470,7 +468,7 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
     return (
         <Draggable
             nodeRef={nodeRef}
-            grid={[gridWidth, pianoRollNoteHeight]}
+            grid={[moveGridWidth, pianoRollNoteHeight]}
             handle=".placedNote"
             cancel=".react-resizable-handle"
             positionOffset={{ x: xOffsetFromGrid, y: 0 }}
@@ -497,9 +495,6 @@ export default function PianoRollPlacedNote(props: PianoRollPlacedNoteProps): Re
                     color: chroma.contrast(instrumentColor, 'white') > 2 ? 'white' : 'black',
                     height: pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH,
                     outlineColor: instrumentColor,
-                    translate: !isDragging && isSelected
-                        ? `${noteDragDelta.x}px ${noteDragDelta.y}px`
-                        : undefined
                 }}
                 title={label()}
                 onDoubleClick={onDoubleClick}

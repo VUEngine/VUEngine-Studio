@@ -1,5 +1,5 @@
 import { deepClone } from '@theia/core';
-import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, MouseEvent, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
@@ -35,7 +35,8 @@ import {
 } from '../SoundEditorTypes';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
-import PianoRollPlacedNote from './PianoRollPlacedNote';
+import PianoRollPlacedNote, { NO_NOTE_DRAG_OFFSET, NoteDragOffset } from './PianoRollPlacedNote';
+import { getCopiedNotes, getMovedNotes, getPastedNotes } from '../Other/Note';
 
 const StyledPianoRollContainer = styled.div`
     align-self: start;
@@ -248,9 +249,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
     } = props;
-    const [noteDragDelta, setNoteDragDelta] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [noteDragOffset, setNoteDragOffset] = useState<NoteDragOffset>(NO_NOTE_DRAG_OFFSET);
     const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
     const [cancelNoteDrag, setCancelNoteDrag] = useState<boolean>(false);
+    const [pastePosition, setPastePosition] = useState<{ step: number, noteId: number } | undefined>();
     const pianoRollRef = useRef<HTMLDivElement>(null);
 
     const currentTrack = soundData.tracks[currentTrackId];
@@ -377,14 +379,15 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setSelectedNotes([]);
     };
 
+    // only the notes get copied, not the effects on their steps
     const copySelectedNotes = (): void => {
-        const noteEvents: EventsMap = {};
-        selectedNotes.forEach(sn => {
-            if (currentPattern.events[sn] !== undefined) {
-                noteEvents[sn] = { ...currentPattern.events[sn] };
-            }
-        });
-        setNoteClipboard({ ...noteEvents });
+        if (currentPattern === undefined) {
+            return;
+        }
+        const copiedNotes = getCopiedNotes(currentPattern.events, selectedNotes);
+        if (Object.keys(copiedNotes).length) {
+            setNoteClipboard(copiedNotes);
+        }
     };
 
     const cutSelectedNotes = (): void => {
@@ -392,27 +395,67 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         removeSelectedNotes();
     };
 
+    // starts pasting at the note cursor, with the copied notes at their original pitch, until the mouse moves them
     const pasteNotes = (): void => {
-        const notesToPaste: EventsMap = {};
-        if (currentPattern === undefined) {
+        if (currentPattern === undefined || noteClipboard[0] === undefined) {
             return;
         }
 
-        const patternStepOffset = currentSequenceIndex * SUB_NOTE_RESOLUTION;
-        const relativeNoteCursor = noteCursor - patternStepOffset;
-        const smallestStep = Math.min(...Object.keys(noteClipboard).map(n => parseInt(n)));
-        Object.keys(noteClipboard).forEach(step => {
-            const stepInt = parseInt(step);
-            const stepRelativeToCursor = stepInt - smallestStep + relativeNoteCursor;
-            if (stepRelativeToCursor >= 0 && stepRelativeToCursor < currentPattern.size * SUB_NOTE_RESOLUTION) {
-                notesToPaste[stepRelativeToCursor] = noteClipboard[stepInt];
-            }
+        setPastePosition({
+            step: Math.max(0, noteCursor - currentSequenceIndex * SUB_NOTE_RESOLUTION),
+            noteId: NOTES_LABELS.indexOf(noteClipboard[0][SoundEvent.Note]),
         });
+    };
 
-        if (Object.keys(notesToPaste).length) {
-            setNotes(notesToPaste);
+    const commitPaste = (): void => {
+        if (currentPattern === undefined || pastePosition === undefined) {
+            return;
+        }
+
+        const pastedNotes = getPastedNotes(noteClipboard, currentPattern.size, pastePosition.step, pastePosition.noteId);
+        const pastedSteps = Object.keys(pastedNotes).map(s => parseInt(s));
+        setPastePosition(undefined);
+        if (pastedSteps.length) {
+            setNotes(pastedNotes);
+            setSelectedNotes(pastedSteps);
+            setNoteCursor(Math.min(...pastedSteps) + currentSequenceIndex * SUB_NOTE_RESOLUTION);
         }
     };
+
+    const cancelPaste = (): void => {
+        setPastePosition(undefined);
+    };
+
+    // notes being pasted or dragged, at the positions they would get
+    const previewNotes = useMemo((): EventsMap | undefined => {
+        if (currentPattern === undefined) {
+            return undefined;
+        }
+        if (pastePosition !== undefined) {
+            return getPastedNotes(noteClipboard, currentPattern.size, pastePosition.step, pastePosition.noteId);
+        }
+        if (!cancelNoteDrag && (noteDragOffset.steps !== 0 || noteDragOffset.notes !== 0)) {
+            const noteCursorStep = noteCursor - currentSequenceIndex * SUB_NOTE_RESOLUTION;
+            return getMovedNotes(
+                currentPattern.events,
+                [...new Set([noteCursorStep, ...selectedNotes])],
+                currentPattern.size,
+                noteDragOffset.steps,
+                noteDragOffset.notes
+            );
+        }
+
+        return undefined;
+    }, [
+        currentPattern,
+        pastePosition,
+        noteClipboard,
+        cancelNoteDrag,
+        noteDragOffset,
+        noteCursor,
+        currentSequenceIndex,
+        selectedNotes,
+    ]);
 
     // I am just here to prevent scrolling while resizing with the below event
     const onWheelNative = (e: WheelEvent): void => {
@@ -470,12 +513,14 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLDivElement>) => {
-        if (!cancelNoteDrag && (noteDragDelta.x !== 0 || noteDragDelta.y !== 0)) {
+        if (!cancelNoteDrag && (noteDragOffset.steps !== 0 || noteDragOffset.notes !== 0)) {
             setCancelNoteDrag(true);
-            setNoteDragDelta({ x: 0, y: 0 });
+            setNoteDragOffset(NO_NOTE_DRAG_OFFSET);
         }
     };
 
+    // the note at the note cursor and all selected ones can be grabbed, to move all selected notes together. With the marquee
+    // tool, only selected notes can, as clicking elsewhere starts a marquee.
     const placedNotesCurrentPattern = () => {
         const patternId = currentTrack?.sequence[currentSequenceIndex];
         const p = soundData.patterns[patternId];
@@ -484,25 +529,28 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         }
 
         const currentSequenceIndexStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
-        const relativeStep = noteCursor - currentSequenceIndexStartStep;
-        const stepEvents = p.events[relativeStep];
-        if (!stepEvents) {
-            return;
-        }
-        const noteLabel = stepEvents[SoundEvent.Note];
-        const noteDuration = stepEvents[SoundEvent.Duration];
-        if (noteLabel !== undefined && noteLabel !== null && noteLabel !== '') {
+        const steps = tool === SoundEditorTool.MARQUEE
+            ? selectedNotes
+            : [...new Set([noteCursor - currentSequenceIndexStartStep, ...selectedNotes])];
+
+        return steps.map(relativeStep => {
+            const stepEvents = p.events[relativeStep];
+            const noteLabel = stepEvents?.[SoundEvent.Note];
+            if (noteLabel === undefined || noteLabel === null || noteLabel === '') {
+                return;
+            }
             const instrumentId = stepEvents[SoundEvent.Instrument] ?? currentTrack.instrument;
             const instrument = soundData.instruments[instrumentId];
             const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+
             return (
                 <PianoRollPlacedNote
                     key={relativeStep}
                     tool={tool}
                     instrumentColor={instrumentColor}
                     noteLabel={noteLabel}
-                    step={noteCursor}
-                    duration={noteDuration}
+                    step={relativeStep + currentSequenceIndexStartStep}
+                    duration={stepEvents[SoundEvent.Duration]}
                     currentSequenceIndex={currentSequenceIndex}
                     setNoteCursor={setNoteCursor}
                     setNotes={setNotes}
@@ -515,14 +563,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                     setSelectedNotes={setSelectedNotes}
                     cancelNoteDrag={cancelNoteDrag}
                     setCancelNoteDrag={setCancelNoteDrag}
-                    isSelected={selectedNotes.includes(relativeStep)}
-                    noteDragDelta={noteDragDelta}
-                    setNoteDragDelta={setNoteDragDelta}
+                    setNoteDragOffset={setNoteDragOffset}
                     newNoteDuration={newNoteDuration}
                     editCurrentNote={editCurrentNote}
+                    pasting={pastePosition !== undefined}
                 />
             );
-        }
+        });
     };
 
     const commandListener = (commandId: string): void => {
@@ -635,6 +682,30 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentPatternId,
         currentSequenceIndex,
         newNoteDuration,
+    ]);
+
+    // pasting ends with escape, or when another pattern gets edited
+    useEffect(() => {
+        if (pastePosition === undefined) {
+            return;
+        }
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Escape') {
+                cancelPaste();
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [
+        pastePosition !== undefined,
+    ]);
+
+    useEffect(() => {
+        cancelPaste();
+    }, [
+        currentTrackId,
+        currentPatternId,
+        currentSequenceIndex,
     ]);
 
     useEffect(() => {
@@ -769,7 +840,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 sequencerPatternHeight={sequencerPatternHeight}
                 sequencerNoteWidth={sequencerNoteWidth}
             />
-            {tool === SoundEditorTool.EDIT &&
+            {(tool === SoundEditorTool.EDIT ||
+                tool === SoundEditorTool.MARQUEE && marqueeMode === SoundEditorMarqueeMode.REPLACE) &&
                 placedNotesCurrentPattern()
             }
             <StyledToggleButtonContainer>
@@ -848,6 +920,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 trackSettings={trackSettings}
                 editCurrentNote={editCurrentNote}
                 openSongLengthDialog={openSongLengthDialog}
+                noteSnapping={noteSnapping}
+                previewNotes={previewNotes}
+                pasting={pastePosition !== undefined}
+                setPastePosition={setPastePosition}
+                commitPaste={commitPaste}
+                cancelPaste={cancelPaste}
             />
             <EffectsPanel
                 soundData={soundData}

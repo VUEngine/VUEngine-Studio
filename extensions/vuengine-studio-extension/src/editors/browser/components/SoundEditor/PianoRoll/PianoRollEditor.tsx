@@ -73,6 +73,12 @@ interface PianoRollEditorProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
+    noteSnapping: boolean
+    previewNotes: EventsMap | undefined
+    pasting: boolean
+    setPastePosition: (position: { step: number, noteId: number }) => void
+    commitPaste: () => void
+    cancelPaste: () => void
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -97,6 +103,8 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         trackSettings,
         editCurrentNote,
         openSongLengthDialog,
+        noteSnapping,
+        previewNotes, pasting, setPastePosition, commitPaste, cancelPaste,
     } = props;
     const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
     const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
@@ -162,6 +170,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     testNote={testNote}
                     editCurrentNote={editCurrentNote}
                     openSongLengthDialog={openSongLengthDialog}
+                    noteSnapping={noteSnapping}
+                    previewNotes={previewNotes}
+                    pasting={pasting}
+                    setPastePosition={setPastePosition}
+                    commitPaste={commitPaste}
+                    cancelPaste={cancelPaste}
                 />
                 {noteDragNoteId > -1 &&
                     <CurrentlyPlacingNote

@@ -67,6 +67,12 @@ interface PianoRollGridProps {
     testNote: string
     editCurrentNote: () => void
     openSongLengthDialog: () => void
+    noteSnapping: boolean
+    previewNotes: EventsMap | undefined
+    pasting: boolean
+    setPastePosition: (position: { step: number, noteId: number }) => void
+    commitPaste: () => void
+    cancelPaste: () => void
 }
 
 const SELECTED_PATTERN_OUTLINE_WIDTH = 3;
@@ -100,10 +106,14 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         playing, testNote,
         editCurrentNote,
         openSongLengthDialog,
+        noteSnapping,
+        previewNotes, pasting, setPastePosition, commitPaste, cancelPaste,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const [noteDragInitialX, setNoteDragInitialX] = useState<number>(-1);
+    // the click which places pasted notes must not select anything when the mouse button gets released
+    const ignoreNextMouseUpRef = useRef<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const classNames = [];
@@ -373,7 +383,46 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             });
         });
 
+        // notes being pasted or dragged, at the positions they would get
+        if (previewNotes && currentPattern) {
+            const track = soundData.tracks[currentTrackId];
+            Object.keys(previewNotes).forEach(stepStr => {
+                const step = parseInt(stepStr);
+                const events = previewNotes[step];
+                const noteId = NOTES_LABELS.indexOf(events[SoundEvent.Note]);
+                const noteX = (currentSequenceIndex + step / SUB_NOTE_RESOLUTION) * pianoRollNoteWidth - pianoRollScrollWindow.x;
+                const noteWidth = Math.max(1, (events[SoundEvent.Duration] ?? SUB_NOTE_RESOLUTION) * pianoRollNoteWidth / SUB_NOTE_RESOLUTION - PIANO_ROLL_GRID_WIDTH);
+                const noteY = noteId * pianoRollNoteHeight;
+                const instrument = soundData.instruments[events[SoundEvent.Instrument] ?? track?.instrument];
+                const instrumentColor = COLOR_PALETTE[instrument?.color ?? DEFAULT_COLOR_INDEX];
+
+                context.fillStyle = chroma(instrumentColor).alpha(0.6).toString();
+                context.fillRect(noteX, noteY, noteWidth, pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH);
+                context.strokeStyle = highlightFullColor;
+                context.lineWidth = 1;
+                context.setLineDash([3, 2]);
+                context.strokeRect(noteX + 0.5, noteY + 0.5, noteWidth - 1, pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH - 1);
+                context.setLineDash([]);
+            });
+        }
+
         drawSongEnd(context, currentThemeType, soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.x, width, height);
+    };
+
+    // while pasting, the first copied note follows the mouse, snapped to whole 1/16 notes with snapping
+    const updatePastePosition = (e: MouseEvent<HTMLCanvasElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left + pianoRollScrollWindow.x;
+        const y = e.clientY - rect.top;
+        const step = (noteSnapping
+            ? Math.floor(x / pianoRollNoteWidth) * SUB_NOTE_RESOLUTION
+            : Math.floor(x * SUB_NOTE_RESOLUTION / pianoRollNoteWidth)
+        ) - currentSequenceIndex * SUB_NOTE_RESOLUTION;
+        const patternSize = (soundData.patterns[currentPatternId]?.size ?? 0) * SUB_NOTE_RESOLUTION;
+        setPastePosition({
+            step: Math.min(Math.max(0, step), patternSize - 1),
+            noteId: Math.floor(y / pianoRollNoteHeight),
+        });
     };
 
     const findNoteStep = (step: number, noteId: number): number => {
@@ -705,6 +754,16 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         e.clientX - e.currentTarget.getBoundingClientRect().left + pianoRollScrollWindow.x < soundData.size * pianoRollNoteWidth;
 
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (pasting) {
+            ignoreNextMouseUpRef.current = true;
+            if (e.button === 0) {
+                updatePastePosition(e);
+                commitPaste();
+            } else {
+                cancelPaste();
+            }
+            return;
+        }
         handleMouseDownDragScrolling(e);
         if (isWithinSong(e)) {
             handleMouseDownNoteDrag(e);
@@ -716,6 +775,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (ignoreNextMouseUpRef.current) {
+            ignoreNextMouseUpRef.current = false;
+            return;
+        }
         handleMouseUpNoteDrag(e);
         handleMouseUpNoteSelect(e);
         handleMouseUpDragScrolling(e);
@@ -723,6 +786,10 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (pasting) {
+            updatePastePosition(e);
+            return;
+        }
         handleMouseMoveDragScrolling(e);
         if (isWithinSong(e)) {
             handleMouseMoveNoteDrag(e);
@@ -766,6 +833,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         pianoRollScrollWindow.w,
         selectedNotes,
         trackSettings,
+        previewNotes,
     ]);
 
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -788,7 +856,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         <canvas
             className={classNames.join(' ')}
             style={{
-                cursor: getToolModeCursor(tool, isDragScrolling, marqueeMode),
+                cursor: pasting ? 'copy' : getToolModeCursor(tool, isDragScrolling, marqueeMode),
             }}
             height={height}
             width={width}
@@ -797,6 +865,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
             onDoubleClick={onDoubleClick}
+            onContextMenu={e => pasting && e.preventDefault()}
             ref={canvasRef}
         />
     );

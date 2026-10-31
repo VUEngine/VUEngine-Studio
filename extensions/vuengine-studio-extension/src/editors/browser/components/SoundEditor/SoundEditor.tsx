@@ -53,7 +53,6 @@ import {
     EVENT_LIST_WIDTH_MIN,
     EventsMap,
     InstrumentMap,
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -356,7 +355,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
-    const [newNoteDuration, setNewNoteDuration] = useState<number>(NOTE_RESOLUTION / parseInt(soundData.timeSignature[0].split('/')[1] ?? 4));
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(1);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
     // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting
