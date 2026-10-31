@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, RefObject, useContext, useEffect, useRef, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../../Common/PaletteColorSelect';
 import { clamp, scaleCanvasAccountForDpi } from '../../Common/Utils';
@@ -43,20 +43,6 @@ interface PianoRollGridProps {
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     setPatternAtCursorPosition: (cursor?: number, size?: number) => void
-    noteDragNoteId: number
-    setNoteDragNoteId: Dispatch<SetStateAction<number>>
-    noteDragStartStep: number
-    setNoteDragStartStep: Dispatch<SetStateAction<number>>
-    noteDragEndStep: number
-    setNoteDragEndStep: Dispatch<SetStateAction<number>>
-    marqueeStartStep: number
-    setMarqueeStartStep: Dispatch<SetStateAction<number>>
-    marqueeEndStep: number
-    setMarqueeEndStep: Dispatch<SetStateAction<number>>
-    marqueeStartNote: number
-    setMarqueeStartNote: Dispatch<SetStateAction<number>>
-    marqueeEndNote: number
-    setMarqueeEndNote: Dispatch<SetStateAction<number>>
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
@@ -114,13 +100,6 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         newNoteDuration,
         pianoRollNoteHeight, pianoRollNoteWidth,
         setPatternAtCursorPosition,
-        noteDragNoteId, setNoteDragNoteId,
-        noteDragStartStep, setNoteDragStartStep,
-        noteDragEndStep, setNoteDragEndStep,
-        marqueeStartStep, setMarqueeStartStep,
-        marqueeEndStep, setMarqueeEndStep,
-        marqueeStartNote, setMarqueeStartNote,
-        marqueeEndNote, setMarqueeEndNote,
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
@@ -134,6 +113,13 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
+    const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
+    const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
+    const [noteDragEndStep, setNoteDragEndStep] = useState<number>(-1);
+    const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
+    const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
+    const [marqueeStartNote, setMarqueeStartNote] = useState<number>(-1);
+    const [marqueeEndNote, setMarqueeEndNote] = useState<number>(-1);
     const [noteDragInitialX, setNoteDragInitialX] = useState<number>(-1);
     const [noteDrag, setNoteDrag] = useState<NoteDrag>();
     const [hoveredNoteDragMode, setHoveredNoteDragMode] = useState<NoteDragMode>();
@@ -445,6 +431,36 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 context.strokeRect(noteX + 0.5, noteY + 0.5, noteWidth - 1, pianoRollNoteHeight - PIANO_ROLL_GRID_WIDTH - 1);
                 context.setLineDash([]);
             });
+        }
+
+        // note being placed
+        if (noteDragNoteId > -1 && noteDragStartStep > -1 && noteDragEndStep > -1) {
+            context.strokeStyle = highlightFullColor;
+            context.lineWidth = 1;
+            context.setLineDash([3, 2]);
+            context.strokeRect(
+                Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x + 0.5,
+                noteDragNoteId * pianoRollNoteHeight + 0.5,
+                (Math.abs(noteDragStartStep - noteDragEndStep) + 1) * pianoRollNoteWidth - 1,
+                pianoRollNoteHeight - 1,
+            );
+            context.setLineDash([]);
+        }
+
+        // select marquee
+        if (marqueeStartStep > -1 && marqueeEndStep > -1 && marqueeStartNote > -1 && marqueeEndNote > -1) {
+            const marqueeLeft = Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x;
+            const marqueeTop = Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight;
+            const marqueeWidth = (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth;
+            const marqueeHeight = (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight;
+
+            context.fillStyle = highlightLowColor;
+            context.fillRect(marqueeLeft, marqueeTop, marqueeWidth, marqueeHeight);
+            context.strokeStyle = highlightFullColor;
+            context.lineWidth = 1;
+            context.setLineDash([3, 2]);
+            context.strokeRect(marqueeLeft - 0.5, marqueeTop - 0.5, marqueeWidth, marqueeHeight);
+            context.setLineDash([]);
         }
 
         drawSongEnd(context, currentThemeType, soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.x, width, height);
@@ -1058,6 +1074,13 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         trackSettings,
         previewNotes,
         noteDrag,
+        noteDragNoteId,
+        noteDragStartStep,
+        noteDragEndStep,
+        marqueeStartStep,
+        marqueeEndStep,
+        marqueeStartNote,
+        marqueeEndNote,
     ]);
 
     const onKeyDown = (e: KeyboardEvent): void => {

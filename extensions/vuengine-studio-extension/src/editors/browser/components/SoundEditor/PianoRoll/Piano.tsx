@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { NOTES_LABELS } from '../SoundEditorTypes';
+import { NOTE_PLAY_STOP_DELAY, NOTES_LABELS } from '../SoundEditorTypes';
 import PianoRollKey from './PianoRollKey';
 
 const StyledPiano = styled.div`
@@ -26,6 +26,18 @@ interface PianoProps {
 
 export default function Piano(props: PianoProps): React.JSX.Element {
     const { playNote, pianoRollNoteHeight } = props;
+    const playNoteRef = useRef(playNote);
+    playNoteRef.current = playNote;
+
+    // a key's note stops wherever the mouse button gets released, not only on the key
+    const stopNote = useRef(() => setTimeout(() => playNoteRef.current(''), NOTE_PLAY_STOP_DELAY)).current;
+    const playKeyNote = (note: string) => {
+        playNote(note);
+        // the same listener is only added once, however many keys get played while the button is held
+        document.addEventListener('mouseup', stopNote, { once: true });
+    };
+
+    useEffect(() => () => document.removeEventListener('mouseup', stopNote), []);
 
     return <StyledPiano>
         {NOTES_LABELS.map((note, index) =>
@@ -33,7 +45,7 @@ export default function Piano(props: PianoProps): React.JSX.Element {
                 key={index}
                 noteId={index}
                 note={note}
-                playNote={playNote}
+                playNote={playKeyNote}
                 pianoRollNoteHeight={pianoRollNoteHeight}
             />
         )}

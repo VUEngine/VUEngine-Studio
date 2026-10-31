@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject } from 'react';
 import styled from 'styled-components';
 import {
     EventsMap,
@@ -24,27 +24,6 @@ const StyledPianoRollGridContainer = styled.div`
     left: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     position: sticky;
     z-index: 10;
-
-    canvas {
-        position: relative;
-        z-index: 10;
-    }
-`;
-
-const CurrentlyPlacingNote = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 9;
-`;
-
-const Marquee = styled.div`
-    background: var(--theia-selection-background);
-    border: 1px dashed var(--theia-focusBorder);
-    border: 1px dashed var(--theia-focusBorder);
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 9;
 `;
 
 interface PianoRollEditorProps {
@@ -106,14 +85,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         noteSnapping,
         previewNotes, pasting, setPastePosition, commitPaste, cancelPaste,
     } = props;
-    const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
-    const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
-    const [noteDragEndStep, setNoteDragEndStep] = useState<number>(-1);
-    const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
-    const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
-    const [marqueeStartNote, setMarqueeStartNote] = useState<number>(-1);
-    const [marqueeEndNote, setMarqueeEndNote] = useState<number>(-1);
-
     return (
         <StyledPianoRollEditor
             style={{
@@ -146,20 +117,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     pianoRollNoteHeight={pianoRollNoteHeight}
                     pianoRollNoteWidth={pianoRollNoteWidth}
                     setPatternAtCursorPosition={setPatternAtCursorPosition}
-                    noteDragNoteId={noteDragNoteId}
-                    setNoteDragNoteId={setNoteDragNoteId}
-                    noteDragStartStep={noteDragStartStep}
-                    setNoteDragStartStep={setNoteDragStartStep}
-                    noteDragEndStep={noteDragEndStep}
-                    setNoteDragEndStep={setNoteDragEndStep}
-                    marqueeStartStep={marqueeStartStep}
-                    setMarqueeStartStep={setMarqueeStartStep}
-                    marqueeEndStep={marqueeEndStep}
-                    setMarqueeEndStep={setMarqueeEndStep}
-                    marqueeStartNote={marqueeStartNote}
-                    setMarqueeStartNote={setMarqueeStartNote}
-                    marqueeEndNote={marqueeEndNote}
-                    setMarqueeEndNote={setMarqueeEndNote}
                     pianoRollScrollWindow={pianoRollScrollWindow}
                     pianoRollRef={pianoRollRef}
                     trackSettings={trackSettings}
@@ -177,26 +134,6 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     commitPaste={commitPaste}
                     cancelPaste={cancelPaste}
                 />
-                {noteDragNoteId > -1 &&
-                    <CurrentlyPlacingNote
-                        style={{
-                            height: pianoRollNoteHeight,
-                            left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                            top: noteDragNoteId * pianoRollNoteHeight,
-                            width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
-                        }}
-                    />
-                }
-                {marqueeStartStep > -1 &&
-                    <Marquee
-                        style={{
-                            height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
-                            left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                            top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
-                            width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
-                        }}
-                    />
-                }
             </StyledPianoRollGridContainer>
         </StyledPianoRollEditor>
     );

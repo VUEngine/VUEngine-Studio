@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
-import { NOTE_PLAY_STOP_DELAY, NOTES_SPECTRUM, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
+import { NOTES_SPECTRUM, PIANO_ROLL_KEY_WIDTH } from '../SoundEditorTypes';
 
 export const StyledPianoKey = styled.div`
     align-items: center;
@@ -91,15 +91,10 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
         }
     };
 
-    const onMouseUp = (e: MouseEvent<HTMLDivElement>) => {
-        setTimeout(() => playNote(''), NOTE_PLAY_STOP_DELAY);
-    };
-
     return <StyledPianoKey
         className={classNames.join(' ')}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-        onMouseUp={onMouseUp}
         style={{
             minHeight: pianoRollNoteHeight,
             maxHeight: pianoRollNoteHeight,

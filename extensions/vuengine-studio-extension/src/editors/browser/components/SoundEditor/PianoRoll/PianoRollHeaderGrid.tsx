@@ -193,6 +193,25 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.lineTo(width, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.stroke();
 
+        // play range being placed
+        if (rangeDragStartStep > -1 && rangeDragEndStep > -1) {
+            const rangeDrawLeft = Math.min(rangeDragStartStep, rangeDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x + 0.5;
+            const rangeDrawWidth = pianoRollNoteWidth * (rangeDragStartStep === rangeDragEndStep
+                ? getBarsLength(timeSignatureSegments, rangeDragStartStep, DEFAULT_BARS_PER_PATTERN)
+                : Math.abs(rangeDragStartStep - rangeDragEndStep) + 1) - 1;
+            const rangeDrawHeight = PIANO_ROLL_GRID_METER_HEIGHT / 2;
+
+            context.strokeStyle = services.colorRegistry.getCurrentColor('focusBorder')!;
+            context.setLineDash([3, 2]);
+            context.beginPath();
+            context.moveTo(rangeDrawLeft, rangeDrawHeight);
+            context.lineTo(rangeDrawLeft, 0.5);
+            context.lineTo(rangeDrawLeft + rangeDrawWidth, 0.5);
+            context.lineTo(rangeDrawLeft + rangeDrawWidth, rangeDrawHeight);
+            context.stroke();
+            context.setLineDash([]);
+        }
+
         drawSongEnd(context, currentThemeType, soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.x, width, height);
     };
 
@@ -361,6 +380,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         currentSequenceIndex,
         playRangeStart,
         playRangeEnd,
+        rangeDragStartStep,
+        rangeDragEndStep,
         soundData,
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,

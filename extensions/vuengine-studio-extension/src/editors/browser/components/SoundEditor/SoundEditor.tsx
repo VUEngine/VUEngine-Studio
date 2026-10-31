@@ -1609,7 +1609,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         editCurrentTrack={editCurrentTrack}
                                         editCurrentPattern={editCurrentPattern}
                                         noteSnapping={noteSnapping}
-                                        effectsPanelHidden={effectsPanelHidden}
                                         pianoRollNoteHeight={pianoRollNoteHeight}
                                         pianoRollNoteWidth={pianoRollNoteWidth}
                                         sequencerPatternHeight={sequencerPatternHeight}

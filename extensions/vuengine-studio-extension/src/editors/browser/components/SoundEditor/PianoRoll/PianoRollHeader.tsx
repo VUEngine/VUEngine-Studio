@@ -2,14 +2,11 @@ import React, { Dispatch, RefObject, SetStateAction } from 'react';
 import styled from 'styled-components';
 import StepIndicator, { StepIndicatorPosition } from '../Sequencer/StepIndicator';
 import {
-    DEFAULT_BARS_PER_PATTERN,
-    PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SoundData,
     SoundEditorTool
 } from '../SoundEditorTypes';
-import { getBarsLength, getTimeSignatureSegments } from '../Other/timeSignature';
 import PianoRollHeaderGrid from './PianoRollHeaderGrid';
 
 export const MetaLine = styled.div`
@@ -50,15 +47,6 @@ export const MetaLineHeader = styled.div`
     }
 `;
 
-const CurrentlyPlacingRange = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    border-bottom-width: 0;
-    box-sizing: border-box;
-    height: ${PIANO_ROLL_GRID_METER_HEIGHT / 2}px;
-    position: absolute;
-    top: 0;
-`;
-
 interface PianoRollHeaderProps {
     soundData: SoundData
     tool: SoundEditorTool
@@ -82,7 +70,6 @@ interface PianoRollHeaderProps {
     setRangeDragStartStep: Dispatch<SetStateAction<number>>
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
-    effectsPanelHidden: boolean
     sequencerNoteWidth: number
     sequencerPatternHeight: number
     noteSnapping: boolean
@@ -104,7 +91,6 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         editCurrentPattern,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
-        effectsPanelHidden,
         sequencerNoteWidth, sequencerPatternHeight,
         noteSnapping,
     } = props;
@@ -117,22 +103,11 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             top: 0,
         }}
     >
-        {rangeDragStartStep > -1 &&
-            <CurrentlyPlacingRange
-                style={{
-                    left: PIANO_ROLL_KEY_WIDTH + 2 + Math.min(rangeDragStartStep, rangeDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                    width: pianoRollNoteWidth * (rangeDragStartStep === rangeDragEndStep
-                        ? getBarsLength(getTimeSignatureSegments(soundData), rangeDragStartStep, DEFAULT_BARS_PER_PATTERN)
-                        : (Math.abs(rangeDragStartStep - rangeDragEndStep) + 1)),
-                }}
-            />
-        }
         <StepIndicator
             soundData={soundData}
             currentPlayerPosition={currentPlayerPosition}
             position={StepIndicatorPosition.PIANO_ROLL_HEADER}
             hidden={currentPlayerPosition === -1}
-            effectsPanelHidden={effectsPanelHidden}
             pianoRollNoteHeight={pianoRollNoteHeight}
             pianoRollNoteWidth={pianoRollNoteWidth}
             sequencerPatternHeight={sequencerPatternHeight}

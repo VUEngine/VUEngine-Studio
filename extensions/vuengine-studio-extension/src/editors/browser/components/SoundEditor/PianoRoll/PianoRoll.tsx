@@ -758,7 +758,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 currentPlayerPosition={currentPlayerPosition}
                 position={StepIndicatorPosition.PIANO_ROLL}
                 hidden={currentPlayerPosition === -1}
-                effectsPanelHidden={effectsPanelHidden}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
@@ -809,7 +808,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setRangeDragStartStep={setRangeDragStartStep}
                 rangeDragEndStep={rangeDragEndStep}
                 setRangeDragEndStep={setRangeDragEndStep}
-                effectsPanelHidden={effectsPanelHidden}
                 sequencerNoteWidth={sequencerNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
                 noteSnapping={noteSnapping}

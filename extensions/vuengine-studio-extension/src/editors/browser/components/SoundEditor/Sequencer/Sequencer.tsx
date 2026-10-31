@@ -118,7 +118,6 @@ interface SequencerProps {
     editCurrentTrack: () => void
     editCurrentPattern: () => void
     noteSnapping: boolean
-    effectsPanelHidden: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
     sequencerPatternHeight: number
@@ -158,7 +157,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         addPattern, setPatternSizes,
         editCurrentTrack, editCurrentPattern,
         noteSnapping,
-        effectsPanelHidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, setSequencerPatternHeight,
         sequencerNoteWidth, setSequencerNoteWidth,
@@ -592,7 +590,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 currentPlayerPosition={currentPlayerPosition}
                 position={StepIndicatorPosition.SEQUENCER}
                 hidden={currentPlayerPosition === -1}
-                effectsPanelHidden={effectsPanelHidden}
                 pianoRollNoteHeight={pianoRollNoteHeight}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 sequencerPatternHeight={sequencerPatternHeight}
