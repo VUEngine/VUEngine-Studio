@@ -308,7 +308,7 @@ SoundROMSpec {{ sanitizedSpecName }}SoundSpec
 	{{ playInLoop }},
 
 	// Tick duration in US
-	{{ item.speed[0] * 1000 / subNoteResolution }},
+	{{ (item.timerResolution if item.timerResolution in [5, 10, 20] else 5) * 1000 }},
 
 	// Tracks
 	(SoundTrackSpec**){{ sanitizedSpecName }}SoundTracks,

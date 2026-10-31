@@ -4,11 +4,16 @@ import styled from 'styled-components';
 import Input from '../../Common/Base/Input';
 import VContainer from '../../Common/Base/VContainer';
 import { EFFECT_LANES, getEffectLaneValues, withGlobalEvent } from '../EffectsPanel/EffectsPanelGrid';
+import { formatTempo, getTimerResolution } from '../Other/tempo';
+import TempoSelect from '../Other/TempoSelect';
 import TimeSignatureInput from '../Other/TimeSignatureInput';
 import { getInstrumentName, getNoteSlideLabel } from '../SoundEditor';
 import {
     EventsMap,
     GLOBAL_SOUND_EVENTS,
+    NOTE_SLIDE_STEPS_DEFAULT,
+    NOTE_SLIDE_STEPS_MAX,
+    NOTE_SLIDE_STEPS_MIN,
     PatternConfig,
     SOUND_EVENT_LABELS,
     SoundData,
@@ -211,6 +216,10 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                         const stepGlobalEvents = globalEvents[globalStep] ?? {};
                                         const hasGlobalEvents = Object.keys(stepGlobalEvents).length > 0;
                                         const listedEvents = { ...stepEvents, ...stepGlobalEvents };
+                                        // the steps of a note slide are listed with the slide, even if they are not set
+                                        if (stepEvents[SoundEvent.NoteSlide] !== undefined && stepEvents[SoundEvent.NoteSlideSteps] === undefined) {
+                                            listedEvents[SoundEvent.NoteSlideSteps] = NOTE_SLIDE_STEPS_DEFAULT;
+                                        }
                                         const stepEventsKeys = Object.keys(listedEvents);
                                         const isSelectedNote = noteCursor === globalStep;
                                         const hasPatternEvents = Object.keys(stepEvents).length > 0;
@@ -316,6 +325,25 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                                 value = getNoteSlideLabel(stepEvents[SoundEvent.Note], value);
                                                                 break;
 
+                                                            case SoundEvent.NoteSlideSteps:
+                                                                if (isSelectedNote) {
+                                                                    return <Input
+                                                                        key={j}
+                                                                        type='number'
+                                                                        min={NOTE_SLIDE_STEPS_MIN}
+                                                                        max={NOTE_SLIDE_STEPS_MAX}
+                                                                        value={value}
+                                                                        title={nls.localize(
+                                                                            'vuengine/editors/sound/noteSlideStepsDescription',
+                                                                            'In how many steps per 1/16 note the note slide changes the pitch'
+                                                                        )}
+                                                                        setValue={v => setNotes({
+                                                                            [localStep]: { [SoundEvent.NoteSlideSteps]: v === NOTE_SLIDE_STEPS_DEFAULT ? undefined : v },
+                                                                        })}
+                                                                    />;
+                                                                }
+                                                                break;
+
                                                             case SoundEvent.Volume:
                                                             case SoundEvent.Panning:
                                                                 if (isSelectedNote) {
@@ -329,10 +357,24 @@ export default function EventList(props: EventListProps): React.JSX.Element {
                                                             case SoundEvent.MasterVolume:
                                                                 if (isSelectedNote) {
                                                                     return getEffectSelect(eventType, value, v => setGlobalEvents(
-                                                                        withGlobalEvent(globalEvents, globalStep, SoundEvent.MasterVolume, v)
+                                                                        withGlobalEvent(globalEvents, globalStep, eventType, v)
                                                                     ), j);
                                                                 }
                                                                 value = EFFECT_LANES[eventType].format(value);
+                                                                break;
+
+                                                            case SoundEvent.Tempo:
+                                                                if (isSelectedNote) {
+                                                                    return <TempoSelect
+                                                                        key={j}
+                                                                        value={value}
+                                                                        timerResolution={getTimerResolution(soundData)}
+                                                                        setValue={v => setGlobalEvents(
+                                                                            withGlobalEvent(globalEvents, globalStep, SoundEvent.Tempo, v)
+                                                                        )}
+                                                                    />;
+                                                                }
+                                                                value = formatTempo(value);
                                                                 break;
 
                                                             case SoundEvent.TimeSignature:

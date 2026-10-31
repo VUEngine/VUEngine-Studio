@@ -83,9 +83,14 @@ const EffectsPanelTabs: EffectsPanelTab[] = [
         shortLabel: nls.localize('vuengine/editors/sound/masterVolumeShort', 'M'),
     },
     {
+        label: nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
+        eventType: SoundEvent.Tempo,
+        shortLabel: nls.localize('vuengine/editors/sound/tempoShort', 'T'),
+    },
+    {
         label: nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
         eventType: SoundEvent.TimeSignature,
-        shortLabel: nls.localize('vuengine/editors/sound/timeSignatureShort', 'T'),
+        shortLabel: nls.localize('vuengine/editors/sound/timeSignatureShort', 'S'),
     },
 ];
 

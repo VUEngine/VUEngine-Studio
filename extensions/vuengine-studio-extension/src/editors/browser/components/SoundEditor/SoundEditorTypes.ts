@@ -13,7 +13,10 @@ export interface SoundData {
     patterns: PatternMap
     instruments: InstrumentMap
     size: number
-    speed: SpeedMap
+    // the duration of a 1/16 note in ms
+    tempo: number
+    // the period in ms of the timer interrupts of the stages the sound plays in, see getTimerResolution
+    timerResolution: number
     timeSignature: TimeSignatureMap
     volume: number
     events: EventsMap
@@ -57,7 +60,9 @@ export enum SoundEvent {
     MasterVolume = 'masterVolume',
     Note = 'note',
     NoteSlide = 'noteSlide',
+    NoteSlideSteps = 'noteSlideSteps',
     Panning = 'panning',
+    Tempo = 'tempo',
     TimeSignature = 'timeSignature',
     Volume = 'volume',
 }
@@ -68,7 +73,9 @@ export const SOUND_EVENT_LABELS = {
     [SoundEvent.MasterVolume]: nls.localize('vuengine/editors/sound/masterVolume', 'Master Volume'),
     [SoundEvent.Note]: nls.localize('vuengine/editors/sound/note', 'Note'),
     [SoundEvent.NoteSlide]: nls.localize('vuengine/editors/sound/noteSlide', 'Note Slide'),
+    [SoundEvent.NoteSlideSteps]: nls.localize('vuengine/editors/sound/noteSlideSteps', 'Note Slide Steps'),
     [SoundEvent.Panning]: nls.localize('vuengine/editors/sound/panning', 'Panning'),
+    [SoundEvent.Tempo]: nls.localize('vuengine/editors/sound/tempo', 'Tempo'),
     [SoundEvent.TimeSignature]: nls.localize('vuengine/editors/sound/timeSignature', 'Time Signature'),
     [SoundEvent.Volume]: nls.localize('vuengine/editors/sound/volume', 'Volume'),
 };
@@ -87,6 +94,7 @@ export const DEFAULT_TRACK_SETTINGS = {
 
 export const GLOBAL_SOUND_EVENTS = [
     SoundEvent.MasterVolume,
+    SoundEvent.Tempo,
     SoundEvent.TimeSignature,
 ];
 
@@ -100,7 +108,6 @@ export type SoundEventMap = Record<string, any>;
 export type EventsMap = Record<number, SoundEventMap>;
 export type PatternMap = Record<string, PatternConfig>;
 export type SequenceMap = Record<number, string>;
-export type SpeedMap = Record<number, number>;
 export type TimeSignatureMap = Record<number, string>;
 
 export interface PatternConfig {
@@ -301,6 +308,11 @@ export const NOTES_PER_OCTAVE = 12;
 export const NOTE_RESOLUTION = 16; // 1/16 note
 export const SUB_NOTE_RESOLUTION = 50; // sub-steps per 1/16 note
 
+// the steps per column (1/16 note) in which note slides change the pitch
+export const NOTE_SLIDE_STEPS_MIN = 1;
+export const NOTE_SLIDE_STEPS_MAX = SUB_NOTE_RESOLUTION;
+export const NOTE_SLIDE_STEPS_DEFAULT = 10;
+
 export const DEFAULT_BARS_PER_PATTERN = 4;
 export const DEFAULT_NEW_NOTE = 'C4';
 
@@ -333,7 +345,12 @@ export const PIANO_ROLL_NOTE_WIDTH_DEFAULT = 20;
 export const PIANO_ROLL_KEY_WIDTH = 75;
 
 export const MIN_TICK_DURATION = 5;
-export const MAX_TICK_DURATION = 256;
+// 60 BPM
+export const MAX_TICK_DURATION = 250;
+export const TEMPO_DEFAULT = 65;
+// the periods in ms of the timer interrupts a sound can be made for, which divide each other, see getTimerResolution
+export const TIMER_RESOLUTIONS = [5, 10, 20];
+export const TIMER_RESOLUTION_DEFAULT = 5;
 
 export const VOLUME_STEPS = 16;
 

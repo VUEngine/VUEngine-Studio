@@ -114,7 +114,7 @@ export const SoundType: ProjectDataType = {
                                 type: 'object',
                                 properties: {},
                                 additionalProperties: {
-                                    type: ['integer', 'string']
+                                    type: ['number', 'string']
                                 }
                             }
                         }
@@ -277,19 +277,13 @@ export const SoundType: ProjectDataType = {
                 type: 'number',
                 default: 256
             },
-            speed: {
-                type: 'object',
-                properties: {},
-                additionalProperties: {
-                    type: 'object',
-                    properties: {},
-                    additionalProperties: {
-                        type: 'integer'
-                    }
-                },
-                default: {
-                    0: 64
-                }
+            tempo: {
+                type: 'number',
+                default: 65
+            },
+            timerResolution: {
+                type: 'number',
+                default: 5
             },
             timeSignature: {
                 type: 'object',
@@ -326,7 +320,7 @@ export const SoundType: ProjectDataType = {
                     type: 'object',
                     properties: {},
                     additionalProperties: {
-                        type: ['integer', 'string']
+                        type: ['number', 'string']
                     }
                 }
             },

@@ -9,6 +9,8 @@ import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import Range from '../../Common/Base/Range';
 import SongLength, { StyledSizeButton } from './SongLength';
+import { getTimerResolution, snapTempo, withTimerResolution } from './tempo';
+import TempoSelect from './TempoSelect';
 import { getTimeSignatureAt, getTimeSignatureSegments, parseTimeSignature } from './timeSignature';
 import TimeSignatureInput from './TimeSignatureInput';
 import VContainer from '../../Common/Base/VContainer';
@@ -19,12 +21,11 @@ import {
     MASTER_VOLUME_DEFAULT,
     MASTER_VOLUME_MAX,
     MASTER_VOLUME_MIN,
-    MAX_TICK_DURATION,
-    MIN_TICK_DURATION,
     NOTE_RESOLUTION,
     SOUND_GROUP_LABELS,
     SoundData,
-    SoundGroup
+    SoundGroup,
+    TIMER_RESOLUTIONS
 } from '../SoundEditorTypes';
 import { clamp } from '../../Common/Utils';
 
@@ -74,10 +75,14 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
     const decreaseLoopPoint = (amount: number) =>
         setLoopPoint(soundData.loopPoint - amount);
 
-    const setSpeed = (s: number): void => {
-        if (s <= MAX_TICK_DURATION && s >= MIN_TICK_DURATION) {
-            updateSoundData({ ...soundData, speed: { 0: s } });
-        }
+    const timerResolution = getTimerResolution(soundData);
+
+    const setTempo = (tempo: number): void => {
+        updateSoundData({ ...soundData, tempo: snapTempo(tempo, timerResolution) });
+    };
+
+    const setTimerResolution = (resolution: number): void => {
+        updateSoundData(withTimerResolution(soundData, resolution));
     };
 
     const setMasterVolume = (masterVolume: number): void => {
@@ -140,17 +145,41 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
             setCurrentPlayerPosition={setCurrentPlayerPosition}
         />
 
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/editors/sound/sixteenthNoteDurationMs', '1/16 note duration (in milliseconds)')}
-            </label>
-            <Range
-                value={soundData.speed[0]}
-                max={MAX_TICK_DURATION}
-                min={MIN_TICK_DURATION}
-                setValue={setSpeed}
-            />
-        </VContainer>
+        <HContainer gap={10}>
+            <VContainer grow={1}>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/sound/tempoBpmLabel', 'Tempo (BPM)')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/sound/tempoDescription',
+                        'Beats (quarter notes) per minute. The tempo effect lane can change it over time.'
+                    )}
+                />
+                <TempoSelect
+                    value={soundData.tempo}
+                    timerResolution={timerResolution}
+                    setValue={setTempo}
+                />
+            </VContainer>
+
+            <VContainer grow={1}>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/sound/timerResolution', 'Timer Resolution')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/sound/timerResolutionDescription',
+                        'The period of the timer interrupts in the stages the sound plays in. Tempos are multiples of it, \
+    so that playback is steady in stages with this period or a finer one. Changing it rounds the tempos to fit.'
+                    )}
+                />
+                <RadioSelect
+                    defaultValue={timerResolution}
+                    options={TIMER_RESOLUTIONS.map(resolution => ({
+                        label: `${resolution} ms`,
+                        value: resolution,
+                    }))}
+                    onChange={options => setTimerResolution(options[0].value as number)}
+                />
+            </VContainer>
+        </HContainer>
 
         <VContainer>
             <InfoLabel

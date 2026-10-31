@@ -1,6 +1,6 @@
 import { deepClone, isString } from '@theia/core';
 import { crc32 } from 'crc';
-import { hexFromBitsArray, intToHex } from '../../Common/Utils';
+import { clamp, hexFromBitsArray, intToHex } from '../../Common/Utils';
 import {
     ModulationData,
     VsuChannelEnvelopeData,
@@ -24,19 +24,20 @@ import {
     SoundEvent,
     SoundEventMap,
     SUB_NOTE_RESOLUTION,
+    NOTE_SLIDE_STEPS_DEFAULT,
+    NOTE_SLIDE_STEPS_MAX,
+    NOTE_SLIDE_STEPS_MIN,
     TrackConfig
 } from '../SoundEditorTypes';
+import { getTempoSegments, getTicksAtStep, getTimerResolution } from './tempo';
 import { getEffectiveVolumeAndPanning, getMasterVolume, getRegisterLevels } from './volume';
 
 interface withArtificialNotes {
     artificial?: true
-    // silences the track until the next note plays
     muted?: true
 }
 type SoundEventMapWithArtificialNotes = SoundEventMap & withArtificialNotes;
 type EventsMapWithArtificialNotes = Record<number, SoundEventMapWithArtificialNotes>;
-
-const NOTE_SLIDE_STEP_DURATION = 10;
 
 interface Keyframe {
     SxINT?: string
@@ -50,6 +51,8 @@ interface Keyframe {
 }
 
 type KeyframeMap = Record<number, Keyframe>;
+
+const KEYFRAME_DURATION_MAX = 0xFFFF;
 
 interface TrackKeyframes {
     keyframeMap: KeyframeMap,
@@ -269,9 +272,9 @@ const applyGlobalEvents = (
     Object.keys(globalEvents ?? {}).forEach(s => {
         const step = parseInt(s);
         const {
-            // filter out time signature events,
-            // since they only affect how the editor draws its grid
+            // filter out some events
             [SoundEvent.TimeSignature]: timeSignature,
+            [SoundEvent.Tempo]: tempo,
             ...playbackEvents
         } = globalEvents[step];
         if (step < totalSize && Object.keys(playbackEvents).length > 0) {
@@ -356,46 +359,58 @@ const applyNoteSlide = (
     trackEventsMap: EventsMapWithArtificialNotes,
 ): EventsMapWithArtificialNotes => {
     const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
+    // sorted from highest to lowest
+    const noteFrequencies = Object.values(NOTES);
 
-    const sortedTrackSteps: number[] = Object.keys(result)
+    const sortedNoteSteps: number[] = Object.keys(result)
         .map(step => parseInt(step))
+        .filter(step => result[step][SoundEvent.Note] !== undefined)
         .sort((a, b) => a - b);
-    sortedTrackSteps.forEach(step => {
+    sortedNoteSteps.forEach((step, index) => {
         const stepEvents = result[step];
         const noteSlide = stepEvents[SoundEvent.NoteSlide];
         if (noteSlide === undefined || noteSlide === 0) {
             return;
         }
 
-        const note = stepEvents[SoundEvent.Note];
-        const noteId = Object.values(NOTES).indexOf(note);
+        const frequency = stepEvents[SoundEvent.Note];
+        const noteId = noteFrequencies.indexOf(frequency);
         const duration = stepEvents[SoundEvent.Duration];
-        if (note === undefined || noteId === -1 || duration === undefined) {
+        if (noteId === -1 || duration === undefined) {
             return;
         }
 
-        const noteSlideDirection = noteSlide < 0 ? -1 : 1;
-        const targetNote = Object.values(NOTES)[noteId - noteSlide];
-        const distance = Math.abs(note - targetNote);
-
-        const numberOfSteps = Math.round(duration / NOTE_SLIDE_STEP_DURATION);
-        if (numberOfSteps <= 2) {
+        // the slide must not reach into the next note
+        const slideDuration = Math.min(duration, (sortedNoteSteps[index + 1] ?? Infinity) - step);
+        const stepDuration = SUB_NOTE_RESOLUTION /
+            clamp(stepEvents[SoundEvent.NoteSlideSteps] ?? NOTE_SLIDE_STEPS_DEFAULT, NOTE_SLIDE_STEPS_MIN, NOTE_SLIDE_STEPS_MAX);
+        // a little tolerance, as the step duration might be a fraction
+        const numberOfSteps = Math.floor(slideDuration / stepDuration + 0.001);
+        if (numberOfSteps < 2) {
             return;
         }
 
-        const changePerStep = Math.round(distance / numberOfSteps) * noteSlideDirection;
+        // the target is reached on the last step, and the frequency register value changes by the same amount on every
+        // step, like a tracker's portamento does with the period. As the frequency is inversely proportional to the
+        // register value's distance to its maximum, the pitch falls fast at first on slides down, and rises slowly at first on slides up.
+        const targetFrequency = noteFrequencies[clamp(noteId - noteSlide, 0, noteFrequencies.length - 1)];
 
-        stepEvents[SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
+        let previousFrequency = frequency;
         for (let i = 1; i < numberOfSteps; i++) {
-            const artificialStep = step + (i * NOTE_SLIDE_STEP_DURATION);
-            if (result[artificialStep] === undefined) {
-                result[artificialStep] = {};
+            const stepFrequency = Math.round(frequency + (targetFrequency - frequency) * i / (numberOfSteps - 1));
+            // slow slides can stay on the same value for several steps
+            if (stepFrequency === previousFrequency) {
+                continue;
             }
+            previousFrequency = stepFrequency;
 
-            result[artificialStep].artificial = true;
-            result[artificialStep][SoundEvent.Note] = note + (i * changePerStep);
-            result[artificialStep][SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
-
+            const artificialStep = step + Math.round(i * stepDuration);
+            result[artificialStep] = {
+                ...result[artificialStep],
+                artificial: true,
+                [SoundEvent.Note]: stepFrequency,
+                [SoundEvent.Duration]: step + slideDuration - artificialStep,
+            };
             if (stepEvents[SoundEvent.Instrument]) {
                 result[artificialStep][SoundEvent.Instrument] = stepEvents[SoundEvent.Instrument];
             }
@@ -457,8 +472,9 @@ const transformToKeyframes = (
             muted = false;
             keyframe.SxFQ = SxFQ(stepEvents[SoundEvent.Note]);
 
-            // explicity set registers to reset the VSU's internal counters for hardware envelopes
-            if (stepIndex !== 0) {
+            // explicity set registers to reset the VSU's internal counters for hardware envelopes,
+            // except for the steps of a note slide, which must only change the frequency, as writing SxINT restarts the sound
+            if (stepIndex !== 0 && !stepEvents.artificial) {
                 keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
                 if (currentInstrument.envelope.enabled || sweepEnabled) {
                     keyframe.SxEV0 = SxEV0(currentInstrument.envelope, getCurrentRegisterLevels().envelopeInitialValue);
@@ -595,8 +611,28 @@ const applyLoopPoint = (
 const transformToKeyframesPrepared = (
     trackKeyframes: TrackKeyframes,
     trackType: SoundEditorTrackType,
+    soundData: SoundData,
 ): TrackKeyframesPrepared => {
+    // The durations are in the player's ticks, of which the tempo defines how many the steps take. They get rounded at the
+    // keyframes' absolute positions, so that all tracks stay in sync. Keyframes which would start on the same tick get
+    // merged, the later values replacing the earlier ones, and keyframes which would be too long get split.
+    const tempoSegments = getTempoSegments(soundData);
+    const timerResolution = getTimerResolution(soundData);
+    const getTicks = (step: number) => getTicksAtStep(tempoSegments, timerResolution, step);
+
     const keyFrameSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step)).sort((a, b) => a - b);
+    const loopStep = keyFrameSteps[trackKeyframes.loopKeyframe];
+    const keyframeGroups: { ticks: number, steps: number[] }[] = [];
+    keyFrameSteps.forEach(step => {
+        const ticks = getTicks(step);
+        const previousGroup = keyframeGroups[keyframeGroups.length - 1];
+        if (previousGroup?.ticks === ticks) {
+            previousGroup.steps.push(step);
+        } else {
+            keyframeGroups.push({ ticks, steps: [step] });
+        }
+    });
+
     const trackKeyframesPrepared: TrackKeyframesPrepared = {
         values: {
             SxEV0: [],
@@ -609,12 +645,20 @@ const transformToKeyframesPrepared = (
             SxMOD: [],
         },
         keyframes: [],
-        loopKeyframe: trackKeyframes.loopKeyframe,
+        loopKeyframe: 0,
     };
 
-    keyFrameSteps.forEach((step, stepIndex) => {
-        const stepKeyframe = trackKeyframes.keyframeMap[step];
-        const duration: number = (keyFrameSteps[stepIndex + 1] ?? trackKeyframes.totalSize) - step;
+    const typeFlags: EventName[] = [];
+    if (trackType === SoundEditorTrackType.SWEEPMOD) {
+        typeFlags.push(EventName.SweepMod);
+    }
+    if (trackType === SoundEditorTrackType.NOISE) {
+        typeFlags.push(EventName.Noise);
+    }
+
+    const endTicks = getTicks(trackKeyframes.totalSize);
+    keyframeGroups.forEach((group, groupIndex) => {
+        const stepKeyframe: Keyframe = Object.assign({}, ...group.steps.map(step => trackKeyframes.keyframeMap[step]));
         const flags: EventName[] = [];
 
         ['SxFQ', 'SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
@@ -627,14 +671,18 @@ const transformToKeyframesPrepared = (
             }
         });
 
-        if (trackType === SoundEditorTrackType.SWEEPMOD) {
-            flags.push(EventName.SweepMod);
-        }
-        if (trackType === SoundEditorTrackType.NOISE) {
-            flags.push(EventName.Noise);
+        if (group.steps.includes(loopStep)) {
+            trackKeyframesPrepared.loopKeyframe = trackKeyframesPrepared.keyframes.length;
         }
 
-        trackKeyframesPrepared.keyframes.push({ duration, flags });
+        let duration = Math.max(0, (keyframeGroups[groupIndex + 1]?.ticks ?? endTicks) - group.ticks);
+        trackKeyframesPrepared.keyframes.push({ duration: Math.min(duration, KEYFRAME_DURATION_MAX), flags: [...flags, ...typeFlags] });
+        duration -= KEYFRAME_DURATION_MAX;
+        // the rest of a long keyframe follows in keyframes which change nothing
+        while (duration > 0) {
+            trackKeyframesPrepared.keyframes.push({ duration: Math.min(duration, KEYFRAME_DURATION_MAX), flags: [...typeFlags] });
+            duration -= KEYFRAME_DURATION_MAX;
+        }
     });
 
     return trackKeyframesPrepared;
@@ -708,7 +756,7 @@ export const getTrackKeyframes = (
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
     // console.log('applyLoopPoint', deepClone(trackKeyframes));
 
-    let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, track.type);
+    let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, track.type, soundData);
     // console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
     // console.log('setStartEvent', deepClone(trackKeyframesPrepared));

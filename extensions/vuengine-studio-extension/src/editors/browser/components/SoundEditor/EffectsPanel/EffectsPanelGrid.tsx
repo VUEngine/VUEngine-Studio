@@ -15,6 +15,7 @@ import {
     snapPanning,
     snapVolume
 } from '../Other/volume';
+import { formatTempo, getBpm, getTempoSegments, getTimerResolution, roundBpm, snapTempo } from '../Other/tempo';
 import { getTimeSignatureSegments, TIME_SIGNATURE_DEFAULT } from '../Other/timeSignature';
 import { getToolModeCursor } from '../SoundEditor';
 import {
@@ -28,11 +29,15 @@ import {
     MASTER_VOLUME_DEFAULT,
     MASTER_VOLUME_EVENT_MAX,
     MASTER_VOLUME_EVENT_MIN,
+    MAX_TICK_DURATION,
+    MIN_TICK_DURATION,
     ScrollWindow,
     SoundData,
     SoundEditorTool,
     SoundEvent,
     SoundEventMap,
+    TEMPO_DEFAULT,
+    TIMER_RESOLUTION_DEFAULT,
     SUB_NOTE_RESOLUTION
 } from '../SoundEditorTypes';
 import { drawGrid, drawSongEnd, getTrackEvents, getTrackLaneEvents, LaneEvent } from './EffectsPanelGridOverview';
@@ -46,7 +51,7 @@ export interface EffectLane {
     // for the value range at the left, if it differs from the values' format
     formatScale?: (value: number) => string
     // rounds a value to the lane's resolution
-    snap: (value: number) => number
+    snap: (value: number, soundData?: SoundData) => number
     // shows the minimum at the top instead of the bottom
     inverted?: boolean
     // lanes for values without a scale, e.g. time signatures, show their events as labelled bars and edit them in a dialog
@@ -79,6 +84,16 @@ export const EFFECT_LANES: Record<string, EffectLane> = {
         format: v => `${v}%`,
         snap: Math.round,
         getDefaultValue: () => MASTER_VOLUME_EVENT_MAX,
+    },
+    [SoundEvent.Tempo]: {
+        min: MIN_TICK_DURATION,
+        max: MAX_TICK_DURATION,
+        baseline: MAX_TICK_DURATION,
+        inverted: true,
+        format: v => `${roundBpm(getBpm(v))}`,
+        formatScale: formatTempo,
+        snap: (v, soundData) => snapTempo(v, soundData ? getTimerResolution(soundData) : TIMER_RESOLUTION_DEFAULT),
+        getDefaultValue: soundData => soundData.tempo ?? TEMPO_DEFAULT,
     },
     [SoundEvent.TimeSignature]: {
         // there is no scale, see editInDialog
@@ -207,7 +222,11 @@ export const getTrackVolumeCurve = (
     });
 
     const totalSize = soundData.size * SUB_NOTE_RESOLUTION;
-    const msPerStep = (soundData.speed?.[0] ?? 0) / SUB_NOTE_RESOLUTION;
+    // the time is tracked step by step, as the tempo can change
+    const tempoSegments = getTempoSegments(soundData);
+    let tempoSegmentIndex = 0;
+    let ms = 0;
+    let noteStartMs = 0;
     const result: LaneValue[] = [];
     let volume: number | undefined;
     let panning: number | undefined;
@@ -229,6 +248,7 @@ export const getTrackVolumeCurve = (
             masterVolumeEvent = change[SoundEvent.MasterVolume] ?? masterVolumeEvent;
             if (change[SoundEvent.Duration] !== undefined) {
                 noteStartStep = step;
+                noteStartMs = ms;
                 noteEndStep = step + change[SoundEvent.Duration];
             }
             registerLevels = undefined;
@@ -236,7 +256,7 @@ export const getTrackVolumeCurve = (
 
         // silent before the first note, after a note's duration and after the instrument's hardware note length
         let value = 0;
-        const elapsedMs = (step - noteStartStep) * msPerStep;
+        const elapsedMs = ms - noteStartMs;
         if (noteStartStep > -1 && step < noteEndStep &&
             !(instrument.interval.enabled && elapsedMs >= VSU_INTERVAL_VALUES[instrument.interval.value])
         ) {
@@ -254,6 +274,11 @@ export const getTrackVolumeCurve = (
         if (result.length === 0 || result[result.length - 1].value !== value) {
             result.push({ step, value });
         }
+
+        while (tempoSegments[tempoSegmentIndex + 1]?.startStep <= step + 1) {
+            tempoSegmentIndex++;
+        }
+        ms += tempoSegments[tempoSegmentIndex].msPerStep;
     }
 
     return result;
@@ -337,7 +362,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
 
     const yToValue = (l: EffectLane, y: number): number => {
         const position = 1 - (y - LANE_PADDING) / (height - 2 * LANE_PADDING);
-        return clamp(l.snap(l.min + (l.inverted ? 1 - position : position) * (l.max - l.min)), l.min, l.max);
+        return clamp(l.snap(l.min + (l.inverted ? 1 - position : position) * (l.max - l.min), soundData), l.min, l.max);
     };
 
     // global events are not bound to patterns
@@ -588,7 +613,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
                 clearedRanges.push([columnStep, columnStep + SUB_NOTE_RESOLUTION]);
                 delete values[columnStep];
                 if (!erase) {
-                    values[columnStep] = lane!.snap(fromValue + (value - fromValue) * (distance === 0 ? 1 : i / distance));
+                    values[columnStep] = lane!.snap(fromValue + (value - fromValue) * (distance === 0 ? 1 : i / distance), soundData);
                 }
             }
         } else {
@@ -607,7 +632,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
                     if (isEditable(gridStep)) {
                         values[gridStep] = lane!.snap(step === fromStep
                             ? value
-                            : fromValue + (value - fromValue) * (gridStep - fromStep) / (step - fromStep));
+                            : fromValue + (value - fromValue) * (gridStep - fromStep) / (step - fromStep), soundData);
                     }
                 }
             }

@@ -766,6 +766,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         SoundEvent.Instrument,
                         SoundEvent.Duration,
                         SoundEvent.NoteSlide,
+                        SoundEvent.NoteSlideSteps,
                     ].includes(e as SoundEvent))
             );
 
@@ -818,8 +819,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 SoundEvent.Duration,
                                 SoundEvent.Instrument,
                                 SoundEvent.NoteSlide,
+                                SoundEvent.NoteSlideSteps,
                             ].includes(e as SoundEvent))
                     );
+                } else if (updatedEvents[stepInt][SoundEvent.NoteSlide] === undefined) {
+                    delete updatedEvents[stepInt][SoundEvent.NoteSlideSteps];
                 }
 
                 if (Object.keys(updatedEvents[stepInt]).length === 0) {
@@ -1046,6 +1050,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     delete r[SoundEvent.Instrument];
                     delete r[SoundEvent.Note];
                     delete r[SoundEvent.NoteSlide];
+                    delete r[SoundEvent.NoteSlideSteps];
                 }
             }
 
@@ -1158,7 +1163,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         const uri: URI | undefined = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
         if (uri) {
             const fileContent = await services.fileService.readFile(uri);
-            const fileArrayBuffer = fileContent.value.buffer as unknown as ArrayBuffer;
+            const fileBytes = fileContent.value.buffer;
+            const fileArrayBuffer = fileBytes.buffer.slice(fileBytes.byteOffset, fileBytes.byteOffset + fileBytes.byteLength) as ArrayBuffer;
             let importedSoundData: SoundData | undefined;
             switch (uri.path.ext) {
                 case '.mid':

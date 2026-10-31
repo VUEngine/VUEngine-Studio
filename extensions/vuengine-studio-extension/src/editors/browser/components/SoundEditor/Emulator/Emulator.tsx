@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { EmulatorSession } from 'vueport-core/lib/browser/emulator-core-service';
 import { VB_CART_RAM_BASE } from 'vueport-core/lib/common/vb-constants';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types.js';
+import { getStepAtTicks, getTempoSegments, getTicksAtStep, getTimerResolution } from '../Other/tempo.js';
 import { SoundData, SUB_NOTE_RESOLUTION, TrackSettings } from '../SoundEditorTypes.js';
 import PlayerRomBuilder from './PlayerRomBuilder.js';
 
@@ -74,9 +75,15 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         setEmulatorInitialized(true);
     };
 
+    // the player counts ticks, which last as long as the timer resolution, and the tempo defines how many a step takes
+    const getTicksAtColumn = (column: number): number =>
+        getTicksAtStep(getTempoSegments(soundData), getTimerResolution(soundData), column * SUB_NOTE_RESOLUTION);
+    const getColumnAtTicks = (ticks: number): number =>
+        getStepAtTicks(getTempoSegments(soundData), getTimerResolution(soundData), ticks) / SUB_NOTE_RESOLUTION;
+
     const startTickFor = (position: number): number => {
         const step = playRangeStart > -1 ? playRangeStart : Math.max(0, position);
-        return step * SUB_NOTE_RESOLUTION;
+        return getTicksAtColumn(step);
     };
 
     const loadRom = async (romFileUri: URI): Promise<void> => {
@@ -137,9 +144,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
             reading.current = false;
         }
 
-        let elapsedSteps = Math.round(currentElapsedTicks / SUB_NOTE_RESOLUTION);
+        let elapsedSteps = Math.round(getColumnAtTicks(currentElapsedTicks));
         if (playRangeStart > -1 && playRangeEnd > -1 && elapsedSteps < playRangeStart) {
-            elapsedSteps += playRangeStart;
+            elapsedSteps = Math.round(getColumnAtTicks(currentElapsedTicks + getTicksAtColumn(playRangeStart)));
         }
 
         if (elapsedSteps >= soundData.size && !soundData.loop && playRangeStart === -1) {

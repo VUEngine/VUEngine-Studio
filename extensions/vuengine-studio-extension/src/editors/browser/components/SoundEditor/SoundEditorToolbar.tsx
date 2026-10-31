@@ -18,6 +18,7 @@ import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect
 import Emulator from './Emulator/Emulator';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
+import { getMsAtStep, getTempoSegments } from './Other/tempo';
 import { getInstrumentLabel, getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
@@ -194,9 +195,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
 
-    const totalSteps = soundData.size * SUB_NOTE_RESOLUTION;
-    const tickDurationUs = soundData.speed[0] * 1000 / SUB_NOTE_RESOLUTION;
-    const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
+    const tempoSegments = getTempoSegments(soundData);
+    const totalLengthSecs = getMsAtStep(tempoSegments, soundData.size * SUB_NOTE_RESOLUTION) / 1000;
+    const currentPositionSecs = getMsAtStep(tempoSegments, Math.max(0, currentPlayerPosition) * SUB_NOTE_RESOLUTION) / 1000;
 
     // the test sound plays independently of the sound's global events
     const getTestSoundData = (): SoundData => ({
@@ -264,9 +265,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 <StyledSoundEditorToolbarTime>
                     <span>
                         {currentPlayerPosition > -1
-                            ? Math.floor(currentPlayerPosition * soundData.speed[0] / 1000 / 60) + ':' +
-                            Math.floor((currentPlayerPosition * soundData.speed[0] / 1000) % 60).toString().padStart(2, '0') + ',' +
-                            Math.floor((currentPlayerPosition * soundData.speed[0] / 100) % 10)
+                            ? Math.floor(currentPositionSecs / 60) + ':' +
+                            Math.floor(currentPositionSecs % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((currentPositionSecs * 10) % 10)
                             : '0:00,0'
                         }
                     </span>
