@@ -14,6 +14,7 @@ import {
     PIANO_ROLL_KEY_WIDTH,
     ScrollWindow,
     SoundData,
+    SoundEditorMarqueeMode,
     SoundEditorTool,
     SoundEvent
 } from '../SoundEditorTypes';
@@ -113,6 +114,9 @@ interface EffectsPanelProps {
     noteSnapping: boolean
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
+    marqueeMode: SoundEditorMarqueeMode
+    effectsFocused: boolean
+    setEffectsFocused: Dispatch<SetStateAction<boolean>>
 }
 
 export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Element {
@@ -132,6 +136,8 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
         noteSnapping,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
+        marqueeMode,
+        effectsFocused, setEffectsFocused,
     } = props;
     const { services, onCommandExecute, focusEditor } = useContext(EditorsContext) as EditorsContextType;
     const [tab, setTab] = useState<number>(0);
@@ -190,6 +196,8 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
             height={effectsPanelHeight}
             pianoRollNoteWidth={pianoRollNoteWidth}
             pianoRollScrollWindow={pianoRollScrollWindow}
+            marqueeMode={marqueeMode}
+            effectsFocused={effectsFocused}
         />;
     }
 
@@ -199,6 +207,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
     }, []);
 
     return <MetaLine
+        onMouseDownCapture={() => setEffectsFocused(true)}
         style={{
             bottom: 0,
             borderTopWidth: 1,

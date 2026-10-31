@@ -96,6 +96,7 @@ const StyledAddTrackButton = styled.button`
 
 interface SequencerProps {
     soundData: SoundData
+    effectsFocused: boolean
     updateSoundData: (soundData: SoundData) => void
     tool: SoundEditorTool
     marqueeMode: SoundEditorMarqueeMode
@@ -172,6 +173,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         setPlayerSeekRequest,
         noteCursor, setNoteCursor,
         openSongLengthDialog,
+        effectsFocused,
     } = props;
     const { services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const [patternDragTrackId, setPatternDragTrackId] = useState<number>(-1);
@@ -400,17 +402,26 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                     setCurrentSequenceIndex(currentTrackId, Math.max(...previousPatterns));
                 }
                 break;
-            case SoundEditorCommands.COPY_SELECTION.id:
-                copySelectedPatterns();
+
+                case SoundEditorCommands.COPY_SELECTION.id:
+                if (!effectsFocused) {
+                    copySelectedPatterns();
+                }
                 break;
             case SoundEditorCommands.CUT_SELECTION.id:
-                cutSelectedPatterns();
+                if (!effectsFocused) {
+                    cutSelectedPatterns();
+                }
                 break;
             case SoundEditorCommands.PASTE_SELECTION.id:
-                pastePatterns();
+                if (!effectsFocused) {
+                    pastePatterns();
+                }
                 break;
             case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
-                removePatternsFromSequence(selectedPatterns);
+                if (!effectsFocused) {
+                    removePatternsFromSequence(selectedPatterns);
+                }
                 break;
             case SoundEditorCommands.SEQUENCER_VERTICAL_SCALE_REDUCE.id:
                 setSequencerPatternHeight(prev =>
@@ -473,6 +484,7 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         patternClipboard,
         noteCursor,
         soundData,
+        effectsFocused,
     ]);
 
     return <StyledSequencerContainer

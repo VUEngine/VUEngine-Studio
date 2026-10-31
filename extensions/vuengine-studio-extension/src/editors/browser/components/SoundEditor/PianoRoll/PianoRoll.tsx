@@ -157,6 +157,8 @@ const StyledToggleButton = styled.button`
 
 interface PianoRollProps {
     soundData: SoundData
+    effectsFocused: boolean
+    setEffectsFocused: Dispatch<SetStateAction<boolean>>
     noteCursor: number
     setNoteCursor: (step: number) => void
     tool: SoundEditorTool
@@ -248,6 +250,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         trackSettings,
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
+        effectsFocused, setEffectsFocused,
     } = props;
     const [noteDragOffset, setNoteDragOffset] = useState<NoteDragOffset>(NO_NOTE_DRAG_OFFSET);
     const [noteClipboard, setNoteClipboard] = useState<EventsMap>({});
@@ -629,17 +632,26 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             case SoundEditorCommands.ADD_AT_CURSOR_POSITION.id:
                 selectAtCursorPosition(true);
                 break;
-            case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
-                removeSelectedNotes();
+
+                case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
+                if (!effectsFocused) {
+                    removeSelectedNotes();
+                }
                 break;
             case SoundEditorCommands.COPY_SELECTION.id:
-                copySelectedNotes();
+                if (!effectsFocused) {
+                    copySelectedNotes();
+                }
                 break;
             case SoundEditorCommands.CUT_SELECTION.id:
-                cutSelectedNotes();
+                if (!effectsFocused) {
+                    cutSelectedNotes();
+                }
                 break;
             case SoundEditorCommands.PASTE_SELECTION.id:
-                pasteNotes();
+                if (!effectsFocused) {
+                    pasteNotes();
+                }
                 break;
             case SoundEditorCommands.PIANO_ROLL_VERTICAL_SCALE_REDUCE.id:
                 setPianoRollNoteHeight(prev =>
@@ -682,6 +694,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentPatternId,
         currentSequenceIndex,
         newNoteDuration,
+        effectsFocused,
     ]);
 
     // pasting ends with escape, or when another pattern gets edited
@@ -824,6 +837,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             </button>
         </ScaleControls>
         <StyledPianoRoll
+            onMouseDownCapture={() => setEffectsFocused(false)}
             ref={pianoRollRef}
             onScroll={getScrollWindowCoords}
             onMouseEnter={onMouseEnter}
@@ -946,6 +960,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 noteSnapping={noteSnapping}
                 pianoRollNoteWidth={pianoRollNoteWidth}
                 pianoRollScrollWindow={pianoRollScrollWindow}
+                marqueeMode={marqueeMode}
+                effectsFocused={effectsFocused}
+                setEffectsFocused={setEffectsFocused}
             />
         </StyledPianoRoll>
     </StyledPianoRollContainer>;

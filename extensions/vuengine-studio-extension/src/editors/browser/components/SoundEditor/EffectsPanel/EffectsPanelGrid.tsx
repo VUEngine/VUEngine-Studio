@@ -18,6 +18,7 @@ import {
 import { formatTempo, getBpm, getTempoSegments, getTimerResolution, roundBpm, snapTempo } from '../Other/tempo';
 import { getTimeSignatureSegments, TIME_SIGNATURE_DEFAULT } from '../Other/timeSignature';
 import { getToolModeCursor } from '../SoundEditor';
+import { SoundEditorCommands } from '../SoundEditorCommands';
 import {
     EventsMap,
     GLOBAL_SOUND_EVENTS,
@@ -33,6 +34,7 @@ import {
     MIN_TICK_DURATION,
     ScrollWindow,
     SoundData,
+    SoundEditorMarqueeMode,
     SoundEditorTool,
     SoundEvent,
     SoundEventMap,
@@ -287,7 +289,7 @@ export const getTrackVolumeCurve = (
 const LANE_PADDING = 6;
 const MIN_NOTE_WIDTH_FOR_LABELS = 18;
 
-type DragMode = 'draw' | 'erase';
+type DragMode = 'draw' | 'erase' | 'marquee' | 'move';
 
 interface PendingEdits {
     // values to set, by step from the start of the sound
@@ -315,6 +317,13 @@ interface EffectsPanelGridProps {
     height: number
     pianoRollNoteWidth: number
     pianoRollScrollWindow: ScrollWindow
+    marqueeMode: SoundEditorMarqueeMode
+    effectsFocused: boolean
+}
+
+interface EffectClipboard {
+    eventType: SoundEvent
+    values: Record<number, number>
 }
 
 export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JSX.Element {
@@ -334,8 +343,10 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         height,
         pianoRollNoteWidth,
         pianoRollScrollWindow,
+        marqueeMode,
+        effectsFocused,
     } = props;
-    const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
+    const { currentThemeType, services, onCommandExecute } = useContext(EditorsContext) as EditorsContextType;
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dragModeRef = useRef<DragMode | undefined>();
     const dragStartStepRef = useRef<number>(-1);
@@ -344,6 +355,12 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     // edits of the current drag, which get applied when it ends
     const [pendingEdits, setPendingEdits] = useState<PendingEdits>(NO_PENDING_EDITS);
     const pendingEditsRef = useRef<PendingEdits>(NO_PENDING_EDITS);
+    const [selectedSteps, setSelectedSteps] = useState<number[]>([]);
+    const [clipboard, setClipboard] = useState<EffectClipboard | undefined>();
+    const [marquee, setMarquee] = useState<{ from: number, to: number } | undefined>();
+    const moveStartStepRef = useRef<number>(-1);
+    const [pasteStep, setPasteStep] = useState<number | undefined>();
+    const [isOverSelection, setIsOverSelection] = useState<boolean>(false);
 
     const lane = eventType !== undefined ? EFFECT_LANES[eventType] : undefined;
     const currentPattern = soundData.patterns[currentPatternId];
@@ -448,6 +465,30 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         }
 
         const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#fff';
+        const drawSelection = (selectionBarWidth: number, getBarRange: (value: number) => [number, number]) => {
+            const isMovingOrPasting = dragModeRef.current === 'move' || pasteStep !== undefined;
+            const outlinedSteps = isMovingOrPasting
+                ? Object.keys(pendingEdits.values).map(s => parseInt(s))
+                : selectedSteps;
+            context.strokeStyle = highlightColor;
+            context.lineWidth = 2;
+            laneData.laneEvents.filter(e => outlinedSteps.includes(e.step)).forEach(e => {
+                const [top, bottom] = getBarRange(e.value);
+                context.strokeRect(stepToX(e.step) - 1, top - 1, selectionBarWidth + 2, bottom - top + 2);
+            });
+            context.lineWidth = 1;
+
+            if (marquee !== undefined) {
+                const from = Math.min(marquee.from, marquee.to);
+                const to = Math.max(marquee.from, marquee.to) + (noteSnapping ? SUB_NOTE_RESOLUTION : 1);
+                context.fillStyle = chroma(highlightColor).alpha(0.15).toString();
+                context.fillRect(stepToX(from), 0, stepToX(to) - stepToX(from), height);
+                context.setLineDash([3, 2]);
+                context.strokeStyle = highlightColor;
+                context.strokeRect(stepToX(from) + 0.5, 0.5, stepToX(to) - stepToX(from) - 1, height - 1);
+                context.setLineDash([]);
+            }
+        };
         // bars of lanes which start at their minimum grow from the bottom edge
         const growsFromBottom = lane.baseline === lane.min && !lane.inverted;
         const baselineY = growsFromBottom ? height : valueToY(lane, lane.baseline);
@@ -480,6 +521,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
                 drawLabelledBar(0, `${lane.getDefaultValue?.(soundData) ?? ''}`, 0.3);
             }
             laneEvents.forEach(e => drawLabelledBar(e.step, lane.format(e.value), e.inCurrentPattern ? 1 : 0.3));
+            drawSelection(labelledBarWidth, () => [0, height]);
             return;
         }
 
@@ -563,6 +605,11 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         // the values set by instruments and effects
         drawStepLine(setValues, textColor, 0.9, 2);
 
+        drawSelection(barWidth, value => {
+            const valueY = valueToY(lane, value);
+            return [Math.min(valueY, baselineY), Math.max(valueY, baselineY, Math.min(valueY, baselineY) + 1)];
+        });
+
         // value range
         context.textAlign = 'left';
         context.fillStyle = chroma(textColor).alpha(0.5).toString();
@@ -644,12 +691,28 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         setPendingEdits(pendingEditsRef.current);
     };
 
-    const commitPendingEdits = (): void => {
-        const edits = pendingEditsRef.current;
+    const resetPendingEdits = (): void => {
         dragModeRef.current = undefined;
         lastDragStepRef.current = -1;
         pendingEditsRef.current = NO_PENDING_EDITS;
         setPendingEdits(NO_PENDING_EDITS);
+    };
+
+    const showPendingEdits = (edits: PendingEdits): void => {
+        pendingEditsRef.current = edits;
+        setPendingEdits(edits);
+    };
+
+    const commitPendingEdits = (): void => {
+        const edits = pendingEditsRef.current;
+        resetPendingEdits();
+        applyEdits(edits);
+    };
+
+    const applyEdits = (edits: PendingEdits): void => {
+        if (eventType === undefined) {
+            return;
+        }
 
         if (isGlobal) {
             let globalEvents = soundData.events ?? {};
@@ -685,6 +748,94 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         }
     };
 
+    const getEditableLaneEvents = (): LaneEvent[] => eventType === undefined
+        ? []
+        : getTrackLaneEvents(soundData, currentTrackId, currentSequenceIndex, eventType)
+            .filter(e => e.inCurrentPattern && isEditable(e.step));
+
+    const getMoveEdits = (stepOffset: number): PendingEdits => {
+        const selectedEvents = getEditableLaneEvents().filter(e => selectedSteps.includes(e.step));
+        if (selectedEvents.length === 0) {
+            return NO_PENDING_EDITS;
+        }
+        const steps = selectedEvents.map(e => e.step);
+        const rangeStart = isGlobal ? 0 : currentSequenceIndex * SUB_NOTE_RESOLUTION;
+        const rangeEnd = isGlobal ? soundData.size * SUB_NOTE_RESOLUTION : (currentSequenceIndex + (currentPattern?.size ?? 0)) * SUB_NOTE_RESOLUTION;
+        const offset = clamp(stepOffset, rangeStart - Math.min(...steps), rangeEnd - 1 - Math.max(...steps));
+
+        return {
+            values: Object.fromEntries(selectedEvents.map(e => [e.step + offset, e.value])),
+            clearedRanges: steps.map(step => [step, step + 1]),
+        };
+    };
+
+    const getPasteEdits = (step: number): PendingEdits => {
+        if (clipboard === undefined) {
+            return NO_PENDING_EDITS;
+        }
+        const values = Object.fromEntries(Object.entries(clipboard.values)
+            .map(([relativeStep, value]) => [step + parseInt(relativeStep), value] as const)
+            .filter(([s]) => isEditable(s)));
+
+        return {
+            values,
+            clearedRanges: Object.keys(values).map(s => [parseInt(s), parseInt(s) + 1]),
+        };
+    };
+
+    const updatePasteStep = (step: number): void => {
+        setPasteStep(step);
+        showPendingEdits(getPasteEdits(step));
+    };
+
+    const cancelPaste = (): void => {
+        setPasteStep(undefined);
+        resetPendingEdits();
+    };
+
+    const copySelectedEvents = (): void => {
+        const selectedEvents = getEditableLaneEvents().filter(e => selectedSteps.includes(e.step));
+        if (eventType === undefined || selectedEvents.length === 0) {
+            return;
+        }
+        const firstStep = Math.min(...selectedEvents.map(e => e.step));
+        setClipboard({
+            eventType,
+            values: Object.fromEntries(selectedEvents.map(e => [e.step - firstStep, e.value])),
+        });
+    };
+
+    const removeSelectedEvents = (): void => {
+        applyEdits({ values: {}, clearedRanges: selectedSteps.map(step => [step, step + 1]) });
+        setSelectedSteps([]);
+    };
+
+    const selectAllEvents = (): void => {
+        setSelectedSteps(marqueeMode === SoundEditorMarqueeMode.SUBTRACT
+            ? []
+            : getEditableLaneEvents().map(e => e.step));
+    };
+
+    const finishMarquee = (): void => {
+        if (marquee === undefined) {
+            return;
+        }
+        const from = Math.min(marquee.from, marquee.to);
+        const to = Math.max(marquee.from, marquee.to) + (noteSnapping ? SUB_NOTE_RESOLUTION : 1);
+        const marqueeSteps = getEditableLaneEvents().map(e => e.step).filter(step => step >= from && step < to);
+        setSelectedSteps(prev => marqueeMode === SoundEditorMarqueeMode.ADD
+            ? [...new Set([...prev, ...marqueeSteps])]
+            : marqueeMode === SoundEditorMarqueeMode.SUBTRACT
+                ? prev.filter(step => !marqueeSteps.includes(step))
+                : marqueeSteps);
+        setMarquee(undefined);
+    };
+
+    const isOnSelectedEvent = (e: MouseEvent<HTMLCanvasElement>): boolean => {
+        const column = getColumn(e);
+        return selectedSteps.some(step => Math.floor(step / SUB_NOTE_RESOLUTION) === column);
+    };
+
     // the sequence index of the current track's pattern at the given column, if any
     const getSequenceIndexAtColumn = (column: number): number | undefined => {
         const sequence = soundData.tracks[currentTrackId]?.sequence ?? {};
@@ -705,6 +856,19 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         const column = getColumn(e);
 
+        // a click places the pasted events, any other button cancels pasting
+        if (pasteStep !== undefined) {
+            if (e.button === 0) {
+                const edits = getPasteEdits(getStep(e));
+                cancelPaste();
+                applyEdits(edits);
+                setSelectedSteps(Object.keys(edits.values).map(s => parseInt(s)));
+            } else {
+                cancelPaste();
+            }
+            return;
+        }
+
         // clicking another pattern only switches to it, editing starts with the next click
         if (e.button === 0) {
             const sequenceIndex = getSequenceIndexAtColumn(column);
@@ -720,6 +884,18 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             if (isEditable(columnStep) && getEventStepInColumn(column) === undefined) {
                 setGlobalEvents(withGlobalEvent(soundData.events ?? {}, columnStep, eventType, lane.getDefaultValue?.(soundData)));
                 editGlobalEvent(columnStep, eventType);
+            }
+            return;
+        }
+
+        // with the marquee tool, selected events can be grabbed to move them, anywhere else a marquee starts
+        if (lane && e.button === 0 && tool === SoundEditorTool.MARQUEE) {
+            if (marqueeMode === SoundEditorMarqueeMode.REPLACE && isOnSelectedEvent(e)) {
+                dragModeRef.current = 'move';
+                moveStartStepRef.current = getStep(e);
+            } else {
+                dragModeRef.current = 'marquee';
+                setMarquee({ from: getStep(e), to: getStep(e) });
             }
             return;
         }
@@ -745,8 +921,17 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     };
 
     const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (dragModeRef.current !== undefined) {
+        if (pasteStep !== undefined) {
+            updatePasteStep(getStep(e));
+        } else if (dragModeRef.current === 'marquee') {
+            const step = getStep(e);
+            setMarquee(prev => prev && { ...prev, to: step });
+        } else if (dragModeRef.current === 'move') {
+            showPendingEdits(getMoveEdits(getStep(e) - moveStartStepRef.current));
+        } else if (dragModeRef.current !== undefined) {
             updatePendingEdits(getStep(e), getValue(e));
+        } else {
+            setIsOverSelection(tool === SoundEditorTool.MARQUEE && isOnSelectedEvent(e));
         }
     };
 
@@ -761,10 +946,101 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     };
 
     const onMouseUp = () => {
-        if (dragModeRef.current !== undefined) {
+        if (dragModeRef.current === 'marquee') {
+            dragModeRef.current = undefined;
+            finishMarquee();
+        } else if (dragModeRef.current === 'move') {
+            const movedSteps = Object.keys(pendingEditsRef.current.values).map(s => parseInt(s));
+            commitPendingEdits();
+            if (movedSteps.length > 0) {
+                setSelectedSteps(movedSteps);
+            }
+        } else if (dragModeRef.current !== undefined) {
             commitPendingEdits();
         }
     };
+
+    const commandListener = (commandId: string): void => {
+        if (!effectsFocused || !lane) {
+            return;
+        }
+        switch (commandId) {
+            case SoundEditorCommands.COPY_SELECTION.id:
+                copySelectedEvents();
+                break;
+            case SoundEditorCommands.CUT_SELECTION.id:
+                copySelectedEvents();
+                removeSelectedEvents();
+                break;
+            case SoundEditorCommands.PASTE_SELECTION.id:
+                // copied events go to the lane they were copied from only
+                if (clipboard?.eventType === eventType) {
+                    updatePasteStep(noteCursor);
+                }
+                break;
+            case SoundEditorCommands.REMOVE_SELECTED_NOTES_OR_PATTERNS.id:
+                removeSelectedEvents();
+                break;
+            case SoundEditorCommands.SELECT_ALL_NOTES.id:
+                selectAllEvents();
+                break;
+        }
+    };
+
+    useEffect(() => {
+        const disp = onCommandExecute(commandListener);
+        return () => disp.dispose();
+    }, [
+        effectsFocused,
+        lane,
+        eventType,
+        selectedSteps,
+        clipboard,
+        noteCursor,
+        marqueeMode,
+        soundData,
+        currentSequenceIndex,
+        currentPatternId,
+    ]);
+
+    // escape cancels pasting, a marquee or moving
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.code !== 'Escape') {
+                return;
+            }
+            if (pasteStep !== undefined) {
+                cancelPaste();
+            } else if (dragModeRef.current === 'marquee' || dragModeRef.current === 'move') {
+                setMarquee(undefined);
+                resetPendingEdits();
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [
+        pasteStep,
+    ]);
+
+    // the selection belongs to the lane and pattern, and only keeps events which still exist
+    useEffect(() => {
+        setSelectedSteps([]);
+        cancelPaste();
+    }, [
+        eventType,
+        currentTrackId,
+        currentPatternId,
+        currentSequenceIndex,
+    ]);
+
+    useEffect(() => {
+        const existingSteps = getEditableLaneEvents().map(e => e.step);
+        setSelectedSteps(prev => prev.every(step => existingSteps.includes(step))
+            ? prev
+            : prev.filter(step => existingSteps.includes(step)));
+    }, [
+        soundData,
+    ]);
 
     useEffect(() => {
         draw();
@@ -781,6 +1057,9 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         currentSequenceIndex,
         noteCursor,
         pendingEdits,
+        selectedSteps,
+        marquee,
+        pasteStep,
         height,
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,
@@ -799,7 +1078,13 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             onContextMenu={e => e.preventDefault()}
             ref={canvasRef}
             style={{
-                cursor: lane ? getToolModeCursor(tool) : undefined,
+                cursor: !lane
+                    ? undefined
+                    : pasteStep !== undefined
+                        ? 'copy'
+                        : tool === SoundEditorTool.MARQUEE && isOverSelection && marqueeMode === SoundEditorMarqueeMode.REPLACE
+                            ? 'move'
+                            : getToolModeCursor(tool, false, tool === SoundEditorTool.MARQUEE ? marqueeMode : undefined),
             }}
         />
     );

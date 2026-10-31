@@ -360,6 +360,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
     // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting
     const [heldMarqueeMode, setHeldMarqueeMode] = useState<SoundEditorMarqueeMode | undefined>();
+    // whether the effects panel was clicked last, so selection and clipboard commands work on effects rather than notes and patterns
+    const [effectsFocused, setEffectsFocused] = useState<boolean>(false);
     const effectiveMarqueeMode = tool === SoundEditorTool.MARQUEE && heldMarqueeMode !== undefined
         ? heldMarqueeMode
         : marqueeMode;
@@ -1410,7 +1412,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 }
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
-                if (soundData.tracks.length > 0) {
+                if (soundData.tracks.length > 0 && !effectsFocused) {
                     if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                         updateSelectedNotes([]);
                     } else {
@@ -1485,6 +1487,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         soundData,
         marqueeMode,
         sidebarTab,
+        effectsFocused,
     ]);
 
     return (
@@ -1554,6 +1557,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 {!sequencerHidden &&
                                     <Sequencer
                                         soundData={soundData}
+                                        effectsFocused={effectsFocused}
                                         tool={tool}
                                         marqueeMode={effectiveMarqueeMode}
                                         updateSoundData={updateSoundData}
@@ -1627,6 +1631,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                     }
                                     <PianoRoll
                                         soundData={soundData}
+                                        effectsFocused={effectsFocused}
+                                        setEffectsFocused={setEffectsFocused}
                                         tool={tool}
                                         marqueeMode={effectiveMarqueeMode}
                                         currentPlayerPosition={currentPlayerPosition}
