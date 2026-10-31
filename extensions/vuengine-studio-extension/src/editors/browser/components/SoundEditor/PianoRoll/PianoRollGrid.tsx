@@ -426,36 +426,38 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const findNoteStep = (step: number, noteId: number): number => {
-        let result = -1;
         const currentPattern = soundData.patterns[currentPatternId];
         if (!currentPattern) {
-            return result;
+            return -1;
         }
 
-        Object.keys(currentPattern.events).forEach(s => {
-            if (result > -1) {
-                return;
-            }
+        let slideResult = -1;
+        for (const s of Object.keys(currentPattern.events)) {
             const sInt = parseInt(s);
-
             const stepEvents = currentPattern.events[sInt];
-            if (!stepEvents) {
-                return;
-            }
-
-            const stepEventNote = stepEvents[SoundEvent.Note];
-            const stepEventNoteDuration = stepEvents[SoundEvent.Duration];
-            if (stepEventNote === undefined || stepEventNoteDuration === undefined) {
-                return;
+            const stepEventNote = stepEvents?.[SoundEvent.Note];
+            const stepEventNoteDuration = stepEvents?.[SoundEvent.Duration];
+            if (stepEventNote === undefined || stepEventNoteDuration === undefined || step < sInt || step >= sInt + stepEventNoteDuration) {
+                continue;
             }
 
             const stepEventNoteId = NOTES_LABELS.indexOf(stepEventNote);
-            if (noteId === stepEventNoteId && step >= sInt && step < sInt + stepEventNoteDuration) {
-                result = sInt;
+            if (noteId === stepEventNoteId) {
+                return sInt;
             }
-        });
 
-        return result;
+            const noteSlide = stepEvents[SoundEvent.NoteSlide] ?? 0;
+            const distance = noteSlide > 0 ? stepEventNoteId - noteId : noteId - stepEventNoteId;
+            if (slideResult === -1 && noteSlide !== 0 && distance >= 1 && distance <= Math.abs(noteSlide)) {
+                // how far the triangle reaches by the end of the clicked 1/16 note
+                const progress = Math.min(1, (step + SUB_NOTE_RESOLUTION - sInt) / stepEventNoteDuration);
+                if (distance - 1 < progress * Math.abs(noteSlide)) {
+                    slideResult = sInt;
+                }
+            }
+        }
+
+        return slideResult;
     };
 
     const resetNoteDrag = () => {
