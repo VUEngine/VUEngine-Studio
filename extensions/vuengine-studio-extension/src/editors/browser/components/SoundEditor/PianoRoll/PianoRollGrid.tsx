@@ -51,7 +51,6 @@ interface PianoRollGridProps {
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
     playNote: (note: string, instrumentId?: string) => void
-    playing: boolean
     testNote: string
     editCurrentNote: () => void
     openSongLengthDialog: () => void
@@ -109,7 +108,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
         trackSettings,
         selectedNotes, setSelectedNotes,
         playNote,
-        playing, testNote,
+        testNote,
         editCurrentNote,
         openSongLengthDialog,
         noteSnapping,
@@ -747,7 +746,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
     };
 
     const resetNoteDrag = () => {
-        if (playing && !!testNote) {
+        if (testNote) {
             setTimeout(() => playNote(''), NOTE_PLAY_STOP_DELAY);
         }
         setNoteDragNoteId(-1);
@@ -781,7 +780,7 @@ export default function PianoRollGrid(props: PianoRollGridProps): React.JSX.Elem
                 setNoteDragInitialX(e.clientX);
                 setNoteDragEndStep(step + newNoteDuration - 1);
 
-                if ((!playing || !!testNote) && getPatternPlacementAt(patternPlacements, step * SUB_NOTE_RESOLUTION)) {
+                if (getPatternPlacementAt(patternPlacements, step * SUB_NOTE_RESOLUTION)) {
                     playNote(NOTES_LABELS[noteId], newNoteInstrumentId);
                 }
             }

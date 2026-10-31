@@ -1,6 +1,7 @@
 import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
 import { deepClone, environment, isOSX, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
@@ -11,7 +12,9 @@ import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
 import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
-import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
+import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
+import { PLAYER_ROM_PATH } from './Emulator/Emulator';
+import { exportSoundRom } from './Emulator/soundSpecSerializer';
 import EventList from './EventList/EventList';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
@@ -19,7 +22,6 @@ import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
 import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
-import { getPatternChanges, getPatternPlacements, getTrackStepEvents, getUpdatedPatternEvents } from './Other/trackNotes';
 import AddPattern from './Other/AddPattern';
 import AddTrack from './Other/AddTrack';
 import CurrentPattern from './Other/CurrentPattern';
@@ -27,6 +29,12 @@ import CurrentTrack from './Other/CurrentTrack';
 import Keybindings from './Other/Keybindings';
 import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
+import ResizeHandle from './Other/ResizeHandle';
+import SongLength from './Other/SongLength';
+import { getTimerResolution } from './Other/tempo';
+import { getBarStartColumn, getTimeSignatureSegments } from './Other/timeSignature';
+import TimeSignatureInput from './Other/TimeSignatureInput';
+import { getPatternChanges, getPatternPlacements, getTrackStepEvents, getUpdatedPatternEvents } from './Other/trackNotes';
 import Transpose, { DEFAULT_TRANSPOSE_OPTIONS, TransposeOptions, TransposeOverflowBehavior, TransposeScope } from './Other/Transpose';
 import Utilities, {
     filterDuplicatePatterns,
@@ -36,11 +44,6 @@ import Utilities, {
     getUnusedInstrumentIds,
     getUnusedPatternsMaps
 } from './Other/Utilities';
-import ResizeHandle from './Other/ResizeHandle';
-import SongLength from './Other/SongLength';
-import { getBarStartColumn, getTimeSignatureSegments } from './Other/timeSignature';
-import TimeSignatureInput from './Other/TimeSignatureInput';
-import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import { SoundEditorCommands } from './SoundEditorCommands';
@@ -400,8 +403,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
-    const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
-    const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
+    const [forceReplay, setForceReplay] = useState<number>(0);
+    const [stageTimer, setStageTimer] = useState<number>(getTimerResolution(soundData));
     const [playerSeekRequest, setPlayerSeekRequest] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
@@ -560,10 +563,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (note && !soundData.instruments[instrumentId || soundData.tracks[currentTrackId]?.instrument]) {
             return;
         }
+        // test notes play alongside the sound
         setTestNote(note);
         setTestInstrumentId(instrumentId);
-        setPlaying(!!note);
-        setCurrentPlayerPosition(-1);
     };
 
     const updateCurrentTrackId = (id: number): void => {
@@ -1009,7 +1011,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const exportFile = async (): Promise<void> => {
-        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))], false);
+        // the sound player ROM, with the sound in it, which it plays at boot
+        const resourcesUri = await services.vesCommonService.getResourcesUri();
+        const playerRom = await services.fileService.readFile(resourcesUri.resolve(PLAYER_ROM_PATH));
+        const rom = exportSoundRom(playerRom.value.buffer.slice().buffer, soundData);
+        if (!rom) {
+            throw new Error('The sound player ROM could not be found.');
+        }
         let exists: boolean = false;
         let overwrite: boolean = false;
         let selected: URI | undefined;
@@ -1034,7 +1042,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (selected) {
             try {
                 await services.commandService.executeCommand(CommonCommands.SAVE.id);
-                await services.fileService.copy(romUri, selected, { overwrite });
+                await services.fileService.writeFile(selected, BinaryBuffer.wrap(new Uint8Array(rom)));
             } catch (e) {
                 console.warn(e);
             }
@@ -1300,7 +1308,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 break;
             case SoundEditorCommands.EXPORT.id:
                 if (soundData.tracks.length > 0) {
-                    exportFile();
+                    exportFile().catch(e => services.messageService.error(
+                        `${nls.localize('vuengine/editors/sound/exportFailed', 'Could not export the sound')}: ${e instanceof Error ? e.message : e}`
+                    ));
                 }
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
@@ -1449,13 +1459,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             playRangeStart={playRangeStart}
                             playRangeEnd={playRangeEnd}
                             trackSettings={trackSettings}
-                            playerRomBuilder={playerRomBuilder}
                             currentInstrumentId={currentInstrumentId}
                             setCurrentInstrumentId={updateCurrentInstrumentId}
                             selectedNotes={selectedNotes}
                             setTrackNotes={setTrackNotes}
                             setTrack={setTrack}
-                            forcePlayerRomRebuild={forcePlayerRomRebuild}
+                            forceReplay={forceReplay}
+                            stageTimer={stageTimer}
                             playerSeekRequest={playerSeekRequest}
                             setPlaying={setPlaying}
                         />
@@ -1567,7 +1577,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playRangeEnd={playRangeEnd}
                                         setPlayRangeEnd={setPlayRangeEnd}
                                         playNote={playNote}
-                                        playing={playing}
                                         testNote={testNote}
                                         setNotes={setNotes}
                                         setTrackNotes={setTrackNotes}
@@ -1630,6 +1639,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         updateSoundData={updateSoundData}
                                         setNewNoteDuration={setNewNoteDuration}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
+                                        stageTimer={stageTimer}
+                                        setStageTimer={setStageTimer}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.instruments &&
@@ -1643,10 +1654,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setWaveformDialogOpen={setWaveformDialogOpen}
                                         setModulationDataDialogOpen={setModulationDataDialogOpen}
                                         setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
-                                        playingTestNote={playing && !!testNote}
+                                        playingTestNote={!!testNote}
                                         playNote={playNote}
                                         emulatorInitialized={emulatorInitialized}
-                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        setForceReplay={setForceReplay}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.currentTrack &&
@@ -1683,7 +1694,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         currentSequenceIndex={currentSequenceIndex}
                                         pattern={soundData.patterns[currentPatternId]}
                                         emulatorInitialized={emulatorInitialized}
-                                        playingTestNote={playing && !!testNote}
+                                        playingTestNote={!!testNote}
                                         playNote={playNote}
                                         setNotes={setNotes}
                                         newNoteDuration={newNoteDuration}

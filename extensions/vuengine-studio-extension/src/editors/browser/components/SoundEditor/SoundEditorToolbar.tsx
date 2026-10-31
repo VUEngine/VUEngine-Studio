@@ -16,7 +16,6 @@ import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import RadioSelect from '../Common/Base/RadioSelect';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
 import Emulator from './Emulator/Emulator';
-import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
 import { getMsAtStep, getTempoSegments } from './Other/tempo';
 import { getPatternPlacements, getTrackStepEvents } from './Other/trackNotes';
@@ -154,12 +153,12 @@ interface SoundEditorToolbarProps {
     playRangeStart: number
     playRangeEnd: number
     trackSettings: TrackSettings[]
-    playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: (instrumentId: string) => void
     setTrackNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
-    forcePlayerRomRebuild: number
+    forceReplay: number
+    stageTimer: number
     playerSeekRequest: number
     setPlaying: Dispatch<SetStateAction<boolean>>
 }
@@ -181,15 +180,15 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         testNote, testInstrumentId,
         playRangeStart, playRangeEnd,
         trackSettings,
-        playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
         setTrackNotes,
         setTrack,
-        forcePlayerRomRebuild,
+        forceReplay,
+        stageTimer,
         playerSeekRequest,
         setPlaying,
     } = props;
-    const isPlayingRegular = playing && !testNote;
+    const isPlayingRegular = playing;
 
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
@@ -280,22 +279,21 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 </StyledSoundEditorToolbarTime>
                 <StyledSoundEditorToolbarVisualization className={playing ? 'playing' : undefined}>
                     <Emulator
+                        soundData={soundData}
                         playing={playing}
-                        testNote={testNote}
+                        setPlaying={setPlaying}
+                        testSoundData={testNote ? getTestSoundData() : undefined}
                         setEmulatorInitialized={setEmulatorInitialized}
                         emulatorRomReady={emulatorRomReady}
                         setEmulatorRomReady={setEmulatorRomReady}
-                        playerRomBuilder={playerRomBuilder}
                         currentPlayerPosition={currentPlayerPosition}
                         setCurrentPlayerPosition={setCurrentPlayerPosition}
-                        soundData={testNote ? getTestSoundData() : soundData}
-                        // the test sound has a single track and plays from its start, regardless of the sound's settings
-                        playRangeStart={testNote ? -1 : playRangeStart}
-                        playRangeEnd={testNote ? -1 : playRangeEnd}
-                        trackSettings={testNote ? [] : trackSettings}
-                        forcePlayerRomRebuild={forcePlayerRomRebuild}
+                        playRangeStart={playRangeStart}
+                        playRangeEnd={playRangeEnd}
+                        trackSettings={trackSettings}
+                        forceReplay={forceReplay}
                         playerSeekRequest={playerSeekRequest}
-                        setPlaying={setPlaying}
+                        stageTimer={stageTimer}
                     />
                 </StyledSoundEditorToolbarVisualization>
             </StyledSoundEditorToolbarGroup>

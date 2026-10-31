@@ -55,7 +55,7 @@ interface InstrumentsProps {
     playingTestNote: boolean
     playNote: (note: string, instrumentId?: string) => void
     emulatorInitialized: boolean
-    setForcePlayerRomRebuild: Dispatch<SetStateAction<number>>
+    setForceReplay: Dispatch<SetStateAction<number>>
 }
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
@@ -68,7 +68,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         playingTestNote,
         playNote,
         emulatorInitialized,
-        setForcePlayerRomRebuild,
+        setForceReplay,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const [typeFilter, setTypeFilter] = useState<SoundEditorTrackType[]>([
@@ -197,7 +197,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                         setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
                     />
                 </VContainer>
-                <VContainer>
+                <VContainer style={{paddingBottom: 2}}>
                     <label>
                         {nls.localize('vuengine/editors/sound/test', 'Test')}
                     </label>
@@ -220,7 +220,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                         </button>
                         <button
                             className="theia-button secondary"
-                            onClick={() => setForcePlayerRomRebuild(prev => prev + 1)}
+                            onClick={() => setForceReplay(prev => prev + 1)}
                             disabled={!emulatorInitialized || !playingTestNote}
                         >
                             <i className="codicon codicon-debug-restart" />

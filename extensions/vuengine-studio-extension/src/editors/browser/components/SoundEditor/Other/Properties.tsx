@@ -34,10 +34,12 @@ interface PropertiesProps {
     updateSoundData: (soundData: SoundData) => void
     setNewNoteDuration: Dispatch<SetStateAction<number>>
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
+    stageTimer: number
+    setStageTimer: Dispatch<SetStateAction<number>>
 }
 
 export default function Properties(props: PropertiesProps): React.JSX.Element {
-    const { soundData, updateSoundData, setNewNoteDuration, setCurrentPlayerPosition } = props;
+    const { soundData, updateSoundData, setNewNoteDuration, setCurrentPlayerPosition, stageTimer, setStageTimer } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const handleOnFocus = () => {
@@ -145,7 +147,7 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
             setCurrentPlayerPosition={setCurrentPlayerPosition}
         />
 
-        <HContainer gap={10}>
+        <HContainer gap={10} wrap='wrap'>
             <VContainer grow={1}>
                 <InfoLabel
                     label={nls.localize('vuengine/editors/sound/tempoBpmLabel', 'Tempo (BPM)')}
@@ -177,6 +179,25 @@ export default function Properties(props: PropertiesProps): React.JSX.Element {
                         value: resolution,
                     }))}
                     onChange={options => setTimerResolution(options[0].value as number)}
+                />
+            </VContainer>
+
+            <VContainer grow={1}>
+                <InfoLabel
+                    label={nls.localize('vuengine/editors/sound/stageTimer', 'Stage Timer')}
+                    tooltip={nls.localize(
+                        'vuengine/editors/sound/stageTimerDescription',
+                        'The period of the timer interrupts in the stage the editor plays the sound in, \
+e.g. to hear how it plays in a stage with a coarser timer than its timer resolution. Not saved with the sound.'
+                    )}
+                />
+                <RadioSelect
+                    defaultValue={stageTimer}
+                    options={TIMER_RESOLUTIONS.map(resolution => ({
+                        label: `${resolution} ms`,
+                        value: resolution,
+                    }))}
+                    onChange={options => setStageTimer(options[0].value as number)}
                 />
             </VContainer>
         </HContainer>

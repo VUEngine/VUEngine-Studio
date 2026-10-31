@@ -187,7 +187,6 @@ interface PianoRollProps {
     setTrackNotes: (notes: EventsMap) => void
     setGlobalEvents: (events: EventsMap) => void
     playNote: (note: string, instrumentId?: string) => void
-    playing: boolean
     testNote: string
     selectedNotes: number[]
     setSelectedNotes: (sn: number[]) => void
@@ -235,7 +234,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setTrackNotes,
         setGlobalEvents,
         playNote,
-        playing, testNote,
+        testNote,
         selectedNotes, setSelectedNotes,
         noteSnapping,
         addPattern,
@@ -841,7 +840,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
                 setTrackNotes={setTrackNotes}
                 setCurrentSequenceIndex={setCurrentSequenceIndexWithoutScrolling}
                 playNote={playNote}
-                playing={playing}
                 testNote={testNote}
                 selectedNotes={selectedNotes}
                 setSelectedNotes={setSelectedNotes}
