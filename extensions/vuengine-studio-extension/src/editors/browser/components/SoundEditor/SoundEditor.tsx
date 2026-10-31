@@ -16,7 +16,13 @@ import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
 import { PLAYER_ROM_PATH } from './Emulator/Emulator';
 import { exportSoundRom } from './Emulator/soundSpecSerializer';
 import EventList from './EventList/EventList';
+import { getDefaultImportTrackSettings } from './ImportExport/importHelpers';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
+import { convertFurnaceSong } from './ImportExport/furnace/furnaceConverter';
+import { parseFurnaceSong } from './ImportExport/furnace/furnaceParser';
+import { convertMidiSong } from './ImportExport/midi/midiConverter';
+import { convertS3mSong } from './ImportExport/s3m/s3mConverter';
+import { parseS3mSong } from './ImportExport/s3m/s3mParser';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
 import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
@@ -1067,28 +1073,41 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             const fileBytes = fileContent.value.buffer;
             const fileArrayBuffer = fileBytes.buffer.slice(fileBytes.byteOffset, fileBytes.byteOffset + fileBytes.byteLength) as ArrayBuffer;
             let importedSoundData: SoundData | undefined;
-            switch (uri.path.ext) {
-                case '.mid':
-                case '.midi':
-                    const parsedMidi = midiManager.parseMidi(fileContent.value.buffer);
-                    console.log('parsed', parsedMidi);
-                    break;
-                case '.s3m':
-                    const parsedS3mSong = window.electronVesCore.kaitaiParse(fileArrayBuffer, uri.path.ext);
-                    console.log('parsed', parsedS3mSong);
-                    break;
-                case '.uge':
-                    const parsedUgeSong = loadUGESong(fileArrayBuffer);
-                    if (parsedUgeSong) {
-                        importedSoundData = convertUgeSong(parsedUgeSong);
-                    }
-                    break;
-                case '.vbm':
-                    const parsedVbmSong = parseVbmSong(fileArrayBuffer);
-                    if (parsedVbmSong) {
-                        importedSoundData = convertVbmSong(parsedVbmSong);
-                    }
-                    break;
+            let importError = '';
+            try {
+                switch (uri.path.ext) {
+                    case '.fur':
+                        const parsedFurnaceSong = await parseFurnaceSong(fileArrayBuffer);
+                        if (parsedFurnaceSong) {
+                            importedSoundData = convertFurnaceSong(parsedFurnaceSong);
+                        }
+                        break;
+                    case '.mid':
+                    case '.midi':
+                        importedSoundData = convertMidiSong(midiManager.parseMidi(fileBytes));
+                        importedSoundData.name = importedSoundData.name || uri.path.name;
+                        break;
+                    case '.s3m':
+                        const parsedS3mSong = parseS3mSong(fileArrayBuffer);
+                        if (parsedS3mSong) {
+                            importedSoundData = convertS3mSong(parsedS3mSong);
+                        }
+                        break;
+                    case '.uge':
+                        const parsedUgeSong = loadUGESong(fileArrayBuffer);
+                        if (parsedUgeSong) {
+                            importedSoundData = convertUgeSong(parsedUgeSong);
+                        }
+                        break;
+                    case '.vbm':
+                        const parsedVbmSong = parseVbmSong(fileArrayBuffer);
+                        if (parsedVbmSong) {
+                            importedSoundData = convertVbmSong(parsedVbmSong);
+                        }
+                        break;
+                }
+            } catch (e) {
+                importError = e instanceof Error ? e.message : `${e}`;
             }
 
             if (!importedSoundData) {
@@ -1097,16 +1116,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         'vuengine/editors/sound/importError',
                         'The was an error importing the file {0}.',
                         uri.path.base,
-                    ));
+                    ) + (importError ? ` ${importError}` : ''));
             } else {
                 setImportSettings(prev => ({
                     ...prev,
                     dialogOpen: true,
                     soundData: importedSoundData!,
-                    trackSettings: importedSoundData!.tracks.map(t => ({
-                        enabled: true,
-                        type: t.type,
-                    })),
+                    trackSettings: getDefaultImportTrackSettings(importedSoundData!),
                     fileUri: uri,
                 }));
             }
@@ -1147,7 +1163,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         const eventsMap = Object.values(importSoundData.patterns[patternId].events);
                         eventsMap.forEach(events =>
                             Object.keys(events).forEach(eventType => {
-                                if (eventType = SoundEvent.Instrument) {
+                                if (eventType === SoundEvent.Instrument) {
                                     const instrumentId = events[eventType];
                                     if (importSoundData.instruments[instrumentId]) {
                                         importSoundData.instruments[instrumentId].type = type;

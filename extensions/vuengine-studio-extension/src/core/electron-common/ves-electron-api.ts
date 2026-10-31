@@ -13,7 +13,6 @@ export interface VesCoreAPI {
     replaceInFiles(files: string[], from: string, to: string): Promise<number>;
     checkUpdateAvailable(currentVersion: string): Promise<string | boolean>;
     zlibDeflate(data: Buffer): Buffer;
-    kaitaiParse(data: ArrayBuffer, format: string): object;
     findFiles(base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[];
     decompress(archivePath: string, targetPath: string): Promise<string[]>;
     getImageDimensions(path: string): ISizeCalculationResult;
@@ -40,7 +39,6 @@ export const VES_CHANNEL_FIND_FILES = 'vesFindFiles';
 export const VES_CHANNEL_GET_IMAGE_DIMENSIONS = 'vesGetIageDimensions';
 export const VES_CHANNEL_GET_CPU_INFORMATION = 'vesGetCpuInformation';
 export const VES_CHANNEL_GET_TEMP_DIR = 'vesGetTempDir';
-export const VES_CHANNEL_KAITAI_PARSE = 'vesKaitaiParse';
 export const VES_CHANNEL_ON_USB_DEVICE_CHANGE = 'vesOnUsbDeviceChange';
 export const VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE = 'vesOnSerialDeviceChange';
 export const VES_CHANNEL_SEND_TOUCHBAR_COMMAND = 'vesSendTouchBarCommand';

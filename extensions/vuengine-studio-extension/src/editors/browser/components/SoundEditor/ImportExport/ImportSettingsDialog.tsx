@@ -107,9 +107,10 @@ export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
 };
 
 export const SUPPORTED_IMPORT_FILETYPES = [
-    // 'midi', 'mid',
+    'fur',
+    'midi', 'mid',
+    's3m',
     'uge',
-    // 's3m',
     'vbm',
 ];
 

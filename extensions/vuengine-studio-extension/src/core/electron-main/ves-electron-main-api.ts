@@ -25,7 +25,6 @@ import {
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
-    VES_CHANNEL_KAITAI_PARSE,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
@@ -79,20 +78,6 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         });
         ipcMain.on(VES_CHANNEL_ZLIB_DEFLATE, (event, data) => {
             event.returnValue = zlib.deflateSync(data);
-        });
-        ipcMain.on(VES_CHANNEL_KAITAI_PARSE, (event, data, format) => {
-            /*
-            let result = '';
-            const KaitaiStream = require('kaitai-struct/KaitaiStream');
-            switch (format) {
-                case '.s3m':
-                    const S3m = require('./parsers/S3m');
-                    result = new S3m(new KaitaiStream(data));
-                    break;
-            }
-            event.returnValue = result;
-            */
-            event.returnValue = '';
         });
         ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];
