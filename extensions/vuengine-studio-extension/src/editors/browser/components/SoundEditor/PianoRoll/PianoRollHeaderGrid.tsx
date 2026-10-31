@@ -4,10 +4,9 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
 import { drawSongEnd } from '../EffectsPanel/EffectsPanelGridOverview';
 import { getBarsLength, getGridLine, getTimeSignatureSegments } from '../Other/timeSignature';
-import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
+import { getFoundPatternSequenceIndex, getPatternNameWithUseCount, getSnappedStep, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_BARS_PER_PATTERN,
-    NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
@@ -183,7 +182,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
             );
             context.fillStyle = isSelected ? patternForegroundHighlight : patternForeground;
-            context.fillText(getPatternName(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
+            context.fillText(getPatternNameWithUseCount(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
         });
 
         // bottom line
@@ -290,7 +289,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     };
 
     const handleMouseUpSelect = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (tool !== SoundEditorTool.EDIT) {
+        if (tool !== SoundEditorTool.EDIT && tool !== SoundEditorTool.MARQUEE) {
             return;
         }
 
@@ -300,6 +299,9 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
             const step = getSnappedStep(Math.floor(x / pianoRollNoteWidth), noteSnapping, soundData);
+            if (tool === SoundEditorTool.MARQUEE && getFoundPatternSequenceIndex(soundData, currentTrackId, step) === -1) {
+                return;
+            }
             setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION);
         }
     };
@@ -362,7 +364,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = Math.floor(x / pianoRollNoteWidth / NOTE_RESOLUTION);
+            const step = Math.floor(x / pianoRollNoteWidth);
 
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, currentTrackId, step);
             if (insidePatternAtSi > -1) {

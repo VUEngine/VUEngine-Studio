@@ -19,6 +19,7 @@ import Emulator from './Emulator/Emulator';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
 import { getMsAtStep, getTempoSegments } from './Other/tempo';
+import { getPatternPlacements, getTrackStepEvents } from './Other/trackNotes';
 import { getInstrumentLabel, getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
@@ -132,7 +133,6 @@ export const SidebarCollapseButton = styled.button`
 interface SoundEditorToolbarProps {
     soundData: SoundData
     currentTrackId: number
-    currentPatternId: string
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     selectedNotes: number[]
@@ -157,7 +157,7 @@ interface SoundEditorToolbarProps {
     playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: (instrumentId: string) => void
-    setNotes: (notes: EventsMap) => void
+    setTrackNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
     forcePlayerRomRebuild: number
     playerSeekRequest: number
@@ -169,7 +169,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const {
         soundData,
         currentTrackId,
-        currentPatternId,
         currentPlayerPosition, setCurrentPlayerPosition,
         selectedNotes,
         playing,
@@ -184,7 +183,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         trackSettings,
         playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
-        setNotes,
+        setTrackNotes,
         setTrack,
         forcePlayerRomRebuild,
         playerSeekRequest,
@@ -423,14 +422,11 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             const instrumentId = v[0] as string;
                             setCurrentInstrumentId(instrumentId);
 
-                            const currentPattern = soundData.patterns[currentPatternId];
-                            if (currentPattern === undefined) {
-                                return;
-                            }
-
+                            // the selected notes are steps from the start of the sound in the current track
+                            const trackEvents = getTrackStepEvents(getPatternPlacements(soundData, currentTrackId));
                             const notes: EventsMap = {};
                             selectedNotes.forEach(sn => {
-                                if (currentPattern.events[sn] && currentPattern.events[sn][SoundEvent.Note]) {
+                                if (trackEvents[sn]?.[SoundEvent.Note]) {
                                     notes[sn] = {
                                         [SoundEvent.Instrument]: instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined
                                     };
@@ -438,7 +434,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             });
 
                             if (Object.keys(notes).length) {
-                                setNotes(notes);
+                                setTrackNotes(notes);
                             }
                         }}
                         backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}

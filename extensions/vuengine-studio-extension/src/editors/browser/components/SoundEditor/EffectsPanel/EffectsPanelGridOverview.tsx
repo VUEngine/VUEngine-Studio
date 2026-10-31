@@ -181,7 +181,6 @@ export interface OverviewEffect {
 
 interface ColumnEffects {
     eventTypes: SoundEvent[]
-    inCurrentPattern: boolean
 }
 
 interface EffectsPanelGridOverviewProps {
@@ -218,11 +217,10 @@ export default function EffectsPanelGridOverview(props: EffectsPanelGridOverview
         effects.forEach(effect => {
             getTrackLaneEvents(soundData, currentTrackId, currentSequenceIndex, effect.eventType).forEach(e => {
                 const column = Math.floor(e.step / SUB_NOTE_RESOLUTION);
-                result[column] = result[column] ?? { eventTypes: [], inCurrentPattern: false };
+                result[column] = result[column] ?? { eventTypes: [] };
                 if (!result[column].eventTypes.includes(effect.eventType)) {
                     result[column].eventTypes.push(effect.eventType);
                 }
-                result[column].inCurrentPattern ||= e.inCurrentPattern;
             });
         });
 
@@ -241,19 +239,6 @@ export default function EffectsPanelGridOverview(props: EffectsPanelGridOverview
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
-        // highlight current pattern
-        const currentPattern = soundData.patterns[currentPatternId];
-        if (currentPattern && currentSequenceIndex > -1) {
-            const highlightColor = services.colorRegistry.getCurrentColor('focusBorder') ?? 'red';
-            context.fillStyle = chroma(highlightColor).alpha(0.1).toString();
-            context.fillRect(
-                currentSequenceIndex * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                0,
-                currentPattern.size * pianoRollNoteWidth - 0.5,
-                height,
-            );
-        }
-
         drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w, getTimeSignatureSegments(soundData));
 
         // label the columns which have effect events
@@ -268,7 +253,7 @@ export default function EffectsPanelGridOverview(props: EffectsPanelGridOverview
             }
 
             // highlight the column, leaving the grid line at its right edge visible
-            context.fillStyle = chroma(color).alpha(columnEffects.inCurrentPattern ? 0.2 : 0.1).toString();
+            context.fillStyle = chroma(color).alpha(0.2).toString();
             context.fillRect(x, 0, Math.max(1, pianoRollNoteWidth - 1), height);
 
             const label = columnEffects.eventTypes.length > MAX_SHORT_LABELS
@@ -277,7 +262,7 @@ export default function EffectsPanelGridOverview(props: EffectsPanelGridOverview
                     .filter(effect => columnEffects.eventTypes.includes(effect.eventType))
                     .map(effect => effect.shortLabel)
                     .join('');
-            context.fillStyle = chroma(color).alpha(columnEffects.inCurrentPattern ? 1 : 0.5).toString();
+            context.fillStyle = chroma(color).alpha(1).toString();
             const centerX = x + pianoRollNoteWidth / 2;
             // fall back to a dot if the label does not fit into the column
             if (context.measureText(label).width <= pianoRollNoteWidth - 2) {

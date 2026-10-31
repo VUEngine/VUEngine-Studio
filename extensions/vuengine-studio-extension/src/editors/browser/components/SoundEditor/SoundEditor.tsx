@@ -11,7 +11,6 @@ import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
 import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
-import { sortObjectByKeys } from '../Common/Utils';
 import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import EventList from './EventList/EventList';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
@@ -20,6 +19,7 @@ import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
 import { parseVbmSong } from './ImportExport/vbm/vbmParser';
 import Instruments from './Instruments/Instruments';
+import { getPatternChanges, getPatternPlacements, getTrackStepEvents, getUpdatedPatternEvents } from './Other/trackNotes';
 import AddPattern from './Other/AddPattern';
 import AddTrack from './Other/AddTrack';
 import CurrentPattern from './Other/CurrentPattern';
@@ -210,6 +210,15 @@ export const getPatternName = (soundData: SoundData, patternId: string): string 
     soundData.patterns[patternId].name.length
         ? soundData.patterns[patternId].name
         : `(${patternId.slice(0, 4)})`;
+
+export const getPatternNameWithUseCount = (soundData: SoundData, patternId: string): string => {
+    const useCount = soundData.tracks.reduce((count, track) =>
+        count + Object.values(track.sequence).filter(pId => pId === patternId).length, 0);
+
+    return useCount > 1
+        ? `${getPatternName(soundData, patternId)} ×${useCount}`
+        : getPatternName(soundData, patternId);
+};
 
 export const getPatternLabel = (soundData: SoundData, patternId: string): ReactElement => {
     const pattern = soundData.patterns[patternId];
@@ -592,20 +601,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, id);
     };
 
+    // the selected notes stay selected within the same track
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
         setCurrentPatternId(patternId);
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
             updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
+            updateSelectedNotes([]);
         }
-
-        updateSelectedNotes([]);
     };
 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
             updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
+            updateSelectedNotes([]);
         }
         if (sequenceIndex < 0) {
             sequenceIndex = 0;
@@ -616,7 +626,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentPatternId(sequence[sequenceIndex] ?? '');
 
         setCurrentSequenceIndex(sequenceIndex);
-        updateSelectedNotes([]);
         setNoteCursor(sequenceIndex * SUB_NOTE_RESOLUTION);
     };
 
@@ -624,17 +633,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setNoteCursor(step);
     };
 
-    const selectAllNotesInCurrentPattern = (): void => {
-        const currentPattern = soundData.patterns[currentPatternId];
-        const currentPatternEvents = currentPattern?.events;
-        if (!currentPatternEvents) {
-            return;
-        }
-        const currentPatternNoteSteps = Object.keys(currentPatternEvents)
+    const selectAllNotesInCurrentTrack = (): void => {
+        const trackEvents = getTrackStepEvents(getPatternPlacements(soundData, currentTrackId));
+        updateSelectedNotes(Object.keys(trackEvents)
             .map(step => parseInt(step))
-            .filter(step => currentPatternEvents[step][SoundEvent.Note]);
-
-        updateSelectedNotes(currentPatternNoteSteps);
+            .filter(step => trackEvents[step][SoundEvent.Note]));
     };
 
     const addTrack = (): void => {
@@ -749,159 +752,53 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     // global events can be passed along to update them in the same go, as separate updates would overwrite each other
-    const setNotes = (notes: EventsMap, globalEvents?: EventsMap): void => {
-        const currentPattern = soundData.patterns[currentPatternId];
-        if (currentPattern === undefined) {
+    // selected notes are steps from the start of the sound in the current track, those without a note anymore get dropped
+    const filterSelectedNotes = (patterns: SoundData['patterns']): void => {
+        const trackEvents = getTrackStepEvents(getPatternPlacements({ ...soundData, patterns }, currentTrackId));
+        setSelectedNotes(prev => prev.filter(step => trackEvents[step]?.[SoundEvent.Note] !== undefined));
+    };
+
+    // edits the current pattern, or the given one of the current track
+    const setNotes = (notes: EventsMap, globalEvents?: EventsMap, patternId: string = currentPatternId): void => {
+        const pattern = soundData.patterns[patternId];
+        if (pattern === undefined) {
             return;
         }
 
-        let updatedEvents: EventsMap = deepClone(currentPattern.events);
-        updatedEvents = sortObjectByKeys(updatedEvents);
-
-        const removeNoteFromEvents = (stepToRemove: number) => {
-            if (updatedEvents[stepToRemove] === undefined) {
-                return;
-            }
-
-            // remove all note-related events
-            updatedEvents[stepToRemove] = Object.fromEntries(
-                Object.entries({ ...updatedEvents[stepToRemove] })
-                    .filter(([e, v]) => ![
-                        SoundEvent.Note,
-                        SoundEvent.Instrument,
-                        SoundEvent.Duration,
-                        SoundEvent.NoteSlide,
-                        SoundEvent.NoteSlideSteps,
-                    ].includes(e as SoundEvent))
-            );
-
-            // if no events remain, remove entirely
-            if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
-                updatedEvents = Object.fromEntries(
-                    Object.entries({ ...updatedEvents })
-                        .filter(([s, e]) => parseInt(s) !== stepToRemove)
-                );
-            }
+        const patterns = {
+            ...soundData.patterns,
+            [patternId]: {
+                ...pattern,
+                events: getUpdatedPatternEvents(pattern, notes, soundData.tracks[currentTrackId]?.instrument),
+            },
         };
-
-        // remove empty notes
-        Object.keys(notes).forEach(step => {
-            const stepInt = parseInt(step);
-            if (Object.keys(notes[stepInt]).length === 0) {
-                removeNoteFromEvents(stepInt);
-            }
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            patterns,
+            ...(globalEvents !== undefined ? { events: globalEvents } : {}),
         });
+    };
 
-        // set notes
-        Object.keys(sortObjectByKeys(notes)).forEach(step => {
-            const stepInt = parseInt(step);
-            if (Object.keys(notes[stepInt]).length > 0) {
-                updatedEvents[stepInt] = {
-                    ...currentPattern.events[stepInt] ?? {},
-                    ...notes[stepInt],
-                };
-
-                // remove explicit default instrument
-                const currentTrack = soundData.tracks[currentTrackId];
-                if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined && updatedEvents[stepInt][SoundEvent.Instrument] === currentTrack?.instrument) {
-                    updatedEvents[stepInt] = Object.fromEntries(
-                        Object.entries({ ...updatedEvents[stepInt] })
-                            .filter(([e, v]) => e !== SoundEvent.Instrument)
-                    );
-                }
-
-                // remove events with empty value
-                updatedEvents[stepInt] = Object.fromEntries(
-                    Object.entries({ ...updatedEvents[stepInt] })
-                        .filter(([e, v]) => v !== '' && v !== undefined)
-                );
-
-                // remove dependent events
-                if (!updatedEvents[stepInt][SoundEvent.Note]) {
-                    updatedEvents[stepInt] = Object.fromEntries(
-                        Object.entries({ ...updatedEvents[stepInt] })
-                            .filter(([e, v]) => ![
-                                SoundEvent.Duration,
-                                SoundEvent.Instrument,
-                                SoundEvent.NoteSlide,
-                                SoundEvent.NoteSlideSteps,
-                            ].includes(e as SoundEvent))
-                    );
-                } else if (updatedEvents[stepInt][SoundEvent.NoteSlide] === undefined) {
-                    delete updatedEvents[stepInt][SoundEvent.NoteSlideSteps];
-                }
-
-                if (Object.keys(updatedEvents[stepInt]).length === 0) {
-                    // if no events remain, remove entirely
-                    updatedEvents = Object.fromEntries(
-                        Object.entries({ ...updatedEvents })
-                            .filter(([s, e]) => parseInt(s) !== stepInt)
-                    );
-
-                } else {
-                    // ...otherwise ensure clean key order
-                    updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
-                }
-            }
-        });
-
-        // cap all note durations at the next note, other events like volume changes do not end notes
-        let prevStep = -1;
-        [
-            ...Object.keys(updatedEvents).filter(step => updatedEvents[parseInt(step)][SoundEvent.Note] !== undefined),
-            (currentPattern.size * SUB_NOTE_RESOLUTION).toString(), // pattern size is last note's limit
-        ].forEach(step => {
-            const stepInt = parseInt(step);
-            if (
-                updatedEvents[prevStep] !== undefined &&
-                updatedEvents[prevStep][SoundEvent.Duration] !== undefined &&
-                updatedEvents[prevStep][SoundEvent.Duration] > (stepInt - prevStep)
-            ) {
-                updatedEvents[prevStep][SoundEvent.Duration] = stepInt - prevStep;
-            }
-
-            prevStep = stepInt;
-        });
-
-        // cap all note slide amounts
-        Object.keys(updatedEvents).map(step => {
-            const stepInt = parseInt(step);
-            const stepEvents = updatedEvents[stepInt];
-            if (stepEvents[SoundEvent.NoteSlide] !== undefined && stepEvents[SoundEvent.Note] !== undefined) {
-                const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note]);
-                const noteSlide = stepEvents[SoundEvent.NoteSlide];
-                if (noteId - noteSlide >= NOTES_SPECTRUM) {
-                    stepEvents[SoundEvent.NoteSlide] = noteId - NOTES_SPECTRUM + 1;
-                } else if (noteId - noteSlide <= 0) {
-                    stepEvents[SoundEvent.NoteSlide] = noteId;
-                }
-            }
-
-            return stepEvents;
-        });
-
-        // filter out no longer existing notes from selected notes
-        setSelectedNotes(prev => prev
-            .filter(sn => updatedEvents[sn] !== undefined)
-            .sort((a, b) => a - b));
-
-        if (globalEvents !== undefined) {
-            updateSoundData({
-                ...soundData,
-                patterns: {
-                    ...soundData.patterns,
-                    [currentPatternId]: {
-                        ...currentPattern,
-                        events: updatedEvents,
-                    },
-                },
-                events: globalEvents,
-            });
-        } else {
-            setPattern(currentPatternId, {
-                events: updatedEvents,
-            });
+    // edits all patterns of the current track, with the changes by step from the start of the sound
+    const setTrackNotes = (changes: EventsMap): void => {
+        const patternChanges = getPatternChanges(getPatternPlacements(soundData, currentTrackId), changes);
+        if (Object.keys(patternChanges).length === 0) {
+            return;
         }
+
+        const patterns = { ...soundData.patterns };
+        Object.keys(patternChanges).forEach(patternId => {
+            patterns[patternId] = {
+                ...patterns[patternId],
+                events: getUpdatedPatternEvents(patterns[patternId], patternChanges[patternId], soundData.tracks[currentTrackId]?.instrument),
+            };
+        });
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            patterns,
+        });
     };
 
     const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
@@ -1420,7 +1317,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                         updateSelectedNotes([]);
                     } else {
-                        selectAllNotesInCurrentPattern();
+                        selectAllNotesInCurrentTrack();
                     }
                 }
                 break;
@@ -1541,7 +1438,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         <SoundEditorToolbar
                             soundData={soundData}
                             currentTrackId={currentTrackId}
-                            currentPatternId={currentPatternId}
                             currentPlayerPosition={currentPlayerPosition}
                             setCurrentPlayerPosition={setCurrentPlayerPosition}
                             playing={playing}
@@ -1566,7 +1462,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             currentInstrumentId={currentInstrumentId}
                             setCurrentInstrumentId={updateCurrentInstrumentId}
                             selectedNotes={selectedNotes}
-                            setNotes={setNotes}
+                            setTrackNotes={setTrackNotes}
                             setTrack={setTrack}
                             forcePlayerRomRebuild={forcePlayerRomRebuild}
                             playerSeekRequest={playerSeekRequest}
@@ -1683,6 +1579,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playing={playing}
                                         testNote={testNote}
                                         setNotes={setNotes}
+                                        setTrackNotes={setTrackNotes}
                                         setGlobalEvents={setGlobalEvents}
                                         addPattern={addPattern}
                                         sequencerHidden={sequencerHidden}

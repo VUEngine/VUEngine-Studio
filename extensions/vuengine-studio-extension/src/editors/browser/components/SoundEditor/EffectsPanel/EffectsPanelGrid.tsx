@@ -16,6 +16,7 @@ import {
     snapVolume
 } from '../Other/volume';
 import { formatTempo, getBpm, getTempoSegments, getTimerResolution, roundBpm, snapTempo } from '../Other/tempo';
+import { getPatternPlacementAt, getPatternPlacements, getTrackStepEvents } from '../Other/trackNotes';
 import { getTimeSignatureSegments, TIME_SIGNATURE_DEFAULT } from '../Other/timeSignature';
 import { getToolModeCursor } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
@@ -308,7 +309,7 @@ interface EffectsPanelGridProps {
     currentSequenceIndex: number
     noteCursor: number
     setNoteCursor: (step: number) => void
-    setNotes: (notes: EventsMap) => void
+    setTrackNotes: (notes: EventsMap) => void
     setGlobalEvents: (events: EventsMap) => void
     setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     editGlobalEvent: (step: number, eventType: SoundEvent) => void
@@ -334,7 +335,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         currentPatternId,
         currentSequenceIndex,
         noteCursor, setNoteCursor,
-        setNotes,
+        setTrackNotes,
         setGlobalEvents,
         setCurrentSequenceIndex,
         editGlobalEvent,
@@ -363,7 +364,6 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     const [isOverSelection, setIsOverSelection] = useState<boolean>(false);
 
     const lane = eventType !== undefined ? EFFECT_LANES[eventType] : undefined;
-    const currentPattern = soundData.patterns[currentPatternId];
 
     // always as wide as the view, even if the sound is shorter
     const width = pianoRollScrollWindow.w;
@@ -385,11 +385,11 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     // global events are not bound to patterns
     const isGlobal = eventType !== undefined && GLOBAL_SOUND_EVENTS.includes(eventType);
 
+    // track events can be edited in all of the current track's patterns
+    const patternPlacements = useMemo(() => getPatternPlacements(soundData, currentTrackId), [soundData, currentTrackId]);
     const isEditable = (step: number): boolean => isGlobal
         ? step >= 0 && step < soundData.size * SUB_NOTE_RESOLUTION
-        : currentPattern !== undefined &&
-        step >= currentSequenceIndex * SUB_NOTE_RESOLUTION &&
-        step < (currentSequenceIndex + currentPattern.size) * SUB_NOTE_RESOLUTION;
+        : getPatternPlacementAt(patternPlacements, step) !== undefined;
 
     const isCleared = (edits: PendingEdits, step: number): boolean =>
         edits.clearedRanges.some(([from, to]) => step >= from && step < to);
@@ -401,7 +401,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         }
 
         const result = getTrackLaneEvents(soundData, currentTrackId, currentSequenceIndex, eventType)
-            .filter(e => !(e.inCurrentPattern && isCleared(pendingEdits, e.step)));
+            .filter(e => !(isEditable(e.step) && isCleared(pendingEdits, e.step)));
         Object.entries(pendingEdits.values).forEach(([step, value]) => {
             result.push({ step: parseInt(step), value, inCurrentPattern: true });
         });
@@ -446,17 +446,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
 
         scaleCanvasAccountForDpi(canvas, context, width, height);
 
-        // highlight current pattern
         const highlightColor = services.colorRegistry.getCurrentColor('focusBorder') ?? 'red';
-        if (currentPattern && currentSequenceIndex > -1) {
-            context.fillStyle = chroma(highlightColor).alpha(0.1).toString();
-            context.fillRect(
-                currentSequenceIndex * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                0,
-                currentPattern.size * pianoRollNoteWidth - 0.5,
-                height,
-            );
-        }
 
         drawGrid(canvas, context, currentThemeType, soundData.size, pianoRollNoteWidth, pianoRollScrollWindow.x, pianoRollScrollWindow.w, getTimeSignatureSegments(soundData));
 
@@ -520,7 +510,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             if (!laneEvents.some(e => e.step < SUB_NOTE_RESOLUTION)) {
                 drawLabelledBar(0, `${lane.getDefaultValue?.(soundData) ?? ''}`, 0.3);
             }
-            laneEvents.forEach(e => drawLabelledBar(e.step, lane.format(e.value), e.inCurrentPattern ? 1 : 0.3));
+            laneEvents.forEach(e => drawLabelledBar(e.step, lane.format(e.value), isEditable(e.step) ? 1 : 0.3));
             drawSelection(labelledBarWidth, () => [0, height]);
             return;
         }
@@ -588,11 +578,11 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
         // effect bars
         context.textAlign = 'center';
         laneEvents.forEach(e => {
-            drawBar(e.step, e.value, e.inCurrentPattern ? 1 : 0.3);
+            drawBar(e.step, e.value, isEditable(e.step) ? 1 : 0.3);
             const x = stepToX(e.step);
             if (pianoRollNoteWidth >= MIN_NOTE_WIDTH_FOR_LABELS && x + barWidth >= 0 && x <= width) {
                 const labelY = Math.min(valueToY(lane, e.value), baselineY);
-                context.fillStyle = chroma(textColor).alpha(e.inCurrentPattern ? 0.9 : 0.4).toString();
+                context.fillStyle = chroma(textColor).alpha(isEditable(e.step) ? 0.9 : 0.4).toString();
                 context.fillText(lane.format(e.value), x + barWidth / 2, labelY < 12 ? labelY + 10 : labelY - 2);
             }
         });
@@ -728,30 +718,26 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             return;
         }
 
-        if (!currentPattern || eventType === undefined) {
-            return;
-        }
-
-        const patternStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
+        const trackEvents = getTrackStepEvents(patternPlacements);
         const notes: EventsMap = {};
-        Object.keys(currentPattern.events).map(s => parseInt(s)).forEach(step => {
-            if (currentPattern.events[step][eventType] !== undefined && isCleared(edits, patternStartStep + step)) {
+        Object.keys(trackEvents).map(s => parseInt(s)).forEach(step => {
+            if (trackEvents[step][eventType] !== undefined && isCleared(edits, step)) {
                 notes[step] = { [eventType]: undefined };
             }
         });
         Object.entries(edits.values).forEach(([step, value]) => {
-            notes[parseInt(step) - patternStartStep] = { [eventType]: value };
+            notes[parseInt(step)] = { [eventType]: value };
         });
 
         if (Object.keys(notes).length > 0) {
-            setNotes(notes);
+            setTrackNotes(notes);
         }
     };
 
     const getEditableLaneEvents = (): LaneEvent[] => eventType === undefined
         ? []
         : getTrackLaneEvents(soundData, currentTrackId, currentSequenceIndex, eventType)
-            .filter(e => e.inCurrentPattern && isEditable(e.step));
+            .filter(e => isEditable(e.step));
 
     const getMoveEdits = (stepOffset: number): PendingEdits => {
         const selectedEvents = getEditableLaneEvents().filter(e => selectedSteps.includes(e.step));
@@ -759,12 +745,13 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             return NO_PENDING_EDITS;
         }
         const steps = selectedEvents.map(e => e.step);
-        const rangeStart = isGlobal ? 0 : currentSequenceIndex * SUB_NOTE_RESOLUTION;
-        const rangeEnd = isGlobal ? soundData.size * SUB_NOTE_RESOLUTION : (currentSequenceIndex + (currentPattern?.size ?? 0)) * SUB_NOTE_RESOLUTION;
-        const offset = clamp(stepOffset, rangeStart - Math.min(...steps), rangeEnd - 1 - Math.max(...steps));
+        const offset = clamp(stepOffset, -Math.min(...steps), soundData.size * SUB_NOTE_RESOLUTION - 1 - Math.max(...steps));
 
+        // events moved into gaps between patterns get dropped
         return {
-            values: Object.fromEntries(selectedEvents.map(e => [e.step + offset, e.value])),
+            values: Object.fromEntries(selectedEvents
+                .map(e => [e.step + offset, e.value] as const)
+                .filter(([step]) => isEditable(step))),
             clearedRanges: steps.map(step => [step, step + 1]),
         };
     };
@@ -851,7 +838,7 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     const getEventStepInColumn = (column: number): number | undefined => eventType === undefined
         ? undefined
         : getTrackLaneEvents(soundData, currentTrackId, currentSequenceIndex, eventType)
-            .find(e => e.inCurrentPattern && Math.floor(e.step / SUB_NOTE_RESOLUTION) === column)?.step;
+            .find(e => isEditable(e.step) && Math.floor(e.step / SUB_NOTE_RESOLUTION) === column)?.step;
 
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         const column = getColumn(e);
@@ -869,12 +856,11 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
             return;
         }
 
-        // clicking another pattern only switches to it, editing starts with the next click
-        if (e.button === 0) {
+        // all of the current track's patterns can be edited, the clicked one becomes the current one
+        if (e.button === 0 && !isGlobal) {
             const sequenceIndex = getSequenceIndexAtColumn(column);
             if (sequenceIndex !== undefined && sequenceIndex !== currentSequenceIndex) {
                 setCurrentSequenceIndex(currentTrackId, sequenceIndex);
-                return;
             }
         }
 
@@ -1029,8 +1015,6 @@ export default function EffectsPanelGrid(props: EffectsPanelGridProps): React.JS
     }, [
         eventType,
         currentTrackId,
-        currentPatternId,
-        currentSequenceIndex,
     ]);
 
     useEffect(() => {

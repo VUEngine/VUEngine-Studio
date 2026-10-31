@@ -158,11 +158,17 @@ export const sortObjectByKeys = (unordered: object) =>
             return ordered;
         }, {});
 
+// resizing a canvas reallocates its buffer, which is expensive for large ones, so it only happens when the size changes.
+// Otherwise, the canvas gets cleared and its context's state reset, like resizing would.
 export const scaleCanvasAccountForDpi = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, width: number, height: number) => {
     const dpr = window.devicePixelRatio ?? 1;
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+    } else {
+        context.reset();
+    }
     context.scale(dpr, dpr);
 
     canvas.style.width = `${width}px`;

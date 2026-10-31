@@ -155,7 +155,7 @@ interface EventListProps {
     noteSnapping: boolean
     pattern: PatternConfig
     noteCursor: number
-    setNotes: (notes: EventsMap, globalEvents?: EventsMap) => void
+    setNotes: (notes: EventsMap, globalEvents?: EventsMap, patternId?: string) => void
     setGlobalEvents: (events: EventsMap) => void
     setNoteCursor: (step: number) => void
     width: number

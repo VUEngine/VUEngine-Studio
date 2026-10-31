@@ -99,7 +99,7 @@ interface EffectsPanelProps {
     soundData: SoundData
     noteCursor: number
     setNoteCursor: (step: number) => void
-    setNotes: (notes: EventsMap) => void
+    setTrackNotes: (notes: EventsMap) => void
     setGlobalEvents: (events: EventsMap) => void
     tool: SoundEditorTool
     currentTrackId: number
@@ -123,7 +123,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
     const {
         soundData,
         noteCursor: noteCursor, setNoteCursor,
-        setNotes,
+        setTrackNotes,
         setGlobalEvents,
         tool,
         currentTrackId,
@@ -187,7 +187,7 @@ export default function EffectsPanel(props: EffectsPanelProps): React.JSX.Elemen
             currentPatternId={currentPatternId}
             currentSequenceIndex={currentSequenceIndex}
             setNoteCursor={setNoteCursor}
-            setNotes={setNotes}
+            setTrackNotes={setTrackNotes}
             setGlobalEvents={setGlobalEvents}
             setCurrentSequenceIndex={setCurrentSequenceIndex}
             editGlobalEvent={editGlobalEvent}
