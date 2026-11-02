@@ -69,6 +69,8 @@ import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib
 import { connectedGamepadList, GamepadProfileResolver, StoredGamepadProfiles } from 'vueport-core/lib/browser/emulator-gamepad';
 import { GamepadRumble } from 'vueport-core/lib/browser/emulator-gamepad-rumble';
 import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
+import { EmulatorRewindBrowser } from 'vueport-core/lib/browser/emulator-rewind-browser';
+import { listenToGamepadUi } from 'vueport-core/lib/browser/emulator-gamepad-ui';
 import { VesEmulatorNotifications } from './ves-emulator-notifications';
 import { VesEmulatorStorage } from './ves-emulator-storage';
 import { VueportNotifications, VueportStorage } from 'vueport-core/lib/common/emulator-host';
@@ -331,6 +333,13 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     EmulatorAction.Screenshot,
     EmulatorAction.VideoRecord,
     EmulatorAction.ToggleControlsOverlay,
+    EmulatorAction.Rewind,
+  ];
+
+  static readonly ACTIONS_WHILE_BROWSING_REWIND: EmulatorAction[] = [
+    EmulatorAction.Screenshot,
+    EmulatorAction.Fullscreen,
+    EmulatorAction.AudioMute,
   ];
 
   protected session?: EmulatorSession;
@@ -371,6 +380,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   bindings: VueportInputBindings;
 
   protected time: EmulatorTimeControl;
+  rewindBrowser: EmulatorRewindBrowser;
 
   get rewinding(): boolean {
     return this.time.rewinding;
@@ -420,7 +430,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return {
       fastForwardRatio: this.settings.get('fastForwardRatio'),
       slowMotionRatio: this.settings.get('slowMotionRatio'),
-      rewindEnabled: this.settings.get('rewindEnabled'),
+      rewindEnabled: this.settings.get('rewindEnabled') && !this.isHardcore() && !this.isLinked(),
       rewindGranularity: this.settings.get('rewindGranularity'),
       rewindBufferBytes: this.settings.get('rewindBufferSize') * 1024 * 1024,
     };
@@ -462,7 +472,22 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   isAcceptingInput(): boolean {
-    return this.state.loaded && !this.state.showPreferences;
+    return this.state.loaded && !this.state.showPreferences && !this.rewindBrowser.isOpen;
+  }
+
+  onNothingToRewind(): void {
+    this.notifications.info(nls.localize('vueport/rewind/nothing', 'Nothing has been recorded to rewind to yet.'));
+  }
+
+  async restoreInput(): Promise<void> {
+    this.input.invalidate();
+    await this.input.applyKeys();
+    await this.input.applyTurbo();
+  }
+
+  protected async applyRewindSettings(): Promise<void> {
+    this.rewindBrowser.abandon();
+    await this.time.applyRewindSettings();
   }
 
   mayTakeFocus(): boolean {
@@ -614,6 +639,24 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.macros.setInput(this.input);
     this.input.setMacroHook(this.macros);
     this.time = new EmulatorTimeControl(this);
+    this.rewindBrowser = new EmulatorRewindBrowser(this, this.time);
+    this.toDispose.push(this.rewindBrowser);
+    let stopRewindPad: (() => void) | undefined;
+    this.toDispose.push(this.rewindBrowser.onDidChange(() => {
+      const open = this.rewindBrowser.isOpen;
+      if (open === (stopRewindPad !== undefined)) {
+        return;
+      }
+      stopRewindPad?.();
+      stopRewindPad = open
+        ? listenToGamepadUi(() => this.gamepadResolver, command => this.rewindBrowser.steer(command))
+        : undefined;
+      if (!open) {
+        this.node.focus();
+      }
+      this.update();
+    }));
+    this.toDispose.push(Disposable.create(() => stopRewindPad?.()));
     this.gamepadResolver = new StoredGamepadProfiles(
       () => this.settings.get('gamepadProfiles'),
       () => this.settings.get('gamepadPlayers'),
@@ -741,6 +784,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected disposeSession(): void {
     this.time.stopRewinding();
+    this.rewindBrowser.abandon(false);
     this.rumbleForwarding?.dispose();
     this.rumbleForwarding = undefined;
     this.rumbleSpecWatch?.dispose();
@@ -832,6 +876,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
     this.setPlayerLabel(1);
     await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    await this.applyRewindSettings();
     this.update();
   }
 
@@ -840,6 +885,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       return undefined;
     }
     await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    await this.applyRewindSettings();
     this.update();
     return this.session;
   }
@@ -904,6 +950,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
     this.resetPlayerLabel();
     await this.session?.detachMirror();
+    await this.applyRewindSettings();
     this.update();
   }
 
@@ -996,7 +1043,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
         } else if ([
           'rewindEnabled', 'rewindGranularity', 'rewindBufferSize',
         ].includes(setting)) {
-          this.time.applyRewindSettings();
+          this.applyRewindSettings();
           // The toolbar button greys out when the feature is off.
           this.update();
         } else if (setting === 'stereoDepth') {
@@ -1696,29 +1743,32 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   };
 
   promptEnableRewind = async (): Promise<void> => {
+    if (this.refuseForHardcore()) {
+      return;
+    }
+    if (this.isLinked()) {
+      this.notifications.info(nls.localize('vueport/link/rewindLocked',
+        'Rewind is not available while linked. Load a save state to go back for both players.'));
+      return;
+    }
     const bufferSize = this.settings.get('rewindBufferSize');
 
     const message = [
-      nls.localize(
-        'vuengine/emulator/rewindWhat',
-        'Rewind runs the game backwards for as long as you hold the button. \
-To make that possible, the emulator records what changes in the \
-machine on every frame while you play.'
-      ),
-      nls.localize(
-        'vuengine/emulator/rewindCost',
-        'Recording makes emulation roughly a third more expensive and uses up  \
-to {0} MB of memory, which holds a bit over a minute of history.  \
-Both are adjustable in the emulator preferences: a coarser rewind  \
-granularity records less often and costs proportionally less.',
-        bufferSize
-      ),
+      nls.localize('vueport/state/rewind/what',
+        'Rewind pauses the game and lays out the last few minutes as a filmstrip: pick a moment and \
+play on from there. To make that possible, the emulator records what changes in the machine \
+on every frame while you play.'),
+      nls.localize('vueport/state/rewind/cost',
+        'Recording makes emulation roughly a third more expensive and uses up to {0} MB \
+of memory. How far back that reaches depends on the game: from about half a minute \
+for games that change a lot every frame to more than half an hour. Both are adjustable \
+in the emulator preferences.', bufferSize),
     ];
 
     const confirmed = await this.notifications.confirm({
-      title: nls.localize('vuengine/emulator/enableRewindTitle', 'Enable Rewind?'),
+      title: nls.localize('vueport/state/rewind/title', 'Enable Rewind?'),
       message,
-      okLabel: nls.localize('vuengine/emulator/enableRewindConfirm', 'Enable'),
+      okLabel: nls.localize('vueport/state/rewind/enable', 'Enable'),
     });
     if (confirmed) {
       await this.settings.set('rewindEnabled', true);
@@ -1745,6 +1795,9 @@ granularity records less often and costs proportionally less.',
     }
     if (this.state.showControls) {
       return action === EmulatorAction.ToggleControlsOverlay;
+    }
+    if (this.rewindBrowser.isOpen) {
+      return VesEmulatorWidget.ACTIONS_WHILE_BROWSING_REWIND.includes(action);
     }
     if (this.state.paused) {
       return VesEmulatorWidget.ACTIONS_WHILE_PAUSED.includes(action)
@@ -1942,18 +1995,12 @@ granularity records less often and costs proportionally less.',
     }
 
     if (data === EmulatorAction.Rewind) {
-      if (command === 'keydown') {
-        this.time.startRewinding();
-      } else if (command === 'keyup') {
-        this.time.stopRewinding();
-      } else if (command === 'keyPress') {
-        this.time.queueCoreTransition(async core => {
-          await core.suspend();
-          await core.rewindStep();
-          if (!this.state.paused) {
-            await core.run();
-          }
-        });
+      if (command === 'keydown' || command === 'keyPress') {
+        if (!this.time.isRewindEnabled()) {
+          await this.promptEnableRewind();
+        } else {
+          this.rewindBrowser.open();
+        }
       }
       return;
     }
@@ -2152,6 +2199,7 @@ granularity records less often and costs proportionally less.',
         for (let index = 0; index < sims.length; index++) {
           await sims[index].loadState(states[index]);
         }
+        await host.restoreInput();
       },
       thumbnail: async () => {
         if (!host.sim || !host.state.loaded) {
@@ -2220,6 +2268,7 @@ granularity records less often and costs proportionally less.',
     if (!this.sims.length) {
       return;
     }
+    this.rewindBrowser.abandon(false);
     const running = !this.state.paused;
     try {
       if (running) {
@@ -2463,7 +2512,7 @@ granularity records less often and costs proportionally less.',
     this.patches.disableAll();
     this.macros.stop();
     this.macros.cancelRecording();
-    await this.time.applyRewindSettings();
+    await this.applyRewindSettings();
     this.update();
   }
 
