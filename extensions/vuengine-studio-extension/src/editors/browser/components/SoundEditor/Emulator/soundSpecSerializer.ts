@@ -1,6 +1,6 @@
 import { crc32 } from 'crc';
 import { getTrackKeyframes } from '../Other/templating';
-import { SoundData, SUB_NOTE_RESOLUTION, TIMER_RESOLUTIONS, TIMER_RESOLUTION_DEFAULT, TrackSettings } from '../SoundEditorTypes';
+import { SoundData, SoundEvent, SUB_NOTE_RESOLUTION, TIMER_RESOLUTIONS, TIMER_RESOLUTION_DEFAULT, TrackConfig, TrackSettings } from '../SoundEditorTypes';
 
 // The sound player ROM does not get built for each sound. Its specs get written to its SRAM instead, laid out the way the engine's
 // structs are, see the player's PlayerInterface.h. Which the player ROM's info block describes.
@@ -168,9 +168,26 @@ export const serializeSoundSpec = (
         }
     }
 
+    // a track without an instrument of its own plays with the one its first note asks for, if any
+    const getTrackInstrument = (track: TrackConfig): string | undefined => {
+        if (soundData.instruments[track.instrument]) {
+            return track.instrument;
+        }
+        const sequenceIndexes = Object.keys(track.sequence).map(si => parseInt(si)).sort((a, b) => a - b);
+        for (const sequenceIndex of sequenceIndexes) {
+            const events = soundData.patterns[track.sequence[sequenceIndex]]?.events ?? {};
+            const step = Object.keys(events).map(s => parseInt(s)).sort((a, b) => a - b)
+                .find(s => events[s][SoundEvent.Note] !== undefined && soundData.instruments[events[s][SoundEvent.Instrument]]);
+            if (step !== undefined) {
+                return events[step][SoundEvent.Instrument];
+            }
+        }
+        return undefined;
+    };
+
     const soloTrack = trackSettings?.findIndex(ts => ts.solo) ?? -1;
     const includedTracks = soundData.tracks
-        .map((track, trackId) => ({ track, trackId }))
+        .map((track, trackId) => ({ track: { ...track, instrument: getTrackInstrument(track) ?? '' }, trackId }))
         .filter(({ track, trackId }) =>
             Object.keys(track.sequence).length > 0 &&
             track.instrument !== '' &&

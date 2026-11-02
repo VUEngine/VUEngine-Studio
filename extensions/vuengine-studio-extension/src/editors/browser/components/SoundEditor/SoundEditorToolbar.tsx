@@ -150,6 +150,8 @@ interface SoundEditorToolbarProps {
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     testNote: string
     testInstrumentId: string
+    sfxPreviewSoundData: SoundData | undefined
+    onSfxPreviewStarted: () => void
     playRangeStart: number
     playRangeEnd: number
     trackSettings: TrackSettings[]
@@ -178,6 +180,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         emulatorInitialized, setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
         testNote, testInstrumentId,
+        sfxPreviewSoundData, onSfxPreviewStarted,
         playRangeStart, playRangeEnd,
         trackSettings,
         currentInstrumentId, setCurrentInstrumentId,
@@ -282,7 +285,8 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                         soundData={soundData}
                         playing={playing}
                         setPlaying={setPlaying}
-                        testSoundData={testNote ? getTestSoundData() : undefined}
+                        testSoundData={sfxPreviewSoundData ?? (testNote ? getTestSoundData() : undefined)}
+                        onTestSoundStarted={sfxPreviewSoundData ? onSfxPreviewStarted : undefined}
                         setEmulatorInitialized={setEmulatorInitialized}
                         emulatorRomReady={emulatorRomReady}
                         setEmulatorRomReady={setEmulatorRomReady}

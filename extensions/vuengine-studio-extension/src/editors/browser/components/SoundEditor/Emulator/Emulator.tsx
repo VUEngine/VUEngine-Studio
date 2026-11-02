@@ -35,6 +35,8 @@ interface EmulatorProps {
     setPlaying: Dispatch<SetStateAction<boolean>>
     // the test sound plays in a simulation of its own, alongside the sound
     testSoundData: SoundData | undefined
+    // called once the test sound has been handed to the player, which starts it with its next frame
+    onTestSoundStarted?: () => void
     setEmulatorInitialized: Dispatch<SetStateAction<boolean>>
     emulatorRomReady: boolean
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
@@ -55,6 +57,7 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         soundData,
         playing, setPlaying,
         testSoundData,
+        onTestSoundStarted,
         setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
         currentPlayerPosition, setCurrentPlayerPosition,
@@ -282,7 +285,9 @@ export default function Emulator(props: EmulatorProps): React.JSX.Element {
         const checksum = window.electronVesCore.sha1(JSON.stringify({ testSoundData, forceReplay }));
         if (checksum !== previewChecksum.current) {
             previewChecksum.current = checksum;
-            previewPlayer.play(testSoundData, {}, 0, PLAYER_FLAG_MINI_VISUALIZER).catch(e => console.error(e));
+            previewPlayer.play(testSoundData, {}, 0, PLAYER_FLAG_MINI_VISUALIZER)
+                .then(sent => sent && onTestSoundStarted?.())
+                .catch(e => console.error(e));
         }
     }, [
         previewPlayer,

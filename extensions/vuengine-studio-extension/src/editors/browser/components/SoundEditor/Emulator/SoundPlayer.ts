@@ -28,6 +28,7 @@ const MAILBOX_COMMANDS = 20;
 const COMMAND_SLOTS = 8;
 const COMMAND_SIZE = 24;
 const SLOT_WAIT_TIMEOUT_MS = 1000;
+const ACKNOWLEDGE_TIMEOUT_MS = 2000;
 
 const VB_CART_RAM_BASE = 0x06000000;
 const READY_POLL_MS = 20;
@@ -53,6 +54,8 @@ export class SoundPlayer {
     protected sequence = 0;
     // the buffer each play command's sound got written to, to know which one the player uses
     protected plays: { sequence: number, buffer: number }[] = [];
+    // counts the plays asked for, so that those another one has superseded before they were sent get skipped
+    protected playRequests = 0;
     protected soundSpecAddress = 0;
     protected flags = 0;
     // operations run one after another, as each takes several round trips to the emulator
@@ -101,10 +104,29 @@ export class SoundPlayer {
         };
     }
 
-    // writes the sound and plays it from the given tick, replacing the one that is playing
-    play(soundData: SoundData, options: SoundSpecOptions, startTick: number, flags: number): Promise<void> {
+    // writes the sound and plays it from the given tick, replacing the one that is playing. Resolves to whether it has been sent,
+    // which it does not if another play has been asked for in the meantime.
+    play(soundData: SoundData, options: SoundSpecOptions, startTick: number, flags: number): Promise<boolean> {
+        const request = ++this.playRequests;
         return this.enqueue(async () => {
-            const { acknowledged } = await this.readStatus();
+            if (request !== this.playRequests) {
+                return false;
+            }
+            // the sound of a play the player has yet to carry out must not get overwritten, as the player would then read a
+            // sound from the middle of another one's data, so it has to carry out the last play first
+            const lastPlay = this.plays[this.plays.length - 1];
+            const started = Date.now();
+            let { acknowledged } = await this.readStatus();
+            while (lastPlay && lastPlay.sequence > acknowledged) {
+                if (Date.now() - started > ACKNOWLEDGE_TIMEOUT_MS) {
+                    throw new Error('The sound player does not carry out commands.');
+                }
+                await new Promise(resolve => setTimeout(resolve, READY_POLL_MS));
+                if (request !== this.playRequests) {
+                    return false;
+                }
+                acknowledged = (await this.readStatus()).acknowledged;
+            }
             // the player reads from the buffer of the last play it has carried out
             const playInUse = [...this.plays].reverse().find(p => p.sequence <= acknowledged);
             const buffer = playInUse?.buffer === 0 ? 1 : 0;
@@ -120,9 +142,9 @@ export class SoundPlayer {
             await this.send(PlayerCommand.Play, startTick);
             this.plays = [
                 ...(playInUse ? [playInUse] : []),
-                ...this.plays.filter(p => p.sequence > acknowledged),
                 { sequence: this.sequence, buffer },
             ];
+            return true;
         });
     }
 

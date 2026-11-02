@@ -97,13 +97,13 @@ export const createInstrument = (
 });
 
 const getLabelOfMidiNote = (note: number): string => `${NOTE_NAMES[note % NOTES_PER_OCTAVE]}${Math.floor(note / NOTES_PER_OCTAVE) - 1}`;
-const getMidiNoteOfLabel = (label: string): number => {
+export const getMidiNoteOfLabel = (label: string): number => {
     const octave = parseInt(label.replace(/^[A-G]#?/, ''));
     return NOTE_NAMES.indexOf(label.replace(/-?\d+$/, '')) + (octave + 1) * NOTES_PER_OCTAVE;
 };
 const MIDI_NOTES_IN_RANGE = NOTES_LABELS.map(getMidiNoteOfLabel);
-const LOWEST_MIDI_NOTE = Math.min(...MIDI_NOTES_IN_RANGE);
-const HIGHEST_MIDI_NOTE = Math.max(...MIDI_NOTES_IN_RANGE);
+export const LOWEST_MIDI_NOTE = Math.min(...MIDI_NOTES_IN_RANGE);
+export const HIGHEST_MIDI_NOTE = Math.max(...MIDI_NOTES_IN_RANGE);
 
 // the editor's note for a MIDI note number (60 is C4), moved by octaves into the range the VSU can play
 export const getNoteLabel = (midiNote: number): string => {

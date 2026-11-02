@@ -1,4 +1,4 @@
-import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
+import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Sparkle, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
 import { deepClone, environment, isOSX, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -10,13 +10,14 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
+import { nanoid } from '../Common/Utils';
 import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
 import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
 import { PLAYER_ROM_PATH } from './Emulator/Emulator';
 import { exportSoundRom } from './Emulator/soundSpecSerializer';
 import EventList from './EventList/EventList';
-import { getDefaultImportTrackSettings } from './ImportExport/importHelpers';
+import { getDefaultImportTrackSettings, newInstrumentId } from './ImportExport/importHelpers';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
 import { convertFurnaceSong } from './ImportExport/furnace/furnaceConverter';
 import { parseFurnaceSong } from './ImportExport/furnace/furnaceParser';
@@ -37,10 +38,17 @@ import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
 import ResizeHandle from './Other/ResizeHandle';
 import SongLength from './Other/SongLength';
-import { getTimerResolution } from './Other/tempo';
+import { getMsAtStep, getStepAtMs, getTempoSegments, getTimerResolution } from './Other/tempo';
 import { getBarStartColumn, getTimeSignatureSegments } from './Other/timeSignature';
 import TimeSignatureInput from './Other/TimeSignatureInput';
-import { getPatternChanges, getPatternPlacements, getTrackStepEvents, getUpdatedPatternEvents } from './Other/trackNotes';
+import {
+    fitNotesToPatterns,
+    getPatternChanges,
+    getPatternPlacementAt,
+    getPatternPlacements,
+    getTrackStepEvents,
+    getUpdatedPatternEvents
+} from './Other/trackNotes';
 import Transpose, { DEFAULT_TRANSPOSE_OPTIONS, TransposeOptions, TransposeOverflowBehavior, TransposeScope } from './Other/Transpose';
 import Utilities, {
     filterDuplicatePatterns,
@@ -87,6 +95,8 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
+import SfxGenerator, { DEFAULT_SFX_GENERATOR_STATE, SfxGeneratorState } from './SfxGenerator/SfxGenerator';
+import { createSfxInstrument, getSfxEvents, getSfxNoteSlideSteps, SfxParams } from './SfxGenerator/sfxGeneration';
 import ModulationDataWithPresets from './Waveforms/ModulationDataWithPresets';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
@@ -97,6 +107,7 @@ enum SidebarTab {
     currentTrack = 'currentTrack',
     currentPattern = 'currentPattern',
     currentNote = 'currentNote',
+    sfxGenerator = 'sfxGenerator',
     utilities = 'utilities',
     keybindings = 'keybindings',
 }
@@ -125,6 +136,10 @@ const SIDEBAR_TABS: Record<string, { title: string, icon: ReactElement }> = {
     [SidebarTab.utilities]: {
         title: nls.localize('vuengine/editors/sound/utilities', 'Utilities'),
         icon: <Wrench size={24} />
+    },
+    [SidebarTab.sfxGenerator]: {
+        title: nls.localize('vuengine/editors/sound/sfxGenerator', 'SFX Generator'),
+        icon: <Sparkle size={24} />
     },
     [SidebarTab.keybindings]: {
         title: nls.localizeByDefault('Keybindings'),
@@ -360,6 +375,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playing, setPlaying] = useState<boolean>(false);
     const [testNote, setTestNote] = useState<string>('');
     const [testInstrumentId, setTestInstrumentId] = useState<string>('');
+    const [sfxGeneratorState, setSfxGeneratorState] = useState<SfxGeneratorState>(DEFAULT_SFX_GENERATOR_STATE);
+    const [sfxPreviewSoundData, setSfxPreviewSoundData] = useState<SoundData | undefined>();
+    const [sfxPreviewStarts, setSfxPreviewStarts] = useState<number>(0);
     const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
@@ -798,6 +816,113 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             ...soundData,
             patterns,
         });
+    };
+
+    // writes a generated sound effect to the current track, at the note cursor or in place of all of the track's patterns. Where
+    // there is no pattern, it gets one of its own. In place of the track's patterns, the sound gets as long as the sound effect,
+    // unless the other tracks are longer.
+    const insertSfx = (params: SfxParams, name: string, replace: boolean): void => {
+        let placements = getPatternPlacements(soundData, currentTrackId);
+        const start = replace ? 0 : noteCursor;
+        const tempoSegments = getTempoSegments(soundData);
+        const startMs = getMsAtStep(tempoSegments, start);
+        const tickMs = getTimerResolution(soundData);
+        const instrumentId = newInstrumentId();
+        const events = getSfxEvents(
+            params,
+            tickMs,
+            ms => getStepAtMs(tempoSegments, startMs + ms) - start,
+            instrumentId,
+            getSfxNoteSlideSteps(getMsAtStep(tempoSegments, start + SUB_NOTE_RESOLUTION) - startMs, tickMs)
+        );
+        const end = start + Math.max(0, ...Object.entries(events).map(([step, e]) => parseInt(step) + (e[SoundEvent.Duration] ?? 0)));
+
+        const patterns = { ...soundData.patterns };
+        let tracks = soundData.tracks;
+        let size = soundData.size;
+        let loopPoint = soundData.loopPoint;
+        // a track without an instrument of its own gets the sound effect's
+        const trackInstrumentId = soundData.instruments[soundData.tracks[currentTrackId].instrument]
+            ? soundData.tracks[currentTrackId].instrument
+            : instrumentId;
+        if (trackInstrumentId !== soundData.tracks[currentTrackId].instrument) {
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId ? { ...track, instrument: trackInstrumentId } : track);
+        }
+        if (replace) {
+            const otherTracks = soundData.tracks.filter((t, trackId) => trackId !== currentTrackId);
+            const patternsOfOtherTracks = otherTracks.flatMap(t => Object.values(t.sequence));
+            Object.values(soundData.tracks[currentTrackId].sequence)
+                .filter(patternId => !patternsOfOtherTracks.includes(patternId))
+                .forEach(patternId => delete patterns[patternId]);
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId ? { ...track, sequence: {} } : track);
+            placements = [];
+            const otherTracksEnd = Math.max(0, ...soundData.tracks
+                .flatMap((t, trackId) => trackId === currentTrackId ? [] : getPatternPlacements(soundData, trackId))
+                .map(p => p.endStep));
+            size = Math.max(1, Math.ceil(Math.max(end, otherTracksEnd) / SUB_NOTE_RESOLUTION));
+            if (loopPoint >= size) {
+                loopPoint = 0;
+            }
+        }
+        let newPattern: { patternId: string, column: number } | undefined;
+        if (!getPatternPlacementAt(placements, start)) {
+            // as long as the sound effect, but not into the next pattern
+            const column = Math.floor(start / SUB_NOTE_RESOLUTION);
+            const nextColumn = Math.min(...placements.map(p => p.sequenceIndex).filter(si => si > column));
+            const patternSize = Math.max(1, Math.min(Math.ceil(end / SUB_NOTE_RESOLUTION), nextColumn) - column);
+            const patternId = nanoid();
+            patterns[patternId] = {
+                name: `SFX ${name}`,
+                type: soundData.tracks[currentTrackId].type,
+                size: patternSize,
+                events: {},
+            };
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId
+                ? { ...track, sequence: { ...track.sequence, [column]: patternId } }
+                : track);
+            size = Math.max(size, column + patternSize);
+            placements = getPatternPlacements({ ...soundData, tracks, patterns }, currentTrackId);
+            newPattern = { patternId, column };
+        }
+
+        const changes: EventsMap = {};
+        // notes in the way get removed
+        if (!replace) {
+            Object.entries(getTrackStepEvents(placements)).forEach(([step, e]) => {
+                const s = parseInt(step);
+                if (e[SoundEvent.Note] !== undefined && s >= start && s < end) {
+                    changes[s] = {};
+                }
+            });
+        }
+        Object.entries(events).forEach(([step, e]) => {
+            changes[start + parseInt(step)] = e;
+        });
+        const fitted = fitNotesToPatterns(placements, changes);
+        const patternChanges = getPatternChanges(placements, fitted);
+        Object.keys(patternChanges).forEach(patternId => {
+            patterns[patternId] = {
+                ...patterns[patternId],
+                events: getUpdatedPatternEvents(patterns[patternId], patternChanges[patternId], trackInstrumentId),
+            };
+        });
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            size,
+            loopPoint,
+            tracks,
+            patterns,
+            instruments: {
+                ...soundData.instruments,
+                [instrumentId]: createSfxInstrument(params, `SFX ${name}`, (Object.keys(soundData.instruments).length * 8 + 1) % 64),
+            },
+        });
+        if (newPattern) {
+            updateSelectedPatterns([]);
+            updateCurrentPatternId(currentTrackId, newPattern.patternId);
+            updateCurrentSequenceIndex(currentTrackId, newPattern.column);
+        }
     };
 
     const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
@@ -1472,6 +1597,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             setNewNoteDuration={setNewNoteDuration}
                             testNote={testNote}
                             testInstrumentId={testInstrumentId}
+                            sfxPreviewSoundData={sfxPreviewSoundData}
+                            onSfxPreviewStarted={() => setSfxPreviewStarts(previous => previous + 1)}
                             playRangeStart={playRangeStart}
                             playRangeEnd={playRangeEnd}
                             trackSettings={trackSettings}
@@ -1714,6 +1841,18 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playNote={playNote}
                                         setNotes={setNotes}
                                         newNoteDuration={newNoteDuration}
+                                    />
+                                }
+                                {sidebarTab === SidebarTab.sfxGenerator &&
+                                    <SfxGenerator
+                                        soundData={soundData}
+                                        currentTrackId={currentTrackId}
+                                        state={sfxGeneratorState}
+                                        setState={setSfxGeneratorState}
+                                        setPreviewSoundData={setSfxPreviewSoundData}
+                                        previewStarts={sfxPreviewStarts}
+                                        insertSfx={insertSfx}
+                                        emulatorInitialized={emulatorInitialized}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.utilities &&
