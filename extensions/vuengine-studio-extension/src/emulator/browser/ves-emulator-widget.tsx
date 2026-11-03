@@ -40,7 +40,12 @@ import { VesKeybindingService } from '../../core/browser/ves-keybinding-service'
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VesEmulatorRumblePack } from './ves-emulator-rumble';
 import { VueportRumblePack } from 'vueport-core/lib/common/emulator-rumble';
-import { formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { crc32 as romCrc32, formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { ES_SOUND_TITLES_FILE } from 'vueport-core/lib/common/emulator-essound';
+import { storeZip } from 'vueport-core/lib/common/emulator-store-zip';
+import { LanShareMoment, LanSharing, takeLanShareMoment } from 'vueport-core/lib/browser/emulator-lan-share';
+import VrWindow from 'vueport-core/lib/browser/components/VrWindow';
+import { vesLanShareShell } from './ves-emulator-lan-share';
 import { CachedAnswer, CachedAnswerRead } from 'vueport-core/lib/common/emulator-cached-answer';
 import { EmulatorCompanionLocation } from 'vueport-core/lib/common/emulator-sram';
 import { VueportInputBindings, VueportSettings } from 'vueport-core/lib/common/emulator-settings';
@@ -375,6 +380,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected storage: VueportStorage;
   protected notifications: VueportNotifications;
+  lanSharing!: LanSharing;
+  protected showVrWindow = false;
   rumblePack: VueportRumblePack;
   settings: VueportSettings;
   bindings: VueportInputBindings;
@@ -472,7 +479,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   isAcceptingInput(): boolean {
-    return this.state.loaded && !this.state.showPreferences && !this.rewindBrowser.isOpen;
+    return this.state.loaded && !this.state.showPreferences && !this.showVrWindow && !this.rewindBrowser.isOpen;
   }
 
   onNothingToRewind(): void {
@@ -579,6 +586,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.onDidChangeModeEmitter);
     this.esSound = new EsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
+    this.lanSharing = new LanSharing(vesLanShareShell);
+    this.toDispose.push(Disposable.create(() => this.lanSharing.dispose()));
+    this.toDispose.push(this.lanSharing.onDidChange(() => this.update()));
     this.toDispose.push(Disposable.create(() => this.stopDecorationSampling()));
     this.macros = new MacroStore(this.storage, undefined, () => this.globalMacrosPath);
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
@@ -1837,6 +1847,9 @@ in the emulator preferences.', bufferSize),
   }
 
   renderOverlay(): React.ReactNode {
+    if (this.showVrWindow) {
+      return <VrWindow emulator={this} onClose={() => this.openVr()} />;
+    }
     return this.state.showPreferences
       ? <SettingsWindow<VesEmulatorSettingsTab>
         tabs={this.settingsTabs()}
@@ -2518,6 +2531,77 @@ in the emulator preferences.', bufferSize),
 
   get hasRom(): boolean {
     return this.status === EmulatorRomStatus.EXISTS;
+  }
+
+  get vrOpen(): boolean {
+    return this.showVrWindow;
+  }
+
+  openVr(): void {
+    this.showVrWindow = !this.showVrWindow;
+    this.update();
+  }
+
+  async shareInLan(): Promise<void> {
+    if (!this.sourceRom || !this.state.loaded) {
+      return;
+    }
+    try {
+      const romUri = await this.getRomUri();
+      const data = this.patchedRom();
+      const sounds = await this.lanShareSounds();
+      await this.lanSharing.start({
+        name: sounds.length > 0 ? `${romUri.path.name}.vbz` : romUri.path.base,
+        data: sounds.length > 0 ? storeZip([{ name: romUri.path.base, data }, ...sounds]) : data,
+        title: this.state.romHeader.name.trim() || romUri.path.name,
+        romId: formatRomId(romCrc32(data)),
+      }, device => this.lanShareMoment(device, romUri.path.base));
+    } catch (error) {
+      this.notifications.error(nls.localize('vueport/vr/share/failed', 'The game could not be shared: {0}',
+        error instanceof Error ? error.message : String(error)));
+    }
+  }
+
+  async retakeLanShare(): Promise<void> {
+    const status = this.lanSharing.status;
+    if (!status || !this.state.loaded) {
+      return;
+    }
+    try {
+      const romUri = await this.getRomUri();
+      await this.lanSharing.retake(await this.lanShareMoment(status.info.device, romUri.path.base));
+    } catch (error) {
+      this.notifications.error(nls.localize('vueport/vr/share/failed', 'The game could not be shared: {0}',
+        error instanceof Error ? error.message : String(error)));
+    }
+  }
+
+  async stopLanShare(): Promise<void> {
+    await this.lanSharing.stop();
+  }
+
+  // nothing for a linked pair, whose state needs two machines, which a headset does not have
+  protected async lanShareMoment(device: string, romName: string): Promise<LanShareMoment | undefined> {
+    if (!this.sim || !this.state.loaded || this.isLinked() || this.isLinkGuest()) {
+      return undefined;
+    }
+    return takeLanShareMoment(this.sim, this.saveStateIdentity, this.esSound.snapshot(), device, romName);
+  }
+
+  protected async lanShareSounds(): Promise<{ name: string, data: Uint8Array }[]> {
+    const tracks = this.esSound.list;
+    if (tracks.length === 0) {
+      return [];
+    }
+    const sounds = [];
+    for (const track of tracks) {
+      sounds.push({ name: track.name, data: await this.storage.read(track.path) });
+    }
+    const titles = this.storage.join(this.storage.parent(tracks[0].path), ES_SOUND_TITLES_FILE);
+    if (await this.storage.exists(titles)) {
+      sounds.push({ name: ES_SOUND_TITLES_FILE, data: await this.storage.read(titles) });
+    }
+    return sounds;
   }
 
   get settingsOpen(): boolean {
