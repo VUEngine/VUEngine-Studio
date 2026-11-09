@@ -62,6 +62,15 @@ export namespace VesEmulatorPreferenceIds {
   export const EMULATOR_BUILTIN_GAMEPAD_PLAYERS = [CATEGORY, 'builtIn', 'gamepad', 'players'].join('.');
   export const EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY = [CATEGORY, 'builtIn', 'gamepad', 'rumble', 'intensity'].join('.');
   export const EMULATOR_BUILTIN_TURBO_RATE = [CATEGORY, 'builtIn', 'turbo', 'rate'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_CONTROLS = [CATEGORY, 'builtIn', 'touch', 'controls'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_OPACITY = [CATEGORY, 'builtIn', 'touch', 'opacity'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_SIZE = [CATEGORY, 'builtIn', 'touch', 'size'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_DIAGONALS = [CATEGORY, 'builtIn', 'touch', 'diagonals'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_SLIDE = [CATEGORY, 'builtIn', 'touch', 'slide'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_VIBRATION = [CATEGORY, 'builtIn', 'touch', 'vibration'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_HIGHLIGHT = [CATEGORY, 'builtIn', 'touch', 'highlight'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_RUMBLE = [CATEGORY, 'builtIn', 'touch', 'rumble'].join('.');
+  export const EMULATOR_BUILTIN_TOUCH_LAYOUT = [CATEGORY, 'builtIn', 'touch', 'layout'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE = [CATEGORY, 'builtIn', 'retroAchievements', 'enable'].join('.');
   export const EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE = [CATEGORY, 'builtIn', 'retroAchievements', 'hardcore'].join('.');
   export const EMULATOR_BUILTIN_DEBUG_PANEL_STATE = [CATEGORY, 'builtIn', 'debug', 'panelState'].join('.');
@@ -117,6 +126,15 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
     gamepadPlayers: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_PLAYERS,
     gamepadRumbleIntensity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_GAMEPAD_RUMBLE_INTENSITY,
     turboRate: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TURBO_RATE,
+    touchControls: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_CONTROLS,
+    touchControlsOpacity: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_OPACITY,
+    touchControlsSize: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_SIZE,
+    touchControlsDiagonals: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_DIAGONALS,
+    touchControlsSlide: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_SLIDE,
+    touchControlsVibration: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_VIBRATION,
+    touchControlsHighlight: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_HIGHLIGHT,
+    touchControlsRumble: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_RUMBLE,
+    touchControlsLayout: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_TOUCH_LAYOUT,
     retroAchievementsEnabled: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_ENABLE,
     retroAchievementsHardcore: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_RETROACHIEVEMENTS_HARDCORE,
     debugPanelState: VesEmulatorPreferenceIds.EMULATOR_BUILTIN_DEBUG_PANEL_STATE,
@@ -136,6 +154,8 @@ export const VUEPORT_PREFERENCE_IDS: Record<keyof VueportConfig, string> = {
 const UNUSED_HERE: readonly (keyof VueportConfig)[] = [
   'videoUseDisplaySettings', 'videoRenderingMode', 'videoScale', 'videoPalette',
   'videoAnaglyphPalette', 'videoQuality', 'videoFormat', 'videoFrameBlending',
+  'touchControls', 'touchControlsOpacity', 'touchControlsSize', 'touchControlsDiagonals', 'touchControlsSlide',
+  'touchControlsVibration', 'touchControlsHighlight', 'touchControlsRumble', 'touchControlsLayout',
 ];
 
 function builtInProperties(): PreferenceSchema['properties'] {

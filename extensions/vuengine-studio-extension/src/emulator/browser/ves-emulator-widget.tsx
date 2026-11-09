@@ -44,7 +44,7 @@ import { crc32 as romCrc32, formatRomId } from 'vueport-core/lib/common/emulator
 import { ES_SOUND_TITLES_FILE } from 'vueport-core/lib/common/emulator-essound';
 import { storeZip } from 'vueport-core/lib/common/emulator-store-zip';
 import { LanShareMoment, LanSharing, takeLanShareMoment } from 'vueport-core/lib/browser/emulator-lan-share';
-import VrWindow from 'vueport-core/lib/browser/components/VrWindow';
+import NetworkSharesWindow from 'vueport-core/lib/browser/components/NetworkSharesWindow';
 import { vesLanShareShell } from './ves-emulator-lan-share';
 import { CachedAnswer, CachedAnswerRead } from 'vueport-core/lib/common/emulator-cached-answer';
 import { EmulatorCompanionLocation } from 'vueport-core/lib/common/emulator-sram';
@@ -381,7 +381,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   protected storage: VueportStorage;
   protected notifications: VueportNotifications;
   lanSharing!: LanSharing;
-  protected showVrWindow = false;
+  protected showNetworkShares = false;
   rumblePack: VueportRumblePack;
   settings: VueportSettings;
   bindings: VueportInputBindings;
@@ -479,7 +479,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   isAcceptingInput(): boolean {
-    return this.state.loaded && !this.state.showPreferences && !this.showVrWindow && !this.rewindBrowser.isOpen;
+    return this.state.loaded && !this.state.showPreferences && !this.showNetworkShares && !this.rewindBrowser.isOpen;
   }
 
   onNothingToRewind(): void {
@@ -1847,8 +1847,8 @@ in the emulator preferences.', bufferSize),
   }
 
   renderOverlay(): React.ReactNode {
-    if (this.showVrWindow) {
-      return <VrWindow emulator={this} onClose={() => this.openVr()} />;
+    if (this.showNetworkShares) {
+      return <NetworkSharesWindow emulator={this} onClose={() => this.openNetworkShares()} />;
     }
     return this.state.showPreferences
       ? <SettingsWindow<VesEmulatorSettingsTab>
@@ -2533,12 +2533,16 @@ in the emulator preferences.', bufferSize),
     return this.status === EmulatorRomStatus.EXISTS;
   }
 
-  get vrOpen(): boolean {
-    return this.showVrWindow;
+  get networkSharesOpen(): boolean {
+    return this.showNetworkShares;
   }
 
-  openVr(): void {
-    this.showVrWindow = !this.showVrWindow;
+  get lanShareActive(): boolean {
+    return this.lanSharing?.status !== undefined;
+  }
+
+  openNetworkShares(): void {
+    this.showNetworkShares = !this.showNetworkShares;
     this.update();
   }
 
