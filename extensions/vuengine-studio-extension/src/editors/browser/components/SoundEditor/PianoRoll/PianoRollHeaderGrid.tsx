@@ -1,11 +1,13 @@
+import chroma from 'chroma-js';
 import React, { Dispatch, MouseEvent, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { scaleCanvasAccountForDpi } from '../../Common/Utils';
+import { drawSongEnd } from '../EffectsPanel/EffectsPanelGridOverview';
+import { getBarsLength, getGridLine, getTimeSignatureSegments } from '../Other/timeSignature';
 import { getFoundPatternSequenceIndex, getPatternName, getSnappedStep, getToolModeCursor } from '../SoundEditor';
 import {
     DEFAULT_BARS_PER_PATTERN,
-    NOTE_RESOLUTION,
     PIANO_ROLL_GRID_METER_HEIGHT,
     PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT,
     PIANO_ROLL_GRID_WIDTH,
@@ -42,7 +44,6 @@ interface PianoRollHeaderGridProps {
     rangeDragEndStep: number
     setRangeDragEndStep: Dispatch<SetStateAction<number>>
     noteSnapping: boolean
-    stepsPerBar: number
 }
 
 export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): React.JSX.Element {
@@ -62,17 +63,14 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         rangeDragStartStep, setRangeDragStartStep,
         rangeDragEndStep, setRangeDragEndStep,
         noteSnapping,
-        stepsPerBar,
     } = props;
     const { currentThemeType, services } = useContext(EditorsContext) as EditorsContextType;
     const [isDragScrolling, setIsDragScrolling] = useState<boolean>(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const height = PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT;
-    const width = Math.min(
-        pianoRollScrollWindow.w,
-        soundData.size * pianoRollNoteWidth
-    );
+    // always as wide as the view, even if the sound is shorter
+    const width = pianoRollScrollWindow.w;
 
     const draw = (): void => {
         const canvas = canvasRef.current;
@@ -93,7 +91,10 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.font = '10px monospace';
 
         // vertical lines & meter numbers
-        for (let x = 0; x < soundData.size; x++) {
+        const timeSignatureSegments = getTimeSignatureSegments(soundData);
+        // the meter continues after the end of the sound, see drawSongEnd
+        const lastColumn = Math.max(soundData.size, Math.ceil((pianoRollScrollWindow.x + pianoRollScrollWindow.w) / pianoRollNoteWidth));
+        for (let x = 0; x < lastColumn; x++) {
             const offsetElement = x * pianoRollNoteWidth;
             if (offsetElement < pianoRollScrollWindow.x) {
                 continue;
@@ -101,7 +102,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             if (offsetElement > pianoRollScrollWindow.x + pianoRollScrollWindow.w) {
                 break;
             }
-            if (x % stepsPerBar !== 0) {
+            const gridLine = getGridLine(timeSignatureSegments, x);
+            if (!gridLine.isBarStart) {
                 continue;
             }
 
@@ -112,7 +114,10 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
             context.strokeStyle = `rgba(${c}, ${c}, ${c}, .4)`;
             context.stroke();
 
-            context.fillText((x / stepsPerBar).toString(), offset + 4, 12);
+            // no bar numbers after the end of the sound
+            if (x < soundData.size) {
+                context.fillText(gridLine.bar.toString(), offset + 4, 12);
+            }
         }
 
         // middle line
@@ -152,6 +157,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         const patternForeground = services.colorRegistry.getCurrentColor('editor.foreground')!;
         const patternBackgroundHighlight = services.colorRegistry.getCurrentColor('focusBorder')!;
         const patternForegroundHighlight = '#fff';
+        const otherPlacementHighlight = chroma(patternBackgroundHighlight).alpha(0.2).toString();
         const track = soundData.tracks[currentTrackId];
         Object.keys(track.sequence).forEach(key => {
             const step = parseInt(key);
@@ -177,6 +183,16 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
                 patternWidth,
                 PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
             );
+            // other placements of the current pattern get a faint highlight
+            if (patternId === currentPatternId && !isSelected) {
+                context.fillStyle = otherPlacementHighlight;
+                context.fillRect(
+                    patternxOffset,
+                    PIANO_ROLL_GRID_METER_HEIGHT,
+                    patternWidth,
+                    PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - PIANO_ROLL_GRID_WIDTH,
+                );
+            }
             context.fillStyle = isSelected ? patternForegroundHighlight : patternForeground;
             context.fillText(getPatternName(soundData, patternId), patternxOffset + 4, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 6);
         });
@@ -187,6 +203,27 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         context.moveTo(0, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.lineTo(width, PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT - 0.5);
         context.stroke();
+
+        // play range being placed
+        if (rangeDragStartStep > -1 && rangeDragEndStep > -1) {
+            const rangeDrawLeft = Math.min(rangeDragStartStep, rangeDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x + 0.5;
+            const rangeDrawWidth = pianoRollNoteWidth * (rangeDragStartStep === rangeDragEndStep
+                ? getBarsLength(timeSignatureSegments, rangeDragStartStep, DEFAULT_BARS_PER_PATTERN)
+                : Math.abs(rangeDragStartStep - rangeDragEndStep) + 1) - 1;
+            const rangeDrawHeight = PIANO_ROLL_GRID_METER_HEIGHT / 2;
+
+            context.strokeStyle = services.colorRegistry.getCurrentColor('focusBorder')!;
+            context.setLineDash([3, 2]);
+            context.beginPath();
+            context.moveTo(rangeDrawLeft, rangeDrawHeight);
+            context.lineTo(rangeDrawLeft, 0.5);
+            context.lineTo(rangeDrawLeft + rangeDrawWidth, 0.5);
+            context.lineTo(rangeDrawLeft + rangeDrawWidth, rangeDrawHeight);
+            context.stroke();
+            context.setLineDash([]);
+        }
+
+        drawSongEnd(context, currentThemeType, soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.x, width, height);
     };
 
     const resetPlayRange = () => {
@@ -239,7 +276,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         if (e.button === 0 && rangeDragStartStep !== -1 && rangeDragEndStep !== -1) {
             const startStep = Math.min(rangeDragStartStep, rangeDragEndStep);
             const endStep = rangeDragStartStep === rangeDragEndStep
-                ? startStep + stepsPerBar * DEFAULT_BARS_PER_PATTERN
+                ? startStep + getBarsLength(getTimeSignatureSegments(soundData), startStep, DEFAULT_BARS_PER_PATTERN)
                 : Math.max(rangeDragStartStep, rangeDragEndStep) + 1;
 
             setPlayRangeStart(startStep);
@@ -264,7 +301,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     };
 
     const handleMouseUpSelect = (e: MouseEvent<HTMLCanvasElement>) => {
-        if (tool !== SoundEditorTool.EDIT) {
+        if (tool !== SoundEditorTool.EDIT && tool !== SoundEditorTool.MARQUEE) {
             return;
         }
 
@@ -273,7 +310,10 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = getSnappedStep(Math.floor(x / pianoRollNoteWidth), noteSnapping, stepsPerBar);
+            const step = getSnappedStep(Math.floor(x / pianoRollNoteWidth), noteSnapping, soundData);
+            if (tool === SoundEditorTool.MARQUEE && getFoundPatternSequenceIndex(soundData, currentTrackId, step) === -1) {
+                return;
+            }
             setPatternAtCursorPosition(step * SUB_NOTE_RESOLUTION);
         }
     };
@@ -301,9 +341,15 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         }
     };
 
+    // the area after the end of the sound only allows scrolling
+    const isWithinSong = (e: MouseEvent<HTMLCanvasElement>): boolean =>
+        e.clientX - e.currentTarget.getBoundingClientRect().left + pianoRollScrollWindow.x < soundData.size * pianoRollNoteWidth;
+
     const onMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
-        handleMouseDownPlayRange(e);
         handleMouseDownDragScrolling(e);
+        if (isWithinSong(e)) {
+            handleMouseDownPlayRange(e);
+        }
     };
 
     const onMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -313,8 +359,10 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
     };
 
     const onMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-        handleMouseMovePlayRange(e);
         handleMouseMoveDragScrolling(e);
+        if (isWithinSong(e)) {
+            handleMouseMovePlayRange(e);
+        }
     };
 
     const onMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -328,7 +376,7 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
 
         if (y > PIANO_ROLL_GRID_METER_HEIGHT) {
             const x = e.clientX - rect.left + pianoRollScrollWindow.x;
-            const step = Math.floor(x / pianoRollNoteWidth / NOTE_RESOLUTION);
+            const step = Math.floor(x / pianoRollNoteWidth);
 
             const insidePatternAtSi = getFoundPatternSequenceIndex(soundData, currentTrackId, step);
             if (insidePatternAtSi > -1) {
@@ -346,6 +394,8 @@ export default function PianoRollHeaderGrid(props: PianoRollHeaderGridProps): Re
         currentSequenceIndex,
         playRangeStart,
         playRangeEnd,
+        rangeDragStartStep,
+        rangeDragEndStep,
         soundData,
         pianoRollNoteWidth,
         pianoRollScrollWindow.x,

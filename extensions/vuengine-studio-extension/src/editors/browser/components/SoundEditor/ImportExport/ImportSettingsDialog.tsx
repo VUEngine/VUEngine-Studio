@@ -11,7 +11,7 @@ import { DataSection } from '../../Common/CommonTypes';
 import { COLOR_PALETTE } from '../../Common/PaletteColorSelect';
 import { getInstrumentName, getTrackTypeLabel } from '../SoundEditor';
 import { SoundEditorCommands } from '../SoundEditorCommands';
-import { SoundData, SoundEditorTrackType, SoundGroup } from '../SoundEditorTypes';
+import { MASTER_VOLUME_DEFAULT, SoundData, SoundEditorTrackType, SoundGroup, TEMPO_DEFAULT, TIMER_RESOLUTION_DEFAULT } from '../SoundEditorTypes';
 import { SUPPORTED_IMPORT_FORMATS_ELEMENT } from './ImportExport';
 
 const StyledFileUri = styled.div`
@@ -88,11 +88,14 @@ export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
         instruments: {},
         loop: false,
         loopPoint: 0,
+        volume: MASTER_VOLUME_DEFAULT,
+        events: {},
         name: '',
         patterns: {},
         section: DataSection.ROM,
         size: 0,
-        speed: {},
+        tempo: TEMPO_DEFAULT,
+        timerResolution: TIMER_RESOLUTION_DEFAULT,
         timeSignature: '4/4',
         tracks: []
     },
@@ -104,9 +107,10 @@ export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
 };
 
 export const SUPPORTED_IMPORT_FILETYPES = [
-    // 'midi', 'mid',
+    'fur',
+    'midi', 'mid',
+    's3m',
     'uge',
-    // 's3m',
     'vbm',
 ];
 

@@ -195,9 +195,9 @@ export default function CurrentTrack(props: CurrentTrackProps): React.JSX.Elemen
                             tooltip={nls.localize(
                                 'vuengine/editors/sound/priorityDescription',
                                 'If no sound source is available when a note of this track is requested, \
-it can steal the sound source from a lower priority track (if "Skip" is not enabled). \
+it can steal the sound source from a lower priority track (if "Allow Queue" is enabled). \
 If all sound sources are used by other tracks with the same priority, \
-then notes are queued to be played once a sound source is freed (if "Skip" is not enabled).'
+then notes are queued to be played once a sound source is freed (if "Allow Queue" is enabled).'
                             )}
                         />
                         <Range
@@ -208,13 +208,14 @@ then notes are queued to be played once a sound source is freed (if "Skip" is no
                         />
                     </VContainer>
                     <Checkbox
-                        label={nls.localize('vuengine/editors/sound/skip', 'Skip')}
+                        label={nls.localize('vuengine/editors/sound/allowQueue', 'Allow Queue')}
                         tooltip={nls.localize(
-                            'vuengine/editors/sound/skipDescription',
+                            'vuengine/editors/sound/allowQueueDescription',
                             'If no sound source is available when a note of this track is requested, \
-do not queue, but skip it.'
+queue it to be played once one is freed, instead of skipping it.'
                         )}
-                        checked={track.skippable}
+                        // stored the other way around, as whether notes get skipped
+                        checked={!track.skippable}
                         setChecked={toggleTrackSkippable}
                     />
                 </HContainer>

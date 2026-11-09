@@ -20,14 +20,24 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_DEFAULT,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VSU_VOLUME_DEFAULT,
-    VSU_VOLUME_MAX,
-    VSU_VOLUME_MIN,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../../../editors/browser/components/SoundEditor/Emulator/VsuTypes';
-import { SoundEditorTrackType, SoundGroup, TRACK_PRIORITY_DEFAULT } from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
+import {
+    INSTRUMENT_PANNING_DEFAULT,
+    INSTRUMENT_PANNING_MAX,
+    INSTRUMENT_PANNING_MIN,
+    INSTRUMENT_VOLUME_DEFAULT,
+    INSTRUMENT_VOLUME_MAX,
+    INSTRUMENT_VOLUME_MIN,
+    MASTER_VOLUME_DEFAULT,
+    MASTER_VOLUME_MAX,
+    MASTER_VOLUME_MIN,
+    SoundEditorTrackType,
+    SoundGroup,
+    TRACK_PRIORITY_DEFAULT
+} from '../../../editors/browser/components/SoundEditor/SoundEditorTypes';
 import { DEFAULT_WAVEFORM } from '../../../editors/browser/components/SoundEditor/Waveforms/WaveFormPresets';
 import { SoundSpecTemplate } from '../template/SoundSpec';
 import { ProjectDataType } from '../ves-project-types';
@@ -104,7 +114,7 @@ export const SoundType: ProjectDataType = {
                                 type: 'object',
                                 properties: {},
                                 additionalProperties: {
-                                    type: ['integer', 'string']
+                                    type: ['number', 'string']
                                 }
                             }
                         }
@@ -140,22 +150,16 @@ export const SoundType: ProjectDataType = {
                             default: DEFAULT_WAVEFORM,
                         },
                         volume: {
-                            type: 'object',
-                            properties: {
-                                left: {
-                                    type: 'integer',
-                                    default: VSU_VOLUME_DEFAULT,
-                                    minimum: VSU_VOLUME_MIN,
-                                    maximum: VSU_VOLUME_MAX
-                                },
-                                right: {
-                                    type: 'integer',
-                                    default: VSU_VOLUME_DEFAULT,
-                                    minimum: VSU_VOLUME_MIN,
-                                    maximum: VSU_VOLUME_MAX
-                                }
-                            },
-                            additionalProperties: false
+                            type: 'integer',
+                            default: INSTRUMENT_VOLUME_DEFAULT,
+                            minimum: INSTRUMENT_VOLUME_MIN,
+                            maximum: INSTRUMENT_VOLUME_MAX
+                        },
+                        panning: {
+                            type: 'integer',
+                            default: INSTRUMENT_PANNING_DEFAULT,
+                            minimum: INSTRUMENT_PANNING_MIN,
+                            maximum: INSTRUMENT_PANNING_MAX
                         },
                         interval: {
                             type: 'object',
@@ -273,19 +277,13 @@ export const SoundType: ProjectDataType = {
                 type: 'number',
                 default: 256
             },
-            speed: {
-                type: 'object',
-                properties: {},
-                additionalProperties: {
-                    type: 'object',
-                    properties: {},
-                    additionalProperties: {
-                        type: 'integer'
-                    }
-                },
-                default: {
-                    0: 64
-                }
+            tempo: {
+                type: 'number',
+                default: 65
+            },
+            timerResolution: {
+                type: 'number',
+                default: 5
             },
             timeSignature: {
                 type: 'object',
@@ -308,6 +306,23 @@ export const SoundType: ProjectDataType = {
             loopPoint: {
                 type: 'number',
                 default: 0
+            },
+            volume: {
+                type: 'integer',
+                default: MASTER_VOLUME_DEFAULT,
+                minimum: MASTER_VOLUME_MIN,
+                maximum: MASTER_VOLUME_MAX
+            },
+            events: {
+                type: 'object',
+                properties: {},
+                additionalProperties: {
+                    type: 'object',
+                    properties: {},
+                    additionalProperties: {
+                        type: ['number', 'string']
+                    }
+                }
             },
             section: {
                 type: 'string',

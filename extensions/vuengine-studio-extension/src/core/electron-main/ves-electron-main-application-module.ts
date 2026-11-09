@@ -1,8 +1,7 @@
-import { ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { ContainerModule } from 'inversify';
-import { VesAppImageIconContribution } from './ves-appimage-icon-contribution';
 import { VesMainApi } from './ves-electron-main-api';
-import './ves-webxr-switches';
+import { ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
+import { VesAppImageIconContribution } from './ves-appimage-icon-contribution';
 
 export default new ContainerModule(bind => {
     bind(VesMainApi).toSelf().inSingletonScope();

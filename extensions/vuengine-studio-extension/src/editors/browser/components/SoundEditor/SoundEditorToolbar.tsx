@@ -16,8 +16,9 @@ import AdvancedSelect from '../Common/Base/AdvancedSelect';
 import RadioSelect from '../Common/Base/RadioSelect';
 import { COLOR_PALETTE, DEFAULT_COLOR_INDEX } from '../Common/PaletteColorSelect';
 import Emulator from './Emulator/Emulator';
-import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
 import { InputWithAction, InputWithActionButton } from './Instruments/Instruments';
+import { getMsAtStep, getTempoSegments } from './Other/tempo';
+import { getPatternPlacements, getTrackStepEvents } from './Other/trackNotes';
 import { getInstrumentLabel, getInstrumentName } from './SoundEditor';
 import { SoundEditorCommands } from './SoundEditorCommands';
 import {
@@ -131,7 +132,6 @@ export const SidebarCollapseButton = styled.button`
 interface SoundEditorToolbarProps {
     soundData: SoundData
     currentTrackId: number
-    currentPatternId: string
     currentPlayerPosition: number
     setCurrentPlayerPosition: Dispatch<SetStateAction<number>>
     selectedNotes: number[]
@@ -150,15 +150,17 @@ interface SoundEditorToolbarProps {
     setEmulatorRomReady: Dispatch<SetStateAction<boolean>>
     testNote: string
     testInstrumentId: string
+    sfxPreviewSoundData: SoundData | undefined
+    onSfxPreviewStarted: () => void
     playRangeStart: number
     playRangeEnd: number
     trackSettings: TrackSettings[]
-    playerRomBuilder: PlayerRomBuilder
     currentInstrumentId: string
     setCurrentInstrumentId: (instrumentId: string) => void
-    setNotes: (notes: EventsMap) => void
+    setTrackNotes: (notes: EventsMap) => void
     setTrack: (trackId: number, track: Partial<TrackConfig>) => void
-    forcePlayerRomRebuild: number
+    forceReplay: number
+    stageTimer: number
     playerSeekRequest: number
     setPlaying: Dispatch<SetStateAction<boolean>>
 }
@@ -168,7 +170,6 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
     const {
         soundData,
         currentTrackId,
-        currentPatternId,
         currentPlayerPosition, setCurrentPlayerPosition,
         selectedNotes,
         playing,
@@ -179,29 +180,32 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
         emulatorInitialized, setEmulatorInitialized,
         emulatorRomReady, setEmulatorRomReady,
         testNote, testInstrumentId,
+        sfxPreviewSoundData, onSfxPreviewStarted,
         playRangeStart, playRangeEnd,
         trackSettings,
-        playerRomBuilder,
         currentInstrumentId, setCurrentInstrumentId,
-        setNotes,
+        setTrackNotes,
         setTrack,
-        forcePlayerRomRebuild,
+        forceReplay,
+        stageTimer,
         playerSeekRequest,
         setPlaying,
     } = props;
-    const isPlayingRegular = playing && !testNote;
+    const isPlayingRegular = playing;
 
     const currentTrack = soundData.tracks[currentTrackId];
     const instrument = soundData.instruments[currentInstrumentId];
 
-    const totalSteps = soundData.size * SUB_NOTE_RESOLUTION;
-    const tickDurationUs = soundData.speed[0] * 1000 / SUB_NOTE_RESOLUTION;
-    const totalLengthSecs = totalSteps * tickDurationUs / 1000 / 1000;
+    const tempoSegments = getTempoSegments(soundData);
+    const totalLengthSecs = getMsAtStep(tempoSegments, soundData.size * SUB_NOTE_RESOLUTION) / 1000;
+    const currentPositionSecs = getMsAtStep(tempoSegments, Math.max(0, currentPlayerPosition) * SUB_NOTE_RESOLUTION) / 1000;
 
+    // the test sound plays independently of the sound's global events
     const getTestSoundData = (): SoundData => ({
         ...soundData,
         loop: testInstrumentId !== '',
         size: 64,
+        events: {},
         instruments: {
             'testInstrument': soundData.instruments[testInstrumentId !== '' ? testInstrumentId : soundData.tracks[currentTrackId].instrument]
         },
@@ -262,9 +266,9 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 <StyledSoundEditorToolbarTime>
                     <span>
                         {currentPlayerPosition > -1
-                            ? Math.floor(currentPlayerPosition * soundData.speed[0] / 1000 / 60) + ':' +
-                            Math.floor((currentPlayerPosition * soundData.speed[0] / 1000) % 60).toString().padStart(2, '0') + ',' +
-                            Math.floor((currentPlayerPosition * soundData.speed[0] / 100) % 10)
+                            ? Math.floor(currentPositionSecs / 60) + ':' +
+                            Math.floor(currentPositionSecs % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((currentPositionSecs * 10) % 10)
                             : '0:00,0'
                         }
                     </span>
@@ -278,21 +282,22 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                 </StyledSoundEditorToolbarTime>
                 <StyledSoundEditorToolbarVisualization className={playing ? 'playing' : undefined}>
                     <Emulator
+                        soundData={soundData}
                         playing={playing}
-                        testNote={testNote}
+                        setPlaying={setPlaying}
+                        testSoundData={sfxPreviewSoundData ?? (testNote ? getTestSoundData() : undefined)}
+                        onTestSoundStarted={sfxPreviewSoundData ? onSfxPreviewStarted : undefined}
                         setEmulatorInitialized={setEmulatorInitialized}
                         emulatorRomReady={emulatorRomReady}
                         setEmulatorRomReady={setEmulatorRomReady}
-                        playerRomBuilder={playerRomBuilder}
                         currentPlayerPosition={currentPlayerPosition}
                         setCurrentPlayerPosition={setCurrentPlayerPosition}
-                        soundData={testNote ? getTestSoundData() : soundData}
                         playRangeStart={playRangeStart}
                         playRangeEnd={playRangeEnd}
                         trackSettings={trackSettings}
-                        forcePlayerRomRebuild={forcePlayerRomRebuild}
+                        forceReplay={forceReplay}
                         playerSeekRequest={playerSeekRequest}
-                        setPlaying={setPlaying}
+                        stageTimer={stageTimer}
                     />
                 </StyledSoundEditorToolbarVisualization>
             </StyledSoundEditorToolbarGroup>
@@ -419,14 +424,11 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             const instrumentId = v[0] as string;
                             setCurrentInstrumentId(instrumentId);
 
-                            const currentPattern = soundData.patterns[currentPatternId];
-                            if (currentPattern === undefined) {
-                                return;
-                            }
-
+                            // the selected notes are steps from the start of the sound in the current track
+                            const trackEvents = getTrackStepEvents(getPatternPlacements(soundData, currentTrackId));
                             const notes: EventsMap = {};
                             selectedNotes.forEach(sn => {
-                                if (currentPattern.events[sn] && currentPattern.events[sn][SoundEvent.Note]) {
+                                if (trackEvents[sn]?.[SoundEvent.Note]) {
                                     notes[sn] = {
                                         [SoundEvent.Instrument]: instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID ? instrumentId : undefined
                                     };
@@ -434,7 +436,7 @@ export default function SoundEditorToolbar(props: SoundEditorToolbarProps): Reac
                             });
 
                             if (Object.keys(notes).length) {
-                                setNotes(notes);
+                                setTrackNotes(notes);
                             }
                         }}
                         backgroundColor={instrument ? COLOR_PALETTE[instrument.color] : undefined}

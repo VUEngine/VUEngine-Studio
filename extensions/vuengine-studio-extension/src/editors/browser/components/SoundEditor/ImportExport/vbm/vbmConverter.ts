@@ -7,15 +7,17 @@ import {
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VSU_VOLUME_DEFAULT,
-    VsuChannelStereoLevelsData,
+    VsuChannelEnvelopeData,
     VsuEnvelopeDirection,
     VsuSweepDirection,
     VsuSweepModulationFunction,
     WaveformData
 } from '../../Emulator/VsuTypes';
+import { snapTempo } from '../../Other/tempo';
+import { DEFAULT_STEREO_LEVELS, getVolumeAndPanningFromStereoLevels } from '../../Other/volume';
 import {
     InstrumentConfig,
+    MASTER_VOLUME_DEFAULT,
     NOTES_LABELS_REVERSED,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -26,21 +28,24 @@ import {
     SoundGroup,
     SUB_NOTE_RESOLUTION,
     TRACK_PRIORITY_DEFAULT,
+    TIMER_RESOLUTION_DEFAULT,
     TrackConfig
 } from '../../SoundEditorTypes';
 import { DEFAULT_WAVEFORM } from '../../Waveforms/WaveFormPresets';
-import { EffectCommandType, EffectName, VBMusicFile } from './vbmTypes';
+import { EffectCommandType, EffectName, PatternRow, VBMusicFile } from './vbmTypes';
+
+const DEFAULT_ENVELOPE: VsuChannelEnvelopeData = {
+    direction: VsuEnvelopeDirection.Decay,
+    enabled: false,
+    initialValue: 15,
+    repeat: false,
+    stepTime: VSU_ENVELOPE_STEP_TIME_MIN
+};
 
 const DEFAULT_INSTRUMENT_ID = 'default';
 const DEFAULT_INSTRUMENT = {
     color: 4,
-    envelope: {
-        direction: VsuEnvelopeDirection.Decay,
-        enabled: false,
-        initialValue: 15,
-        repeat: false,
-        stepTime: VSU_ENVELOPE_STEP_TIME_MIN
-    },
+    envelope: DEFAULT_ENVELOPE,
     interval: {
         enabled: false,
         value: VSU_INTERVAL_MIN
@@ -60,11 +65,17 @@ const DEFAULT_INSTRUMENT = {
     },
     tap: 0,
     type: SoundEditorTrackType.WAVE,
-    volume: {
-        left: VSU_VOLUME_DEFAULT,
-        right: VSU_VOLUME_DEFAULT
-    },
+    ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, DEFAULT_ENVELOPE),
     waveform: DEFAULT_WAVEFORM,
+};
+
+const getVolumeEvents = (left: number, right: number): SoundEventMap => {
+    const { volume, panning } = getVolumeAndPanningFromStereoLevels({ left, right }, DEFAULT_ENVELOPE);
+
+    return {
+        [SoundEvent.Volume]: volume,
+        [SoundEvent.Panning]: panning,
+    };
 };
 
 interface ConvertedInstrument {
@@ -78,6 +89,9 @@ interface ConvertedPattern {
 }
 
 const NOTE_OFFSET = 42;
+const VOLUME_MAX = 15;
+// volume slides change the volume in eighths of a level
+const VOLUME_SLIDE_RESOLUTION = 8;
 
 export const convertVbmSong = (song: VBMusicFile): SoundData => {
     const convertedPatternSize = song.SongSettings.Rows;
@@ -90,14 +104,15 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         patterns: {},
         instruments: {},
         size: 0,
-        speed: {
-            0: 2 * song.SongSettings.Speed, // TODO
-        },
+        tempo: snapTempo(2 * song.SongSettings.Speed, TIMER_RESOLUTION_DEFAULT), // TODO
+        timerResolution: TIMER_RESOLUTION_DEFAULT,
         timeSignature: {
             0: '4/4'
         },
         loop: false,
         loopPoint: 0,
+        volume: MASTER_VOLUME_DEFAULT,
+        events: {},
         section: DataSection.ROM,
         group: SoundGroup.None,
     };
@@ -175,6 +190,8 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         });
     });
 
+    applyVolumeSlides(song, patternsLookup, tracks, convertedPatternSize);
+
     // find track default instruments and settings from instrument events on first pattern's first event
     const firstPatternMapFrame = song.PatternMap.Frame[0];
     firstPatternMapFrame?.Data.forEach((patternIndex, trackIndex) => {
@@ -182,12 +199,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
         if (foundSourcePattern?.Row[0].Inst !== undefined) {
             const instrumentId = foundSourcePattern.Row[0].Inst;
             const convertedInstrument = instrumentsLookup[instrumentId];
-
-            // get volume
-            const volume: VsuChannelStereoLevelsData = {
-                left: foundSourcePattern?.Row[0].VolL ?? convertedInstrument.instrumentConfig.volume.left,
-                right: foundSourcePattern?.Row[0].VolR ?? convertedInstrument.instrumentConfig.volume.right,
-            };
 
             // get waveform/tap
             let waveform = convertedInstrument.instrumentConfig.waveform;
@@ -223,7 +234,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
                 name: convertedInstrument.instrumentConfig.name + ` (CH${trackIndex + 1})`,
                 type: tracks[trackIndex].type,
                 tap,
-                volume,
                 waveform,
             };
 
@@ -247,7 +257,6 @@ export const convertVbmSong = (song: VBMusicFile): SoundData => {
             const firstEventKey = parseInt(Object.keys(pattern.events)[0]);
             const updatedEvents = { ...pattern.events };
             delete updatedEvents[firstEventKey][SoundEvent.Instrument];
-            delete updatedEvents[firstEventKey][SoundEvent.Volume];
             result.patterns[firstPatternId] = {
                 ...pattern,
                 events: updatedEvents,
@@ -291,13 +300,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
             id: nanoid(),
             instrumentConfig: {
                 color: index * 8 % COLOR_PALETTE.length,
-                envelope: {
-                    direction: VsuEnvelopeDirection.Decay,
-                    enabled: false,
-                    initialValue: 15,
-                    repeat: false,
-                    stepTime: VSU_ENVELOPE_STEP_TIME_MIN
-                },
+                envelope: { ...DEFAULT_ENVELOPE },
                 interval: {
                     enabled: false,
                     value: VSU_INTERVAL_MIN
@@ -317,10 +320,7 @@ const convertInstruments = (song: VBMusicFile): ConvertedInstrument[] => {
                 },
                 tap: 0,
                 type: SoundEditorTrackType.WAVE,
-                volume: {
-                    left: VSU_VOLUME_DEFAULT,
-                    right: VSU_VOLUME_DEFAULT
-                },
+                ...getVolumeAndPanningFromStereoLevels(DEFAULT_STEREO_LEVELS, DEFAULT_ENVELOPE),
                 waveform: DEFAULT_WAVEFORM,
             },
         });
@@ -350,7 +350,7 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             const event: SoundEventMap = {};
 
             if (tick.Note !== undefined) {
-                event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM)];
+                event[SoundEvent.Note] = NOTES_LABELS_REVERSED[clamp(tick.Note - NOTE_OFFSET, 0, NOTES_SPECTRUM - 1)];
                 let length = 1;
                 while (pattern.Row[i + length] && pattern.Row[i + length].Note === undefined) {
                     length++;
@@ -366,7 +366,9 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
             }
 
             if (tick.VolL !== undefined || tick.VolR !== undefined) {
-                event[SoundEvent.Volume] = ((tick.VolL ?? 0) << 4) + (tick.VolR ?? 0);
+                Object.assign(event, getVolumeEvents(tick.VolL ?? 0, tick.VolR ?? 0));
+            } else if (tick.Inst !== undefined) {
+                Object.assign(event, getVolumeEvents(DEFAULT_STEREO_LEVELS.left, DEFAULT_STEREO_LEVELS.right));
             }
 
             [
@@ -378,7 +380,7 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
                 if (fx !== undefined) {
                     const effectCommandType = fx.substring(0, 1);
                     // const EffectCommandValue = parseInt(fx.substring(1));
-                    // TODO: support effects
+                    // TODO: add support for missing effects listed below
                     switch (effectCommandType) {
                         case EffectCommandType.Arpeggio: break;
                         case EffectCommandType.PitchSlideUp: break;
@@ -386,7 +388,6 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
                         case EffectCommandType.Portamento: break;
                         case EffectCommandType.Vibrato: break;
                         case EffectCommandType.Tremolo: break;
-                        case EffectCommandType.VolumeSlide: break;
                         case EffectCommandType.Jump: break;
                         case EffectCommandType.Halt: break;
                         case EffectCommandType.Skip: break;
@@ -416,4 +417,105 @@ const convertPatterns = (song: VBMusicFile, instrumentsLookup: ConvertedInstrume
     });
 
     return result;
+};
+
+// the change per tick of a volume slide (Axy), in eighths of a level
+const getVolumeSlideRate = (fx: string): number => {
+    const param = fx.substring(1).padStart(2, '0');
+    const rate = parseInt(param.charAt(param.length - 2), 16) - parseInt(param.charAt(param.length - 1), 16);
+
+    return isNaN(rate) ? 0 : rate;
+};
+
+// Volume slides (Axy) change the volume by (x - y) / 8 every tick, until A00 stops them, while setting the volume or an
+// instrument sets the volume they start from. They get converted to volume events wherever the resulting volume changes,
+// which requires following the song through its frames.
+// Patterns used more than once keep the volume events of their first occurence.
+const applyVolumeSlides = (
+    song: VBMusicFile,
+    patternsLookup: ConvertedPattern[][],
+    tracks: TrackConfig[],
+    convertedPatternSize: number,
+): void => {
+    const ticksPerRow = Math.max(1, song.SongSettings.Speed);
+    const maxVolume = VOLUME_MAX * VOLUME_SLIDE_RESOLUTION;
+
+    tracks.forEach((track, trackIndex) => {
+        // patterns are looked up by their position among the channel's ones, like for the sequence
+        const sourcePatterns = song.Pattern.filter(p => p.Channel === trackIndex);
+        let left = DEFAULT_STEREO_LEVELS.left * VOLUME_SLIDE_RESOLUTION;
+        let right = DEFAULT_STEREO_LEVELS.right * VOLUME_SLIDE_RESOLUTION;
+        let rate = 0;
+        let playedVolumeEvents = getVolumeEvents(DEFAULT_STEREO_LEVELS.left, DEFAULT_STEREO_LEVELS.right);
+        const visitedPatternIds = new Set<string>();
+
+        song.PatternMap.Frame.forEach(frame => {
+            const patternIndex = frame.Data[trackIndex];
+            const convertedPattern = patternsLookup[trackIndex]?.[patternIndex];
+            const canAddEvents = convertedPattern !== undefined
+                && track.sequence[frame.ID * convertedPatternSize] === convertedPattern.id
+                && !visitedPatternIds.has(convertedPattern.id);
+            if (convertedPattern) {
+                visitedPatternIds.add(convertedPattern.id);
+            }
+            const rows: Record<number, PatternRow> = {};
+            sourcePatterns[patternIndex]?.Row.forEach(row => {
+                rows[row.ID] = row;
+            });
+
+            const slide = (step: number) => {
+                if (rate === 0) {
+                    return;
+                }
+                left = clamp(left + rate, 0, maxVolume);
+                right = clamp(right + rate, 0, maxVolume);
+                const volumeEvents = getVolumeEvents(
+                    Math.floor(left / VOLUME_SLIDE_RESOLUTION),
+                    Math.floor(right / VOLUME_SLIDE_RESOLUTION)
+                );
+                const changedEvents: SoundEventMap = {};
+                [SoundEvent.Volume, SoundEvent.Panning].forEach(eventType => {
+                    if (volumeEvents[eventType] !== playedVolumeEvents[eventType]) {
+                        changedEvents[eventType] = volumeEvents[eventType];
+                    }
+                });
+                playedVolumeEvents = volumeEvents;
+                if (canAddEvents && Object.keys(changedEvents).length > 0) {
+                    const events = convertedPattern.patternConfig.events;
+                    events[step] = {
+                        ...events[step],
+                        ...changedEvents,
+                    };
+                }
+            };
+
+            for (let rowIndex = 0; rowIndex < convertedPatternSize; rowIndex++) {
+                const row = rows[rowIndex];
+                const rowStep = rowIndex * SUB_NOTE_RESOLUTION;
+
+                // a running slide goes on on the row's first tick, unless the row sets the volume
+                if (row?.VolL !== undefined || row?.VolR !== undefined) {
+                    left = (row.VolL ?? 0) * VOLUME_SLIDE_RESOLUTION;
+                    right = (row.VolR ?? 0) * VOLUME_SLIDE_RESOLUTION;
+                    playedVolumeEvents = getVolumeEvents(row.VolL ?? 0, row.VolR ?? 0);
+                } else if (row?.Inst !== undefined) {
+                    left = DEFAULT_STEREO_LEVELS.left * VOLUME_SLIDE_RESOLUTION;
+                    right = DEFAULT_STEREO_LEVELS.right * VOLUME_SLIDE_RESOLUTION;
+                    playedVolumeEvents = getVolumeEvents(DEFAULT_STEREO_LEVELS.left, DEFAULT_STEREO_LEVELS.right);
+                } else {
+                    slide(rowStep);
+                }
+
+                const volumeSlide = [row?.FX0, row?.FX1, row?.FX2, row?.FX3]
+                    .find(fx => fx?.startsWith(EffectCommandType.VolumeSlide));
+                if (volumeSlide) {
+                    rate = getVolumeSlideRate(volumeSlide);
+                }
+
+                for (let tick = 1; tick < ticksPerRow; tick++) {
+                    slide(rowStep + Math.round(tick * SUB_NOTE_RESOLUTION / ticksPerRow));
+                }
+            }
+        });
+    });
 };

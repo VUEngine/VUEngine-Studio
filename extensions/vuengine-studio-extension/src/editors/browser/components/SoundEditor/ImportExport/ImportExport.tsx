@@ -14,6 +14,13 @@ export const SUPPORTED_IMPORT_FORMATS_ELEMENT = <VContainer>
     )}
     <ul>
         <li>
+            <b>VB Music Tracker (.vbm)</b>{': '}
+            {nls.localize(
+                'vuengine/editors/sound/vbmDescription',
+                "Proprietary sound format used by M.K.'s VB Music Tracker."
+            )}
+        </li>
+        <li>
             <b>hUGEtracker (.uge)</b>{': '}
             {nls.localize(
                 'vuengine/editors/sound/ugeDescription',
@@ -21,10 +28,24 @@ export const SUPPORTED_IMPORT_FORMATS_ELEMENT = <VContainer>
             )}
         </li>
         <li>
-            <b>VB Music Tracker (.vbm)</b>{': '}
+            <b>MIDI (.mid, .midi)</b>{': '}
             {nls.localize(
-                'vuengine/editors/sound/vbmDescription',
-                "Proprietary sound format used by M.K.'s VB Music Tracker."
+                'vuengine/editors/sound/midiDescription',
+                'Standard format for exchanging music between sequencers, DAWs and other music software.'
+            )}
+        </li>
+        <li>
+            <b>ScreamTracker 3 (.s3m)</b>{': '}
+            {nls.localize(
+                'vuengine/editors/sound/s3mDescription',
+                'Sample-based module format of the DOS tracker ScreamTracker 3.'
+            )}
+        </li>
+        <li>
+            <b>Furnace (.fur)</b>{': '}
+            {nls.localize(
+                'vuengine/editors/sound/furnaceDescription',
+                'Module format of the multi-system chiptune tracker Furnace, which supports the Virtual Boy.'
             )}
         </li>
     </ul>

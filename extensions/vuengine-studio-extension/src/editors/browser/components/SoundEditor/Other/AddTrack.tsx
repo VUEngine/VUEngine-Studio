@@ -6,7 +6,16 @@ import { SoundType } from '../../../../../project/browser/types/Sound';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { ALL_TRACK_TYPES, DEFAULT_TRACK_SETTINGS, SoundData, SoundEditorTrackType, TRACK_TYPE_LABELS, TrackConfig, TrackSettings } from '../SoundEditorTypes';
+import {
+    ALL_TRACK_TYPES,
+    DEFAULT_TRACK_SETTINGS,
+    SoundData,
+    SoundEditorTrackType,
+    TRACK_TYPE_INSTRUMENT_COMPATIBILITY,
+    TRACK_TYPE_LABELS,
+    TrackConfig,
+    TrackSettings
+} from '../SoundEditorTypes';
 
 const StyledChannel = styled.button`
     align-items: center;
@@ -116,9 +125,14 @@ export default function AddTrack(props: AddTrackProps): React.JSX.Element {
                 type: trackType,
             });
 
+            // the first instrument that suits the track, as tracks without one stay silent
+            const instrument = Object.keys(soundData.instruments)
+                .find(id => TRACK_TYPE_INSTRUMENT_COMPATIBILITY[trackType].includes(soundData.instruments[id].type));
+
             updatedTracks.push({
                 ...newTrackData,
-                type: trackType
+                type: trackType,
+                instrument: instrument ?? newTrackData.instrument ?? '',
             });
         });
 

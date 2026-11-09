@@ -29,13 +29,14 @@ export default function StepInput(props: StepInputProps): React.JSX.Element {
             step={noteSnapping ? SUB_NOTE_RESOLUTION : 1}
             value={step}
             setValue={v => {
+                // remove all events from the previous step
                 setNotes({
-                    [step]: {},
+                    [step]: Object.fromEntries(Object.keys(events).map(e => [e, undefined])),
                     [v]: {
                         ...events
                     }
                 });
-                setNoteCursor((v as number) + patternStepOffset);
+                setNoteCursor((v as number) + patternStepOffset * SUB_NOTE_RESOLUTION);
             }}
             width={width}
         />

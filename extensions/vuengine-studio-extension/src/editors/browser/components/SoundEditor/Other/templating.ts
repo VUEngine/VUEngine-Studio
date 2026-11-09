@@ -1,6 +1,6 @@
 import { deepClone, isString } from '@theia/core';
 import { crc32 } from 'crc';
-import { hexFromBitsArray, intToHex } from '../../Common/Utils';
+import { clamp, hexFromBitsArray, intToHex } from '../../Common/Utils';
 import {
     ModulationData,
     VsuChannelEnvelopeData,
@@ -11,12 +11,11 @@ import {
     WaveformData
 } from '../Emulator/VsuTypes';
 import {
-    getStereoLevelsFromVolumeEventValue,
-    getVolumeEventValueFromStereoLevels
-} from '../SoundEditor';
-import {
     InstrumentConfig,
+    EventsMap,
     InstrumentMap,
+    MASTER_VOLUME_DEFAULT,
+    MASTER_VOLUME_EVENT_MAX,
     NOTES,
     PatternConfig,
     PatternMap,
@@ -25,16 +24,20 @@ import {
     SoundEvent,
     SoundEventMap,
     SUB_NOTE_RESOLUTION,
+    NOTE_SLIDE_STEPS_DEFAULT,
+    NOTE_SLIDE_STEPS_MAX,
+    NOTE_SLIDE_STEPS_MIN,
     TrackConfig
 } from '../SoundEditorTypes';
+import { getTempoSegments, getTicksAtStep, getTimerResolution } from './tempo';
+import { getEffectiveVolumeAndPanning, getMasterVolume, getRegisterLevels } from './volume';
 
 interface withArtificialNotes {
     artificial?: true
+    muted?: true
 }
 type SoundEventMapWithArtificialNotes = SoundEventMap & withArtificialNotes;
 type EventsMapWithArtificialNotes = Record<number, SoundEventMapWithArtificialNotes>;
-
-const NOTE_SLIDE_STEP_DURATION = 10;
 
 interface Keyframe {
     SxINT?: string
@@ -48,6 +51,8 @@ interface Keyframe {
 }
 
 type KeyframeMap = Record<number, Keyframe>;
+
+const KEYFRAME_DURATION_MAX = 0xFFFF;
 
 interface TrackKeyframes {
     keyframeMap: KeyframeMap,
@@ -102,8 +107,8 @@ const SxLRV = (volume: VsuChannelStereoLevelsData): string => hexFromBitsArray([
 
 const SxFQ = (frequency: number): string => intToHex(frequency, 4);
 
-const SxEV0 = (envelope: VsuChannelEnvelopeData): string => hexFromBitsArray([
-    [envelope.initialValue, 4],
+const SxEV0 = (envelope: VsuChannelEnvelopeData, initialValue: number): string => hexFromBitsArray([
+    [initialValue, 4],
     [envelope.direction, 1],
     [envelope.stepTime, 3]
 ]);
@@ -182,24 +187,38 @@ const mergePatterns = (
 ): EventsMapWithArtificialNotes => {
     const trackEventsMap: EventsMapWithArtificialNotes = {};
 
-    let patternStartStep = 0;
-    let patternStepSize = 0;
-    let pattern: PatternConfig = {} as PatternConfig;
-    for (let step = 0; step < totalSize; step++) {
-        // Does a pattern start at the current step?
-        const sequenceStep = track.sequence[step / SUB_NOTE_RESOLUTION];
-        if (sequenceStep) {
-            pattern = patterns[sequenceStep];
-            patternStepSize = pattern.size * SUB_NOTE_RESOLUTION;
-            patternStartStep = step;
-        }
+    // patterns can only start at whole steps
+    const sequenceColumns = Object.keys(track.sequence)
+        .map(column => parseFloat(column))
+        .filter(column => column >= 0
+            && track.sequence[column]
+            && Math.round(column * SUB_NOTE_RESOLUTION) / SUB_NOTE_RESOLUTION === column
+        )
+        .sort((a, b) => a - b);
 
-        // Is there an event for the current step in the current pattern?
-        const patternStep = step - patternStartStep;
-        if (pattern.events && patternStep < patternStepSize && pattern.events[patternStep]) {
-            trackEventsMap[step] = { ...pattern.events[patternStep] };
+    // only visit the patterns' events instead of every step of the sound
+    sequenceColumns.forEach((column, index) => {
+        const pattern: PatternConfig | undefined = patterns[track.sequence[column]];
+        if (!pattern) {
+            return;
         }
-    }
+        const patternStartStep = Math.round(column * SUB_NOTE_RESOLUTION);
+        // a pattern gets cut off by the next one in the sequence and by the end of the sound
+        const nextColumn = sequenceColumns[index + 1];
+        const patternEndStep = Math.min(
+            totalSize,
+            patternStartStep + pattern.size * SUB_NOTE_RESOLUTION,
+            nextColumn !== undefined ? nextColumn * SUB_NOTE_RESOLUTION : Infinity,
+        );
+
+        Object.keys(pattern.events ?? {}).forEach(patternStepStr => {
+            const patternStep = parseFloat(patternStepStr);
+            const step = patternStartStep + patternStep;
+            if (Number.isInteger(patternStep) && patternStep >= 0 && step < patternEndStep && pattern.events[patternStep]) {
+                trackEventsMap[step] = { ...pattern.events[patternStep] };
+            }
+        });
+    });
 
     return trackEventsMap;
 };
@@ -223,10 +242,9 @@ const filterEmptyEvents = (
     return result;
 };
 
-// if there's no note at step 0, set volume to 0 initially
-const applyTrackInitialVolume = (
+// if there's no note at step 0, mute the track until the first note plays
+const applyTrackInitialMute = (
     trackEventsMap: EventsMapWithArtificialNotes,
-    initialInstrument: InstrumentConfig,
 ): EventsMapWithArtificialNotes => {
     const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
 
@@ -234,22 +252,38 @@ const applyTrackInitialVolume = (
         .map(step => parseInt(step))
         .filter(step => result[step][SoundEvent.Note] !== undefined)
         .sort((a, b) => a - b);
-    if (sortedTrackStepsWithNote.length === 0) {
-        return result;
+    if (sortedTrackStepsWithNote.length > 0 && sortedTrackStepsWithNote[0] > 0) {
+        result[0] = {
+            ...(result[0] ?? {}),
+            muted: true,
+        };
     }
 
-    const firstStepWithNote: number = Math.min(...sortedTrackStepsWithNote);
-    if (firstStepWithNote && firstStepWithNote > 0) {
-        result[0] = {
-            [SoundEvent.Volume]: 0,
-        };
-        // set initial instrument volume on first step only if it does not set the volume explicitly
-        if (result[firstStepWithNote][SoundEvent.Instrument] === undefined &&
-            result[firstStepWithNote][SoundEvent.Volume] === undefined
-        ) {
-            result[firstStepWithNote][SoundEvent.Volume] = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
+    return result;
+};
+
+const applyGlobalEvents = (
+    trackEventsMap: EventsMapWithArtificialNotes,
+    globalEvents: EventsMap,
+    totalSize: number,
+): EventsMapWithArtificialNotes => {
+    const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
+
+    Object.keys(globalEvents ?? {}).forEach(s => {
+        const step = parseInt(s);
+        const {
+            // filter out some events
+            [SoundEvent.TimeSignature]: timeSignature,
+            [SoundEvent.Tempo]: tempo,
+            ...playbackEvents
+        } = globalEvents[step];
+        if (step < totalSize && Object.keys(playbackEvents).length > 0) {
+            result[step] = {
+                ...(result[step] ?? {}),
+                ...playbackEvents,
+            };
         }
-    }
+    });
 
     return result;
 };
@@ -268,76 +302,30 @@ const applyTrackInitialInstrument = (
     return result;
 };
 
-// set volume to 0 if a note's duration end before a new note plays
+// mute the track if a note's duration ends before a new note plays
 const applyNoteDuration = (
     trackEventsMap: EventsMapWithArtificialNotes,
-    initialInstrument: InstrumentConfig,
-    instruments: InstrumentMap,
     totalSize: number,
 ): EventsMapWithArtificialNotes => {
     const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
 
-    const trackSteps: number[] = Object.keys(result).map(step => parseInt(step)).sort((a, b) => a - b);
-    let lastVolume = getVolumeEventValueFromStereoLevels(initialInstrument?.volume);
-
-    trackSteps.forEach((step, stepIndex) => {
-        const stepEvents = result[step];
-
-        // remember last set volume
-        // explicit volume event has preference over instument event
-        const instrumentId = stepEvents[SoundEvent.Instrument];
-        if (instrumentId !== undefined) {
-            const instrument = instruments[instrumentId];
-            if (instrument !== undefined) {
-                lastVolume = getVolumeEventValueFromStereoLevels(instrument.volume);
-            }
-        }
-        const volume = stepEvents[SoundEvent.Volume];
-        if (volume !== undefined) {
-            lastVolume = volume;
+    const sortedTrackStepsWithNote: number[] = Object.keys(result)
+        .map(step => parseInt(step))
+        .filter(step => result[step][SoundEvent.Note] !== undefined)
+        .sort((a, b) => a - b);
+    sortedTrackStepsWithNote.forEach((step, index) => {
+        const duration = result[step][SoundEvent.Duration];
+        if (duration === undefined) {
+            return;
         }
 
-        // check duration expiration
-        const duration = stepEvents[SoundEvent.Duration];
         const endStep = step + duration;
-        if (duration !== undefined) {
-            // follow all steps of duration
-            for (let i = step + 1; i <= endStep; i++) {
-                // if exceeding track length, stop
-                if (i >= totalSize) {
-                    break;
-                }
-                // if there's a note event along the way, stop
-                if (result[i] !== undefined && result[i][SoundEvent.Note] !== undefined) {
-                    break;
-                }
-                // if there's none until the final step...
-                if (i === endStep &&
-                    // ... and there's no explicit volume set at that step...
-                    (result[i] === undefined || result[i][SoundEvent.Volume] === undefined)
-                ) {
-                    // ... then set volume to 0
-                    result[i] = {
-                        ...(result[i] ?? {}),
-                        [SoundEvent.Volume]: 0,
-                    };
-
-                    // if there's a next step and it doesn't set the volume, reset it there
-                    const nextStep = trackSteps[stepIndex + 1];
-                    if (nextStep !== undefined) {
-                        const nextStepEvents = result[nextStep];
-                        if (nextStepEvents !== undefined &&
-                            nextStepEvents[SoundEvent.Instrument] === undefined &&
-                            nextStepEvents[SoundEvent.Volume] === undefined
-                        ) {
-                            result[nextStep] = {
-                                ...(nextStepEvents ?? {}),
-                                [SoundEvent.Volume]: lastVolume,
-                            };
-                        }
-                    }
-                }
-            }
+        const nextNoteStep = sortedTrackStepsWithNote[index + 1];
+        if (endStep < totalSize && (nextNoteStep === undefined || nextNoteStep > endStep)) {
+            result[endStep] = {
+                ...(result[endStep] ?? {}),
+                muted: true,
+            };
         }
     });
 
@@ -371,46 +359,58 @@ const applyNoteSlide = (
     trackEventsMap: EventsMapWithArtificialNotes,
 ): EventsMapWithArtificialNotes => {
     const result: EventsMapWithArtificialNotes = deepClone(trackEventsMap);
+    // sorted from highest to lowest
+    const noteFrequencies = Object.values(NOTES);
 
-    const sortedTrackSteps: number[] = Object.keys(result)
+    const sortedNoteSteps: number[] = Object.keys(result)
         .map(step => parseInt(step))
+        .filter(step => result[step][SoundEvent.Note] !== undefined)
         .sort((a, b) => a - b);
-    sortedTrackSteps.forEach(step => {
+    sortedNoteSteps.forEach((step, index) => {
         const stepEvents = result[step];
         const noteSlide = stepEvents[SoundEvent.NoteSlide];
         if (noteSlide === undefined || noteSlide === 0) {
             return;
         }
 
-        const note = stepEvents[SoundEvent.Note];
-        const noteId = Object.values(NOTES).indexOf(note);
+        const frequency = stepEvents[SoundEvent.Note];
+        const noteId = noteFrequencies.indexOf(frequency);
         const duration = stepEvents[SoundEvent.Duration];
-        if (note === undefined || noteId === -1 || duration === undefined) {
+        if (noteId === -1 || duration === undefined) {
             return;
         }
 
-        const noteSlideDirection = noteSlide < 0 ? -1 : 1;
-        const targetNote = Object.values(NOTES)[noteId - noteSlide];
-        const distance = Math.abs(note - targetNote);
-
-        const numberOfSteps = Math.round(duration / NOTE_SLIDE_STEP_DURATION);
-        if (numberOfSteps <= 2) {
+        // the slide must not reach into the next note
+        const slideDuration = Math.min(duration, (sortedNoteSteps[index + 1] ?? Infinity) - step);
+        const stepDuration = SUB_NOTE_RESOLUTION /
+            clamp(stepEvents[SoundEvent.NoteSlideSteps] ?? NOTE_SLIDE_STEPS_DEFAULT, NOTE_SLIDE_STEPS_MIN, NOTE_SLIDE_STEPS_MAX);
+        // a little tolerance, as the step duration might be a fraction
+        const numberOfSteps = Math.floor(slideDuration / stepDuration + 0.001);
+        if (numberOfSteps < 2) {
             return;
         }
 
-        const changePerStep = Math.round(distance / numberOfSteps) * noteSlideDirection;
+        // the target is reached on the last step, and the frequency register value changes by the same amount on every
+        // step, like a tracker's portamento does with the period. As the frequency is inversely proportional to the
+        // register value's distance to its maximum, the pitch falls fast at first on slides down, and rises slowly at first on slides up.
+        const targetFrequency = noteFrequencies[clamp(noteId - noteSlide, 0, noteFrequencies.length - 1)];
 
-        stepEvents[SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
+        let previousFrequency = frequency;
         for (let i = 1; i < numberOfSteps; i++) {
-            const artificialStep = step + (i * NOTE_SLIDE_STEP_DURATION);
-            if (result[artificialStep] === undefined) {
-                result[artificialStep] = {};
+            const stepFrequency = Math.round(frequency + (targetFrequency - frequency) * i / (numberOfSteps - 1));
+            // slow slides can stay on the same value for several steps
+            if (stepFrequency === previousFrequency) {
+                continue;
             }
+            previousFrequency = stepFrequency;
 
-            result[artificialStep].artificial = true;
-            result[artificialStep][SoundEvent.Note] = note + (i * changePerStep);
-            result[artificialStep][SoundEvent.Duration] = NOTE_SLIDE_STEP_DURATION;
-
+            const artificialStep = step + Math.round(i * stepDuration);
+            result[artificialStep] = {
+                ...result[artificialStep],
+                artificial: true,
+                [SoundEvent.Note]: stepFrequency,
+                [SoundEvent.Duration]: step + slideDuration - artificialStep,
+            };
             if (stepEvents[SoundEvent.Instrument]) {
                 result[artificialStep][SoundEvent.Instrument] = stepEvents[SoundEvent.Instrument];
             }
@@ -424,6 +424,7 @@ const applyNoteSlide = (
 const transformToKeyframes = (
     trackEventsMap: EventsMapWithArtificialNotes,
     instruments: InstrumentMap,
+    soundMasterVolume: number,
     totalSize: number,
     track: TrackConfig,
     specName: string,
@@ -435,9 +436,32 @@ const transformToKeyframes = (
 
     let currentInstrumentId: string | undefined;
     let currentInstrument: InstrumentConfig = instruments[track.instrument];
+    let volume: number | undefined;
+    let panning: number | undefined;
+    let masterVolumeEvent = MASTER_VOLUME_EVENT_MAX;
+    let muted = false;
+    const getCurrentRegisterLevels = () => {
+        const effective = getEffectiveVolumeAndPanning(currentInstrument, volume, panning, getMasterVolume(soundMasterVolume, masterVolumeEvent));
+        return getRegisterLevels(effective.volume, effective.panning, currentInstrument.envelope);
+    };
+
     trackSteps.forEach((step, stepIndex) => {
         const stepEvents = trackEventsMap[step];
         const keyframe: Keyframe = {};
+
+        // volume and panning persist until changed
+        if (stepEvents[SoundEvent.Volume] !== undefined) {
+            volume = stepEvents[SoundEvent.Volume];
+        }
+        if (stepEvents[SoundEvent.Panning] !== undefined) {
+            panning = stepEvents[SoundEvent.Panning];
+        }
+        if (stepEvents[SoundEvent.MasterVolume] !== undefined) {
+            masterVolumeEvent = stepEvents[SoundEvent.MasterVolume];
+        }
+        if (stepEvents.muted) {
+            muted = true;
+        }
 
         const sweepEnabled = track.type === SoundEditorTrackType.SWEEPMOD
             && currentInstrument.sweepMod.enabled
@@ -445,13 +469,15 @@ const transformToKeyframes = (
 
         // note event
         if (stepEvents[SoundEvent.Note] !== undefined) {
+            muted = false;
             keyframe.SxFQ = SxFQ(stepEvents[SoundEvent.Note]);
 
-            // explicity set registers to reset the VSU's internal counters for hardware envelopes
-            if (stepIndex !== 0) {
+            // explicity set registers to reset the VSU's internal counters for hardware envelopes,
+            // except for the steps of a note slide, which must only change the frequency, as writing SxINT restarts the sound
+            if (stepIndex !== 0 && !stepEvents.artificial) {
                 keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
                 if (currentInstrument.envelope.enabled || sweepEnabled) {
-                    keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
+                    keyframe.SxEV0 = SxEV0(currentInstrument.envelope, getCurrentRegisterLevels().envelopeInitialValue);
                     keyframe.SxEV1 = SxEV1(
                         currentInstrument.envelope,
                         currentInstrument.sweepMod,
@@ -467,14 +493,20 @@ const transformToKeyframes = (
             }
         }
 
-        // instrument event
-        if (stepEvents[SoundEvent.Instrument] !== currentInstrumentId) {
+        // instrument event, an instrument applies to its note, so steps without a note keep the current one
+        if ((stepIndex === 0 || stepEvents[SoundEvent.Note] !== undefined) && stepEvents[SoundEvent.Instrument] !== currentInstrumentId) {
+            const previousInstrument = currentInstrument;
             currentInstrumentId = stepEvents[SoundEvent.Instrument];
             currentInstrument = instruments[currentInstrumentId ?? track.instrument];
 
+            // a different instrument brings its own volume and panning, unless effects at the same step set them
+            if (currentInstrument !== previousInstrument) {
+                volume = stepEvents[SoundEvent.Volume];
+                panning = stepEvents[SoundEvent.Panning];
+            }
+
             keyframe.SxINT = SxINT(true, currentInstrument.interval, !stepEvents.artificial);
-            keyframe.SxLRV = SxLRV(currentInstrument.volume);
-            keyframe.SxEV0 = SxEV0(currentInstrument.envelope);
+            keyframe.SxEV0 = SxEV0(currentInstrument.envelope, getCurrentRegisterLevels().envelopeInitialValue);
             keyframe.SxEV1 = SxEV1(
                 currentInstrument.envelope,
                 currentInstrument.sweepMod,
@@ -492,9 +524,12 @@ const transformToKeyframes = (
             }
         }
 
-        // volume event
-        if (stepEvents[SoundEvent.Volume] !== undefined) {
-            keyframe.SxLRV = SxLRV(getStereoLevelsFromVolumeEventValue(stepEvents[SoundEvent.Volume]));
+        // set volume on every keyframe, unchanged values get removed in reduceKeyframes
+        const registerLevels = getCurrentRegisterLevels();
+        keyframe.SxLRV = SxLRV(muted ? { left: 0, right: 0 } : registerLevels.stereoLevels);
+        // the envelope value is only free to change while the hardware envelope is disabled, writing it would restart the envelope otherwise
+        if (!currentInstrument.envelope.enabled) {
+            keyframe.SxEV0 = SxEV0(currentInstrument.envelope, registerLevels.envelopeInitialValue);
         }
 
         keyframeMap[step] = keyframe;
@@ -507,51 +542,44 @@ const transformToKeyframes = (
     };
 };
 
+const REDUCIBLE_REGISTERS: (keyof Keyframe)[] = ['SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'];
+
 // remove unnecessary steps, i.e. those which would cause no register value change
 const reduceKeyframes = (
     trackKeyframes: TrackKeyframes,
 ): TrackKeyframes => {
-    const result = deepClone(trackKeyframes);
+    const keyframeMap: KeyframeMap = {};
 
     const trackSteps: number[] = Object.keys(trackKeyframes.keyframeMap)
         .map(step => parseInt(step))
-        .sort((a, b) => a - b)
-        .reverse();
+        .sort((a, b) => a - b);
 
-    // remove values that are same as previous occurence
+    // remove values that are same as previous occurence, remembering the last value of each register in a single pass
+    const previousValues: Keyframe = {};
     trackSteps.forEach(step => {
         const stepValues = trackKeyframes.keyframeMap[step];
+        // remove empty keyframes
+        if (Object.keys(stepValues).length === 0) {
+            return;
+        }
 
-        ['SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
-            // @ts-ignore
-            if (stepValues[v] !== undefined) {
-                let foundPrev = false;
-                trackSteps.filter(prevStep => prevStep < step).forEach(prevStep => {
-                    const prevStepValues = result.keyframeMap[prevStep];
-                    // @ts-ignore
-                    if (!foundPrev && prevStepValues[v] !== undefined) {
-                        foundPrev = true;
-                        // @ts-ignore
-                        if (prevStepValues[v] === stepValues[v]) {
-                            // @ts-ignore
-                            delete result.keyframeMap[step][v];
-                        }
-                    }
-                });
+        const reducedStepValues: Keyframe = {};
+        (Object.keys(stepValues) as (keyof Keyframe)[]).forEach(v => {
+            const value = stepValues[v];
+            if (!REDUCIBLE_REGISTERS.includes(v) || value === undefined || previousValues[v] !== value) {
+                reducedStepValues[v] = value;
+            }
+            if (value !== undefined) {
+                previousValues[v] = value;
             }
         });
+        keyframeMap[step] = reducedStepValues;
     });
 
-    // remove empty keyframes
-    trackSteps.forEach(step => {
-        const stepValues = trackKeyframes.keyframeMap[step];
-
-        if (Object.keys(stepValues).length === 0) {
-            delete result.keyframeMap[step];
-        }
-    });
-
-    return result;
+    return {
+        ...trackKeyframes,
+        keyframeMap,
+    };
 };
 
 // find keyframe (step index) of looping point
@@ -582,10 +610,29 @@ const applyLoopPoint = (
 // transform to final return format with event flags
 const transformToKeyframesPrepared = (
     trackKeyframes: TrackKeyframes,
-    initialInstrument: InstrumentConfig,
     trackType: SoundEditorTrackType,
+    soundData: SoundData,
 ): TrackKeyframesPrepared => {
+    // The durations are in the player's ticks, of which the tempo defines how many the steps take. They get rounded at the
+    // keyframes' absolute positions, so that all tracks stay in sync. Keyframes which would start on the same tick get
+    // merged, the later values replacing the earlier ones, and keyframes which would be too long get split.
+    const tempoSegments = getTempoSegments(soundData);
+    const timerResolution = getTimerResolution(soundData);
+    const getTicks = (step: number) => getTicksAtStep(tempoSegments, timerResolution, step);
+
     const keyFrameSteps: number[] = Object.keys(trackKeyframes.keyframeMap).map(step => parseInt(step)).sort((a, b) => a - b);
+    const loopStep = keyFrameSteps[trackKeyframes.loopKeyframe];
+    const keyframeGroups: { ticks: number, steps: number[] }[] = [];
+    keyFrameSteps.forEach(step => {
+        const ticks = getTicks(step);
+        const previousGroup = keyframeGroups[keyframeGroups.length - 1];
+        if (previousGroup?.ticks === ticks) {
+            previousGroup.steps.push(step);
+        } else {
+            keyframeGroups.push({ ticks, steps: [step] });
+        }
+    });
+
     const trackKeyframesPrepared: TrackKeyframesPrepared = {
         values: {
             SxEV0: [],
@@ -598,18 +645,20 @@ const transformToKeyframesPrepared = (
             SxMOD: [],
         },
         keyframes: [],
-        loopKeyframe: trackKeyframes.loopKeyframe,
+        loopKeyframe: 0,
     };
 
-    // set volume on first keyframe
-    const firstKeyframe = trackKeyframes.keyframeMap[keyFrameSteps[0]];
-    if (firstKeyframe !== undefined && firstKeyframe.SxLRV === undefined) {
-        trackKeyframes.keyframeMap[keyFrameSteps[0]].SxLRV = SxLRV(initialInstrument.volume);
+    const typeFlags: EventName[] = [];
+    if (trackType === SoundEditorTrackType.SWEEPMOD) {
+        typeFlags.push(EventName.SweepMod);
+    }
+    if (trackType === SoundEditorTrackType.NOISE) {
+        typeFlags.push(EventName.Noise);
     }
 
-    keyFrameSteps.forEach((step, stepIndex) => {
-        const stepKeyframe = trackKeyframes.keyframeMap[step];
-        const duration: number = (keyFrameSteps[stepIndex + 1] ?? trackKeyframes.totalSize) - step;
+    const endTicks = getTicks(trackKeyframes.totalSize);
+    keyframeGroups.forEach((group, groupIndex) => {
+        const stepKeyframe: Keyframe = Object.assign({}, ...group.steps.map(step => trackKeyframes.keyframeMap[step]));
         const flags: EventName[] = [];
 
         ['SxFQ', 'SxINT', 'SxEV0', 'SxEV1', 'SxLRV', 'SxRAM', 'SxSWP', 'SxMOD'].forEach(v => {
@@ -622,14 +671,18 @@ const transformToKeyframesPrepared = (
             }
         });
 
-        if (trackType === SoundEditorTrackType.SWEEPMOD) {
-            flags.push(EventName.SweepMod);
-        }
-        if (trackType === SoundEditorTrackType.NOISE) {
-            flags.push(EventName.Noise);
+        if (group.steps.includes(loopStep)) {
+            trackKeyframesPrepared.loopKeyframe = trackKeyframesPrepared.keyframes.length;
         }
 
-        trackKeyframesPrepared.keyframes.push({ duration, flags });
+        let duration = Math.max(0, (keyframeGroups[groupIndex + 1]?.ticks ?? endTicks) - group.ticks);
+        trackKeyframesPrepared.keyframes.push({ duration: Math.min(duration, KEYFRAME_DURATION_MAX), flags: [...flags, ...typeFlags] });
+        duration -= KEYFRAME_DURATION_MAX;
+        // the rest of a long keyframe follows in keyframes which change nothing
+        while (duration > 0) {
+            trackKeyframesPrepared.keyframes.push({ duration: Math.min(duration, KEYFRAME_DURATION_MAX), flags: [...typeFlags] });
+            duration -= KEYFRAME_DURATION_MAX;
+        }
     });
 
     return trackKeyframesPrepared;
@@ -669,32 +722,41 @@ export const getTrackKeyframes = (
     modulationDataRegistry: ModulationData[],
     soundData: SoundData
 ): TrackKeyframesPrepared => {
-    const initialInstrument = soundData.instruments[track.instrument];
-
     // console.log('-----------------------------------------------------');
     let trackEventsMap = mergePatterns(track, soundData.patterns, totalSize);
     // console.log('mergePatterns', deepClone(trackEventsMap));
     trackEventsMap = filterEmptyEvents(trackEventsMap);
     // console.log('filterEmptyEvents', deepClone(trackEventsMap));
-    trackEventsMap = applyTrackInitialVolume(trackEventsMap, initialInstrument);
-    // console.log('applyTrackInitialVolume', deepClone(trackEventsMap));
+    trackEventsMap = applyGlobalEvents(trackEventsMap, soundData.events, totalSize);
+    // console.log('applyGlobalEvents', deepClone(trackEventsMap));
+    trackEventsMap = applyTrackInitialMute(trackEventsMap);
+    // console.log('applyTrackInitialMute', deepClone(trackEventsMap));
     trackEventsMap = applyTrackInitialInstrument(trackEventsMap, track.instrument);
     // console.log('applyTrackInitialInstrument', deepClone(trackEventsMap));
     trackEventsMap = notesToFrequencies(trackEventsMap);
     // console.log('notesToFrequencies', deepClone(trackEventsMap));
-    trackEventsMap = applyNoteDuration(trackEventsMap, initialInstrument, soundData.instruments, totalSize);
+    trackEventsMap = applyNoteDuration(trackEventsMap, totalSize);
     // console.log('applyNoteDuration', deepClone(trackEventsMap));
     trackEventsMap = applyNoteSlide(trackEventsMap);
     // console.log('applyNoteSlide', deepClone(trackEventsMap));
 
-    let trackKeyframes = transformToKeyframes(trackEventsMap, soundData.instruments, totalSize, track, specName, waveformRegistry, modulationDataRegistry);
+    let trackKeyframes = transformToKeyframes(
+        trackEventsMap,
+        soundData.instruments,
+        soundData.volume ?? MASTER_VOLUME_DEFAULT,
+        totalSize,
+        track,
+        specName,
+        waveformRegistry,
+        modulationDataRegistry
+    );
     // console.log('transformToKeyframes', deepClone(trackKeyframes));
     trackKeyframes = reduceKeyframes(trackKeyframes);
     // console.log('reduceKeyframes', deepClone(trackKeyframes));
     trackKeyframes = applyLoopPoint(trackKeyframes, loopPoint);
     // console.log('applyLoopPoint', deepClone(trackKeyframes));
 
-    let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, initialInstrument, track.type);
+    let trackKeyframesPrepared = transformToKeyframesPrepared(trackKeyframes, track.type, soundData);
     // console.log('transformToKeyframesPrepared', deepClone(trackKeyframesPrepared));
     trackKeyframesPrepared = setStartEvent(trackKeyframesPrepared, track.type);
     // console.log('setStartEvent', deepClone(trackKeyframesPrepared));

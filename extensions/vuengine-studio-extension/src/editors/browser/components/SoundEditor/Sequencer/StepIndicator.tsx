@@ -42,7 +42,6 @@ interface StepIndicatorProps {
     soundData: SoundData
     currentPlayerPosition: number
     position: StepIndicatorPosition
-    effectsPanelHidden: boolean
     hidden: boolean
     pianoRollNoteHeight: number
     pianoRollNoteWidth: number
@@ -56,15 +55,11 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         soundData,
         currentPlayerPosition,
         position,
-        effectsPanelHidden,
         hidden,
         pianoRollNoteHeight, pianoRollNoteWidth,
         sequencerPatternHeight, sequencerNoteWidth,
         pianoRollScrollWindow,
     } = props;
-
-    // const effectsPanelHeight = effectsPanelHidden ? EFFECTS_PANEL_COLLAPSED_HEIGHT : EFFECTS_PANEL_EXPANDED_HEIGHT;
-    const effectsPanelHeight = effectsPanelHidden ? 0 : 0;
 
     const style = {
         display: hidden ? 'none' : undefined,
@@ -77,7 +72,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
             ? soundData.tracks.length * sequencerPatternHeight + SEQUENCER_GRID_METER_HEIGHT
             : position === StepIndicatorPosition.PIANO_ROLL_HEADER
                 ? PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT
-                : PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + NOTES_SPECTRUM * pianoRollNoteHeight + effectsPanelHeight
+                : PIANO_ROLL_GRID_METER_HEIGHT + PIANO_ROLL_GRID_PLACED_PATTERN_HEIGHT + NOTES_SPECTRUM * pianoRollNoteHeight
     };
 
     return <StyledStepIndicator style={style} />;

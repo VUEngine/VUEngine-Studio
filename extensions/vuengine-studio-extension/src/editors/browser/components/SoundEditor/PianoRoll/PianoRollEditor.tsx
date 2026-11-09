@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject } from 'react';
 import styled from 'styled-components';
 import {
     EventsMap,
@@ -24,31 +24,12 @@ const StyledPianoRollGridContainer = styled.div`
     left: ${PIANO_ROLL_KEY_WIDTH + 2}px;
     position: sticky;
     z-index: 10;
-
-    canvas {
-        position: relative;
-        z-index: 10;
-    }
-`;
-
-const CurrentlyPlacingNote = styled.div`
-    border: 1px dashed var(--theia-focusBorder);
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 9;
-`;
-
-const Marquee = styled.div`
-    background: var(--theia-selection-background);
-    border: 1px dashed var(--theia-focusBorder);
-    border: 1px dashed var(--theia-focusBorder);
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 9;
 `;
 
 interface PianoRollEditorProps {
     soundData: SoundData
+    editCurrentNote: () => void
+    openSongLengthDialog: () => void
     tool: SoundEditorTool
     marqueeMode: SoundEditorMarqueeMode
     currentTrackId: number
@@ -58,8 +39,8 @@ interface PianoRollEditorProps {
     setCurrentInstrumentId: (instrumentId: string) => void
     noteCursor: number
     setNoteCursor: (note: number) => void
-    setNotes: (notes: EventsMap) => void
-    playing: boolean
+    setTrackNotes: (notes: EventsMap) => void
+    setCurrentSequenceIndex: (trackId: number, sequenceIndex: number) => void
     testNote: string
     playNote: (note: string, instrumentId?: string) => void
     selectedNotes: number[]
@@ -71,8 +52,12 @@ interface PianoRollEditorProps {
     pianoRollScrollWindow: ScrollWindow
     pianoRollRef: RefObject<HTMLDivElement>
     trackSettings: TrackSettings[]
-    stepsPerNote: number
-    stepsPerBar: number
+    noteSnapping: boolean
+    previewNotes: EventsMap | undefined
+    pasting: boolean
+    setPastePosition: (position: { step: number, noteId: number }) => void
+    commitPaste: () => void
+    cancelPaste: () => void
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -85,8 +70,9 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentInstrumentId,
         setCurrentInstrumentId,
         noteCursor, setNoteCursor,
-        setNotes,
-        playing, testNote,
+        setTrackNotes,
+        setCurrentSequenceIndex,
+        testNote,
         playNote,
         selectedNotes, setSelectedNotes,
         newNoteDuration,
@@ -95,20 +81,16 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         pianoRollScrollWindow,
         pianoRollRef,
         trackSettings,
-        stepsPerNote, stepsPerBar,
+        editCurrentNote,
+        openSongLengthDialog,
+        noteSnapping,
+        previewNotes, pasting, setPastePosition, commitPaste, cancelPaste,
     } = props;
-    const [noteDragNoteId, setNoteDragNoteId] = useState<number>(-1);
-    const [noteDragStartStep, setNoteDragStartStep] = useState<number>(-1);
-    const [noteDragEndStep, setNoteDragEndStep] = useState<number>(-1);
-    const [marqueeStartStep, setMarqueeStartStep] = useState<number>(-1);
-    const [marqueeEndStep, setMarqueeEndStep] = useState<number>(-1);
-    const [marqueeStartNote, setMarqueeStartNote] = useState<number>(-1);
-    const [marqueeEndNote, setMarqueeEndNote] = useState<number>(-1);
-
     return (
         <StyledPianoRollEditor
             style={{
-                width: PIANO_ROLL_KEY_WIDTH + 2 + soundData.size * pianoRollNoteWidth,
+                // fill the view, even if the sound is shorter
+                width: PIANO_ROLL_KEY_WIDTH + 2 + Math.max(soundData.size * pianoRollNoteWidth, pianoRollScrollWindow.w),
             }}
         >
             <Piano
@@ -131,56 +113,28 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                     currentInstrumentId={currentInstrumentId}
                     setCurrentInstrumentId={setCurrentInstrumentId}
                     setNoteCursor={setNoteCursor}
-                    setNotes={setNotes}
+                    setTrackNotes={setTrackNotes}
+                    setCurrentSequenceIndex={setCurrentSequenceIndex}
                     newNoteDuration={newNoteDuration}
                     pianoRollNoteHeight={pianoRollNoteHeight}
                     pianoRollNoteWidth={pianoRollNoteWidth}
                     setPatternAtCursorPosition={setPatternAtCursorPosition}
-                    noteDragNoteId={noteDragNoteId}
-                    setNoteDragNoteId={setNoteDragNoteId}
-                    noteDragStartStep={noteDragStartStep}
-                    setNoteDragStartStep={setNoteDragStartStep}
-                    noteDragEndStep={noteDragEndStep}
-                    setNoteDragEndStep={setNoteDragEndStep}
-                    marqueeStartStep={marqueeStartStep}
-                    setMarqueeStartStep={setMarqueeStartStep}
-                    marqueeEndStep={marqueeEndStep}
-                    setMarqueeEndStep={setMarqueeEndStep}
-                    marqueeStartNote={marqueeStartNote}
-                    setMarqueeStartNote={setMarqueeStartNote}
-                    marqueeEndNote={marqueeEndNote}
-                    setMarqueeEndNote={setMarqueeEndNote}
                     pianoRollScrollWindow={pianoRollScrollWindow}
                     pianoRollRef={pianoRollRef}
                     trackSettings={trackSettings}
                     selectedNotes={selectedNotes}
                     setSelectedNotes={setSelectedNotes}
                     playNote={playNote}
-                    playing={playing}
                     testNote={testNote}
-                    stepsPerNote={stepsPerNote}
-                    stepsPerBar={stepsPerBar}
+                    editCurrentNote={editCurrentNote}
+                    openSongLengthDialog={openSongLengthDialog}
+                    noteSnapping={noteSnapping}
+                    previewNotes={previewNotes}
+                    pasting={pasting}
+                    setPastePosition={setPastePosition}
+                    commitPaste={commitPaste}
+                    cancelPaste={cancelPaste}
                 />
-                {noteDragNoteId > -1 &&
-                    <CurrentlyPlacingNote
-                        style={{
-                            height: pianoRollNoteHeight,
-                            left: Math.min(noteDragStartStep, noteDragEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x,
-                            top: noteDragNoteId * pianoRollNoteHeight,
-                            width: pianoRollNoteWidth * (Math.abs(noteDragStartStep - noteDragEndStep) + 1),
-                        }}
-                    />
-                }
-                {marqueeStartStep > -1 &&
-                    <Marquee
-                        style={{
-                            height: (Math.abs(marqueeStartNote - marqueeEndNote) + 1) * pianoRollNoteHeight,
-                            left: Math.min(marqueeStartStep, marqueeEndStep) * pianoRollNoteWidth - pianoRollScrollWindow.x - 0.5,
-                            top: Math.min(marqueeStartNote, marqueeEndNote) * pianoRollNoteHeight - 0.5,
-                            width: (Math.abs(marqueeStartStep - marqueeEndStep) + 1) * pianoRollNoteWidth,
-                        }}
-                    />
-                }
             </StyledPianoRollGridContainer>
         </StyledPianoRollEditor>
     );

@@ -39,9 +39,13 @@ import {
     VsuSweepDirection,
     VsuSweepModulationFunction
 } from '../Emulator/VsuTypes';
+import { getPanningLabel, getReachableVolumes, panningStepToPanning, panningToPanningStep } from '../Other/volume';
 import { getInstrumentName, getTrackTypeLabel } from '../SoundEditor';
 import {
+    INSTRUMENT_PANNING_MAX,
+    INSTRUMENT_PANNING_MIN,
     InstrumentConfig,
+    PANNING_STEPS,
     InstrumentMap,
     SoundData,
     SoundEditorTrackType,
@@ -121,14 +125,21 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         });
     };
 
-    const setStereoLevel = (side: 'left' | 'right', value: number) => {
+    const setVolume = (volume: number) => {
         const updatedInstruments = { ...soundData.instruments };
         updatedInstruments[currentEditedInstrumentId] = {
             ...updatedInstruments[currentEditedInstrumentId],
-            volume: {
-                ...updatedInstruments[currentEditedInstrumentId].volume,
-                [side]: value,
-            },
+            volume,
+        };
+
+        setInstruments(updatedInstruments);
+    };
+
+    const setPanning = (panning: number) => {
+        const updatedInstruments = { ...soundData.instruments };
+        updatedInstruments[currentEditedInstrumentId] = {
+            ...updatedInstruments[currentEditedInstrumentId],
+            panning: clamp(panning, INSTRUMENT_PANNING_MIN, INSTRUMENT_PANNING_MAX),
         };
 
         setInstruments(updatedInstruments);
@@ -329,8 +340,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 }))
             ];
 
-            // remove references in pattern events
-            const updatedPatterns = { ...soundData.patterns };
+            // remove references in pattern events, on a copy, as the events get changed in place
+            const updatedPatterns = deepClone(soundData.patterns);
             Object.keys(soundData.patterns).forEach(patternId => {
                 Object.keys(soundData.patterns[patternId].events).forEach(eventStep => {
                     if (soundData.patterns[patternId].events[parseInt(eventStep)][SoundEvent.Instrument] === currentEditedInstrumentId) {
@@ -456,6 +467,25 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         instrument?.envelope.stepTime,
     ]);
 
+    const reachableVolumes = useMemo(() => instrument
+        ? getReachableVolumes(instrument.envelope)
+        : [], [
+        instrument?.envelope.enabled,
+        instrument?.envelope.direction,
+        instrument?.envelope.initialValue,
+    ]);
+
+    // the stored volume might not be reachable with the current envelope settings, so show the closest one
+    const volumeIndex = useMemo(() => reachableVolumes.reduce((closestIndex, v, i) =>
+        Math.abs(v - instrument?.volume) < Math.abs(reachableVolumes[closestIndex] - instrument?.volume)
+            ? i
+            : closestIndex,
+        0
+    ), [
+        reachableVolumes,
+        instrument?.volume,
+    ]);
+
     const clampedModulationFrequency = useMemo(() => clamp(
         instrument?.sweepMod.frequency ?? VSU_SWEEP_MODULATION_FREQUENCY_MIN,
         VSU_SWEEP_MODULATION_FREQUENCY_MIN,
@@ -572,44 +602,42 @@ than any of the other effects that are implemented in software."
                 <TabPanel>
                     <VContainer gap="var(--padding)">
                         <BorderedVContainer>
-                            <label>
-                                {nls.localize('vuengine/editors/sound/initialVolume', 'Initial Volume')}
-                            </label>
+                            <InfoLabel
+                                label={nls.localize('vuengine/editors/sound/volume', 'Volume')}
+                                tooltip={nls.localize(
+                                    'vuengine/editors/sound/instrumentVolumeDescription',
+                                    "The instrument's output level, which gets mapped onto the channel's stereo levels and envelope value. \
+While the hardware volume envelope is enabled, it refers to the envelope's loudest point and fewer steps are available."
+                                )}
+                            />
                             <Range
-                                value={instrument?.envelope.initialValue}
-                                max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
-                                min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
-                                setValue={setEnvelopeInitialValue}
+                                value={volumeIndex}
+                                min={0}
+                                max={reachableVolumes.length - 1}
+                                options={reachableVolumes.map((v, i) => ({
+                                    value: i,
+                                    label: `${v}%`,
+                                }))}
+                                setValue={i => setVolume(reachableVolumes[i])}
+                                disabled={reachableVolumes.length < 2}
+                                selectWidth={64}
                             />
                         </BorderedVContainer>
                         <BorderedVContainer>
                             <label>
-                                {nls.localize('vuengine/editors/sound/stereoLevels', 'Stereo Levels')}
+                                {nls.localize('vuengine/editors/sound/panning', 'Panning')}
                             </label>
-                            <HContainer alignItems="center">
-                                <div style={{ minWidth: 10, width: 10 }}>
-                                    L
-                                </div>
-                                <Range
-                                    value={instrument?.volume.left}
-                                    max={15}
-                                    min={0}
-                                    setValue={(v: number) => setStereoLevel('left', v)}
-                                    width="100%"
-                                />
-                            </HContainer>
-                            <HContainer alignItems="center">
-                                <div style={{ minWidth: 10, width: 10 }}>
-                                    R
-                                </div>
-                                <Range
-                                    value={instrument?.volume.right}
-                                    max={15}
-                                    min={0}
-                                    setValue={(v: number) => setStereoLevel('right', v)}
-                                    width="100%"
-                                />
-                            </HContainer>
+                            <Range
+                                value={panningToPanningStep(instrument?.panning)}
+                                min={-PANNING_STEPS}
+                                max={PANNING_STEPS}
+                                options={[...Array(2 * PANNING_STEPS + 1)].map((x, i) => ({
+                                    value: i - PANNING_STEPS,
+                                    label: getPanningLabel(panningStepToPanning(i - PANNING_STEPS)),
+                                }))}
+                                setValue={step => setPanning(panningStepToPanning(step))}
+                                selectWidth={72}
+                            />
                         </BorderedVContainer>
                         {instrument.type === SoundEditorTrackType.NOISE &&
                             <BorderedVContainer>
@@ -689,9 +717,8 @@ Different bits will produce pseudorandom bit sequences of different lengths befo
                                     label={nls.localize('vuengine/editors/sound/volumeEnvelope', 'Volume Envelope')}
                                     tooltip={nls.localize(
                                         'vuengine/editors/sound/envelopeDescription',
-                                        'Acts like a master volume setting independent from the stereo levels. \
-It can be configured to grow or decay automatically over time, and optionally reload \
-a pre-configured value and repeat the grow/decay process.'
+                                        "Changes the instrument's volume over time by automatically growing or decaying it in steps, \
+optionally reloading the start value and repeating the grow/decay process."
                                     )}
                                 />
                                 <RadioSelect
@@ -713,9 +740,14 @@ a pre-configured value and repeat the grow/decay process.'
                             {instrument?.envelope.enabled &&
                                 <>
                                     <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/editors/sound/initialVolume', 'Initial Volume')}
-                                        </label>
+                                        <InfoLabel
+                                            label={nls.localize('vuengine/editors/sound/envelopeStartValue', 'Start Value')}
+                                            tooltip={nls.localize(
+                                                'vuengine/editors/sound/envelopeStartValueDescription',
+                                                'The envelope value the grow or decay process starts from. A decay falls from here to silence, \
+a grow rises from here to the maximum.'
+                                            )}
+                                        />
                                         <Range
                                             value={instrument?.envelope.initialValue}
                                             max={VSU_ENVELOPE_INITIAL_VALUE_MAX}

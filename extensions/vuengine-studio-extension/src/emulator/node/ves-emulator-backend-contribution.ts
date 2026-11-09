@@ -3,9 +3,11 @@ import { injectable } from '@theia/core/shared/inversify';
 import * as express from 'express';
 import * as path from 'path';
 import { RETROACHIEVEMENTS_CLIENT } from 'vueport-core/lib/common/vb-constants';
+import { LanShareServer } from './ves-emulator-lan-share';
 
 const RA_ALLOWED_HOST = 'retroachievements.org';
 const RA_MAX_BODY_BYTES = 1024 * 1024;
+const LAN_SHARE_MAX_BODY = '256mb';
 
 function isAllowedRaHost(host: string): boolean {
   const lowered = host.toLowerCase();
@@ -14,6 +16,7 @@ function isAllowedRaHost(host: string): boolean {
 
 @injectable()
 export class EmulatorBackendContribution implements BackendApplicationContribution {
+  protected readonly lanShare = new LanShareServer();
 
   async configure(app: express.Application): Promise<void> {
     app.use(
@@ -24,11 +27,47 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
       )
     );
 
+    const raw = express.raw({ type: () => true, limit: LAN_SHARE_MAX_BODY });
+    const header = (request: express.Request, name: string): string | undefined => {
+      const value = request.header(name);
+      return value === undefined ? undefined : decodeURIComponent(value);
+    };
+    const failed = (response: express.Response, error: unknown): void => {
+      response.status(400).type('text/plain').send(error instanceof Error ? error.message : String(error));
+    };
+    app.post('/emulator/lan-share/start', raw, async (request, response) => {
+      try {
+        response.json(await this.lanShare.start(
+          header(request, 'x-vueport-name') ?? 'rom.vb', request.body as Buffer, header(request, 'x-vueport-web')));
+      } catch (error) {
+        failed(response, error);
+      }
+    });
+    app.post('/emulator/lan-share/attach', raw, (request, response) => {
+      try {
+        this.lanShare.attach(header(request, 'x-vueport-kind') ?? '', request.body as Buffer);
+        response.status(204).end();
+      } catch (error) {
+        failed(response, error);
+      }
+    });
+    app.get('/emulator/lan-share/info', (_request, response) => {
+      response.json(this.lanShare.info() ?? null);
+    });
+    app.post('/emulator/lan-share/stop', (_request, response) => {
+      this.lanShare.stop();
+      response.status(204).end();
+    });
+
     app.post(
       '/emulator/retroachievements',
       express.json({ limit: RA_MAX_BODY_BYTES }),
       (request, response) => this.relayToRetroAchievements(request, response)
     );
+  }
+
+  onStop(): void {
+    this.lanShare.stop();
   }
 
   protected async relayToRetroAchievements(

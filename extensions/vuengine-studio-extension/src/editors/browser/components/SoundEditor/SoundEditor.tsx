@@ -1,6 +1,7 @@
-import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
-import { deepClone, environment, nls, URI } from '@theia/core';
+import { FadersHorizontal, Guitar, Keyboard, MusicNote, Rectangle, RoadHorizon, Sparkle, Waveform, WaveSawtooth, WaveSine, Wrench } from '@phosphor-icons/react';
+import { deepClone, environment, isOSX, nls, URI } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { OpenFileDialogProps, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import * as midiManager from 'midi-file';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
@@ -9,13 +10,20 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
+import { nanoid } from '../Common/Utils';
 import EmptyContainer from '../Common/EmptyContainer';
 import PaletteColorSelect from '../Common/PaletteColorSelect';
-import { sortObjectByKeys } from '../Common/Utils';
-import PlayerRomBuilder from './Emulator/PlayerRomBuilder';
-import { VsuChannelStereoLevelsData } from './Emulator/VsuTypes';
+import { withGlobalEvent } from './EffectsPanel/EffectsPanelGrid';
+import { PLAYER_ROM_PATH } from './Emulator/Emulator';
+import { exportSoundRom } from './Emulator/soundSpecSerializer';
 import EventList from './EventList/EventList';
+import { getDefaultImportTrackSettings, newInstrumentId } from './ImportExport/importHelpers';
 import ImportSettingsDialog, { DEFAULT_IMPORT_SETTINGS, ImportMode, ImportSettings, SUPPORTED_IMPORT_FILETYPES } from './ImportExport/ImportSettingsDialog';
+import { convertFurnaceSong } from './ImportExport/furnace/furnaceConverter';
+import { parseFurnaceSong } from './ImportExport/furnace/furnaceParser';
+import { convertMidiSong } from './ImportExport/midi/midiConverter';
+import { convertS3mSong } from './ImportExport/s3m/s3mConverter';
+import { parseS3mSong } from './ImportExport/s3m/s3mParser';
 import { convertUgeSong } from './ImportExport/uge/ugeConverter';
 import { loadUGESong } from './ImportExport/uge/ugeHelper';
 import { convertVbmSong } from './ImportExport/vbm/vbmConverter';
@@ -28,6 +36,19 @@ import CurrentTrack from './Other/CurrentTrack';
 import Keybindings from './Other/Keybindings';
 import NoteProperties from './Other/NoteProperties';
 import Properties from './Other/Properties';
+import ResizeHandle from './Other/ResizeHandle';
+import SongLength from './Other/SongLength';
+import { getMsAtStep, getStepAtMs, getTempoSegments, getTimerResolution } from './Other/tempo';
+import { getBarStartColumn, getTimeSignatureSegments } from './Other/timeSignature';
+import TimeSignatureInput from './Other/TimeSignatureInput';
+import {
+    fitNotesToPatterns,
+    getPatternChanges,
+    getPatternPlacementAt,
+    getPatternPlacements,
+    getTrackStepEvents,
+    getUpdatedPatternEvents
+} from './Other/trackNotes';
 import Transpose, { DEFAULT_TRANSPOSE_OPTIONS, TransposeOptions, TransposeOverflowBehavior, TransposeScope } from './Other/Transpose';
 import Utilities, {
     filterDuplicatePatterns,
@@ -43,9 +64,12 @@ import { SoundEditorCommands } from './SoundEditorCommands';
 import SoundEditorToolbar from './SoundEditorToolbar';
 import {
     DEFAULT_TRACK_SETTINGS,
+    EFFECTS_PANEL_EXPANDED_HEIGHT,
+    EVENT_LIST_WIDTH_DEFAULT,
+    EVENT_LIST_WIDTH_MAX,
+    EVENT_LIST_WIDTH_MIN,
     EventsMap,
     InstrumentMap,
-    NOTE_RESOLUTION,
     NOTES_LABELS,
     NOTES_SPECTRUM,
     PatternConfig,
@@ -54,6 +78,10 @@ import {
     ScrollWindow,
     SEQUENCER_PATTERN_HEIGHT_DEFAULT,
     SEQUENCER_PATTERN_WIDTH_DEFAULT,
+    SIDEBAR_WIDTH_DEFAULT,
+    SIDEBAR_WIDTH_MAX,
+    SIDEBAR_WIDTH_MIN,
+    SOUND_EVENT_LABELS,
     SoundData,
     SoundEditorMarqueeMode,
     SoundEditorTool,
@@ -67,6 +95,8 @@ import {
     TrackConfig,
     TrackSettings
 } from './SoundEditorTypes';
+import SfxGenerator, { DEFAULT_SFX_GENERATOR_STATE, SfxGeneratorState } from './SfxGenerator/SfxGenerator';
+import { createSfxInstrument, getSfxEvents, getSfxNoteSlideSteps, SfxParams } from './SfxGenerator/sfxGeneration';
 import ModulationDataWithPresets from './Waveforms/ModulationDataWithPresets';
 import WaveformWithPresets from './Waveforms/WaveformWithPresets';
 
@@ -77,6 +107,7 @@ enum SidebarTab {
     currentTrack = 'currentTrack',
     currentPattern = 'currentPattern',
     currentNote = 'currentNote',
+    sfxGenerator = 'sfxGenerator',
     utilities = 'utilities',
     keybindings = 'keybindings',
 }
@@ -105,6 +136,10 @@ const SIDEBAR_TABS: Record<string, { title: string, icon: ReactElement }> = {
     [SidebarTab.utilities]: {
         title: nls.localize('vuengine/editors/sound/utilities', 'Utilities'),
         icon: <Wrench size={24} />
+    },
+    [SidebarTab.sfxGenerator]: {
+        title: nls.localize('vuengine/editors/sound/sfxGenerator', 'SFX Generator'),
+        icon: <Sparkle size={24} />
     },
     [SidebarTab.keybindings]: {
         title: nls.localizeByDefault('Keybindings'),
@@ -167,7 +202,6 @@ const StyledSidebar = styled.div`
     border-left: 1px solid var(--theia-editorGroup-border);
     display: flex;
     flex-direction: column;
-    max-width: 40%;
     padding: 0 var(--padding) var(--padding);
 `;
 
@@ -182,7 +216,6 @@ const StyledSidebarContent = styled.div`
     max-width: 100%;
     overflow-y: auto;
     position: relative;
-    width: 440px;
 `;
 
 export const getTrackName = (type: SoundEditorTrackType, i: number): string => {
@@ -289,7 +322,24 @@ export const getFoundPatternSequenceIndex = (soundData: SoundData, trackId: numb
     return result;
 };
 
-export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) => {
+// crosshair with a small plus or minus badge for the marquee modes, outlined to be visible on any background
+const MARQUEE_CURSOR_BADGES: Record<SoundEditorMarqueeMode, string> = {
+    [SoundEditorMarqueeMode.REPLACE]: '',
+    [SoundEditorMarqueeMode.ADD]: 'M15 18.5h7M18.5 15v7',
+    [SoundEditorMarqueeMode.SUBTRACT]: 'M15 18.5h7',
+};
+const getMarqueeCursor = (marqueeMode: SoundEditorMarqueeMode): string => {
+    const path = `M8.5 1v15M1 8.5h15${MARQUEE_CURSOR_BADGES[marqueeMode]}`;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">' +
+        `<path d="${path}" stroke="white" stroke-width="3" stroke-linecap="square"/>` +
+        `<path d="${path}" stroke="black" stroke-width="1"/>` +
+        '</svg>';
+
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 8 8, crosshair`;
+};
+
+// marquee mode is only to be given where the marquee can be used
+export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean, marqueeMode?: SoundEditorMarqueeMode) => {
     if (isDragging) {
         return 'grabbing';
     }
@@ -303,24 +353,14 @@ export const getToolModeCursor = (tool: SoundEditorTool, isDragging?: boolean) =
         case SoundEditorTool.DRAG:
             return 'grab';
         case SoundEditorTool.MARQUEE:
-            return 'initial';
+            return marqueeMode !== undefined ? getMarqueeCursor(marqueeMode) : 'initial';
     }
 };
 
-export const getSnappedStep = (step: number, noteSnapping: boolean, stepsPerBar: number) => noteSnapping
-    ? Math.floor(step / stepsPerBar) * stepsPerBar
+// with note snapping, the start of the bar the step lies in, according to the time signature at that step
+export const getSnappedStep = (step: number, noteSnapping: boolean, soundData: SoundData) => noteSnapping
+    ? getBarStartColumn(getTimeSignatureSegments(soundData), step)
     : step;
-
-export const getVolumeEventValueFromStereoLevels = (volume: VsuChannelStereoLevelsData) => volume
-    ? ((volume.left ?? 0) << 4) + (volume.right ?? 0)
-    : 0;
-
-export const getStereoLevelsFromVolumeEventValue = (volume: number) => {
-    const left = volume >> 4;
-    const right = volume - (left << 4);
-
-    return { left, right };
-};
 
 interface SoundEditorProps {
     soundData: SoundData
@@ -335,13 +375,27 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [playing, setPlaying] = useState<boolean>(false);
     const [testNote, setTestNote] = useState<string>('');
     const [testInstrumentId, setTestInstrumentId] = useState<string>('');
+    const [sfxGeneratorState, setSfxGeneratorState] = useState<SfxGeneratorState>(DEFAULT_SFX_GENERATOR_STATE);
+    const [sfxPreviewSoundData, setSfxPreviewSoundData] = useState<SoundData | undefined>();
+    const [sfxPreviewStarts, setSfxPreviewStarts] = useState<number>(0);
     const [trackSettings, setTrackSettings] = useState<TrackSettings[]>([...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))]);
     const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>(-1);
-    const [newNoteDuration, setNewNoteDuration] = useState<number>(NOTE_RESOLUTION / parseInt(soundData.timeSignature[0].split('/')[1] ?? 4));
+    const [newNoteDuration, setNewNoteDuration] = useState<number>(1);
     const [tool, setTool] = useState<SoundEditorTool>(SoundEditorTool.EDIT);
     const [marqueeMode, setMarqueeMode] = useState<SoundEditorMarqueeMode>(SoundEditorMarqueeMode.REPLACE);
+    // holding shift or ctrl (option on macOS) temporarily switches the marquee to adding or subtracting,
+    // and makes the edit tool select like the marquee tool
+    const [heldMarqueeMode, setHeldMarqueeMode] = useState<SoundEditorMarqueeMode | undefined>();
+    // whether the effects panel was clicked last, so selection and clipboard commands work on effects rather than notes and patterns
+    const [effectsFocused, setEffectsFocused] = useState<boolean>(false);
+    const effectiveMarqueeMode = (tool === SoundEditorTool.MARQUEE || tool === SoundEditorTool.EDIT) && heldMarqueeMode !== undefined
+        ? heldMarqueeMode
+        : marqueeMode;
+    const effectiveTool = tool === SoundEditorTool.EDIT && heldMarqueeMode !== undefined
+        ? SoundEditorTool.MARQUEE
+        : tool;
     const [currentInstrumentId, setCurrentInstrumentId] = useState<string>(TRACK_DEFAULT_INSTRUMENT_ID);
     const [currentTrackId, setCurrentTrackId] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<string>(soundData.tracks[0]
@@ -360,16 +414,21 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [sequencerNoteWidth, setSequencerNoteWidth] = useState<number>(SEQUENCER_PATTERN_WIDTH_DEFAULT);
     const [sequencerHidden, setSequencerHidden] = useState<boolean>(false);
     const [effectsPanelHidden, setEffectsPanelHidden] = useState<boolean>(true);
+    const [effectsPanelHeight, setEffectsPanelHeight] = useState<number>(EFFECTS_PANEL_EXPANDED_HEIGHT);
+    const [eventListWidth, setEventListWidth] = useState<number>(EVENT_LIST_WIDTH_DEFAULT);
+    const [sidebarWidth, setSidebarWidth] = useState<number>(SIDEBAR_WIDTH_DEFAULT);
     const [eventListHidden, setEventListHidden] = useState<boolean>(true);
     const [noteSnapping, setNoteSnapping] = useState<boolean>(true);
     const [addPatternDialogOpen, setAddPatternDialogOpen] = useState<{ trackId: number, sequenceIndex: number, size?: number }>({ trackId: -1, sequenceIndex: -1 });
     const [addTrackDialogOpen, setAddTrackDialogOpen] = useState<boolean>(false);
+    const [editedGlobalEvent, setEditedGlobalEvent] = useState<{ step: number, eventType: SoundEvent } | undefined>();
+    const [songLengthDialogOpen, setSongLengthDialogOpen] = useState<boolean>(false);
     const [transposeDialogOpen, setTransposeDialogOpen] = useState<boolean>(false);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<string>('');
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<string>('');
     const [instrumentColorDialogOpen, setInstrumentColorDialogOpen] = useState<string>('');
-    const [playerRomBuilder] = useState<PlayerRomBuilder>(new PlayerRomBuilder(services));
-    const [forcePlayerRomRebuild, setForcePlayerRomRebuild] = useState<number>(0);
+    const [forceReplay, setForceReplay] = useState<number>(0);
+    const [stageTimer, setStageTimer] = useState<number>(getTimerResolution(soundData));
     const [playerSeekRequest, setPlayerSeekRequest] = useState<number>(0);
     const [rangeDragStartStep, setRangeDragStartStep] = useState<number>(-1);
     const [rangeDragEndStep, setRangeDragEndStep] = useState<number>(-1);
@@ -380,11 +439,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     const [currentEditedInstrumentId, setCurrentEditedInstrumentId] = useState<string>(soundData.tracks.length
         ? soundData.tracks[0].instrument ?? TRACK_DEFAULT_INSTRUMENT_ID
         : TRACK_DEFAULT_INSTRUMENT_ID);
-
-    const beats = parseInt(soundData.timeSignature[0].split('/')[0] ?? 4);
-    const bar = parseInt(soundData.timeSignature[0].split('/')[1] ?? 4);
-    const stepsPerNote = NOTE_RESOLUTION / bar;
-    const stepsPerBar = beats * stepsPerNote;
 
     const updateSelectedNotes = (sn: number[]) => {
         if (!sn) {
@@ -449,9 +503,11 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const doRemoveTrack = (trackId: number): void => {
-        const newTrackCount = soundData.tracks.length - 2;
-        if (currentTrackId >= newTrackCount) {
-            setCurrentTrackId(newTrackCount);
+        // the index of the last remaining track, but at least 0,
+        // so that adding a track after removing the last one works
+        const newLastTrackId = Math.max(0, soundData.tracks.length - 2);
+        if (currentTrackId >= newLastTrackId) {
+            setCurrentTrackId(newLastTrackId);
         }
         setTrackSettings(prev => ([
             ...prev.slice(0, trackId),
@@ -501,7 +557,8 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
             Object.keys(pattern.events).forEach(stepStr => {
                 const step = parseInt(stepStr);
                 if (step < patternSteps) {
-                    updatedEvents[step] = pattern.events[step];
+                    // a copy, as its duration might get changed below
+                    updatedEvents[step] = { ...pattern.events[step] };
 
                     // cut note duration if it would reach beyond the pattern limits
                     if (updatedEvents[step][SoundEvent.Duration] &&
@@ -526,10 +583,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const playNote = (note: string, instrumentId: string = ''): void => {
+        // without an instrument, there is nothing to play the note with
+        if (note && !soundData.instruments[instrumentId || soundData.tracks[currentTrackId]?.instrument]) {
+            return;
+        }
+        // test notes play alongside the sound
         setTestNote(note);
         setTestInstrumentId(instrumentId);
-        setPlaying(!!note);
-        setCurrentPlayerPosition(-1);
     };
 
     const updateCurrentTrackId = (id: number): void => {
@@ -555,23 +615,24 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentSequenceIndex(newSequenceIndex);
         updateSelectedNotes([]);
         setNoteCursor(newSequenceIndex * SUB_NOTE_RESOLUTION);
-        updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+        updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, id);
     };
 
+    // the selected notes stay selected within the same track
     const updateCurrentPatternId = (trackId: number, patternId: string): void => {
         setCurrentPatternId(patternId);
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
-            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
+            updateSelectedNotes([]);
         }
-
-        updateSelectedNotes([]);
     };
 
     const updateCurrentSequenceIndex = (trackId: number, sequenceIndex: number): void => {
         if (trackId !== currentTrackId) {
             setCurrentTrackId(trackId);
-            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID);
+            updateCurrentInstrumentId(TRACK_DEFAULT_INSTRUMENT_ID, trackId);
+            updateSelectedNotes([]);
         }
         if (sequenceIndex < 0) {
             sequenceIndex = 0;
@@ -582,35 +643,18 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setCurrentPatternId(sequence[sequenceIndex] ?? '');
 
         setCurrentSequenceIndex(sequenceIndex);
-        updateSelectedNotes([]);
         setNoteCursor(sequenceIndex * SUB_NOTE_RESOLUTION);
     };
 
     const updateNoteCursor = (step: number): void => {
         setNoteCursor(step);
-
-        // Select note at note cursor step, if there is one
-        const updatedSelectedNotes: number[] = [];
-        const currentPatternStartStep = currentSequenceIndex * SUB_NOTE_RESOLUTION;
-        const patternRelativeStep = step - currentPatternStartStep;
-        const currentPattern = soundData.patterns[currentPatternId];
-        const currentPatternEvents = currentPattern?.events;
-        if (currentPatternEvents[patternRelativeStep] && currentPatternEvents[patternRelativeStep][SoundEvent.Note]) {
-            updatedSelectedNotes.push(patternRelativeStep);
-        }
     };
 
-    const selectAllNotesInCurrentPattern = (): void => {
-        const currentPattern = soundData.patterns[currentPatternId];
-        const currentPatternEvents = currentPattern?.events;
-        if (!currentPatternEvents) {
-            return;
-        }
-        const currentPatternNoteSteps = Object.keys(currentPatternEvents)
+    const selectAllNotesInCurrentTrack = (): void => {
+        const trackEvents = getTrackStepEvents(getPatternPlacements(soundData, currentTrackId));
+        updateSelectedNotes(Object.keys(trackEvents)
             .map(step => parseInt(step))
-            .filter(step => currentPatternEvents[step][SoundEvent.Note]);
-
-        updateSelectedNotes(currentPatternNoteSteps);
+            .filter(step => trackEvents[step][SoundEvent.Note]));
     };
 
     const addTrack = (): void => {
@@ -717,141 +761,168 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         ]);
     };
 
-    const setNotes = (notes: EventsMap): void => {
-        const currentPattern = soundData.patterns[currentPatternId];
-        if (currentPattern === undefined) {
+    const setGlobalEvents = (events: EventsMap): void => {
+        updateSoundData({
+            ...soundData,
+            events,
+        });
+    };
+
+    // global events can be passed along to update them in the same go, as separate updates would overwrite each other
+    // selected notes are steps from the start of the sound in the current track, those without a note anymore get dropped
+    const filterSelectedNotes = (patterns: SoundData['patterns']): void => {
+        const trackEvents = getTrackStepEvents(getPatternPlacements({ ...soundData, patterns }, currentTrackId));
+        setSelectedNotes(prev => prev.filter(step => trackEvents[step]?.[SoundEvent.Note] !== undefined));
+    };
+
+    // edits the current pattern, or the given one of the current track
+    const setNotes = (notes: EventsMap, globalEvents?: EventsMap, patternId: string = currentPatternId): void => {
+        const pattern = soundData.patterns[patternId];
+        if (pattern === undefined) {
             return;
         }
 
-        let updatedEvents: EventsMap = deepClone(currentPattern.events);
-        updatedEvents = sortObjectByKeys(updatedEvents);
-
-        const removeNoteFromEvents = (stepToRemove: number) => {
-            if (updatedEvents[stepToRemove] === undefined) {
-                return;
-            }
-
-            // remove all note-related events
-            updatedEvents[stepToRemove] = Object.fromEntries(
-                Object.entries({ ...updatedEvents[stepToRemove] })
-                    .filter(([e, v]) => ![
-                        SoundEvent.Note,
-                        SoundEvent.Instrument,
-                        SoundEvent.Duration,
-                        SoundEvent.NoteSlide,
-                    ].includes(e as SoundEvent))
-            );
-
-            // if no events remain, remove entirely
-            if (Object.keys(updatedEvents[stepToRemove]).length === 0) {
-                updatedEvents = Object.fromEntries(
-                    Object.entries({ ...updatedEvents })
-                        .filter(([s, e]) => parseInt(s) !== stepToRemove)
-                );
-            }
+        const patterns = {
+            ...soundData.patterns,
+            [patternId]: {
+                ...pattern,
+                events: getUpdatedPatternEvents(pattern, notes, soundData.tracks[currentTrackId]?.instrument),
+            },
         };
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            patterns,
+            ...(globalEvents !== undefined ? { events: globalEvents } : {}),
+        });
+    };
 
-        // remove empty notes
-        Object.keys(notes).forEach(step => {
-            const stepInt = parseInt(step);
-            if (Object.keys(notes[stepInt]).length === 0) {
-                removeNoteFromEvents(stepInt);
+    // edits all patterns of the current track, with the changes by step from the start of the sound
+    const setTrackNotes = (changes: EventsMap): void => {
+        const patternChanges = getPatternChanges(getPatternPlacements(soundData, currentTrackId), changes);
+        if (Object.keys(patternChanges).length === 0) {
+            return;
+        }
+
+        const patterns = { ...soundData.patterns };
+        Object.keys(patternChanges).forEach(patternId => {
+            patterns[patternId] = {
+                ...patterns[patternId],
+                events: getUpdatedPatternEvents(patterns[patternId], patternChanges[patternId], soundData.tracks[currentTrackId]?.instrument),
+            };
+        });
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            patterns,
+        });
+    };
+
+    // writes a generated sound effect to the current track, at the note cursor or in place of all of the track's patterns. Where
+    // there is no pattern, it gets one of its own. In place of the track's patterns, the sound gets as long as the sound effect,
+    // unless the other tracks are longer.
+    const insertSfx = (params: SfxParams, name: string, replace: boolean): void => {
+        let placements = getPatternPlacements(soundData, currentTrackId);
+        const start = replace ? 0 : noteCursor;
+        const tempoSegments = getTempoSegments(soundData);
+        const startMs = getMsAtStep(tempoSegments, start);
+        const tickMs = getTimerResolution(soundData);
+        const instrumentId = newInstrumentId();
+        const events = getSfxEvents(
+            params,
+            tickMs,
+            ms => getStepAtMs(tempoSegments, startMs + ms) - start,
+            instrumentId,
+            getSfxNoteSlideSteps(getMsAtStep(tempoSegments, start + SUB_NOTE_RESOLUTION) - startMs, tickMs)
+        );
+        const end = start + Math.max(0, ...Object.entries(events).map(([step, e]) => parseInt(step) + (e[SoundEvent.Duration] ?? 0)));
+
+        const patterns = { ...soundData.patterns };
+        let tracks = soundData.tracks;
+        let size = soundData.size;
+        let loopPoint = soundData.loopPoint;
+        // a track without an instrument of its own gets the sound effect's
+        const trackInstrumentId = soundData.instruments[soundData.tracks[currentTrackId].instrument]
+            ? soundData.tracks[currentTrackId].instrument
+            : instrumentId;
+        if (trackInstrumentId !== soundData.tracks[currentTrackId].instrument) {
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId ? { ...track, instrument: trackInstrumentId } : track);
+        }
+        if (replace) {
+            const otherTracks = soundData.tracks.filter((t, trackId) => trackId !== currentTrackId);
+            const patternsOfOtherTracks = otherTracks.flatMap(t => Object.values(t.sequence));
+            Object.values(soundData.tracks[currentTrackId].sequence)
+                .filter(patternId => !patternsOfOtherTracks.includes(patternId))
+                .forEach(patternId => delete patterns[patternId]);
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId ? { ...track, sequence: {} } : track);
+            placements = [];
+            const otherTracksEnd = Math.max(0, ...soundData.tracks
+                .flatMap((t, trackId) => trackId === currentTrackId ? [] : getPatternPlacements(soundData, trackId))
+                .map(p => p.endStep));
+            size = Math.max(1, Math.ceil(Math.max(end, otherTracksEnd) / SUB_NOTE_RESOLUTION));
+            if (loopPoint >= size) {
+                loopPoint = 0;
             }
-        });
+        }
+        let newPattern: { patternId: string, column: number } | undefined;
+        if (!getPatternPlacementAt(placements, start)) {
+            // as long as the sound effect, but not into the next pattern
+            const column = Math.floor(start / SUB_NOTE_RESOLUTION);
+            const nextColumn = Math.min(...placements.map(p => p.sequenceIndex).filter(si => si > column));
+            const patternSize = Math.max(1, Math.min(Math.ceil(end / SUB_NOTE_RESOLUTION), nextColumn) - column);
+            const patternId = nanoid();
+            patterns[patternId] = {
+                name: `SFX ${name}`,
+                type: soundData.tracks[currentTrackId].type,
+                size: patternSize,
+                events: {},
+            };
+            tracks = tracks.map((track, trackId) => trackId === currentTrackId
+                ? { ...track, sequence: { ...track.sequence, [column]: patternId } }
+                : track);
+            size = Math.max(size, column + patternSize);
+            placements = getPatternPlacements({ ...soundData, tracks, patterns }, currentTrackId);
+            newPattern = { patternId, column };
+        }
 
-        // set notes
-        Object.keys(sortObjectByKeys(notes)).forEach(step => {
-            const stepInt = parseInt(step);
-            if (Object.keys(notes[stepInt]).length > 0) {
-                updatedEvents[stepInt] = {
-                    ...currentPattern.events[stepInt] ?? {},
-                    ...notes[stepInt],
-                };
-
-                // remove explicit default instrument
-                const currentTrack = soundData.tracks[currentTrackId];
-                if (updatedEvents[stepInt][SoundEvent.Instrument] !== undefined && updatedEvents[stepInt][SoundEvent.Instrument] === currentTrack?.instrument) {
-                    updatedEvents[stepInt] = Object.fromEntries(
-                        Object.entries({ ...updatedEvents[stepInt] })
-                            .filter(([e, v]) => e !== SoundEvent.Instrument)
-                    );
+        const changes: EventsMap = {};
+        // notes in the way get removed
+        if (!replace) {
+            Object.entries(getTrackStepEvents(placements)).forEach(([step, e]) => {
+                const s = parseInt(step);
+                if (e[SoundEvent.Note] !== undefined && s >= start && s < end) {
+                    changes[s] = {};
                 }
-
-                // remove events with empty value
-                updatedEvents[stepInt] = Object.fromEntries(
-                    Object.entries({ ...updatedEvents[stepInt] })
-                        .filter(([e, v]) => v !== '' && v !== undefined)
-                );
-
-                // remove dependent events
-                if (!updatedEvents[stepInt][SoundEvent.Note]) {
-                    updatedEvents[stepInt] = Object.fromEntries(
-                        Object.entries({ ...updatedEvents[stepInt] })
-                            .filter(([e, v]) => ![
-                                SoundEvent.Duration,
-                                SoundEvent.Instrument,
-                                SoundEvent.NoteSlide,
-                            ].includes(e as SoundEvent))
-                    );
-                }
-
-                if (Object.keys(updatedEvents[stepInt]).length === 0) {
-                    // if no events remain, remove entirely
-                    updatedEvents = Object.fromEntries(
-                        Object.entries({ ...updatedEvents })
-                            .filter(([s, e]) => parseInt(s) !== stepInt)
-                    );
-
-                } else {
-                    // ...otherwise ensure clean key order
-                    updatedEvents[stepInt] = sortObjectByKeys(updatedEvents[stepInt]);
-                }
-            }
+            });
+        }
+        Object.entries(events).forEach(([step, e]) => {
+            changes[start + parseInt(step)] = e;
         });
-
-        // cap all note durations
-        let prevStep = -1;
-        [
-            ...Object.keys(updatedEvents),
-            (currentPattern.size * SUB_NOTE_RESOLUTION).toString(), // pattern size is last note's limit
-        ].forEach(step => {
-            const stepInt = parseInt(step);
-            if (
-                updatedEvents[prevStep] !== undefined &&
-                updatedEvents[prevStep][SoundEvent.Duration] !== undefined &&
-                updatedEvents[prevStep][SoundEvent.Duration] > (stepInt - prevStep)
-            ) {
-                updatedEvents[prevStep][SoundEvent.Duration] = stepInt - prevStep;
-            }
-
-            prevStep = stepInt;
+        const fitted = fitNotesToPatterns(placements, changes);
+        const patternChanges = getPatternChanges(placements, fitted);
+        Object.keys(patternChanges).forEach(patternId => {
+            patterns[patternId] = {
+                ...patterns[patternId],
+                events: getUpdatedPatternEvents(patterns[patternId], patternChanges[patternId], trackInstrumentId),
+            };
         });
-
-        // cap all note slide amounts
-        Object.keys(updatedEvents).map(step => {
-            const stepInt = parseInt(step);
-            const stepEvents = updatedEvents[stepInt];
-            if (stepEvents[SoundEvent.NoteSlide] !== undefined && stepEvents[SoundEvent.Note] !== undefined) {
-                const noteId = NOTES_LABELS.indexOf(stepEvents[SoundEvent.Note]);
-                const noteSlide = stepEvents[SoundEvent.NoteSlide];
-                if (noteId - noteSlide >= NOTES_SPECTRUM) {
-                    stepEvents[SoundEvent.NoteSlide] = noteId - NOTES_SPECTRUM + 1;
-                } else if (noteId - noteSlide <= 0) {
-                    stepEvents[SoundEvent.NoteSlide] = noteId;
-                }
-            }
-
-            return stepEvents;
+        filterSelectedNotes(patterns);
+        updateSoundData({
+            ...soundData,
+            size,
+            loopPoint,
+            tracks,
+            patterns,
+            instruments: {
+                ...soundData.instruments,
+                [instrumentId]: createSfxInstrument(params, `SFX ${name}`, (Object.keys(soundData.instruments).length * 8 + 1) % 64),
+            },
         });
-
-        // filter out no longer existing notes from selected notes
-        setSelectedNotes(prev => prev
-            .filter(sn => updatedEvents[sn] !== undefined)
-            .sort((a, b) => a - b));
-
-        setPattern(currentPatternId, {
-            events: updatedEvents,
-        });
+        if (newPattern) {
+            updateSelectedPatterns([]);
+            updateCurrentPatternId(currentTrackId, newPattern.patternId);
+            updateCurrentSequenceIndex(currentTrackId, newPattern.column);
+        }
     };
 
     const isTrackAvailable = (trackType: SoundEditorTrackType, tracks: TrackConfig[]) => {
@@ -891,15 +962,16 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         setInstruments(updatedInstruments);
     };
 
-    const updateCurrentInstrumentId = (instrumentId: string): void => {
+    // the track can be passed along when it changes at the same time, as currentTrackId still holds the previous one then
+    const updateCurrentInstrumentId = (instrumentId: string, trackId: number = currentTrackId): void => {
         setCurrentInstrumentId(instrumentId);
-        updateCurrentEditedInstrumentId(instrumentId);
+        updateCurrentEditedInstrumentId(instrumentId, trackId);
     };
 
-    const updateCurrentEditedInstrumentId = (instrumentId: string): void => {
+    const updateCurrentEditedInstrumentId = (instrumentId: string, trackId: number = currentTrackId): void => {
         const actualInstrumentId = instrumentId !== TRACK_DEFAULT_INSTRUMENT_ID
             ? instrumentId
-            : soundData.tracks[currentTrackId].instrument;
+            : soundData.tracks[trackId]?.instrument ?? '';
         setCurrentEditedInstrumentId(actualInstrumentId);
     };
 
@@ -923,6 +995,26 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
 
     const editCurrentPattern = (): void => {
         updateSidebarTab(SidebarTab.currentPattern);
+    };
+
+    const editGlobalEvent = (step: number, eventType: SoundEvent): void => {
+        setEditedGlobalEvent({ step, eventType });
+    };
+
+    const openSongLengthDialog = (): void => {
+        setSongLengthDialogOpen(true);
+    };
+
+    const closeSongLengthDialog = (): void => {
+        setSongLengthDialogOpen(false);
+        enableCommands();
+        focusEditor();
+    };
+
+    const closeGlobalEventDialog = (): void => {
+        setEditedGlobalEvent(undefined);
+        enableCommands();
+        focusEditor();
     };
 
     const editCurrentNote = (): void => {
@@ -984,6 +1076,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                     delete r[SoundEvent.Instrument];
                     delete r[SoundEvent.Note];
                     delete r[SoundEvent.NoteSlide];
+                    delete r[SoundEvent.NoteSlideSteps];
                 }
             }
 
@@ -1049,7 +1142,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     };
 
     const exportFile = async (): Promise<void> => {
-        const romUri = await playerRomBuilder.buildSoundPlayerRom(soundData, -1, -1, -1, [...soundData.tracks.map(t => (DEFAULT_TRACK_SETTINGS))], false);
+        // the sound player ROM, with the sound in it, which it plays at boot
+        const resourcesUri = await services.vesCommonService.getResourcesUri();
+        const playerRom = await services.fileService.readFile(resourcesUri.resolve(PLAYER_ROM_PATH));
+        const rom = exportSoundRom(playerRom.value.buffer.slice().buffer, soundData);
+        if (!rom) {
+            throw new Error('The sound player ROM could not be found.');
+        }
         let exists: boolean = false;
         let overwrite: boolean = false;
         let selected: URI | undefined;
@@ -1074,7 +1173,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         if (selected) {
             try {
                 await services.commandService.executeCommand(CommonCommands.SAVE.id);
-                await services.fileService.copy(romUri, selected, { overwrite });
+                await services.fileService.writeFile(selected, BinaryBuffer.wrap(new Uint8Array(rom)));
             } catch (e) {
                 console.warn(e);
             }
@@ -1096,30 +1195,44 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         const uri: URI | undefined = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
         if (uri) {
             const fileContent = await services.fileService.readFile(uri);
-            const fileArrayBuffer = fileContent.value.buffer as unknown as ArrayBuffer;
+            const fileBytes = fileContent.value.buffer;
+            const fileArrayBuffer = fileBytes.buffer.slice(fileBytes.byteOffset, fileBytes.byteOffset + fileBytes.byteLength) as ArrayBuffer;
             let importedSoundData: SoundData | undefined;
-            switch (uri.path.ext) {
-                case '.mid':
-                case '.midi':
-                    const parsedMidi = midiManager.parseMidi(fileContent.value.buffer);
-                    console.log('parsed', parsedMidi);
-                    break;
-                case '.s3m':
-                    const parsedS3mSong = window.electronVesCore.kaitaiParse(fileArrayBuffer, uri.path.ext);
-                    console.log('parsed', parsedS3mSong);
-                    break;
-                case '.uge':
-                    const parsedUgeSong = loadUGESong(fileArrayBuffer);
-                    if (parsedUgeSong) {
-                        importedSoundData = convertUgeSong(parsedUgeSong);
-                    }
-                    break;
-                case '.vbm':
-                    const parsedVbmSong = parseVbmSong(fileArrayBuffer);
-                    if (parsedVbmSong) {
-                        importedSoundData = convertVbmSong(parsedVbmSong);
-                    }
-                    break;
+            let importError = '';
+            try {
+                switch (uri.path.ext) {
+                    case '.fur':
+                        const parsedFurnaceSong = await parseFurnaceSong(fileArrayBuffer);
+                        if (parsedFurnaceSong) {
+                            importedSoundData = convertFurnaceSong(parsedFurnaceSong);
+                        }
+                        break;
+                    case '.mid':
+                    case '.midi':
+                        importedSoundData = convertMidiSong(midiManager.parseMidi(fileBytes));
+                        importedSoundData.name = importedSoundData.name || uri.path.name;
+                        break;
+                    case '.s3m':
+                        const parsedS3mSong = parseS3mSong(fileArrayBuffer);
+                        if (parsedS3mSong) {
+                            importedSoundData = convertS3mSong(parsedS3mSong);
+                        }
+                        break;
+                    case '.uge':
+                        const parsedUgeSong = loadUGESong(fileArrayBuffer);
+                        if (parsedUgeSong) {
+                            importedSoundData = convertUgeSong(parsedUgeSong);
+                        }
+                        break;
+                    case '.vbm':
+                        const parsedVbmSong = parseVbmSong(fileArrayBuffer);
+                        if (parsedVbmSong) {
+                            importedSoundData = convertVbmSong(parsedVbmSong);
+                        }
+                        break;
+                }
+            } catch (e) {
+                importError = e instanceof Error ? e.message : `${e}`;
             }
 
             if (!importedSoundData) {
@@ -1128,16 +1241,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         'vuengine/editors/sound/importError',
                         'The was an error importing the file {0}.',
                         uri.path.base,
-                    ));
+                    ) + (importError ? ` ${importError}` : ''));
             } else {
                 setImportSettings(prev => ({
                     ...prev,
                     dialogOpen: true,
                     soundData: importedSoundData!,
-                    trackSettings: importedSoundData!.tracks.map(t => ({
-                        enabled: true,
-                        type: t.type,
-                    })),
+                    trackSettings: getDefaultImportTrackSettings(importedSoundData!),
                     fileUri: uri,
                 }));
             }
@@ -1153,17 +1263,13 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
         // apply user changes
         const tracksToImport: TrackConfig[] = [];
         importSoundData.tracks
+            // keep the tracks' original indexes, which their settings refer to
+            .map((track, trackIndex) => ({ track, settings: importSettings.trackSettings[trackIndex] }))
             // filter out unselected tracks
-            .filter((track, trackIndex) =>
-                importSettings.trackSettings[trackIndex]
-                    ? importSettings.trackSettings[trackIndex].enabled
-                    : true
-            )
+            .filter(({ settings }) => settings ? settings.enabled : true)
             // for others, adjust type
-            .forEach((track, trackIndex) => {
-                const type = importSettings.trackSettings[trackIndex]
-                    ? importSettings.trackSettings[trackIndex].type
-                    : track.type;
+            .forEach(({ track, settings }) => {
+                const type = settings ? settings.type : track.type;
                 // update track
                 tracksToImport.push({ ...track, type });
                 // update patterns
@@ -1182,7 +1288,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         const eventsMap = Object.values(importSoundData.patterns[patternId].events);
                         eventsMap.forEach(events =>
                             Object.keys(events).forEach(eventType => {
-                                if (eventType = SoundEvent.Instrument) {
+                                if (eventType === SoundEvent.Instrument) {
                                     const instrumentId = events[eventType];
                                     if (importSoundData.instruments[instrumentId]) {
                                         importSoundData.instruments[instrumentId].type = type;
@@ -1343,15 +1449,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                 break;
             case SoundEditorCommands.EXPORT.id:
                 if (soundData.tracks.length > 0) {
-                    exportFile();
+                    exportFile().catch(e => services.messageService.error(
+                        `${nls.localize('vuengine/editors/sound/exportFailed', 'Could not export the sound')}: ${e instanceof Error ? e.message : e}`
+                    ));
                 }
                 break;
             case SoundEditorCommands.SELECT_ALL_NOTES.id:
-                if (soundData.tracks.length > 0) {
+                if (soundData.tracks.length > 0 && !effectsFocused) {
                     if (marqueeMode === SoundEditorMarqueeMode.SUBTRACT) {
                         updateSelectedNotes([]);
                     } else {
-                        selectAllNotesInCurrentPattern();
+                        selectAllNotesInCurrentTrack();
                     }
                 }
                 break;
@@ -1390,16 +1498,65 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
     }, []);
 
     useEffect(() => {
+        const getHeldMarqueeMode = (e: KeyboardEvent | MouseEvent) => e.shiftKey
+            ? SoundEditorMarqueeMode.ADD
+            : (isOSX ? e.altKey : e.ctrlKey)
+                ? SoundEditorMarqueeMode.SUBTRACT
+                : undefined;
+        // the mode stays as it was while a mouse button is held, so that pressing or releasing a key does not switch
+        // tools in the middle of a marquee or drag. The grids handle mouse up before these listeners on the window.
+        let mouseButtonHeld = false;
+        const updateHeldMarqueeMode = (e: KeyboardEvent) => {
+            if (!mouseButtonHeld) {
+                setHeldMarqueeMode(getHeldMarqueeMode(e));
+            }
+        };
+        const onMouseDown = () => {
+            mouseButtonHeld = true;
+        };
+        const onMouseUp = (e: MouseEvent) => {
+            if (mouseButtonHeld && e.buttons === 0) {
+                mouseButtonHeld = false;
+                setHeldMarqueeMode(getHeldMarqueeMode(e));
+            }
+        };
+        // keys released while the window is not focused would not be noticed otherwise
+        const resetHeldMarqueeMode = () => {
+            mouseButtonHeld = false;
+            setHeldMarqueeMode(undefined);
+        };
+        window.addEventListener('keydown', updateHeldMarqueeMode);
+        window.addEventListener('keyup', updateHeldMarqueeMode);
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mouseup', onMouseUp);
+        // a mouse button released outside of the window
+        window.addEventListener('mousemove', onMouseUp);
+        window.addEventListener('blur', resetHeldMarqueeMode);
+        return () => {
+            window.removeEventListener('keydown', updateHeldMarqueeMode);
+            window.removeEventListener('keyup', updateHeldMarqueeMode);
+            window.removeEventListener('mousedown', onMouseDown);
+            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('mousemove', onMouseUp);
+            window.removeEventListener('blur', resetHeldMarqueeMode);
+        };
+    }, []);
+
+    useEffect(() => {
         const disp = onCommandExecute(commandListener);
         return () => disp.dispose();
     }, [
         currentTrackId,
+        currentPatternId,
+        currentSequenceIndex,
+        currentInstrumentId,
         noteCursor,
         playing,
         setPlaying,
         soundData,
         marqueeMode,
         sidebarTab,
+        effectsFocused,
     ]);
 
     return (
@@ -1423,7 +1580,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         <SoundEditorToolbar
                             soundData={soundData}
                             currentTrackId={currentTrackId}
-                            currentPatternId={currentPatternId}
                             currentPlayerPosition={currentPlayerPosition}
                             setCurrentPlayerPosition={setCurrentPlayerPosition}
                             playing={playing}
@@ -1435,22 +1591,24 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                             setNoteSnapping={setNoteSnapping}
                             tool={tool}
                             setTool={setTool}
-                            marqueeMode={marqueeMode}
+                            marqueeMode={effectiveMarqueeMode}
                             setMarqueeMode={setMarqueeMode}
                             newNoteDuration={newNoteDuration}
                             setNewNoteDuration={setNewNoteDuration}
                             testNote={testNote}
                             testInstrumentId={testInstrumentId}
+                            sfxPreviewSoundData={sfxPreviewSoundData}
+                            onSfxPreviewStarted={() => setSfxPreviewStarts(previous => previous + 1)}
                             playRangeStart={playRangeStart}
                             playRangeEnd={playRangeEnd}
                             trackSettings={trackSettings}
-                            playerRomBuilder={playerRomBuilder}
                             currentInstrumentId={currentInstrumentId}
                             setCurrentInstrumentId={updateCurrentInstrumentId}
                             selectedNotes={selectedNotes}
-                            setNotes={setNotes}
+                            setTrackNotes={setTrackNotes}
                             setTrack={setTrack}
-                            forcePlayerRomRebuild={forcePlayerRomRebuild}
+                            forceReplay={forceReplay}
+                            stageTimer={stageTimer}
                             playerSeekRequest={playerSeekRequest}
                             setPlaying={setPlaying}
                         />
@@ -1469,8 +1627,9 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                 {!sequencerHidden &&
                                     <Sequencer
                                         soundData={soundData}
-                                        tool={tool}
-                                        marqueeMode={marqueeMode}
+                                        effectsFocused={effectsFocused}
+                                        tool={effectiveTool}
+                                        marqueeMode={effectiveMarqueeMode}
                                         updateSoundData={updateSoundData}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
@@ -1490,7 +1649,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         editCurrentTrack={editCurrentTrack}
                                         editCurrentPattern={editCurrentPattern}
                                         noteSnapping={noteSnapping}
-                                        effectsPanelHidden={effectsPanelHidden}
                                         pianoRollNoteHeight={pianoRollNoteHeight}
                                         pianoRollNoteWidth={pianoRollNoteWidth}
                                         sequencerPatternHeight={sequencerPatternHeight}
@@ -1512,8 +1670,7 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setPlayerSeekRequest={setPlayerSeekRequest}
                                         noteCursor={noteCursor}
                                         setNoteCursor={updateNoteCursor}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
+                                        openSongLengthDialog={openSongLengthDialog}
                                     />
                                 }
                                 <StyledLowerContainer>
@@ -1526,13 +1683,27 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                             pattern={soundData.patterns[currentPatternId]}
                                             noteCursor={noteCursor}
                                             setNotes={setNotes}
+                                            setGlobalEvents={setGlobalEvents}
                                             setNoteCursor={updateNoteCursor}
+                                            width={eventListWidth}
+                                        />
+                                    }
+                                    {!eventListHidden &&
+                                        <ResizeHandle
+                                            direction='horizontal'
+                                            size={eventListWidth}
+                                            setSize={setEventListWidth}
+                                            min={EVENT_LIST_WIDTH_MIN}
+                                            max={EVENT_LIST_WIDTH_MAX}
+                                            defaultSize={EVENT_LIST_WIDTH_DEFAULT}
                                         />
                                     }
                                     <PianoRoll
                                         soundData={soundData}
-                                        tool={tool}
-                                        marqueeMode={marqueeMode}
+                                        effectsFocused={effectsFocused}
+                                        setEffectsFocused={setEffectsFocused}
+                                        tool={effectiveTool}
+                                        marqueeMode={effectiveMarqueeMode}
                                         currentPlayerPosition={currentPlayerPosition}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
                                         setPlayerSeekRequest={setPlayerSeekRequest}
@@ -1549,14 +1720,17 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         playRangeEnd={playRangeEnd}
                                         setPlayRangeEnd={setPlayRangeEnd}
                                         playNote={playNote}
-                                        playing={playing}
                                         testNote={testNote}
                                         setNotes={setNotes}
+                                        setTrackNotes={setTrackNotes}
+                                        setGlobalEvents={setGlobalEvents}
                                         addPattern={addPattern}
                                         sequencerHidden={sequencerHidden}
                                         setSequencerHidden={setSequencerHidden}
                                         effectsPanelHidden={effectsPanelHidden}
                                         setEffectsPanelHidden={setEffectsPanelHidden}
+                                        effectsPanelHeight={effectsPanelHeight}
+                                        setEffectsPanelHeight={setEffectsPanelHeight}
                                         eventListHidden={eventListHidden}
                                         setEventListHidden={setEventListHidden}
                                         selectedNotes={selectedNotes}
@@ -1573,34 +1747,43 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         pianoRollScrollWindow={pianoRollScrollWindow}
                                         editCurrentPattern={editCurrentPattern}
                                         editCurrentNote={editCurrentNote}
+                                        editGlobalEvent={editGlobalEvent}
+                                        openSongLengthDialog={openSongLengthDialog}
                                         trackSettings={trackSettings}
                                         rangeDragStartStep={rangeDragStartStep}
                                         setRangeDragStartStep={setRangeDragStartStep}
                                         rangeDragEndStep={rangeDragEndStep}
                                         setRangeDragEndStep={setRangeDragEndStep}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
                                     />
                                 </StyledLowerContainer>
                             </>}
                     </VContainer>
 
                     {sidebarTab !== SidebarTab.none &&
+                        <ResizeHandle
+                            direction='horizontal'
+                            size={sidebarWidth}
+                            setSize={setSidebarWidth}
+                            min={SIDEBAR_WIDTH_MIN}
+                            max={SIDEBAR_WIDTH_MAX}
+                            defaultSize={SIDEBAR_WIDTH_DEFAULT}
+                            inverted
+                        />
+                    }
+                    {sidebarTab !== SidebarTab.none &&
                         <StyledSidebar>
                             <StyledSidebarTitle>
                                 <h2>{SIDEBAR_TABS[sidebarTab].title}</h2>
                             </StyledSidebarTitle>
-                            <StyledSidebarContent>
+                            <StyledSidebarContent style={{ width: sidebarWidth }}>
                                 {sidebarTab === SidebarTab.properties &&
                                     <Properties
                                         soundData={soundData}
-                                        beats={beats}
-                                        bar={bar}
                                         updateSoundData={updateSoundData}
                                         setNewNoteDuration={setNewNoteDuration}
                                         setCurrentPlayerPosition={setCurrentPlayerPosition}
-                                        stepsPerNote={stepsPerNote}
-                                        stepsPerBar={stepsPerBar}
+                                        stageTimer={stageTimer}
+                                        setStageTimer={setStageTimer}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.instruments &&
@@ -1614,10 +1797,10 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         setWaveformDialogOpen={setWaveformDialogOpen}
                                         setModulationDataDialogOpen={setModulationDataDialogOpen}
                                         setInstrumentColorDialogOpen={setInstrumentColorDialogOpen}
-                                        playingTestNote={playing && !!testNote}
+                                        playingTestNote={!!testNote}
                                         playNote={playNote}
                                         emulatorInitialized={emulatorInitialized}
-                                        setForcePlayerRomRebuild={setForcePlayerRomRebuild}
+                                        setForceReplay={setForceReplay}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.currentTrack &&
@@ -1654,11 +1837,22 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                                         currentSequenceIndex={currentSequenceIndex}
                                         pattern={soundData.patterns[currentPatternId]}
                                         emulatorInitialized={emulatorInitialized}
-                                        playingTestNote={playing && !!testNote}
+                                        playingTestNote={!!testNote}
                                         playNote={playNote}
                                         setNotes={setNotes}
                                         newNoteDuration={newNoteDuration}
-                                        stepsPerBar={stepsPerBar}
+                                    />
+                                }
+                                {sidebarTab === SidebarTab.sfxGenerator &&
+                                    <SfxGenerator
+                                        soundData={soundData}
+                                        currentTrackId={currentTrackId}
+                                        state={sfxGeneratorState}
+                                        setState={setSfxGeneratorState}
+                                        setPreviewSoundData={setSfxPreviewSoundData}
+                                        previewStarts={sfxPreviewStarts}
+                                        insertSfx={insertSfx}
+                                        emulatorInitialized={emulatorInitialized}
                                     />
                                 }
                                 {sidebarTab === SidebarTab.utilities &&
@@ -1697,6 +1891,47 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         )}
                     </StyledSidebarTabs>
                 </>}
+            {
+                songLengthDialogOpen &&
+                <PopUpDialog
+                    open={true}
+                    onClose={closeSongLengthDialog}
+                    onOk={closeSongLengthDialog}
+                    title={nls.localize('vuengine/editors/sound/length', 'Length')}
+                    height='160px'
+                    width='440px'
+                    cancelButton={false}
+                    okButton={true}
+                >
+                    <SongLength
+                        soundData={soundData}
+                        updateSoundData={updateSoundData}
+                        setCurrentPlayerPosition={setCurrentPlayerPosition}
+                        hideLabel
+                    />
+                </PopUpDialog>
+            }
+            {
+                editedGlobalEvent !== undefined &&
+                <PopUpDialog
+                    open={true}
+                    onClose={closeGlobalEventDialog}
+                    onOk={closeGlobalEventDialog}
+                    title={SOUND_EVENT_LABELS[editedGlobalEvent.eventType]}
+                    height='160px'
+                    width='240px'
+                    cancelButton={false}
+                    okButton={true}
+                >
+                    {editedGlobalEvent.eventType === SoundEvent.TimeSignature &&
+                        <TimeSignatureInput
+                            value={soundData.events?.[editedGlobalEvent.step]?.[SoundEvent.TimeSignature] ?? soundData.timeSignature[0]}
+                            setValue={v => setGlobalEvents(withGlobalEvent(soundData.events ?? {}, editedGlobalEvent.step, SoundEvent.TimeSignature, v))}
+                            width={64}
+                        />
+                    }
+                </PopUpDialog>
+            }
             {
                 addTrackDialogOpen &&
                 <PopUpDialog
@@ -1761,7 +1996,6 @@ export default function SoundEditor(props: SoundEditorProps): React.JSX.Element 
                         selectedPatterns={selectedPatterns}
                         setSelectedPatterns={updateSelectedPatterns}
                         setAddPatternDialogOpen={setAddPatternDialogOpen}
-                        stepsPerBar={stepsPerBar}
                     />
                 </PopUpDialog>
             }

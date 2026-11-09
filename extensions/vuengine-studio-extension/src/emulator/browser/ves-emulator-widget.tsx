@@ -23,7 +23,6 @@ import {
   Camera,
   Cpu,
   FloppyDisk,
-  GoogleCardboardLogo,
   Keyboard,
   Monitor,
   SpeakerHigh,
@@ -41,7 +40,12 @@ import { VesKeybindingService } from '../../core/browser/ves-keybinding-service'
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VesEmulatorRumblePack } from './ves-emulator-rumble';
 import { VueportRumblePack } from 'vueport-core/lib/common/emulator-rumble';
-import { formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { crc32 as romCrc32, formatRomId } from 'vueport-core/lib/common/emulator-cheat-database';
+import { ES_SOUND_TITLES_FILE } from 'vueport-core/lib/common/emulator-essound';
+import { storeZip } from 'vueport-core/lib/common/emulator-store-zip';
+import { LanShareMoment, LanSharing, takeLanShareMoment } from 'vueport-core/lib/browser/emulator-lan-share';
+import NetworkSharesWindow from 'vueport-core/lib/browser/components/NetworkSharesWindow';
+import { vesLanShareShell } from './ves-emulator-lan-share';
 import { CachedAnswer, CachedAnswerRead } from 'vueport-core/lib/common/emulator-cached-answer';
 import { EmulatorCompanionLocation } from 'vueport-core/lib/common/emulator-sram';
 import { VueportInputBindings, VueportSettings } from 'vueport-core/lib/common/emulator-settings';
@@ -70,6 +74,8 @@ import { EmulatorInputController, GAMEPAD_KEY_TO_VB_KEY } from 'vueport-core/lib
 import { connectedGamepadList, GamepadProfileResolver, StoredGamepadProfiles } from 'vueport-core/lib/browser/emulator-gamepad';
 import { GamepadRumble } from 'vueport-core/lib/browser/emulator-gamepad-rumble';
 import { EmulatorTimeControl, EmulatorTimeSettings } from 'vueport-core/lib/browser/emulator-time-control';
+import { EmulatorRewindBrowser } from 'vueport-core/lib/browser/emulator-rewind-browser';
+import { listenToGamepadUi } from 'vueport-core/lib/browser/emulator-gamepad-ui';
 import { VesEmulatorNotifications } from './ves-emulator-notifications';
 import { VesEmulatorStorage } from './ves-emulator-storage';
 import { VueportNotifications, VueportStorage } from 'vueport-core/lib/common/emulator-host';
@@ -98,8 +104,6 @@ import {
   SettingsWindow,
   SettingsWindowParts,
 } from 'vueport-core/lib/browser/components/SettingsWindow';
-import XrSettings from 'vueport-core/lib/browser/components/settings/XrSettings';
-import { EmulatorXrController } from 'vueport-core/lib/browser/emulator-xr-controller';
 import PopUpDialog from '../../editors/browser/components/Common/Base/PopUpDialog';
 import { VbColorIcon } from 'vueport-core/lib/browser/components/kit/VbColorIcon';
 import { BreakpointManager } from '@theia/debug/lib/browser/breakpoint/breakpoint-manager';
@@ -206,8 +210,7 @@ export type VesEmulatorSettingsTab =
   | 'saveData'
   | 'screenshots'
   | 'video'
-  | 'achievements'
-  | 'vr';
+  | 'achievements';
 
 export interface vesEmulatorWidgetState {
   loaded: boolean;
@@ -335,6 +338,13 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     EmulatorAction.Screenshot,
     EmulatorAction.VideoRecord,
     EmulatorAction.ToggleControlsOverlay,
+    EmulatorAction.Rewind,
+  ];
+
+  static readonly ACTIONS_WHILE_BROWSING_REWIND: EmulatorAction[] = [
+    EmulatorAction.Screenshot,
+    EmulatorAction.Fullscreen,
+    EmulatorAction.AudioMute,
   ];
 
   protected session?: EmulatorSession;
@@ -370,11 +380,14 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected storage: VueportStorage;
   protected notifications: VueportNotifications;
+  lanSharing!: LanSharing;
+  protected showNetworkShares = false;
   rumblePack: VueportRumblePack;
   settings: VueportSettings;
   bindings: VueportInputBindings;
 
   protected time: EmulatorTimeControl;
+  rewindBrowser: EmulatorRewindBrowser;
 
   get rewinding(): boolean {
     return this.time.rewinding;
@@ -424,7 +437,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     return {
       fastForwardRatio: this.settings.get('fastForwardRatio'),
       slowMotionRatio: this.settings.get('slowMotionRatio'),
-      rewindEnabled: this.settings.get('rewindEnabled'),
+      rewindEnabled: this.settings.get('rewindEnabled') && !this.isHardcore() && !this.isLinked(),
       rewindGranularity: this.settings.get('rewindGranularity'),
       rewindBufferBytes: this.settings.get('rewindBufferSize') * 1024 * 1024,
     };
@@ -448,7 +461,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected input: EmulatorInputController;
-  protected xr: EmulatorXrController;
   protected gamepadResolver: StoredGamepadProfiles;
 
   get turboRate(): number {
@@ -467,7 +479,22 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   isAcceptingInput(): boolean {
-    return this.state.loaded && !this.state.showPreferences;
+    return this.state.loaded && !this.state.showPreferences && !this.showNetworkShares && !this.rewindBrowser.isOpen;
+  }
+
+  onNothingToRewind(): void {
+    this.notifications.info(nls.localize('vueport/rewind/nothing', 'Nothing has been recorded to rewind to yet.'));
+  }
+
+  async restoreInput(): Promise<void> {
+    this.input.invalidate();
+    await this.input.applyKeys();
+    await this.input.applyTurbo();
+  }
+
+  protected async applyRewindSettings(): Promise<void> {
+    this.rewindBrowser.abandon();
+    await this.time.applyRewindSettings();
   }
 
   mayTakeFocus(): boolean {
@@ -533,23 +560,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
     const instanceId = this.options?.instanceId ?? 'default';
     this.storage = new VesEmulatorStorage(this.fileService, this.workspaceService);
-    const notifications = new VesEmulatorNotifications(this.messageService);
-    this.notifications = notifications;
-    this.xr = new EmulatorXrController({
-      sim: () => this.sim,
-      core: () => this.core,
-      input: () => this.input,
-      displayMode: () => this.getDisplayMode(),
-      hudSource: () => this,
-      romTitle: () => this.state.romHeader?.name?.trim() || this.title.label,
-      runAction: action => this.runAction(action),
-      canLoadState: () => !this.isHardcore() && this.saveStates.latestManual !== undefined,
-      applyStereoDepth: () => this.applyStereoDepth(),
-      update: () => this.update(),
-      notifyError: message => this.notifications.error(message),
-      setHeadset: headset => { notifications.headset = headset; },
-    });
-    this.toDispose.push(this.xr);
+    this.notifications = new VesEmulatorNotifications(this.messageService);
     this.rumblePack = new VesEmulatorRumblePack(this.vesRumblePackService);
     this.settings = new VesEmulatorSettings(this.preferenceService);
     this.bindings = new VesEmulatorBindings(this.vesKeybindingService, this.keybindingRegistry);
@@ -575,6 +586,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.toDispose.push(this.onDidChangeModeEmitter);
     this.esSound = new EsSoundPlayer(this.storage);
     this.toDispose.push(Disposable.create(() => this.esSound.dispose()));
+    this.lanSharing = new LanSharing(vesLanShareShell);
+    this.toDispose.push(Disposable.create(() => this.lanSharing.dispose()));
+    this.toDispose.push(this.lanSharing.onDidChange(() => this.update()));
     this.toDispose.push(Disposable.create(() => this.stopDecorationSampling()));
     this.macros = new MacroStore(this.storage, undefined, () => this.globalMacrosPath);
     this.toDispose.push(this.macros.onDidChange(() => this.update()));
@@ -635,6 +649,24 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     this.macros.setInput(this.input);
     this.input.setMacroHook(this.macros);
     this.time = new EmulatorTimeControl(this);
+    this.rewindBrowser = new EmulatorRewindBrowser(this, this.time);
+    this.toDispose.push(this.rewindBrowser);
+    let stopRewindPad: (() => void) | undefined;
+    this.toDispose.push(this.rewindBrowser.onDidChange(() => {
+      const open = this.rewindBrowser.isOpen;
+      if (open === (stopRewindPad !== undefined)) {
+        return;
+      }
+      stopRewindPad?.();
+      stopRewindPad = open
+        ? listenToGamepadUi(() => this.gamepadResolver, command => this.rewindBrowser.steer(command))
+        : undefined;
+      if (!open) {
+        this.node.focus();
+      }
+      this.update();
+    }));
+    this.toDispose.push(Disposable.create(() => stopRewindPad?.()));
     this.gamepadResolver = new StoredGamepadProfiles(
       () => this.settings.get('gamepadProfiles'),
       () => this.settings.get('gamepadPlayers'),
@@ -754,7 +786,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   }
 
   protected onCloseRequest(msg: Message): void {
-    this.xr.end().catch(() => undefined);
     this.finishVideoRecording()
       .then(() => this.saveSaveRam())
       .finally(() => this.disposeSession());
@@ -763,6 +794,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected disposeSession(): void {
     this.time.stopRewinding();
+    this.rewindBrowser.abandon(false);
     this.rumbleForwarding?.dispose();
     this.rumbleForwarding = undefined;
     this.rumbleSpecWatch?.dispose();
@@ -775,7 +807,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       }
       this.session = undefined;
     }
-    this.xr.setSim(undefined).catch(() => undefined);
     this.sim = undefined;
     this.core = undefined;
     this.setEmulationSpeed(undefined);
@@ -855,6 +886,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
     this.setPlayerLabel(1);
     await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    await this.applyRewindSettings();
     this.update();
   }
 
@@ -863,6 +895,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       return undefined;
     }
     await this.session.attachMirror(ownedCopy(this.patchedRom()));
+    await this.applyRewindSettings();
     this.update();
     return this.session;
   }
@@ -927,6 +960,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
     }
     this.resetPlayerLabel();
     await this.session?.detachMirror();
+    await this.applyRewindSettings();
     this.update();
   }
 
@@ -1019,7 +1053,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
         } else if ([
           'rewindEnabled', 'rewindGranularity', 'rewindBufferSize',
         ].includes(setting)) {
-          this.time.applyRewindSettings();
+          this.applyRewindSettings();
           // The toolbar button greys out when the feature is off.
           this.update();
         } else if (setting === 'stereoDepth') {
@@ -1046,7 +1080,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
   protected async applyStereoDepth(): Promise<void> {
     this.dock.screen.setStereoDepth(this.settings.get('stereoDepth'));
-    await this.core?.setStereoDepth(this.xr.stereoDepth(this.settings.get('stereoDepth')));
+    await this.core?.setStereoDepth(this.settings.get('stereoDepth'));
   }
 
   /** Where the column table puts columns, and whether a game comes up as the display unit does — see `web-emulator.tsx`. */
@@ -1507,7 +1541,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
       this.applyScale();
       await this.sim.setDisplayMode(displayMode);
       await this.sim.attachCanvas(canvas);
-      await this.xr.setSim(this.sim);
       await this.sim.setVolume(this.state.muted ? 0 : VesEmulatorWidget.DEFAULT_VOLUME);
 
       await this.time.applySpeed();
@@ -1518,7 +1551,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
 
       await this.loadRom();
       const romUri = await this.getRomUri();
-      await this.cheats.load(await this.companionRomPath(), this.romId);
+      await this.cheats.load(await this.companionRomPath(), this.romId, this.sourceRom?.byteLength);
       await this.esSound.scan(romUri.toString());
       await this.esSound.setSim(this.sim);
       this.esSound.setMuted(this.state.muted);
@@ -1720,29 +1753,32 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget 
   };
 
   promptEnableRewind = async (): Promise<void> => {
+    if (this.refuseForHardcore()) {
+      return;
+    }
+    if (this.isLinked()) {
+      this.notifications.info(nls.localize('vueport/link/rewindLocked',
+        'Rewind is not available while linked. Load a save state to go back for both players.'));
+      return;
+    }
     const bufferSize = this.settings.get('rewindBufferSize');
 
     const message = [
-      nls.localize(
-        'vuengine/emulator/rewindWhat',
-        'Rewind runs the game backwards for as long as you hold the button. \
-To make that possible, the emulator records what changes in the \
-machine on every frame while you play.'
-      ),
-      nls.localize(
-        'vuengine/emulator/rewindCost',
-        'Recording makes emulation roughly a third more expensive and uses up  \
-to {0} MB of memory, which holds a bit over a minute of history.  \
-Both are adjustable in the emulator preferences: a coarser rewind  \
-granularity records less often and costs proportionally less.',
-        bufferSize
-      ),
+      nls.localize('vueport/state/rewind/what',
+        'Rewind pauses the game and lays out the last few minutes as a filmstrip: pick a moment and \
+play on from there. To make that possible, the emulator records what changes in the machine \
+on every frame while you play.'),
+      nls.localize('vueport/state/rewind/cost',
+        'Recording makes emulation roughly a third more expensive and uses up to {0} MB \
+of memory. How far back that reaches depends on the game: from about half a minute \
+for games that change a lot every frame to more than half an hour. Both are adjustable \
+in the emulator preferences.', bufferSize),
     ];
 
     const confirmed = await this.notifications.confirm({
-      title: nls.localize('vuengine/emulator/enableRewindTitle', 'Enable Rewind?'),
+      title: nls.localize('vueport/state/rewind/title', 'Enable Rewind?'),
       message,
-      okLabel: nls.localize('vuengine/emulator/enableRewindConfirm', 'Enable'),
+      okLabel: nls.localize('vueport/state/rewind/enable', 'Enable'),
     });
     if (confirmed) {
       await this.settings.set('rewindEnabled', true);
@@ -1757,18 +1793,6 @@ granularity records less often and costs proportionally less.',
     this.node.focus();
   };
 
-  get xrSupported(): boolean {
-    return this.xr.supported && !this.isLinkGuest();
-  }
-
-  get xrActive(): boolean {
-    return this.xr.active;
-  }
-
-  toggleXr(): Promise<void> {
-    return this.xr.toggle();
-  }
-
   public runAction = (action: EmulatorAction): void => {
     this.commandService.executeCommand(EMULATOR_ACTION_COMMANDS[action].id);
     // Hand the keyboard back, so the shortcuts keep working after a click.
@@ -1781,6 +1805,9 @@ granularity records less often and costs proportionally less.',
     }
     if (this.state.showControls) {
       return action === EmulatorAction.ToggleControlsOverlay;
+    }
+    if (this.rewindBrowser.isOpen) {
+      return VesEmulatorWidget.ACTIONS_WHILE_BROWSING_REWIND.includes(action);
     }
     if (this.state.paused) {
       return VesEmulatorWidget.ACTIONS_WHILE_PAUSED.includes(action)
@@ -1820,6 +1847,9 @@ granularity records less often and costs proportionally less.',
   }
 
   renderOverlay(): React.ReactNode {
+    if (this.showNetworkShares) {
+      return <NetworkSharesWindow emulator={this} onClose={() => this.openNetworkShares()} />;
+    }
     return this.state.showPreferences
       ? <SettingsWindow<VesEmulatorSettingsTab>
         tabs={this.settingsTabs()}
@@ -1926,14 +1956,6 @@ granularity records less often and costs proportionally less.',
           'retroachievements achievements leaderboards score account sign in hardcore points'
         ),
       },
-      {
-        id: 'vr',
-        label: nls.localize('vueport/settings/tabs/vr', 'VR'),
-        icon: <GoogleCardboardLogo size={18} />,
-        keywords: nls.localize('vueport/settings/keywords/vr',
-          'vr virtual reality xr webxr headset quest meta screen size width depth 3d \
-backdrop passthrough hologram room ar'),
-      },
     ];
   }
 
@@ -1970,14 +1992,6 @@ backdrop passthrough hologram room ar'),
           settings={this.settings}
           achievements={this.retroAchievements}
         />;
-      case 'vr':
-        return <XrSettings
-          availability={this.xr.availability}
-          screen={this.xr.screen}
-          backdrop={this.xr.backdrop}
-          onScreen={screen => this.xr.setScreen(screen)}
-          onBackdrop={backdrop => this.xr.setBackdrop(backdrop)}
-        />;
     }
   }
 
@@ -1994,18 +2008,12 @@ backdrop passthrough hologram room ar'),
     }
 
     if (data === EmulatorAction.Rewind) {
-      if (command === 'keydown') {
-        this.time.startRewinding();
-      } else if (command === 'keyup') {
-        this.time.stopRewinding();
-      } else if (command === 'keyPress') {
-        this.time.queueCoreTransition(async core => {
-          await core.suspend();
-          await core.rewindStep();
-          if (!this.state.paused) {
-            await core.run();
-          }
-        });
+      if (command === 'keydown' || command === 'keyPress') {
+        if (!this.time.isRewindEnabled()) {
+          await this.promptEnableRewind();
+        } else {
+          this.rewindBrowser.open();
+        }
       }
       return;
     }
@@ -2204,6 +2212,7 @@ backdrop passthrough hologram room ar'),
         for (let index = 0; index < sims.length; index++) {
           await sims[index].loadState(states[index]);
         }
+        await host.restoreInput();
       },
       thumbnail: async () => {
         if (!host.sim || !host.state.loaded) {
@@ -2272,6 +2281,7 @@ backdrop passthrough hologram room ar'),
     if (!this.sims.length) {
       return;
     }
+    this.rewindBrowser.abandon(false);
     const running = !this.state.paused;
     try {
       if (running) {
@@ -2515,12 +2525,87 @@ backdrop passthrough hologram room ar'),
     this.patches.disableAll();
     this.macros.stop();
     this.macros.cancelRecording();
-    await this.time.applyRewindSettings();
+    await this.applyRewindSettings();
     this.update();
   }
 
   get hasRom(): boolean {
     return this.status === EmulatorRomStatus.EXISTS;
+  }
+
+  get networkSharesOpen(): boolean {
+    return this.showNetworkShares;
+  }
+
+  get lanShareActive(): boolean {
+    return this.lanSharing?.status !== undefined;
+  }
+
+  openNetworkShares(): void {
+    this.showNetworkShares = !this.showNetworkShares;
+    this.update();
+  }
+
+  async shareInLan(): Promise<void> {
+    if (!this.sourceRom || !this.state.loaded) {
+      return;
+    }
+    try {
+      const romUri = await this.getRomUri();
+      const data = this.patchedRom();
+      const sounds = await this.lanShareSounds();
+      await this.lanSharing.start({
+        name: sounds.length > 0 ? `${romUri.path.name}.vbz` : romUri.path.base,
+        data: sounds.length > 0 ? storeZip([{ name: romUri.path.base, data }, ...sounds]) : data,
+        title: this.state.romHeader.name.trim() || romUri.path.name,
+        romId: formatRomId(romCrc32(data)),
+      }, device => this.lanShareMoment(device, romUri.path.base));
+    } catch (error) {
+      this.notifications.error(nls.localize('vueport/vr/share/failed', 'The game could not be shared: {0}',
+        error instanceof Error ? error.message : String(error)));
+    }
+  }
+
+  async retakeLanShare(): Promise<void> {
+    const status = this.lanSharing.status;
+    if (!status || !this.state.loaded) {
+      return;
+    }
+    try {
+      const romUri = await this.getRomUri();
+      await this.lanSharing.retake(await this.lanShareMoment(status.info.device, romUri.path.base));
+    } catch (error) {
+      this.notifications.error(nls.localize('vueport/vr/share/failed', 'The game could not be shared: {0}',
+        error instanceof Error ? error.message : String(error)));
+    }
+  }
+
+  async stopLanShare(): Promise<void> {
+    await this.lanSharing.stop();
+  }
+
+  // nothing for a linked pair, whose state needs two machines, which a headset does not have
+  protected async lanShareMoment(device: string, romName: string): Promise<LanShareMoment | undefined> {
+    if (!this.sim || !this.state.loaded || this.isLinked() || this.isLinkGuest()) {
+      return undefined;
+    }
+    return takeLanShareMoment(this.sim, this.saveStateIdentity, this.esSound.snapshot(), device, romName);
+  }
+
+  protected async lanShareSounds(): Promise<{ name: string, data: Uint8Array }[]> {
+    const tracks = this.esSound.list;
+    if (tracks.length === 0) {
+      return [];
+    }
+    const sounds = [];
+    for (const track of tracks) {
+      sounds.push({ name: track.name, data: await this.storage.read(track.path) });
+    }
+    const titles = this.storage.join(this.storage.parent(tracks[0].path), ES_SOUND_TITLES_FILE);
+    if (await this.storage.exists(titles)) {
+      sounds.push({ name: ES_SOUND_TITLES_FILE, data: await this.storage.read(titles) });
+    }
+    return sounds;
   }
 
   get settingsOpen(): boolean {
@@ -2746,7 +2831,6 @@ backdrop passthrough hologram room ar'),
   protected async applyDisplayMode(): Promise<void> {
     const mode = this.getDisplayMode();
     this.dock.screen.setDisplayMode(mode);
-    this.xr.setDisplayMode(mode);
     await this.sim?.setDisplayMode(mode);
   }
 
