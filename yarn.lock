@@ -14927,6 +14927,11 @@ puppeteer@25.1.0:
     puppeteer-core "25.1.0"
     typed-query-selector "^2.12.2"
 
+qrcode-generator@2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/qrcode-generator/-/qrcode-generator-2.0.4.tgz#e8b3f30922577eba52078aa9c0d5a2a74fe1fd94"
+  integrity sha512-mZSiP6RnbHl4xL2Ap5HfkjLnmxfKcPWpWe/c+5XxCuetEenqmNFf1FH/ftXPCtFG5/TDobjsjz6sSNL0Sr8Z9g==
+
 qs@6.13.0, qs@^6.13.0, qs@^6.4.0:
   version "6.13.0"
   resolved "https://registry.npmjs.org/qs/-/qs-6.13.0.tgz"
@@ -18169,7 +18174,7 @@ vscode-uri@^2.1.1:
 
 "vueport-core@file:vendor/vueport-core-1.0.0.tgz":
   version "1.0.0"
-  resolved "file:vendor/vueport-core-1.0.0.tgz#6436b84ca9215f37b52fda77baa0e07c7f46fa88"
+  resolved "file:vendor/vueport-core-1.0.0.tgz#9e8e332d6eb314b00dad112f00a1faa46fc1cc7e"
   dependencies:
     "@lumino/dragdrop" "^2.1.8"
     "@lumino/messaging" "^2.0.4"
@@ -18178,6 +18183,7 @@ vscode-uri@^2.1.1:
     "@lumino/widgets" "2.7.5"
     "@phosphor-icons/react" "2.0.15"
     perfect-scrollbar "1.5.5"
+    qrcode-generator "2.0.4"
     react "^18.3.1"
     react-color "2.19.3"
     react-dom "^18.2.0"
